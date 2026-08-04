@@ -13,7 +13,7 @@ A **Fase 1 é a peça-assinatura**, como fatia vertical feia mas completa. Antes
 
 ---
 
-## Fase 0 — Bootstrap · **EM ANDAMENTO**
+## Fase 0 — Bootstrap · ✅ **CONCLUÍDA** (2026-08-04)
 
 | # | Tarefa | Modo | Estado | Check executável | Evidência |
 |---|---|---|---|---|---|
@@ -25,7 +25,7 @@ A **Fase 1 é a peça-assinatura**, como fatia vertical feia mas completa. Antes
 | 0.6 | Instalar `.claude/agents/` (5 papéis) | [AFK] | ✅ Concluído | 5 arquivos com `description`, `model` e `tools` explícitos | 5/5 validados: `model=true tools=true` em todos |
 | 0.7 | Instalar `.claude/skills/padrao-*` (7 skills) | [AFK] | ✅ Concluído | 7 pastas com `SKILL.md` de frontmatter válido | 7/7 com `name` + `description` válidos |
 | 0.8 | Instalar hooks em `.claude/settings.json` | [HITL] | ⚠️ Instalado, **não provado em uso** | Pipe-testar antes de gravar; JSON validado | **`jq` NÃO existe neste Windows** — hooks reescritos em Node. Pipe-teste: injeção do índice retorna JSON válido; gate bloqueia com código modificado + PROGRESS intocado; trava anti-loop libera com `stop_hook_active=true`. **Ver pendência abaixo** |
-| 0.9 | PR da fase de bootstrap | [AFK] | ⬜ Pendente | `gh pr view` mostra o PR aberto | |
+| 0.9 | PR da fase de bootstrap | [AFK] | ✅ Concluído | `gh pr view` mostra o PR aberto | [PR #1](https://github.com/GuilhermeSaldanha02/lastro/pull/1) · base `main` |
 
 **⚠️ Pendência declarada da tarefa 0.8.** Hooks de `Stop` e `UserPromptSubmit` disparam **fora do turno** — não é possível provar que funcionam na mesma sessão em que foram escritos. O que está provado é que os scripts rodam corretamente quando alimentados pela linha de comando. **O que confirma de verdade:** na próxima sessão aberta neste projeto, o índice de skills deve aparecer no contexto sem ninguém pedir. Se não aparecer, o hook não está sendo disparado e a triagem de skill volta a ser conselho ignorável.
 
