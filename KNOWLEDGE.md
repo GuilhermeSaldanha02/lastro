@@ -27,6 +27,8 @@
 | **Volume** (`volume load`) | `Σ (reps × peso)` das séries **valendo**, no período. | Métrica central do gráfico e da Análise. |
 | **e1RM** | Carga máxima estimada para 1 repetição, derivada de uma série valendo. | Mede força quando as reps variam — volume sozinho não distingue "mais peso" de "mais reps". |
 | **Estagnação** | Exercício sem melhora em e1RM nem em volume por N semanas consecutivas. | É uma das cinco perguntas da Análise. **`N` ainda não definido — ver seção 4.** |
+| **RIR** (`reps in reserve`) | Quantas repetições sobraram no tanque ao encerrar a série. RIR 0 = falha. Campo **opcional** por série valendo. | Mede esforço real. Volume alto com RIR 5 é estímulo fraco disfarçado de trabalho. |
+| **Série difícil** (`hard set`) | Série valendo com RIR ≤ 3. | Indicador de estímulo melhor que volume bruto — mas só existe quando o RIR foi preenchido. O agregador precisa tratar RIR ausente sem contaminar a métrica. |
 
 **Decisão de unidade:** kg fixo, sem tela de configuração. O campo `unidade` existe no banco desde o início para não exigir migração se isso mudar.
 
@@ -81,8 +83,8 @@ O LLM recebe métricas já calculadas e **apenas interpreta**. É a decisão de 
 - **TODO** — Quota real da Gemini no console do AI Studio (seção 3.2).
 - **TODO** — `N` semanas sem progresso que caracterizam **estagnação**. Precisa de fundamento, não de chute.
 - **TODO** — Faixa de referência de séries semanais por grupo muscular, para a pergunta "meu volume está equilibrado?". Existe literatura, mas **ainda não foi consultada em fonte primária** — não usar número de memória.
-- **TODO** — Rotina/divisão de treino atual do dono (quantos dias por semana, quais grupos por dia). Necessário para calibrar o que a Análise considera normal.
-- **TODO** — O dono acompanha RIR/RPE (proximidade da falha)? Campo existe no banco; a decisão é se aparece na UI.
+- ~~Rotina/divisão de treino do dono~~ → **RESOLVIDO (2026-08-04):** não existe rotina declarada. O dono anota o que treinou e a Análise **deriva o padrão real dos dados**. Elimina a tela de configuração e mede o que foi feito, não o que foi prometido.
+- ~~RIR/RPE aparece na UI?~~ → **RESOLVIDO (2026-08-04):** sim, campo opcional por série valendo.
 
 ---
 
