@@ -16,6 +16,12 @@ coverage/
 playwright-report/
 test-results/
 .playwright/
+playwright/.cache/
+blob-report/
+
+# Supabase local
+supabase/.temp/
+supabase/.branches/
 
 # Sistema
 .DS_Store

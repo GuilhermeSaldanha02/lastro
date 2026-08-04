@@ -27,6 +27,8 @@
 | **Volume** (`volume load`) | `Σ (reps × peso)` das séries **valendo**, no período. | Métrica central do gráfico e da Análise. |
 | **e1RM** | Carga máxima estimada para 1 repetição, derivada de uma série valendo. | Mede força quando as reps variam — volume sozinho não distingue "mais peso" de "mais reps". |
 | **Estagnação** | Exercício sem melhora em e1RM nem em volume por N semanas consecutivas. | É uma das cinco perguntas da Análise. **`N` ainda não definido — ver seção 4.** |
+| **RIR** (`reps in reserve`) | Quantas repetições sobraram no tanque ao encerrar a série. RIR 0 = falha. Campo **opcional** por série valendo. | Mede esforço real. Volume alto com RIR 5 é estímulo fraco disfarçado de trabalho. |
+| **Série difícil** (`hard set`) | Série valendo com **RIR ≤ 3**, o que **inclui RIR 0** (série levada à falha). Este é o **único lugar** onde o limiar é definido — nenhum outro documento o repete. | Indicador de estímulo melhor que volume bruto. Escrever o critério como "dentro de 1 a 3 reps da falha" **exclui a falha** e faz a Análise reportar estímulo fraco justamente nas semanas mais pesadas. Só existe quando o RIR foi preenchido: o agregador trata RIR ausente como ausência de informação, nunca como série fácil. |
 
 **Decisão de unidade:** kg fixo, sem tela de configuração. O campo `unidade` existe no banco desde o início para não exigir migração se isso mudar.
 
@@ -74,15 +76,43 @@ O LLM recebe métricas já calculadas e **apenas interpreta**. É a decisão de 
 
 ---
 
+### 3.6 Volume semanal por grupo muscular — o que a literatura sustenta (e o que não)
+
+*Pesquisa 2026-08-04. Tarefa 1.0a. Fontes verificadas diretamente no PubMed pelo controller, não só relatadas por subagente.*
+
+**O que está estabelecido:** a relação volume → hipertrofia é **crescente e contínua**, com **retorno decrescente**. O que **não** está estabelecido é um teto ou platô numérico.
+
+| Fonte | Desenho | O que diz |
+|---|---|---|
+| [Schoenfeld, Ogborn & Krieger 2017](https://pubmed.ncbi.nlm.nih.gov/27433992/), *J Sports Sci* | Meta-análise, 15 estudos / 34 grupos | Cada série semanal adicional = **+0,37%** de massa muscular (efeito contínuo, p=0,002). ⚠️ A comparação por categorias (<5, 5–9, 10+) foi **apenas tendência, p=0,074 — não significante**. Não use essa quebra como se fosse achado |
+| [Meta-regressão 2026](https://pubmed.ncbi.nlm.nih.gov/41343037/), *Sports Med* | 67 estudos, 2.058 participantes (79% homens, idade média 25) | Ganhos crescem com o volume, com **retorno decrescente** — mais pronunciado para força que para hipertrofia. **Sem platô fixo identificado** |
+| [Baz-Valle et al. 2022](https://bazmanscience.com/wp-content/uploads/2024/02/Baz-Valleetal.-2022-ASystematicReviewoftheEffectsofDifferentResistanceTrainingVolumesonMuscleHypertrophy.pdf) | Revisão sistemática | 12–20 vs >20 séries/semana em homens treinados: tríceps ganhou mais com >20 (p=0,01); quadríceps e bíceps sem diferença. Sugere **12–20** como faixa-padrão |
+
+**Decisão para o app:** usar **10–20 séries valendo por grupo por semana** como faixa de referência, e **rotulá-la na UI como convenção prática derivada de média de estudos, não como alvo individual**.
+
+**Ressalvas que a UI precisa carregar, não esconder:**
+- A base é majoritariamente **homem jovem treinado** (~25 anos). Pode não valer 1:1 para outro perfil.
+- Não existe teto validado. "Acima de 20 é demais" **não** é achado da literatura — é simplificação.
+- O ótimo varia **por músculo** (tríceps respondeu a volume maior; quadríceps e bíceps não).
+
+### 3.7 Estagnação — não há critério científico
+
+*Tarefa 1.0b.* **Não existe fonte primária** definindo quantas semanas sem progresso caracterizam estagnação real versus flutuação normal. O número que circula (**3–4 semanas sem PR**) é **convenção de mercado** — apps e treinadores convergem nele, sem estudo controlado por trás.
+
+**Decisão para o app:** usar **3–4 semanas** como gatilho de alerta, e **dizer na tela que é convenção prática, não critério clínico validado**. Emprestar autoridade científica a um número que a literatura não sustenta é exatamente o E3 que este projeto se proibiu.
+
+---
+
 ## 4. Perguntas em aberto
 
 *Nada aqui pode ser preenchido com invenção. Cada item vira pergunta ao dono ou medição.*
 
-- **TODO** — Quota real da Gemini no console do AI Studio (seção 3.2).
-- **TODO** — `N` semanas sem progresso que caracterizam **estagnação**. Precisa de fundamento, não de chute.
-- **TODO** — Faixa de referência de séries semanais por grupo muscular, para a pergunta "meu volume está equilibrado?". Existe literatura, mas **ainda não foi consultada em fonte primária** — não usar número de memória.
-- **TODO** — Rotina/divisão de treino atual do dono (quantos dias por semana, quais grupos por dia). Necessário para calibrar o que a Análise considera normal.
-- **TODO** — O dono acompanha RIR/RPE (proximidade da falha)? Campo existe no banco; a decisão é se aparece na UI.
+- **TODO** — Quota real da Gemini no console do AI Studio (§3.2). **Bloqueia a premissa do ADR-001** ("sem teto de gasto" assume folga que ninguém mediu).
+- **TODO** — Regra de liberação semanal do botão Análise: a semana fecha na segunda? O botão bloqueia antes disso, ou fica sempre disponível com aviso de poucos dados?
+- ~~`N` semanas de estagnação~~ → **RESOLVIDO (2026-08-04):** ver §3.7. Não há critério científico; 3–4 semanas é convenção de mercado, e a UI precisa dizer isso.
+- ~~Faixa de referência de volume por grupo~~ → **RESOLVIDO (2026-08-04):** ver §3.6. 10–20 séries/semana, com ressalvas obrigatórias na UI.
+- ~~Rotina/divisão de treino do dono~~ → **RESOLVIDO (2026-08-04):** não existe rotina declarada. O dono anota o que treinou e a Análise **deriva o padrão real dos dados**. Elimina a tela de configuração e mede o que foi feito, não o que foi prometido.
+- ~~RIR/RPE aparece na UI?~~ → **RESOLVIDO (2026-08-04):** sim, campo opcional por série valendo.
 
 ---
 

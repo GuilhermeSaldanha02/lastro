@@ -1,8 +1,8 @@
 # PRD.md — `lastro`
 
-> **Contrato de produto.** Congela após aprovação do dono. Mudança depois disso = protocolo de Scope Change (`padroes/documentos.md`), registrada em `DECISIONS.md`.
+> **Contrato de produto.** Congela após aprovação do dono. Mudança depois disso = protocolo de Scope Change (`.claude/skills/padrao-documentos/SKILL.md`), registrada em `DECISIONS.md`.
 >
-> **Status: AGUARDANDO APROVAÇÃO DO DONO.** O SDD não começa antes deste portão.
+> **Status: APROVADO pelo dono em 2026-08-04.** Congelado. Mudança daqui em diante = Scope Change registrado em `DECISIONS.md`.
 
 ---
 
@@ -109,7 +109,7 @@ Um app de treino **pessoal** que registra cada série executada e, uma vez por s
 | A2 | Séries de aquecimento não entram em volume, e1RM nem contagem de séries | Teste unitário do agregador com fixture contendo aquecimento + valendo |
 | A3 | O agregador calcula volume e e1RM corretamente | Teste unitário com valores conferidos à mão |
 | A4 | Nenhum módulo do cliente importa o cliente da Gemini | Fitness function: busca por import no bundle do cliente |
-| A5 | A chave da Gemini não aparece no bundle do cliente | Busca pela string da chave em `dist/` após build |
+| A5 | A chave da Gemini não aparece no bundle do cliente | Build **com a chave presente no ambiente** (build sem chave passa vazio e não prova nada), depois buscar a string da chave em `.next/` — Next.js App Router builda em `.next/`, não em `dist/` |
 | A6 | Um parecer da Análise cita ao menos um nome de exercício e um número reais do dono | Leitura humana de 3 pareceres gerados sobre dados reais |
 | A7 | O agregador não faz chamada de rede | Fitness function: sem import de `fetch`/cliente HTTP no módulo |
 | A8 | Login com Google funciona em celular e PC, e o mesmo treino aparece nos dois | Teste manual nos dois dispositivos |
@@ -125,11 +125,15 @@ Um app de treino **pessoal** que registra cada série executada e, uma vez por s
 
 ---
 
-## 9. TODOs — dados que faltam e não podem ser inventados
+## 9. Decisões resolvidas no portão de aprovação (2026-08-04)
 
-- **TODO** — Rotina de treino atual do dono (dias por semana, divisão de grupos). Sem isso, "está equilibrado?" não tem parâmetro.
-- **TODO** — Faixa de referência de séries semanais por grupo muscular, com **fonte primária consultada**. Não usar número de memória.
-- **TODO** — `N` semanas que caracterizam estagnação.
-- **TODO** — RIR/RPE aparece na UI ou fica só no banco?
+**Sem tela de configuração de rotina.** O dono anota o que treinou; a Análise **deriva o padrão real dos dados registrados** em vez de comparar com uma divisão declarada. Consequência: a pergunta "meu volume está equilibrado?" não compara com um plano — ela detecta o padrão efetivo e aponta grupos musculares negligenciados. Isso mede o que foi feito, não o que foi prometido, e elimina uma tela inteira do MVP.
+
+**RIR entra na UI.** Campo opcional por série valendo. Habilita a métrica de **série difícil**, definida em `KNOWLEDGE.md` §1 — **fonte única, não repetir o limiar aqui.** Mede estímulo real melhor que volume bruto.
+
+## 10. TODOs — dados que faltam e não podem ser inventados
+
+- **TODO** — Faixa de referência de séries semanais por grupo muscular, com **fonte primária consultada**. Assunto de saúde: não usar número de memória. → tarefa de pesquisa no `PROGRESS.md`.
+- **TODO** — `N` semanas que caracterizam estagnação. Mesma tarefa de pesquisa.
 - **TODO** — Regra de liberação semanal do botão Análise (seção 3).
-- **TODO** — Quota real da Gemini, medida no console.
+- **TODO** — Quota real da Gemini, medida no console do AI Studio.
