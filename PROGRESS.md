@@ -100,7 +100,7 @@ Achado 7 do QA original (isenção de `auth.uid()` no catálogo `exercicio`) foi
 
 | # | Tarefa | Modo | Estado | Check executável | Evidência |
 |---|---|---|---|---|---|
-| 1.1 | Projeto Next.js + Supabase + schema de `exercicio`/`treino`/`serie` com **todos** os campos do glossário | [HITL] | 🔶 Next.js scaffolded; Supabase pendente | `npm run build` limpo; RLS ativa em toda tabela de usuário (FF5) | `npm run build` verificado real: exit 0, `Compiled successfully`. Falta o schema/RLS — **bloqueado em saber se você já tem projeto Supabase** |
+| 1.1 | Projeto Next.js + Supabase + schema de `exercicio`/`treino`/`serie` com **todos** os campos do glossário | [HITL] | 🔶 SQL escrito, **não executado** | `npm run build` limpo; RLS ativa em toda tabela de usuário (FF5) | `npm run build`: exit 0. Migração (`0001_schema_inicial.sql`), seed, `scripts/ff5-rls.sql` e os clientes Supabase estão escritos, seguindo o SDD §3 — mas **nenhum dos 6 checks do §3.8 rodou**. Ver nota abaixo |
 | 1.2 | Tela mínima de registro de série (sem offline, sem polimento) | [AFK] | ⬜ Pendente | Registrar 5 séries reais e vê-las no Postgres | Depende de 1.1 (schema) |
 | 1.3 | **Agregador de métricas — TDD estrito** | [HITL] | ✅ Concluído | Testes antes do código. Volume, e1RM, séries difíceis, frequência com valores conferidos à mão. **FF4:** fixture com aquecimento não altera nenhuma métrica. **FF3:** sem import de rede | **Verificado por execução real, não por relato do agente:** `npx vitest run` → 8 arquivos, **49/49 testes passando** (saída colada, não resumida). `grep` FF3 → 0. `grep new Date()` (C4) → 0. `npm run build` → limpo. Interpretação do engenheiro registrada em `DECISIONS.md`: semana fecha na segunda — é a única leitura que bate os 30 valores do SDD §4.5 sem editar fixture, mas ainda depende de você confirmar na 1.0d |
 | 1.4 | Route handler da Gemini — recebe **só o resumo**, nunca séries cruas | [HITL] | ⬜ Pendente | **FF1 e FF2:** SDK ausente do cliente, chave ausente do bundle de produção | Depende de 1.1 (ler séries do Supabase) |
@@ -115,6 +115,16 @@ Achado 7 do QA original (isenção de `auth.uid()` no catálogo `exercicio`) foi
 | 1.0b | ✅ Critério de estagnação | [AFK] | **Concluído.** `KNOWLEDGE.md` §3.7: **não há fonte primária.** 3–4 semanas é convenção de mercado, e a UI tem de dizer isso — emprestar autoridade científica a número que a literatura não sustenta é o E3 que o projeto se proibiu |
 | 1.0c | Ler a quota real da Gemini no console do AI Studio | [HITL] | Valor **medido**, com data, em `KNOWLEDGE.md` §3.2. **Bloqueia a premissa do ADR-001** |
 | 1.0d | Definir a regra de liberação semanal do botão Análise | [HITL] | Decisão do dono registrada no PRD §3. A tarefa 1.5 não fecha sem isto — sem a regra, vira improviso na hora |
+
+### Bloqueio de infraestrutura na tarefa 1.1 — Docker local (2026-08-04)
+
+**Não é falha do SQL, é falta de onde rodá-lo.** `npx supabase start` falhou 2x com `LegacyHealthCheckTimeoutError`/`LegacyDockerLifecycleInspectError` — `analytics`, `storage` e `pg_meta` nunca ficaram saudáveis, e na segunda tentativa o **Docker Desktop caiu por completo** (máquina com só 3.8 GB alocados ao Docker, insuficiente para o stack cheio). Desliguei `analytics` e `edge_runtime` em `supabase/config.toml` (nenhum dos dois é usado em fase alguma do projeto) — mas não tentei uma terceira vez: **dois erros no mesmo lugar é E6**, e depois de tentar reduzir carga a resposta certa não é insistir com o Docker de novo, é levar a decisão ao dono.
+
+**Erro meu no meio do caminho, registrado por honestidade:** a primeira tentativa rodou como `npx supabase start 2>&1 | tail -40`, e o pipe mascarou o exit code real — a notificação de background reportou "exit code 0" (do `tail`, não do `supabase start`), e eu quase segui em frente achando que tinha funcionado. Corrigido gravando o exit code de dentro do log, não confiando no status externo da ferramenta. Lição para `KNOWLEDGE.md` §5.
+
+**Decisão que só o dono pode tomar** (duas opções, custo baixo nas duas):
+- **(a)** Aumentar a memória do Docker Desktop (Settings → Resources) e rodar `npx supabase start` de novo — mantém tudo local.
+- **(b)** Criar um projeto Supabase hospedado (free tier) e rodar a migração contra ele — evita o Docker local por completo, e é onde o app vai morar de verdade em produção. Como bônus, resolve junto a tela de consentimento OAuth do Google que a tarefa 2.1 já vai pedir.
 
 ---
 

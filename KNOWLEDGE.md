@@ -122,4 +122,8 @@ O LLM recebe métricas já calculadas e **apenas interpreta**. É a decisão de 
 
 ## 5. Lições
 
-*(vazio — preencher quando algo falhar)*
+**`cmd | tail` mascara o exit code real (2026-08-04).** Rodei `npx supabase start 2>&1 | tail -40` em background; a notificação de conclusão reportou "exit code 0", mas esse é o exit code do `tail`, não do comando piped. O `supabase start` tinha falhado de verdade (`LegacyHealthCheckTimeoutError`). Quase segui em frente achando que tinha dado certo. **Correção:** quando o exit code importa, gravar `echo "EXIT_CODE=$?" >> log` dentro do próprio arquivo de log, e ler essa linha — nunca confiar no status que a ferramenta de background reporta quando o comando passou por um pipe.
+
+**Processo em background lançado *dentro* do turno de um subagente morre quando o turno termina.** Um subagente pediu para rodar `npx supabase start` como parte da tarefa 1.1; o download de imagens Docker parou de progredir assim que o turno dele encerrou — o processo não sobreviveu. Processo longo que precisa sobreviver entre turnos deve ser lançado pelo controller, no seu próprio `run_in_background`, não delegado a um subagente.
+
+**Docker Desktop com pouca memória alocada (aqui, 3.8 GB) derruba o stack completo do Supabase.** `analytics` (Logflare) é o gatilho mais comum de `LegacyHealthCheckTimeoutError`, e arrasta `storage`/`pg_meta` junto por dependência em cadeia. Projeto que não usa analytics/edge functions deve desligá-los em `supabase/config.toml` antes mesmo de tentar — não é otimização, é pré-requisito em máquina com pouco Docker.
