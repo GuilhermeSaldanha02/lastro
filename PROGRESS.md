@@ -98,14 +98,14 @@ Achado 7 do QA original (isenção de `auth.uid()` no catálogo `exercicio`) foi
 
 **Ainda não verificado por execução real** — nada disso rodou ainda, porque não existe código: `npm run build`, `supabase db reset`, `vitest`, e os grep de FF1–FF7 só serão evidência quando a tarefa 1.1 começar.
 
-| # | Tarefa | Modo | Check executável |
-|---|---|---|---|
-| 1.1 | Projeto Next.js + Supabase + schema de `exercicio`/`treino`/`serie` com **todos** os campos do glossário | [HITL] | `npm run build` limpo; RLS ativa em toda tabela de usuário (FF5) |
-| 1.2 | Tela mínima de registro de série (sem offline, sem polimento) | [AFK] | Registrar 5 séries reais e vê-las no Postgres |
-| 1.3 | **Agregador de métricas — TDD estrito** | [HITL] | Testes antes do código. Volume, e1RM, séries difíceis, frequência com valores conferidos à mão. **FF4:** fixture com aquecimento não altera nenhuma métrica. **FF3:** sem import de rede |
-| 1.4 | Route handler da Gemini — recebe **só o resumo**, nunca séries cruas | [HITL] | **FF1 e FF2:** SDK ausente do cliente, chave ausente do bundle de produção |
-| 1.5 | Botão Análise + as 5 perguntas + exibição do parecer | [HITL] | 3 pareceres gerados sobre dados reais. **Critério A6:** cada um cita ao menos um exercício e um número do dono. Parecer que serviria pra qualquer pessoa = falha |
-| 1.6 | **Portão do dono na peça-assinatura** | [HITL] | O dono lê os 3 pareceres e diz se convence. Reprovou → replanejar antes de seguir |
+| # | Tarefa | Modo | Estado | Check executável | Evidência |
+|---|---|---|---|---|---|
+| 1.1 | Projeto Next.js + Supabase + schema de `exercicio`/`treino`/`serie` com **todos** os campos do glossário | [HITL] | 🔶 Next.js scaffolded; Supabase pendente | `npm run build` limpo; RLS ativa em toda tabela de usuário (FF5) | `npm run build` verificado real: exit 0, `Compiled successfully`. Falta o schema/RLS — **bloqueado em saber se você já tem projeto Supabase** |
+| 1.2 | Tela mínima de registro de série (sem offline, sem polimento) | [AFK] | ⬜ Pendente | Registrar 5 séries reais e vê-las no Postgres | Depende de 1.1 (schema) |
+| 1.3 | **Agregador de métricas — TDD estrito** | [HITL] | ✅ Concluído | Testes antes do código. Volume, e1RM, séries difíceis, frequência com valores conferidos à mão. **FF4:** fixture com aquecimento não altera nenhuma métrica. **FF3:** sem import de rede | **Verificado por execução real, não por relato do agente:** `npx vitest run` → 8 arquivos, **49/49 testes passando** (saída colada, não resumida). `grep` FF3 → 0. `grep new Date()` (C4) → 0. `npm run build` → limpo. Interpretação do engenheiro registrada em `DECISIONS.md`: semana fecha na segunda — é a única leitura que bate os 30 valores do SDD §4.5 sem editar fixture, mas ainda depende de você confirmar na 1.0d |
+| 1.4 | Route handler da Gemini — recebe **só o resumo**, nunca séries cruas | [HITL] | ⬜ Pendente | **FF1 e FF2:** SDK ausente do cliente, chave ausente do bundle de produção | Depende de 1.1 (ler séries do Supabase) |
+| 1.5 | Botão Análise + as 5 perguntas + exibição do parecer | [HITL] | ⬜ Pendente | 3 pareceres gerados sobre dados reais. **Critério A6:** cada um cita ao menos um exercício e um número do dono. Parecer que serviria pra qualquer pessoa = falha | |
+| 1.6 | **Portão do dono na peça-assinatura** | [HITL] | ⬜ Pendente | O dono lê os 3 pareceres e diz se convence. Reprovou → replanejar antes de seguir | |
 
 **Pesquisa que bloqueia 1.3 e 1.5:**
 
