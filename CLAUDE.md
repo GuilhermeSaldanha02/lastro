@@ -34,9 +34,9 @@ Responda sempre em **pt-BR** e instrua todo subagente a responder em pt-BR — a
 
 ## Vocabulário (linguagem ubíqua — sem sinônimo)
 
-`série` = uma execução · `série valendo` vs `aquecimento` · `peso` = o número lido no equipamento, em kg · `volume` = Σ(reps × peso) das séries valendo · `e1RM` · `RIR` · `série difícil` = RIR ≤ 3.
+`série` · `série valendo` vs `aquecimento` · `peso` · `volume` · `e1RM` · `RIR` · `série difícil`.
 
-Definições completas em `KNOWLEDGE.md` §1. Nomes de tabela, campo e função usam **exatamente** estes termos.
+**Definições e limiares vivem só em `KNOWLEDGE.md` §1** — não reproduza nenhum valor aqui (P7: fonte única por dado). Nomes de tabela, campo e função usam **exatamente** estes termos.
 
 ---
 

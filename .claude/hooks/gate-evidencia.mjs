@@ -22,9 +22,16 @@ if (entrada.stop_hook_active) process.exit(0);
 
 const raiz = process.env.CLAUDE_PROJECT_DIR || process.cwd();
 
+// `core.quotepath` vem ligado por padrão e faz o git escapar caminho não-ASCII
+// como "an\303\241lise.ts" — com as aspas fazendo parte da string. O regex de
+// extensão, ancorado em $, deixava passar todo arquivo com acento no nome, que
+// num projeto em português não é caso raro. Verificado em teste.
 function git(args) {
   try {
-    return execFileSync("git", args, { cwd: raiz, encoding: "utf8" });
+    return execFileSync("git", ["-c", "core.quotepath=false", ...args], {
+      cwd: raiz,
+      encoding: "utf8",
+    });
   } catch {
     return null;
   }

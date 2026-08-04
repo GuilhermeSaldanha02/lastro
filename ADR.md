@@ -10,7 +10,9 @@
 
 **Decisão.** O alvo não é monopólio de mercado — é **profundidade máxima no treino real de uma pessoa**. Persona única, sem features de crescimento.
 
-**Consequências.** Sem rate limit, sem billing, sem onboarding para estranhos, sem defesa anti-abuso no MVP. O free tier da Gemini cobre um usuário com folga. Nenhuma decisão do produto pode se justificar por "outros usuários poderiam querer".
+**Consequências.** Sem rate limit, sem billing, sem onboarding para estranhos, sem defesa anti-abuso no MVP. Nenhuma decisão do produto pode se justificar por "outros usuários poderiam querer".
+
+**TODO — premissa não verificada.** Esta decisão assume que a quota disponível cobre um usuário com folga. **Isso ainda não foi medido** (`KNOWLEDGE.md` §3.2: as fontes públicas se contradizem e houve corte de quota em dez/2025). Enquanto a tarefa 1.0c não ler o valor real no console, "sem teto de gasto" é aposta, não conclusão.
 
 **Alternativa descartada.** Produto público desde o MVP — exigiria limite por usuário, teto de gasto e defesa contra abuso do chat, aumentando o escopo em ~30% sem servir ao dono.
 

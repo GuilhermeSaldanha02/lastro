@@ -21,7 +21,7 @@ A **Fase 1 é a peça-assinatura**, como fatia vertical feia mas completa. Antes
 | 0.2 | `PRD.md` + portão de aprovação | [HITL] | ✅ Concluído | Dono aprova explicitamente | Aprovado em 2026-08-04; PRD congelado |
 | 0.3 | `ADR.md` + fitness functions + `ARCHITECTURE.md` + `DECISIONS.md` | [AFK] | ✅ Concluído | 8 ADRs, 7 fitness functions, cada camada da stack com alternativa descartada | ADR-001..008; FF1..FF7 |
 | 0.4 | `DESIGN.md` semeado | [AFK] | ✅ Concluído | Restrições funcionais decididas; identidade em aberto com gate declarado | D1..D9 |
-| 0.5 | `CLAUDE.md` < 200 linhas | [AFK] | ✅ Concluído | `wc -l CLAUDE.md` < 200 e nenhum valor duplicado de outro doc | **89 linhas.** Só ponteiros; stack e padrões remetem a ADR/skills |
+| 0.5 | `CLAUDE.md` < 200 linhas | [AFK] | ✅ Concluído | `wc -l CLAUDE.md` < 200 e nenhum valor duplicado de outro doc | **89 linhas.** ⚠️ A segunda metade do check **não passou na primeira tentativa** — o Inspetor achou o limiar de RIR repetido em 3 arquivos e a lista de libs do ADR repetida no CLAUDE.md. Limiares removidos do CLAUDE.md (agora só aponta para `KNOWLEDGE.md` §1). A repetição de *princípios* entre CLAUDE.md e as skills é deliberada: skill carrega isolada e precisa se sustentar sozinha |
 | 0.6 | Instalar `.claude/agents/` (5 papéis) | [AFK] | ✅ Concluído | 5 arquivos com `description`, `model` e `tools` explícitos | 5/5 validados: `model=true tools=true` em todos |
 | 0.7 | Instalar `.claude/skills/padrao-*` (7 skills) | [AFK] | ✅ Concluído | 7 pastas com `SKILL.md` de frontmatter válido | 7/7 com `name` + `description` válidos |
 | 0.8 | Instalar hooks em `.claude/settings.json` | [HITL] | ⚠️ Instalado, **não provado em uso** | Pipe-testar antes de gravar; JSON validado | **`jq` NÃO existe neste Windows** — hooks reescritos em Node. Pipe-teste: injeção do índice retorna JSON válido; gate bloqueia com código modificado + PROGRESS intocado; trava anti-loop libera com `stop_hook_active=true`. **Ver pendência abaixo** |
@@ -36,6 +36,26 @@ A **Fase 1 é a peça-assinatura**, como fatia vertical feia mas completa. Antes
 | Trava anti-loop | `stop_hook_active = true` → sempre libera | ✅ |
 
 **⚠️ Pendência declarada da tarefa 0.8.** Hooks de `Stop` e `UserPromptSubmit` disparam **fora do turno** — não é possível provar que funcionam na mesma sessão em que foram escritos. O que está provado é que os scripts se comportam corretamente quando alimentados pela linha de comando, nos casos da tabela acima. **O que confirma de verdade:** na próxima sessão aberta neste projeto, o índice de skills deve aparecer no contexto sem ninguém pedir. Se não aparecer, o hook não está sendo disparado e a triagem de skill volta a ser conselho ignorável.
+
+---
+
+### Review do Inspetor QA sobre a Fase 0 (2026-08-04)
+
+Contexto limpo, 13 achados. Aplicados após verificação individual (E8 — review é alegação, não verdade):
+
+| Achado | Gravidade | Resolução |
+|---|---|---|
+| `PRD` dizia série difícil = "1–3 reps da falha"; `KNOWLEDGE` dizia RIR ≤ 3 | **Atinge a peça-assinatura** | "1–3 da falha" **exclui a falha (RIR 0)** — a Análise reportaria estímulo fraco nas semanas mais pesadas. Limiar agora existe só em `KNOWLEDGE` §1, incluindo RIR 0 explicitamente |
+| Gate de evidência cego a nome de arquivo com acento | **Real, verificado** | `core.quotepath` escapava `análise.ts` como `"an\303\241lise.ts"`; o regex de extensão falhava. Testado antes e depois. Corrigido com `-c core.quotepath=false` |
+| Hooks com caminho relativo viravam no-op fora da raiz | Real | Trocado por `$CLAUDE_PROJECT_DIR` |
+| `ADR-001` afirmava que o free tier cobre um usuário "com folga" | **E3** | O próprio `KNOWLEDGE` §3.2 diz que a quota é desconhecida. Virou TODO com ponteiro para 1.0c |
+| Check da A5 buscava a chave em `dist/` | Real | Next.js builda em `.next/`. E build **sem** a chave no ambiente passa vazio sem provar nada — o check agora exige a chave presente |
+| `diretor-arte` mandava "abrir no navegador e olhar" sem ferramenta para isso | Real | O agente agora **especifica** o roteiro do gate; quem executa é o controller |
+| Ponteiro `padroes/documentos.md` inexistente | Menor | Corrigido para o caminho real da skill |
+| TODO da liberação semanal sem tarefa | Menor | Virou tarefa 1.0d |
+| `.gitignore` incompleto para a stack | Menor | Adicionados `playwright/.cache/`, `blob-report/`, `supabase/.temp/` |
+| Trava anti-loop libera após um bloqueio | **Aceito como está** | É deliberado: sem ela o turno trava em loop. O gate é **um empurrão forte, não um portão intransponível** — e a documentação agora diz isso |
+| Descriptions de agentes e skills | Sem achado | 5/5 e 7/7 são gatilho ("Acionar quando…"), não descrição de papel |
 
 ---
 
@@ -56,9 +76,10 @@ A **Fase 1 é a peça-assinatura**, como fatia vertical feia mas completa. Antes
 
 | # | Tarefa | Modo | Check executável |
 |---|---|---|---|
-| 1.0a | Faixa de referência de séries semanais por grupo muscular, com **fonte primária** | [AFK] | Registro em `KNOWLEDGE.md` com link e citação. **Proibido número de memória** — assunto de saúde |
-| 1.0b | Definir `N` semanas que caracterizam estagnação, com fundamento | [AFK] | Registro em `KNOWLEDGE.md` com justificativa |
-| 1.0c | Ler a quota real da Gemini no console do AI Studio | [HITL] | Valor **medido**, com data, em `KNOWLEDGE.md` §3.2 |
+| 1.0a | ✅ Faixa de referência de volume por grupo muscular | [AFK] | **Concluído.** `KNOWLEDGE.md` §3.6: 10–20 séries/semana. Fontes verificadas direto no PubMed pelo controller, não só relatadas pelo subagente. Correção sobre o relato: no Schoenfeld 2017 a quebra por categorias foi **tendência (p=0,074), não significância** |
+| 1.0b | ✅ Critério de estagnação | [AFK] | **Concluído.** `KNOWLEDGE.md` §3.7: **não há fonte primária.** 3–4 semanas é convenção de mercado, e a UI tem de dizer isso — emprestar autoridade científica a número que a literatura não sustenta é o E3 que o projeto se proibiu |
+| 1.0c | Ler a quota real da Gemini no console do AI Studio | [HITL] | Valor **medido**, com data, em `KNOWLEDGE.md` §3.2. **Bloqueia a premissa do ADR-001** |
+| 1.0d | Definir a regra de liberação semanal do botão Análise | [HITL] | Decisão do dono registrada no PRD §3. A tarefa 1.5 não fecha sem isto — sem a regra, vira improviso na hora |
 
 ---
 
