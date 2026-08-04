@@ -101,6 +101,8 @@ O LLM recebe métricas já calculadas e **apenas interpreta**. É a decisão de 
 
 **Decisão para o app:** usar **3–4 semanas** como gatilho de alerta, e **dizer na tela que é convenção prática, não critério clínico validado**. Emprestar autoridade científica a um número que a literatura não sustenta é exatamente o E3 que este projeto se proibiu.
 
+**Valor adotado no código: 4** (`SEMANAS_ESTAGNACAO`, `SDD.md` §4.2, decidido durante o QA da Fase 1). Motivo: alinha com `JANELA_SEMANAS = 4` — um único horizonte mental no produto, em vez de dois períodos arbitrários distintos — e é o extremo mais conservador da faixa acima, gerando menos alerta de estagnação em falso. **Fonte única do número em código:** `SDD.md` §4.2 / `src/lib/analise/limiares.ts`; esta seção permanece a fonte da faixa da literatura, não do valor adotado (P7).
+
 ---
 
 ## 4. Perguntas em aberto

@@ -70,9 +70,33 @@ Contexto limpo, 13 achados. Aplicados após verificação individual (E8 — rev
 
 ---
 
-## Fase 1 — PEÇA-ASSINATURA: a Análise, de ponta a ponta · ⬜ Não iniciada
+## Fase 1 — PEÇA-ASSINATURA: a Análise, de ponta a ponta · 🔶 Specs escritas, implementação não iniciada
 
 *Feio é permitido. Incompleto não é. O objetivo é o dono ler um parecer sobre os treinos reais dele.*
+
+### Specs da Fase 1 (2026-08-04)
+
+`SDD.md` (arquiteto) e `DESIGN.md` §3–5 (diretor de arte) escritos em paralelo — arquivos independentes, decisão legítima de paralelizar. Duas decisões de produto levantadas pelo arquiteto e fechadas pelo controller, registradas em `DECISIONS.md`: **unilateral** (reps por lado, volume ×2, atributo do exercício) e **peso corporal** (fora do volume no MVP, dado que o dono nunca forneceu).
+
+**Review do Inspetor QA sobre SDD + DESIGN — 9 achados, todos verificados e corrigidos:**
+
+| # | Achado | Gravidade | Correção |
+|---|---|---|---|
+| 1 | SDD contradizia `DECISIONS.md` sobre unilateral (schema, agregador, UI, testes escritos antes da decisão) | **Bloqueante** | `unilateral` movido para `exercicio`; volume ×2; T-V4 |
+| 2 | SDD contradizia `DECISIONS.md` sobre peso corporal (não excluía do volume) | **Bloqueante** | `volume.ts` exclui série com `peso_corporal_incluso`; T-V5; ressalva na UI (§7.1) |
+| 3 | Validador reprovaria todo parecer que citasse a data da semana (`DESIGN.md` §3.6.2 obriga isso) | **Bloqueante** | Componentes de data entram no conjunto CONTEXTO antes da extração de tokens |
+| 4 | `series_dificeis`: D3 dizia "da janela", teste T-D1 media só a semana atual | **Bloqueante** | Escopo fixado em **semana atual**, igual a `volume_por_grupo_muscular` |
+| 5 | `ResumoCompacto` não alimentava as perguntas 1 e 4 do PRD (tendência de 4 semanas) | Importante | Campo `volume_semanal[]` acrescentado; orçamento de bytes recalculado (≈4,6 KB) |
+| 6 | `SEMANAS_ESTAGNACAO` placeholder mandava "copiar" uma faixa (3–4), não um valor — inexecutável | Importante | Adotado **4**, justificado, registrado em `KNOWLEDGE.md` §3.7 e `DECISIONS.md` |
+| 7 | `ff5-rls.sql` só testava "existe alguma policy", não `auth.uid()` de fato | Importante | Query reescrita em duas partes: dono verificado por `auth.uid()`, catálogo verificado por RLS ligada |
+| 8 | Metade positiva do validador aceitava número genérico ("últimas 4 semanas") como prova de especificidade | Importante | Conjunto branco dividido em DADOS (prova especificidade) vs CONTEXTO (só evita falso intruso) |
+| 9 | Fixture T-F1 (frequência) não dava sim/não — ambíguo se o treino só-aquecimento estava dentro dos 3 | Menor | Fixture reescrito: 4 treinos, 3 com série valendo, esperado explícito |
+
+Achado 7 do QA original (isenção de `auth.uid()` no catálogo `exercicio`) foi avaliado como **defensável**, não corrigido como erro — RLS continua ligada, só sem `auth.uid()`, e agora isso **é verificado**, não só declarado.
+
+**O agente que corrigia o SDD caiu por limite de sessão antes de aplicar qualquer correção** (working tree confirmado limpo antes de retomar). O controller assumiu a correção diretamente no mesmo arquivo, verificando cada achado contra `SDD.md` e `DECISIONS.md` antes de aplicar (E8).
+
+**Ainda não verificado por execução real** — nada disso rodou ainda, porque não existe código: `npm run build`, `supabase db reset`, `vitest`, e os grep de FF1–FF7 só serão evidência quando a tarefa 1.1 começar.
 
 | # | Tarefa | Modo | Check executável |
 |---|---|---|---|

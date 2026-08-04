@@ -101,6 +101,22 @@ export type ResumoCompacto = {
    */
   faixa_referencia_series: [number, number];
 
+  /**
+   * Volume total (todos os grupos somados) por semana, mais recente por
+   * último, cobrindo `periodo.janela_semanas` semanas. É o que falta para
+   * responder "estou progredindo?" (PRD §3, pergunta 1) e "volume vs.
+   * semanas anteriores" (pergunta 4) — um delta contra UMA semana anterior
+   * não é tendência de 4 semanas.
+   * Semana sem nenhuma série valendo aparece com volume 0 EXPLÍCITO aqui —
+   * isso NÃO viola a Regra da Presença (§1): zero é fato conhecido (o dono
+   * não treinou), não "não sei". A Regra protege contra número que finge
+   * ser dado quando é ausência; aqui o zero É o dado.
+   */
+  volume_semanal: Array<{
+    semana_inicio: string;   // ISO date, segunda-feira
+    volume_total: number;    // kg, soma de todos os grupos, 1 casa
+  }>;
+
   volume_por_grupo_muscular: Array<{
     grupo_muscular: string;              // "peito", "costas", ...
     series_valendo: number;              // contagem, semana atual
@@ -126,7 +142,8 @@ export type ResumoCompacto = {
   }>;
 
   /**
-   * Série difícil (RIR ≤ limiar, KNOWLEDGE §1).
+   * Série difícil (RIR ≤ limiar, KNOWLEDGE §1). Escopo: SEMANA ATUAL,
+   * mesmo escopo de volume_por_grupo_muscular — não a janela de comparação.
    * Campo AUSENTE quando a cobertura de RIR fica abaixo do piso (SDD §2/D3).
    * Quando presente, carrega SEMPRE os dois denominadores.
    */
@@ -184,7 +201,7 @@ export type ResumoCompacto = {
 | C4 | **A data de referência é parâmetro injetado**, nunca `new Date()` dentro de `src/lib/analise/` | Teste é determinístico; FF3 (pureza) é integral, não parcial |
 | C5 | **Um objeto serve as 5 perguntas.** A pergunta é escolhida no route handler, não no agregador | Sem projeções por pergunta na Fase 1 |
 
-**O orçamento C1 foi somado contra os tetos de C2, não chutado.** Com a carga máxima que C2 permite: 12 grupos × ~170 B = 2.040 · 8 exercícios × ~130 B = 1.040 · 5 estagnações × ~105 B = 525 · 5 PRs × ~82 B = 410 · `periodo` + `frequencia` + `series_dificeis` + `faixa_referencia_series` ≈ 400. **Total ≈ 4,4 KB.** Daí `MAX_BYTES_RESUMO = 6144` — o teto precisa ficar **acima** do que os próprios tetos de lista produzem, senão T-R1 reprova no fixture que T-R1 manda construir. Se um teto de C2 subir, C1 sobe junto e a soma é refeita.
+**O orçamento C1 foi somado contra os tetos de C2, não chutado — refeito nesta revisão para incluir `volume_semanal` (achado 5 do QA).** Com a carga máxima que C2 permite: 12 grupos × ~170 B = 2.040 · 8 exercícios × ~130 B = 1.040 · 5 estagnações × ~105 B = 525 · 5 PRs × ~82 B = 410 · `volume_semanal` com `JANELA_SEMANAS = 4` entradas × ~45 B = 180 · `periodo` + `frequencia` + `series_dificeis` + `faixa_referencia_series` ≈ 400. **Total ≈ 4,6 KB.** Daí `MAX_BYTES_RESUMO = 6144` — o teto precisa ficar **acima** do que os próprios tetos de lista produzem, senão T-R1 reprova no fixture que T-R1 manda construir. Se um teto de C2 subir, C1 sobe junto e a soma é refeita.
 
 **Por que um objeto só e não cinco:** as cinco perguntas do PRD §3 se alimentam de subconjuntos sobrepostos das mesmas métricas. Cinco projeções seriam cinco superfícies para testar e cinco chances de divergir. Com 4 KB de teto, o custo de mandar tudo é irrelevante — e a pergunta 5 ("o que mudar?") precisa de tudo mesmo.
 
@@ -196,13 +213,26 @@ export type ResumoCompacto = {
 
 **Decisão:** contagem absoluta **com os dois denominadores sempre juntos** (`total`, `series_valendo_com_rir`, `series_valendo`), mais um **piso de cobertura** abaixo do qual o campo inteiro desaparece.
 
-- `COBERTURA_RIR_MINIMA = 0,60` (60% das séries valendo da janela com `rir` preenchido). Valor em `limiares.ts`. **Convenção prática, sem base em literatura** — mesmo rótulo de honestidade da §3.7.
+**Escopo temporal — corrigido nesta revisão.** `series_dificeis` é métrica de **semana atual**, não da janela de 4 semanas de comparação — o mesmo escopo de `volume_por_grupo_muscular`. Uma versão anterior desta seção dizia "da janela", o que contradizia o próprio caso de teste T-D1 (§4.5), que soma só as 3 séries valendo da semana atual do fixture, ignorando as 2 da semana anterior. Ficou o escopo que o teste sempre esperou: **semana atual**.
+
+- `COBERTURA_RIR_MINIMA = 0,60` (60% das séries valendo **da semana atual** com `rir` preenchido). Valor em `limiares.ts`. **Convenção prática, sem base em literatura** — mesmo rótulo de honestidade da §3.7.
 - Cobertura ≥ piso → `series_dificeis` presente com os três números.
 - Cobertura < piso → `series_dificeis` **ausente** e `cobertura_rir_insuficiente` presente. O prompt (§6.3) instrui o modelo a dizer que não há dado suficiente sobre intensidade — e não a inferir nada.
 
 **Por que não proporção pura.** "38% das suas séries foram difíceis" é a frase que o modelo escreveria — e ela é indefensável se apenas 3 de 40 séries têm RIR. A proporção **apaga o denominador**, que é precisamente a informação que separa medida de chute. Com os três números na mesa, o modelo tem como escrever "12 de 20 séries com RIR anotado" e o validador numérico (§6.4) tem como conferir cada um.
 
 **Por que também um piso, e não só os denominadores.** Com cobertura muito baixa o número existe mas não significa nada, e a Regra da Presença manda tirá-lo de cena — um número presente será citado.
+
+---
+
+### D3.5 — Como `volume.ts` trata unilateral e peso corporal
+
+Duas decisões do dono (`DECISIONS.md` 2026-08-04), incorporadas ao cálculo:
+
+- **Unilateral** (atributo de `exercicio`, não de `serie` — §3.2): `volume_da_serie = reps × peso × (exercicio.unilateral ? 2 : 1)`. O dono anota "10 de cada lado"; o agregador sabe que isso são 20 execuções.
+- **Peso corporal:** série com `peso_corporal_incluso = true` **não entra** em `volume` nem em `volume_por_grupo_muscular`, em nenhuma hipótese — nem só a carga adicional. Calcular volume parcial (só a carga externa) seria um número tecnicamente correto mas enganoso, porque comparado lado a lado com séries de volume completo ele pareceria "treino leve" quando pode ser o oposto. A série **continua contando** em `frequencia.treinos_semana_atual` e em `series_dificeis` (o esforço é real, mesmo que o volume não seja mensurável). A tela (§7.1) declara a limitação onde o número de volume aparece.
+
+Casos de teste: T-V4 e T-V5 (§4.5).
 
 ---
 
@@ -246,6 +276,10 @@ create table public.exercicio (
   id                       uuid primary key default gen_random_uuid(),
   nome                     text not null unique,
   grupo_muscular_primario  text not null references public.grupo_muscular(id),
+  -- ATRIBUTO DO EXERCÍCIO, não da série (DECISIONS.md 2026-08-04 "Unilateral").
+  -- Rosca alternada é sempre unilateral; não é o dono quem decide isso toda
+  -- série. O agregador dobra o volume quando este flag é true (§4.5, T-V4).
+  unilateral               boolean not null default false,
   dica_execucao            text,          -- CURADA, nunca gerada (FF7). Fase 4.
   criado_em                timestamptz not null default now()
 );
@@ -272,7 +306,9 @@ create table public.serie (
   peso                  numeric(6,2) not null,
   unidade               text    not null default 'kg',
   rir                   smallint,
-  unilateral            boolean not null default false,
+  -- `unilateral` NÃO mora aqui — é atributo do exercício (ver tabela acima).
+  -- Marcado assim porque cada série já poderia divergir do catálogo, e a
+  -- decisão registrada é que ele não diverge: a série herda do exercício.
   peso_corporal_incluso boolean not null default false,
   criado_em             timestamptz not null default now(),
 
@@ -377,17 +413,20 @@ A Fase 1 **não constrói** telas de login. Assume um usuário já autenticado n
 ```bash
 npm run build                       # sai limpo, exit 0
 supabase db reset                   # migração + seed aplicam sem erro
-psql "$DATABASE_URL" -f scripts/ff5-rls.sql   # precisa imprimir 0
+psql "$DATABASE_URL" -f scripts/ff5-rls.sql   # as DUAS linhas precisam imprimir 0
 ```
 
-`scripts/ff5-rls.sql` — a FF5 como consulta, não como prosa:
+`scripts/ff5-rls.sql` — a FF5 como consulta, não como prosa. **Corrigido nesta revisão (achado 7 do QA):** a versão anterior só testava "existe alguma policy", que uma policy `using (true)` satisfaz sem proteger nada — a query não checava a parte que dá nome à FF5, `auth.uid()`. Agora são duas consultas, cada uma com a asserção que lhe cabe:
 
 ```sql
--- FF5 falha FECHADA: varre TODA tabela de public e subtrai uma allowlist
--- declarada de catálogo. Listar as tabelas protegidas em vez das isentas
--- faria a query passar em silêncio quando a Fase 2 criar uma tabela nova.
--- Saída esperada: uma linha, contagem 0.
-select count(*) as tabelas_sem_protecao
+-- PARTE 1 — tabelas de USUÁRIO (fora da allowlist de catálogo) precisam
+-- ter RLS ligada E ao menos uma policy que referencia auth.uid() DE FATO
+-- em USING ou WITH CHECK — não só "existe alguma policy", que uma
+-- `using (true)` satisfaria sem proteger nada. Falha FECHADA: varre TODA
+-- tabela de public e subtrai a allowlist, em vez de listar as protegidas
+-- (listar as protegidas deixaria passar em silêncio uma tabela nova da
+-- Fase 2). Saída esperada: 0.
+select count(*) as tabelas_sem_protecao_por_dono
 from pg_class c
 join pg_namespace n on n.oid = c.relnamespace
 where n.nspname = 'public'
@@ -396,14 +435,30 @@ where n.nspname = 'public'
   -- justificar por escrito por que a tabela não tem dado de usuário.
   and c.relname not in ('exercicio', 'grupo_muscular')
   and ( c.relrowsecurity = false
-        or not exists (select 1 from pg_policies p
-                       where p.schemaname = 'public' and p.tablename = c.relname) );
+        or not exists (
+             select 1 from pg_policies p
+             where p.schemaname = 'public' and p.tablename = c.relname
+               and (p.qual ilike '%auth.uid()%' or p.with_check ilike '%auth.uid()%')
+           ) );
+
+-- PARTE 2 — tabelas de CATÁLOGO (a allowlist acima) precisam ter RLS
+-- LIGADA mesmo sem auth.uid() — senão o PostgREST expõe escrita (§3.3).
+-- A Parte 1 as isenta da checagem de dono; esta parte fecha a outra
+-- metade da exigência de §3.3, que antes não tinha verificação nenhuma.
+-- Saída esperada: 0.
+select count(*) as catalogo_sem_rls
+from pg_class c
+join pg_namespace n on n.oid = c.relnamespace
+where n.nspname = 'public'
+  and c.relkind = 'r'
+  and c.relname in ('exercicio', 'grupo_muscular')
+  and c.relrowsecurity = false;
 ```
 
 ### 3.8 Verificação end-to-end da 1.1
 
 1. `supabase db reset` aplica migração + seed sem erro.
-2. `scripts/ff5-rls.sql` imprime `0`.
+2. `scripts/ff5-rls.sql` imprime `0` nas **duas** linhas (tabelas de usuário sem `auth.uid()`; catálogo sem RLS).
 3. Com o JWT do usuário A, `insert` em `serie` **referenciando o `treino_id` do usuário B** falha. *(Testar mandando `usuario_id` de B direto **não prova nada**: o trigger sobrescreve o campo a partir do treino e o insert passa. O vetor real é o `treino_id` alheio.)*
 4. `insert` de série com `rir = 0` e `tipo='valendo'` **passa**; com `rir = 0` e `tipo='aquecimento'` **falha**.
 5. `insert` com `tipo='cardio'` **falha** no CHECK.
@@ -441,8 +496,18 @@ A Fase 0 falhou o check do `CLAUDE.md` exatamente por **limiar duplicado**, e o 
 export const RIR_SERIE_DIFICIL: number = 0; // TODO: copiar de KNOWLEDGE.md §1
 /** Faixa de referência de séries valendo por grupo/semana. Fonte: KNOWLEDGE.md §3.6. */
 export const FAIXA_SERIES_SEMANAIS: [number, number] = [0, 0]; // TODO: copiar de KNOWLEDGE.md §3.6
-/** Semanas sem progresso = estagnação. Convenção de mercado. Fonte: KNOWLEDGE.md §3.7. */
-export const SEMANAS_ESTAGNACAO: number = 0; // TODO: copiar de KNOWLEDGE.md §3.7
+/**
+ * Semanas sem progresso = estagnação. KNOWLEDGE.md §3.7 dá uma FAIXA (3–4),
+ * não um ponto — "TODO: copiar" não serve aqui, porque não há valor único
+ * para copiar; alguém implementando escolheria 3 ou 4 sozinho, exatamente
+ * a decisão sem dono que o placeholder existia para impedir (achado 6, QA).
+ * RESOLVIDO nesta spec: 4. Motivo — alinha com JANELA_SEMANAS (mesmo
+ * horizonte mental em todo o produto, em vez de dois períodos arbitrários
+ * distintos) e é o extremo mais conservador da faixa 3–4 (menos alerta de
+ * "estagnado" em falso). Convenção, não achado científico — mesmo rótulo
+ * de honestidade de §3.7. Registrado em DECISIONS.md e KNOWLEDGE.md §3.7.
+ */
+export const SEMANAS_ESTAGNACAO: number = 4;
 
 /** Teto de reps para e1RM confiável. Convenção prática. Fonte: SDD §2/D1. */
 export const E1RM_REPS_MAX = 12;
@@ -467,7 +532,7 @@ export const MAX_GRUPOS = 12;
 export const MAX_BYTES_RESUMO = 6144;
 ```
 
-> Os três primeiros valores são **placeholder com `TODO: copiar`**, não o valor real: quem implementar copia do `KNOWLEDGE.md`, não da memória. Este SDD deliberadamente **não reproduz** `RIR ≤ 3`, `10–20` nem `3–4` — reproduzi-los criaria a quarta cópia do erro da Fase 0. Os testes de §4.5 falham enquanto os placeholders estiverem em `0`, o que é a rede de segurança: esquecer de copiar é ruído vermelho, não silêncio.
+> `RIR_SERIE_DIFICIL` e `FAIXA_SERIES_SEMANAIS` seguem como **placeholder com `TODO: copiar`**: `KNOWLEDGE.md` já dá um valor único e inequívoco para cada um (RIR ≤ 3; faixa 10–20), então "copiar" é a ação certa — quem implementar copia do `KNOWLEDGE.md`, não da memória, e os testes de §4.5 falham enquanto os placeholders estiverem em `0`, que é a rede de segurança. `SEMANAS_ESTAGNACAO` é diferente e por isso **não** ficou como placeholder: `KNOWLEDGE.md` §3.7 dá uma faixa, não um valor, então não havia nada para "copiar" — a decisão precisava ser tomada em algum lugar, e este SDD é esse lugar (acima, `= 4`, com justificativa).
 
 **Três janelas distintas, e elas não são a mesma coisa:**
 
@@ -489,7 +554,7 @@ export function montarResumoCompacto(entrada: {
    * Volume de dado de um usuário é pequeno; ler tudo é barato.
    */
   treinos: TreinoBruto[];
-  exercicios: ExercicioBruto[];  // catálogo
+  exercicios: ExercicioBruto[];  // catálogo — inclui exercicio.unilateral (D3.5)
   /** C4: data de referência INJETADA. Nunca new Date() aqui dentro. */
   agora: Date;
   janelaSemanas?: number;        // default JANELA_SEMANAS
@@ -522,6 +587,8 @@ Semana anterior (início 2026-07-20), mesmo exercício: duas séries valendo de 
 | **T-V1** | Volume da semana atual em `F1` | `10×50 + 8×50 + 6×50 = 500+400+300 =` **1200** |
 | **T-V2** | **FF4** — remover `s0` do fixture | Volume, e1RM, frequência e contagem de séries **idênticos** a T-V1. O aquecimento `10×20 = 200` **não** aparece em lugar nenhum |
 | **T-V3** | Delta de volume vs. semana anterior (`2×(10×50) = 1000`) | `(1200−1000)/1000 =` **+20,0 %**, campo `delta_volume_pct` pré-calculado |
+| **T-V4** | **Unilateral (D3.5)** — exercício com `exercicio.unilateral = true`, série `10 × 14` (rosca alternada) | Volume da série = `10 × 14 × 2 =` **280**, não 140. O `2×` vem do catálogo, não de campo na série |
+| **T-V5** | **Peso corporal (D3.5)** — série `tipo='valendo'`, `peso_corporal_incluso=true`, `8 × 10` (barra fixa com 10 kg extra) | **Não** entra em `volume` nem em `volume_por_grupo_muscular` — nem a parte de 80 kg da carga externa. A série **conta** em `frequencia.treinos_semana_atual` e, se tiver RIR, em `series_dificeis` |
 | **T-E1** | e1RM de `s1` (10×50) | `50 × (1 + 10/30) = 50 × 1,3333 =` **66,7 kg** |
 | **T-E2** | e1RM de `s2` (8×50) | `50 × (1 + 8/30) = 50 × 1,26667 =` **63,3 kg** |
 | **T-E3** | **Identidade** — série `1 × 100` | **100,0 kg** exatos. Epley cru daria 103,3 — falha |
@@ -533,7 +600,7 @@ Semana anterior (início 2026-07-20), mesmo exercício: duas séries valendo de 
 | **T-D3** | **RIR ausente não é fácil** — s3 (`rir` null) | Não conta como difícil **e** permanece no denominador `series_valendo = 3` |
 | **T-D4** | **Piso de cobertura** — 1 RIR em 5 séries valendo (20 %) | `series_dificeis` **ausente**; `cobertura_rir_insuficiente = { 1, 5 }` presente. Nenhum `0` aparece |
 | **T-D5** | Cobertura exatamente no piso (3 de 5 = 60 %) | `series_dificeis` **presente** (comparação `>=`, não `>`) |
-| **T-F1** | Frequência: 3 treinos na semana atual, aquecimento avulso incluso | `treinos_semana_atual = 3`; treino que só tem aquecimento **não conta** (FF4) |
+| **T-F1** | Frequência: **4 treinos** na semana atual, sendo **3** com ao menos uma série valendo e **1** só com aquecimento (nenhuma valendo) | `treinos_semana_atual = 3` — o treino só-aquecimento não entra na contagem (FF4). Fixture corrigido nesta revisão (achado 9 do QA): a versão anterior não dizia se o treino "aquecimento avulso" estava dentro ou fora dos 3, e por isso não dava sim/não |
 | **T-F2** | Grupo muscular sem série valendo na janela | Aparece em `grupos_sem_estimulo` |
 | **T-S1** | Exercício estável em e1RM **e** volume por `SEMANAS_ESTAGNACAO` semanas, com histórico de `LOOKBACK_ESTAGNACAO_SEMANAS` semanas | Entra em `estagnacoes` com `semanas_sem_progresso` correto. **Fixture precisa exceder `JANELA_SEMANAS`** — é o teste que prova que as janelas são independentes |
 | **T-S2** | e1RM parado mas **volume subindo** | **Não** é estagnação (glossário exige as duas sem melhora) |
@@ -544,6 +611,7 @@ Semana anterior (início 2026-07-20), mesmo exercício: duas séries valendo de 
 | **T-R3** | **C4** — chamar duas vezes com o mesmo `agora` | Saídas idênticas por `deepEqual` |
 | **T-R4** | Janela sem nenhuma série valendo | Retorna resumo válido com listas vazias e **sem** campos de delta. Não lança |
 | **T-R5** | Semana anterior sem dados | `delta_*` **ausentes** (não `0`) — Regra da Presença |
+| **T-R6** | **`volume_semanal` (achado 5 do QA)** — 4 semanas, sendo uma sem nenhuma série valendo | `volume_semanal.length = JANELA_SEMANAS`; a semana sem treino aparece com `volume_total = 0` **explícito** (fato conhecido, não ausência) — diferente de T-R5, que trata delta contra semana **inexistente** |
 
 ### 4.6 Check executável da 1.3
 
@@ -571,7 +639,9 @@ src/components/formulario-serie.tsx
 src/lib/dados/treino.ts           ← leitura/escrita via Supabase (fora de analise/)
 ```
 
-Campos do formulário, um por um: exercício (select do seed), `tipo` (aquecimento | valendo — **default valendo**), `reps`, `peso`, `rir` (visível **só** quando `tipo = valendo`, e **opcional**), `unilateral` (checkbox), `peso_corporal_incluso` (checkbox).
+Campos do formulário, um por um: exercício (select do seed), `tipo` (aquecimento | valendo — **default valendo**), `reps`, `peso`, `rir` (visível **só** quando `tipo = valendo`, e **opcional**), `peso_corporal_incluso` (checkbox).
+
+**`unilateral` não é campo do formulário.** É atributo do exercício escolhido, lido do catálogo — a tela mostra um indicador ("rosca alternada — reps contam por lado"), não um checkbox. O dono não re-declara isso a cada série.
 
 ### 5.2 FORA
 
@@ -579,11 +649,12 @@ Offline, Dexie, outbox, service worker (Fase 2) · "repetir última série" (Fas
 
 ### 5.3 Check executável
 
-Registrar **5 séries reais** — incluindo pelo menos um aquecimento, um `rir = 0` e uma série sem `rir` — e ver as 5 no Postgres:
+Registrar **5 séries reais** — incluindo pelo menos um aquecimento, um `rir = 0`, uma série sem `rir`, e uma série de exercício unilateral do catálogo — e ver as 5 no Postgres:
 
 ```sql
-select tipo, reps, peso, rir, unilateral, peso_corporal_incluso
-from serie order by criado_em desc limit 5;
+select s.tipo, s.reps, s.peso, s.rir, e.unilateral, s.peso_corporal_incluso
+from serie s join exercicio e on e.id = s.exercicio_id
+order by s.criado_em desc limit 5;
 ```
 
 ### 5.4 Verificação end-to-end da 1.2
@@ -645,23 +716,31 @@ Instrução de prompt é a alavanca **fraca**. A alavanca forte é o **validador
 export function validarNumeros(
   parecer: string,
   resumo: ResumoCompacto,
-  contexto: number[],            // inteiros que o próprio prompt injetou
+  contexto: number[],            // inteiros ESTRUTURAIS que o prompt injetou
+                                  // (tamanho de janela, contagens de item —
+                                  // NUNCA prova especificidade, só evita falso intruso)
 ): { ok: true; citados: number[] }
 | { ok: false; motivo: 'intrusos'; intrusos: number[] }
 | { ok: false; motivo: 'sem_numero_do_dono' };
 ```
 
-**As duas metades, e por que a segunda não é opcional.** Ausência de intruso prova só que o modelo **não inventou** número — um parecer com **zero** números passa nesse teste e é exatamente o conselho genérico que o PRD §3 chama de falha. Por isso o validador também exige a metade positiva: a interseção entre os números do parecer e o conjunto branco precisa ser **não vazia** (`citados.length > 0`). É a metade automatizável do critério A6.
+**As duas metades, e por que a segunda não é opcional.** Ausência de intruso prova só que o modelo **não inventou** número — um parecer com **zero** números passa nesse teste e é exatamente o conselho genérico que o PRD §3 chama de falha. Por isso o validador também exige a metade positiva. **Correção sobre uma versão anterior desta spec:** a metade positiva não pode casar contra o mesmo conjunto branco da anti-intruso — "nas últimas 4 semanas" citaria `contexto` (o tamanho da janela) e passaria como se fosse específico do dono, quando é genérico o bastante para servir a qualquer pessoa. Por isso o conjunto branco é **dividido em dois**, com papéis diferentes:
+
+- **Conjunto DADOS** — valores numéricos substantivos de `resumo`: volumes, e1RMs, deltas percentuais, `series_dificeis.total`/`series_valendo`/`series_valendo_com_rir`, `frequencia.treinos_semana_atual`, `estagnacoes[].semanas_sem_progresso`, `prs[].valor`. **Isto é o que prova que o parecer é sobre este dono.**
+- **Conjunto CONTEXTO** — `janela_semanas`, `semanas_com_dados`, comprimento de listas, limiares citados no prompt (`E1RM_REPS_MAX`, `COBERTURA_RIR_MINIMA` etc.) e — ver correção de data abaixo — os componentes numéricos das datas de `periodo`. **Isto só evita falso positivo de "intruso"; nunca conta como prova de especificidade.**
 
 Algoritmo:
-1. Extrair de `resumo` **todos** os valores numéricos, recursivamente → conjunto branco.
-2. Acrescentar ao conjunto branco: os arredondamentos de cada valor a 0 e 1 casas decimais, e os inteiros de `contexto` (número de semanas da janela, quantidade de itens, os limiares que o prompt citou).
-3. Extrair do parecer todo token numérico (`/-?\d+(?:[.,]\d+)?/g`), normalizando vírgula decimal.
-4. Um token passa se existir `y` no conjunto branco com `|x − y| ≤ max(0,05; 0,01 × |y|)` — **tolerância declarada**, para não reprovar arredondamento legítimo ("66,7" contra 66,666…).
-5. Tokens sobrando = **intrusos** → `motivo: 'intrusos'`.
-6. Nenhum intruso **mas** nenhum token casando com o conjunto branco → `motivo: 'sem_numero_do_dono'`.
+1. Extrair de `resumo` os valores numéricos substantivos (definição acima) → **conjunto DADOS**.
+2. Montar **conjunto CONTEXTO**: os inteiros de `contexto`, **mais os componentes de data** (ver correção abaixo).
+3. **Conjunto branco completo** = DADOS ∪ CONTEXTO, mais os arredondamentos de cada valor a 0 e 1 casas decimais.
+4. Extrair do parecer todo token numérico (`/-?\d+(?:[.,]\d+)?/g`), normalizando vírgula decimal.
+5. Um token passa (não é intruso) se existir `y` no conjunto branco **completo** com `|x − y| ≤ max(0,05; 0,01 × |y|)` — tolerância declarada, para não reprovar arredondamento legítimo ("66,7" contra 66,666…).
+6. Tokens sobrando = **intrusos** → `motivo: 'intrusos'`.
+7. Nenhum intruso, **mas** nenhum token casando especificamente com o conjunto **DADOS** (não CONTEXTO) → `motivo: 'sem_numero_do_dono'`. `citados` no retorno `ok: true` é a interseção com DADOS.
 
-> **O que este validador NÃO pega — e a spec diz isso em voz alta.** Ele detecta número **fabricado**, não número **mal atribuído**. "Seu supino subiu 20%" quando o resumo diz que **caiu** 20% passa em todos os portões automáticos: o número 20 existe, o sinal e o sujeito não são verificáveis por casamento de token. **A única defesa contra isso é a leitura humana das tarefas 1.5 e 1.6.** Tratar o validador como cobertura completa é o modo de falha desta spec — ver §8.
+**Correção — a data quebrava todo parecer que cita a semana.** `periodo.semana_atual_inicio` é uma `string` ISO ("2026-07-27"); o algoritmo original só varria valores **numéricos** de `resumo`, então "2026", "07" e "27" nunca entravam em conjunto nenhum. E o `DESIGN.md` §3.6.2 **obriga** o cabeçalho do parecer a trazer o intervalo da semana e a data de emissão — todo parecer citaria esses números e seria rejeitado como "intruso". Fix: ao montar o conjunto CONTEXTO (passo 2), extrair os componentes numéricos (ano, mês, dia, e as formas de 2 dígitos) de `periodo.semana_atual_inicio`, do fim de semana calculado (`+6 dias`) e de `agora` (data de emissão). Datas são estrutura que o próprio app injeta no prompt, não uma alegação do modelo sobre o dono — por isso pertencem a CONTEXTO, nunca a DADOS.
+
+> **O que este validador NÃO pega — e a spec diz isso em voz alta.** Ele detecta número **fabricado**, não número **mal atribuído**. "Seu supino subiu 20%" quando o resumo diz que **caiu** 20% passa em todos os portões automáticos: o número 20 existe em DADOS, o sinal e o sujeito não são verificáveis por casamento de token. **A única defesa contra isso é a leitura humana das tarefas 1.5 e 1.6.** Tratar o validador como cobertura completa é o modo de falha desta spec — ver §8.
 
 **Política em caso de intruso** (a pergunta que a tarefa faz, respondida de frente):
 
@@ -691,7 +770,12 @@ npm run build
 grep -r "$GEMINI_API_KEY" .next/ | wc -l      # precisa imprimir 0. Next builda em .next/, não dist/
 ```
 
-Mais os testes unitários de `validarNumeros`: parecer só com números do resumo → `ok: true`; parecer citando "seu supino subiu 15%" quando o resumo diz 20% → `ok: false, intrusos: [15]`; "66,7" contra resumo `66,666…` → `ok: true` (tolerância).
+Mais os testes unitários de `validarNumeros`:
+- parecer citando um valor de DADOS (ex.: o volume real) → `ok: true`, e o valor aparece em `citados`;
+- parecer citando "seu supino subiu 15%" quando o resumo diz 20% → `ok: false, intrusos: [15]`;
+- "66,7" contra resumo `66,666…` → `ok: true` (tolerância);
+- parecer citando **só** números de CONTEXTO ("nas últimas 4 semanas", sem nenhum valor de DADOS) → `ok: false, motivo: 'sem_numero_do_dono'` — é o teste que prova que a metade positiva não é enganada por número genérico;
+- parecer citando a data da semana no formato do cabeçalho do `DESIGN.md` §3.6.2 ("27/07 a 02/08") **e** um valor de DADOS → `ok: true`, sem os componentes de data aparecerem como intrusos.
 
 ### 6.7 Verificação end-to-end da 1.4
 
@@ -711,7 +795,8 @@ src/components/parecer.tsx        ← renderiza texto + ressalvas obrigatórias
 **Ressalvas que a tela carrega, não esconde** (não são rodapé decorativo — são o que separa este app de conselho inventado):
 - faixa de referência de volume = convenção prática, base majoritariamente de homens jovens treinados, sem teto validado (`KNOWLEDGE.md` §3.6);
 - estagnação de N semanas = convenção de mercado, não critério clínico (§3.7);
-- e1RM acima do teto de reps não é reportado, e por quê (§D1).
+- e1RM acima do teto de reps não é reportado, e por quê (§D1);
+- **exercício de peso corporal não entra no volume mostrado** — a série conta, o volume dela não é somado (D3.5). Declarar isso onde o número de volume aparece, não em rodapé genérico.
 
 ### 7.2 FORA
 
@@ -740,11 +825,11 @@ Isso entrega a tarefa **1.6** ao dono: ele lê os 3 pareceres e diz se convence.
 
 ## 8. TODOs e perguntas ao dono
 
-**Perguntas que mudam o produto — não decido sozinho.** As duas primeiras alteram **todo número de volume do app** e não têm resposta derivável dos documentos:
+**Unilateral e peso corporal — já decididos, não reabrir.** `DECISIONS.md` (2026-08-04) fechou os dois: unilateral dobra o volume via atributo do exercício (D3.5, §3.2, §4.5 T-V4); peso corporal fica fora do volume, contando só em frequência e série difícil (D3.5, §4.5 T-V5). Esta versão da spec já incorpora as duas.
 
-1. **`unilateral`** — uma série registrada como unilateral com `reps = 10` contribui **10** ou **20** repetições para o volume? Registrar "10" significando "10 de cada lado" e somar como 10 subestima o trabalho pela metade; somar 20 quando o dono anotou o total superestima. Nenhum documento resolve isso. **Enquanto não houver resposta, a Fase 1 soma o valor literal de `reps` e a tela precisa deixar explícito o que o campo pede.**
-2. **`peso_corporal_incluso`** — o que o volume faz com uma barra fixa ou paralela? Somar o peso corporal exige **saber o peso corporal do dono**, que não existe no PRD nem no schema. Opções: (a) volume usa só o peso externo e o flag serve de anotação; (b) acrescentar `peso_corporal` ao perfil e somá-lo. **Não invento nem o número nem a regra.**
-3. **Semana de análise = ISO-8601 (segunda a domingo)?** Adotei isso como padrão técnico do agregador. **Diferente** da tarefa 1.0d, que decide quando o *botão* libera — mas as duas precisam concordar.
+**Pergunta que permanece aberta:**
+
+1. **Semana de análise = ISO-8601 (segunda a domingo)?** Adotei isso como padrão técnico do agregador. **Diferente** da tarefa 1.0d, que decide quando o *botão* libera — mas as duas precisam concordar.
 
 **TODOs bloqueantes já registrados no `PROGRESS.md`:**
 
