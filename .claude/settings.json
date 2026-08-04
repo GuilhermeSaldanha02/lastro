@@ -1,0 +1,25 @@
+{
+  "totalTokensReminder": "countdown",
+  "hooks": {
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node .claude/hooks/injetar-indice-skills.mjs"
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node .claude/hooks/gate-evidencia.mjs"
+          }
+        ]
+      }
+    ]
+  }
+}

@@ -21,11 +21,13 @@ A **Fase 1 é a peça-assinatura**, como fatia vertical feia mas completa. Antes
 | 0.2 | `PRD.md` + portão de aprovação | [HITL] | ✅ Concluído | Dono aprova explicitamente | Aprovado em 2026-08-04; PRD congelado |
 | 0.3 | `ADR.md` + fitness functions + `ARCHITECTURE.md` + `DECISIONS.md` | [AFK] | ✅ Concluído | 8 ADRs, 7 fitness functions, cada camada da stack com alternativa descartada | ADR-001..008; FF1..FF7 |
 | 0.4 | `DESIGN.md` semeado | [AFK] | ✅ Concluído | Restrições funcionais decididas; identidade em aberto com gate declarado | D1..D9 |
-| 0.5 | `CLAUDE.md` < 200 linhas | [AFK] | ⬜ Pendente | `wc -l CLAUDE.md` < 200 e nenhum valor duplicado de outro doc | |
-| 0.6 | Instalar `.claude/agents/` (5 papéis) | [AFK] | ⬜ Pendente | 5 arquivos com `description`, `model` e `tools` explícitos | |
-| 0.7 | Instalar `.claude/skills/padrao-*` (7 skills) | [AFK] | ⬜ Pendente | 7 pastas com `SKILL.md` de frontmatter válido | |
-| 0.8 | Instalar hooks em `.claude/settings.json` | [HITL] | ⬜ Pendente | **Pipe-testar antes de gravar**; JSON validado. `jq` não existe por padrão no Windows | |
+| 0.5 | `CLAUDE.md` < 200 linhas | [AFK] | ✅ Concluído | `wc -l CLAUDE.md` < 200 e nenhum valor duplicado de outro doc | **89 linhas.** Só ponteiros; stack e padrões remetem a ADR/skills |
+| 0.6 | Instalar `.claude/agents/` (5 papéis) | [AFK] | ✅ Concluído | 5 arquivos com `description`, `model` e `tools` explícitos | 5/5 validados: `model=true tools=true` em todos |
+| 0.7 | Instalar `.claude/skills/padrao-*` (7 skills) | [AFK] | ✅ Concluído | 7 pastas com `SKILL.md` de frontmatter válido | 7/7 com `name` + `description` válidos |
+| 0.8 | Instalar hooks em `.claude/settings.json` | [HITL] | ⚠️ Instalado, **não provado em uso** | Pipe-testar antes de gravar; JSON validado | **`jq` NÃO existe neste Windows** — hooks reescritos em Node. Pipe-teste: injeção do índice retorna JSON válido; gate bloqueia com código modificado + PROGRESS intocado; trava anti-loop libera com `stop_hook_active=true`. **Ver pendência abaixo** |
 | 0.9 | PR da fase de bootstrap | [AFK] | ⬜ Pendente | `gh pr view` mostra o PR aberto | |
+
+**⚠️ Pendência declarada da tarefa 0.8.** Hooks de `Stop` e `UserPromptSubmit` disparam **fora do turno** — não é possível provar que funcionam na mesma sessão em que foram escritos. O que está provado é que os scripts rodam corretamente quando alimentados pela linha de comando. **O que confirma de verdade:** na próxima sessão aberta neste projeto, o índice de skills deve aparecer no contexto sem ninguém pedir. Se não aparecer, o hook não está sendo disparado e a triagem de skill volta a ser conselho ignorável.
 
 ---
 

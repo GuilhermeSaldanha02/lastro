@@ -1,0 +1,23 @@
+# Segredos — a chave da Gemini e as credenciais do Supabase são o ativo
+# mais sensível do projeto. Nada de .env entra no git.
+.env
+.env.*
+!.env.example
+
+# Dependências e build
+node_modules/
+.next/
+dist/
+out/
+.vercel/
+
+# Testes
+coverage/
+playwright-report/
+test-results/
+.playwright/
+
+# Sistema
+.DS_Store
+Thumbs.db
+*.log
