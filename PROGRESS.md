@@ -35,7 +35,18 @@ A **Fase 1 é a peça-assinatura**, como fatia vertical feia mas completa. Antes
 | B — branch vs `main` | Branch alterou código e **nenhum commit** tocou o `PROGRESS.md` | ✅ bloqueia em branch limpa a partir de `main` |
 | Trava anti-loop | `stop_hook_active = true` → sempre libera | ✅ |
 
-**⚠️ Pendência declarada da tarefa 0.8.** Hooks de `Stop` e `UserPromptSubmit` disparam **fora do turno** — não é possível provar que funcionam na mesma sessão em que foram escritos. O que está provado é que os scripts se comportam corretamente quando alimentados pela linha de comando, nos casos da tabela acima. **O que confirma de verdade:** na próxima sessão aberta neste projeto, o índice de skills deve aparecer no contexto sem ninguém pedir. Se não aparecer, o hook não está sendo disparado e a triagem de skill volta a ser conselho ignorável.
+**⚠️ Pendência declarada da tarefa 0.8 — duas coisas não provadas, e a segunda é consequência de uma correção.**
+
+Hooks de `Stop` e `UserPromptSubmit` disparam **fora do turno**: não há como provar que funcionam na mesma sessão em que foram escritos. O que **está** provado é o comportamento dos scripts alimentados pela linha de comando, nos casos da tabela acima, em clone limpo.
+
+O que **não** está provado, e precisa ser testado junto na próxima sessão:
+
+| # | O que testar | Como saber |
+|---|---|---|
+| 1 | **O hook dispara?** | Abrir sessão em `C:\lastro`. O índice de skills deve aparecer no contexto **sem ninguém pedir**. Não apareceu → o hook não está sendo acionado e a triagem de skill volta a ser conselho ignorável |
+| 2 | **O caminho resolve?** | O `settings.json` usa **exec form** com `${CLAUDE_PROJECT_DIR}`, conforme a documentação oficial (a doc diz que o hook roda no *diretório atual*, não necessariamente na raiz do projeto — por isso caminho relativo é frágil). Se a versão instalada não suportar `args`, o hook falha em silêncio. **Os dois sintomas são idênticos**, então teste o item 1 primeiro; se falhar, o próximo suspeito é este |
+
+Rede de segurança já embutida: os dois scripts caem para `process.cwd()` quando `CLAUDE_PROJECT_DIR` não está no ambiente.
 
 ---
 
