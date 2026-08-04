@@ -53,6 +53,32 @@
 
 ---
 
+## 2026-08-04 — Desvio consciente: commit direto na `main` para proteger `.env`
+
+**O que mudou.** `.gitignore` commitado diretamente na `main`, fora do fluxo de branch + PR.
+
+**Por quê.** A `main` foi criada apontando para o primeiro commit, que não continha `.gitignore` — ele nasceu depois, na branch de bootstrap. Consequência: qualquer branch criada a partir de `main` (que é a regra do próprio projeto) nasceria **sem proteção de `.env`**, exatamente nas fases 1.1 e 2.1, quando a chave da Gemini e as credenciais do Supabase são criadas. Um segredo commitado por acidente não se "descommita" — fica no histórico.
+
+**Alternativa descartada.** Esperar o merge do PR #1. Deixa a janela de risco aberta justamente na sessão seguinte, que é quando o código começa.
+
+**Impacto.** Um commit na `main` sem review. A regra "nunca commitar na `main`" segue valendo para todo o resto — **desvio consciente é permitido, desviar em silêncio não** (`padrao-proibicoes`).
+
+**Como reverter.** `git revert` do commit. Não se deve.
+
+---
+
+## 2026-08-04 — Correção no gate de evidência: dois escopos separados
+
+**O que mudou.** O hook de `Stop` passou a avaliar working tree e diff-da-branch **separadamente**, em vez de juntar as listas de caminhos.
+
+**Por quê.** Bug encontrado em teste: juntando as listas, um `PROGRESS.md` já commitado na branch mascarava código sujo não commitado — o gate silenciava pelo resto da branch. E a versão original só olhava o working tree, então código **commitado** sem tocar o PROGRESS passava batido, que é o caso mais comum na prática.
+
+**Impacto.** O gate agora cobre os dois casos. Repo sem branch `main` degrada graciosamente (escopo B desativa) em vez de quebrar.
+
+**Como reverter.** Editar `.claude/hooks/gate-evidencia.mjs`.
+
+---
+
 ## 2026-08-04 — RIR entra na UI
 
 **O que mudou.** Campo RIR opcional por série valendo, visível na interface.
