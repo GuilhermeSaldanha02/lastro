@@ -22,34 +22,51 @@ if (entrada.stop_hook_active) process.exit(0);
 
 const raiz = process.env.CLAUDE_PROJECT_DIR || process.cwd();
 
-let saida;
-try {
-  saida = execFileSync("git", ["status", "--porcelain"], {
-    cwd: raiz,
-    encoding: "utf8",
-  });
-} catch {
-  // Fora de repo git, ou git indisponível: não é função deste hook reclamar.
-  process.exit(0);
+function git(args) {
+  try {
+    return execFileSync("git", args, { cwd: raiz, encoding: "utf8" });
+  } catch {
+    return null;
+  }
 }
 
-const caminhos = saida
-  .split("\n")
-  .map((l) => l.slice(3).trim())
-  .filter(Boolean);
+// Os dois escopos são avaliados SEPARADAMENTE, de propósito. Juntar as duas
+// listas de caminhos faria um PROGRESS.md já commitado na branch mascarar
+// código sujo no working tree — o gate silenciaria pelo resto da branch.
+function falta_evidencia(caminhos) {
+  if (!caminhos) return false;
+  const lista = caminhos.filter(Boolean);
+  const tem_codigo = lista.some((p) => EXT_CODIGO.test(p));
+  const tocou_progress = lista.some((p) => /PROGRESS\.md$/i.test(p));
+  return tem_codigo && !tocou_progress;
+}
 
-const tem_codigo = caminhos.some((p) => EXT_CODIGO.test(p));
-const tocou_progress = caminhos.some((p) => /PROGRESS\.md$/i.test(p));
+// Escopo A — working tree: código escrito e ainda não commitado.
+const status = git(["status", "--porcelain"]);
+// Fora de repo git, ou git indisponível: não é função deste hook reclamar.
+if (status === null) process.exit(0);
+const nao_commitado = status.split("\n").map((l) => l.slice(3).trim());
 
-if (tem_codigo && !tocou_progress) {
+// Escopo B — branch vs main: código commitado sem nunca tocar o PROGRESS
+// deixa o working tree limpo e passaria batido se olhássemos só o escopo A.
+const diff_branch = git(["diff", "--name-only", "main...HEAD"]);
+const na_branch = diff_branch ? diff_branch.split("\n") : null;
+
+const motivo = falta_evidencia(nao_commitado)
+  ? "Há código modificado e ainda não commitado, e o PROGRESS.md não foi tocado."
+  : falta_evidencia(na_branch)
+    ? "Esta branch alterou código e em nenhum commit tocou o PROGRESS.md."
+    : null;
+
+if (motivo) {
   process.stdout.write(
     JSON.stringify({
       decision: "block",
       reason:
-        "Há código modificado no working tree e o PROGRESS.md não foi tocado. " +
-        "Atualizar o PROGRESS.md é a ação final obrigatória de toda tarefa: " +
-        "registre o estado da tarefa e a EVIDÊNCIA da verificação (a saída real " +
-        "do comando, não 'build limpo'). Depois encerre o turno.",
+        motivo +
+        " Atualizar o PROGRESS.md é a ação final obrigatória de toda tarefa:" +
+        " registre o estado da tarefa e a EVIDÊNCIA da verificação — a saída" +
+        " real do comando, não 'build limpo'. Depois encerre o turno.",
     }),
   );
 }

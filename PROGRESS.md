@@ -27,7 +27,15 @@ A **Fase 1 é a peça-assinatura**, como fatia vertical feia mas completa. Antes
 | 0.8 | Instalar hooks em `.claude/settings.json` | [HITL] | ⚠️ Instalado, **não provado em uso** | Pipe-testar antes de gravar; JSON validado | **`jq` NÃO existe neste Windows** — hooks reescritos em Node. Pipe-teste: injeção do índice retorna JSON válido; gate bloqueia com código modificado + PROGRESS intocado; trava anti-loop libera com `stop_hook_active=true`. **Ver pendência abaixo** |
 | 0.9 | PR da fase de bootstrap | [AFK] | ✅ Concluído | `gh pr view` mostra o PR aberto | [PR #1](https://github.com/GuilhermeSaldanha02/lastro/pull/1) · base `main` |
 
-**⚠️ Pendência declarada da tarefa 0.8.** Hooks de `Stop` e `UserPromptSubmit` disparam **fora do turno** — não é possível provar que funcionam na mesma sessão em que foram escritos. O que está provado é que os scripts rodam corretamente quando alimentados pela linha de comando. **O que confirma de verdade:** na próxima sessão aberta neste projeto, o índice de skills deve aparecer no contexto sem ninguém pedir. Se não aparecer, o hook não está sendo disparado e a triagem de skill volta a ser conselho ignorável.
+**O que o gate de evidência cobre, exatamente.** Dois escopos avaliados **separadamente** — juntar as listas de caminhos fazia um `PROGRESS.md` já commitado na branch mascarar código sujo no working tree, silenciando o gate pelo resto da branch. Erro encontrado e corrigido em teste.
+
+| Escopo | Condição de bloqueio | Testado |
+|---|---|---|
+| A — working tree | Código não commitado + `PROGRESS.md` não tocado | ✅ bloqueia; libera quando o PROGRESS também está sujo |
+| B — branch vs `main` | Branch alterou código e **nenhum commit** tocou o `PROGRESS.md` | ✅ bloqueia em branch limpa a partir de `main` |
+| Trava anti-loop | `stop_hook_active = true` → sempre libera | ✅ |
+
+**⚠️ Pendência declarada da tarefa 0.8.** Hooks de `Stop` e `UserPromptSubmit` disparam **fora do turno** — não é possível provar que funcionam na mesma sessão em que foram escritos. O que está provado é que os scripts se comportam corretamente quando alimentados pela linha de comando, nos casos da tabela acima. **O que confirma de verdade:** na próxima sessão aberta neste projeto, o índice de skills deve aparecer no contexto sem ninguém pedir. Se não aparecer, o hook não está sendo disparado e a triagem de skill volta a ser conselho ignorável.
 
 ---
 
