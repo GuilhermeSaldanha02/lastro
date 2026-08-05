@@ -187,3 +187,17 @@
 3. **Habilitar billing** no projeto Google Cloud — sai do free tier, custo real por uso, mas remove o teto de 20/dia.
 
 **Como reverter.** Não há o que reverter — é um fato medido sobre a conta do dono, não uma decisão de código.
+
+---
+
+## 2026-08-05 — Tarefa 1.0d resolvida: botão Análise sempre disponível, sem bloqueio semanal
+
+**O que mudou.** TODO do PRD §3 resolvido: o botão da Análise Semanal fica **sempre disponível** — não bloqueia até a semana ISO fechar (segunda-feira). Nenhuma mudança de código: é exatamente o comportamento já implementado na tarefa 1.5.
+
+**Por quê.** Decisão do dono. Bloquear o botão até segunda-feira significa que um usuário novo não vê **nenhum** parecer nos primeiros dias de uso — pior primeiro contato possível com a peça-assinatura. Manter sempre disponível aceita uma confusão pontual menor (clicar terça e não ver o treino de hoje refletido, porque a semana em andamento nunca entra na Análise) em troca de nunca deixar a tela vazia.
+
+**Alternativa descartada.** "Sempre disponível + aviso de poucos dados" — melhor dos dois mundos, mas exige código novo (detectar semana fechada com poucos dados, mostrar aviso) fora do escopo já fechado da 1.5. Não descartada para sempre — candidata a entrar na Fase 3 (polimento de UI), se o dono achar que a confusão é recorrente na prática.
+
+**Impacto.** Nenhum — código já implementado dessa forma. Só fecha a pendência formal.
+
+**Como reverter.** Se a confusão for real no uso do dia a dia, revisitar como a alternativa descartada acima (Fase 3), não como reversão desta decisão.

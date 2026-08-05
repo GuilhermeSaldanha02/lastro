@@ -50,7 +50,7 @@ Um app de treino **pessoal** que registra cada série executada e, uma vez por s
 
 **Critério de qualidade que separa isto de conselho genérico:** o parecer precisa **citar exercício e número específicos do dono**. "Aumente a carga progressivamente" é falha. "Seu supino está em 60kg há 5 semanas enquanto o agachamento subiu 12% no mesmo período" é o produto.
 
-**Liberação semanal:** o botão fica disponível quando há dados de uma semana fechada. **TODO — confirmar com o dono:** semana começa na segunda? O botão bloqueia antes disso ou fica sempre disponível com aviso de "poucos dados"?
+**Liberação semanal — RESOLVIDO (2026-08-05):** a semana fecha na segunda (segunda-feira a domingo, ISO-8601). O botão fica **sempre disponível**, sem bloqueio — clicar antes da semana fechar mostra a última semana ISO **completa**, nunca a que está em andamento. Risco aceito conscientemente: quem clicar logo depois de treinar pode não ver o treino do dia refletido ainda, porque a semana em andamento nunca entra na Análise (honestidade sobre dado parcial > sensação de resposta imediata). Decisão registrada em `DECISIONS.md`.
 
 ---
 

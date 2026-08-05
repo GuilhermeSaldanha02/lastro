@@ -113,8 +113,8 @@ Achado 7 do QA original (isenção de `auth.uid()` no catálogo `exercicio`) foi
 |---|---|---|---|
 | 1.0a | ✅ Faixa de referência de volume por grupo muscular | [AFK] | **Concluído.** `KNOWLEDGE.md` §3.6: 10–20 séries/semana. Fontes verificadas direto no PubMed pelo controller, não só relatadas pelo subagente. Correção sobre o relato: no Schoenfeld 2017 a quebra por categorias foi **tendência (p=0,074), não significância** |
 | 1.0b | ✅ Critério de estagnação | [AFK] | **Concluído.** `KNOWLEDGE.md` §3.7: **não há fonte primária.** 3–4 semanas é convenção de mercado, e a UI tem de dizer isso — emprestar autoridade científica a número que a literatura não sustenta é o E3 que o projeto se proibiu |
-| 1.0c | Ler a quota real da Gemini no console do AI Studio | [HITL] | Valor **medido**, com data, em `KNOWLEDGE.md` §3.2. **Bloqueia a premissa do ADR-001** |
-| 1.0d | Definir a regra de liberação semanal do botão Análise | [HITL] | Decisão do dono registrada no PRD §3. A tarefa 1.5 não fecha sem isto — sem a regra, vira improviso na hora |
+| 1.0c | ✅ Quota real da Gemini | [HITL] | **Concluído (2026-08-05), do jeito mais caro possível.** Medida não no console, mas batendo em `RESOURCE_EXHAUSTED` em uso real: **20 req/dia** para `gemini-3.6-flash`. `KNOWLEDGE.md` §3.2. Invalida a premissa do ADR-001 — 3 caminhos registrados em `DECISIONS.md`, decisão do dono pendente |
+| 1.0d | ✅ Regra de liberação semanal | [HITL] | **Concluído (2026-08-05).** Botão sempre disponível, sem bloqueio — comportamento já implementado na 1.5, só faltava a confirmação formal. `PRD.md` §3 e `DECISIONS.md` |
 
 ### Como a tarefa 1.1 foi fechada — Docker local abandonado, projeto hospedado (2026-08-04)
 
