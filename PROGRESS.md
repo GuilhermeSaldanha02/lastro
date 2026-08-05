@@ -101,7 +101,7 @@ Achado 7 do QA original (isenção de `auth.uid()` no catálogo `exercicio`) foi
 | # | Tarefa | Modo | Estado | Check executável | Evidência |
 |---|---|---|---|---|---|
 | 1.1 | Projeto Next.js + Supabase + schema de `exercicio`/`treino`/`serie` com **todos** os campos do glossário | [HITL] | ✅ Aplicado e verificado contra banco hospedado real | `npm run build` limpo; RLS ativa em toda tabela de usuário (FF5) | Ver nota detalhada abaixo — 5 dos 6 checks do §3.8 verificados contra o projeto hospedado `tbkzcqfvafznxallyfqk` (São Paulo). O 6º (isolamento entre 2 usuários reais via JWT) fica pendente até existir auth de verdade (Fase 2) |
-| 1.2 | Tela mínima de registro de série (sem offline, sem polimento) | [AFK] | ⬜ Pendente | Registrar 5 séries reais e vê-las no Postgres | Depende de 1.1 (schema) — **já pronta para começar** |
+| 1.2 | Tela mínima de registro de série (sem offline, sem polimento) | [AFK] | ✅ Concluído e verificado fim a fim | Registrar 5 séries reais e vê-las no Postgres | Ver nota detalhada abaixo — as 5 séries exigidas pelo §5.3 (aquecimento, RIR=0, sem RIR, unilateral) registradas pela UI real e conferidas linha a linha no Postgres. Achado real corrigido no caminho: migração 0002 (GRANT faltante) |
 | 1.3 | **Agregador de métricas — TDD estrito** | [HITL] | ✅ Concluído | Testes antes do código. Volume, e1RM, séries difíceis, frequência com valores conferidos à mão. **FF4:** fixture com aquecimento não altera nenhuma métrica. **FF3:** sem import de rede | **Verificado por execução real, não por relato do agente:** `npx vitest run` → 8 arquivos, **49/49 testes passando** (saída colada, não resumida). `grep` FF3 → 0. `grep new Date()` (C4) → 0. `npm run build` → limpo. Interpretação do engenheiro registrada em `DECISIONS.md`: semana fecha na segunda — é a única leitura que bate os 30 valores do SDD §4.5 sem editar fixture, mas ainda depende de você confirmar na 1.0d |
 | 1.4 | Route handler da Gemini — recebe **só o resumo**, nunca séries cruas | [HITL] | ⬜ Pendente | **FF1 e FF2:** SDK ausente do cliente, chave ausente do bundle de produção | Depende de 1.1 (ler séries do Supabase) |
 | 1.5 | Botão Análise + as 5 perguntas + exibição do parecer | [HITL] | ⬜ Pendente | 3 pareceres gerados sobre dados reais. **Critério A6:** cada um cita ao menos um exercício e um número do dono. Parecer que serviria pra qualquer pessoa = falha | |
@@ -138,6 +138,33 @@ Achado 7 do QA original (isenção de `auth.uid()` no catálogo `exercicio`) foi
 8. `npm run build` limpo com o ambiente real. `npx vitest run` — 49/49 continuam passando (regressão da tarefa 1.3, intacta).
 
 **Duas lições registradas em `KNOWLEDGE.md` §5:** pipe mascarando exit code (`cmd | tail`), e um editor web pode reescrever texto digitado de formas inesperadas — para SQL/código sensível a sintaxe, preferir CLI a editor de navegador quando disponível.
+
+### Como a tarefa 1.2 foi verificada fim a fim (2026-08-05)
+
+**Código revisado antes de testar** (E8): `usuario_id` da série nunca é escrito pelo cliente (confia no trigger); RIR distingue `null` de `0` corretamente em toda a cadeia; `unilateral` vem do catálogo, não é campo do formulário.
+
+**O desafio: a Fase 1 não constrói login, mas a tela só funciona com sessão real (RLS exige).** Resolvido sem violar o escopo — nenhum arquivo do SDD §5.1 ganhou lógica de auth:
+1. Usuário de teste criado direto via SQL (`auth.users` + `auth.identities`, com senha hash real via `pgcrypto`) — não é dado do dono, é fixture de verificação.
+2. Página **temporária** `/dev-login` (fora do SDD, nunca commitada) chamando `criarClienteBrowser().auth.signInWithPassword()` — o mesmo cliente que o app real usa, só para estabelecer sessão.
+3. Servidor de dev rodado pelo controller com `run_in_background` de verdade (não `&` de shell, que não sobrevive entre chamadas — mesma lição já registrada).
+
+**Achado real no meio da verificação — GRANT faltante.** Depois de logar, toda leitura/escrita batia em `permission denied for table treino`, mesmo com RLS e policy corretas. Causa: a migração 0001 nunca deu `GRANT` de privilégio ao role `authenticated` — RLS filtra **linha**, mas sem GRANT o Postgres nega o **objeto** antes de a RLS ser avaliada. Corrigido com uma migração nova, **0002_grants_authenticated.sql** (não editei a 0001 já aplicada e registrada no histórico remoto). Aplicada e confirmada via `migration list` (local=remote=0002).
+
+**As 5 séries exigidas pelo §5.3, registradas pela UI real e conferidas linha a linha no Postgres:**
+
+| tipo | reps | peso | rir | unilateral | usuario_id (do trigger) |
+|---|---|---|---|---|---|
+| valendo | 8 | 80 | 2 | false | `628e42a0-...` |
+| aquecimento | 10 | 40 | **null** | false | `628e42a0-...` |
+| valendo | 5 | 60 | **0** | false | `628e42a0-...` |
+| valendo | 6 | 55 | **null** | false | `628e42a0-...` |
+| valendo | 10 | 14 | 1 | **true** | `628e42a0-...` |
+
+Os 3 pontos do §5.4 confirmados: `usuario_id` correto em todas (preenchido pelo trigger, nunca pelo cliente) · RIR=0 gravado como `0`, não `null` · série sem RIR gravada como `null`, não `0`.
+
+**Limpeza pós-verificação:** `/dev-login` apagado (`git status` confirma que não existe mais). Usuário de teste e os dados vinculados (treino + 5 séries) removidos via `delete from auth.users` — o `on delete cascade` do schema levou tudo junto, confirmado por contagem = 0. Deixar esse usuário ativo seria porta dos fundos: ele podia logar via API pública com a mesma chave publicável, mesmo sem nenhuma tela de login no app. A evidência da tabela acima já estava capturada antes da limpeza.
+
+**Instabilidade de ferramenta registrada, não do produto:** a automação de navegador teve travamentos de renderização recorrentes nesta sessão (aba preta, captura de tela expirando) — problema do ambiente de browser, não do app. Contornado com abas novas e checagem via `fetch`/DOM em vez de só screenshot.
 
 ---
 

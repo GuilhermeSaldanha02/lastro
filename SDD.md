@@ -254,6 +254,7 @@ Ver **§6**.
 
 ```
 supabase/migrations/0001_schema_inicial.sql     ← todo o DDL, RLS inclusa
+supabase/migrations/0002_grants_authenticated.sql ← GRANT ao role authenticated — ver §3.3
 supabase/seed.sql                                ← seed mínimo de exercicio (§3.5)
 src/lib/supabase/cliente-browser.ts              ← cliente de navegador
 src/lib/supabase/cliente-servidor.ts             ← cliente de servidor (route handlers)
@@ -393,6 +394,16 @@ create policy grupo_muscular_leitura on public.grupo_muscular
 ```
 
 > `(select auth.uid())` em vez de `auth.uid()` puro é intencional: o planner avalia a subquery uma vez por statement em vez de por linha. Confirmar na doc vigente do Supabase ao aplicar (E12).
+
+**⚠️ Correção pós-1.1 — GRANT faltava, achado na verificação end-to-end da 1.2 (`migrations/0002_grants_authenticated.sql`).** RLS filtra **linha**; sem `GRANT` de base ao role, o Postgres nega o **objeto inteiro** antes de a RLS ser avaliada — sintoma real: `permission denied for table treino` mesmo com policy e sessão corretas. A 0001 acima **não inclui os GRANTs**; eles vivem na migração seguinte, de propósito (não se edita migração já aplicada e registrada no histórico remoto):
+
+```sql
+grant usage on schema public to authenticated;
+grant select, insert, update, delete on public.treino to authenticated;
+grant select, insert, update, delete on public.serie to authenticated;
+grant select on public.exercicio to authenticated;
+grant select on public.grupo_muscular to authenticated;
+```
 
 ### 3.4 FORA desta tarefa
 
