@@ -72,6 +72,9 @@ Definida em `.claude/agents/` — 1 arquivo por papel, com `model` e `tools` exp
 | `engenheiro` | implementar item do SDD, componente, correção localizada |
 | `diretor-arte` | decisão visual, peça-assinatura, tokens, motion, gate visual |
 | `inspetor-qa` | review de risco sutil, integração final, antes de merge |
+| `qa-treino` | dogfooding de UX antes de release — simula persona real de treino, ponta a ponta |
+
+**Especialista novo, registrado (2026-08-05):** `qa-treino` — a equipe base revisa código e schema, mas nenhum papel simula um usuário real interagindo com a peça-assinatura para avaliar se o parecer *convence*, não só se está tecnicamente correto. Rodar 3-5 instâncias em paralelo, cada uma com persona distinta.
 
 ---
 
@@ -87,3 +90,13 @@ Windows, restaurar binário: `git checkout SHA -- caminho` — nunca `git show >
 Relatório de agente **não é prova**. Antes de mover para Concluído: rodar o comando e ler a saída; mudança visual → **abrir no navegador real e olhar**, em viewport mobile, com contraste AA **medido**; anotar a evidência em `PROGRESS.md`.
 
 Verificação visual é do controller — subagente não tem essa ferramenta de forma confiável, e medição de DOM não substitui olho.
+
+<!-- BEGIN:nextjs-agent-rules -->
+
+# This is NOT the Next.js you know
+
+This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` (resolved from this file's directory; in monorepos the `next` package may not be visible from the repo root) before writing any code. Heed deprecation notices.
+
+This block is written and re-added by `next dev` — verify at `node_modules/next/dist/server/lib/generate-agent-files.js`. Removing it from a diff only re-creates the uncommitted change; committing it with your work keeps the tree clean.
+
+<!-- END:nextjs-agent-rules -->

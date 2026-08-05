@@ -55,7 +55,7 @@ Partindo sempre da opção mais boring; cada peça extra justifica o custo. Cons
 | Auth + Banco | **Supabase** — Google OAuth + e-mail, Postgres, RLS por `auth.uid()` | *Auth.js + Postgres separado* — mais peças para manter num projeto de uma pessoa. |
 | Offline | **IndexedDB (Dexie) + fila outbox + service worker (Serwist)** | *PowerSync / ElectricSQL* — motor de sync completo é peso desproporcional para um usuário. |
 | Gráficos | **Recharts** | *Chart.js* — Recharts integra melhor em React; a diferença real é pequena. |
-| IA | **Gemini via route handler** (`@google/genai`, `gemini-2.5-flash`) | *Chamada do cliente* — ADR-002. |
+| IA | **Gemini via route handler** (`@google/genai`, `gemini-3.6-flash` — corrigido 2026-08-05, ver DECISIONS.md) | *Chamada do cliente* — ADR-002. |
 | Catálogo de exercícios | **~100 curados em PT-BR, seed no Supabase** | *ExerciseDB (1500+ com GIF)* — procedência das mídias nebulosa e nomes em inglês; tradução automática produz lixo ("Bent Over Row" → "Fileira Curvada"). |
 | Testes | **Vitest** (unitário) + **Playwright** (E2E, proporcional ao risco) | *Jest* — Vitest é o padrão do ecossistema Vite/Next moderno e mais rápido. |
 
