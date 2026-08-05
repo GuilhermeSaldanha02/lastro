@@ -104,8 +104,8 @@ Achado 7 do QA original (isenção de `auth.uid()` no catálogo `exercicio`) foi
 | 1.2 | Tela mínima de registro de série (sem offline, sem polimento) | [AFK] | ✅ Concluído e verificado fim a fim | Registrar 5 séries reais e vê-las no Postgres | Ver nota detalhada abaixo — as 5 séries exigidas pelo §5.3 (aquecimento, RIR=0, sem RIR, unilateral) registradas pela UI real e conferidas linha a linha no Postgres. Achado real corrigido no caminho: migração 0002 (GRANT faltante) |
 | 1.3 | **Agregador de métricas — TDD estrito** | [HITL] | ✅ Concluído | Testes antes do código. Volume, e1RM, séries difíceis, frequência com valores conferidos à mão. **FF4:** fixture com aquecimento não altera nenhuma métrica. **FF3:** sem import de rede | **Verificado por execução real, não por relato do agente:** `npx vitest run` → 8 arquivos, **49/49 testes passando** (saída colada, não resumida). `grep` FF3 → 0. `grep new Date()` (C4) → 0. `npm run build` → limpo. Interpretação do engenheiro registrada em `DECISIONS.md`: semana fecha na segunda — é a única leitura que bate os 30 valores do SDD §4.5 sem editar fixture, mas ainda depende de você confirmar na 1.0d |
 | 1.4 | Route handler da Gemini — recebe **só o resumo**, nunca séries cruas | [HITL] | ✅ Concluído e verificado com a API real | **FF1 e FF2:** SDK ausente do cliente, chave ausente do bundle de produção | Ver nota detalhada abaixo — chamada real à Gemini (`gemini-3.6-flash`), parecer conferido número a número à mão, prompt inspecionado e sem vestígio de série crua. Achado real: modelo do ADR estava obsoleto (aposenta out/2026); achado no FF2 explicado (cache do bundler ≠ vazamento ao cliente) |
-| 1.5 | Botão Análise + as 5 perguntas + exibição do parecer | [HITL] | ⬜ Pendente | 3 pareceres gerados sobre dados reais. **Critério A6:** cada um cita ao menos um exercício e um número do dono. Parecer que serviria pra qualquer pessoa = falha | |
-| 1.6 | **Portão do dono na peça-assinatura** | [HITL] | ⬜ Pendente | O dono lê os 3 pareceres e diz se convence. Reprovou → replanejar antes de seguir | |
+| 1.5 | Botão Análise + as 5 perguntas + exibição do parecer | [HITL] | ✅ Concluído — 3 pareceres reais verificados | 3 pareceres gerados sobre dados reais. **Critério A6:** cada um cita ao menos um exercício e um número do dono. Parecer que serviria pra qualquer pessoa = falha | Ver nota detalhada abaixo — 3 pareceres gerados via UI real, números conferidos à mão, todos passam no "teste que realmente importa" do SDD §7.3. **Fase 1 inteira fechada em cadeia contínua (SDD §7.4).** |
+| 1.6 | **Portão do dono na peça-assinatura** | [HITL] | ⬜ **Aguardando você** | O dono lê os 3 pareceres e diz se convence. Reprovou → replanejar antes de seguir | Falta você registrar séries reais (via `/treino`) e ver o parecer da sua própria Análise — os 3 pareceres verificados até aqui foram sobre dados de teste sintéticos, não os seus |
 
 **Pesquisa que bloqueia 1.3 e 1.5:**
 
@@ -182,6 +182,30 @@ Os 3 pontos do §5.4 confirmados: `usuario_id` correto em todas (preenchido pelo
 - **Números conferidos à mão contra a fórmula de Epley**, não só lidos: supino 55kg → e1RM 69,7; 62kg → e1RM 78,5; delta 12,7%. Agachamento 70kg → 88,7; 75kg → 95,0; delta 7,1%. Volume total 1440 → 1592. **Todos batem exatamente** com o que o parecer citou.
 - **Prompt inspecionado diretamente** (reconstruído com os mesmos dados, já que o log do servidor não capturou — mesmo problema de buffering do Turbopack já registrado): busca por todo ID de série, campo de série individual e ID de treino usados no teste → **nenhum encontrado**. O prompt carrega só o JSON do `ResumoCompacto`, exatamente como o SDD §6.7 exige.
 - Limpeza: `/dev-login`, usuário de teste e dados vinculados removidos (contagem = 0, confirmado).
+
+### Como a tarefa 1.5 foi verificada — a peça-assinatura de ponta a ponta (2026-08-05)
+
+**Código revisado antes de testar** (E8): `page.tsx` reusa `PERGUNTAS` de `perguntas.ts` sem duplicar, trata 401/erro de rede, desabilita botões durante a chamada (evita corrida de estado, não é a regra de liberação semanal — essa continua fora de escopo, o botão fica sempre disponível). `parecer.tsx` traz as 4 ressalvas sempre visíveis, nunca atrás de accordion, e o aviso de fallback quando `avisoFalhaInterpretativa: true`.
+
+**Dados de teste desenhados para cobrir os 3 cenários da peça-assinatura:** 5 treinos reais (usuário de teste temporário, mesma técnica das tarefas anteriores) — supino estagnado (50kg constante por 5 semanas), agachamento progredindo (70→75→80→85kg), rosca direta unilateral nova (testa o multiplicador ×2 até a ponta da cadeia).
+
+**Achado real 1 — clique "fantasma" mascarado por sessão antiga, quase virou caça a bug de servidor.** Após relogar com um usuário novo, o servidor continuou dizendo "sessão ausente" — cheguei a suspeitar de corrupção do processo de dev e reiniciei o servidor duas vezes. A causa real: o clique via `ref` do `find` não estava disparando o handler `onClick` (mesma classe de instabilidade já registrada), e como um cookie de sessão de um teste **anterior** (já com usuário deletado) continuava no navegador, meu check de "cookie presente" dava falso positivo. Só a decodificação do JWT (conferindo o `sub` contra o ID esperado) revelou que a sessão era de outro usuário. **Correção:** depois de um login em automação de navegador, não basta checar que existe cookie — decodificar o token e confirmar que o `sub` é o esperado.
+
+**Achado real 2 — build falhou por cache de tipos órfão, não por código quebrado.** Depois de apagar `/dev-login`, `npm run build` falhou no type-check apontando pra um arquivo que não existia mais. A causa: `.next/dev/types/` (gerado, gitignored) ainda referenciava a página apagada. `rm -rf .next` + rebuild resolveu — não é bug de código.
+
+**Os 3 pareceres exigidos pelo §7.3, gerados via clique real na UI (não só `fetch` direto), aplicando o "teste que realmente importa" (apagar mentalmente o nome do dono):**
+
+| Pergunta | O que citou | Conferido à mão |
+|---|---|---|
+| "Onde eu empaquei?" | Supino reto com barra, 4 semanas sem progresso, e1RM estável em 63,3, volume estável em 800 | `50×(1+8/30)=63,33` ✓ · `2×8×50=800` ✓ |
+| "Meu volume está equilibrado?" | Peito 800, Quadríceps 510, **Bíceps 240** (Rosca direta, unilateral) | `10×12×2=240` ✓ — confirma o multiplicador unilateral (D3.5) chegando íntegro até a Análise |
+| "O que mudar na próxima semana?" | Agachamento 84→102 e1RM (+21,4%), PR de volume 510 vs 480 anterior | `85×(1+6/30)=102` ✓ · `85×6=510` vs `80×6=480` ✓ |
+
+**Nenhum dos 3 pareceres serviria para outra pessoa** — cada um cita exercício e número que só fazem sentido para este histórico específico. Critério A6 satisfeito nos 3, e o `validarNumeros` confirmou automaticamente (nenhum passou por número inventado).
+
+**SDD §7.4 fechado:** a cadeia inteira — registrar série (1.2) → RLS (1.1) → agregador (1.3) → route handler (1.4) → parecer na tela (1.5) — rodou como uma passagem contínua, sem atalho.
+
+**O que falta para a 1.6:** os 3 pareceres acima foram sobre dados **sintéticos de teste**, não sobre o treino real do dono. A tarefa 1.6 — o portão que decide se a peça-assinatura convence — só pode ser cumprida por você, registrando séries reais e lendo o parecer sobre a sua própria Análise.
 
 ---
 
