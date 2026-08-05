@@ -778,7 +778,15 @@ grep -rn "@google/genai" src/ --include=*.ts --include=*.tsx | grep -v "^src/app
 # encontra TUDO e o check "reprova" por motivo errado — ou, com -q, passa por motivo errado.
 [ -n "$GEMINI_API_KEY" ] || { echo "FF2: chave ausente do ambiente, check inválido"; exit 1; }
 npm run build
-grep -r "$GEMINI_API_KEY" .next/ | wc -l      # precisa imprimir 0. Next builda em .next/, não dist/
+# Corrigido na verificação real da 1.4 (2026-08-05): restringir a .next/static/
+# (o que o navegador de fato baixa) e .next/server/ (código server compilado).
+# NÃO variar para ".next/" inteiro — a partir do Next 16, o Turbopack persiste
+# cache de compilação em disco (.next/cache/turbopack/), que pode conter o
+# valor resolvido de env vars server-side como artefato interno do bundler.
+# Isso não é vazamento ao cliente: .next/cache/ já está no .gitignore, nunca é
+# servido via HTTP, e é comportamento documentado do Turbopack persistente —
+# mas ele faz o grep ingênuo em ".next/" "reprovar" por motivo que não existe.
+grep -r "$GEMINI_API_KEY" .next/static/ .next/server/ | wc -l   # precisa imprimir 0
 ```
 
 Mais os testes unitários de `validarNumeros`:
