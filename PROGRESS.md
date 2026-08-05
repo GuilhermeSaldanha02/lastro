@@ -231,15 +231,27 @@ Especialista novo registrado (`CLAUDE.md`, `.claude/agents/qa-treino.md`): simul
 
 ---
 
-## Fase 2 — Registro que sobrevive à academia · ⬜ Não iniciada
+## Fase 2 — Registro que sobrevive à academia · 🔶 Em andamento (2026-08-05)
 
-| # | Tarefa | Modo | Check executável |
-|---|---|---|---|
-| 2.1 | Auth: Google OAuth + e-mail | [HITL] | Login no celular e no PC, mesmo treino nos dois (A8). **Depende do dono configurar a tela de consentimento OAuth** |
-| 2.2 | IndexedDB (Dexie) + fila outbox | [HITL] | Registro grava local e a UI confirma sem esperar rede (D6) |
-| 2.3 | Service worker + sincronização | [HITL] | **FF6/A1:** celular real em modo avião, 3 séries, reativar rede, conferir no PC |
-| 2.4 | PWA instalável | [AFK] | Instalar na tela inicial do celular real e abrir em tela cheia |
-| 2.5 | "Repetir última série" em um toque | [AFK] | D3: um toque, medido no aparelho real |
+| # | Tarefa | Modo | Estado | Check executável |
+|---|---|---|---|---|
+| 2.1 | Auth: Google OAuth + e-mail | [HITL] | ⬜ Aguardando você | Login no celular e no PC, mesmo treino nos dois (A8). **Depende do dono configurar a tela de consentimento OAuth** — ver instruções na conversa |
+| 2.2 | IndexedDB (Dexie) + fila outbox | [HITL] | 🔶 Fundação + ligação ao formulário de série feitas; verificação manual no celular real ainda falta | Registro grava local e a UI confirma sem esperar rede (D6) |
+| 2.3 | Service worker + sincronização | [HITL] | ⬜ Não iniciada | **FF6/A1:** celular real em modo avião, 3 séries, reativar rede, conferir no PC |
+| 2.4 | PWA instalável | [AFK] | ⬜ Não iniciada | Instalar na tela inicial do celular real e abrir em tela cheia |
+| 2.5 | "Repetir última série" em um toque | [AFK] | ⬜ Não iniciada | D3: um toque, medido no aparelho real |
+
+### Tarefa 2.2 — o que foi feito e o que falta verificar (2026-08-05)
+
+**Fundação (`src/lib/offline/db.ts`, `outbox.ts`):** fila FIFO em IndexedDB (Dexie), testada isoladamente (5 testes, `fake-indexeddb`) — enfileirar sem tocar rede, sincronizar em ordem preservando a dependência treino→série, parar no primeiro erro sem pular à frente, retomar sem duplicar.
+
+**Ligação ao formulário (`treino-detalhe.tsx`, `formulario-serie.tsx` reescrito, `treino.ts`):** a tabela de séries e o formulário passaram a viver juntos num componente cliente (`TreinoDetalhe`) porque precisam compartilhar estado pra atualização otimista funcionar — o Server Component da página só busca os dados iniciais. `criarSerie` (FormData + contagem de `ordem` no servidor) foi substituída por `criarSerieRemoto` (recebe `id`/`ordem` já decididos pelo cliente, sem `redirect`/`revalidatePath` — quem chama já atualizou a UI antes). `id` de série agora é gerado no cliente (`crypto.randomUUID()`), não mais pelo Postgres — pré-requisito pra escrever offline sem esperar o servidor responder com um ID.
+
+**Verificado:** `npx vitest run` (66/66), `npx tsc --noEmit` (limpo), `next build` limpo.
+
+**NÃO verificado — clique real no navegador bloqueado por um erro de infraestrutura do Supabase Auth, não do código.** Tentei o mesmo padrão de verificação das tarefas 1.2/1.5 (usuário de teste via SQL + página `/dev-login` temporária) e o login falhou com `AuthRetryableFetchError` / HTTP 500 `"Database error querying schema"`. Isolei a causa fora do meu código: uma chamada `fetch` direta ao endpoint `/auth/v1/token` do projeto hospedado, sem nenhuma linha do app envolvida, reproduz o mesmo 500. `/auth/v1/settings` (sem tocar a tabela de usuários) responde 200 normalmente — o serviço está de pé, só a consulta específica de login falha. Não é o bug já conhecido de token/e1RM do validador (área totalmente diferente do código). Conferido: `pgcrypto`/`uuid-ossp` instalados, colunas de token do `auth.users` preenchidas com `''` (não `null`), `auth.identities` com o formato padrão — nada disso mudou o resultado. Usuário e treino de teste removidos ao final (contagem = 0), `/dev-login` apagada.
+
+**Fica pendente, registrado, não escondido:** verificar o clique real (celular ou navegador) quando esse erro de infraestrutura for entendido/resolvido — pode valer a pena olhar os logs de Auth no painel do Supabase, algo que eu não tenho como acessar.
 
 ---
 

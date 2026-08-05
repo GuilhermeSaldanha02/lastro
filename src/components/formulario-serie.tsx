@@ -2,28 +2,83 @@
 
 // lastro · SDD.md §5.1 — formulário de registro de série.
 //
+// D6 (Fase 2): a gravação em si (fila offline + atualização otimista da
+// lista) é responsabilidade do pai (`treino-detalhe.tsx`), que é quem tem
+// o estado da lista de séries. Este componente só valida a entrada e
+// entrega um objeto pronto — não sabe nada sobre rede nem sobre a fila.
+//
 // `unilateral` NÃO é campo deste formulário: é atributo do exercício
 // escolhido, lido do catálogo (`exercicio.unilateral`). A tela só mostra um
 // indicador de texto quando o exercício selecionado for unilateral — o dono
 // não re-declara isso a cada série (SDD §5.1).
-import { useState } from "react";
-import { criarSerie, type Exercicio } from "@/lib/dados/treino";
+import { useState, type FormEvent } from "react";
+import type { Exercicio } from "@/lib/dados/treino";
+
+export type DadosNovaSerie = {
+  exercicioId: string;
+  tipo: "aquecimento" | "valendo";
+  reps: number;
+  peso: number;
+  rir: number | null;
+  pesoCorporalIncluso: boolean;
+};
 
 export default function FormularioSerie({
-  treinoId,
   exercicios,
+  onRegistrar,
 }: {
-  treinoId: string;
   exercicios: Exercicio[];
+  onRegistrar: (dados: DadosNovaSerie) => void | Promise<void>;
 }) {
   const [exercicioId, setExercicioId] = useState(exercicios[0]?.id ?? "");
   const [tipo, setTipo] = useState<"aquecimento" | "valendo">("valendo");
+  const [erro, setErro] = useState<string | null>(null);
 
   const exercicioSelecionado = exercicios.find((e) => e.id === exercicioId);
-  const criarSerieDoTreino = criarSerie.bind(null, treinoId);
+
+  async function aoEnviar(evento: FormEvent<HTMLFormElement>) {
+    evento.preventDefault();
+    setErro(null);
+
+    const formulario = evento.currentTarget;
+    const formData = new FormData(formulario);
+    const reps = Number(formData.get("reps"));
+    const peso = Number(formData.get("peso"));
+    const rirBruto = formData.get("rir");
+    const pesoCorporalIncluso = formData.get("peso_corporal_incluso") === "on";
+
+    if (!exercicioId) {
+      setErro("Exercício é obrigatório.");
+      return;
+    }
+    if (!Number.isFinite(reps) || reps <= 0) {
+      setErro("Reps precisa ser um número positivo.");
+      return;
+    }
+    if (!Number.isFinite(peso) || peso < 0) {
+      setErro("Peso precisa ser um número válido.");
+      return;
+    }
+
+    // RIR é campo de série valendo (SDD §3.2, constraint serie_rir_so_valendo).
+    // Ausência é `null`, nunca `0` — RIR 0 é valor válido e diferente de
+    // ausente (KNOWLEDGE.md §1). Aquecimento nunca carrega RIR.
+    let rir: number | null = null;
+    if (tipo === "valendo" && rirBruto !== null && rirBruto !== "") {
+      const rirNumero = Number(rirBruto);
+      if (!Number.isFinite(rirNumero)) {
+        setErro("RIR precisa ser um número válido.");
+        return;
+      }
+      rir = rirNumero;
+    }
+
+    await onRegistrar({ exercicioId, tipo, reps, peso, rir, pesoCorporalIncluso });
+    formulario.reset();
+  }
 
   return (
-    <form action={criarSerieDoTreino}>
+    <form onSubmit={aoEnviar}>
       <div>
         <label htmlFor="exercicio_id">Exercício</label>
         <select
@@ -93,6 +148,8 @@ export default function FormularioSerie({
           Peso corporal incluso
         </label>
       </div>
+
+      {erro && <p role="alert">{erro}</p>}
 
       <button type="submit">Registrar série</button>
     </form>
