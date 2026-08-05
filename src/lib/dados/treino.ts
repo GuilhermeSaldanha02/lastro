@@ -158,68 +158,41 @@ export async function criarTreino(): Promise<void> {
   redirect(`/treino/${data.id}`);
 }
 
+export type NovaSerieInput = {
+  id: string;
+  treinoId: string;
+  exercicioId: string;
+  ordem: number;
+  tipo: "aquecimento" | "valendo";
+  reps: number;
+  peso: number;
+  rir: number | null;
+  pesoCorporalIncluso: boolean;
+};
+
 /**
- * Registra uma série valendo/aquecimento no treino.
- * Server Action — chamada do form de `formulario-serie.tsx`.
+ * Grava no servidor uma série já validada e com `id`/`ordem` decididos
+ * pelo cliente (D6 — offline-first, `src/lib/offline/`). Chamada tanto
+ * direto (se online) quanto pela fila de sincronização (se a rede caiu no
+ * meio do treino) — por isso não faz `redirect`/`revalidatePath`: quem
+ * chama já atualizou a UI de forma otimista antes desta chamada existir.
  *
  * `usuario_id` NÃO entra no insert: o trigger `serie_usuario_id_bi`
  * (SDD §3.2) preenche a partir de `treino_id`.
  */
-export async function criarSerie(
-  treinoId: string,
-  formData: FormData,
-): Promise<void> {
+export async function criarSerieRemoto(input: NovaSerieInput): Promise<void> {
   const { supabase } = await usuarioAutenticadoOuErro();
 
-  const exercicioId = String(formData.get("exercicio_id") ?? "");
-  const tipo = String(formData.get("tipo") ?? "valendo") as
-    | "aquecimento"
-    | "valendo";
-  const reps = Number(formData.get("reps"));
-  const peso = Number(formData.get("peso"));
-  const rirBruto = formData.get("rir");
-  const pesoCorporalIncluso = formData.get("peso_corporal_incluso") === "on";
-
-  if (!exercicioId) throw new Error("Exercício é obrigatório.");
-  if (!Number.isFinite(reps) || reps <= 0) {
-    throw new Error("Reps precisa ser um número positivo.");
-  }
-  if (!Number.isFinite(peso) || peso < 0) {
-    throw new Error("Peso precisa ser um número válido.");
-  }
-
-  // RIR é campo de série valendo (SDD §3.2, constraint serie_rir_so_valendo).
-  // Ausência é `null`, nunca `0` — RIR 0 é valor válido e diferente de
-  // ausente (KNOWLEDGE.md §1). Aquecimento nunca carrega RIR.
-  let rir: number | null = null;
-  if (tipo === "valendo" && rirBruto !== null && rirBruto !== "") {
-    const rirNumero = Number(rirBruto);
-    if (!Number.isFinite(rirNumero)) {
-      throw new Error("RIR precisa ser um número válido.");
-    }
-    rir = rirNumero;
-  }
-
-  const { count, error: erroContagem } = await supabase
-    .from("serie")
-    .select("id", { count: "exact", head: true })
-    .eq("treino_id", treinoId);
-  if (erroContagem) {
-    throw new Error(`Falha ao calcular ordem da série: ${erroContagem.message}`);
-  }
-  const ordem = (count ?? 0) + 1;
-
   const { error } = await supabase.from("serie").insert({
-    treino_id: treinoId,
-    exercicio_id: exercicioId,
-    ordem,
-    tipo,
-    reps,
-    peso,
-    rir,
-    peso_corporal_incluso: pesoCorporalIncluso,
+    id: input.id,
+    treino_id: input.treinoId,
+    exercicio_id: input.exercicioId,
+    ordem: input.ordem,
+    tipo: input.tipo,
+    reps: input.reps,
+    peso: input.peso,
+    rir: input.rir,
+    peso_corporal_incluso: input.pesoCorporalIncluso,
   });
   if (error) throw new Error(`Falha ao registrar série: ${error.message}`);
-
-  revalidatePath(`/treino/${treinoId}`);
 }

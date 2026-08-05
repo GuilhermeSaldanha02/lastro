@@ -231,15 +231,51 @@ Especialista novo registrado (`CLAUDE.md`, `.claude/agents/qa-treino.md`): simul
 
 ---
 
-## Fase 2 — Registro que sobrevive à academia · ⬜ Não iniciada
+## Fase 2 — Registro que sobrevive à academia · 🔶 Em andamento (2026-08-05)
 
-| # | Tarefa | Modo | Check executável |
-|---|---|---|---|
-| 2.1 | Auth: Google OAuth + e-mail | [HITL] | Login no celular e no PC, mesmo treino nos dois (A8). **Depende do dono configurar a tela de consentimento OAuth** |
-| 2.2 | IndexedDB (Dexie) + fila outbox | [HITL] | Registro grava local e a UI confirma sem esperar rede (D6) |
-| 2.3 | Service worker + sincronização | [HITL] | **FF6/A1:** celular real em modo avião, 3 séries, reativar rede, conferir no PC |
-| 2.4 | PWA instalável | [AFK] | Instalar na tela inicial do celular real e abrir em tela cheia |
-| 2.5 | "Repetir última série" em um toque | [AFK] | D3: um toque, medido no aparelho real |
+| # | Tarefa | Modo | Estado | Check executável |
+|---|---|---|---|---|
+| 2.1 | Auth: Google OAuth + e-mail | [HITL] | ⬜ Aguardando você | Login no celular e no PC, mesmo treino nos dois (A8). **Depende do dono configurar a tela de consentimento OAuth** — ver instruções na conversa |
+| 2.2 | IndexedDB (Dexie) + fila outbox | [HITL] | ✅ Verificado fim a fim | Registro grava local e a UI confirma sem esperar rede (D6) |
+| 2.3 | Service worker + sincronização | [HITL] | 🔶 Background Sync implementado e verificado com rede bloqueada no navegador; falta o teste em celular real (modo avião de verdade) | **FF6/A1:** celular real em modo avião, 3 séries, reativar rede, conferir no PC |
+| 2.4 | PWA instalável | [AFK] | 🔶 Manifest + SW mínimo verificados no navegador; falta instalar num celular real | Instalar na tela inicial do celular real e abrir em tela cheia |
+| 2.5 | "Repetir última série" em um toque | [AFK] | ✅ Verificado fim a fim | D3: um toque, medido no aparelho real |
+
+### Tarefa 2.2 — o que foi feito e o que falta verificar (2026-08-05)
+
+**Fundação (`src/lib/offline/db.ts`, `outbox.ts`):** fila FIFO em IndexedDB (Dexie), testada isoladamente (5 testes, `fake-indexeddb`) — enfileirar sem tocar rede, sincronizar em ordem preservando a dependência treino→série, parar no primeiro erro sem pular à frente, retomar sem duplicar.
+
+**Ligação ao formulário (`treino-detalhe.tsx`, `formulario-serie.tsx` reescrito, `treino.ts`):** a tabela de séries e o formulário passaram a viver juntos num componente cliente (`TreinoDetalhe`) porque precisam compartilhar estado pra atualização otimista funcionar — o Server Component da página só busca os dados iniciais. `criarSerie` (FormData + contagem de `ordem` no servidor) foi substituída por `criarSerieRemoto` (recebe `id`/`ordem` já decididos pelo cliente, sem `redirect`/`revalidatePath` — quem chama já atualizou a UI antes). `id` de série agora é gerado no cliente (`crypto.randomUUID()`), não mais pelo Postgres — pré-requisito pra escrever offline sem esperar o servidor responder com um ID.
+
+**Verificado:** `npx vitest run` (66/66), `npx tsc --noEmit` (limpo), `next build` limpo.
+
+**Achado real — causa raiz do bloqueio de login encontrada e corrigida (não era infra, era o fixture de teste).** A primeira tentativa de verificar no navegador falhou com `AuthRetryableFetchError` / HTTP 500 `"Database error querying schema"` no login. Reproduzido fora do código do app (fetch direto ao `/auth/v1/token`), o que sugeria erro de infraestrutura do Supabase — **conclusão errada**, corrigida ao ler os **Auth Logs do próprio painel do Supabase** (acesso via navegador do dono, sessão já logada): o erro real era `error finding user: sql: Scan error on column index 5, name "created_at": unsupported Scan, storing driver.Value type <nil> into type *time.Time`. O `insert` manual em `auth.users` (usuário de teste, criado só para verificação — nunca dado do dono) não preenchia `created_at`/`updated_at`, colunas sem valor padrão; o driver Go do GoTrue não aceita `NULL` ali. Corrigido preenchendo os dois explicitamente no fixture de teste.
+
+**Verificado de ponta a ponta, com clique real na UI (não só `fetch` direto):** login → `/treino/<id>` → 2 séries registradas pelo formulário real. A tabela atualizou **na hora**, antes de qualquer round-trip — confirmado depois contra o Postgres: `ordem=1`/`ordem=2` corretos, `usuario_id` preenchido pelo trigger (nunca pelo cliente), RIR ausente gravado como `null` (não `0`, segunda série sem RIR). Usuário de teste, treino e as 2 séries removidos ao final (3 contagens = 0, confirmado numa query só), `/dev-login` apagada.
+
+**Fica para a tarefa 2.3, não para agora:** o cenário que este teste NÃO cobre é a rede cair de verdade no meio do registro (aqui a sincronização sempre teve rede disponível, só testei que o caminho "grava local → enfileira → sincroniza" funciona online). Isso exige celular real em modo avião — check executável já registrado na tabela acima.
+
+### Tarefa 2.3 — Background Sync (2026-08-05)
+
+**Por que o listener `online` da 2.2 não bastava:** só funciona com a aba em primeiro plano. A Background Sync API (`public/sw.js`, evento `sync`) deixa o **navegador** acordar o service worker quando a rede volta, mesmo com a aba em segundo plano — mais confiável em celular, que é o cenário real do PRD (J1, "o elevador derruba o sinal"). O SW não tem como chamar a Server Action `criarSerieRemoto` diretamente (não tem acesso ao runtime de Server Actions do Next), então ele avisa as abas abertas via `postMessage`; quem sincroniza de fato continua sendo o cliente. `src/lib/offline/sincronizacao-em-segundo-plano.ts` é a ponte: `pedirSincronizacaoEmSegundoPlano()` registra o interesse quando uma tentativa de sync falha, `ouvirPedidosDeSincronizacao()` reage ao aviso do SW. API experimental (sem suporte em Safari/Firefox) — tudo com `try/catch` silencioso, o listener `online` continua como fallback nesses navegadores.
+
+**Verificado no navegador, com rede genuinamente bloqueada (não só sem round-trip):** `window.fetch` sobrescrito pra rejeitar toda chamada (equivalente a modo avião do ponto de vista do código — a diferença de um teste em celular real é a camada do SO, não o comportamento observável pelo app). Registrei uma série: a UI confirmou na hora mesmo com a rede bloqueada; conferido na IndexedDB que a série ficou na fila (`tentativas: 1`); conferido que `registration.sync.register('sincronizar-outbox')` foi chamado de verdade. Restaurei a rede e simulei o aviso do SW (mensagem `sincronizar-outbox`, o mesmo formato que `avisarClientes()` envia): a fila esvaziou e a série apareceu no Postgres com os valores corretos. Usuário, treino e série de teste removidos (contagem = 0).
+
+**Fica para quando você tiver o celular à mão:** o teste real em modo avião do SO, com a tela de fato bloqueada/em segundo plano — o que este teste NÃO cobre é o navegador de verdade disparando o evento `sync` sozinho (isso é implementação nativa do Chrome, não código meu; testei que meu código reage certo ao que ele entrega, não a entrega em si).
+
+### Tarefa 2.5 — "repetir última série" (2026-08-05)
+
+`repetirUltimaSerie` em `treino-detalhe.tsx` reaproveita exercício/tipo/reps/peso/RIR/peso-corporal da última série do estado local e chama o mesmo `registrarSerie` do fluxo normal — sem formulário, um clique. Verificado com clique real: registrei uma série pelo formulário, cliquei "Repetir última série", e uma segunda linha idêntica apareceu na hora; conferido no Postgres — dois registros com `id`/`ordem` distintos (1 e 2), mesmos valores de reps/peso/rir. Usuário e dados de teste removidos (contagem = 0).
+
+### Tarefa 2.4 — PWA instalável (2026-08-05)
+
+**O que foi feito:** `public/manifest.webmanifest` (nome, ícone, `display: standalone`, `start_url: /treino`, `theme_color`), `public/icon.svg` (monograma simples — **pendência de polimento**: só SVG, sem PNG raster; o `apple-touch-icon` do iOS não usa SVG, então no iPhone o "adicionar à tela de início" cai pra uma miniatura da página em vez do ícone — sem sinal de que o dono usa iPhone, registrado como conhecido, não escondido). `public/sw.js`: service worker mínimo (install/activate/fetch passthrough, sem estratégia de cache ainda — isso é a tarefa 2.3) só pra satisfazer o critério de instalabilidade do Chrome (precisa de um SW ativo controlando o escopo). Registrado via `registrar-service-worker.tsx` montado no layout. Aproveitei pra corrigir o boilerplate do Next ainda não customizado (achado menor do Inspetor QA, tarefa 1): `lang="pt-BR"`, título/descrição reais em `layout.tsx`.
+
+**Verificado no navegador:** `/manifest.webmanifest` serve o JSON correto; `<link rel="manifest">`, `<meta name="theme-color">` e `lang="pt-BR"` presentes no HTML renderizado; `navigator.serviceWorker.getRegistrations()` retorna 1 registro ativo com o escopo certo.
+
+**NÃO verificado — e não dá pra verificar daqui:** o critério real da tarefa (instalar na tela inicial de um celular real e abrir em tela cheia) exige o dispositivo físico do dono. Fica pendente, não escondido.
+
+**Fica pendente, registrado, não escondido:** verificar o clique real (celular ou navegador) quando esse erro de infraestrutura for entendido/resolvido — pode valer a pena olhar os logs de Auth no painel do Supabase, algo que eu não tenho como acessar.
 
 ---
 
