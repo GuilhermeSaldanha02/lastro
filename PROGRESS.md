@@ -100,8 +100,8 @@ Achado 7 do QA original (isenção de `auth.uid()` no catálogo `exercicio`) foi
 
 | # | Tarefa | Modo | Estado | Check executável | Evidência |
 |---|---|---|---|---|---|
-| 1.1 | Projeto Next.js + Supabase + schema de `exercicio`/`treino`/`serie` com **todos** os campos do glossário | [HITL] | 🔶 SQL escrito, **não executado** | `npm run build` limpo; RLS ativa em toda tabela de usuário (FF5) | `npm run build`: exit 0. Migração (`0001_schema_inicial.sql`), seed, `scripts/ff5-rls.sql` e os clientes Supabase estão escritos, seguindo o SDD §3 — mas **nenhum dos 6 checks do §3.8 rodou**. Ver nota abaixo |
-| 1.2 | Tela mínima de registro de série (sem offline, sem polimento) | [AFK] | ⬜ Pendente | Registrar 5 séries reais e vê-las no Postgres | Depende de 1.1 (schema) |
+| 1.1 | Projeto Next.js + Supabase + schema de `exercicio`/`treino`/`serie` com **todos** os campos do glossário | [HITL] | ✅ Aplicado e verificado contra banco hospedado real | `npm run build` limpo; RLS ativa em toda tabela de usuário (FF5) | Ver nota detalhada abaixo — 5 dos 6 checks do §3.8 verificados contra o projeto hospedado `tbkzcqfvafznxallyfqk` (São Paulo). O 6º (isolamento entre 2 usuários reais via JWT) fica pendente até existir auth de verdade (Fase 2) |
+| 1.2 | Tela mínima de registro de série (sem offline, sem polimento) | [AFK] | ⬜ Pendente | Registrar 5 séries reais e vê-las no Postgres | Depende de 1.1 (schema) — **já pronta para começar** |
 | 1.3 | **Agregador de métricas — TDD estrito** | [HITL] | ✅ Concluído | Testes antes do código. Volume, e1RM, séries difíceis, frequência com valores conferidos à mão. **FF4:** fixture com aquecimento não altera nenhuma métrica. **FF3:** sem import de rede | **Verificado por execução real, não por relato do agente:** `npx vitest run` → 8 arquivos, **49/49 testes passando** (saída colada, não resumida). `grep` FF3 → 0. `grep new Date()` (C4) → 0. `npm run build` → limpo. Interpretação do engenheiro registrada em `DECISIONS.md`: semana fecha na segunda — é a única leitura que bate os 30 valores do SDD §4.5 sem editar fixture, mas ainda depende de você confirmar na 1.0d |
 | 1.4 | Route handler da Gemini — recebe **só o resumo**, nunca séries cruas | [HITL] | ⬜ Pendente | **FF1 e FF2:** SDK ausente do cliente, chave ausente do bundle de produção | Depende de 1.1 (ler séries do Supabase) |
 | 1.5 | Botão Análise + as 5 perguntas + exibição do parecer | [HITL] | ⬜ Pendente | 3 pareceres gerados sobre dados reais. **Critério A6:** cada um cita ao menos um exercício e um número do dono. Parecer que serviria pra qualquer pessoa = falha | |
@@ -116,15 +116,28 @@ Achado 7 do QA original (isenção de `auth.uid()` no catálogo `exercicio`) foi
 | 1.0c | Ler a quota real da Gemini no console do AI Studio | [HITL] | Valor **medido**, com data, em `KNOWLEDGE.md` §3.2. **Bloqueia a premissa do ADR-001** |
 | 1.0d | Definir a regra de liberação semanal do botão Análise | [HITL] | Decisão do dono registrada no PRD §3. A tarefa 1.5 não fecha sem isto — sem a regra, vira improviso na hora |
 
-### Bloqueio de infraestrutura na tarefa 1.1 — Docker local (2026-08-04)
+### Como a tarefa 1.1 foi fechada — Docker local abandonado, projeto hospedado (2026-08-04)
 
-**Não é falha do SQL, é falta de onde rodá-lo.** `npx supabase start` falhou 2x com `LegacyHealthCheckTimeoutError`/`LegacyDockerLifecycleInspectError` — `analytics`, `storage` e `pg_meta` nunca ficaram saudáveis, e na segunda tentativa o **Docker Desktop caiu por completo** (máquina com só 3.8 GB alocados ao Docker, insuficiente para o stack cheio). Desliguei `analytics` e `edge_runtime` em `supabase/config.toml` (nenhum dos dois é usado em fase alguma do projeto) — mas não tentei uma terceira vez: **dois erros no mesmo lugar é E6**, e depois de tentar reduzir carga a resposta certa não é insistir com o Docker de novo, é levar a decisão ao dono.
+**O caminho local não vingou.** `npx supabase start` falhou 2x (`LegacyHealthCheckTimeoutError` em analytics/storage/pg_meta, depois o Docker Desktop caiu por completo — máquina com só 3.8 GB alocados). Parei depois do segundo erro no mesmo lugar (E6) e levei a decisão ao dono, que escolheu **(b) projeto hospedado**.
 
-**Erro meu no meio do caminho, registrado por honestidade:** a primeira tentativa rodou como `npx supabase start 2>&1 | tail -40`, e o pipe mascarou o exit code real — a notificação de background reportou "exit code 0" (do `tail`, não do `supabase start`), e eu quase segui em frente achando que tinha funcionado. Corrigido gravando o exit code de dentro do log, não confiando no status externo da ferramenta. Lição para `KNOWLEDGE.md` §5.
+**Passo a passo real do que funcionou:**
+1. Projeto criado pelo controller via navegador, usando a sessão já autenticada do dono (GitHub SSO) — `mcp__claude-in-chrome`. Nome `lastro`, região `sa-east-1` (São Paulo), `sb_publishable`/`anon` como chave pública. **A senha do banco foi digitada pelo próprio dono** — o controller nunca a viu, parou exatamente nesse campo e retomou depois. Duas configurações de segurança ajustadas na criação: `Expor automaticamente novas tabelas` **desligado** (contradiz RLS explícita do projeto) e `Ativar RLS automático` **ligado** (camada extra).
+2. **Tentativa de aplicar a migração pelo SQL Editor do dashboard falhou** — o editor tem algum recurso (provavelmente assistente de IA, não tradução simples) que reescreve/parafraseia SQL digitado em tempo real ("text primary key" virou "chave primária de texto de identificação"). Três tentativas, todas corrompidas. Nenhuma chegou a ser executada — banco permaneceu limpo. Abandonado por E6 (mesmo erro, terceira vez seguida).
+3. **Autenticação da CLI:** `supabase login` não funciona neste ambiente de execução — não é terminal interativo de verdade, e a CLI recusa login automático fora de TTY (`LegacyLoginMissingTokenError`, testado 2x, com e sem `--no-browser`). Também não é possível digitar num terminal real via computer-use (nível de acesso "click", digitação bloqueada por segurança do próprio Windows). **O dono rodou `npx supabase login` no terminal dele mesmo** — único passo que precisou ser humano. Credencial ficou salva em disco no perfil da CLI, nunca passou pelo chat.
+4. Com a CLI logada: `supabase link --project-ref tbkzcqfvafznxallyfqk` → `supabase db push` (migração aplicada; um aviso não-fatal sobre cache de catálogo pg-delta apareceu, mas a migração de fato aplicou — confirmado por `migration list` mostrando local=remote=0001, não só pelo exit code).
+5. Seed aplicado via `supabase db query --linked -f supabase/seed.sql` (não existe comando de "seed push" para projeto remoto na CLI atual).
+6. **Verificação real, item por item do SDD §3.8:**
+   - ✅ `scripts/ff5-rls.sql` contra o banco real: `tabelas_sem_protecao_por_dono = 0` **e** `catalogo_sem_rls = 0` (as duas partes rodadas separadamente, porque `db query -f` só devolve o resultado da última statement de um arquivo).
+   - ✅ Seed conferido por contagem: `total_grupos = 7`, `total_exercicios = 3` — batem exatamente com `seed.sql`.
+   - ✅ `insert` com `rir=0` + `tipo='valendo'` — passou (RIR 0 = falha é válido).
+   - ✅ `insert` com `rir=0` + `tipo='aquecimento'` — falhou na constraint certa (`serie_rir_so_valendo`).
+   - ✅ `insert` com `tipo='cardio'` — falhou na constraint certa (`serie_tipo_valido`).
+   - ⬜ **Isolamento entre 2 usuários via JWT real** (`treino_id` de outro usuário) — não testado. Exige 2 usuários autenticados de verdade; a Fase 1 assume auth manual via painel (SDD §3.6), e criar isso só para o teste seria esforço desproporcional agora. **Fica pendente, não escondido** — retestar quando a Fase 2 (auth) existir, ou antes se o dono preferir.
+   - Dados de teste (usuário/treino temporários) **apagados ao final**, confirmado por contagem = 0.
+7. `.env.local` criado com `NEXT_PUBLIC_SUPABASE_URL` e a chave `publishable` (pública, protegida por RLS). **A `service_role` nunca foi escrita em arquivo nenhum.** Coberto pelo `.gitignore` (`.env.*`), confirmado com `git check-ignore -v`.
+8. `npm run build` limpo com o ambiente real. `npx vitest run` — 49/49 continuam passando (regressão da tarefa 1.3, intacta).
 
-**Decisão que só o dono pode tomar** (duas opções, custo baixo nas duas):
-- **(a)** Aumentar a memória do Docker Desktop (Settings → Resources) e rodar `npx supabase start` de novo — mantém tudo local.
-- **(b)** Criar um projeto Supabase hospedado (free tier) e rodar a migração contra ele — evita o Docker local por completo, e é onde o app vai morar de verdade em produção. Como bônus, resolve junto a tela de consentimento OAuth do Google que a tarefa 2.1 já vai pedir.
+**Duas lições registradas em `KNOWLEDGE.md` §5:** pipe mascarando exit code (`cmd | tail`), e um editor web pode reescrever texto digitado de formas inesperadas — para SQL/código sensível a sintaxe, preferir CLI a editor de navegador quando disponível.
 
 ---
 
