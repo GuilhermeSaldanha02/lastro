@@ -23,9 +23,31 @@ function normalizarToken(token: string): number {
   return Number(token.replace(",", "."));
 }
 
-/** Extrai todo token numérico do parecer (SDD §6.4, passo 4). */
+/**
+ * Extrai todo token numérico do parecer (SDD §6.4, passo 4).
+ *
+ * Duas correções sobre a versão original, achadas testando com dados
+ * realistas (persona "Consistente Pesado", qa-treino, 2026-08-05) — sem
+ * elas, TODO parecer que citasse uma data ISO ou o termo "e1RM" era
+ * rejeitado por engano, mesmo com números corretos:
+ *
+ * 1. Data ISO ("2026-07-27") tem hífen antes do mês e do dia — o regex
+ *    original lia isso como SINAL DE MENOS, produzindo "-07" e "-27"
+ *    (negativos), que nunca batem com os componentes de data POSITIVOS
+ *    do conjunto CONTEXTO. Corrigido separando a data em componentes
+ *    (espaço no lugar do hífen) ANTES da extração genérica.
+ * 2. Sigla técnica com dígito embutido ("e1RM") tinha o "1" extraído como
+ *    se fosse número citado. Corrigido com lookbehind negativo de letra:
+ *    um dígito colado a uma letra IMEDIATAMENTE ANTES não conta como
+ *    início de número (mas "80kg", com letra DEPOIS, continua válido —
+ *    só a letra antes é o sinal de "isto é parte de uma palavra").
+ */
 function extrairTokens(parecer: string): number[] {
-  const brutos = parecer.match(/-?\d+(?:[.,]\d+)?/g) ?? [];
+  const semDatasIso = parecer.replace(
+    /\b(\d{4})-(\d{2})-(\d{2})\b/g,
+    "$1 $2 $3",
+  );
+  const brutos = semDatasIso.match(/(?<![a-zA-Z])-?\d+(?:[.,]\d+)?/g) ?? [];
   return brutos.map(normalizarToken).filter((n) => Number.isFinite(n));
 }
 

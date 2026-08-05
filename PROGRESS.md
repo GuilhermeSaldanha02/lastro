@@ -207,6 +207,20 @@ Os 3 pontos do §5.4 confirmados: `usuario_id` correto em todas (preenchido pelo
 
 **O que falta para a 1.6:** os 3 pareceres acima foram sobre dados **sintéticos de teste**, não sobre o treino real do dono. A tarefa 1.6 — o portão que decide se a peça-assinatura convence — só pode ser cumprida por você, registrando séries reais e lendo o parecer sobre a sua própria Análise.
 
+### `qa-treino` — dogfooding com 3 personas simuladas (2026-08-05, EM ANDAMENTO)
+
+Especialista novo registrado (`CLAUDE.md`, `.claude/agents/qa-treino.md`): simula persona real usando o app de ponta a ponta, avalia se o parecer convence, não só se está correto. Script de apoio `scripts/qa-treino-helper.sh` (criar usuário de teste, autenticar, chamar `/api/analise` real) testado nos 4 comandos antes de confiar a subagentes.
+
+**As 3 primeiras instâncias (subagentes em background) caíram por limite de sessão da conta antes de terminar** — nenhuma chegou a gerar parecer. O controller assumiu as 3 personas diretamente.
+
+**Achado crítico real, direto da persona "Consistente Pesado" — bug no validador, não na persona.** Histórico de 16 treinos/41 séries revelou que `validarNumeros` rejeitava sistematicamente pareceres corretos: hífen de data ISO ("2026-07-27") lido como sinal de menos; "1" embutido em "e1RM" lido como número citado. **100% das primeiras chamadas caíam no fallback determinístico** — a peça-assinatura nunca mostraria o parecer real da IA em uso normal. Corrigido em `validador.ts`, 2 testes novos travando a correção (56/56 passando), reproduzido isoladamente e confirmado contra o servidor real antes e depois da correção. Detalhe completo em `DECISIONS.md`.
+
+**Achado de UX real (persona "Consistente Pesado"):** as respostas às perguntas 1, 2, 4 e 5 se repetem muito quando o histórico cobre poucos exercícios/grupos — mesmos números, redação quase idêntica. Com pouca "superfície" de dado, as 5 perguntas convergem para o mesmo conteúdo. Vale considerar, numa fase futura, direcionar mais o prompt de cada pergunta a um ângulo específico (ex.: pergunta 4 puxar para frequência/recuperação, não repetir volume de séries).
+
+**Lição de processo:** delegar "decida seu histórico de treino" para subagente sem faixa numérica de referência produziu volume absurdo (180 a 2832 séries por persona, quando o esperado era dezenas) — registrado em `KNOWLEDGE.md` §5.
+
+**Faltam:** persona "Irregular" e "Amplo" — a rodar após esta.
+
 ---
 
 ## Fase 2 — Registro que sobrevive à academia · ⬜ Não iniciada

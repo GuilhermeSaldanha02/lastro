@@ -127,4 +127,35 @@ describe("validarNumeros", () => {
       expect(resultado.citados).toContain(1300);
     }
   });
+
+  it("parecer citando data em formato ISO (2026-07-27) → ok true, hífen da data não vira sinal de menos (achado real, qa-treino 2026-08-05)", () => {
+    const resumo = resumoBase();
+    const parecer =
+      "Na semana iniciada em 2026-07-27, seu volume total foi 1300.";
+
+    const resultado = validarNumeros(parecer, resumo, []);
+
+    expect(resultado.ok).toBe(true);
+    if (resultado.ok) {
+      expect(resultado.citados).toContain(1300);
+      // "-07" e "-27" não podem aparecer como intrusos derivados do hífen.
+    }
+  });
+
+  it('parecer citando "e1RM" (termo com dígito embutido) → o "1" de dentro da sigla não vira número citado (achado real, qa-treino 2026-08-05)', () => {
+    const resumo = resumoBase();
+    // 47 não existe em nenhum campo do resumoBase — único candidato a
+    // intruso deveria ser 47; o "1" embutido em "e1RM" não pode aparecer.
+    const parecer = "Seu e1RM no supino chegou perto de 47, um bom sinal.";
+
+    const resultado = validarNumeros(parecer, resumo, []);
+
+    expect(resultado.ok).toBe(false);
+    if (!resultado.ok && resultado.motivo === "intrusos") {
+      expect(resultado.intrusos).not.toContain(1);
+      expect(resultado.intrusos).toEqual([47]);
+    } else {
+      throw new Error("esperava motivo 'intrusos' contendo só [47]");
+    }
+  });
 });
