@@ -207,7 +207,7 @@ Os 3 pontos do §5.4 confirmados: `usuario_id` correto em todas (preenchido pelo
 
 **O que falta para a 1.6:** os 3 pareceres acima foram sobre dados **sintéticos de teste**, não sobre o treino real do dono. A tarefa 1.6 — o portão que decide se a peça-assinatura convence — só pode ser cumprida por você, registrando séries reais e lendo o parecer sobre a sua própria Análise.
 
-### `qa-treino` — dogfooding com 3 personas simuladas (2026-08-05, EM ANDAMENTO)
+### `qa-treino` — dogfooding com 3 personas simuladas (2026-08-05, INTERROMPIDO — sem quota, não por falha)
 
 Especialista novo registrado (`CLAUDE.md`, `.claude/agents/qa-treino.md`): simula persona real usando o app de ponta a ponta, avalia se o parecer convence, não só se está correto. Script de apoio `scripts/qa-treino-helper.sh` (criar usuário de teste, autenticar, chamar `/api/analise` real) testado nos 4 comandos antes de confiar a subagentes.
 
@@ -219,7 +219,15 @@ Especialista novo registrado (`CLAUDE.md`, `.claude/agents/qa-treino.md`): simul
 
 **Lição de processo:** delegar "decida seu histórico de treino" para subagente sem faixa numérica de referência produziu volume absurdo (180 a 2832 séries por persona, quando o esperado era dezenas) — registrado em `KNOWLEDGE.md` §5.
 
-**Faltam:** persona "Irregular" e "Amplo" — a rodar após esta.
+**Persona "Irregular" — parcial.** 5 treinos/9 séries desenhados para cobrir semana sem treino, sessão só de aquecimento e cobertura de RIR baixa. Perguntas 1 e 3 retornaram parecer real (`ok`); pergunta 2 caiu no fallback (variação normal, não bug — mesmo padrão já visto). Tecnicamente confirmado: semana sem treino aparece com `volume_total: 0` explícito no `volume_semanal`, exatamente como o agregador prevê. **Pergunta 3 em diante bloqueada por 429 (RESOURCE_EXHAUSTED)** — ver achado abaixo.
+
+**Achado crítico de infraestrutura — quota da Gemini estourada, não bug de código.** Depois de investigar um `HTTP 500` persistente (reproduzido isolado sem erro, reiniciado o servidor duas vezes, testado com usuário novo — tudo descartado), a causa real apareceu chamando a API diretamente: `RESOURCE_EXHAUSTED`, **limite de 20 requisições/dia** para `gemini-3.6-flash` no free tier. Isso resolve (do jeito mais caro possível) a tarefa **1.0c**, pendente desde o bootstrap. **Invalida a premissa do ADR-001** ("free tier cobre com folga") — com até 2 chamadas por pergunta, sobram ~10 perguntas/dia, contando junto qualquer chamada de desenvolvimento. Detalhe e as 3 opções de caminho (aguardar reset / trocar modelo / habilitar billing) em `DECISIONS.md` — **decisão do dono, não tomada aqui**.
+
+**Persona "Amplo" — não iniciada.** Bloqueada pela mesma quota.
+
+**Limpeza confirmada:** os 4 usuários de teste desta rodada (`pesado`, `irregular`, `amplo`, `smoke-test`) removidos, contagem = 0 confirmada em uma única query final. Nenhum resíduo em disco (scripts de debug e SQL temporários apagados).
+
+**Retomar quando:** a quota resetar (diária) ou o dono decidir um dos 3 caminhos do achado acima. Não adianta tentar de novo antes disso — a mesma chamada `curl` direto à API confirmou o bloqueio, não é intermitente.
 
 ---
 

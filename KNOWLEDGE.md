@@ -57,9 +57,12 @@ Fontes: [Hevy vs Strong 2026](https://setgraph.app/ai-blog/hevy-vs-strong-app-co
 ### 3.1 Gemini — a chave nunca toca o cliente
 Num app web, qualquer chave embarcada no bundle é lida no DevTools. Toda chamada obrigatoriamente passa por route handler no servidor. Isso é restrição de arquitetura, virou fitness function no ADR.
 
-### 3.2 Gemini — quota: NÃO CONFIAR EM FONTE SECUNDÁRIA
-As fontes públicas se contradizem sobre o free tier (500 RPD vs 1.500 RPD) e mencionam um corte de 50–80% nas quotas em dezembro/2025. O Google deixou de publicar tabela universal — a quota é **por projeto** e só é confiável lida no console do AI Studio.
-**Pendência:** ler a quota real do projeto e registrar aqui como **valor medido, com data**. Até lá, não existe orçamento de quota neste projeto.
+### 3.2 Gemini — quota: MEDIDA (não mais pendência)
+As fontes públicas se contradizem sobre o free tier (500 RPD vs 1.500 RPD) e mencionam um corte de 50–80% nas quotas em dezembro/2025. O Google deixou de publicar tabela universal — a quota é **por projeto e por modelo**.
+
+**Valor medido, com data (2026-08-05):** o projeto real, rodando `gemini-3.6-flash`, bateu em `RESOURCE_EXHAUSTED` (HTTP 429) durante testes do `qa-treino` — mensagem literal: `"Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 20, model: gemini-3.6-flash"`. **Limite real: 20 requisições/dia**, não medido antecipadamente (a tarefa 1.0c ficou pendente até o limite ser batido em uso real, não em teste controlado).
+
+**Isso invalida a premissa do ADR-001** ("o free tier cobre um usuário com folga") — 20 req/dia é **apertado**, não folgado: cada pergunta da Análise pode consumir até 2 chamadas (1ª tentativa + retry de validação), então na prática são **~10 perguntas/dia no máximo**, e isso conta junto com qualquer chamada de desenvolvimento/debug/teste. Decisão de como proceder (aguardar reset diário, trocar de modelo, considerar billing) registrada em `DECISIONS.md` — não é decisão que se toma sozinho, é trade-off de custo/produto do dono.
 
 ### 3.3 Dados de exercício — por que catálogo curado venceu API pronta
 - `ExerciseDB`: 1500–11000 exercícios com GIF, mas a procedência das mídias é nebulosa (risco de licença) e os nomes são em inglês.
