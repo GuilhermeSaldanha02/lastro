@@ -72,6 +72,9 @@ Definida em `.claude/agents/` — 1 arquivo por papel, com `model` e `tools` exp
 | `engenheiro` | implementar item do SDD, componente, correção localizada |
 | `diretor-arte` | decisão visual, peça-assinatura, tokens, motion, gate visual |
 | `inspetor-qa` | review de risco sutil, integração final, antes de merge |
+| `qa-treino` | dogfooding de UX antes de release — simula persona real de treino, ponta a ponta |
+
+**Especialista novo, registrado (2026-08-05):** `qa-treino` — a equipe base revisa código e schema, mas nenhum papel simula um usuário real interagindo com a peça-assinatura para avaliar se o parecer *convence*, não só se está tecnicamente correto. Rodar 3-5 instâncias em paralelo, cada uma com persona distinta.
 
 ---
 
