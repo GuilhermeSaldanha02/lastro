@@ -39,6 +39,24 @@ export default function TreinoDetalhe({
     return () => window.removeEventListener("online", sincronizarPendentes);
   }, []);
 
+  /**
+   * D3 (PRD §4.1) — "repetir a última série" é a ação mais frequente do
+   * app: reaproveita exercício/tipo/reps/peso/RIR da última série e
+   * registra de novo, sem passar pelo formulário.
+   */
+  async function repetirUltimaSerie(): Promise<void> {
+    const ultima = series[series.length - 1];
+    if (!ultima) return;
+    await registrarSerie({
+      exercicioId: ultima.exercicioId,
+      tipo: ultima.tipo,
+      reps: ultima.reps,
+      peso: ultima.peso,
+      rir: ultima.rir,
+      pesoCorporalIncluso: ultima.pesoCorporalIncluso,
+    });
+  }
+
   async function registrarSerie(dados: DadosNovaSerie): Promise<void> {
     const exercicio = exercicios.find((e) => e.id === dados.exercicioId);
     if (!exercicio) throw new Error("Exercício não encontrado no catálogo.");
@@ -109,6 +127,12 @@ export default function TreinoDetalhe({
             ))}
           </tbody>
         </table>
+      )}
+
+      {series.length > 0 && (
+        <button type="button" onClick={repetirUltimaSerie}>
+          Repetir última série
+        </button>
       )}
 
       <h2>Registrar série</h2>

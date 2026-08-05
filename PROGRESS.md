@@ -238,8 +238,8 @@ Especialista novo registrado (`CLAUDE.md`, `.claude/agents/qa-treino.md`): simul
 | 2.1 | Auth: Google OAuth + e-mail | [HITL] | ⬜ Aguardando você | Login no celular e no PC, mesmo treino nos dois (A8). **Depende do dono configurar a tela de consentimento OAuth** — ver instruções na conversa |
 | 2.2 | IndexedDB (Dexie) + fila outbox | [HITL] | ✅ Verificado fim a fim (online) — só falta o teste em celular real com rede caindo de verdade (2.3) | Registro grava local e a UI confirma sem esperar rede (D6) |
 | 2.3 | Service worker + sincronização | [HITL] | ⬜ Não iniciada | **FF6/A1:** celular real em modo avião, 3 séries, reativar rede, conferir no PC |
-| 2.4 | PWA instalável | [AFK] | ⬜ Não iniciada | Instalar na tela inicial do celular real e abrir em tela cheia |
-| 2.5 | "Repetir última série" em um toque | [AFK] | ⬜ Não iniciada | D3: um toque, medido no aparelho real |
+| 2.4 | PWA instalável | [AFK] | 🔶 Manifest + SW mínimo verificados no navegador; falta instalar num celular real | Instalar na tela inicial do celular real e abrir em tela cheia |
+| 2.5 | "Repetir última série" em um toque | [AFK] | ✅ Verificado fim a fim | D3: um toque, medido no aparelho real |
 
 ### Tarefa 2.2 — o que foi feito e o que falta verificar (2026-08-05)
 
@@ -254,6 +254,18 @@ Especialista novo registrado (`CLAUDE.md`, `.claude/agents/qa-treino.md`): simul
 **Verificado de ponta a ponta, com clique real na UI (não só `fetch` direto):** login → `/treino/<id>` → 2 séries registradas pelo formulário real. A tabela atualizou **na hora**, antes de qualquer round-trip — confirmado depois contra o Postgres: `ordem=1`/`ordem=2` corretos, `usuario_id` preenchido pelo trigger (nunca pelo cliente), RIR ausente gravado como `null` (não `0`, segunda série sem RIR). Usuário de teste, treino e as 2 séries removidos ao final (3 contagens = 0, confirmado numa query só), `/dev-login` apagada.
 
 **Fica para a tarefa 2.3, não para agora:** o cenário que este teste NÃO cobre é a rede cair de verdade no meio do registro (aqui a sincronização sempre teve rede disponível, só testei que o caminho "grava local → enfileira → sincroniza" funciona online). Isso exige celular real em modo avião — check executável já registrado na tabela acima.
+
+### Tarefa 2.5 — "repetir última série" (2026-08-05)
+
+`repetirUltimaSerie` em `treino-detalhe.tsx` reaproveita exercício/tipo/reps/peso/RIR/peso-corporal da última série do estado local e chama o mesmo `registrarSerie` do fluxo normal — sem formulário, um clique. Verificado com clique real: registrei uma série pelo formulário, cliquei "Repetir última série", e uma segunda linha idêntica apareceu na hora; conferido no Postgres — dois registros com `id`/`ordem` distintos (1 e 2), mesmos valores de reps/peso/rir. Usuário e dados de teste removidos (contagem = 0).
+
+### Tarefa 2.4 — PWA instalável (2026-08-05)
+
+**O que foi feito:** `public/manifest.webmanifest` (nome, ícone, `display: standalone`, `start_url: /treino`, `theme_color`), `public/icon.svg` (monograma simples — **pendência de polimento**: só SVG, sem PNG raster; o `apple-touch-icon` do iOS não usa SVG, então no iPhone o "adicionar à tela de início" cai pra uma miniatura da página em vez do ícone — sem sinal de que o dono usa iPhone, registrado como conhecido, não escondido). `public/sw.js`: service worker mínimo (install/activate/fetch passthrough, sem estratégia de cache ainda — isso é a tarefa 2.3) só pra satisfazer o critério de instalabilidade do Chrome (precisa de um SW ativo controlando o escopo). Registrado via `registrar-service-worker.tsx` montado no layout. Aproveitei pra corrigir o boilerplate do Next ainda não customizado (achado menor do Inspetor QA, tarefa 1): `lang="pt-BR"`, título/descrição reais em `layout.tsx`.
+
+**Verificado no navegador:** `/manifest.webmanifest` serve o JSON correto; `<link rel="manifest">`, `<meta name="theme-color">` e `lang="pt-BR"` presentes no HTML renderizado; `navigator.serviceWorker.getRegistrations()` retorna 1 registro ativo com o escopo certo.
+
+**NÃO verificado — e não dá pra verificar daqui:** o critério real da tarefa (instalar na tela inicial de um celular real e abrir em tela cheia) exige o dispositivo físico do dono. Fica pendente, não escondido.
 
 **Fica pendente, registrado, não escondido:** verificar o clique real (celular ou navegador) quando esse erro de infraestrutura for entendido/resolvido — pode valer a pena olhar os logs de Auth no painel do Supabase, algo que eu não tenho como acessar.
 
