@@ -201,3 +201,22 @@
 **Impacto.** Nenhum — código já implementado dessa forma. Só fecha a pendência formal.
 
 **Como reverter.** Se a confusão for real no uso do dia a dia, revisitar como a alternativa descartada acima (Fase 3), não como reversão desta decisão.
+
+---
+
+## 2026-08-05 — Revisão estática do Inspetor QA: 4 bugs reais corrigidos antes do PR da Fase 1
+
+**O que mudou.** Antes de abrir o PR da Fase 1, rodei uma revisão estática de todos os 13 commits (agente Inspetor QA). Ele reportou 8 achados + itens menores. Segui E8 (review é alegação, não verdade) e reproduzi cada achado de severidade alta isoladamente antes de tocar em código — 4 se confirmaram como bugs reais, todos corrigidos nesta rodada:
+
+1. **Fuso horário (UTC vs. Brasília) quebrando a fronteira da semana ISO.** `criarTreino` (`src/lib/dados/treino.ts`) gravava `data = new Date().toISOString().slice(0,10)` — UTC puro. BRT é UTC-3, então um treino feito às 22h de domingo em Brasília (01h de segunda em UTC) era salvo com a data de **segunda**, empurrando o treino pra semana ISO seguinte. O mesmo problema existia em `route.ts` (`agora = new Date()`), afetando qual semana a Análise considera "a última completa". Corrigido com `src/lib/tempo.ts` (`dataLocalBrasil`, `Intl.DateTimeFormat` fixado em `America/Sao_Paulo`) nos dois pontos. Reproduzido e travado por teste (`tempo.test.ts`): 22h de domingo BRT → ainda é domingo.
+2. **Validador rejeitava queda percentual sem sinal escrito.** Prosa natural em português ("seu supino caiu 15%") nunca escreve o sinal de menos que existe no `delta_pct` numérico (-15) — o parecer correto virava "intruso". Corrigido expandindo o conjunto de comparação com o módulo de cada valor (`Math.abs`), sem perder especificidade (a magnitude ainda precisa vir do dado real, só o sinal fica livre).
+3. **Separador de milhar PT-BR ("12.480") lido como decimal.** `normalizarToken` só troca vírgula por ponto; um volume real de 12480kg escrito como "12.480" virava `12.48` e nunca batia com o dado. Corrigido normalizando o padrão `\d{1,3}(\.\d{3})+` antes da extração genérica (mesma técnica já usada para data ISO).
+4. **Exercício sem sessão numa semana virava "estagnado".** `estagnacao.ts` tratava `volume = 0` (nenhuma série naquela semana) como "sem melhora", igual a um exercício realmente treinado sem progresso — violando a Regra da Presença (ausência ≠ valor neutro). Corrigido: `ValoresSemanaisExercicio.volume` agora é `number | undefined` (`undefined` = sem sessão), e `calcularEstagnacoes` filtra semanas ausentes antes de contar o streak.
+
+Também corrigidos, achados menores confirmados por leitura direta (sem precisar de reprodução isolada): texto fixo "rosca alternada" na UI aparecia para **qualquer** exercício unilateral (`formulario-serie.tsx`, generalizado para "Exercício unilateral"); o exercício placeholder de teste `seed.sql` chamava-se "Rosca direta" (nome de exercício tipicamente bilateral) mas estava marcado `unilateral: true` — renomeado para "Rosca alternada".
+
+**Por quê.** Os 4 bugs numerados são da MESMA classe do bug crítico já corrigido na tarefa anterior (validador rejeitando parecer correto / dado numérico mal interpretado) — silenciosos, só aparecem com dado ou cenário realista, e minam diretamente a promessa da peça-assinatura ("cita números e exercícios reais do dono"). O de fuso horário é o mais sério dos quatro: pode fazer um treino sumir da semana certa sem qualquer erro visível.
+
+**Achados NÃO corrigidos, registrados como pendência conhecida (baixa severidade, não bloqueiam o PR):** a Análise não deixa explícito no parecer/UI qual semana está sendo analisada (achados #5/#6 do Inspetor); `grupos_sem_estimulo` sem teto de tamanho (achado #7); boilerplate do Next não customizado em `page.tsx`/`layout.tsx`. Nenhum desses compromete a correção dos números — são polimento, candidatos à Fase 3.
+
+**Como reverter.** Reverter o commit — `tempo.test.ts`, os 2 testes novos em `validador.test.ts` e o T-S3 em `estagnacao.test.ts` travam as 3 correções de lógica; removê-los sem reverter o código quebraria a suíte silenciosamente.

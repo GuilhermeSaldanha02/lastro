@@ -41,4 +41,21 @@ describe("calcularEstagnacoes", () => {
     ]);
     expect(resultado).toEqual([]);
   });
+
+  // T-S3: exercício abandonado (semanas sem sessão, volume undefined) não pode
+  // virar "estagnado" — ausência não é "0 estável" (Regra da Presença; achado
+  // real, revisão estática qa-treino, 2026-08-05).
+  it("T-S3: exercício com semanas sem sessão (volume undefined) -> ausência não conta como estagnação", () => {
+    const semanas: ValoresSemanaisExercicio[] = [
+      { semanaInicio: "2026-06-29", e1rm: 66.7, volume: 1200 },
+      { semanaInicio: "2026-07-06", volume: undefined },
+      { semanaInicio: "2026-07-13", volume: undefined },
+      { semanaInicio: "2026-07-20", volume: undefined },
+      { semanaInicio: "2026-07-27", volume: undefined },
+    ];
+    const resultado = calcularEstagnacoes([
+      { exercicio: "Rosca direta", semanas },
+    ]);
+    expect(resultado).toEqual([]);
+  });
 });

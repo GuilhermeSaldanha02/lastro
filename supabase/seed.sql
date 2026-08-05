@@ -26,5 +26,5 @@ insert into public.grupo_muscular (id, nome) values
 -- volume.test.ts, prs.test.ts etc. Não é o catálogo real do dono (§3.5 TODO).
 insert into public.exercicio (nome, grupo_muscular_primario, unilateral) values
   ('Supino reto com barra', 'peito',      false),
-  ('Rosca direta',          'biceps',     true),
+  ('Rosca alternada',       'biceps',     true),
   ('Agachamento livre',     'quadriceps', false);

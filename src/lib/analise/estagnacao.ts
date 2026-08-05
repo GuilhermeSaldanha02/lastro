@@ -5,7 +5,8 @@ export type ValoresSemanaisExercicio = {
   semanaInicio: string;
   /** e1RM máximo elegível da semana para o exercício. `undefined` = sem sessão elegível. */
   e1rm?: number;
-  volume: number;
+  /** `undefined` = nenhuma série do exercício nesta semana (ausente, não "0 estável" — Regra da Presença). */
+  volume?: number;
 };
 
 export type EntradaEstagnacao = {
@@ -39,7 +40,12 @@ export function calcularEstagnacoes(
   const resultado: Estagnacao[] = [];
 
   for (const entrada of entradas) {
-    const { exercicio, semanas } = entrada;
+    // Semana sem sessão (`volume === undefined`) é ausência, não "0 estável"
+    // — a Regra da Presença exige que ela fique fora da conta de progresso
+    // em vez de contar como "sem melhora" (achado real, revisão estática
+    // qa-treino, 2026-08-05). Só semanas com sessão real entram no streak.
+    const semanas = entrada.semanas.filter((s) => s.volume !== undefined) as
+      (ValoresSemanaisExercicio & { volume: number })[];
     if (semanas.length < 2) continue;
 
     let maxE1rm = semanas[0].e1rm ?? -Infinity;
@@ -68,7 +74,7 @@ export function calcularEstagnacoes(
 
     if (streak >= SEMANAS_ESTAGNACAO) {
       const entradaResultado: Estagnacao = {
-        exercicio,
+        exercicio: entrada.exercicio,
         semanas_sem_progresso: streak,
       };
       if (ultimoE1rmEstavel !== undefined) {

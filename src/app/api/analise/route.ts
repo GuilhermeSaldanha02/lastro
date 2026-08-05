@@ -10,11 +10,13 @@
 import { NextResponse } from "next/server";
 import { criarClienteServidor } from "@/lib/supabase/cliente-servidor";
 import { montarResumoCompacto } from "@/lib/analise/agregar";
+import { paraDataUTC } from "@/lib/analise/semanas";
 import type {
   ExercicioBruto,
   ResumoCompacto,
   TreinoBruto,
 } from "@/lib/analise/tipos";
+import { dataLocalBrasil } from "@/lib/tempo";
 import { ClienteParecerGemini } from "./gemini";
 import { montarPrompt } from "./prompt";
 import { validarNumeros } from "./validador";
@@ -170,7 +172,11 @@ export async function POST(request: Request) {
     carregarExercicios(supabase),
   ]);
 
-  const agora = new Date();
+  // Ancorado no calendário de Brasília (src/lib/tempo.ts), não UTC —
+  // `semanas.ts` trata todo Date recebido como calendário Y-M-D via
+  // getUTC*; sem essa conversão, checar a Análise à noite podia calcular
+  // a semana errada perto da virada do dia.
+  const agora = paraDataUTC(dataLocalBrasil());
   const resumo = montarResumoCompacto({ treinos, exercicios, agora });
 
   if (resumo.versao !== 1) {

@@ -41,13 +41,21 @@ function normalizarToken(token: string): number {
  *    um dígito colado a uma letra IMEDIATAMENTE ANTES não conta como
  *    início de número (mas "80kg", com letra DEPOIS, continua válido —
  *    só a letra antes é o sinal de "isto é parte de uma palavra").
+ * 3. Separador de milhar PT-BR ("12.480") era lido como decimal — o "."
+ *    vira separador de milhar aqui, não de casas decimais (que é a
+ *    vírgula). Sem isso, "12.480" virava 12.48 e nunca batia com o dado
+ *    real (achado real, revisão estática qa-treino, 2026-08-05).
  */
 function extrairTokens(parecer: string): number[] {
   const semDatasIso = parecer.replace(
     /\b(\d{4})-(\d{2})-(\d{2})\b/g,
     "$1 $2 $3",
   );
-  const brutos = semDatasIso.match(/(?<![a-zA-Z])-?\d+(?:[.,]\d+)?/g) ?? [];
+  const semMilhar = semDatasIso.replace(
+    /\b\d{1,3}(?:\.\d{3})+(?:,\d+)?\b/g,
+    (bruto) => bruto.replace(/\./g, ""),
+  );
+  const brutos = semMilhar.match(/(?<![a-zA-Z])-?\d+(?:[.,]\d+)?/g) ?? [];
   return brutos.map(normalizarToken).filter((n) => Number.isFinite(n));
 }
 
@@ -140,11 +148,21 @@ function coletarContextoEstrutural(resumo: ResumoCompacto): number[] {
   ];
 }
 
-/** Expande cada valor com seus arredondamentos a 0 e 1 casa decimal (passo 3). */
+/**
+ * Expande cada valor com seus arredondamentos a 0 e 1 casa decimal (passo 3)
+ * e com o módulo — prosa em português descreve queda ("caiu 12,5%") sem
+ * escrever o sinal de menos que só existe no `delta_pct` numérico; sem o
+ * módulo, todo parecer correto sobre uma queda virava intruso (achado real,
+ * revisão estática qa-treino, 2026-08-05). Não perde especificidade: o
+ * módulo de um positivo é ele mesmo, então isto só afasta o sinal, nunca a
+ * magnitude — o número ainda precisa vir do dado real.
+ */
 function expandirComArredondamentos(valores: number[]): number[] {
   const expandido: number[] = [];
   for (const v of valores) {
-    expandido.push(v, Math.round(v), Math.round(v * 10) / 10);
+    for (const x of [v, Math.abs(v)]) {
+      expandido.push(x, Math.round(x), Math.round(x * 10) / 10);
+    }
   }
   return expandido;
 }

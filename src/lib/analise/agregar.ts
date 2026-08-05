@@ -267,7 +267,12 @@ export function montarResumoCompacto(entrada: {
           return {
             semanaInicio: semana,
             e1rm: e1rmMaximoDaSessao(seriesDaSemana),
-            volume: calcularVolume(seriesDaSemana),
+            // Sem série = sem sessão nesta semana (ausente, não "0 estável"
+            // — Regra da Presença; ver estagnacao.ts).
+            volume:
+              seriesDaSemana.length > 0
+                ? calcularVolume(seriesDaSemana)
+                : undefined,
           };
         },
       );

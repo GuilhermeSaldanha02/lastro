@@ -42,7 +42,7 @@ export default function FormularioSerie({
       </div>
 
       {exercicioSelecionado?.unilateral && (
-        <p>rosca alternada — reps contam por lado</p>
+        <p>Exercício unilateral — reps contam por lado</p>
       )}
 
       <div>

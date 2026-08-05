@@ -11,6 +11,7 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { criarClienteServidor } from "@/lib/supabase/cliente-servidor";
+import { dataLocalBrasil } from "@/lib/tempo";
 
 export type Exercicio = {
   id: string;
@@ -142,7 +143,9 @@ export async function listarExercicios(): Promise<Exercicio[]> {
  */
 export async function criarTreino(): Promise<void> {
   const { supabase, user } = await usuarioAutenticadoOuErro();
-  const hoje = new Date().toISOString().slice(0, 10);
+  // Calendário de Brasília, não UTC (src/lib/tempo.ts) — evita treino
+  // noturno virar o dia seguinte e cair na semana ISO errada.
+  const hoje = dataLocalBrasil();
 
   const { data, error } = await supabase
     .from("treino")

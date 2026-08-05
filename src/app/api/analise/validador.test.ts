@@ -158,4 +158,40 @@ describe("validarNumeros", () => {
       throw new Error("esperava motivo 'intrusos' contendo só [47]");
     }
   });
+
+  it('parecer citando volume com separador de milhar PT-BR ("12.480") → ok true, ponto não vira decimal (achado real, qa-treino 2026-08-05)', () => {
+    const resumo = resumoBase();
+    resumo.volume_semanal.push({
+      semana_inicio: "2026-08-03",
+      volume_total: 12480,
+    });
+    const parecer = "Seu volume total nesta semana foi 12.480.";
+
+    const resultado = validarNumeros(parecer, resumo, []);
+
+    expect(resultado.ok).toBe(true);
+    if (resultado.ok) {
+      expect(resultado.citados).toContain(12480);
+    }
+  });
+
+  it('parecer descrevendo queda sem escrever o sinal ("caiu 15%") quando o dado é delta_pct -15 → ok true, módulo do negativo conta como citado (achado real, qa-treino 2026-08-05)', () => {
+    const resumo = resumoBase();
+    resumo.tendencia_e1rm.push({
+      exercicio: "Desenvolvimento militar",
+      grupo_muscular: "ombro",
+      e1rm_atual: 34,
+      e1rm_inicial: 40,
+      delta_pct: -15,
+      sessoes: 4,
+    });
+    const parecer = "Seu desenvolvimento militar caiu 15% no período.";
+
+    const resultado = validarNumeros(parecer, resumo, []);
+
+    expect(resultado.ok).toBe(true);
+    if (resultado.ok) {
+      expect(resultado.citados).toContain(15);
+    }
+  });
 });
