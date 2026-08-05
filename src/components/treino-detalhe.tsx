@@ -9,10 +9,14 @@ import { useEffect, useState } from "react";
 import type { Exercicio, NovaSerieInput, Serie } from "@/lib/dados/treino";
 import { criarSerieRemoto } from "@/lib/dados/treino";
 import { enfileirar, sincronizar } from "@/lib/offline/outbox";
+import {
+  ouvirPedidosDeSincronizacao,
+  pedirSincronizacaoEmSegundoPlano,
+} from "@/lib/offline/sincronizacao-em-segundo-plano";
 import FormularioSerie, { type DadosNovaSerie } from "./formulario-serie";
 
 async function sincronizarPendentes() {
-  await sincronizar({
+  return sincronizar({
     // Sincronização de treino ainda não existe (só séries, por ora) — a
     // fila nunca recebe "criar_treino" até essa próxima etapa existir.
     criar_treino: async () => {},
@@ -36,7 +40,15 @@ export default function TreinoDetalhe({
   useEffect(() => {
     void sincronizarPendentes();
     window.addEventListener("online", sincronizarPendentes);
-    return () => window.removeEventListener("online", sincronizarPendentes);
+    // Tarefa 2.3 — além do `online` (só funciona com a aba em primeiro
+    // plano), o SW pode acordar via Background Sync e avisar por mensagem.
+    const pararDeOuvir = ouvirPedidosDeSincronizacao(() => {
+      void sincronizarPendentes();
+    });
+    return () => {
+      window.removeEventListener("online", sincronizarPendentes);
+      pararDeOuvir();
+    };
   }, []);
 
   /**
@@ -89,9 +101,14 @@ export default function TreinoDetalhe({
       pesoCorporalIncluso: novaSerie.pesoCorporalIncluso,
     });
 
-    // Melhor esforço — se não houver rede, a série já está na fila e
-    // sincroniza no próximo evento `online`.
-    void sincronizarPendentes();
+    // Melhor esforço — se não houver rede, a série já está na fila.
+    // Pede ao navegador (Background Sync) para tentar de novo quando a
+    // rede voltar, mesmo se a aba ficar em segundo plano; o listener
+    // `online` acima segue como fallback nos navegadores sem suporte.
+    const resultado = await sincronizarPendentes();
+    if (resultado.falhou) {
+      void pedirSincronizacaoEmSegundoPlano();
+    }
   }
 
   return (
