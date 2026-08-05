@@ -17,7 +17,12 @@ export const metadata: Metadata = {
   title: "lastro",
   description: "Registro de treino e leitura semanal com IA — app pessoal.",
   manifest: "/manifest.webmanifest",
-  icons: { icon: "/icon.svg" },
+  icons: {
+    icon: "/icon.svg",
+    // Safari/iOS não lê SVG para "adicionar à tela de início" — sem isso,
+    // o ícone vira uma miniatura da página em vez da marca (2.4).
+    apple: "/apple-touch-icon.png",
+  },
 };
 
 export const viewport: Viewport = {
