@@ -3,203 +3,217 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>lastro — direção visual</title>
+<title>lastro — direção visual 01</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
+/* =====================================================================
+   lastro — DIREÇÃO VISUAL 01 (protótipo, não é o CSS do app)
+   Toda medida vem da escala do DESIGN.md §3.1. Piso de fonte: 14px.
+   Sinais semânticos: mantidos EXATAMENTE como no §3.1 — a luminância
+   deles foi calibrada lá e a nota C do §3.2 depende disso.
+   O que esta direção propõe de novo: superfície, texto e ação primária.
+   ===================================================================== */
 :root{
-  /* ---- fundo: petróleo profundo, não preto ---- */
-  --fundo:      #0C1618;
-  --sup-1:      #122326;
-  --sup-2:      #182E32;
-  --linha:      #24413F;
+  /* ---- NOVO · superfícies: petróleo profundo, não cinza neutro ---- */
+  --fundo:   #0C1618;
+  --sup-1:   #122326;
+  --sup-2:   #182E32;
+  --sup-3:   #21393D;
+  --borda:           #2B4A4C;  /* decorativa — nota A: nunca é limite de alvo */
+  --borda-controle:  #7C9698;  /* limite de qualquer alvo de toque */
 
-  /* ---- texto: areia quente sobre frio ---- */
-  --txt:        #EFE5D6;
-  --txt-2:      #BCB1A0;
-  --txt-3:      #93897B;
+  /* ---- NOVO · texto: areia quente sobre frio ---- */
+  --txt:     #EFE5D6;
+  --txt-2:   #BCB1A0;
+  --txt-3:   #ABA294;  /* piso do que ainda passa AA em sup-3: 4.85 */
 
-  /* ---- marca: bordô terroso. NÃO é sinal. ---- */
-  --bordo:      #B04652;
-  --bordo-forte:#B74855;
+  /* ---- INALTERADO · sinais semânticos (§3.1) ---- */
+  --alta:    #6BD79B;
+  --plato:   #E3AC55;
+  --queda:   #E8927A;
+  --sync:    #8FB6D9;
+  --erro:    #F2796F;
+  --foco:    #9BE7FF;
 
-  /* ---- sinais semânticos, afastados da marca ---- */
-  --alta:       #8FC46B;
-  --plato:      #D9A441;
-  --queda:      #E5765C;
-  --erro:       #F05A50;
-  --sync:       #4E9B9C;
+  /* ---- NOVO · ação primária: bordô. NÃO pertence ao vocabulário de sinal ---- */
+  --acao:        #B04652;
+  --acao-hover:  #B74855;
+  --acao-txt:    #FFF3E9;
 
-  --e1:4px; --e2:8px; --e3:12px; --e4:16px; --e5:20px; --e6:24px; --e8:32px; --e12:48px; --e16:64px;
-  --raio-1:3px; --raio-2:6px;
-  --barra:3px;
+  /* ---- Espaçamento (§3.1, base 4) ---- */
+  --e1:4px; --e2:8px; --e3:12px; --e4:16px; --e5:20px; --e6:24px;
+  --e8:32px; --e10:40px; --e12:48px; --e16:64px;
 
-  --txt-fam: "Newsreader", Georgia, serif;
-  --num-fam: "IBM Plex Mono", ui-monospace, monospace;
+  /* ---- Alvos (§3.1) ---- */
+  --alvo-min:48px; --alvo-folga:12px; --alvo-acao:72px;
+
+  /* ---- Tipografia ---- */
+  --fonte-txt: "Newsreader", Georgia, serif;      /* MUDANÇA vs §3.1 (era IBM Plex Sans) */
+  --fonte-num: "IBM Plex Mono", ui-monospace, monospace;
+
+  /* ---- Escala de tamanho (§3.1) — piso 14 ---- */
+  --t-meta:14px; --t-corpo:16px; --t-1:18px; --t-2:20px; --t-3:24px;
+  --t-4:30px; --t-5:38px; --t-6:48px; --t-7:60px; --t-8:76px;
+
+  --el-apertada:1.1; --el-titulo:1.25; --el-corpo:1.6;
+  --peso-normal:400; --peso-medio:500; --peso-forte:600;
+  --raio-1:6px; --raio-2:10px; --raio-3:14px;
+  --foco-espessura:3px; --foco-afast:2px;
+  --barra-evidencia:3px;
+  --dur-1:120ms; --dur-2:220ms;
 }
 *{box-sizing:border-box;margin:0;padding:0}
 body{
-  background:#070E0F; color:var(--txt);
-  font-family:var(--txt-fam);
-  -webkit-font-smoothing:antialiased;
-  padding:var(--e6) 0 var(--e16);
+  background:#060D0E; color:var(--txt); font-family:var(--fonte-txt);
+  -webkit-font-smoothing:antialiased; padding:var(--e6) 0 var(--e16);
 }
 .rotulo{
-  font-family:var(--num-fam); font-size:11px; letter-spacing:.14em;
+  font-family:var(--fonte-num); font-size:var(--t-meta); letter-spacing:.1em;
   text-transform:uppercase; color:var(--txt-3);
   padding:0 var(--e5) var(--e3); max-width:390px; margin:0 auto;
 }
 .tela{
   max-width:390px; margin:0 auto var(--e12); background:var(--fundo);
-  min-height:640px; position:relative; overflow:hidden;
-  border:1px solid #16292B;
+  min-height:640px; overflow:hidden; border:1px solid var(--borda);
 }
 
-/* ================= TELA 1 — PARECER (Modo Leitura) ================= */
+/* ============ TELA 1 · PARECER — Modo Leitura ============ */
 .doc{padding:var(--e6) var(--e5) var(--e16)}
 
-/* cabeçalho de emissão */
-.emissao{border-bottom:1px solid var(--linha); padding-bottom:var(--e4); margin-bottom:var(--e6)}
-.emissao h1{
-  font-family:var(--txt-fam); font-size:26px; line-height:1.2; font-weight:500;
-  letter-spacing:-.01em;
-}
+.emissao{border-bottom:1px solid var(--borda); padding-bottom:var(--e4); margin-bottom:var(--e6)}
+.emissao h1{font-size:var(--t-3); line-height:var(--el-titulo); font-weight:var(--peso-medio); letter-spacing:-.01em}
 .emissao .meta{
-  font-family:var(--num-fam); font-size:11px; letter-spacing:.06em;
+  font-family:var(--fonte-num); font-size:var(--t-meta); letter-spacing:.04em;
   color:var(--txt-3); margin-top:var(--e3); text-transform:uppercase;
 }
 
-/* veredito */
 .veredito{
-  font-size:21px; line-height:1.38; font-weight:500; letter-spacing:-.005em;
-  margin-bottom:var(--e8); color:var(--txt);
+  font-size:var(--t-3); line-height:var(--el-titulo); font-weight:var(--peso-forte);
+  letter-spacing:-.008em; margin-bottom:var(--e8); color:var(--txt);
 }
-.veredito em{font-style:italic; font-weight:400}
+.veredito em{font-style:italic; font-weight:var(--peso-normal)}
 
-/* blocos de evidência */
+/* ---- bloco de evidência (§3.6.3) ---- */
 .evid{
-  border-left:var(--barra) solid var(--linha);
-  background:var(--sup-1);
-  border-radius:0 var(--raio-2) var(--raio-2) 0;
-  padding:var(--e4) var(--e5);
-  margin-bottom:var(--e3);
+  border-left:var(--barra-evidencia) solid var(--borda);
+  background:var(--sup-1); border-radius:0 var(--raio-1) var(--raio-1) 0;
+  padding:var(--e4) var(--e5); margin-bottom:var(--e3);
 }
 .evid.alta{border-left-color:var(--alta)}
 .evid.plato{border-left-color:var(--plato)}
 .evid.queda{border-left-color:var(--queda)}
 
 .evid .ex{
-  font-family:var(--num-fam); font-size:12px; font-weight:500;
-  letter-spacing:.08em; text-transform:uppercase; color:var(--txt-2);
+  font-family:var(--fonte-num); font-size:var(--t-corpo); font-weight:var(--peso-medio);
+  letter-spacing:.04em; text-transform:uppercase; color:var(--txt-2);
 }
 .evid .num{
-  font-family:var(--num-fam); font-size:30px; font-weight:500; line-height:1.15;
-  margin-top:var(--e2); display:flex; align-items:baseline; gap:var(--e3);
-  font-variant-numeric:tabular-nums; letter-spacing:-.02em;
+  font-family:var(--fonte-num); font-size:var(--t-5); font-weight:var(--peso-medio);
+  line-height:var(--el-apertada); margin-top:var(--e2);
+  display:flex; align-items:baseline; gap:var(--e2);
+  font-variant-numeric:tabular-nums; letter-spacing:-.03em;
 }
-.evid .num .un{font-size:14px; color:var(--txt-2); font-weight:400}
-.evid .num .de{color:var(--txt-3); font-size:19px}
-.evid .num .seta{color:var(--txt-3); font-size:15px}
+.evid .num .un{font-size:var(--t-meta); color:var(--txt-2); font-weight:var(--peso-normal); letter-spacing:0}
+.evid .num .de{color:var(--txt-3); font-size:var(--t-3)}
+.evid .num .seta{color:var(--txt-3); font-size:var(--t-2)}
+/* delta em linha própria — é o canal de texto obrigatório da nota C */
 .delta{
-  font-family:var(--num-fam); font-size:13px; font-weight:600;
-  padding:2px var(--e2); border-radius:var(--raio-1); margin-left:auto;
-  letter-spacing:.01em; white-space:nowrap;
+  font-family:var(--fonte-num); font-size:var(--t-meta); font-weight:var(--peso-forte);
+  margin-top:var(--e2); letter-spacing:.02em; display:inline-block;
 }
-.delta.alta{color:var(--alta); background:rgba(143,196,107,.10)}
-.delta.plato{color:var(--plato); background:rgba(217,164,65,.10)}
-.delta.queda{color:var(--queda); background:rgba(229,118,92,.10)}
+.delta.alta{color:var(--alta)}
+.delta.plato{color:var(--plato)}
+.delta.queda{color:var(--queda)}
 .evid .proc{
-  font-family:var(--num-fam); font-size:10.5px; letter-spacing:.045em;
+  font-family:var(--fonte-num); font-size:var(--t-meta); letter-spacing:.02em;
   color:var(--txt-3); margin-top:var(--e3); line-height:1.5;
 }
 
-/* prosa */
 .prosa{margin:var(--e8) 0 var(--e6); max-width:34em}
-.prosa p{font-size:17px; line-height:1.62; color:var(--txt-2); margin-bottom:var(--e4)}
-.prosa p .n{font-family:var(--num-fam); font-size:15px; font-weight:500; color:var(--txt)}
+.prosa p{font-size:var(--t-1); line-height:var(--el-corpo); color:var(--txt-2); margin-bottom:var(--e4)}
+.prosa p .n{font-family:var(--fonte-num); font-size:var(--t-corpo); font-weight:var(--peso-medio); color:var(--txt)}
 
-/* rodapé de método */
 .metodo{
-  border-top:1px solid var(--linha); padding-top:var(--e4);
-  font-family:var(--num-fam); font-size:10.5px; line-height:1.65;
-  color:var(--txt-3); letter-spacing:.03em;
+  border-top:1px solid var(--borda); padding-top:var(--e4);
+  font-family:var(--fonte-num); font-size:var(--t-meta); line-height:1.6;
+  color:var(--txt-3); letter-spacing:.02em;
 }
 
-/* ================= TELA 2 — REGISTRO (Modo Bancada) ================= */
+/* ============ TELA 2 · REGISTRO — Modo Bancada ============ */
 .banc{display:flex; flex-direction:column; min-height:640px}
-.banc-topo{padding:var(--e5) var(--e5) var(--e4); border-bottom:1px solid var(--linha)}
+.banc-topo{padding:var(--e5) var(--e5) var(--e4); border-bottom:1px solid var(--borda)}
 .banc-topo .data{
-  font-family:var(--num-fam); font-size:11px; letter-spacing:.14em;
+  font-family:var(--fonte-num); font-size:var(--t-meta); letter-spacing:.1em;
   text-transform:uppercase; color:var(--txt-3);
 }
-.banc-topo h2{font-size:24px; font-weight:500; margin-top:var(--e2); letter-spacing:-.01em}
+.banc-topo h2{font-size:var(--t-3); font-weight:var(--peso-medio); margin-top:var(--e2); letter-spacing:-.01em}
 .sync{
   display:inline-flex; align-items:center; gap:var(--e2); margin-top:var(--e3);
-  font-family:var(--num-fam); font-size:11px; letter-spacing:.05em; color:var(--sync);
+  font-family:var(--fonte-num); font-size:var(--t-meta); letter-spacing:.03em; color:var(--sync);
 }
-.sync .pt{width:6px;height:6px;border-radius:50%;background:var(--sync)}
+.sync .pt{width:7px;height:7px;border-radius:50%;background:var(--sync);flex:none}
 
-.series{flex:1; padding:var(--e4) var(--e5) var(--e6); overflow:auto}
+.series{flex:1; padding:var(--e4) var(--e5) var(--e6)}
 .grupo{margin-bottom:var(--e6)}
 .grupo h3{
-  font-family:var(--num-fam); font-size:12px; font-weight:500; letter-spacing:.1em;
-  text-transform:uppercase; color:var(--txt-2); margin-bottom:var(--e3);
-  display:flex; justify-content:space-between;
+  font-family:var(--fonte-num); font-size:var(--t-corpo); font-weight:var(--peso-medio);
+  letter-spacing:.05em; text-transform:uppercase; color:var(--txt-2);
+  margin-bottom:var(--e3); display:flex; justify-content:space-between; gap:var(--e3);
 }
-.grupo h3 .cont{color:var(--txt-3); letter-spacing:.05em}
+.grupo h3 .cont{color:var(--txt-3); letter-spacing:.02em; white-space:nowrap}
 .linha{
   display:flex; align-items:center; gap:var(--e4);
-  padding:var(--e3) 0; border-bottom:1px solid #15282A;
+  padding:var(--e3) 0; border-bottom:1px solid var(--borda);
 }
 .linha .i{
-  font-family:var(--num-fam); font-size:11px; color:var(--txt-3);
-  width:18px; flex:none; font-variant-numeric:tabular-nums;
+  font-family:var(--fonte-num); font-size:var(--t-meta); color:var(--txt-3);
+  width:20px; flex:none; font-variant-numeric:tabular-nums;
 }
 .linha .v{
-  font-family:var(--num-fam); font-size:22px; font-weight:500; color:var(--txt);
-  font-variant-numeric:tabular-nums; letter-spacing:-.01em;
+  font-family:var(--fonte-num); font-size:var(--t-4); font-weight:var(--peso-medio);
+  color:var(--txt); font-variant-numeric:tabular-nums; letter-spacing:-.02em;
 }
-.linha .v .x{color:var(--txt-3); font-size:15px; margin:0 6px}
-.linha .v .un{font-size:13px; color:var(--txt-2); margin-left:3px}
+.linha .v .x{color:var(--txt-3); font-size:var(--t-1); margin:0 4px}
+.linha .v .un{font-size:var(--t-meta); color:var(--txt-2); margin-left:3px; letter-spacing:0}
 .tag{
-  margin-left:auto; font-family:var(--num-fam); font-size:10px; letter-spacing:.1em;
-  text-transform:uppercase; padding:3px 7px; border-radius:var(--raio-1);
-  border:1px solid var(--linha); color:var(--txt-3);
+  margin-left:auto; font-family:var(--fonte-num); font-size:var(--t-meta);
+  letter-spacing:.04em; text-transform:uppercase; color:var(--txt-3); white-space:nowrap;
 }
-.tag.val{color:var(--txt-2); border-color:#2E5350}
+.tag.val{color:var(--txt-2)}
 .pr{
-  margin-left:auto; font-family:var(--num-fam); font-size:10px; letter-spacing:.1em;
-  text-transform:uppercase; color:var(--alta);
+  margin-left:auto; font-family:var(--fonte-num); font-size:var(--t-meta);
+  letter-spacing:.04em; text-transform:uppercase; color:var(--alta); white-space:nowrap;
 }
 
-/* ação primária — metade inferior, largura total, alvo grande */
-.acao{
-  padding:var(--e4) var(--e5) var(--e6);
-  border-top:1px solid var(--linha); background:var(--fundo);
-}
+/* ação primária — metade inferior, largura total (D2, D3) */
+.acao-area{padding:var(--e4) var(--e5) var(--e6); border-top:1px solid var(--borda)}
 .repetir{
-  width:100%; min-height:72px; border:0; cursor:pointer;
-  background:var(--bordo); color:#FFF3E9; border-radius:var(--raio-2);
-  display:flex; flex-direction:column; align-items:center; justify-content:center; gap:3px;
-  transition:background 180ms ease;
+  width:100%; min-height:var(--alvo-acao); border:0; cursor:pointer;
+  background:var(--acao); color:var(--acao-txt); border-radius:var(--raio-2);
+  font-family:var(--fonte-txt); font-size:var(--t-2);
+  display:flex; flex-direction:column; align-items:center; justify-content:center; gap:var(--e1);
+  transition:background var(--dur-2) ease;
 }
-.repetir:hover{background:var(--bordo-forte)}
-.repetir:focus-visible{outline:2px solid var(--txt); outline-offset:3px}
-.repetir .t{font-family:var(--txt-fam); font-size:19px; font-weight:600; letter-spacing:.01em}
+.repetir:hover{background:var(--acao-hover)}
+/* nota B do §3.2 — o anel de foco nunca encosta na ação */
+.repetir:focus-visible,.secundaria:focus-visible{
+  outline:var(--foco-espessura) solid var(--foco); outline-offset:var(--foco-afast);
+}
+.repetir .t{font-size:var(--t-2); font-weight:var(--peso-forte); letter-spacing:.005em}
 .repetir .s{
-  font-family:var(--num-fam); font-size:12px; letter-spacing:.06em;
-  color:rgba(255,243,233,.72); font-variant-numeric:tabular-nums;
+  font-family:var(--fonte-num); font-size:var(--t-meta); color:rgba(255,243,233,.78);
+  font-variant-numeric:tabular-nums; letter-spacing:.02em;
 }
 .secundaria{
-  width:100%; min-height:52px; margin-top:var(--e3); cursor:pointer;
-  background:transparent; border:1px solid var(--linha); color:var(--txt-2);
-  border-radius:var(--raio-2); font-family:var(--num-fam);
-  font-size:13px; letter-spacing:.08em; text-transform:uppercase;
-  transition:border-color 180ms ease, color 180ms ease;
+  width:100%; min-height:var(--alvo-min); margin-top:var(--alvo-folga); cursor:pointer;
+  background:transparent; border:1px solid var(--borda-controle); color:var(--txt-2);
+  border-radius:var(--raio-2); font-family:var(--fonte-num);
+  font-size:var(--t-meta); letter-spacing:.06em; text-transform:uppercase;
+  transition:color var(--dur-2) ease, border-color var(--dur-2) ease;
 }
-.secundaria:hover{border-color:#356764; color:var(--txt)}
-.secundaria:focus-visible{outline:2px solid var(--txt); outline-offset:3px}
+.secundaria:hover{border-color:var(--txt-2); color:var(--txt)}
 
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
 </style>
@@ -219,28 +233,22 @@ body{
 
     <div class="evid plato">
       <p class="ex">Supino reto</p>
-      <p class="num">
-        <span>60</span><span class="un">kg</span>
-        <span class="delta plato">sem mudança · 5 sem</span>
-      </p>
+      <p class="num"><span>60</span><span class="un">kg</span></p>
+      <p class="delta plato">sem mudança · 5 semanas</p>
       <p class="proc">4 semanas · 14 séries valendo · calculado no aparelho</p>
     </div>
 
     <div class="evid alta">
       <p class="ex">Agachamento livre</p>
-      <p class="num">
-        <span class="de">85</span><span class="seta">→</span><span>95</span><span class="un">kg</span>
-        <span class="delta alta">+12%</span>
-      </p>
+      <p class="num"><span class="de">85</span><span class="seta">→</span><span>95</span><span class="un">kg</span></p>
+      <p class="delta alta">+12% · 4 semanas</p>
       <p class="proc">4 semanas · 18 séries valendo · calculado no aparelho</p>
     </div>
 
     <div class="evid queda">
       <p class="ex">Remada curvada</p>
-      <p class="num">
-        <span class="de">72</span><span class="seta">→</span><span>68</span><span class="un">kg</span>
-        <span class="delta queda">−5,6%</span>
-      </p>
+      <p class="num"><span class="de">72</span><span class="seta">→</span><span>68</span><span class="un">kg</span></p>
+      <p class="delta queda">−5,6% · 4 semanas</p>
       <p class="proc">4 semanas · 9 séries valendo · calculado no aparelho</p>
     </div>
 
@@ -273,13 +281,13 @@ body{
     </div>
 
     <div class="grupo">
-      <h3>Supino inclinado halter <span class="cont">2 valendo</span></h3>
+      <h3>Supino inclinado <span class="cont">2 valendo</span></h3>
       <div class="linha"><span class="i">1</span><span class="v">10<span class="x">×</span>22<span class="un">kg</span></span><span class="tag val">valendo</span></div>
       <div class="linha"><span class="i">2</span><span class="v">10<span class="x">×</span>24<span class="un">kg</span></span><span class="pr">recorde</span></div>
     </div>
   </div>
 
-  <div class="acao">
+  <div class="acao-area">
     <button class="repetir">
       <span class="t">Repetir última série</span>
       <span class="s">10 × 24 kg · valendo</span>
