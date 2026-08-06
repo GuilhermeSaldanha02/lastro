@@ -16,9 +16,12 @@
   padding: var(--lastro-e-5);
 }
 
-/* Reserva o espaço da aba inferior fixa, para o último item não sumir. */
+/* A aba inferior vive NO FLUXO (último filho de `.tela`), então ela já
+   ocupa a própria altura. Reservar espaço aqui contava a nav duas vezes e
+   empurrava a página 27px além do viewport, cortando os rótulos — medido
+   a 390×844 em 2026-08-06. Aqui só entra respiro de leitura. */
 .corpo--com-nav {
-  padding-bottom: calc(var(--lastro-alvo-min) + var(--lastro-e-8));
+  padding-bottom: var(--lastro-e-6);
 }
 
 /* ---------- Entrada ---------- */
@@ -631,6 +634,185 @@
   color: var(--lastro-txt-3);
   margin-top: var(--lastro-e-3);
   line-height: 1.5;
+}
+
+/* =====================================================================
+   CATÁLOGO DE EXERCÍCIOS
+   ===================================================================== */
+.ficha {
+  border: 1px solid var(--lastro-linha);
+  border-radius: var(--lastro-raio-1);
+  background: var(--lastro-grad-sup);
+  box-shadow: var(--lastro-elev-1), var(--lastro-bevel);
+  padding: var(--lastro-e-4) var(--lastro-e-5);
+}
+
+.ficha + .ficha {
+  margin-top: var(--lastro-e-3);
+}
+
+.ficha__nome {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--lastro-e-3);
+  font-size: var(--lastro-t-corpo);
+  font-weight: var(--lastro-peso-forte);
+}
+
+.ficha__flag {
+  font-family: var(--lastro-fonte-num);
+  font-size: var(--lastro-t-meta);
+  font-weight: var(--lastro-peso-normal);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--lastro-txt-3);
+  white-space: nowrap;
+}
+
+.ficha__dica {
+  font-size: var(--lastro-t-corpo);
+  line-height: var(--lastro-el-corpo);
+  color: var(--lastro-txt-2);
+  margin-top: var(--lastro-e-2);
+  max-width: var(--lastro-medida-leitura);
+}
+
+/* Dica ausente é estado NEUTRO, não erro: é o que ainda não foi escrito. */
+.ficha__pendente {
+  font-family: var(--lastro-fonte-num);
+  font-size: var(--lastro-t-meta);
+  color: var(--lastro-txt-3);
+  margin-top: var(--lastro-e-2);
+}
+
+.nota-metodo {
+  font-size: var(--lastro-t-meta);
+  line-height: 1.6;
+  color: var(--lastro-txt-3);
+  margin-top: var(--lastro-e-6);
+  max-width: var(--lastro-medida-leitura);
+}
+
+.aviso-saude {
+  border-top: 1px solid var(--lastro-linha);
+  margin-top: var(--lastro-e-4);
+  padding-top: var(--lastro-e-4);
+  font-size: var(--lastro-t-meta);
+  line-height: 1.6;
+  color: var(--lastro-txt-2);
+  max-width: var(--lastro-medida-leitura);
+}
+
+/* =====================================================================
+   COACH 24h — a ÚNICA tela do app onde balão é correto.
+   No parecer, qualquer um destes elementos reprova o gate.
+   ===================================================================== */
+.conversa {
+  display: flex;
+  flex-direction: column;
+  gap: var(--lastro-e-3);
+}
+
+.balao {
+  max-width: 82%;
+  padding: var(--lastro-e-3) var(--lastro-e-4);
+  font-size: var(--lastro-t-corpo);
+  line-height: 1.5;
+  white-space: pre-wrap;
+  box-shadow: var(--lastro-elev-2), var(--lastro-bevel);
+}
+
+/* O rabicho é o canto reto — é ele, e a alternância de lado, que fazem
+   isto ler como conversa. Fora daqui, é cartão. */
+.balao--dele {
+  align-self: flex-start;
+  background: var(--lastro-grad-sup);
+  color: var(--lastro-txt);
+  border: 1px solid var(--lastro-linha);
+  border-radius: var(--lastro-raio-balao) var(--lastro-raio-balao)
+    var(--lastro-raio-balao) var(--lastro-e-1);
+}
+
+.balao--minha {
+  align-self: flex-end;
+  background: var(--lastro-grad-acao);
+  color: var(--lastro-acao-txt);
+  border: 1px solid var(--lastro-acao-borda);
+  border-radius: var(--lastro-raio-balao) var(--lastro-raio-balao)
+    var(--lastro-e-1) var(--lastro-raio-balao);
+  box-shadow: var(--lastro-elev-2), var(--lastro-bevel-forte);
+}
+
+.balao__quem {
+  display: block;
+  font-family: var(--lastro-fonte-num);
+  font-size: var(--lastro-t-meta);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--lastro-txt-3);
+  margin-bottom: var(--lastro-e-1);
+}
+
+/* Estado, não animação: sem reticências pulsantes em lugar nenhum do app. */
+.balao--pensando {
+  font-family: var(--lastro-fonte-num);
+  font-size: var(--lastro-t-meta);
+  color: var(--lastro-txt-3);
+}
+
+.campo-conversa {
+  display: flex;
+  gap: var(--lastro-e-2);
+  align-items: center;
+  padding: var(--lastro-e-3) var(--lastro-e-5);
+  border-top: 1px solid var(--lastro-linha);
+  background: var(--lastro-fundo);
+}
+
+.campo-conversa input {
+  flex: 1;
+  min-width: 0;
+  min-height: var(--lastro-alvo-min);
+  padding: 0 var(--lastro-e-4);
+  border: 1px solid var(--lastro-controle);
+  border-radius: var(--lastro-raio-3);
+  background: var(--lastro-campo-fundo);
+  box-shadow: var(--lastro-elev-afundado);
+  font-size: var(--lastro-t-corpo);
+}
+
+.enviar {
+  width: var(--lastro-alvo-min);
+  height: var(--lastro-alvo-min);
+  flex: none;
+  border: 1px solid var(--lastro-acao-borda);
+  border-radius: 50%;
+  background: var(--lastro-grad-acao);
+  color: var(--lastro-acao-txt);
+  box-shadow: var(--lastro-elev-2), var(--lastro-bevel-forte);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition:
+    box-shadow var(--lastro-dur-1) ease,
+    transform var(--lastro-dur-1) ease;
+}
+
+.enviar:active:not(:disabled) {
+  box-shadow: var(--lastro-elev-1), var(--lastro-elev-afundado);
+  transform: translateY(1px);
+}
+
+.enviar:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.enviar svg {
+  width: var(--lastro-e-5);
+  height: var(--lastro-e-5);
 }
 
 /* ---------- Escolha da pergunta: cinco alvos grandes ---------- */

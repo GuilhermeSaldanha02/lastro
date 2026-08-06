@@ -6,7 +6,10 @@
 import { type NextRequest, NextResponse } from "next/server";
 import { createServerClient } from "@supabase/ssr";
 
-const PREFIXOS_PRIVADOS = ["/treino", "/analise"];
+// Toda tela que lê ou escreve dado do dono entra aqui. Rota nova que
+// esqueça esta lista fica pública por omissão — é o tipo de furo que só
+// aparece em produção.
+const PREFIXOS_PRIVADOS = ["/treino", "/analise", "/catalogo", "/coach"];
 
 export async function proxy(request: NextRequest) {
   let response = NextResponse.next({ request });

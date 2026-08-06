@@ -137,6 +137,51 @@ export async function listarExercicios(): Promise<Exercicio[]> {
   }));
 }
 
+export type ExercicioDoCatalogo = Exercicio & {
+  grupoMuscularNome: string;
+  /**
+   * CURADA por humano, nunca gerada por IA (FF7, PRD §4.5) — é assunto de
+   * saúde. `null` significa "ainda não foi escrita", e a UI diz isso em
+   * vez de esconder: o vazio honesto é melhor que texto inventado.
+   */
+  dicaExecucao: string | null;
+};
+
+/** Catálogo completo, agrupável por grupo muscular. */
+export async function listarCatalogo(): Promise<ExercicioDoCatalogo[]> {
+  const { supabase } = await usuarioAutenticadoOuErro();
+  const { data, error } = await supabase
+    .from("exercicio")
+    .select(
+      "id, nome, grupo_muscular_primario, unilateral, dica_execucao, grupo_muscular (nome)",
+    )
+    .order("nome", { ascending: true });
+  if (error) throw new Error(`Falha ao listar o catálogo: ${error.message}`);
+
+  type Linha = {
+    id: string;
+    nome: string;
+    grupo_muscular_primario: string;
+    unilateral: boolean;
+    dica_execucao: string | null;
+    grupo_muscular: { nome: string } | { nome: string }[] | null;
+  };
+
+  return ((data ?? []) as unknown as Linha[]).map((e) => {
+    const grupo = Array.isArray(e.grupo_muscular)
+      ? e.grupo_muscular[0]
+      : e.grupo_muscular;
+    return {
+      id: e.id,
+      nome: e.nome,
+      grupoMuscularPrimario: e.grupo_muscular_primario,
+      grupoMuscularNome: grupo?.nome ?? e.grupo_muscular_primario,
+      unilateral: e.unilateral,
+      dicaExecucao: e.dica_execucao,
+    };
+  });
+}
+
 /**
  * Inicia um treino novo para o usuário logado, com `data = hoje`.
  * Server Action — chamada direto do form de `src/app/treino/page.tsx`.
