@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>lastro — o bloco de evidência: A ou B</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --fundo:#F0EAE0; --sup:linear-gradient(180deg,#FFFDFA,#F7F2E9);
+  --linha:#CFC3B1; --txt:#12303F; --txt-2:#3A5361; --txt-3:#476069;
+  --alta:#1B6B3A; --plato:#8A5A0B; --queda:#A33220;
+  --sans:"IBM Plex Sans",system-ui,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,monospace;
+  --elev:0 1px 2px rgba(28,18,6,.07), 0 4px 12px rgba(28,18,6,.08);
+  --bevel:inset 0 1px 0 rgba(255,255,255,.75);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--fundo);color:var(--txt);font-family:var(--sans);
+  -webkit-font-smoothing:antialiased;padding:24px 0 64px}
+.col{max-width:390px;margin:0 auto;padding:0 20px}
+
+h1{font-size:24px;font-weight:700;line-height:1.25}
+.intro{font-size:16px;line-height:1.6;color:var(--txt-2);margin-top:12px}
+.opcao{margin-top:40px}
+.opcao h2{font-size:20px;font-weight:700}
+.opcao .sub{font-size:16px;line-height:1.5;color:var(--txt-2);margin:4px 0 16px}
+
+/* o bloco */
+.bloco{
+  background:var(--sup); border:1px solid var(--linha);
+  border-left:4px solid var(--alta); border-radius:8px;
+  box-shadow:var(--elev), var(--bevel); padding:16px 20px;
+}
+.bloco + .bloco{margin-top:12px}
+.bloco.plato{border-left-color:var(--plato)}
+.bloco.queda{border-left-color:var(--queda)}
+.ex{font-size:16px;font-weight:600}
+
+/* A — um número grande */
+.num{font-family:var(--mono);font-size:38px;font-weight:500;line-height:1.1;
+  margin-top:8px;display:flex;align-items:baseline;gap:8px;
+  font-variant-numeric:tabular-nums;letter-spacing:-.03em}
+.num .un{font-size:14px;color:var(--txt-2);font-weight:400;letter-spacing:0}
+.num .de{color:var(--txt-3);font-size:24px}
+.num .seta{color:var(--txt-3);font-size:20px}
+.delta{display:block;font-family:var(--mono);font-size:14px;font-weight:600;margin-top:8px}
+.delta.alta{color:var(--alta)} .delta.plato{color:var(--plato)} .delta.queda{color:var(--queda)}
+
+/* B — números em fila */
+.fila{display:flex;gap:12px;margin-top:12px}
+.fila > div{flex:1;min-width:0}
+.fila .n{font-family:var(--mono);font-size:24px;font-weight:500;
+  font-variant-numeric:tabular-nums;letter-spacing:-.02em;line-height:1.1}
+.fila .n.alta{color:var(--alta)} .fila .n.plato{color:var(--plato)} .fila .n.queda{color:var(--queda)}
+.fila .r{font-family:var(--mono);font-size:14px;color:var(--txt-3);margin-top:4px;line-height:1.25}
+
+.proc{font-family:var(--mono);font-size:14px;color:var(--txt-3);margin-top:12px;line-height:1.5}
+
+.nota{
+  border-top:1px solid var(--linha); margin-top:40px; padding-top:20px;
+  font-size:16px; line-height:1.6; color:var(--txt-2);
+}
+.nota strong{color:var(--txt)}
+</style>
+</head>
+<body>
+<div class="col">
+
+  <h1>O bloco de evidência</h1>
+  <p class="intro">
+    É o quadrinho do parecer que mostra um exercício e o número dele.
+    O parecer tem três: um verde (subiu), um amarelo (parou) e um vermelho (caiu).
+    Só preciso que você escolha entre estes dois jeitos.
+  </p>
+
+  <!-- ================= A ================= -->
+  <section class="opcao">
+    <h2>Opção A</h2>
+    <p class="sub">Um número grande. É como está hoje no app.</p>
+
+    <div class="bloco">
+      <p class="ex">Agachamento livre</p>
+      <p class="num"><span class="de">85</span><span class="seta">→</span><span>95</span><span class="un">kg</span></p>
+      <span class="delta alta">+12% · 4 semanas</span>
+      <p class="proc">4 semanas · 18 séries valendo · calculado no aparelho</p>
+    </div>
+
+    <div class="bloco plato">
+      <p class="ex">Supino reto</p>
+      <p class="num"><span>60</span><span class="un">kg</span></p>
+      <span class="delta plato">sem mudança · 5 semanas</span>
+      <p class="proc">4 semanas · 14 séries valendo · calculado no aparelho</p>
+    </div>
+  </section>
+
+  <!-- ================= B ================= -->
+  <section class="opcao">
+    <h2>Opção B</h2>
+    <p class="sub">Números em fila, com o nome embaixo de cada um. É como está na sua imagem.</p>
+
+    <div class="bloco">
+      <p class="ex">Agachamento livre</p>
+      <div class="fila">
+        <div><p class="n">95</p><p class="r">kg hoje</p></div>
+        <div><p class="n">85</p><p class="r">4 sem atrás</p></div>
+        <div><p class="n">18</p><p class="r">séries</p></div>
+        <div><p class="n alta">+12%</p><p class="r">subiu</p></div>
+      </div>
+      <p class="proc">calculado no aparelho</p>
+    </div>
+
+    <div class="bloco plato">
+      <p class="ex">Supino reto</p>
+      <div class="fila">
+        <div><p class="n">60</p><p class="r">kg hoje</p></div>
+        <div><p class="n">60</p><p class="r">5 sem atrás</p></div>
+        <div><p class="n">14</p><p class="r">séries</p></div>
+        <div><p class="n plato">0%</p><p class="r">parado</p></div>
+      </div>
+      <p class="proc">calculado no aparelho</p>
+    </div>
+  </section>
+
+  <p class="nota">
+    A diferença prática: a <strong>A</strong> se lê de relance, de longe —
+    você bate o olho e já sabe o peso. A <strong>B</strong> mostra mais coisa
+    de uma vez, mas cada número fica menor e pede um segundo a mais de leitura.
+  </p>
+
+</div>
+</body>
+</html>
