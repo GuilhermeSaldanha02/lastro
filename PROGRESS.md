@@ -243,6 +243,28 @@ Quota checada com uma chamada direta à API antes de gastar esforço recriando d
 
 ---
 
+## ▶ PONTO DE RETOMADA — ler primeiro (2026-08-06)
+
+**Estado do repo:** `main`, working tree limpo, tudo mergeado e sincronizado com o remoto. `vitest` 66/66 · `tsc` sem erros · `next build` limpo.
+
+**Fase 2 fechada**, exceto o ciclo completo de sincronização offline (2.3), adiado a pedido do dono para os testes finais da Fase 6 — já anotado lá.
+
+**Próximo passo: iniciar a Fase 3 (registro, gráficos e o gate visual).** A Fase 3 é onde o front visual finalmente acontece: até aqui o app é funcional mas cru (HTML sem estilo). O `DESIGN.md` já tem paleta, tipografia e contraste calculados — **mas ele exige a aprovação do dono em 6 pontos (§5) antes de qualquer tela ser construída.** Nada de CSS antes disso.
+
+**As 6 decisões pendentes do dono (`DESIGN.md` §5), na ordem de importância:**
+1. **A personalidade** (§3.0) — instrumento sóbrio, sem gradiente/vidro/3D, ação primária quase branca em vez de colorida. É a decisão da qual todo o resto pende.
+2. **O par tipográfico** IBM Plex Sans + IBM Plex Mono, e o custo de auto-hospedar quatro arquivos.
+3. **Os dois regimes de densidade** (§3.5) — Modo Bancada (registro, em pé, com pressa) vs. Modo Leitura (parecer, sentado). Se o dono achar que as duas telas devem parecer iguais, §3.5 e §3.6 mudam juntas.
+4. **O parecer como documento datado com blocos de evidência** (§3.6) — a aposta central do projeto.
+5. **Âmbar em vez de vermelho para platô** (§3.6.6) — informa sem repreender, mas é menos urgente à primeira vista.
+6. **O tamanho da linha de procedência** (§3.6.4) — manter no menor degrau, ou promover a `--lastro-t-corpo`.
+
+**Já mostrado ao dono:** uma prévia visual do bloco de evidência do parecer (cabeçalho de emissão, veredito, três blocos com barra de alta/platô/queda, prosa e rodapé de método), renderizada com os tokens reais de `DESIGN.md` §3.1. **A reação do dono a essa prévia ainda não foi registrada** — é o primeiro assunto a retomar.
+
+**Combinado com o dono para esta retomada:** trabalhar local, sem subir nada para a nuvem e sem code review por ora.
+
+---
+
 ## Fase 2 — Registro que sobrevive à academia · 🔶 Em andamento (2026-08-05)
 
 | # | Tarefa | Modo | Estado | Check executável |
