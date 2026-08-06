@@ -1,0 +1,714 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>lastro — Padrão Visual · Areia & Azul Petróleo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* =====================================================================
+   lastro — PADRÃO VISUAL  ·  "Areia & Azul Petróleo"
+   Este arquivo é o sistema, não a tela. Nenhum conteúdo de exemplo
+   além do mínimo para o componente existir.
+   Escala e alvos: DESIGN.md §3.1. Toda cor tem razão medida ao lado.
+   ===================================================================== */
+:root{
+  /* Superfícies */
+  --fundo:   #F0EAE0;
+  --sup-1:   #FBF8F3;
+  --sup-2:   #E4DACB;
+  --linha:   #CFC3B1;
+  --controle:#8A7C68;
+  /* Tinta */
+  --txt:     #12303F;
+  --txt-2:   #3A5361;
+  --txt-3:   #476069;
+  --barra:   #123241;
+  --barra-txt:#F0EAE0;
+  /* ---- Ação ----
+     Verde VIVO com tinta escura. Duas razões, as duas medidas:
+     verde vivo não sustenta texto branco (2.1:1), e verde escuro
+     ficaria a 1.06:1 do --alta, ou seja, o mesmo verde do sinal.
+     Preenchimento vivo + tinta escura resolve os dois de uma vez.   */
+  --acao:        #46C27B;   /* topo do gradiente */
+  --acao-escura: #35A866;   /* base — pior caso para a tinta escura */
+  --acao-txt:    #0A2A18;
+  --acao-borda:  #0E5E35;   /* cumpre o limite de 3:1 que o preenchimento vivo não cumpre */
+  --acao-tinta:  #0E5E35;   /* a ação como TEXTO: aba ativa, link. Nunca o vivo sobre areia */
+  /* Sinais */
+  --alta:  #1B6B3A;
+  --plato: #8A5A0B;
+  --queda: #A33220;
+  --sync:  #2E6076;
+  --erro:  #A32014;
+  --foco:  #0B5CAB;
+  /* Escala */
+  --e1:4px; --e2:8px; --e3:12px; --e4:16px; --e5:20px; --e6:24px;
+  --e8:32px; --e10:40px; --e12:48px; --e16:64px;
+  --alvo-min:48px; --alvo-folga:12px; --alvo-acao:72px;
+  --t-meta:14px; --t-corpo:16px; --t-1:18px; --t-2:20px; --t-3:24px;
+  --t-4:30px; --t-5:38px; --t-6:48px; --t-7:60px; --t-8:76px;
+  --el-apertada:1.1; --el-titulo:1.25; --el-corpo:1.6;
+  --peso-normal:400; --peso-medio:500; --peso-forte:600; --peso-max:700;
+  --raio-1:8px; --raio-2:14px; --raio-3:20px; --raio-balao:18px;
+  --foco-espessura:3px; --foco-afast:2px;
+  --barra-evidencia:4px;
+  --dur-1:120ms; --dur-2:220ms;
+  --fonte-txt:"IBM Plex Sans",system-ui,sans-serif;
+  --fonte-num:"IBM Plex Mono",ui-monospace,monospace;
+
+  /* ---- MATÉRIA · o que gruda o elemento na tela ----
+     Sombra em tom quente, não cinza: cinza sobre areia suja e "acinzenta"
+     o fundo. A luz vem de cima, então todo elemento levantado leva um
+     fio claro na borda superior (bevel) e a sombra cai para baixo.      */
+  --sombra-cor:      28,18,6;
+  --elev-1: 0 1px 2px rgba(var(--sombra-cor),.06), 0 2px 6px rgba(var(--sombra-cor),.05);
+  --elev-2: 0 1px 2px rgba(var(--sombra-cor),.07), 0 4px 12px rgba(var(--sombra-cor),.08);
+  --elev-3: 0 2px 4px rgba(var(--sombra-cor),.10), 0 10px 24px rgba(var(--sombra-cor),.14);
+  --elev-afundado: inset 0 2px 4px rgba(var(--sombra-cor),.12);
+  --bevel:       inset 0 1px 0 rgba(255,255,255,.75);
+  --bevel-forte: inset 0 1px 0 rgba(255,255,255,.22);
+
+  /* Gradientes: sempre do claro para o escuro, no máximo dois passos.
+     O texto é medido contra o passo MAIS CLARO — o pior caso.          */
+  --grad-acao:   linear-gradient(180deg, #46C27B 0%, #35A866 100%);
+  --grad-acao-h: linear-gradient(180deg, #4CC682 0%, #3AAE6C 100%);
+  --grad-sup:    linear-gradient(180deg, #FFFDFA 0%, #F7F2E9 100%);
+  --grad-barra:  linear-gradient(180deg, #17414F 0%, #0E2833 100%);
+  --barra-clara: #17414F;   /* topo do gradiente da barra — pior caso */
+
+  /* Vidro: só onde o conteúdo passa por baixo (aba inferior).          */
+  --vidro:      rgba(251,248,243,.82);
+  --vidro-nitido:#FBF8F3;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--fundo); color:var(--txt); font-family:var(--fonte-txt)}
+.pagina{max-width:1080px; margin:0 auto; padding:var(--e10) var(--e6) var(--e16)}
+
+/* --- cabeçalho do documento --- */
+.topo{border-bottom:3px solid var(--txt); padding-bottom:var(--e5); margin-bottom:var(--e10)}
+.marca{font-size:var(--t-6); font-weight:var(--peso-max); letter-spacing:-.03em; line-height:1}
+.topo .sub{font-size:var(--t-2); color:var(--txt-2); margin-top:var(--e2)}
+.topo .meta{font-family:var(--fonte-num); font-size:var(--t-meta); color:var(--txt-3); margin-top:var(--e3)}
+
+/* --- estrutura de seção --- */
+section{margin-bottom:var(--e16)}
+.num-secao{
+  font-family:var(--fonte-num); font-size:var(--t-meta); letter-spacing:.14em;
+  text-transform:uppercase; color:var(--txt-3); margin-bottom:var(--e2);
+}
+h2{font-size:var(--t-4); font-weight:var(--peso-max); letter-spacing:-.02em; margin-bottom:var(--e3)}
+.nota{font-size:var(--t-corpo); line-height:var(--el-corpo); color:var(--txt-2); max-width:62ch; margin-bottom:var(--e6)}
+h3{
+  font-family:var(--fonte-num); font-size:var(--t-meta); letter-spacing:.1em;
+  text-transform:uppercase; color:var(--txt-3);
+  border-bottom:1px solid var(--linha); padding-bottom:var(--e2);
+  margin:var(--e8) 0 var(--e4);
+}
+
+/* --- paleta --- */
+.swatches{display:grid; grid-template-columns:repeat(auto-fill,minmax(200px,1fr)); gap:var(--e3)}
+.sw{border:1px solid var(--linha); border-radius:var(--raio-1); overflow:hidden; background:var(--sup-1)}
+.sw .chip{height:72px}
+.sw .info{padding:var(--e3)}
+.sw .nome{font-size:var(--t-meta); font-weight:var(--peso-forte)}
+.sw .hex{font-family:var(--fonte-num); font-size:var(--t-meta); color:var(--txt-2); margin-top:2px}
+.sw .razao{font-family:var(--fonte-num); font-size:var(--t-meta); color:var(--txt-3); margin-top:var(--e2)}
+
+/* --- tipografia --- */
+.escala{border-collapse:collapse; width:100%}
+.escala td{border-bottom:1px solid var(--linha); padding:var(--e3) var(--e3) var(--e3) 0; vertical-align:baseline}
+.escala .tok{font-family:var(--fonte-num); font-size:var(--t-meta); color:var(--txt-3); white-space:nowrap; width:1%}
+.escala .uso{font-size:var(--t-meta); color:var(--txt-2); white-space:nowrap; width:1%; text-align:right}
+
+/* --- espaçamento --- */
+.espacos{display:flex; align-items:flex-end; gap:var(--e4); flex-wrap:wrap}
+.espaco{text-align:center}
+.espaco .bloco{background:var(--txt); border-radius:2px}
+.espaco .lab{font-family:var(--fonte-num); font-size:var(--t-meta); color:var(--txt-3); margin-top:var(--e2)}
+
+/* --- grade de componentes --- */
+.comps{display:grid; grid-template-columns:repeat(auto-fill,minmax(330px,1fr)); gap:var(--e6)}
+.comp{
+  border:1px solid var(--linha); border-radius:var(--raio-2);
+  background:var(--grad-sup); overflow:hidden;
+  box-shadow:var(--elev-1), var(--bevel);
+}
+.comp .cab{
+  font-family:var(--fonte-num); font-size:var(--t-meta); letter-spacing:.06em;
+  text-transform:uppercase; color:var(--txt-3);
+  padding:var(--e3) var(--e4); border-bottom:1px solid var(--linha); background:var(--fundo);
+}
+.comp .palco{padding:var(--e5)}
+.comp .regra{
+  font-size:var(--t-meta); line-height:1.5; color:var(--txt-2);
+  padding:var(--e3) var(--e4); border-top:1px solid var(--linha); background:var(--fundo);
+}
+
+/* ====================== OS COMPONENTES ====================== */
+
+/* botão primário — D3 */
+.btn-primario{
+  width:100%; min-height:var(--alvo-acao); border:0; cursor:pointer;
+  background:var(--grad-acao); color:var(--acao-txt); border-radius:var(--raio-2);
+  border:1px solid var(--acao-borda);   /* é a borda que cumpre o limite de 3:1 */
+  box-shadow:var(--elev-3), var(--bevel-forte);
+  font-family:var(--fonte-txt); display:flex; flex-direction:column;
+  align-items:center; justify-content:center; gap:var(--e1);
+  transition:background var(--dur-2) ease, box-shadow var(--dur-1) ease, transform var(--dur-1) ease;
+}
+.btn-primario:hover{background:var(--grad-acao-h)}
+/* pressionar afunda pela SOMBRA, não escurecendo o preenchimento:
+   escurecer derrubaria a tinta escura para 3.76:1 e reprovaria. */
+.btn-primario:active{
+  box-shadow:var(--elev-1), var(--elev-afundado);
+  transform:translateY(1px);
+}
+.btn-primario .t{font-size:var(--t-2); font-weight:var(--peso-forte)}
+.btn-primario .s{font-family:var(--fonte-num); font-size:var(--t-meta); color:rgba(10,42,24,.78)}
+
+.btn-secundario{
+  width:100%; min-height:var(--alvo-min); cursor:pointer;
+  background:var(--grad-sup); border:1px solid var(--controle); color:var(--txt-2);
+  border-radius:var(--raio-2); box-shadow:var(--elev-1), var(--bevel);
+  font-family:var(--fonte-txt);
+  font-size:var(--t-corpo); font-weight:var(--peso-medio);
+  transition:color var(--dur-2) ease, border-color var(--dur-2) ease, box-shadow var(--dur-1) ease, transform var(--dur-1) ease;
+}
+.btn-secundario:hover{border-color:var(--txt); color:var(--txt)}
+.btn-secundario:active{box-shadow:var(--elev-afundado); transform:translateY(1px)}
+.btn-primario:focus-visible,.btn-secundario:focus-visible,.aba:focus-visible,.nav a:focus-visible{
+  outline:var(--foco-espessura) solid var(--foco); outline-offset:var(--foco-afast);
+}
+.pilha>*+*{margin-top:var(--alvo-folga)}
+
+/* bloco de evidência */
+.evid{
+  background:var(--grad-sup); border:1px solid var(--linha);
+  border-left:var(--barra-evidencia) solid var(--linha);
+  border-radius:var(--raio-1);
+  box-shadow:var(--elev-2), var(--bevel);
+  padding:var(--e4) var(--e5);
+}
+.evid+.evid{margin-top:var(--e3)}
+.evid.alta{border-left-color:var(--alta)}
+.evid.plato{border-left-color:var(--plato)}
+.evid.queda{border-left-color:var(--queda)}
+.evid .l1{font-size:var(--t-corpo); font-weight:var(--peso-forte)}
+.evid .l2{
+  font-family:var(--fonte-num); font-size:var(--t-5); font-weight:var(--peso-medio);
+  line-height:var(--el-apertada); margin-top:var(--e2);
+  display:flex; align-items:baseline; gap:var(--e2);
+  font-variant-numeric:tabular-nums; letter-spacing:-.03em;
+}
+.evid .l2 .un{font-size:var(--t-meta); color:var(--txt-2); font-weight:var(--peso-normal); letter-spacing:0}
+.evid .l2 .de{color:var(--txt-3); font-size:var(--t-3)}
+.evid .l2 .seta{color:var(--txt-3); font-size:var(--t-2)}
+.evid .delta{font-family:var(--fonte-num); font-size:var(--t-meta); font-weight:var(--peso-forte); margin-top:var(--e2); display:block}
+.evid.alta .delta{color:var(--alta)}
+.evid.plato .delta{color:var(--plato)}
+.evid.queda .delta{color:var(--queda)}
+.evid .l3{font-family:var(--fonte-num); font-size:var(--t-meta); color:var(--txt-3); margin-top:var(--e3); line-height:1.5}
+
+/* linha de série */
+.serie{
+  display:flex; align-items:center; gap:var(--e4);
+  min-height:var(--alvo-min); border-bottom:1px solid var(--linha);
+}
+.serie .i{font-family:var(--fonte-num); font-size:var(--t-meta); color:var(--txt-3); width:20px; flex:none; font-variant-numeric:tabular-nums}
+.serie .v{font-family:var(--fonte-num); font-size:var(--t-4); font-weight:var(--peso-medio); font-variant-numeric:tabular-nums; letter-spacing:-.02em}
+.serie .v .x{color:var(--txt-3); font-size:var(--t-1); margin:0 4px}
+.serie .v .un{font-size:var(--t-meta); color:var(--txt-2); margin-left:3px}
+.serie .marca{margin-left:auto; font-family:var(--fonte-num); font-size:var(--t-meta); text-transform:uppercase; letter-spacing:.05em; white-space:nowrap}
+.marca.aq{color:var(--txt-3)} .marca.val{color:var(--txt-2)} .marca.pr{color:var(--alta); font-weight:var(--peso-forte)}
+
+/* barra de topo e abas */
+.barra-topo{
+  background:var(--grad-barra); color:var(--barra-txt); padding:var(--e4) var(--e5);
+  box-shadow:var(--elev-2);
+}
+.barra-topo .k{font-family:var(--fonte-num); font-size:var(--t-meta); letter-spacing:.1em; text-transform:uppercase; opacity:.72}
+.barra-topo .h{font-size:var(--t-3); font-weight:var(--peso-forte); margin-top:var(--e1)}
+.abas{display:flex; background:var(--grad-barra)}
+.aba{
+  flex:1; min-height:var(--alvo-min); border:0; cursor:pointer; background:transparent;
+  color:var(--barra-txt); font-family:var(--fonte-txt); font-size:var(--t-corpo);
+  font-weight:var(--peso-medio); opacity:.62; border-bottom:3px solid transparent;
+}
+.aba[aria-selected="true"]{opacity:1; border-bottom-color:var(--acao); font-weight:var(--peso-forte)}
+
+/* aba inferior */
+/* vidro de verdade: o conteúdo rola por baixo, então a superfície é
+   translúcida com desfoque. Onde o navegador não suporta, cai no opaco. */
+.nav{
+  display:flex; border-top:1px solid var(--linha);
+  background:var(--vidro-nitido);
+  box-shadow:0 -2px 10px rgba(var(--sombra-cor),.07), inset 0 1px 0 rgba(255,255,255,.8);
+}
+@supports (backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px)){
+  .nav{
+    background:var(--vidro);
+    -webkit-backdrop-filter:blur(14px) saturate(1.4);
+    backdrop-filter:blur(14px) saturate(1.4);
+  }
+}
+.nav a{
+  flex:1; min-height:var(--alvo-min); display:flex; flex-direction:column;
+  align-items:center; justify-content:center; gap:var(--e1);
+  text-decoration:none; color:var(--txt-3); font-size:var(--t-meta); font-weight:var(--peso-medio);
+}
+.nav a[aria-current="page"]{color:var(--acao-tinta); font-weight:var(--peso-forte)}
+.nav svg{width:20px;height:20px}
+
+/* estado de sincronização */
+.sync{display:inline-flex; align-items:center; gap:var(--e2); font-family:var(--fonte-num); font-size:var(--t-meta); color:var(--sync)}
+.sync .pt{width:8px;height:8px;border-radius:50%;background:var(--sync);flex:none}
+
+/* campo */
+.campo{display:block}
+.campo .rot{display:block; font-size:var(--t-meta); font-weight:var(--peso-medio); color:var(--txt-2); margin-bottom:var(--e2)}
+/* campo é o inverso do botão: ele afunda em vez de levantar */
+.campo input{
+  width:100%; min-height:var(--alvo-min); padding:0 var(--e4);
+  background:#FFFDFA; border:1px solid var(--controle); border-radius:var(--raio-1);
+  box-shadow:var(--elev-afundado);
+  font-family:var(--fonte-txt); font-size:var(--t-corpo); color:var(--txt);
+}
+.campo input:focus-visible{outline:var(--foco-espessura) solid var(--foco); outline-offset:var(--foco-afast)}
+
+/* ---- balão de conversa · EXCLUSIVO do Coach 24h ---- */
+.conversa{display:flex; flex-direction:column; gap:var(--e3)}
+.balao{
+  max-width:82%; padding:var(--e3) var(--e4);
+  font-size:var(--t-corpo); line-height:1.5; position:relative;
+  box-shadow:var(--elev-2), var(--bevel);
+}
+.balao.deles{
+  align-self:flex-start; background:var(--grad-sup); color:var(--txt);
+  border:1px solid var(--linha);
+  border-radius:var(--raio-balao) var(--raio-balao) var(--raio-balao) var(--e1);
+}
+.balao.minha{
+  align-self:flex-end; background:var(--grad-acao); color:var(--acao-txt);
+  border:1px solid var(--acao-borda);
+  border-radius:var(--raio-balao) var(--raio-balao) var(--e1) var(--raio-balao);
+  box-shadow:var(--elev-2), var(--bevel-forte);
+}
+.balao .quem{
+  display:block; font-family:var(--fonte-num); font-size:var(--t-meta);
+  letter-spacing:.06em; text-transform:uppercase; color:var(--txt-3); margin-bottom:var(--e1);
+}
+.campo-conversa{
+  display:flex; gap:var(--e2); align-items:center; margin-top:var(--e4);
+  padding-top:var(--e4); border-top:1px solid var(--linha);
+}
+.campo-conversa input{
+  flex:1; min-height:var(--alvo-min); padding:0 var(--e4);
+  background:#FFFDFA; border:1px solid var(--controle); border-radius:999px;
+  box-shadow:var(--elev-afundado);
+  font-family:var(--fonte-txt); font-size:var(--t-corpo); color:var(--txt);
+}
+.enviar{
+  width:var(--alvo-min); height:var(--alvo-min); flex:none; border:0; cursor:pointer;
+  border-radius:50%; background:var(--grad-acao); color:var(--acao-txt);
+  border:1px solid var(--acao-borda);
+  box-shadow:var(--elev-2), var(--bevel-forte);
+  display:flex; align-items:center; justify-content:center;
+}
+.enviar svg{width:20px;height:20px}
+
+/* o mesmo dado em cartão — é isto que o parecer usa */
+.cartao-doc{
+  background:var(--grad-sup); border:1px solid var(--linha);
+  border-left:var(--barra-evidencia) solid var(--alta);
+  border-radius:var(--raio-1); box-shadow:var(--elev-2), var(--bevel);
+  padding:var(--e4) var(--e5);
+}
+
+/* demonstração de foco */
+.demo-foco{outline:var(--foco-espessura) solid var(--foco); outline-offset:var(--foco-afast)}
+
+/* proibições */
+.proibe{list-style:none; max-width:62ch}
+.proibe li{
+  font-size:var(--t-corpo); line-height:1.5; color:var(--txt-2);
+  padding:var(--e3) 0 var(--e3) var(--e6); border-bottom:1px solid var(--linha); position:relative;
+}
+.proibe li::before{
+  content:'✕'; position:absolute; left:0; top:var(--e3);
+  color:var(--queda); font-weight:var(--peso-forte);
+}
+
+/* aferição */
+#afericao{
+  font-family:var(--fonte-num); font-size:var(--t-meta); line-height:1.7;
+  background:var(--sup-1); border:1px solid var(--linha); border-radius:var(--raio-1);
+  padding:var(--e5); white-space:pre-wrap; color:var(--txt-2);
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="pagina">
+
+<header class="topo">
+  <p class="marca">lastro</p>
+  <p class="sub">Padrão visual — Areia &amp; Azul Petróleo</p>
+  <p class="meta">Fase 3 · 2026-08-06 · o sistema, não as telas</p>
+</header>
+
+<!-- ============ 1 · PALETA ============ -->
+<section>
+  <p class="num-secao">01</p>
+  <h2>Paleta</h2>
+  <p class="nota">Areia é a superfície, azul petróleo é a tinta, verde é a ação — e só a ação. Os quatro sinais semânticos vivem fora do verde de ação de propósito: se o botão mais frequente do app fosse do mesmo verde de “progressão”, o verde deixaria de significar progresso e viraria só “botão”.</p>
+
+  <h3>Superfícies</h3>
+  <div class="swatches">
+    <div class="sw"><div class="chip" style="background:#F0EAE0"></div><div class="info"><p class="nome">fundo</p><p class="hex">#F0EAE0</p><p class="razao" data-par="--txt|--fundo"></p></div></div>
+    <div class="sw"><div class="chip" style="background:#FBF8F3"></div><div class="info"><p class="nome">sup-1 · cartão</p><p class="hex">#FBF8F3</p><p class="razao" data-par="--txt|--sup-1"></p></div></div>
+    <div class="sw"><div class="chip" style="background:#E4DACB"></div><div class="info"><p class="nome">sup-2 · faixa</p><p class="hex">#E4DACB</p><p class="razao" data-par="--txt|--sup-2"></p></div></div>
+    <div class="sw"><div class="chip" style="background:#123241"></div><div class="info"><p class="nome">barra · topo escuro</p><p class="hex">#123241</p><p class="razao" data-par="--barra-txt|--barra"></p></div></div>
+  </div>
+
+  <h3>Tinta</h3>
+  <div class="swatches">
+    <div class="sw"><div class="chip" style="background:#12303F"></div><div class="info"><p class="nome">txt · corpo e número</p><p class="hex">#12303F</p><p class="razao" data-par="--txt|--fundo"></p></div></div>
+    <div class="sw"><div class="chip" style="background:#3A5361"></div><div class="info"><p class="nome">txt-2 · secundário</p><p class="hex">#3A5361</p><p class="razao" data-par="--txt-2|--fundo"></p></div></div>
+    <div class="sw"><div class="chip" style="background:#476069"></div><div class="info"><p class="nome">txt-3 · procedência</p><p class="hex">#476069</p><p class="razao" data-par="--txt-3|--sup-2"></p></div></div>
+    <div class="sw"><div class="chip" style="background:#8A7C68"></div><div class="info"><p class="nome">controle · limite de alvo</p><p class="hex">#8A7C68</p><p class="razao" data-par="--controle|--fundo" data-min="3"></p></div></div>
+  </div>
+
+  <h3>Ação — preenchimento vivo, tinta escura</h3>
+  <div class="swatches">
+    <div class="sw"><div class="chip" style="background:linear-gradient(180deg,#46C27B,#35A866)"></div><div class="info"><p class="nome">ação · preenchimento</p><p class="hex">#46C27B → #35A866</p><p class="razao" data-par="--acao-txt|--acao-escura"></p></div></div>
+    <div class="sw"><div class="chip" style="background:#0A2A18"></div><div class="info"><p class="nome">ação · tinta sobre ela</p><p class="hex">#0A2A18</p><p class="razao" data-par="--acao-txt|--acao"></p></div></div>
+    <div class="sw"><div class="chip" style="background:#0E5E35"></div><div class="info"><p class="nome">ação · borda e texto</p><p class="hex">#0E5E35</p><p class="razao" data-par="--acao-borda|--fundo" data-min="3"></p></div></div>
+  </div>
+  <p class="nota" style="margin-top:var(--e4)">O verde vivo <strong>não</strong> pode ser usado como texto sobre a areia — ele dá 1.89:1. Aba ativa, link e item selecionado usam <code>--acao-tinta</code>, o verde escuro. Preenchimento e tinta são dois papéis, não a mesma cor.</p>
+
+  <h3>Sinais semânticos</h3>
+  <div class="swatches">
+    <div class="sw"><div class="chip" style="background:#1B6B3A"></div><div class="info"><p class="nome">alta · progressão</p><p class="hex">#1B6B3A</p><p class="razao" data-par="--alta|--sup-1"></p></div></div>
+    <div class="sw"><div class="chip" style="background:#8A5A0B"></div><div class="info"><p class="nome">platô · estagnação</p><p class="hex">#8A5A0B</p><p class="razao" data-par="--plato|--sup-1"></p></div></div>
+    <div class="sw"><div class="chip" style="background:#A33220"></div><div class="info"><p class="nome">queda · regressão</p><p class="hex">#A33220</p><p class="razao" data-par="--queda|--sup-1"></p></div></div>
+    <div class="sw"><div class="chip" style="background:#2E6076"></div><div class="info"><p class="nome">sync · nunca alarme</p><p class="hex">#2E6076</p><p class="razao" data-par="--sync|--fundo"></p></div></div>
+    <div class="sw"><div class="chip" style="background:#A32014"></div><div class="info"><p class="nome">erro · só falha real</p><p class="hex">#A32014</p><p class="razao" data-par="--erro|--fundo"></p></div></div>
+    <div class="sw"><div class="chip" style="background:#0B5CAB"></div><div class="info"><p class="nome">foco</p><p class="hex">#0B5CAB</p><p class="razao" data-par="--foco|--fundo" data-min="3"></p></div></div>
+  </div>
+</section>
+
+<!-- ============ 2 · TIPOGRAFIA ============ -->
+<section>
+  <p class="num-secao">02</p>
+  <h2>Tipografia</h2>
+  <p class="nota">Duas famílias. <strong>IBM Plex Sans</strong> para tudo que se lê; <strong>IBM Plex Mono</strong> para tudo que é número, unidade, metadado e rótulo de sistema. A troca de família é o que destaca o dado — não a cor. Número dentro de prosa muda de família e ganha peso, nunca cor: cor ali confundiria com sinal semântico.</p>
+
+  <h3>Escala — piso 14px, corpo nunca abaixo de 16px (D4)</h3>
+  <table class="escala">
+    <tr><td class="tok">--t-8 · 76px</td><td style="font-family:var(--fonte-num);font-size:76px;line-height:1.1;font-weight:500;letter-spacing:-.03em">60</td><td class="uso">número em bancada</td></tr>
+    <tr><td class="tok">--t-5 · 38px</td><td style="font-family:var(--fonte-num);font-size:38px;line-height:1.1;font-weight:500;letter-spacing:-.03em">60</td><td class="uso">número da evidência</td></tr>
+    <tr><td class="tok">--t-4 · 30px</td><td style="font-family:var(--fonte-num);font-size:30px;font-weight:500">8 × 60</td><td class="uso">linha de série</td></tr>
+    <tr><td class="tok">--t-3 · 24px</td><td style="font-size:24px;font-weight:700">Título de tela</td><td class="uso">cabeçalho</td></tr>
+    <tr><td class="tok">--t-2 · 20px</td><td style="font-size:20px;font-weight:600">Veredito</td><td class="uso">ação primária, veredito</td></tr>
+    <tr><td class="tok">--t-1 · 18px</td><td style="font-size:18px">Prosa de leitura</td><td class="uso">parecer</td></tr>
+    <tr><td class="tok">--t-corpo · 16px</td><td style="font-size:16px">Corpo — o piso</td><td class="uso">rótulo, item</td></tr>
+    <tr><td class="tok">--t-meta · 14px</td><td style="font-family:var(--fonte-num);font-size:14px">4 semanas · 14 séries</td><td class="uso">procedência, só em mono</td></tr>
+  </table>
+</section>
+
+<!-- ============ 3 · ESPAÇO E ALVO ============ -->
+<section>
+  <p class="num-secao">03</p>
+  <h2>Espaço e alvo</h2>
+  <p class="nota">Base 4. Alvo de toque nunca abaixo de 48px, com 12px de folga entre vizinhos — dedo suado, pessoa em pé. A ação primária é 72px, maior que o piso de propósito.</p>
+  <div class="espacos">
+    <div class="espaco"><div class="bloco" style="width:4px;height:4px"></div><p class="lab">4</p></div>
+    <div class="espaco"><div class="bloco" style="width:8px;height:8px"></div><p class="lab">8</p></div>
+    <div class="espaco"><div class="bloco" style="width:12px;height:12px"></div><p class="lab">12</p></div>
+    <div class="espaco"><div class="bloco" style="width:16px;height:16px"></div><p class="lab">16</p></div>
+    <div class="espaco"><div class="bloco" style="width:20px;height:20px"></div><p class="lab">20</p></div>
+    <div class="espaco"><div class="bloco" style="width:24px;height:24px"></div><p class="lab">24</p></div>
+    <div class="espaco"><div class="bloco" style="width:32px;height:32px"></div><p class="lab">32</p></div>
+    <div class="espaco"><div class="bloco" style="width:48px;height:48px"></div><p class="lab">48 · alvo</p></div>
+    <div class="espaco"><div class="bloco" style="width:72px;height:72px"></div><p class="lab">72 · ação</p></div>
+  </div>
+</section>
+
+<!-- ============ 3b · MATÉRIA ============ -->
+<section>
+  <p class="num-secao">03b</p>
+  <h2>Matéria</h2>
+  <p class="nota">Sem elevação, cartão claro sobre fundo claro fica solto — a peça não gruda na tela. Três regras dão o material sem virar enfeite: <strong>a luz vem de cima</strong>, então todo elemento levantado leva um fio claro na borda superior e a sombra cai para baixo; <strong>a sombra é quente</strong>, nunca cinza, porque cinza sobre areia acinzenta o fundo; e <strong>gradiente tem no máximo dois passos</strong>, sempre do claro para o escuro.</p>
+
+  <div class="comps">
+    <div class="comp">
+      <p class="cab">elev-1 · repouso</p>
+      <div class="palco"><div style="height:88px;border-radius:var(--raio-1);background:var(--grad-sup);border:1px solid var(--linha);box-shadow:var(--elev-1),var(--bevel)"></div></div>
+      <p class="regra">Painel, cartão de lista. Só separa do fundo.</p>
+    </div>
+    <div class="comp">
+      <p class="cab">elev-2 · levantado</p>
+      <div class="palco"><div style="height:88px;border-radius:var(--raio-1);background:var(--grad-sup);border:1px solid var(--linha);box-shadow:var(--elev-2),var(--bevel)"></div></div>
+      <p class="regra">Bloco de evidência, barra de topo, balão.</p>
+    </div>
+    <div class="comp">
+      <p class="cab">elev-3 · ação primária</p>
+      <div class="palco"><div style="height:88px;border-radius:var(--raio-2);background:var(--grad-acao);box-shadow:var(--elev-3),var(--bevel-forte)"></div></div>
+      <p class="regra">Só a ação mais importante da tela chega aqui.</p>
+    </div>
+    <div class="comp">
+      <p class="cab">afundado · campo</p>
+      <div class="palco"><div style="height:88px;border-radius:var(--raio-1);background:#FFFDFA;border:1px solid var(--controle);box-shadow:var(--elev-afundado)"></div></div>
+      <p class="regra">O campo é o inverso do botão: recebe em vez de saltar.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 4 · COMPONENTES ============ -->
+<section>
+  <p class="num-secao">04</p>
+  <h2>Componentes</h2>
+
+  <div class="comps">
+
+    <div class="comp">
+      <p class="cab">Ação primária · 72px</p>
+      <div class="palco pilha">
+        <button class="btn-primario"><span class="t">Ação primária</span><span class="s">estado que ela repete</span></button>
+        <button class="btn-secundario">Ação secundária</button>
+      </div>
+      <p class="regra">Largura total, metade inferior da tela. A segunda linha em mono mostra <em>o que</em> a ação vai fazer, para confirmar sem abrir.</p>
+    </div>
+
+    <div class="comp">
+      <p class="cab">Foco · nunca encosta</p>
+      <div class="palco pilha">
+        <button class="btn-primario demo-foco"><span class="t">Ação primária</span></button>
+        <button class="btn-secundario demo-foco">Ação secundária</button>
+      </div>
+      <p class="regra">O anel é desenhado <strong>fora</strong> do elemento, com afastamento. Anel interno some contra o preenchimento.</p>
+    </div>
+
+    <div class="comp">
+      <p class="cab">Bloco de evidência · 3 linhas</p>
+      <div class="palco">
+        <div class="evid alta">
+          <p class="l1">Exercício</p>
+          <p class="l2"><span class="de">85</span><span class="seta">→</span><span>95</span><span class="un">kg</span></p>
+          <span class="delta">+12% · 4 semanas</span>
+          <p class="l3">janela · n de séries valendo · origem</p>
+        </div>
+      </div>
+      <p class="regra">Linha 1 o exercício, linha 2 o número em mono tabular, linha 3 a procedência. A barra lateral carrega o sinal.</p>
+    </div>
+
+    <div class="comp">
+      <p class="cab">Os três sinais lado a lado</p>
+      <div class="palco">
+        <div class="evid alta"><p class="l1">Alta</p><span class="delta">+12% · 4 semanas</span></div>
+        <div class="evid plato"><p class="l1">Platô</p><span class="delta">sem mudança · 5 semanas</span></div>
+        <div class="evid queda"><p class="l1">Queda</p><span class="delta">−5,6% · 4 semanas</span></div>
+      </div>
+      <p class="regra"><strong>Cor nunca é o portador.</strong> Cada sinal traz a palavra e o número que o identificam. Dois blocos distinguidos só pela cor reprovam.</p>
+    </div>
+
+    <div class="comp">
+      <p class="cab">Linha de série</p>
+      <div class="palco">
+        <div class="serie"><span class="i">1</span><span class="v">12<span class="x">×</span>40<span class="un">kg</span></span><span class="marca aq">aquecimento</span></div>
+        <div class="serie"><span class="i">2</span><span class="v">8<span class="x">×</span>60<span class="un">kg</span></span><span class="marca val">valendo</span></div>
+        <div class="serie"><span class="i">3</span><span class="v">10<span class="x">×</span>24<span class="un">kg</span></span><span class="marca pr">recorde</span></div>
+      </div>
+      <p class="regra">Aquecimento e valendo se distinguem por palavra, porque aquecimento não entra em nenhum cálculo.</p>
+    </div>
+
+    <div class="comp">
+      <p class="cab">Barra de topo e abas</p>
+      <div class="palco" style="padding:0">
+        <div class="barra-topo"><p class="k">Contexto</p><p class="h">Título da tela</p></div>
+        <div class="abas" role="tablist">
+          <button class="aba" role="tab" aria-selected="true">Ativa</button>
+          <button class="aba" role="tab" aria-selected="false">Inativa</button>
+        </div>
+      </div>
+      <p class="regra">A única superfície escura do padrão. Ancora a tela e devolve o petróleo como cor de marca.</p>
+    </div>
+
+    <div class="comp">
+      <p class="cab">Aba inferior</p>
+      <div class="palco" style="padding:0">
+        <nav class="nav">
+          <a href="#" aria-current="page"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 8v8M20 8v8M8 6v12M16 6v12M8 12h8"/></svg>Bancada</a>
+          <a href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 19V9M10 19V5M16 19v-7M22 19H2"/></svg>Análise</a>
+          <a href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 3a9 9 0 100 18 9 9 0 000-18zM12 8v4l3 2"/></svg>Catálogo</a>
+        </nav>
+      </div>
+      <p class="regra">Ícone traçado, nunca preenchido. O item ativo usa o verde de ação e peso, não só cor.</p>
+    </div>
+
+    <div class="comp">
+      <p class="cab">Campo</p>
+      <div class="palco pilha">
+        <label class="campo"><span class="rot">Rótulo do campo</span><input type="text" placeholder="—"></label>
+      </div>
+      <p class="regra">Rótulo sempre visível, nunca só <em>placeholder</em>. Limite em <code>--controle</code>, que cumpre 3:1.</p>
+    </div>
+
+    <div class="comp">
+      <p class="cab">Balão · só no Coach 24h</p>
+      <div class="palco">
+        <div class="conversa">
+          <div class="balao deles"><span class="quem">Coach</span>Resposta do coach.</div>
+          <div class="balao minha">Pergunta do dono.</div>
+        </div>
+        <div class="campo-conversa">
+          <input type="text" placeholder="Perguntar…" aria-label="Perguntar ao coach">
+          <button class="enviar" aria-label="Enviar">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 12h15M13 6l6 6-6 6"/></svg>
+          </button>
+        </div>
+      </div>
+      <p class="regra">Balão, rabicho, alinhamento alternado e caixa de digitação — o pacote completo, e correto <strong>aqui</strong>. Esta é a única tela do app onde se conversa.</p>
+    </div>
+
+    <div class="comp">
+      <p class="cab">O mesmo dado, como documento</p>
+      <div class="palco">
+        <div class="cartao-doc">
+          <p class="l1" style="font-size:var(--t-corpo);font-weight:var(--peso-forte)">Exercício</p>
+          <p class="l2" style="font-family:var(--fonte-num);font-size:var(--t-5);font-weight:500;margin-top:8px;letter-spacing:-.03em">95<span class="un" style="font-size:14px;color:var(--txt-2);font-weight:400;margin-left:6px">kg</span></p>
+          <span class="delta" style="color:var(--alta);font-family:var(--fonte-num);font-size:14px;font-weight:600;display:block;margin-top:8px">+12% · 4 semanas</span>
+        </div>
+      </div>
+      <p class="regra">Mesmo canto arredondado, mesma elevação, mesma matéria — e não lê como conversa. Sem rabicho, sem alternar lado, sem campo embaixo. É isto que o parecer usa.</p>
+    </div>
+
+    <div class="comp">
+      <p class="cab">Estado de sincronização</p>
+      <div class="palco">
+        <div style="display:flex;flex-direction:column;gap:var(--e3);align-items:flex-start">
+          <p class="sync"><span class="pt"></span>salvo no aparelho</p>
+          <p class="sync"><span class="pt"></span>sincronizado</p>
+        </div>
+      </div>
+      <p class="regra">Sempre em estado, nunca em susto. <strong>Jamais</strong> na cor de erro — offline é o funcionamento normal, não falha.</p>
+    </div>
+
+  </div>
+</section>
+
+<!-- ============ 5 · O QUE REPROVA ============ -->
+<section>
+  <p class="num-secao">05</p>
+  <h2>O que reprova</h2>
+  <p class="nota">Matéria — gradiente, vidro, bevel, sombra, canto arredondado — <strong>é do padrão</strong> e vale em toda tela. O que reprova não é o material: é a <em>conversa</em>, e só na tela do parecer. Se o parecer parecer conversa, o app vira “chatbot com gráfico colado” e a tese morre.</p>
+
+  <h3>No parecer da Análise Semanal — reprova</h3>
+  <ul class="proibe">
+    <li>Rabicho no bloco, ou blocos alternando entre esquerda e direita</li>
+    <li>Avatar, iniciais, ícone de robô, nome de assistente</li>
+    <li>Reticências pulsantes, cursor piscando, texto aparecendo letra a letra</li>
+    <li>Caixa de digitação abaixo do parecer — perguntar é o Coach, outra tela</li>
+    <li>Selo de “gerado por IA”: procedência se mostra com número, não com adesivo</li>
+  </ul>
+
+  <h3>Em qualquer tela — reprova</h3>
+  <ul class="proibe">
+    <li>Número colorido dentro da prosa — confunde com sinal semântico</li>
+    <li>Dois sinais distinguidos apenas pela cor, sem a palavra que os nomeia</li>
+    <li>Cor de erro em platô, ou em estado offline — offline é funcionamento normal</li>
+    <li>Medalha, troféu, streak, confete, badge, nível, XP</li>
+    <li>Alvo de toque abaixo de 48px, ou corpo de texto abaixo de 16px</li>
+    <li>Sombra cinza sobre a areia — a sombra do padrão é quente</li>
+    <li>Gradiente de mais de dois passos, ou que inverta o sentido da luz</li>
+  </ul>
+</section>
+
+<!-- ============ 6 · AFERIÇÃO ============ -->
+<section>
+  <p class="num-secao">06</p>
+  <h2>Aferição de contraste</h2>
+  <p class="nota">Medido no navegador, sobre as cores computadas desta página. Limiar 4.5:1 para texto, 3:1 para limite de componente. O método é conferido contra os valores canônicos do WCAG antes de rodar. <strong>Onde há gradiente, o texto é medido contra o passo mais claro</strong> — o pior caso —, não contra uma média.</p>
+  <div id="afericao">medindo…</div>
+</section>
+
+</div>
+
+<script>
+(function(){
+  var cs = getComputedStyle(document.documentElement);
+  function v(n){ return cs.getPropertyValue(n).trim(); }
+  function L(h){
+    h = h.replace('#','');
+    if (h.length === 3) h = h.split('').map(function(c){return c+c;}).join('');
+    var c = [0,2,4].map(function(i){ return parseInt(h.substr(i,2),16)/255; })
+      .map(function(x){ return x <= 0.03928 ? x/12.92 : Math.pow((x+0.055)/1.055, 2.4); });
+    return 0.2126*c[0] + 0.7152*c[1] + 0.0722*c[2];
+  }
+  function R(a,b){ var x=L(a), y=L(b); return (Math.max(x,y)+0.05)/(Math.min(x,y)+0.05); }
+
+  // razão em cada swatch
+  document.querySelectorAll('.razao').forEach(function(el){
+    var p = el.dataset.par.split('|');
+    var min = parseFloat(el.dataset.min || '4.5');
+    var r = R(v(p[0]), v(p[1]));
+    el.textContent = (r >= min ? '✓ ' : '✕ ') + r.toFixed(2) + ':1  (min ' + min + ')';
+    el.style.color = r >= min ? 'var(--txt-3)' : 'var(--queda)';
+  });
+
+  // painel de aferição
+  var pares = [
+    ['txt / fundo','--txt','--fundo',4.5],
+    ['txt / sup-1','--txt','--sup-1',4.5],
+    ['txt / sup-2','--txt','--sup-2',4.5],
+    ['txt-2 / fundo','--txt-2','--fundo',4.5],
+    ['txt-2 / sup-1','--txt-2','--sup-1',4.5],
+    ['txt-3 / fundo','--txt-3','--fundo',4.5],
+    ['txt-3 / sup-1','--txt-3','--sup-1',4.5],
+    ['txt-3 / sup-2','--txt-3','--sup-2',4.5],
+    ['alta / sup-1','--alta','--sup-1',4.5],
+    ['plato / sup-1','--plato','--sup-1',4.5],
+    ['queda / sup-1','--queda','--sup-1',4.5],
+    ['sync / fundo','--sync','--fundo',4.5],
+    ['erro / fundo','--erro','--fundo',4.5],
+    ['acao-tinta / fundo (aba ativa, link)','--acao-tinta','--fundo',4.5],
+    ['acao-txt / topo do gradiente','--acao-txt','--acao',4.5],
+    ['acao-txt / BASE do gradiente (pior caso)','--acao-txt','--acao-escura',4.5],
+    ['barra-txt / TOPO do gradiente da barra','--barra-txt','--barra-clara',4.5],
+    ['acao-borda / fundo (limite do botao)','--acao-borda','--fundo',3],
+    ['controle / fundo (limite de alvo)','--controle','--fundo',3],
+    ['controle / sup-1','--controle','--sup-1',3],
+    ['foco / fundo','--foco','--fundo',3],
+    ['linha / fundo (divisoria, decorativa)','--linha','--fundo',0]
+  ];
+  var out = [], falhas = 0;
+  pares.forEach(function(p){
+    var r = R(v(p[1]), v(p[2]));
+    var ok = p[3] === 0 ? null : r >= p[3];
+    if (ok === false) falhas++;
+    out.push((ok === null ? '·      ' : (ok ? '✓ passa' : '✕ REPROVA')) + '   ' +
+             r.toFixed(2).padStart(6) + ':1   ' + p[0]);
+  });
+
+  // aferição do método contra os valores canônicos do WCAG
+  var aferi = 'Método conferido: #FFF/#000 = ' + R('#FFFFFF','#000000').toFixed(2) +
+              ' · #777/#FFF = ' + R('#777777','#FFFFFF').toFixed(2) +
+              ' · #767676/#FFF = ' + R('#767676','#FFFFFF').toFixed(2) +
+              '   (canônicos: 21.00 · 4.48 · 4.54)';
+
+  // separação entre o verde de ação e o verde de sinal
+  var sep = 'Separação do verde de ação vs o verde de sinal (--alta):\n' +
+            '  preenchimento vivo vs alta ... ' + R(v('--acao'), v('--alta')).toFixed(2) + ':1\n' +
+            '  verde vivo como texto na areia ' + R(v('--acao'), v('--fundo')).toFixed(2) +
+            ':1  → por isso ele NUNCA é texto';
+
+  document.getElementById('afericao').textContent =
+    aferi + '\n\n' + out.join('\n') + '\n\n' + sep +
+    '\n\nReprovações: ' + falhas;
+})();
+</script>
+</body>
+</html>
