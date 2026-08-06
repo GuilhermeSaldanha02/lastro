@@ -1,0 +1,293 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>lastro — direção visual</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  /* ---- fundo: petróleo profundo, não preto ---- */
+  --fundo:      #0C1618;
+  --sup-1:      #122326;
+  --sup-2:      #182E32;
+  --linha:      #24413F;
+
+  /* ---- texto: areia quente sobre frio ---- */
+  --txt:        #EFE5D6;
+  --txt-2:      #BCB1A0;
+  --txt-3:      #93897B;
+
+  /* ---- marca: bordô terroso. NÃO é sinal. ---- */
+  --bordo:      #B04652;
+  --bordo-forte:#B74855;
+
+  /* ---- sinais semânticos, afastados da marca ---- */
+  --alta:       #8FC46B;
+  --plato:      #D9A441;
+  --queda:      #E5765C;
+  --erro:       #F05A50;
+  --sync:       #4E9B9C;
+
+  --e1:4px; --e2:8px; --e3:12px; --e4:16px; --e5:20px; --e6:24px; --e8:32px; --e12:48px; --e16:64px;
+  --raio-1:3px; --raio-2:6px;
+  --barra:3px;
+
+  --txt-fam: "Newsreader", Georgia, serif;
+  --num-fam: "IBM Plex Mono", ui-monospace, monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+  background:#070E0F; color:var(--txt);
+  font-family:var(--txt-fam);
+  -webkit-font-smoothing:antialiased;
+  padding:var(--e6) 0 var(--e16);
+}
+.rotulo{
+  font-family:var(--num-fam); font-size:11px; letter-spacing:.14em;
+  text-transform:uppercase; color:var(--txt-3);
+  padding:0 var(--e5) var(--e3); max-width:390px; margin:0 auto;
+}
+.tela{
+  max-width:390px; margin:0 auto var(--e12); background:var(--fundo);
+  min-height:640px; position:relative; overflow:hidden;
+  border:1px solid #16292B;
+}
+
+/* ================= TELA 1 — PARECER (Modo Leitura) ================= */
+.doc{padding:var(--e6) var(--e5) var(--e16)}
+
+/* cabeçalho de emissão */
+.emissao{border-bottom:1px solid var(--linha); padding-bottom:var(--e4); margin-bottom:var(--e6)}
+.emissao h1{
+  font-family:var(--txt-fam); font-size:26px; line-height:1.2; font-weight:500;
+  letter-spacing:-.01em;
+}
+.emissao .meta{
+  font-family:var(--num-fam); font-size:11px; letter-spacing:.06em;
+  color:var(--txt-3); margin-top:var(--e3); text-transform:uppercase;
+}
+
+/* veredito */
+.veredito{
+  font-size:21px; line-height:1.38; font-weight:500; letter-spacing:-.005em;
+  margin-bottom:var(--e8); color:var(--txt);
+}
+.veredito em{font-style:italic; font-weight:400}
+
+/* blocos de evidência */
+.evid{
+  border-left:var(--barra) solid var(--linha);
+  background:var(--sup-1);
+  border-radius:0 var(--raio-2) var(--raio-2) 0;
+  padding:var(--e4) var(--e5);
+  margin-bottom:var(--e3);
+}
+.evid.alta{border-left-color:var(--alta)}
+.evid.plato{border-left-color:var(--plato)}
+.evid.queda{border-left-color:var(--queda)}
+
+.evid .ex{
+  font-family:var(--num-fam); font-size:12px; font-weight:500;
+  letter-spacing:.08em; text-transform:uppercase; color:var(--txt-2);
+}
+.evid .num{
+  font-family:var(--num-fam); font-size:30px; font-weight:500; line-height:1.15;
+  margin-top:var(--e2); display:flex; align-items:baseline; gap:var(--e3);
+  font-variant-numeric:tabular-nums; letter-spacing:-.02em;
+}
+.evid .num .un{font-size:14px; color:var(--txt-2); font-weight:400}
+.evid .num .de{color:var(--txt-3); font-size:19px}
+.evid .num .seta{color:var(--txt-3); font-size:15px}
+.delta{
+  font-family:var(--num-fam); font-size:13px; font-weight:600;
+  padding:2px var(--e2); border-radius:var(--raio-1); margin-left:auto;
+  letter-spacing:.01em; white-space:nowrap;
+}
+.delta.alta{color:var(--alta); background:rgba(143,196,107,.10)}
+.delta.plato{color:var(--plato); background:rgba(217,164,65,.10)}
+.delta.queda{color:var(--queda); background:rgba(229,118,92,.10)}
+.evid .proc{
+  font-family:var(--num-fam); font-size:10.5px; letter-spacing:.045em;
+  color:var(--txt-3); margin-top:var(--e3); line-height:1.5;
+}
+
+/* prosa */
+.prosa{margin:var(--e8) 0 var(--e6); max-width:34em}
+.prosa p{font-size:17px; line-height:1.62; color:var(--txt-2); margin-bottom:var(--e4)}
+.prosa p .n{font-family:var(--num-fam); font-size:15px; font-weight:500; color:var(--txt)}
+
+/* rodapé de método */
+.metodo{
+  border-top:1px solid var(--linha); padding-top:var(--e4);
+  font-family:var(--num-fam); font-size:10.5px; line-height:1.65;
+  color:var(--txt-3); letter-spacing:.03em;
+}
+
+/* ================= TELA 2 — REGISTRO (Modo Bancada) ================= */
+.banc{display:flex; flex-direction:column; min-height:640px}
+.banc-topo{padding:var(--e5) var(--e5) var(--e4); border-bottom:1px solid var(--linha)}
+.banc-topo .data{
+  font-family:var(--num-fam); font-size:11px; letter-spacing:.14em;
+  text-transform:uppercase; color:var(--txt-3);
+}
+.banc-topo h2{font-size:24px; font-weight:500; margin-top:var(--e2); letter-spacing:-.01em}
+.sync{
+  display:inline-flex; align-items:center; gap:var(--e2); margin-top:var(--e3);
+  font-family:var(--num-fam); font-size:11px; letter-spacing:.05em; color:var(--sync);
+}
+.sync .pt{width:6px;height:6px;border-radius:50%;background:var(--sync)}
+
+.series{flex:1; padding:var(--e4) var(--e5) var(--e6); overflow:auto}
+.grupo{margin-bottom:var(--e6)}
+.grupo h3{
+  font-family:var(--num-fam); font-size:12px; font-weight:500; letter-spacing:.1em;
+  text-transform:uppercase; color:var(--txt-2); margin-bottom:var(--e3);
+  display:flex; justify-content:space-between;
+}
+.grupo h3 .cont{color:var(--txt-3); letter-spacing:.05em}
+.linha{
+  display:flex; align-items:center; gap:var(--e4);
+  padding:var(--e3) 0; border-bottom:1px solid #15282A;
+}
+.linha .i{
+  font-family:var(--num-fam); font-size:11px; color:var(--txt-3);
+  width:18px; flex:none; font-variant-numeric:tabular-nums;
+}
+.linha .v{
+  font-family:var(--num-fam); font-size:22px; font-weight:500; color:var(--txt);
+  font-variant-numeric:tabular-nums; letter-spacing:-.01em;
+}
+.linha .v .x{color:var(--txt-3); font-size:15px; margin:0 6px}
+.linha .v .un{font-size:13px; color:var(--txt-2); margin-left:3px}
+.tag{
+  margin-left:auto; font-family:var(--num-fam); font-size:10px; letter-spacing:.1em;
+  text-transform:uppercase; padding:3px 7px; border-radius:var(--raio-1);
+  border:1px solid var(--linha); color:var(--txt-3);
+}
+.tag.val{color:var(--txt-2); border-color:#2E5350}
+.pr{
+  margin-left:auto; font-family:var(--num-fam); font-size:10px; letter-spacing:.1em;
+  text-transform:uppercase; color:var(--alta);
+}
+
+/* ação primária — metade inferior, largura total, alvo grande */
+.acao{
+  padding:var(--e4) var(--e5) var(--e6);
+  border-top:1px solid var(--linha); background:var(--fundo);
+}
+.repetir{
+  width:100%; min-height:72px; border:0; cursor:pointer;
+  background:var(--bordo); color:#FFF3E9; border-radius:var(--raio-2);
+  display:flex; flex-direction:column; align-items:center; justify-content:center; gap:3px;
+  transition:background 180ms ease;
+}
+.repetir:hover{background:var(--bordo-forte)}
+.repetir:focus-visible{outline:2px solid var(--txt); outline-offset:3px}
+.repetir .t{font-family:var(--txt-fam); font-size:19px; font-weight:600; letter-spacing:.01em}
+.repetir .s{
+  font-family:var(--num-fam); font-size:12px; letter-spacing:.06em;
+  color:rgba(255,243,233,.72); font-variant-numeric:tabular-nums;
+}
+.secundaria{
+  width:100%; min-height:52px; margin-top:var(--e3); cursor:pointer;
+  background:transparent; border:1px solid var(--linha); color:var(--txt-2);
+  border-radius:var(--raio-2); font-family:var(--num-fam);
+  font-size:13px; letter-spacing:.08em; text-transform:uppercase;
+  transition:border-color 180ms ease, color 180ms ease;
+}
+.secundaria:hover{border-color:#356764; color:var(--txt)}
+.secundaria:focus-visible{outline:2px solid var(--txt); outline-offset:3px}
+
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+
+<p class="rotulo">Tela 1 · Análise Semanal — Modo Leitura</p>
+<section class="tela">
+  <div class="doc">
+
+    <header class="emissao">
+      <h1>Onde eu empaquei?</h1>
+      <p class="meta">Semana de 28 jul a 3 ago · emitido 4 ago</p>
+    </header>
+
+    <p class="veredito">O supino parou há cinco semanas — <em>e é o único que parou.</em></p>
+
+    <div class="evid plato">
+      <p class="ex">Supino reto</p>
+      <p class="num">
+        <span>60</span><span class="un">kg</span>
+        <span class="delta plato">sem mudança · 5 sem</span>
+      </p>
+      <p class="proc">4 semanas · 14 séries valendo · calculado no aparelho</p>
+    </div>
+
+    <div class="evid alta">
+      <p class="ex">Agachamento livre</p>
+      <p class="num">
+        <span class="de">85</span><span class="seta">→</span><span>95</span><span class="un">kg</span>
+        <span class="delta alta">+12%</span>
+      </p>
+      <p class="proc">4 semanas · 18 séries valendo · calculado no aparelho</p>
+    </div>
+
+    <div class="evid queda">
+      <p class="ex">Remada curvada</p>
+      <p class="num">
+        <span class="de">72</span><span class="seta">→</span><span>68</span><span class="un">kg</span>
+        <span class="delta queda">−5,6%</span>
+      </p>
+      <p class="proc">4 semanas · 9 séries valendo · calculado no aparelho</p>
+    </div>
+
+    <div class="prosa">
+      <p>O agachamento subiu <span class="n">12%</span> no mesmo período em que o supino ficou parado. Isso descarta cansaço geral: se fosse recuperação, os dois teriam travado juntos.</p>
+      <p>A remada caiu <span class="n">5,6%</span> com <span class="n">9</span> séries valendo — metade do volume do agachamento. É o menor denominador do parecer, e o único número aqui que pede mais dados antes de virar conclusão.</p>
+    </div>
+
+    <p class="metodo">Método · e1RM (Epley) e volume por série valendo. Séries de aquecimento excluídas do cálculo. Janela: 4 semanas ISO fechadas.</p>
+
+  </div>
+</section>
+
+<p class="rotulo">Tela 2 · Treino em andamento — Modo Bancada</p>
+<section class="tela banc">
+
+  <div class="banc-topo">
+    <p class="data">Quinta · 6 ago</p>
+    <h2>Peito e tríceps</h2>
+    <span class="sync"><span class="pt"></span>salvo no aparelho</span>
+  </div>
+
+  <div class="series">
+    <div class="grupo">
+      <h3>Supino reto <span class="cont">3 valendo</span></h3>
+      <div class="linha"><span class="i">1</span><span class="v">12<span class="x">×</span>40<span class="un">kg</span></span><span class="tag">aquecimento</span></div>
+      <div class="linha"><span class="i">2</span><span class="v">8<span class="x">×</span>60<span class="un">kg</span></span><span class="tag val">valendo</span></div>
+      <div class="linha"><span class="i">3</span><span class="v">8<span class="x">×</span>60<span class="un">kg</span></span><span class="tag val">valendo</span></div>
+      <div class="linha"><span class="i">4</span><span class="v">7<span class="x">×</span>60<span class="un">kg</span></span><span class="tag val">valendo</span></div>
+    </div>
+
+    <div class="grupo">
+      <h3>Supino inclinado halter <span class="cont">2 valendo</span></h3>
+      <div class="linha"><span class="i">1</span><span class="v">10<span class="x">×</span>22<span class="un">kg</span></span><span class="tag val">valendo</span></div>
+      <div class="linha"><span class="i">2</span><span class="v">10<span class="x">×</span>24<span class="un">kg</span></span><span class="pr">recorde</span></div>
+    </div>
+  </div>
+
+  <div class="acao">
+    <button class="repetir">
+      <span class="t">Repetir última série</span>
+      <span class="s">10 × 24 kg · valendo</span>
+    </button>
+    <button class="secundaria">Outra série</button>
+  </div>
+
+</section>
+
+</body>
+</html>
