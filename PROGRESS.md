@@ -247,10 +247,10 @@ Quota checada com uma chamada direta à API antes de gastar esforço recriando d
 
 | # | Tarefa | Modo | Estado | Check executável |
 |---|---|---|---|---|
-| 2.1 | Auth: Google OAuth + e-mail | [HITL] | ✅ Provedor Google configurado e conectado (Cloud Console + Supabase); falta só o teste de login real do dono no celular/PC | Login no celular e no PC, mesmo treino nos dois (A8) |
+| 2.1 | Auth: Google OAuth + e-mail | [HITL] | ✅ Verificado fim a fim, login real do dono no iPhone (2026-08-06) | Login no celular e no PC, mesmo treino nos dois (A8) |
 | 2.2 | IndexedDB (Dexie) + fila outbox | [HITL] | ✅ Verificado fim a fim | Registro grava local e a UI confirma sem esperar rede (D6) |
-| 2.3 | Service worker + sincronização | [HITL] | 🔶 Background Sync implementado e verificado com rede bloqueada no navegador; falta o teste em celular real (modo avião de verdade) | **FF6/A1:** celular real em modo avião, 3 séries, reativar rede, conferir no PC |
-| 2.4 | PWA instalável | [AFK] | 🔶 Manifest + SW mínimo verificados no navegador; falta instalar num celular real | Instalar na tela inicial do celular real e abrir em tela cheia |
+| 2.3 | Service worker + sincronização | [HITL] | 🔶 Abrir o app instalado em modo avião funciona de verdade (confirmado no iPhone); falta confirmar o ciclo completo — registrar série offline, reconectar, ver sincronizado no PC | **FF6/A1:** celular real em modo avião, 3 séries, reativar rede, conferir no PC |
+| 2.4 | PWA instalável | [AFK] | ✅ Instalada e verificada no iPhone real (2026-08-06) — abre em tela cheia, funciona em modo avião | Instalar na tela inicial do celular real e abrir em tela cheia |
 | 2.5 | "Repetir última série" em um toque | [AFK] | ✅ Verificado fim a fim | D3: um toque, medido no aparelho real |
 
 ### Tarefa 2.1 — auth (2026-08-05)
@@ -288,7 +288,15 @@ Quota checada com uma chamada direta à API antes de gastar esforço recriando d
    - **Sem tratamento de erro visível.** Se `exchangeCodeForSession` falhasse, o código só redirecionava de volta pro login **sem nenhuma pista do motivo** — nem no servidor (sem log), nem pro dono (sem mensagem na tela). Era literalmente impossível saber por que sem acesso aos logs do Vercel (que já tinham expirado a retenção de 1h do plano Hobby quando fui checar). Corrigido: `console.error` no servidor com a mensagem/status reais do Supabase, e a tela de `/login` agora lê `?erro=...` da URL e mostra uma mensagem (`AvisoDeErroNaUrl`, com `Suspense` porque `useSearchParams` exige).
    - **Suspeita da causa raiz, direto da doc oficial:** a Vercel roda o app atrás de um balanceador de carga — `new URL(request.url).origin` traz o **host interno**, não o domínio público (`lastro-pi.vercel.app`). Redirecionar pro host errado depois de trocar o código por sessão descarta os cookies recém-criados (pertencem ao domínio público), e o dono cai de volta no login como se nada tivesse acontecido — bate exatamente com o sintoma relatado. Corrigido lendo `x-forwarded-host` (padrão oficial do Supabase pra Next.js na Vercel), com fallback pro `origin` normal em desenvolvimento (sem balanceador).
    - De passagem, fechada uma brecha de redirecionamento aberto: `?next=` da URL agora só aceita caminho relativo (`/algo`), nunca `//dominio-externo`.
-   - **Não verificado com login real** (exige o dono, mesma restrição de sempre) — mas agora, se falhar de novo, os logs do servidor e a tela vão dizer o motivo exato, em vez de eu ter que adivinhar.
+   - **A hipótese do `x-forwarded-host` NÃO era a causa raiz** (registrado como correção defensiva legítima, não como o conserto do bug). O log que passei a emitir é que resolveu: na tentativa seguinte do dono, apareceu o erro real, vindo do próprio Supabase — `error=server_error`, `error_description=Unable to exchange external code`. Ou seja, o Google devolvia o código certo, mas o **Supabase** falhava ao trocá-lo com o Google.
+
+**3. Causa raiz real do login com Google: Client Secret desalinhado no Supabase (não era bug de código).** Com o erro em mãos, comparei os dois lados item a item — Client ID no Google (`172367684853-62nr5tjgu...`) idêntico ao do Supabase ✅, URI de redirecionamento registrada no Google exatamente `https://tbkzcqfvafznxallyfqk.supabase.co/auth/v1/callback` ✅, provedor habilitado ✅. Por eliminação sobrou o **Client Secret** — provavelmente colado antes da correção do campo "Client IDs" (que primeiro recebeu o texto `lastro` por engano), ou com espaço/quebra de linha junto. O dono recolou o segredo; **nunca abri nem li esse campo**. 
+
+**Verificado de ponta a ponta, com o dono no iPhone real (2026-08-06, 01:18):** o `/auth/callback` seguinte não gerou erro nenhum (contador de erros do Vercel permaneceu em 2, das tentativas antigas), e a conta apareceu no banco — `guilhermesaldanha007@gmail.com`, `provider: google`, `created_at` e `last_sign_in_at` com 2 segundos de diferença. Prints do dono confirmam a sequência completa funcionando no aparelho: login → tela "Treinos" → "Iniciar treino de hoje" → formulário de registrar série na tela.
+
+**PWA offline confirmada funcionando no mesmo teste:** os logs mostram vários `GET /offline.html 200` durante a sessão em modo avião do dono — a página de fallback foi servida de verdade, em vez do crash `FetchEvent.respondWith received` de antes. Fecha a lacuna de verificação que ficou aberta no item 1.
+
+**Lição de processo (vale mais que o conserto):** a primeira correção que escrevi (`x-forwarded-host`) foi uma hipótese plausível tirada da doc oficial — e estava **errada** sobre a causa. O que realmente destravou foi a parte "chata" da mesma mudança: **fazer o erro aparecer** (log no servidor + mensagem na tela). Sem observabilidade, o bug era invisível e eu só conseguia adivinhar; com ela, a causa apareceu na primeira tentativa seguinte. Quando um fluxo depende de sistema externo, instrumentar antes de teorizar economiza rodadas.
 
 ### Tarefa 2.2 — o que foi feito e o que falta verificar (2026-08-05)
 
