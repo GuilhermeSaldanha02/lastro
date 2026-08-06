@@ -3,10 +3,29 @@
 // lastro · SDD.md §4.6 (PRD) — login por e-mail/senha ou Google. Rota
 // pública; o middleware manda pra cá quem tenta acessar /treino ou
 // /analise sem sessão.
-import { useState, type FormEvent } from "react";
-import { useRouter } from "next/navigation";
+import { Suspense, useState, type FormEvent } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { criarClienteBrowser } from "@/lib/supabase/cliente-browser";
 import { criarContaComEmail, entrarComEmail } from "@/lib/dados/auth";
+
+/**
+ * O callback do OAuth redireciona pra cá com `?erro=...` quando algo falha.
+ * Sem exibir isso, o login com Google que dá errado devolve o dono pra tela
+ * de login sem explicação nenhuma — foi exatamente o que aconteceu no teste
+ * em celular (2026-08-06) e o que tornou o diagnóstico difícil.
+ */
+const MENSAGENS_DE_ERRO: Record<string, string> = {
+  troca: "Não foi possível concluir o login com o Google. Tente de novo.",
+  "sem-codigo": "O Google não retornou a autorização. Tente de novo.",
+  auth: "Falha na autenticação. Tente de novo.",
+};
+
+function AvisoDeErroNaUrl() {
+  const searchParams = useSearchParams();
+  const erro = searchParams.get("erro");
+  if (!erro) return null;
+  return <p role="alert">{MENSAGENS_DE_ERRO[erro] ?? "Falha na autenticação."}</p>;
+}
 
 export default function PaginaLogin() {
   const router = useRouter();
@@ -51,6 +70,10 @@ export default function PaginaLogin() {
   return (
     <main>
       <h1>lastro</h1>
+
+      <Suspense fallback={null}>
+        <AvisoDeErroNaUrl />
+      </Suspense>
 
       <button type="button" onClick={entrarComGoogle}>
         Entrar com Google
