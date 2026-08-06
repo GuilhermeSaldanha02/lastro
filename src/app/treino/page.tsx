@@ -1,8 +1,10 @@
 // lastro · SDD.md §5.1 — lista os treinos do usuário logado e permite
-// iniciar um treino novo. Fase 1: assume sessão já autenticada (§3.6) —
-// nenhuma tela de login é construída aqui.
+// iniciar um treino novo. A sessão em si é responsabilidade do
+// middleware (tarefa 2.1) — esta página só assume que, se chegou até
+// aqui, o usuário está autenticado.
 import Link from "next/link";
 import { listarTreinos, criarTreino } from "@/lib/dados/treino";
+import { sair } from "@/lib/dados/auth";
 
 export default async function PaginaTreino() {
   const treinos = await listarTreinos();
@@ -10,6 +12,10 @@ export default async function PaginaTreino() {
   return (
     <main>
       <h1>Treinos</h1>
+
+      <form action={sair}>
+        <button type="submit">Sair</button>
+      </form>
 
       <form action={criarTreino}>
         <button type="submit">Iniciar treino de hoje</button>

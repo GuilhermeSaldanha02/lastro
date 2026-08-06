@@ -235,11 +235,35 @@ Especialista novo registrado (`CLAUDE.md`, `.claude/agents/qa-treino.md`): simul
 
 | # | Tarefa | Modo | Estado | Check executável |
 |---|---|---|---|---|
-| 2.1 | Auth: Google OAuth + e-mail | [HITL] | ⬜ Aguardando você | Login no celular e no PC, mesmo treino nos dois (A8). **Depende do dono configurar a tela de consentimento OAuth** — ver instruções na conversa |
+| 2.1 | Auth: Google OAuth + e-mail | [HITL] | 🔶 E-mail/senha + middleware verificados fim a fim; Google aguarda você configurar o provedor | Login no celular e no PC, mesmo treino nos dois (A8). **Depende do dono configurar a tela de consentimento OAuth** — checklist abaixo |
 | 2.2 | IndexedDB (Dexie) + fila outbox | [HITL] | ✅ Verificado fim a fim | Registro grava local e a UI confirma sem esperar rede (D6) |
 | 2.3 | Service worker + sincronização | [HITL] | 🔶 Background Sync implementado e verificado com rede bloqueada no navegador; falta o teste em celular real (modo avião de verdade) | **FF6/A1:** celular real em modo avião, 3 séries, reativar rede, conferir no PC |
 | 2.4 | PWA instalável | [AFK] | 🔶 Manifest + SW mínimo verificados no navegador; falta instalar num celular real | Instalar na tela inicial do celular real e abrir em tela cheia |
 | 2.5 | "Repetir última série" em um toque | [AFK] | ✅ Verificado fim a fim | D3: um toque, medido no aparelho real |
+
+### Tarefa 2.1 — auth (2026-08-05)
+
+**O que foi feito:** `src/proxy.ts` (ver nota abaixo sobre o nome do arquivo) refresca a sessão a cada requisição e redireciona `/treino` e `/analise` pra `/login` sem sessão. `src/app/login/page.tsx` — e-mail/senha (entrar e criar conta) e "Entrar com Google". `src/lib/dados/auth.ts` — `entrarComEmail`, `criarContaComEmail` (distingue conta criada mas com confirmação de e-mail pendente — este projeto Supabase exige confirmação, `mailer_autoconfirm: false`), `sair`. `src/app/auth/callback/route.ts` troca o código do OAuth por sessão. `/` agora redireciona pra `/treino` em vez de mostrar o boilerplate do Next (nunca customizado, achado do Inspetor QA na Fase 1) — aproveitei e apaguei o boilerplate morto (`page.module.css`, os 5 SVGs de exemplo).
+
+**Dois bugs reais achados e corrigidos, nenhum aplicado às cegas (E8):**
+1. **`middleware.ts` na raiz nunca rodava.** O projeto usa layout `src/` — Next.js só reconhece o arquivo de middleware dentro de `src/`, não na raiz do repo. Sem isso, o middleware inteiro era ignorado silenciosamente: `/treino` sem sessão caía direto no erro "Sessão ausente" (500), nunca no redirecionamento pro `/login`. Descoberto adicionando um log de depuração temporário e vendo que ele nunca aparecia no servidor — removido depois de confirmar a causa.
+2. **O redirecionamento pro `/login` não carregava os cookies que o próprio SDK tentou limpar.** Quando `getUser()` encontra um refresh token inválido (conta de teste deletada, por exemplo), o Supabase tenta emitir `Set-Cookie` pra limpar o cookie morto — mas eu construía a resposta de redirecionamento como um objeto novo (`NextResponse.redirect(url)`), que não carrega esses cookies. Resultado: o navegador ficava com o cookie inválido preso, repetindo o mesmo erro de refresh a cada requisição, num loop. Corrigido copiando os cookies da resposta mutada pelo SDK pra resposta de redirecionamento (padrão documentado do `@supabase/ssr`).
+
+**`middleware.ts` → `src/proxy.ts`:** o Next.js 16.3 avisou em runtime que a convenção `middleware.ts` está depreciada em favor de `proxy.ts` (E12 — doc/aviso vigente vence o que eu "lembrava"). Migrado com o codemod oficial (`@next/codemod middleware-to-proxy`), não à mão — `export function middleware` virou `export function proxy`, mesmo comportamento.
+
+**Verificado com clique real na tela de `/login` (não só chamada direta), usuário de teste real:**
+- Login com e-mail/senha → `/treino`, com o botão "Sair" visível.
+- `/` com sessão ativa → redireciona pra `/treino` (não mostra mais boilerplate).
+- "Sair" → volta pro `/login`; tentar `/treino` de novo é barrado — sessão realmente encerrada, não só a UI escondida.
+- "Criar uma conta" alterna o formulário corretamente. O `signUp` em si esbarrou na validação de e-mail do próprio Supabase (domínios de teste tipo `.teste`/`example.com` são rejeitados como "invalid") — não é bug do app (o mesmo `entrarComEmail`, testado com sucesso, usa o idêntico padrão de chamada); ficou sem cobertura de clique real o caminho exato "conta criada, confirmação pendente", mas a lógica (`!data.session` → `confirmacaoPendente: true`) é a leitura direta e óbvia da documentação do Supabase.
+- "Entrar com Google" → redireciona pro Supabase com os parâmetros certos (PKCE `code_challenge`, `redirect_to=/auth/callback`); Supabase responde "provider is not enabled", exatamente o esperado — confirma que o lado do app está certo, falta só o provedor ser habilitado.
+- Usuários de teste (3, todos com domínios `.teste`/`example.com`) removidos ao final, contagem = 0.
+
+**Checklist pendente — só o dono pode fazer (nunca a chave/segredo comigo no chat):**
+1. [Google Cloud Console](https://console.cloud.google.com/apis/credentials) → criar credencial OAuth 2.0 tipo "Web application" → URI de redirecionamento autorizado: `https://tbkzcqfvafznxallyfqk.supabase.co/auth/v1/callback`.
+2. Configurar a tela de consentimento OAuth (nome do app, e-mail de suporte).
+3. Colar Client ID e Client Secret **direto no painel do Supabase** (Authentication → Sign In/Providers → Google) — nunca aqui no chat.
+4. Em Authentication → URL Configuration, adicionar `http://localhost:3002/auth/callback` e `https://lastro-pi.vercel.app/auth/callback` (o domínio de produção do Vercel, deploy da Fase 2) à lista de Redirect URLs.
 
 ### Tarefa 2.2 — o que foi feito e o que falta verificar (2026-08-05)
 
