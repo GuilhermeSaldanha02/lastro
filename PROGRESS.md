@@ -247,7 +247,7 @@ Quota checada com uma chamada direta à API antes de gastar esforço recriando d
 
 | # | Tarefa | Modo | Estado | Check executável |
 |---|---|---|---|---|
-| 2.1 | Auth: Google OAuth + e-mail | [HITL] | 🔶 E-mail/senha + middleware verificados fim a fim; Google aguarda você configurar o provedor | Login no celular e no PC, mesmo treino nos dois (A8). **Depende do dono configurar a tela de consentimento OAuth** — checklist abaixo |
+| 2.1 | Auth: Google OAuth + e-mail | [HITL] | ✅ Provedor Google configurado e conectado (Cloud Console + Supabase); falta só o teste de login real do dono no celular/PC | Login no celular e no PC, mesmo treino nos dois (A8) |
 | 2.2 | IndexedDB (Dexie) + fila outbox | [HITL] | ✅ Verificado fim a fim | Registro grava local e a UI confirma sem esperar rede (D6) |
 | 2.3 | Service worker + sincronização | [HITL] | 🔶 Background Sync implementado e verificado com rede bloqueada no navegador; falta o teste em celular real (modo avião de verdade) | **FF6/A1:** celular real em modo avião, 3 séries, reativar rede, conferir no PC |
 | 2.4 | PWA instalável | [AFK] | 🔶 Manifest + SW mínimo verificados no navegador; falta instalar num celular real | Instalar na tela inicial do celular real e abrir em tela cheia |
@@ -271,11 +271,14 @@ Quota checada com uma chamada direta à API antes de gastar esforço recriando d
 - "Entrar com Google" → redireciona pro Supabase com os parâmetros certos (PKCE `code_challenge`, `redirect_to=/auth/callback`); Supabase responde "provider is not enabled", exatamente o esperado — confirma que o lado do app está certo, falta só o provedor ser habilitado.
 - Usuários de teste (3, todos com domínios `.teste`/`example.com`) removidos ao final, contagem = 0.
 
-**Checklist pendente — só o dono pode fazer (nunca a chave/segredo comigo no chat):**
-1. [Google Cloud Console](https://console.cloud.google.com/apis/credentials) → criar credencial OAuth 2.0 tipo "Web application" → URI de redirecionamento autorizado: `https://tbkzcqfvafznxallyfqk.supabase.co/auth/v1/callback`.
-2. Configurar a tela de consentimento OAuth (nome do app, e-mail de suporte).
-3. Colar Client ID e Client Secret **direto no painel do Supabase** (Authentication → Sign In/Providers → Google) — nunca aqui no chat.
-4. Em Authentication → URL Configuration, adicionar `http://localhost:3002/auth/callback` e `https://lastro-pi.vercel.app/auth/callback` (o domínio de produção do Vercel, deploy da Fase 2) à lista de Redirect URLs.
+### Checklist do Google OAuth — concluído (2026-08-06)
+
+1. ✅ [Google Cloud Console](https://console.cloud.google.com/apis/credentials) → credencial OAuth 2.0 "Aplicativo da Web" criada, no projeto `gen-lang-client-0917024278` (mesmo projeto da chave Gemini), com a tela de consentimento configurada pelo dono. **O Google Cloud Console chegou a mostrar um aviso de "bloqueio por excesso de solicitações automatizadas" enquanto eu tentava ajudar via navegador — parei imediatamente e deixei o dono terminar essa parte específica sozinho**, por ser exatamente o tipo de sinal de bot-detection que não devo ignorar.
+2. ✅ Client ID e Client Secret colados pelo dono direto no painel do Supabase (Authentication → Sign In/Providers → Google) — nunca vistos nem digitados por mim.
+3. **Achado real, corrigido em conjunto:** o campo "Client IDs" do Supabase estava com o valor `lastro` (nome do projeto) em vez do Client ID de verdade (`NNNN.apps.googleusercontent.com`) — o Supabase acusou "Invalid characters" no `Salvar`. Identifiquei o erro pela mensagem de validação, o dono recolou o valor certo.
+4. ✅ Provedor Google confirmado como "Enabled" no Supabase.
+5. **Achado real, corrigido por mim:** a lista de Redirect URLs em Authentication → URL Configuration estava **vazia** — sem isso, o Google deixaria logar mas o retorno ao app falharia no passo final. Adicionei `https://lastro-pi.vercel.app/auth/callback` e `http://localhost:3002/auth/callback` (ação de configuração, não de credencial — não envolve chave/segredo).
+6. **Verificado:** clique em "Entrar com Google" na tela `/login` real (`npm run dev`) agora redireciona até a tela de login de verdade do Google ("Prosseguir para tbkzcqfvafznxallyfqk.supabase.co") — antes disso, a resposta era "provider is not enabled". Não completei o login com uma conta Google real (isso é do dono).
 
 ### Tarefa 2.2 — o que foi feito e o que falta verificar (2026-08-05)
 
