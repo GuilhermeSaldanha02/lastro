@@ -348,6 +348,9 @@ Chat de dúvidas pelo mesmo proxy server-side. **Não improvisa técnica de movi
 ## Fase 6 — Integração final · ⬜ Não iniciada
 Review integral do Inspetor · todas as fitness functions · E2E das 3 jornadas · gate visual completo.
 
+**Pendências adiadas de fases anteriores, pra rodar aqui (não esquecer):**
+- **Tarefa 2.3 — ciclo completo de sincronização em celular real.** Já verificado: Background Sync implementado e testado com rede bloqueada no navegador (2026-08-05); app instalado abre em modo avião sem travar, no iPhone real (2026-08-06). **Falta**: registrar 3 séries com o app em modo avião de verdade, reconectar a rede, e conferir no PC que as séries chegaram sincronizadas — o ciclo fim a fim ainda não foi observado com o dono no controle. Adiado a pedido do dono em 2026-08-06 ("não precisa essa parte agora, anotar para os testes finais").
+
 ---
 
 ## Abordagens que falharam
