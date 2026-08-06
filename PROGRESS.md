@@ -229,6 +229,18 @@ Especialista novo registrado (`CLAUDE.md`, `.claude/agents/qa-treino.md`): simul
 
 **Retomar quando:** a quota resetar (diária) ou o dono decidir um dos 3 caminhos do achado acima. Não adianta tentar de novo antes disso — a mesma chamada `curl` direto à API confirmou o bloqueio, não é intermitente.
 
+### `qa-treino` — retomada (2026-08-06, INTERROMPIDO DE NOVO — mesma causa: quota diária)
+
+Quota checada com uma chamada direta à API antes de gastar esforço recriando dado — voltou 200 (liberada). Recriada a persona "Irregular" (mesmo desenho: 5 treinos/18 séries cobrindo semana sem treino, sessão só de aquecimento, RIR inconsistente) só para completar as perguntas 4 e 5 que faltavam.
+
+**Persona "Irregular" — agora completa (5/5 perguntas).** Perguntas 4 e 5 retornaram parecer real, citando números específicos e batendo com o dado (`Agachamento livre` e1RM 98,8 vs. anterior 95; `Supino reto com barra` e1RM 81,1 vs. 76,5; quadríceps e peito "abaixo" da faixa de referência; `costas` listado como grupo sem estímulo na semana). Passa no teste de apagar o nome — não serviria para outra pessoa.
+
+**Achado de UX real (persona "Irregular", pergunta 5):** o parecer disse *"Não há dados de volume para outros grupos musculares **no arquivo enviado**"* — "arquivo enviado" é um conceito que não existe no produto (o dono nunca envia arquivo nenhum, é tudo já registrado no app). É a IA vazando um jargão genérico de assistente de documentos em vez de falar a língua do produto. Pequeno, mas quebra a ilusão de "isto entende o meu treino" — vale ajustar o prompt do sistema numa fase futura para proibir esse tipo de referência.
+
+**Persona "Amplo" — tentada e bloqueada de novo, mesma causa.** Desenhada (8 treinos/53 séries, cobrindo os 5 grupos musculares do catálogo com progressão de carga ao longo de 4 semanas — testa especificamente a pergunta 3, "meu volume está equilibrado?", com histórico amplo em vez de estreito). As 5 perguntas foram chamadas em sequência; a **primeira já bateu 429** — a quota, que tinha acabado de ser confirmada liberada, se esgotou só com as 2 chamadas do Irregular (bem abaixo do limite teórico de 20/dia). Isso é consistente com o achado já registrado: o limite real é mais apertado na prática do que os 20/dia sugerem à primeira vista (contando qualquer chamada de desenvolvimento/teste feita no mesmo dia, inclusive fora deste agente). Usuário e as 53 séries de teste removidos ao final (contagem = 0) — a persona "Amplo" **nunca chegou a gerar um parecer**, mesmo indiretamente.
+
+**Retomar "Amplo" quando:** a quota resetar de novo. O desenho de dado já está documentado aqui (8 treinos/53 séries, 5 grupos musculares, 4 semanas) — não precisa redesenhar do zero, só recriar via SQL e rodar as 5 perguntas assim que houver orçamento de chamadas suficiente (idealmente logo no início do dia, antes de qualquer outro teste consumir quota).
+
 ---
 
 ## Fase 2 — Registro que sobrevive à academia · 🔶 Em andamento (2026-08-05)
