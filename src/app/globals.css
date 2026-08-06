@@ -1,17 +1,24 @@
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+/* =====================================================================
+   lastro · BASE — reset e padrões de elemento.
+   Nenhum valor literal aqui: tudo vem de `tokens.css`.
+   As classes do sistema vivem em `sistema.css`.
+   ===================================================================== */
+@import "./tokens.css";
+@import "./sistema.css";
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
 }
 
 html {
   height: 100%;
+  /* D5 foi revista pelo dono em 2026-08-06: o padrão passou a ser claro.
+     Declarar o esquema evita que o navegador escureça controles nativos. */
+  color-scheme: light;
 }
 
 html,
@@ -24,26 +31,47 @@ body {
   min-height: 100%;
   display: flex;
   flex-direction: column;
-  color: var(--foreground);
-  background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--lastro-fundo);
+  color: var(--lastro-txt);
+  font-family: var(--lastro-fonte-txt);
+  font-size: var(--lastro-t-corpo); /* D4 — piso do corpo */
+  line-height: var(--lastro-el-corpo);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-* {
-  box-sizing: border-box;
-  padding: 0;
-  margin: 0;
+h1,
+h2,
+h3 {
+  line-height: var(--lastro-el-titulo);
+  letter-spacing: -0.01em;
 }
 
 a {
-  color: inherit;
+  color: var(--lastro-acao-tinta);
   text-decoration: none;
 }
 
-@media (prefers-color-scheme: dark) {
-  html {
-    color-scheme: dark;
+button,
+input,
+select,
+textarea {
+  font: inherit;
+  color: inherit;
+}
+
+/* D9 — foco visível em tudo que recebe teclado. O anel é desenhado FORA
+   do elemento, com afastamento: anel interno some contra preenchimento. */
+:focus-visible {
+  outline: var(--lastro-foco-espessura) solid var(--lastro-foco);
+  outline-offset: var(--lastro-foco-afast);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
   }
 }

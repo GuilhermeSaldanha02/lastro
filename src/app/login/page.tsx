@@ -24,7 +24,11 @@ function AvisoDeErroNaUrl() {
   const searchParams = useSearchParams();
   const erro = searchParams.get("erro");
   if (!erro) return null;
-  return <p role="alert">{MENSAGENS_DE_ERRO[erro] ?? "Falha na autenticação."}</p>;
+  return (
+    <p className="aviso-erro" role="alert">
+      {MENSAGENS_DE_ERRO[erro] ?? "Falha na autenticação."}
+    </p>
+  );
 }
 
 export default function PaginaLogin() {
@@ -68,57 +72,88 @@ export default function PaginaLogin() {
   }
 
   return (
-    <main>
-      <h1>lastro</h1>
+    // Primeira e única tela antes de existir qualquer dado — é aqui que a
+    // personalidade se estabelece. Ferramenta pessoal e séria: sem tour,
+    // sem depoimento, sem promessa de marketing (ESCOPO.md §5.1).
+    <main className="tela tela--entrada">
+      <div className="entrada">
+        <header className="entrada__marca">
+          <h1>lastro</h1>
+          <p>Registro de treino e leitura semanal.</p>
+        </header>
 
-      <Suspense fallback={null}>
-        <AvisoDeErroNaUrl />
-      </Suspense>
+        <Suspense fallback={null}>
+          <AvisoDeErroNaUrl />
+        </Suspense>
 
-      <button type="button" onClick={entrarComGoogle}>
-        Entrar com Google
-      </button>
+        <form className="formulario" onSubmit={aoEnviar}>
+          <div className="campo">
+            <label className="campo__rotulo" htmlFor="email">
+              E-mail
+            </label>
+            <input
+              id="email"
+              type="email"
+              autoComplete="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+            />
+          </div>
 
-      <form onSubmit={aoEnviar}>
-        <div>
-          <label htmlFor="email">E-mail</label>
-          <input
-            id="email"
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-          />
+          <div className="campo">
+            <label className="campo__rotulo" htmlFor="senha">
+              Senha
+            </label>
+            <input
+              id="senha"
+              type="password"
+              autoComplete={
+                modo === "entrar" ? "current-password" : "new-password"
+              }
+              value={senha}
+              onChange={(e) => setSenha(e.target.value)}
+              required
+              minLength={6}
+            />
+          </div>
+
+          {mensagem && (
+            <p className="aviso-erro" role="alert">
+              {mensagem}
+            </p>
+          )}
+
+          <button type="submit" className="botao-primario" disabled={carregando}>
+            {carregando
+              ? "Entrando…"
+              : modo === "entrar"
+                ? "Entrar"
+                : "Criar conta"}
+          </button>
+        </form>
+
+        <div className="pilha">
+          <button
+            type="button"
+            className="botao-secundario"
+            onClick={entrarComGoogle}
+          >
+            Entrar com Google
+          </button>
+
+          <button
+            type="button"
+            className="botao-secundario"
+            onClick={() => {
+              setModo(modo === "entrar" ? "criar-conta" : "entrar");
+              setMensagem(null);
+            }}
+          >
+            {modo === "entrar" ? "Criar uma conta" : "Já tenho conta"}
+          </button>
         </div>
-
-        <div>
-          <label htmlFor="senha">Senha</label>
-          <input
-            id="senha"
-            type="password"
-            value={senha}
-            onChange={(e) => setSenha(e.target.value)}
-            required
-            minLength={6}
-          />
-        </div>
-
-        {mensagem && <p role="alert">{mensagem}</p>}
-
-        <button type="submit" disabled={carregando}>
-          {modo === "entrar" ? "Entrar" : "Criar conta"}
-        </button>
-      </form>
-
-      <button
-        type="button"
-        onClick={() => {
-          setModo(modo === "entrar" ? "criar-conta" : "entrar");
-          setMensagem(null);
-        }}
-      >
-        {modo === "entrar" ? "Criar uma conta" : "Já tenho conta"}
-      </button>
+      </div>
     </main>
   );
 }

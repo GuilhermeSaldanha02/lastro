@@ -78,9 +78,11 @@ export default function FormularioSerie({
   }
 
   return (
-    <form onSubmit={aoEnviar}>
-      <div>
-        <label htmlFor="exercicio_id">Exercício</label>
+    <form className="formulario" onSubmit={aoEnviar}>
+      <div className="campo">
+        <label className="campo__rotulo" htmlFor="exercicio_id">
+          Exercício
+        </label>
         <select
           id="exercicio_id"
           name="exercicio_id"
@@ -97,11 +99,15 @@ export default function FormularioSerie({
       </div>
 
       {exercicioSelecionado?.unilateral && (
-        <p>Exercício unilateral — reps contam por lado</p>
+        <p className="campo__nota">
+          Exercício unilateral — reps contam por lado
+        </p>
       )}
 
-      <div>
-        <label htmlFor="tipo">Tipo</label>
+      <div className="campo">
+        <label className="campo__rotulo" htmlFor="tipo">
+          Tipo
+        </label>
         <select
           id="tipo"
           name="tipo"
@@ -113,45 +119,66 @@ export default function FormularioSerie({
         </select>
       </div>
 
-      <div>
-        <label htmlFor="reps">Reps</label>
-        <input id="reps" name="reps" type="number" min={1} max={200} required />
-      </div>
+      <div className="dupla">
+        <div className="campo">
+          <label className="campo__rotulo" htmlFor="reps">
+            Reps
+          </label>
+          <input
+            id="reps"
+            name="reps"
+            type="number"
+            inputMode="numeric"
+            min={1}
+            max={200}
+            required
+          />
+        </div>
 
-      <div>
-        <label htmlFor="peso">Peso (kg)</label>
-        <input
-          id="peso"
-          name="peso"
-          type="number"
-          min={0}
-          max={1000}
-          step="0.01"
-          required
-        />
+        <div className="campo">
+          <label className="campo__rotulo" htmlFor="peso">
+            Peso (kg)
+          </label>
+          <input
+            id="peso"
+            name="peso"
+            type="number"
+            inputMode="decimal"
+            min={0}
+            max={1000}
+            step="0.01"
+            required
+          />
+        </div>
       </div>
 
       {tipo === "valendo" && (
-        <div>
-          <label htmlFor="rir">RIR (opcional)</label>
-          <input id="rir" name="rir" type="number" min={0} max={10} />
+        <div className="campo">
+          <label className="campo__rotulo" htmlFor="rir">
+            RIR (opcional)
+          </label>
+          <input id="rir" name="rir" type="number" inputMode="numeric" min={0} max={10} />
         </div>
       )}
 
-      <div>
-        <label htmlFor="peso_corporal_incluso">
-          <input
-            id="peso_corporal_incluso"
-            name="peso_corporal_incluso"
-            type="checkbox"
-          />
-          Peso corporal incluso
-        </label>
-      </div>
+      <label className="campo-caixa" htmlFor="peso_corporal_incluso">
+        <input
+          id="peso_corporal_incluso"
+          name="peso_corporal_incluso"
+          type="checkbox"
+        />
+        Peso corporal incluso
+      </label>
 
-      {erro && <p role="alert">{erro}</p>}
+      {erro && (
+        <p className="aviso-erro" role="alert">
+          {erro}
+        </p>
+      )}
 
-      <button type="submit">Registrar série</button>
+      <button type="submit" className="botao-secundario">
+        Registrar série
+      </button>
     </form>
   );
 }

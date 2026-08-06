@@ -1,0 +1,145 @@
+/* =====================================================================
+   lastro · TOKENS — espelho executável de DESIGN.md §3.1
+   Padrão "Areia & Azul Petróleo", aprovado pelo dono em 2026-08-06.
+
+   ESTE É O ÚNICO ARQUIVO DO PROJETO onde um valor literal de cor,
+   espaço, tamanho, peso, raio, sombra ou duração pode existir.
+   Qualquer hex, px ou rem fora daqui é violação e reprova no review.
+
+   Toda razão de contraste anotada aqui foi MEDIDA em navegador real,
+   com o método conferido contra os valores canônicos do WCAG.
+   ===================================================================== */
+
+:root {
+  /* ---- Superfícies: areia quente ---- */
+  --lastro-fundo:  #F0EAE0;
+  --lastro-sup-1:  #FBF8F3; /* cartão, bloco de evidência, aba inferior */
+  --lastro-sup-2:  #E4DACB; /* faixa, cabeçalho de tabela */
+
+  /* ---- Traços ---- */
+  --lastro-linha:     #CFC3B1; /* SÓ divisória. 1.45:1 — nunca é limite de controle */
+  --lastro-controle:  #8A7C68; /* limite de qualquer alvo de toque. 3.40:1 no fundo */
+
+  /* ---- Tinta: azul petróleo ---- */
+  --lastro-txt:    #12303F; /* corpo, número, título. 11.54:1 */
+  --lastro-txt-2:  #3A5361; /* secundário. 6.78:1 */
+  --lastro-txt-3:  #476069; /* procedência, metadado. 4.83:1 no sup-2, o pior caso */
+
+  /* ---- Barra de topo: a única superfície escura do padrão ---- */
+  --lastro-barra-a:   #17414F; /* topo do gradiente — pior caso do texto */
+  --lastro-barra-b:   #0E2833;
+  --lastro-barra-txt: #F0EAE0; /* 9.21:1 contra o topo */
+
+  /* ---- Ação primária ----
+     Preenchimento VIVO com tinta ESCURA. Duas medições obrigaram isso:
+     verde vivo não sustenta texto branco (2.10:1), e um verde escuro
+     ficaria a 1.06:1 do --lastro-alta, isto é, o mesmo verde do sinal
+     de progressão. Preenchimento vivo + tinta escura resolve os dois. */
+  --lastro-acao-a:      #46C27B; /* topo do gradiente */
+  --lastro-acao-b:      #35A866; /* base — pior caso para a tinta escura: 5.12:1 */
+  --lastro-acao-a-h:    #4CC682;
+  --lastro-acao-b-h:    #3AAE6C;
+  --lastro-acao-txt:    #0A2A18;
+  --lastro-acao-borda:  #0E5E35; /* é a BORDA que cumpre o limite de 3:1 (6.57:1) */
+  --lastro-acao-tinta:  #0E5E35; /* a ação como TEXTO: aba ativa, link. 6.57:1 */
+
+  /* ---- Sinais semânticos (cor NUNCA é o único canal — ver §3.2 nota C) ---- */
+  --lastro-alta:   #1B6B3A; /* progressão.  6.17:1 no sup-1 */
+  --lastro-plato:  #8A5A0B; /* estagnação.  5.59:1 — âmbar, nunca vermelho */
+  --lastro-queda:  #A33220; /* regressão.   6.53:1 */
+  --lastro-sync:   #2E6076; /* sincronização (D7). 5.75:1. Jamais vermelho */
+  --lastro-erro:   #A32014; /* RESERVADO: falha real. 6.33:1 */
+  --lastro-foco:   #0B5CAB; /* 5.60:1 */
+
+  /* ---- Espaçamento: base 4px. 48 (D1) cai exatamente na escala ---- */
+  --lastro-e-1:   4px;
+  --lastro-e-2:   8px;
+  --lastro-e-3:  12px;
+  --lastro-e-4:  16px;
+  --lastro-e-5:  20px;
+  --lastro-e-6:  24px;
+  --lastro-e-8:  32px;
+  --lastro-e-10: 40px;
+  --lastro-e-12: 48px;
+  --lastro-e-16: 64px;
+  --lastro-e-20: 80px;
+
+  /* ---- Alvos ---- */
+  --lastro-alvo-min:   48px; /* D1 — piso absoluto de qualquer alvo de toque */
+  --lastro-alvo-folga: 12px; /* distância mínima entre dois alvos vizinhos */
+  --lastro-alvo-acao:  72px; /* altura da ação primária (D3) */
+
+  /* ---- Tipografia ---- */
+  --lastro-fonte-txt: var(--fonte-plex-sans), system-ui, sans-serif;
+  --lastro-fonte-num: var(--fonte-plex-mono), ui-monospace, monospace;
+
+  /* ---- Escala de tamanho. Piso 14px, e 14 só para metadado não-corpo ---- */
+  --lastro-t-meta:  14px;
+  --lastro-t-corpo: 16px; /* D4 — piso do corpo */
+  --lastro-t-1:     18px;
+  --lastro-t-2:     20px;
+  --lastro-t-3:     24px;
+  --lastro-t-4:     30px;
+  --lastro-t-5:     38px;
+  --lastro-t-6:     48px;
+  --lastro-t-7:     60px;
+  --lastro-t-8:     76px; /* número em modo bancada, lido a um braço */
+
+  /* ---- Entrelinha ---- */
+  --lastro-el-apertada: 1.1;
+  --lastro-el-titulo:   1.25;
+  --lastro-el-corpo:    1.6;
+
+  /* ---- Peso ---- */
+  --lastro-peso-normal: 400;
+  --lastro-peso-medio:  500;
+  --lastro-peso-forte:  600;
+  --lastro-peso-max:    700;
+
+  /* ---- Raio ---- */
+  --lastro-raio-1:      8px;
+  --lastro-raio-2:     14px;
+  --lastro-raio-3:     20px;
+  --lastro-raio-balao: 18px; /* SÓ o coach 24h */
+
+  /* ---- Foco (D9) ---- */
+  --lastro-foco-espessura: 3px;
+  --lastro-foco-afast:     2px;
+
+  /* ---- Barra lateral do bloco de evidência ---- */
+  --lastro-barra-evidencia: 4px;
+
+  /* ---- MATÉRIA ----
+     A luz vem de cima: elemento levantado leva fio claro na borda
+     superior e a sombra cai para baixo. A sombra é QUENTE — cinza
+     sobre areia acinzenta o fundo.                                    */
+  --lastro-sombra-cor: 28, 18, 6;
+  --lastro-elev-1:
+    0 1px 2px rgba(var(--lastro-sombra-cor), 0.06),
+    0 2px 6px rgba(var(--lastro-sombra-cor), 0.05);
+  --lastro-elev-2:
+    0 1px 2px rgba(var(--lastro-sombra-cor), 0.07),
+    0 4px 12px rgba(var(--lastro-sombra-cor), 0.08);
+  --lastro-elev-3:
+    0 2px 4px rgba(var(--lastro-sombra-cor), 0.1),
+    0 10px 24px rgba(var(--lastro-sombra-cor), 0.14);
+  --lastro-elev-afundado: inset 0 2px 4px rgba(var(--lastro-sombra-cor), 0.12);
+  --lastro-bevel:       inset 0 1px 0 rgba(255, 255, 255, 0.75);
+  --lastro-bevel-forte: inset 0 1px 0 rgba(255, 255, 255, 0.22);
+
+  /* Gradientes: no máximo dois passos, sempre do claro para o escuro.
+     Texto sobre gradiente é medido contra o passo de PIOR caso.        */
+  --lastro-grad-acao:   linear-gradient(180deg, var(--lastro-acao-a) 0%, var(--lastro-acao-b) 100%);
+  --lastro-grad-acao-h: linear-gradient(180deg, var(--lastro-acao-a-h) 0%, var(--lastro-acao-b-h) 100%);
+  --lastro-grad-sup:    linear-gradient(180deg, #FFFDFA 0%, #F7F2E9 100%);
+  --lastro-grad-barra:  linear-gradient(180deg, var(--lastro-barra-a) 0%, var(--lastro-barra-b) 100%);
+  --lastro-campo-fundo: #FFFDFA;
+
+  /* Vidro: só onde o conteúdo passa por baixo (aba inferior). */
+  --lastro-vidro:        rgba(251, 248, 243, 0.82);
+  --lastro-vidro-opaco:  #FBF8F3;
+
+  /* ---- Duração (respeitar prefers-reduced-motion) ---- */
+  --lastro-dur-1: 120ms;
+  --lastro-dur-2: 220ms;
+}

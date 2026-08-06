@@ -1,0 +1,707 @@
+/* =====================================================================
+   lastro · SISTEMA — as classes do padrão "Areia & Azul Petróleo".
+   Espelha `design/padrao-visual.html`. Nenhum valor literal: só tokens.
+   ===================================================================== */
+
+/* ---------- Casca de tela ---------- */
+.tela {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+}
+
+.corpo {
+  flex: 1;
+  padding: var(--lastro-e-5);
+}
+
+/* Reserva o espaço da aba inferior fixa, para o último item não sumir. */
+.corpo--com-nav {
+  padding-bottom: calc(var(--lastro-alvo-min) + var(--lastro-e-8));
+}
+
+/* ---------- Entrada ---------- */
+.tela--entrada {
+  justify-content: center;
+  padding: var(--lastro-e-6) var(--lastro-e-5) var(--lastro-e-12);
+}
+
+.entrada {
+  width: 100%;
+  max-width: 26rem;
+  margin: 0 auto;
+}
+
+.entrada > * + * {
+  margin-top: var(--lastro-e-6);
+}
+
+.entrada__marca h1 {
+  font-size: var(--lastro-t-6);
+  font-weight: var(--lastro-peso-max);
+  letter-spacing: -0.03em;
+  line-height: var(--lastro-el-apertada);
+}
+
+.entrada__marca p {
+  font-size: var(--lastro-t-corpo);
+  color: var(--lastro-txt-2);
+  margin-top: var(--lastro-e-2);
+}
+
+/* ---------- Barra de topo: a única superfície escura ---------- */
+.barra-topo {
+  background: var(--lastro-grad-barra);
+  color: var(--lastro-barra-txt);
+  padding: var(--lastro-e-4) var(--lastro-e-5);
+  box-shadow: var(--lastro-elev-2);
+}
+
+.barra-topo__contexto {
+  font-family: var(--lastro-fonte-num);
+  font-size: var(--lastro-t-meta);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  opacity: 0.72;
+}
+
+.barra-topo__titulo {
+  font-size: var(--lastro-t-3);
+  font-weight: var(--lastro-peso-forte);
+  margin-top: var(--lastro-e-1);
+}
+
+.barra-topo__acoes {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--lastro-e-3);
+}
+
+/* ---------- Ações ---------- */
+.botao-primario {
+  width: 100%;
+  min-height: var(--lastro-alvo-acao); /* D3 */
+  border: 1px solid var(--lastro-acao-borda); /* cumpre o limite de 3:1 */
+  border-radius: var(--lastro-raio-2);
+  background: var(--lastro-grad-acao);
+  color: var(--lastro-acao-txt);
+  box-shadow: var(--lastro-elev-3), var(--lastro-bevel-forte);
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--lastro-e-1);
+  font-size: var(--lastro-t-2);
+  font-weight: var(--lastro-peso-forte);
+  transition:
+    background var(--lastro-dur-2) ease,
+    box-shadow var(--lastro-dur-1) ease,
+    transform var(--lastro-dur-1) ease;
+}
+
+.botao-primario:hover:not(:disabled) {
+  background: var(--lastro-grad-acao-h);
+}
+
+/* Pressionar afunda pela SOMBRA, não escurecendo o preenchimento:
+   escurecer derrubaria a tinta escura para 3.76:1 e reprovaria. */
+.botao-primario:active:not(:disabled) {
+  box-shadow: var(--lastro-elev-1), var(--lastro-elev-afundado);
+  transform: translateY(1px);
+}
+
+.botao-primario:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.botao-primario__estado {
+  font-family: var(--lastro-fonte-num);
+  font-size: var(--lastro-t-meta);
+  font-weight: var(--lastro-peso-normal);
+  font-variant-numeric: tabular-nums;
+  color: rgba(10, 42, 24, 0.78);
+}
+
+.botao-secundario {
+  width: 100%;
+  min-height: var(--lastro-alvo-min);
+  border: 1px solid var(--lastro-controle);
+  border-radius: var(--lastro-raio-2);
+  background: var(--lastro-grad-sup);
+  color: var(--lastro-txt-2);
+  box-shadow: var(--lastro-elev-1), var(--lastro-bevel);
+  cursor: pointer;
+  font-size: var(--lastro-t-corpo);
+  font-weight: var(--lastro-peso-medio);
+  transition:
+    color var(--lastro-dur-2) ease,
+    border-color var(--lastro-dur-2) ease,
+    box-shadow var(--lastro-dur-1) ease,
+    transform var(--lastro-dur-1) ease;
+}
+
+.botao-secundario:hover:not(:disabled) {
+  border-color: var(--lastro-txt);
+  color: var(--lastro-txt);
+}
+
+.botao-secundario:active:not(:disabled) {
+  box-shadow: var(--lastro-elev-afundado);
+  transform: translateY(1px);
+}
+
+.botao-secundario:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+/* Ação discreta de barra escura (sair, voltar). */
+.botao-barra {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  min-height: var(--lastro-alvo-min);
+  padding: 0 var(--lastro-e-3);
+  border: 1px solid rgba(240, 234, 224, 0.38);
+  border-radius: var(--lastro-raio-1);
+  background: transparent;
+  color: var(--lastro-barra-txt);
+  cursor: pointer;
+  font-size: var(--lastro-t-meta);
+  font-weight: var(--lastro-peso-medio);
+}
+
+.pilha > * + * {
+  margin-top: var(--lastro-alvo-folga); /* D1 — folga entre alvos vizinhos */
+}
+
+/* ---------- Área de ação: metade inferior (D2) ---------- */
+.acao-area {
+  padding: var(--lastro-e-4) var(--lastro-e-5);
+  border-top: 1px solid var(--lastro-linha);
+  background: var(--lastro-fundo);
+}
+
+/* ---------- Grupo de exercício e linha de série ---------- */
+.grupo + .grupo {
+  margin-top: var(--lastro-e-6);
+}
+
+.grupo__cab {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: var(--lastro-e-3);
+  margin-bottom: var(--lastro-e-2);
+  padding-bottom: var(--lastro-e-2);
+  border-bottom: 2px solid var(--lastro-linha);
+}
+
+.grupo__nome {
+  font-size: var(--lastro-t-1);
+  font-weight: var(--lastro-peso-forte);
+}
+
+.grupo__cont {
+  font-family: var(--lastro-fonte-num);
+  font-size: var(--lastro-t-meta);
+  color: var(--lastro-txt-3);
+  white-space: nowrap;
+}
+
+.serie {
+  display: flex;
+  align-items: center;
+  gap: var(--lastro-e-4);
+  min-height: var(--lastro-alvo-min);
+  border-bottom: 1px solid var(--lastro-linha);
+}
+
+.serie__i {
+  font-family: var(--lastro-fonte-num);
+  font-size: var(--lastro-t-meta);
+  color: var(--lastro-txt-3);
+  width: var(--lastro-e-5);
+  flex: none;
+  font-variant-numeric: tabular-nums;
+}
+
+.serie__v {
+  font-family: var(--lastro-fonte-num);
+  font-size: var(--lastro-t-4);
+  font-weight: var(--lastro-peso-medio);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
+}
+
+.serie__x {
+  color: var(--lastro-txt-3);
+  font-size: var(--lastro-t-1);
+  margin: 0 var(--lastro-e-1);
+}
+
+.serie__un {
+  font-size: var(--lastro-t-meta);
+  color: var(--lastro-txt-2);
+  margin-left: var(--lastro-e-1);
+}
+
+/* Aquecimento e valendo se distinguem pela PALAVRA, não pela cor:
+   aquecimento não entra em volume, e1RM nem contagem. */
+.marca {
+  margin-left: auto;
+  font-family: var(--lastro-fonte-num);
+  font-size: var(--lastro-t-meta);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  white-space: nowrap;
+}
+
+.marca--aquecimento { color: var(--lastro-txt-3); }
+.marca--valendo     { color: var(--lastro-txt-2); }
+.marca--recorde     { color: var(--lastro-alta); font-weight: var(--lastro-peso-forte); }
+
+/* ---------- Estado de sincronização (D7): estado, nunca susto ---------- */
+.sync {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--lastro-e-2);
+  font-family: var(--lastro-fonte-num);
+  font-size: var(--lastro-t-meta);
+  color: var(--lastro-sync); /* JAMAIS --lastro-erro */
+}
+
+.sync--area {
+  display: flex;
+  justify-content: center;
+  margin-top: var(--lastro-e-3);
+}
+
+.sync__ponto {
+  width: var(--lastro-e-2);
+  height: var(--lastro-e-2);
+  border-radius: 50%;
+  background: var(--lastro-sync);
+  flex: none;
+}
+
+/* ---------- Aba inferior: vidro, porque o conteúdo passa por baixo ---- */
+.nav {
+  position: sticky;
+  bottom: 0;
+  display: flex;
+  border-top: 1px solid var(--lastro-linha);
+  background: var(--lastro-vidro-opaco);
+  box-shadow:
+    0 -2px 10px rgba(var(--lastro-sombra-cor), 0.07),
+    inset 0 1px 0 rgba(255, 255, 255, 0.8);
+}
+
+@supports (backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px)) {
+  .nav {
+    background: var(--lastro-vidro);
+    -webkit-backdrop-filter: blur(14px) saturate(1.4);
+    backdrop-filter: blur(14px) saturate(1.4);
+  }
+}
+
+.nav a {
+  flex: 1;
+  min-height: var(--lastro-alvo-min);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--lastro-e-1);
+  color: var(--lastro-txt-3);
+  font-size: var(--lastro-t-meta);
+  font-weight: var(--lastro-peso-medio);
+}
+
+/* O item ativo usa PESO além da cor — cor nunca é o único canal. */
+.nav a[aria-current="page"] {
+  color: var(--lastro-acao-tinta);
+  font-weight: var(--lastro-peso-forte);
+}
+
+.nav svg {
+  width: var(--lastro-e-5);
+  height: var(--lastro-e-5);
+}
+
+/* ---------- Campo: o inverso do botão — afunda em vez de saltar ------- */
+.formulario > * + * {
+  margin-top: var(--lastro-e-4);
+}
+
+.campo {
+  display: block;
+}
+
+.campo + .campo {
+  margin-top: var(--lastro-e-4);
+}
+
+.campo__nota {
+  font-size: var(--lastro-t-meta);
+  color: var(--lastro-txt-2);
+}
+
+.campo__rotulo {
+  display: block;
+  font-size: var(--lastro-t-meta);
+  font-weight: var(--lastro-peso-medio);
+  color: var(--lastro-txt-2);
+  margin-bottom: var(--lastro-e-2);
+}
+
+.campo input,
+.campo select {
+  width: 100%;
+  min-height: var(--lastro-alvo-min);
+  padding: 0 var(--lastro-e-4);
+  border: 1px solid var(--lastro-controle);
+  border-radius: var(--lastro-raio-1);
+  background: var(--lastro-campo-fundo);
+  box-shadow: var(--lastro-elev-afundado);
+  font-size: var(--lastro-t-corpo);
+}
+
+.campo-caixa {
+  display: flex;
+  align-items: center;
+  gap: var(--lastro-e-3);
+  min-height: var(--lastro-alvo-min);
+  font-size: var(--lastro-t-corpo);
+  color: var(--lastro-txt-2);
+  cursor: pointer;
+}
+
+.campo-caixa input {
+  width: var(--lastro-e-6);
+  height: var(--lastro-e-6);
+  flex: none;
+  accent-color: var(--lastro-acao-borda);
+}
+
+.dupla {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--lastro-e-3);
+}
+
+.dupla .campo + .campo {
+  margin-top: 0;
+}
+
+/* ---------- Avisos ---------- */
+.aviso-erro {
+  border: 1px solid var(--lastro-erro);
+  border-left: var(--lastro-barra-evidencia) solid var(--lastro-erro);
+  border-radius: var(--lastro-raio-1);
+  background: var(--lastro-grad-sup);
+  box-shadow: var(--lastro-elev-1);
+  padding: var(--lastro-e-3) var(--lastro-e-4);
+  color: var(--lastro-erro);
+  font-size: var(--lastro-t-corpo);
+  font-weight: var(--lastro-peso-medio);
+}
+
+/* Ausência de dado NÃO é erro: é começo. Estado neutro, sem cor de sinal. */
+.vazio {
+  border: 1px dashed var(--lastro-controle);
+  border-radius: var(--lastro-raio-1);
+  padding: var(--lastro-e-6) var(--lastro-e-5);
+  color: var(--lastro-txt-2);
+  text-align: center;
+}
+
+/* ---------- Lista de treinos ---------- */
+.lista {
+  list-style: none;
+}
+
+.lista li + li {
+  margin-top: var(--lastro-e-3);
+}
+
+.item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--lastro-e-3);
+  min-height: var(--lastro-alvo-min);
+  padding: var(--lastro-e-3) var(--lastro-e-4);
+  border: 1px solid var(--lastro-linha);
+  border-radius: var(--lastro-raio-1);
+  background: var(--lastro-grad-sup);
+  box-shadow: var(--lastro-elev-1), var(--lastro-bevel);
+  color: var(--lastro-txt);
+  transition:
+    box-shadow var(--lastro-dur-1) ease,
+    transform var(--lastro-dur-1) ease;
+}
+
+.item:hover {
+  box-shadow: var(--lastro-elev-2), var(--lastro-bevel);
+}
+
+.item:active {
+  box-shadow: var(--lastro-elev-afundado);
+  transform: translateY(1px);
+}
+
+.item__data {
+  font-family: var(--lastro-fonte-num);
+  font-size: var(--lastro-t-1);
+  font-variant-numeric: tabular-nums;
+}
+
+.item__meta {
+  font-family: var(--lastro-fonte-num);
+  font-size: var(--lastro-t-meta);
+  color: var(--lastro-txt-3);
+}
+
+/* =====================================================================
+   PARECER DA ANÁLISE SEMANAL — documento emitido, nunca conversa.
+   Reprova aqui: rabicho, avatar, alternância de lado, campo de
+   digitação, texto letra a letra, selo de "gerado por IA".
+   ===================================================================== */
+.doc {
+  padding: var(--lastro-e-6) var(--lastro-e-5) var(--lastro-e-8);
+}
+
+.doc__emissao {
+  border-bottom: 2px solid var(--lastro-linha);
+  padding-bottom: var(--lastro-e-4);
+  margin-bottom: var(--lastro-e-6);
+}
+
+.doc__selo {
+  font-family: var(--lastro-fonte-num);
+  font-size: var(--lastro-t-meta);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--lastro-txt-3);
+  margin-bottom: var(--lastro-e-2);
+}
+
+.doc__pergunta {
+  font-size: var(--lastro-t-3);
+  font-weight: var(--lastro-peso-max);
+}
+
+.doc__meta {
+  font-family: var(--lastro-fonte-num);
+  font-size: var(--lastro-t-meta);
+  color: var(--lastro-txt-3);
+  margin-top: var(--lastro-e-3);
+}
+
+.doc__secao {
+  font-family: var(--lastro-fonte-num);
+  font-size: var(--lastro-t-meta);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--lastro-txt-3);
+  margin: var(--lastro-e-6) 0 var(--lastro-e-3);
+}
+
+/* A prosa CONECTA as evidências; os números não moram nela. Número no
+   meio da frase muda de família e ganha peso — nunca cor. */
+.doc__prosa {
+  max-width: 34em;
+  font-size: var(--lastro-t-1);
+  line-height: var(--lastro-el-corpo);
+  color: var(--lastro-txt-2);
+  white-space: pre-wrap;
+}
+
+.doc__metodo {
+  border-top: 1px solid var(--lastro-linha);
+  padding-top: var(--lastro-e-4);
+  margin-top: var(--lastro-e-6);
+  font-size: var(--lastro-t-meta);
+  line-height: 1.6;
+  color: var(--lastro-txt-3);
+}
+
+.doc__metodo h2 {
+  font-family: var(--lastro-fonte-num);
+  font-size: var(--lastro-t-meta);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin-bottom: var(--lastro-e-3);
+}
+
+.doc__metodo ul {
+  list-style: none;
+}
+
+.doc__metodo li {
+  position: relative;
+  padding-left: var(--lastro-e-4);
+}
+
+.doc__metodo li + li {
+  margin-top: var(--lastro-e-2);
+}
+
+.doc__metodo li::before {
+  content: "—";
+  position: absolute;
+  left: 0;
+}
+
+/* ---------- Bloco de evidência: 3 linhas, barra lateral no sinal ------
+   Pronto no sistema. Só recebe dado real quando /api/analise passar a
+   devolver o resumo estruturado junto da prosa. */
+.evidencia {
+  border: 1px solid var(--lastro-linha);
+  border-left: var(--lastro-barra-evidencia) solid var(--lastro-linha);
+  border-radius: var(--lastro-raio-1);
+  background: var(--lastro-grad-sup);
+  box-shadow: var(--lastro-elev-2), var(--lastro-bevel);
+  padding: var(--lastro-e-4) var(--lastro-e-5);
+}
+
+.evidencia + .evidencia {
+  margin-top: var(--lastro-e-3);
+}
+
+.evidencia--alta  { border-left-color: var(--lastro-alta); }
+.evidencia--plato { border-left-color: var(--lastro-plato); }
+.evidencia--queda { border-left-color: var(--lastro-queda); }
+
+.evidencia__exercicio {
+  font-size: var(--lastro-t-corpo);
+  font-weight: var(--lastro-peso-forte);
+}
+
+.evidencia__numero {
+  font-family: var(--lastro-fonte-num);
+  font-size: var(--lastro-t-5);
+  font-weight: var(--lastro-peso-medio);
+  line-height: var(--lastro-el-apertada);
+  margin-top: var(--lastro-e-2);
+  display: flex;
+  align-items: baseline;
+  gap: var(--lastro-e-2);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.03em;
+}
+
+.evidencia__un {
+  font-size: var(--lastro-t-meta);
+  color: var(--lastro-txt-2);
+  font-weight: var(--lastro-peso-normal);
+  letter-spacing: 0;
+}
+
+.evidencia__de   { color: var(--lastro-txt-3); font-size: var(--lastro-t-3); }
+.evidencia__seta { color: var(--lastro-txt-3); font-size: var(--lastro-t-2); }
+
+/* O delta é o CANAL DE TEXTO obrigatório: cada sinal traz a palavra e o
+   número que o identificam. Dois blocos distinguidos só pela cor reprovam. */
+.evidencia__delta {
+  display: block;
+  font-family: var(--lastro-fonte-num);
+  font-size: var(--lastro-t-meta);
+  font-weight: var(--lastro-peso-forte);
+  margin-top: var(--lastro-e-2);
+}
+
+.evidencia--alta  .evidencia__delta { color: var(--lastro-alta); }
+.evidencia--plato .evidencia__delta { color: var(--lastro-plato); }
+.evidencia--queda .evidencia__delta { color: var(--lastro-queda); }
+
+.evidencia__procedencia {
+  font-family: var(--lastro-fonte-num);
+  font-size: var(--lastro-t-meta);
+  color: var(--lastro-txt-3);
+  margin-top: var(--lastro-e-3);
+  line-height: 1.5;
+}
+
+/* ---------- Escolha da pergunta: cinco alvos grandes ---------- */
+.perguntas {
+  list-style: none;
+}
+
+.perguntas li + li {
+  margin-top: var(--lastro-alvo-folga);
+}
+
+.pergunta {
+  width: 100%;
+  min-height: var(--lastro-alvo-min);
+  padding: var(--lastro-e-3) var(--lastro-e-4);
+  text-align: left;
+  border: 1px solid var(--lastro-controle);
+  border-radius: var(--lastro-raio-2);
+  background: var(--lastro-grad-sup);
+  box-shadow: var(--lastro-elev-1), var(--lastro-bevel);
+  color: var(--lastro-txt);
+  cursor: pointer;
+  font-size: var(--lastro-t-corpo);
+  font-weight: var(--lastro-peso-medio);
+  transition:
+    box-shadow var(--lastro-dur-1) ease,
+    transform var(--lastro-dur-1) ease;
+}
+
+.pergunta:hover:not(:disabled) {
+  box-shadow: var(--lastro-elev-2), var(--lastro-bevel);
+}
+
+.pergunta:active:not(:disabled) {
+  box-shadow: var(--lastro-elev-afundado);
+  transform: translateY(1px);
+}
+
+.pergunta:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+/* Estado "gerando": esqueleto na altura das linhas que virão.
+   Sem reticências pulsantes, sem spinner, sem texto letra a letra. */
+.esqueleto {
+  height: var(--lastro-t-1);
+  border-radius: var(--lastro-raio-1);
+  background: var(--lastro-sup-2);
+  animation: lastro-pulso 1.6s ease-in-out infinite;
+}
+
+.esqueleto + .esqueleto {
+  margin-top: var(--lastro-e-3);
+}
+
+.esqueleto--curto { width: 62%; }
+
+@keyframes lastro-pulso {
+  0%, 100% { opacity: 1; }
+  50%      { opacity: 0.55; }
+}
+
+/* ---------- Utilidades de leitura ---------- */
+.leitura {
+  max-width: 34em;
+}
+
+.so-leitor-de-tela {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}

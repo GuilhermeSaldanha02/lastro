@@ -11,6 +11,7 @@
 import { useState } from "react";
 import { PERGUNTAS, type NumeroPergunta } from "@/app/api/analise/perguntas";
 import Parecer from "@/components/parecer";
+import AbaInferior from "@/components/aba-inferior";
 
 type Resultado = {
   parecer: string;
@@ -21,9 +22,15 @@ export default function PaginaAnalise() {
   const [carregando, setCarregando] = useState<NumeroPergunta | null>(null);
   const [resultado, setResultado] = useState<Resultado | null>(null);
   const [erro, setErro] = useState<string | null>(null);
+  // A pergunta escolhida é o TÍTULO do documento emitido (DESIGN.md
+  // §3.6.2). Guardada à parte de `carregando`, que zera ao terminar.
+  const [perguntaEmitida, setPerguntaEmitida] = useState<NumeroPergunta | null>(
+    null,
+  );
 
   async function perguntar(numero: NumeroPergunta) {
     setCarregando(numero);
+    setPerguntaEmitida(numero);
     setErro(null);
     setResultado(null);
 
@@ -53,33 +60,63 @@ export default function PaginaAnalise() {
   }
 
   return (
-    <main>
-      <h1>Análise Semanal</h1>
+    <main className="tela">
+      <header className="barra-topo">
+        <p className="barra-topo__contexto">Análise semanal</p>
+        <h1 className="barra-topo__titulo">Semana fechada</h1>
+      </header>
 
-      <ul>
-        {(Object.keys(PERGUNTAS) as unknown as NumeroPergunta[]).map((numero) => (
-          <li key={numero}>
-            <button
-              type="button"
-              onClick={() => perguntar(Number(numero) as NumeroPergunta)}
-              disabled={carregando !== null}
-            >
-              {PERGUNTAS[Number(numero) as NumeroPergunta]}
-            </button>
-          </li>
-        ))}
-      </ul>
+      <div className="corpo corpo--com-nav">
+        <h2 className="doc__secao">Escolha a pergunta</h2>
+        <ul className="perguntas">
+          {(Object.keys(PERGUNTAS) as unknown as NumeroPergunta[]).map((numero) => (
+            <li key={numero}>
+              <button
+                type="button"
+                className="pergunta"
+                onClick={() => perguntar(Number(numero) as NumeroPergunta)}
+                disabled={carregando !== null}
+              >
+                {PERGUNTAS[Number(numero) as NumeroPergunta]}
+              </button>
+            </li>
+          ))}
+        </ul>
 
-      {carregando !== null && <p>Gerando parecer, pode levar alguns segundos…</p>}
+        {/* Estado "gerando" (DESIGN.md §3.6.5): esqueleto na altura das
+            linhas que virão. Sem reticências pulsantes, sem spinner, sem
+            texto letra a letra — qualquer um dos três reprova o gate. */}
+        {carregando !== null && (
+          <section className="doc" aria-live="polite">
+            <header className="doc__emissao">
+              <p className="doc__selo">Parecer em emissão</p>
+              <h2 className="doc__pergunta">{PERGUNTAS[carregando]}</h2>
+            </header>
+            <p className="doc__secao">escrevendo a leitura</p>
+            <div className="esqueleto" />
+            <div className="esqueleto" />
+            <div className="esqueleto esqueleto--curto" />
+          </section>
+        )}
 
-      {erro && <p role="alert">{erro}</p>}
+        {/* A prosa é o que falha aqui; nenhum número se perde junto, porque
+            a conta é local e não dependia da rede (DESIGN.md §3.6.5). */}
+        {erro && (
+          <p className="aviso-erro" role="alert">
+            {erro}
+          </p>
+        )}
 
-      {resultado && (
-        <Parecer
-          texto={resultado.parecer}
-          avisoFalhaInterpretativa={resultado.avisoFalhaInterpretativa}
-        />
-      )}
+        {resultado && (
+          <Parecer
+            pergunta={perguntaEmitida ? PERGUNTAS[perguntaEmitida] : null}
+            texto={resultado.parecer}
+            avisoFalhaInterpretativa={resultado.avisoFalhaInterpretativa}
+          />
+        )}
+      </div>
+
+      <AbaInferior ativa="analise" />
     </main>
   );
 }

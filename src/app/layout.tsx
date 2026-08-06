@@ -1,16 +1,23 @@
 import type { Metadata, Viewport } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { IBM_Plex_Sans, IBM_Plex_Mono } from "next/font/google";
 import RegistrarServiceWorker from "@/components/registrar-service-worker";
 import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+// DESIGN.md §3.3 — duas famílias. Sans para tudo que se lê; Mono para
+// número, unidade, metadado e rótulo de sistema. É a troca de família que
+// destaca o dado, não a cor.
+const plexSans = IBM_Plex_Sans({
+  variable: "--fonte-plex-sans",
+  weight: ["400", "500", "600", "700"],
   subsets: ["latin"],
+  display: "swap",
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+const plexMono = IBM_Plex_Mono({
+  variable: "--fonte-plex-mono",
+  weight: ["400", "500", "600"],
   subsets: ["latin"],
+  display: "swap",
 });
 
 export const metadata: Metadata = {
@@ -26,15 +33,15 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#171717",
+  // A cor da barra do sistema acompanha a barra de topo do app
+  // (--lastro-barra-a). Valor literal exigido pelo formato do manifesto:
+  // metadata do Next não aceita `var()`.
+  themeColor: "#17414F",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html
-      lang="pt-BR"
-      className={`${geistSans.variable} ${geistMono.variable}`}
-    >
+    <html lang="pt-BR" className={`${plexSans.variable} ${plexMono.variable}`}>
       <body>
         <RegistrarServiceWorker />
         {children}
