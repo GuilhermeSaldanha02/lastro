@@ -232,16 +232,16 @@ export default function TreinoDetalhe({
           </button>
         )}
 
-        <div className={ultima ? "pilha" : undefined}>
-          <button
-            type="button"
-            className="botao-secundario"
-            aria-expanded={formularioAberto}
-            onClick={() => setFormularioAberto((aberto) => !aberto)}
-          >
-            {formularioAberto ? "Fechar" : "Outra série"}
-          </button>
-        </div>
+        {/* A folga vem de `.acao-area > * + *` (D1) — não de um invólucro,
+            que só espaça irmãos internos e deixaria os dois encostados. */}
+        <button
+          type="button"
+          className="botao-secundario"
+          aria-expanded={formularioAberto}
+          onClick={() => setFormularioAberto((aberto) => !aberto)}
+        >
+          {formularioAberto ? "Fechar" : "Outra série"}
+        </button>
 
         {/* D7 — estado de sincronização sempre visível, nunca alarmante.
             "salvo no aparelho" é estado normal, não falha: a série já

@@ -187,6 +187,13 @@
   background: var(--lastro-fundo);
 }
 
+/* D1 — a folga entre alvos vizinhos vale aqui dentro também, e não pode
+   depender de quem envolveu o quê. Medido em 2026-08-06: sem esta regra,
+   a ação primária e a secundária ficavam encostadas (0px). */
+.acao-area > * + * {
+  margin-top: var(--lastro-alvo-folga);
+}
+
 /* ---------- Grupo de exercício e linha de série ---------- */
 .grupo + .grupo {
   margin-top: var(--lastro-e-6);
@@ -279,7 +286,6 @@
 .sync--area {
   display: flex;
   justify-content: center;
-  margin-top: var(--lastro-e-3);
 }
 
 .sync__ponto {
