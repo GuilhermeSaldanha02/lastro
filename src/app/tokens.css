@@ -39,7 +39,8 @@
   --lastro-acao-b:      #35A866; /* base — pior caso para a tinta escura: 5.12:1 */
   --lastro-acao-a-h:    #4CC682;
   --lastro-acao-b-h:    #3AAE6C;
-  --lastro-acao-txt:    #0A2A18;
+  --lastro-acao-txt:       #0A2A18;
+  --lastro-acao-txt-fraco: rgba(10, 42, 24, 0.78); /* segunda linha do botão */
   --lastro-acao-borda:  #0E5E35; /* é a BORDA que cumpre o limite de 3:1 (6.57:1) */
   --lastro-acao-tinta:  #0E5E35; /* a ação como TEXTO: aba ativa, link. 6.57:1 */
 
@@ -136,8 +137,18 @@
   --lastro-campo-fundo: #FFFDFA;
 
   /* Vidro: só onde o conteúdo passa por baixo (aba inferior). */
-  --lastro-vidro:        rgba(251, 248, 243, 0.82);
-  --lastro-vidro-opaco:  #FBF8F3;
+  --lastro-vidro:          rgba(251, 248, 243, 0.82);
+  --lastro-vidro-opaco:    #FBF8F3;
+  --lastro-vidro-desfoque: blur(14px) saturate(1.4);
+  --lastro-elev-nav:       0 -2px 10px rgba(var(--lastro-sombra-cor), 0.07);
+
+  /* Traço fraco sobre a barra escura — limite de controle secundário
+     em superfície escura, onde --lastro-controle sumiria. */
+  --lastro-barra-traco: rgba(240, 234, 224, 0.38);
+
+  /* ---- Medidas de leitura ---- */
+  --lastro-largura-entrada: 26rem; /* coluna do login */
+  --lastro-medida-leitura:  34em;  /* medida confortável da prosa */
 
   /* ---- Duração (respeitar prefers-reduced-motion) ---- */
   --lastro-dur-1: 120ms;

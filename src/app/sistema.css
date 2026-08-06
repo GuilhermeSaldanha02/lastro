@@ -29,7 +29,7 @@
 
 .entrada {
   width: 100%;
-  max-width: 26rem;
+  max-width: var(--lastro-largura-entrada);
   margin: 0 auto;
 }
 
@@ -123,7 +123,7 @@
   font-size: var(--lastro-t-meta);
   font-weight: var(--lastro-peso-normal);
   font-variant-numeric: tabular-nums;
-  color: rgba(10, 42, 24, 0.78);
+  color: var(--lastro-acao-txt-fraco);
 }
 
 .botao-secundario {
@@ -167,7 +167,7 @@
   flex: none;
   min-height: var(--lastro-alvo-min);
   padding: 0 var(--lastro-e-3);
-  border: 1px solid rgba(240, 234, 224, 0.38);
+  border: 1px solid var(--lastro-barra-traco);
   border-radius: var(--lastro-raio-1);
   background: transparent;
   color: var(--lastro-barra-txt);
@@ -297,16 +297,14 @@
   display: flex;
   border-top: 1px solid var(--lastro-linha);
   background: var(--lastro-vidro-opaco);
-  box-shadow:
-    0 -2px 10px rgba(var(--lastro-sombra-cor), 0.07),
-    inset 0 1px 0 rgba(255, 255, 255, 0.8);
+  box-shadow: var(--lastro-elev-nav), var(--lastro-bevel);
 }
 
 @supports (backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px)) {
   .nav {
     background: var(--lastro-vidro);
-    -webkit-backdrop-filter: blur(14px) saturate(1.4);
-    backdrop-filter: blur(14px) saturate(1.4);
+    -webkit-backdrop-filter: var(--lastro-vidro-desfoque);
+    backdrop-filter: var(--lastro-vidro-desfoque);
   }
 }
 
@@ -516,7 +514,7 @@
 /* A prosa CONECTA as evidências; os números não moram nela. Número no
    meio da frase muda de família e ganha peso — nunca cor. */
 .doc__prosa {
-  max-width: 34em;
+  max-width: var(--lastro-medida-leitura);
   font-size: var(--lastro-t-1);
   line-height: var(--lastro-el-corpo);
   color: var(--lastro-txt-2);
@@ -692,7 +690,7 @@
 
 /* ---------- Utilidades de leitura ---------- */
 .leitura {
-  max-width: 34em;
+  max-width: var(--lastro-medida-leitura);
 }
 
 .so-leitor-de-tela {

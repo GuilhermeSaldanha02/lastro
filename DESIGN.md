@@ -2,7 +2,9 @@
 
 > **Fonte ÚNICA do visual.** Nenhum valor de cor, espaçamento ou tipografia é definido em outro lugar. Verificar autoconsistência deste arquivo a cada edição.
 >
-> **Estado em 2026-08-04:** as restrições funcionais abaixo estão **decididas** — elas derivam do contexto de uso real, não de gosto. A **identidade estética** (paleta, tipografia, personalidade) está **em aberto** e passa pelo gate do Diretor de Arte + aprovação do dono antes de qualquer tela ser construída.
+> **Estado em 2026-08-06:** a identidade estética foi **APROVADA pelo dono** — padrão *"Areia & Azul Petróleo"*, com matéria (gradiente, vidro, bevel, sombra). Os valores vivem em `src/app/tokens.css`, que é o espelho executável de §3.1; as classes, em `src/app/sistema.css`. A referência navegável é `design/padrao-visual.html`, que traz a aferição de contraste rodando na própria página.
+>
+> **Uma restrição funcional foi revista pelo dono nesta data: D5.** O tema padrão passou a ser **claro** (areia), não escuro. A justificativa original de D5 (academia com luz baixa, tela clara cansa à noite) continua válida como risco conhecido; o dono a aceitou conscientemente em favor do padrão escolhido. A única superfície escura que sobrou é a barra de topo.
 
 ---
 
@@ -22,7 +24,7 @@ Isso não é detalhe de acabamento — é a restrição que decide o layout inte
 | D2 | **Ações primárias na metade inferior da tela**, ao alcance do polegar | Uma mão só. Botão no topo obriga a reposicionar o aparelho |
 | D3 | **"Repetir última série" é o botão mais proeminente do app** | É a ação mais frequente do fluxo de treino. Se ela custar mais de um toque, o log é abandonado |
 | D4 | **Legível a um braço de distância** — corpo nunca abaixo de 16px | O celular fica apoiado no banco, não na mão, entre séries |
-| D5 | **Tema escuro como padrão** | Academia com luz baixa, e tela clara à noite cansa. **A decisão é funcional; a paleta ainda não existe** |
+| D5 | ~~Tema escuro como padrão~~ → **Tema claro (areia) como padrão** | **REVISTA pelo dono em 2026-08-06.** A justificativa original — academia com luz baixa, tela clara cansa à noite — segue válida e vira risco aceito. A barra de topo é a única superfície escura |
 | D6 | **Nenhuma ação de registro espera resposta de rede** | ADR/ARCHITECTURE: registrar série é offline-first. A UI confirma na hora |
 | D7 | **Estado de sincronização sempre visível, nunca alarmante** | O usuário precisa saber que o dado está salvo local, sem que isso pareça erro |
 | D8 | **Contraste AA medido, não estimado** | Gate de acessibilidade é critério do gate visual, não fase posterior |
@@ -34,9 +36,19 @@ Isso não é detalhe de acabamento — é a restrição que decide o layout inte
 
 > **Este bloco `:root` é o único lugar do projeto onde um valor literal de cor, espaço, tamanho ou fonte pode existir.** Qualquer hex, `px`, `rem` ou nome de fonte fora daqui — em componente, em Tailwind config, em CSS de módulo, em prop de Recharts — é violação e reprova no review.
 
-### 3.0 Tese visual
+### 3.0 Tese visual — APROVADA em 2026-08-06
 
-**Instrumento, não interface de conversa.** `lastro` se parece com um mostrador de equipamento lido no escuro: fundo profundo quase sem cor, número claro e grande, cor cromática usada só onde ela *significa* alguma coisa. A personalidade **acompanha** o nome sóbrio — nada de gradiente, vidro, brilho ou 3D.
+**"Areia & Azul Petróleo".** Areia é a superfície, azul petróleo é a tinta, verde é a ação — e só a ação. Número em mono tabular; cor cromática usada só onde ela *significa* alguma coisa.
+
+**A matéria é do padrão, e é deliberada.** Gradiente, vidro, bevel e sombra entram por decisão do dono, contra a proposta anterior: sem elevação, cartão claro sobre fundo claro fica solto — a peça não gruda na tela. Três regras seguram isso sem virar enfeite:
+
+1. **A luz vem de cima.** Todo elemento levantado leva um fio claro na borda superior (bevel) e a sombra cai para baixo.
+2. **A sombra é quente**, nunca cinza — cinza sobre areia acinzenta o fundo e suja a paleta.
+3. **Gradiente tem no máximo dois passos**, sempre do claro para o escuro. Texto sobre gradiente é medido contra o passo de **pior caso**, nunca contra uma média.
+
+**Escala de elevação:** `elev-1` repouso (painel, item de lista) · `elev-2` levantado (bloco de evidência, barra de topo) · `elev-3` só a ação primária · `afundado` para campo, que é o inverso do botão: recebe em vez de saltar.
+
+> **Histórico.** A tese anterior — *"instrumento sóbrio, nada de gradiente, vidro, brilho ou 3D"*, derivada da leitura de uma galeria de referência e de ISA-101 (High-Performance HMI) — foi **reprovada pelo dono**. ISA-101 segue útil como disciplina (base quieta, cor que significa, sem bevel decorativo), mas é norma de controle de processo, para operador caçando falha; o `lastro` é instrumento de leitura para uma pessoa. Onde conflitarem, **o PRD vence**.
 
 **Referência consultada:** `https://3dgallery-eqrvxb8t.manus.space` — catálogo curado de 179 sites (Lusion, Active Theory, Obys, Awwwards, Godly, Linear, Stripe, luxo/e-commerce 3D). Lida por download do HTML, do CSS (`/assets/index-BAPlKeQi.css`) e do bundle JS. **Nada foi renderizado nem olhado** — ver §3.9.
 
@@ -45,140 +57,90 @@ Dois achados que orientaram a decisão:
 1. O CSS da própria galeria é **tema padrão do Tailwind v4** (`--font-sans: ui-sans-serif`, escala slate/blue/cyan em `oklch`). A galeria é uma **régua de artesanato**, não uma especificação de estilo. Não se copia dela nenhum valor.
 2. A massa da galeria é imersiva/WebGL/luxo — gradiente, vidro, sobreposição de baixo contraste, texto sobre vídeo. **Esse ramo é incompatível com D4 e D8** (celular suado, luz ruim, contraste AA medido). A adjacência que se adota é o outro ramo do mesmo catálogo — **Linear e Stripe**: hierarquia tipográfica, densidade de dado, contenção. Isso é rejeição por restrição funcional, não por gosto.
 
-### 3.1 Paleta — `:root`
+### 3.1 Paleta — a fonte única agora é `src/app/tokens.css`
 
-Escuro por padrão (D5). Sem tema claro no MVP: não há segunda persona (PRD §2) e a cena de uso é luz baixa.
+> **Mudança de custódia (2026-08-06).** O bloco `:root` deixou de morar neste documento e passou a morar em **`src/app/tokens.css`**, que é o **único arquivo do projeto onde um valor literal de cor, espaço, tamanho, peso, raio, sombra ou duração pode existir**. Qualquer hex, `px` ou `rem` fora dele — em componente, em CSS de módulo, em prop de Recharts — é violação e reprova no review.
+>
+> **Por que inverteu:** manter os mesmos ~90 valores em dois lugares garante divergência. O documento passa a explicar *por que* cada cor é o que é; o arquivo passa a ser o que executa. Cada token em `tokens.css` carrega a razão medida no comentário ao lado.
 
-```css
-:root {
-  /* ---- Superfícies (escuro é o padrão; não há tema claro no MVP) ---- */
-  --lastro-fundo:          #0D1013; /* base. Não é #000: preto puro mata elevação e causa halo em OLED */
-  --lastro-sup-1:          #151A1E; /* card, painel de gráfico */
-  --lastro-sup-2:          #1E252A; /* linha de série, bloco de veredito do parecer */
-  --lastro-sup-3:          #283137; /* topo da pilha: input focado, item selecionado */
+Tema **claro** por padrão (D5 revista). A leitura humana da paleta:
 
-  /* ---- Traços ---- */
-  --lastro-borda:          #39444C; /* SÓ decorativa/divisória. Nunca é o único limite de um controle */
-  --lastro-borda-controle: #74838E; /* limite de qualquer alvo de toque. Cumpre 3:1 em toda superfície */
+| Papel | Token | Valor | Razão medida |
+|---|---|---|---|
+| Fundo | `--lastro-fundo` | `#F0EAE0` | — |
+| Cartão, bloco de evidência | `--lastro-sup-1` | `#FBF8F3` | — |
+| Faixa, cabeçalho de tabela | `--lastro-sup-2` | `#E4DACB` | — |
+| Divisória — **só decorativa** | `--lastro-linha` | `#CFC3B1` | 1.45:1 · reprova de propósito, ver nota A |
+| Limite de alvo de toque | `--lastro-controle` | `#8A7C68` | 3.40:1 no fundo |
+| Corpo, número, título | `--lastro-txt` | `#12303F` | 11.54:1 |
+| Secundário | `--lastro-txt-2` | `#3A5361` | 6.78:1 |
+| Procedência, metadado | `--lastro-txt-3` | `#476069` | 4.83:1 no `sup-2`, o pior caso |
+| Barra de topo (gradiente) | `--lastro-barra-a/b` | `#17414F` → `#0E2833` | texto a 9.21:1 contra o topo |
+| **Ação — preenchimento** | `--lastro-acao-a/b` | `#46C27B` → `#35A866` | tinta a 5.12:1 na base, o pior caso |
+| **Ação — tinta sobre ela** | `--lastro-acao-txt` | `#0A2A18` | — |
+| **Ação — borda e texto** | `--lastro-acao-borda` / `--lastro-acao-tinta` | `#0E5E35` | 6.57:1 no fundo |
+| Alta · progressão | `--lastro-alta` | `#1B6B3A` | 6.17:1 no `sup-1` |
+| Platô · estagnação | `--lastro-plato` | `#8A5A0B` | 5.59:1 — âmbar, nunca vermelho |
+| Queda · regressão | `--lastro-queda` | `#A33220` | 6.53:1 |
+| Sincronização (D7) | `--lastro-sync` | `#2E6076` | 5.75:1 · jamais vermelho |
+| Erro — **reservado a falha real** | `--lastro-erro` | `#A32014` | 6.33:1 |
+| Foco (D9) | `--lastro-foco` | `#0B5CAB` | 5.60:1 |
 
-  /* ---- Texto ---- */
-  --lastro-txt:            #F1F4F6; /* corpo, números, títulos */
-  --lastro-txt-2:          #B3BEC6; /* secundário, rótulo */
-  --lastro-txt-3:          #939EA6; /* procedência, metadado. Piso do que ainda passa AA em sup-3 */
+**A decisão que mais custou: por que a ação é preenchimento vivo com tinta escura.**
 
-  /* ---- Sinais semânticos (cor NUNCA é o único canal — §3.7) ---- */
-  --lastro-alta:           #6BD79B; /* progressão confirmada */
-  --lastro-plato:          #E3AC55; /* estagnação. Âmbar, não vermelho — §3.6.5 */
-  --lastro-queda:          #E8927A; /* regressão. Terroso, não alarme */
-  --lastro-sync:           #8FB6D9; /* estado de sincronização (D7). Azul frio, jamais vermelho */
-  --lastro-erro:           #F2796F; /* RESERVADO: falha real e ação destrutiva. Nada mais usa esta cor */
+Duas medições obrigaram a inversão, e nenhuma das duas era visível a olho:
 
-  /* ---- Foco (D9) ---- */
-  --lastro-foco:           #9BE7FF;
+1. Verde vivo **não sustenta texto branco** — `#2ECC71` com branco dá **2.10:1**, contra 4.5 exigidos. Era o que a referência do dono trazia.
+2. Um verde escuro o bastante para carregar branco fica a **1.06:1 de `--lastro-alta`** — ou seja, vira *o mesmo verde* do sinal de progressão. E como a ação primária aparece em toda tela o tempo todo, o verde deixaria de significar "progresso" e viraria só "botão", exatamente o que §3.2 nota C existe para impedir.
 
-  /* ---- Ação primária (D3) ---- */
-  --lastro-acao-fundo:     #F1F4F6; /* o botão mais importante do app é a coisa mais clara da tela */
-  --lastro-acao-txt:       #0D1013;
+Preenchimento vivo + tinta escura resolve os dois de uma vez. Consequências obrigatórias:
 
-  /* ---- Espaçamento: base 4px. 48 (D1) cai exatamente na escala ---- */
-  --lastro-e-1:   4px;
-  --lastro-e-2:   8px;
-  --lastro-e-3:  12px;
-  --lastro-e-4:  16px;
-  --lastro-e-5:  20px;
-  --lastro-e-6:  24px;
-  --lastro-e-8:  32px;
-  --lastro-e-10: 40px;
-  --lastro-e-12: 48px;
-  --lastro-e-16: 64px;
-  --lastro-e-20: 80px;
+- **O verde vivo não cumpre o limite de 3:1 contra a areia** (1.89:1). Quem cumpre é a **borda** `--lastro-acao-borda`. Botão de ação sem essa borda reprova.
+- **O verde vivo NUNCA é texto.** Aba ativa, link e item selecionado usam `--lastro-acao-tinta`. Preenchimento e tinta são dois papéis, não a mesma cor.
+- **Pressionar não escurece o preenchimento** — escurecer derruba a tinta para 3.76:1. O afundamento é pela sombra (`--lastro-elev-afundado`) e por 1px de deslocamento.
 
-  /* ---- Alvos ---- */
-  --lastro-alvo-min:       48px; /* D1 — piso absoluto de qualquer alvo de toque */
-  --lastro-alvo-folga:     12px; /* distância mínima entre dois alvos vizinhos */
-  --lastro-alvo-acao:      72px; /* altura da ação primária (D3). Maior que o piso, de propósito */
+**Espaçamento, alvos, escala de tamanho, peso, raio, duração e matéria** seguem em `tokens.css` com os mesmos nomes usados neste documento. Base 4px; `--lastro-alvo-min` 48px (D1), `--lastro-alvo-acao` 72px (D3); escala de tamanho com piso 14px e corpo em 16px (D4).
 
-  /* ---- Tipografia ---- */
-  --lastro-fonte-txt:  "IBM Plex Sans", system-ui, sans-serif;
-  --lastro-fonte-num:  "IBM Plex Mono", ui-monospace, monospace;
+### 3.2 Contraste — medido em navegador, não estimado (D8)
 
-  /* ---- Escala de tamanho. Piso 14px, e 14 só para metadado não-corpo (§3.4) ---- */
-  --lastro-t-meta:  14px;
-  --lastro-t-corpo: 16px; /* D4 — piso do corpo */
-  --lastro-t-1:     18px;
-  --lastro-t-2:     20px;
-  --lastro-t-3:     24px;
-  --lastro-t-4:     30px;
-  --lastro-t-5:     38px;
-  --lastro-t-6:     48px;
-  --lastro-t-7:     60px;
-  --lastro-t-8:     76px; /* número em modo bancada, lido a um braço */
+Fórmula WCAG 2.x (linearização sRGB, `L = 0.2126R + 0.7152G + 0.0722B`, `(Lmax+0.05)/(Lmin+0.05)`). **Aferição do método, rodada antes de cada medição:** `#FFFFFF/#000000 = 21.00`, `#777777/#FFFFFF = 4.48`, `#767676/#FFFFFF = 4.54` — batem com os canônicos do WCAG.
 
-  /* ---- Entrelinha ---- */
-  --lastro-el-apertada: 1.1;  /* números */
-  --lastro-el-titulo:   1.25;
-  --lastro-el-corpo:    1.6;  /* prosa do parecer, lida sentado */
+**Mudança de método (2026-08-06):** as razões deixaram de ser aritmética sobre hex escritos à mão e passam a ser **medidas sobre as cores computadas de uma página renderizada**. `design/padrao-visual.html` roda a matriz inteira na própria página, no navegador. Reproduzir a medição é abrir o arquivo e rolar até §06.
 
-  /* ---- Peso ---- */
-  --lastro-peso-normal: 400;
-  --lastro-peso-medio:  500;
-  --lastro-peso-forte:  600;
+Limiares: **4.5:1** texto normal · **3:1** texto grande (≥ `--lastro-t-3` em `--lastro-peso-forte`, ou ≥ `--lastro-t-4`) e limite de componente de interface.
 
-  /* ---- Raio ---- */
-  --lastro-raio-1: 6px;
-  --lastro-raio-2: 10px;
-  --lastro-raio-3: 14px;
-
-  /* ---- Foco: espessura e afastamento ---- */
-  --lastro-foco-espessura: 3px;
-  --lastro-foco-afast:     2px;
-
-  /* ---- Barra lateral do bloco de evidência do parecer (§3.6.3) ---- */
-  --lastro-barra-evidencia: 3px;
-
-  /* ---- Duração de transição (respeitar prefers-reduced-motion) ---- */
-  --lastro-dur-1: 120ms;
-  --lastro-dur-2: 220ms;
-}
-```
-
-### 3.2 Contraste — calculado, não estimado (D8)
-
-Calculado com a fórmula WCAG 2.x (linearização sRGB, `L = 0.2126R + 0.7152G + 0.0722B`, `(Lmax+0.05)/(Lmin+0.05)`) em Node, sobre os hex acima. **Aferição do método:** `#FFFFFF/#000000 = 21.00`, `#777777/#FFFFFF = 4.48`, `#767676/#FFFFFF = 4.54` — batem com os valores canônicos do WCAG.
-
-Limiares: **4.5:1** texto normal · **3:1** texto grande (≥ `--lastro-t-3` em `--lastro-peso-forte`, ou ≥ `--lastro-t-4`) e componente de interface.
-
-| Frente | vs `--lastro-fundo` | vs `--lastro-sup-1` | vs `--lastro-sup-2` | vs `--lastro-sup-3` | Limiar | Veredito |
-|---|---|---|---|---|---|---|
-| `--lastro-txt` | 17.27 | 15.86 | 14.05 | 12.00 | 4.5 | passa |
-| `--lastro-txt-2` | 10.08 | 9.26 | 8.20 | 7.00 | 4.5 | passa |
-| `--lastro-txt-3` | 6.98 | 6.41 | 5.68 | **4.85** | 4.5 | passa (margem menor em sup-3) |
-| `--lastro-alta` | 10.74 | 9.86 | 8.73 | 7.46 | 4.5 | passa |
-| `--lastro-plato` | 9.36 | 8.59 | 7.61 | 6.50 | 4.5 | passa |
-| `--lastro-queda` | 8.02 | 7.36 | 6.52 | 5.57 | 4.5 | passa |
-| `--lastro-sync` | 8.96 | 8.23 | 7.29 | 6.22 | 4.5 | passa |
-| `--lastro-erro` | 7.03 | 6.46 | 5.72 | **4.88** | 4.5 | passa |
-| `--lastro-foco` | 13.87 | 12.74 | 11.28 | 9.63 | 3.0 | passa |
-| `--lastro-borda-controle` | 4.89 | 4.49 | 3.98 | **3.39** | 3.0 | passa |
-| `--lastro-borda` | 1.91 | 1.76 | 1.56 | 1.33 | — | **reprova de propósito** — ver nota A |
-
-Pares fora da matriz:
+**Regra nova, que o gradiente obriga:** onde há gradiente, o texto é medido contra o **passo de pior caso**, nunca contra uma média nem contra o passo mais favorável.
 
 | Par | Razão | Limiar | Veredito |
 |---|---|---|---|
-| `--lastro-acao-txt` sobre `--lastro-acao-fundo` | 17.27 | 4.5 | passa |
-| `--lastro-acao-fundo` sobre `--lastro-fundo` (limite do botão) | 17.27 | 3.0 | passa |
-| `--lastro-foco` sobre `--lastro-acao-fundo` | **1.25** | 3.0 | **reprova** — ver nota B |
-| `--lastro-alta` vs `--lastro-plato` | **1.15** | — | ver nota C |
-| `--lastro-plato` vs `--lastro-queda` | **1.17** | — | ver nota C |
-| `--lastro-alta` vs `--lastro-queda` | **1.34** | — | ver nota C |
-| `--lastro-erro` vs `--lastro-queda` | **1.14** | — | ver nota C |
+| `--lastro-txt` / fundo · sup-1 · sup-2 | 11.54 · 13.04 · 9.99 | 4.5 | passa |
+| `--lastro-txt-2` / fundo · sup-1 | 6.78 · 7.65 | 4.5 | passa |
+| `--lastro-txt-3` / fundo · sup-1 · sup-2 | 5.58 · 6.30 · **4.83** | 4.5 | passa (margem menor em sup-2) |
+| `--lastro-alta` / sup-1 | 6.17 | 4.5 | passa |
+| `--lastro-plato` / sup-1 | 5.59 | 4.5 | passa |
+| `--lastro-queda` / sup-1 | 6.53 | 4.5 | passa |
+| `--lastro-sync` / fundo | 5.75 | 4.5 | passa |
+| `--lastro-erro` / fundo | 6.33 | 4.5 | passa |
+| `--lastro-acao-tinta` / fundo (aba ativa, link) | 6.57 | 4.5 | passa |
+| `--lastro-acao-txt` / topo do gradiente da ação | 6.82 | 4.5 | passa |
+| `--lastro-acao-txt` / **base** do gradiente — pior caso | **5.12** | 4.5 | passa |
+| `--lastro-barra-txt` / topo do gradiente da barra — pior caso | 9.21 | 4.5 | passa |
+| `--lastro-acao-borda` / fundo (limite do botão) | 6.57 | 3.0 | passa |
+| `--lastro-controle` / fundo · sup-1 | 3.40 · 3.84 | 3.0 | passa |
+| `--lastro-foco` / fundo | 5.60 | 3.0 | passa |
+| `--lastro-linha` / fundo | 1.45 | — | **reprova de propósito** — ver nota A |
+| `--lastro-acao-a` (vivo) / fundo | **1.89** | 3.0 | **reprova** — ver nota D |
+| `--lastro-acao-a` vs `--lastro-alta` | 2.89 | — | ver nota C |
 
-**Nota A — `--lastro-borda` é decorativa por decisão.** 1.91:1 não serve como limite de componente. Ela só separa blocos que já se distinguem por superfície. **Todo alvo de toque usa `--lastro-borda-controle`** (pior caso 3.39:1). Regra de reprovação: qualquer controle cujo único limite visual seja `--lastro-borda` reprova o gate.
+**Nota A — `--lastro-linha` é decorativa por decisão.** 1.45:1 não serve como limite de componente. Ela só separa blocos que já se distinguem por superfície ou elevação. **Todo alvo de toque usa `--lastro-controle`** (pior caso 3.40:1), ou uma borda própria quando o preenchimento não cumpre o limite (nota D). Regra de reprovação: qualquer controle cujo único limite visual seja `--lastro-linha` reprova o gate.
 
-**Nota B — o anel de foco nunca encosta na ação primária.** Contra o botão claro ele some (1.25:1). Portanto o foco é sempre desenhado **fora** do elemento, com afastamento: `outline: var(--lastro-foco-espessura) solid var(--lastro-foco); outline-offset: var(--lastro-foco-afast);`. O vão do `offset` mostra a superfície do pai (fundo/sup-1/sup-2/sup-3), onde o anel entrega de 9.63 a 13.87. **Proibido `outline-offset: 0` ou anel interno (`inset`) em qualquer elemento sobre `--lastro-acao-fundo`.**
+**Nota B — o anel de foco nunca encosta no elemento.** É sempre desenhado **fora**, com afastamento: `outline: var(--lastro-foco-espessura) solid var(--lastro-foco); outline-offset: var(--lastro-foco-afast);`. O vão do `offset` mostra a superfície do pai, onde o anel entrega 5.60:1. **Proibido `outline-offset: 0` ou anel interno (`inset`)** — contra um preenchimento saturado o anel some.
 
-**Nota C — os quatro sinais têm luminância quase idêntica entre si (1.14 a 1.34).** Isso é proposital: todos foram calibrados para passar AA contra as quatro superfícies, o que os deixa na mesma faixa de claridade. O efeito colateral é que **um sinal não se distingue do outro** para quem tem deficiência de visão de cor — e blocos de alta, platô e queda podem aparecer lado a lado no mesmo parecer.
+**Nota C — a separação entre o verde de ação e o verde de sinal é de 2.89:1, e não pode ser maior.** Os dois têm de ser verdes: um porque o dono escolheu, o outro porque verde é progressão. O que os separa não é só a razão — é o **papel e o tamanho**: a ação é um preenchimento de 72px de largura total; `--lastro-alta` é uma barra de 4px e um texto de 14px. Eles nunca ocorrem no mesmo papel. **Um verde escuro o bastante para carregar texto branco ficaria a 1.06:1 do `--lastro-alta`** — literalmente o mesmo verde —, e foi por isso que a ação virou preenchimento vivo com tinta escura (§3.1).
+
+**Nota D — o preenchimento vivo da ação reprova o limite de 3:1 de propósito, e quem cumpre é a borda.** `#46C27B` contra a areia dá 1.89:1: verde claro e areia são os dois claros. `--lastro-acao-borda` (6.57:1) é o limite real do componente. **Botão de ação sem essa borda reprova o gate.** Pela mesma razão, **o verde vivo nunca é usado como texto sobre a areia** — aba ativa, link e item selecionado usam `--lastro-acao-tinta`.
+
+**Nota E — os sinais continuam sem poder depender da cor.** No tema claro as luminâncias se afastaram um pouco (5.59 a 6.53 contra o `sup-1`), mas a regra não afrouxa: quem tem deficiência de visão de cor não distingue âmbar de terracota, e blocos de alta, platô e queda aparecem lado a lado no mesmo parecer.
 
 Consequência obrigatória, não recomendação — **em toda ocorrência, no gráfico e no parecer, cada sinal se distingue por dois canais além da cor:**
 
@@ -190,7 +152,7 @@ Consequência obrigatória, não recomendação — **em toda ocorrência, no gr
 
 **Cor nunca é o portador da informação — é reforço.** Bloco de evidência ou trecho de gráfico que dependa só da cor para dizer o que é **reprova o gate**. Ver §3.7 e §3.6.6.
 
-**O que não foi calculado:** nada. **Todo par de cor deste documento tem razão computada**, incluindo os pares sinal-contra-sinal, e o método foi aferido contra os valores canônicos do WCAG. Se um token novo entrar, ele entra com a razão calculada ao lado ou não entra.
+**O que não foi medido:** nada. Todo par acima tem razão computada em navegador real, com o método aferido antes. Se um token novo entrar, ele entra com a razão medida ao lado ou não entra.
 
 ### 3.3 Tipografia
 
@@ -323,24 +285,38 @@ A pergunta que o gráfico responde não é "quanto?", é "**está subindo?**". O
 6. **Alternativa textual.** Todo gráfico tem um resumo em texto acessível a leitor de tela, com os mesmos números dos rótulos diretos. Sem isso, o gráfico reprova.
 7. **Viável na stack (Recharts, CLAUDE.md):** rotulagem direta com componentes de rótulo próprios, linha de referência e segmentos com `strokeDasharray` distinto. Nada aqui exige biblioteca fora da stack.
 
-### 3.8 Autoconsistência — verificação feita
+### 3.8 Autoconsistência — onde os literais moram agora
 
-Verificado por busca mecânica neste arquivo:
+Desde 2026-08-06 o bloco `:root` vive em **`src/app/tokens.css`**, não neste arquivo. A regra de fonte única não mudou de força; mudou de endereço.
 
-Método: varredura por expressão regular sobre o arquivo, procurando `#hex`, literais `px`/`rem`/`em` e nome de família fora do bloco `:root` de §3.1, mais conferência cruzada entre tokens declarados e tokens citados.
+**O que pode conter valor literal:**
 
-- **Todo valor literal de cor, espaço, tamanho, peso, raio e duração do sistema está dentro do `:root`.** As únicas ocorrências fora dele, todas legítimas e nomeadas aqui:
-  - **razões de contraste** em §3.2 e §4.2 — resultado de medição, não valor de design;
-  - **limiares do WCAG** (4.5 e 3.0) — norma externa, não decisão nossa;
-  - os literais `48px` e `16px` que já estavam em **D1 e D4 na §2** (restrições congeladas, anteriores a este gate). Os tokens `--lastro-alvo-min` e `--lastro-t-corpo` foram fixados exatamente nesses valores, e é o token que o código usa;
-  - o **nome das famílias** em §3.3 e §5, citado apenas para justificar e para o dono aprovar. O valor efetivo vive só em `--lastro-fonte-txt` / `--lastro-fonte-num`.
-- **Todo token citado em prosa existe no `:root`:** conferido, zero divergência. Todo token de cor tem razão calculada em §3.2.
-- Alguns degraus de `--lastro-e-*` e `--lastro-t-*` não são citados em prosa — uma escala existe inteira por definição; não é inconsistência.
-- Nenhuma cor foi importada da referência visual; a paleta é original e todo par foi calculado.
+- `src/app/tokens.css` — o `:root`, e só ele.
+
+**O que aparece fora dele neste documento, e é legítimo:**
+
+- **razões de contraste** em §3.2 e §4.2 — resultado de medição, não valor de design;
+- **limiares do WCAG** (4.5 e 3.0) — norma externa, não decisão nossa;
+- os literais `48px` e `16px` em **D1 e D4 (§2)** — restrições congeladas, anteriores ao gate. Os tokens `--lastro-alvo-min` e `--lastro-t-corpo` valem exatamente isso, e é o token que o código usa;
+- os **hex da tabela de §3.1** — reprodução para leitura humana; o valor que executa é o do `tokens.css`;
+- o **nome das famílias** em §3.3 e §5, citado para justificar e para o dono aprovar.
+
+**As exceções no código, todas por limitação de formato, e nenhuma outra é aceita:**
+
+- `viewport.themeColor` em `src/app/layout.tsx` — o metadata do Next não aceita `var()`. Acompanha `--lastro-barra-a`.
+- **fio de 1px** — `border: 1px`, `translateY(1px)` do estado pressionado, e o `width/height: 1px` do utilitário de leitor de tela. 1px é fio de cabelo, não degrau de escala; a escala começa em 4.
+- o `2px` da divisória de `.grupo__cab` e `.doc__emissao`, pelo mesmo motivo.
+
+**Verificação executável — deve voltar vazia:**
+
+```bash
+grep -nE '#[0-9A-Fa-f]{3,6}|[0-9]+rem|[0-9]{2,}px|rgba([0-9]' src/app/sistema.css
+```
+
+Rodada em 2026-08-06: vazia. **Cinco violações foram encontradas e corrigidas nesta passagem** — o `26rem` da coluna do login, o traço do botão de barra, o desfoque do vidro, a sombra da aba inferior e a segunda linha do botão primário, todos promovidos a token.
 
 ### 3.9 O que este documento NÃO é
-
-**Nenhuma tela foi renderizada, aberta em navegador ou olhada.** O Diretor de Arte não tem ferramenta que renderize página; a referência visual foi lida por download de HTML/CSS/JS. Toda razão de contraste acima é aritmética sobre hex, não medição em pixel renderizado. **A validação continua sendo o gate de §4, executado pelo controller, com olho em navegador real.**
+**A paleta e a matéria foram medidas em navegador real** — não são mais aritmética sobre hex escritos à mão (§3.2). O que **ainda não foi olhado em celular real** são as telas logadas: `/treino`, `/treino/[id]` e `/analise` ficam atrás de autenticação. **O gate de §4 continua pendente para elas** e é executado pelo dono, no aparelho dele.
 
 ---
 
@@ -428,13 +404,23 @@ Anel de foco: `--lastro-foco-espessura` sólido em `--lastro-foco`, com `--lastr
 
 ---
 
-## 5. Precisa da aprovação do dono antes de virar código
+## 5. Decisões do dono — RESOLVIDAS em 2026-08-06
 
-1. **A personalidade** de §3.0 — instrumento sóbrio, sem gradiente nem 3D, ação primária quase branca em vez de colorida. É a decisão da qual todo o resto pende.
-2. **O par tipográfico** IBM Plex Sans + IBM Plex Mono, e o custo de auto-hospedar quatro arquivos.
-3. **A divisão em dois regimes de densidade** (§3.5) — se o dono achar que uma tela deve parecer com a outra, §3.5 e §3.6 mudam juntas.
-4. **O formato do parecer como documento datado com blocos de evidência** (§3.6) — é a aposta central do projeto inteiro. Se o dono ler e disser "isso é frio", a correção é de tom de texto, não de estrutura.
-5. **A escolha do âmbar para platô** em vez de vermelho (§3.6.6): informa sem repreender, mas é menos urgente à primeira vista. Decisão do dono.
-6. **O tamanho da linha de procedência.** §3.6.4 a classifica como o mecanismo **mais importante** para mostrar que há cálculo determinístico atrás — e §3.6.3 a renderiza em `--lastro-t-meta` (o único degrau abaixo do corpo) e `--lastro-txt-3` (a razão mais apertada do sistema, 5.68 sobre `--lastro-sup-2`). É o elemento que estabelece confiança, no menor tamanho e no menor contraste do sistema. Defensável porque vive só no Modo Leitura, sentado — mas é o ponto em que este documento mais raspa em D4. **Duas saídas, o dono escolhe:** manter como está, ou promover a procedência a `--lastro-t-corpo` e aceitar que o bloco de evidência fique mais alto.
+| # | O que estava em aberto | Decisão |
+|---|---|---|
+| 1 | **A personalidade** (§3.0) | **Reprovada** a proposta de instrumento sóbrio sem gradiente nem 3D. Aprovado o padrão *"Areia & Azul Petróleo"* **com matéria** — gradiente, vidro, bevel e sombra. Razão do dono, registrada: sem elevação, "parece que fica algo solto" |
+| 2 | **O par tipográfico** | **IBM Plex Sans + IBM Plex Mono**, confirmado. Carregado por `next/font/google`, com `display: swap` e subset latin — não há quatro arquivos para auto-hospedar |
+| 3 | **Os dois regimes de densidade** (§3.5) | **Mantidos.** Modo Bancada e Modo Leitura seguem com tratamentos diferentes |
+| 4 | **O parecer como documento datado** (§3.6) | **Mantido**, e reforçado: a proibição de conversa deixou de ser geral e passou a ter escopo (ver abaixo) |
+| 5 | **Âmbar para platô** em vez de vermelho | **Mantido.** `--lastro-plato` é âmbar; vermelho segue proibido em estagnação |
+| 6 | **O tamanho da linha de procedência** | **Mantida em `--lastro-t-meta`.** No tema claro ela deixou de ser a razão mais apertada do sistema: `--lastro-txt-3` entrega 4.83:1 no pior caso, com margem sobre o limiar |
 
-**Advertência registrada:** a validação final de qualquer peça visual é **olho do dono em navegador real, no celular**. Medição de DOM não substitui — `getComputedStyle` não detecta toda renderização errada.
+**A revisão que veio junto e não estava na lista: D5.** O tema padrão passou de escuro para **claro**. É restrição funcional revista pelo dono, com o risco original — academia com luz baixa, leitura noturna — aceito conscientemente.
+
+**A proibição de balão ganhou escopo.** Antes valia como regra geral de estética; agora vale só onde tem razão de produto:
+
+- **Na tela do parecer, reprova:** rabicho, blocos alternando lado, avatar, ícone de robô, reticências pulsantes, texto letra a letra, caixa de digitação, selo de "gerado por IA".
+- **Canto arredondado, elevação e sombra NÃO reprovam em lugar nenhum** — são do padrão. O que faz uma peça ler como conversa é o rabicho, a alternância e o campo embaixo, não o raio da borda.
+- **No coach 24h o balão é correto e completo**, com rabicho, alternância e campo de digitação. É a única tela do app onde se conversa (PRD §4.4).
+
+**Advertência que continua de pé:** a validação final de qualquer peça visual é **olho do dono em navegador real, no celular**. Medição de DOM não substitui — `getComputedStyle` não detecta toda renderização errada. As telas logadas (`/treino`, `/treino/[id]`, `/analise`) **ainda não passaram por isso**: ficam atrás de autenticação e o gate de §4 segue pendente para elas.
