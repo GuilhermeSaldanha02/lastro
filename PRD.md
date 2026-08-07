@@ -143,5 +143,5 @@ Um app de treino **pessoal** que registra cada série executada e, uma vez por s
 
 - **TODO** — Faixa de referência de séries semanais por grupo muscular, com **fonte primária consultada**. Assunto de saúde: não usar número de memória. → tarefa de pesquisa no `PROGRESS.md`.
 - **TODO** — `N` semanas que caracterizam estagnação. Mesma tarefa de pesquisa.
-- **TODO** — Regra de liberação semanal do botão Análise (seção 3).
-- **TODO** — Quota real da Gemini, medida no console do AI Studio.
+- ~~TODO — Regra de liberação semanal do botão Análise~~ **RESOLVIDO (2026-08-05).** Botão sempre disponível, sem bloqueio até a semana ISO fechar — ver §3 e `DECISIONS.md` "Tarefa 1.0d".
+- ~~TODO — Quota real da Gemini~~ **RESOLVIDO (2026-08-05), medido em uso real.** 20 requisições/dia no free tier de `gemini-3.6-flash` — ver `KNOWLEDGE.md` §3.2 e `DECISIONS.md` "Quota da Gemini medida".
