@@ -313,3 +313,20 @@ Também corrigidos, achados menores confirmados por leitura direta (sem precisar
 **Impacto.** Gráfico de progressão passa no gate G6/C10/C11 com dado real. Usuário e séries de teste foram removidos (`limpar-usuario`, cascade = 0 linhas confirmado) — nenhum resíduo no banco de produção.
 
 **Como reverter.** Nada a reverter — verificação, não mudança de código.
+
+---
+
+## 2026-08-07 — Inspetor-qa no PR #12: 4 achados corrigidos, sem gap de segurança
+
+**O que mudou.** Rodada de revisão em contexto limpo (papel `inspetor-qa`) contra o diff do PR #12, antes do merge na main. 4 achados reais, todos corrigidos:
+
+1. **Rótulo do último ponto sumia no caso comum (sem platô).** `rotularExtremos` estava preso à linha errada — a de platô, que fica vazia quando não há platô. Corrigido: uma função única de rótulo, presente nas duas `<Line>`, que só desenha onde o índice bate E a linha tem valor ali.
+2. **Peso 0 (assistida sem carga externa) quebrava a matemática.** `(atual − 0) / 0` é `Infinity`; texto virava "e1RM subiu Infinity%". No platô, `0/0` é `NaN`, e `NaN > tolerância` é `false` em JS — um histórico todo em 0 passava como platô válido por acidente, não por decisão. Corrigido nos dois lugares: delta vira valor absoluto em kg quando a base é 0; platô só aceita extremos exatamente 0, qualquer variação a partir de 0 reprova.
+3. **"Melhor marca" implicava recorde histórico, mas só olhava as 12 semanas do gráfico** — divergindo do PR real que `prs.ts` já calcula em outro lugar do app (P7: duas fontes de verdade pro mesmo conceito). Não unifiquei as duas (mudança maior, fora de escopo) — só corrigi o rótulo pra dizer "no período", que é o que o número de fato mede.
+4. **Exercício padrão do seletor ignorava a janela de 12 semanas mostrada.** Escolhia por sessões no histórico TODO; um exercício treinado por um ano e parado há 4 meses abria a tela em "dados insuficientes" mesmo com outro exercício ativo essa semana. Corrigido: o padrão agora prioriza sessão dentro do período visível, com fallback pro histórico todo só se nenhum exercício tiver sessão recente nenhuma.
+
+**Passe de segurança (obrigatório por ser endpoint público novo):** sem achado. Auth por `getUser()` antes da query, RLS por `auth.uid()` em `treino`/`serie`, `exercicioId` de entrada neutralizado pela própria filtragem por usuário, sem vazamento de mensagem de erro do Supabase.
+
+**Impacto.** 79 testes (2 novos, cobrindo o platô em peso 0). `tsc`/`test`/`lint`/`build` verdes de novo depois da correção.
+
+**Como reverter.** Cada achado é um guard isolado — reverter qualquer um sozinho não derruba os outros.
