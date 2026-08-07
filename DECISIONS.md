@@ -330,3 +330,19 @@ Também corrigidos, achados menores confirmados por leitura direta (sem precisar
 **Impacto.** 79 testes (2 novos, cobrindo o platô em peso 0). `tsc`/`test`/`lint`/`build` verdes de novo depois da correção.
 
 **Como reverter.** Cada achado é um guard isolado — reverter qualquer um sozinho não derruba os outros.
+
+---
+
+## 2026-08-07 — Formulário de série sempre começa em branco (achado do dono)
+
+**O que mudou.** `FormularioSerie` (`src/components/formulario-serie.tsx`) pré-selecionava `exercicios[0]` (o primeiro em ordem alfabética) e `tipo: "valendo"` assim que abria — o dono reportou que o botão pra abrir o formulário na primeira série do treino dizia "Outra série" (implicando que já existia uma) e o exercício vinha com um já marcado sem a pessoa escolher. Os dois campos agora começam em `""`, com `<option disabled>` de placeholder e `required` nativo — o navegador bloqueia o envio até a pessoa escolher os dois de propósito. `treino-detalhe.tsx` também: o botão só diz "Outra série" quando já existe pelo menos 1 série no treino; antes disso diz "Adicionar exercício".
+
+**Por quê.** Pré-selecionar o primeiro exercício por ordem alfabética nunca teve relação com o que a pessoa ia treinar — e vai piorar assim que o catálogo crescer de 5 pra ~80-100 exercícios (próxima tarefa): o primeiro em ordem alfabética vira ruído ainda mais aleatório.
+
+**Verificado:** usuário QA efêmero, fluxo completo — treino novo abre com "Adicionar exercício"; formulário abre com os dois selects em branco (`checkValidity() === false`, bloqueia envio); depois de registrar 1 série, o botão passa a dizer "Outra série". `tsc`/`test` (79 passando)/`lint`/`build` verdes. Usuário removido ao final.
+
+**Alternativa descartada.** Manter o exercício pré-selecionado só entre séries CONSECUTIVAS do mesmo exercício (conveniência real: bater várias séries seguidas do mesmo exercício sem reselecionar) — na prática já é o comportamento resultante, porque o `<select>` é controlado e não reresene sozinho no `formulario.reset()` nativo. Só a primeira abertura do formulário (sem nenhuma série ainda) força a escolha.
+
+**Impacto.** Nenhuma migração — é comportamento de formulário, não schema.
+
+**Como reverter.** Voltar `useState(exercicios[0]?.id ?? "")` e `useState("valendo")`, e o `?  "Outra série"` incondicional em `treino-detalhe.tsx`.

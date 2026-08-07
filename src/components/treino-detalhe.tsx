@@ -391,7 +391,7 @@ export default function TreinoDetalhe({
           aria-expanded={formularioAberto}
           onClick={() => setFormularioAberto((aberto) => !aberto)}
         >
-          {formularioAberto ? "Fechar" : "Outra série"}
+          {formularioAberto ? "Fechar" : series.length === 0 ? "Adicionar exercício" : "Outra série"}
         </button>
 
         {/* D7 — estado de sincronização sempre visível, nunca alarmante.
