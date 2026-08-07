@@ -167,7 +167,7 @@ function GraficoConteudo({ dados }: { dados: DadosProgressao }) {
           <XAxis
             dataKey="semanaInicio"
             tickFormatter={formatarSemana}
-            tick={{ fill: "var(--lastro-txt-3)", fontSize: 11 }}
+            tick={{ fill: "var(--lastro-txt-3)", fontSize: "var(--lastro-t-meta)" }}
             tickLine={false}
             axisLine={{ stroke: "var(--lastro-linha)" }}
             interval="preserveStartEnd"
@@ -180,7 +180,7 @@ function GraficoConteudo({ dados }: { dados: DadosProgressao }) {
               value: `melhor marca no período: ${formatarKg(melhorMarca)}`,
               position: "insideTopRight",
               fill: "var(--lastro-txt-3)",
-              fontSize: 11,
+              fontSize: "var(--lastro-t-meta)",
             }}
           />
           <Line

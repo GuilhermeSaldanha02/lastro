@@ -50,6 +50,7 @@
   --lastro-queda:  #A33220; /* regressão.   6.53:1 */
   --lastro-sync:   #2E6076; /* sincronização (D7). 5.75:1. Jamais vermelho */
   --lastro-erro:   #A32014; /* RESERVADO: falha real e ação destrutiva (excluir). 6.33:1 no fundo, 7.57:1 com texto branco */
+  --lastro-erro-txt: #FFFFFF; /* texto sobre --lastro-erro (botão destrutivo). 7.57:1 */
   --lastro-foco:   #0B5CAB; /* 5.60:1 */
 
   /* ---- Espaçamento: base 4px. 48 (D1) cai exatamente na escala ---- */
@@ -145,6 +146,10 @@
   /* Traço fraco sobre a barra escura — limite de controle secundário
      em superfície escura, onde --lastro-controle sumiria. */
   --lastro-barra-traco: rgba(240, 234, 224, 0.38);
+
+  /* Fundo do círculo de iniciais (avatar sem foto) — mesma tinta de
+     --lastro-fundo, bem diluída, sobre a barra escura. */
+  --lastro-avatar-iniciais-fundo: rgba(240, 234, 224, 0.12);
 
   /* ---- Medidas de leitura ---- */
   --lastro-largura-entrada: 26rem; /* coluna do login */

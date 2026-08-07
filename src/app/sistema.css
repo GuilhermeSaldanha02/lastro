@@ -117,7 +117,7 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  background: rgba(240, 234, 224, 0.12);
+  background: var(--lastro-avatar-iniciais-fundo);
   color: var(--lastro-barra-txt);
   font-size: var(--lastro-t-meta);
   font-weight: var(--lastro-peso-forte);
@@ -280,7 +280,7 @@
   border: 1px solid var(--lastro-erro);
   border-radius: var(--lastro-raio-2);
   background: var(--lastro-erro);
-  color: #fff;
+  color: var(--lastro-erro-txt);
   cursor: pointer;
   font-size: var(--lastro-t-corpo);
   font-weight: var(--lastro-peso-forte);
@@ -954,7 +954,7 @@
 
 .grafico-progressao__rotulo {
   font-family: var(--lastro-fonte-num);
-  font-size: 11px;
+  font-size: var(--lastro-t-meta);
   fill: var(--lastro-txt);
 }
 
