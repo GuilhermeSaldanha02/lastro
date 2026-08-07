@@ -89,13 +89,21 @@ export async function carregarResumoHome(hojeISO: string): Promise<ResumoHome> {
       })) as SerieValendo[];
   }
 
-  const daSemana = treinos.filter(
+  // Treino sem NENHUMA série (aquecimento ou valendo) não é um treino
+  // feito — é uma linha criada por um clique em "Iniciar treino de hoje"
+  // que ainda não virou nada. Não conta em nenhuma estatística nem
+  // aparece em "recentes" (achado do dono, 2026-08-07): só o treino de
+  // hoje (`treinoDeHojeId`, abaixo) permanece visível vazio, porque é o
+  // link de "continuar" pra ele.
+  const comSerie = treinos.filter((t) => (t.serie?.length ?? 0) > 0);
+
+  const daSemana = comSerie.filter(
     (t) => semanaInicioDoTreino(t.data) === semanaCorrente,
   );
   const valendoDaSemana = daSemana.flatMap(valendoDoTreino);
 
   const semanasComTreino = new Set(
-    treinos
+    comSerie
       .map((t) => semanaInicioDoTreino(t.data))
       .filter((semana) => semana <= ultimaSemanaFechada),
   );
@@ -104,7 +112,7 @@ export async function carregarResumoHome(hojeISO: string): Promise<ResumoHome> {
     treinosNaSemana: daSemana.length,
     volumeNaSemana: calcularVolume(valendoDaSemana),
     seriesValendoNaSemana: valendoDaSemana.length,
-    recentes: treinos.slice(0, 3).map((t) => ({
+    recentes: comSerie.slice(0, 3).map((t) => ({
       id: t.id,
       data: t.data,
       totalSeries: (t.serie ?? []).length,

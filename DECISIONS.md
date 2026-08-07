@@ -365,3 +365,25 @@ Também corrigidos, achados menores confirmados por leitura direta (sem precisar
 **Impacto.** Nenhum código tocado — só dado. `tsc`/`test`/`lint`/`build` continuam verdes (nada mudou de comportamento de app).
 
 **Como reverter.** `delete from exercicio where criado_em > '2026-08-07'` reverteria as linhas novas (não as 5 de teste antigas, que são anteriores). Reverter os grupos musculares novos exigiria primeiro mover ou apagar os exercícios que os referenciam (FK).
+
+---
+
+## 2026-08-07 — Treino vazio não conta em nada (achado do dono, QA manual)
+
+**O que mudou.** Três correções relacionadas, achadas testando manualmente pelo Chrome:
+
+1. **`criarTreino()` reaproveita o treino de hoje em vez de duplicar.** Antes, cada clique em "Iniciar treino de hoje" inseria uma linha nova em `treino`, mesmo se já existisse uma pra hoje sem nenhuma série. `src/lib/dados/treino.ts` agora consulta antes de inserir — se já existe treino de hoje, só redireciona pra ele.
+2. **`/treino` (Bancada) ficou sem checagem, ao contrário da home.** A home (`src/app/page.tsx`) já mostrava "Continuar treino de hoje" condicionalmente, mas `src/app/treino/page.tsx` sempre oferecia "Iniciar treino de hoje" como form estático, não importa o estado — clicar de novo criava outro treino vazio. Agora ela faz a mesma checagem da home e mostra "Continuar" quando já existe.
+3. **Treino sem nenhuma série não conta em `carregarResumoHome` (`src/lib/dados/resumo-home.ts`).** `treinosNaSemana`, `recentes` e `semanasFechadasComTreino` agora filtram por `(t.serie?.length ?? 0) > 0` antes de contar. `treinoDeHojeId` continua sem filtro — é o link de "continuar", precisa existir mesmo vazio.
+
+**Por quê.** O dono descreveu exatamente o sintoma: "toda hora eu clicar em iniciar treino mas não ter adicionado nada, contar, isso não deveria existir." Um treino vazio criado por clique acidental (ou por reabrir a tela sem lembrar que já tinha começado) não é um treino feito — não devia aparecer em "treinos recentes" nem inflar "Treinos: N" da semana.
+
+**Verificado:** usuário QA efêmero — cliquei "Iniciar treino de hoje" na Bancada, voltei pra Bancada sem adicionar nada: já mostrava "Continuar treino de hoje" (não "Iniciar" de novo), e o link levava pro MESMO id. Conferido direto no banco: só 1 linha em `treino`, 0 séries. Home mostrava "Treinos: 0" e "Nenhum treino ainda" em recentes, mesmo com o treino vazio existindo. `tsc`/`test` (79)/`lint`/`build` verdes.
+
+**O que NÃO mudei:** `listarTreinos()` (histórico completo em `/treino`) continua mostrando treinos vazios — de propósito, pra o dono conseguir ver e apagar um treino vazio que sobrou (via `ExcluirTreino`, já existente). Escondê-lo ali também deixaria um resíduo órfão sem jeito de limpar pela UI.
+
+**Pergunta em aberto, não resolvida aqui:** o dono também relatou "a página já deve abrir no início, ela tá abrindo em bancada" — não encontrei a causa (manifest `start_url` é `/`, login por e-mail redireciona pra `/`). Pode ser resíduo de sessão de teste anterior, ou outro fluxo específico. Fica pendente até o dono detalhar quando exatamente isso acontece.
+
+**Impacto.** Muda o que "conta" como treino feito nas estatísticas da home — sem migração, sem mudança de schema.
+
+**Como reverter.** Reverter o commit — os três pontos são independentes, mas foram feitos juntos por serem sintoma do mesmo achado.
