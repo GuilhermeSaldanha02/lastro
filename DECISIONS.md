@@ -419,3 +419,41 @@ Também corrigidos, achados menores confirmados por leitura direta (sem precisar
 **Impacto.** Componente novo, sem tocar rota nem dado. Só age quando `display-mode: standalone` é verdadeiro (nunca em navegador comum).
 
 **Como reverter.** Remover `<ForcarInicioNoLancamento />` de `src/app/layout.tsx` — o componente é aditivo.
+
+---
+
+## 2026-08-07 — Perfil do usuário (nome, foto): tabela dedicada, trigger, avatar do Google baixado para Storage
+
+**O que mudou.** PROGRESS.md pendência 4, adiantada a pedido do dono (estava marcada pra "próxima fase"). Cinco decisões de escopo fechadas com o dono antes de codar:
+
+1. **Cadastro por e-mail passa a exigir nome** (campo obrigatório, novo em `/login`) — antes só pedia e-mail/senha.
+2. **Exibição:** barra de topo de toda tela logada (`/`, `/treino`, `/treino/[id]`, `/analise`, `/catalogo`, `/coach`), não só uma.
+3. **Persistência:** tabela `public.usuario` nova (migração `0004_perfil_usuario.sql`), não `user_metadata` do Auth — mais correto se o perfil crescer, e mantém a mesma disciplina de RLS por `auth.uid()` (FF5) que o resto do schema já segue.
+4. **Foto do Google:** baixada e re-hospedada no bucket `avatares` (Supabase Storage), nunca hotlink direto pra `avatar_url` do Google — evita quebrar se a política de acesso do Google mudar.
+5. **Sem foto (cadastro por e-mail):** iniciais do nome. Upload manual de foto própria foi pedido em seguida, mas **adiado explicitamente pelo dono** pra depois — vira PROGRESS.md pendência 13, não construído agora.
+
+**Trigger, não código de aplicação, cria a linha de perfil.** `usuario_cria_perfil()` roda `AFTER INSERT ON auth.users`, lê `raw_user_meta_data->>'full_name'` (Google) ou `->>'nome'` (e-mail, passado via `options.data` no `signUp`), com fallback pro local-part do e-mail se nenhum dos dois existir. **`SECURITY DEFINER`, de propósito — e isso diverge do trigger `serie_herda_usuario` da migração 0001, que é deliberadamente SEM definer.** A diferença: `serie_herda_usuario` depende de rodar sem privilégio elevado pra que a RLS de `treino` bloqueie inserir série em treino alheio; `usuario_cria_perfil` não tem esse papel de guarda — ele só espelha o cadastro pra uma tabela de perfil, e sem definer o insert falharia sempre (a sessão do signup ainda não existe no instante em que a linha de `auth.users` é gravada). Um `coalesce` de 3 níveis garante que o trigger nunca lance exceção — um trigger que aborta em `auth.users` derruba o signup/OAuth inteiro, não só a criação do perfil.
+
+**Achado real que teria vazado pra produção sem ele — backfill de conta pré-existente.** O trigger só dispara em conta **nova**; a conta real do dono (Google, verificada na tarefa 2.1) já existia antes desta migração e não passaria pelo trigger nenhuma vez. Sem um `insert ... on conflict do nothing` cobrindo `auth.users` inteiro, o dono seria o único a ver a barra de topo quebrada (nome vazio) — e qualquer usuário de QA efêmero criado **depois** da migração passaria pelo trigger normalmente, escondendo o buraco atrás de um teste verde. Aplicado e conferido: as 3 contas reais que já existiam (`gabrielcartaxomerces@gmail.com`, `fazinrodrigo@hotmail.com`, a do dono) ganharam linha em `public.usuario` com nome vindo do metadado real (`full_name` quando existia, local-part do e-mail quando não).
+
+**Bucket `avatares` é PÚBLICO — decisão explícita, não default silencioso.** Diverge da postura "RLS em tudo" do resto do projeto (FF5): foto de perfil não é dado sensível como série/treino, e público evita assinar URL a cada render da barra de topo (a barra renderiza em toda página logada). Escrita continua restrita a `{auth.uid()}/...` via policy em `storage.objects`; só a leitura é aberta. `delete from auth.users` cascade não alcança Storage — excluir uma conta deixa o arquivo de avatar órfão no bucket. Aceito como está; não construída limpeza automática pra isso (custo desproporcional a um app de 1-3 usuários).
+
+**O download do avatar do Google não pode derrubar login.** `sincronizarAvatarGoogle()` (`src/lib/dados/perfil.ts`) roda dentro do `/auth/callback` **depois** da troca de código por sessão, envolta em try/catch que só loga — se o Google estiver fora do ar ou a URL der 404, o dono ainda consegue entrar, só fica sem foto. Gated por `avatar_url is null`: não baixa de novo a cada login.
+
+**Verificado, não só relatado (E8):**
+- `npx tsc --noEmit` limpo · `npx vitest run` 79/79 · `npm run lint` 0 erros · `npm run build` limpo.
+- Migração aplicada no banco hospedado (`npx supabase db push --linked`, `migration list` confirma local=remote=0004).
+- Backfill: `auth.users` = `public.usuario` = 3, antes e depois de qualquer teste.
+- FF5 estendido: `usuario` passa o mesmo check de `scripts/ff5-rls.sql` (RLS ligada + policy referenciando `auth.uid()` de fato).
+- Trigger com dado real da aplicação (não só via SQL direto): cadastro pela UI real (`/login`, campo Nome = "QA Perfil Teste") gravou exatamente esse nome na linha criada pelo trigger, conferido no banco.
+- UI real, sessão real (usuário QA efêmero, e-mail): barra de topo de `/treino` renderizou o avatar de iniciais ("Q", do local-part do e-mail de teste, sem nome). Contraste **medido** via `getComputedStyle` (não lido do design system): pior caso do gradiente da barra dá 6.72:1 entre o texto das iniciais e o fundo do círculo — acima do piso AA de 4.5:1. Círculo 48×48 (`--lastro-alvo-min`), `border-radius: 50%`, sem token novo inventado.
+- Cascade: `delete from auth.users` levou a linha de `public.usuario` junto nos dois usuários de teste — contagem voltou a 3=3 nos dois casos.
+- Limpeza: os 2 usuários de teste (um via `signUp` real da UI, outro via `qa-treino-helper.sh`) removidos, confirmado por contagem.
+
+**Não verificado — só o dono pode fazer isso.** O caminho de download do avatar do Google (`sincronizarAvatarGoogle`) nunca disparou numa verificação real: usuário de QA é sempre criado por e-mail (sem `avatar_url` do Google no metadado), e forjar isso por SQL não prova que o `fetch()` real contra a URL do Google funciona. Fica pendente até o dono logar de novo com a conta Google real — PROGRESS.md pendência 4 registra isso como o primeiro lugar a olhar se a foto não aparecer.
+
+**Alternativas descartadas.** `user_metadata` do Supabase Auth em vez de tabela — mais simples, mas menos flexível se o perfil crescer, e o dono preferiu a tabela. Hotlink direto da `avatar_url` do Google em vez de baixar pro Storage — mais simples, mas frágil a mudança de política do Google; o dono escolheu o caminho mais robusto. Ícone genérico em vez de iniciais pro estado "sem foto" — o dono preferiu iniciais.
+
+**Impacto.** Schema novo (`public.usuario`), bucket novo (`avatares`), trigger novo em `auth.users` (afeta todo signup/OAuth futuro, verificado que não quebra nenhum). `criarContaComEmail` ganhou parâmetro `nome` — assinatura mudou, únicos chamadores são `login/page.tsx`. `app/analise/page.tsx` e `app/coach/page.tsx` viraram Server Components (extraída a parte interativa pra `components/analise-interativa.tsx` e `components/coach-interativo.tsx`) — necessário pra buscar o perfil com `cookies()` antes de renderizar a barra de topo; Client Component não importa Server Component diretamente.
+
+**Como reverter.** Reverter o PR. Sem migração `down` escrita (convenção do projeto até aqui) — reverter o schema exigiria uma migração nova que dropasse `public.usuario`, o bucket `avatares` e o trigger, mantendo `auth.users` intocado.

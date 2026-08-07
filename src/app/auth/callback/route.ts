@@ -3,6 +3,7 @@
 // `?code=...` na URL — padrão PKCE do @supabase/ssr.
 import { NextResponse } from "next/server";
 import { criarClienteServidor } from "@/lib/supabase/cliente-servidor";
+import { sincronizarAvatarGoogle } from "@/lib/dados/perfil";
 
 export async function GET(request: Request) {
   const { searchParams, origin } = new URL(request.url);
@@ -39,8 +40,19 @@ export async function GET(request: Request) {
 
   if (code) {
     const supabase = await criarClienteServidor();
-    const { error } = await supabase.auth.exchangeCodeForSession(code);
+    const { data, error } = await supabase.auth.exchangeCodeForSession(code);
     if (!error) {
+      // PROGRESS.md pendência 4 — baixa o avatar do Google pro Storage na
+      // primeira vez. Nunca pode derrubar o login: erro aqui (Google fora
+      // do ar, 404 na imagem) só deixa o avatar sem foto, não impede a
+      // sessão de existir (DECISIONS.md 2026-08-07).
+      if (data.user) {
+        try {
+          await sincronizarAvatarGoogle(supabase, data.user);
+        } catch (erroAvatar) {
+          console.error("[auth/callback] falha ao sincronizar avatar", erroAvatar);
+        }
+      }
       return NextResponse.redirect(destino(proximo));
     }
     console.error("[auth/callback] falha ao trocar código por sessão", {

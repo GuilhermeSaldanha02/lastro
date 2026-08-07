@@ -34,11 +34,17 @@ export async function entrarComEmail(
 export async function criarContaComEmail(
   email: string,
   senha: string,
+  nome: string,
 ): Promise<ResultadoAuth> {
   const supabase = await criarClienteServidor();
+  // `options.data` vira `raw_user_meta_data` em auth.users — é de lá que
+  // o trigger `usuario_cria_perfil` (migração 0004) lê o nome pra criar
+  // a linha de perfil. Sem isto, a conta nasceria sem nome nenhum e o
+  // trigger cairia no fallback de e-mail (PROGRESS.md pendência 4).
   const { data, error } = await supabase.auth.signUp({
     email,
     password: senha,
+    options: { data: { nome } },
   });
   if (error) return { ok: false, erro: error.message };
   return { ok: true, confirmacaoPendente: !data.session };
