@@ -457,3 +457,22 @@ Também corrigidos, achados menores confirmados por leitura direta (sem precisar
 **Impacto.** Schema novo (`public.usuario`), bucket novo (`avatares`), trigger novo em `auth.users` (afeta todo signup/OAuth futuro, verificado que não quebra nenhum). `criarContaComEmail` ganhou parâmetro `nome` — assinatura mudou, únicos chamadores são `login/page.tsx`. `app/analise/page.tsx` e `app/coach/page.tsx` viraram Server Components (extraída a parte interativa pra `components/analise-interativa.tsx` e `components/coach-interativo.tsx`) — necessário pra buscar o perfil com `cookies()` antes de renderizar a barra de topo; Client Component não importa Server Component diretamente.
 
 **Como reverter.** Reverter o PR. Sem migração `down` escrita (convenção do projeto até aqui) — reverter o schema exigiria uma migração nova que dropasse `public.usuario`, o bucket `avatares` e o trigger, mantendo `auth.users` intocado.
+
+---
+
+## 2026-08-07 — Perfil do usuário: "Sair" movido pra Início; Google verificado em produção
+
+**O que mudou.** Dois achados do dono, no mesmo dia do PR de perfil (`#18`, mergeado em `main`):
+
+1. **Barra de topo não estava padronizada** — "Sair" vivia na tela Bancada (`/treino`), sem relação com o que a tela faz. Movido pra Início (`/`), a porta de entrada única do app desde 2026-08-06 — é de lá que faz sentido sair. Bancada passou a mostrar só o avatar, igual às telas sem ação secundária (Análise, Catálogo, Coach).
+2. **Login com Google não funciona em preview do Vercel** — testado ao tentar verificar o avatar antes do merge: o redirect OAuth configurado no Supabase aceita só `localhost:3000` e o domínio de produção, não o domínio dinâmico de preview por branch (`lastro-git-<branch>-audicon.vercel.app`). O clique em "Entrar com Google" no preview termina em `localhost:3000/?code=...`, que não existe pra fora da máquina do dono. **Login por e-mail não é afetado** — só OAuth depende do redirect registrado.
+
+**Por quê o Google só pôde ser verificado depois do merge.** A pendência do PR original ("caminho do Google não verificado, exige o dono") não era só falta de oportunidade — era um bloqueio de infra real: nenhum ambiente de preview jamais completaria esse login enquanto o Supabase não tiver esse domínio na allowlist. Confirmar isso antes de insistir em testar no preview evitou repetir a tentativa em vão.
+
+**Verificado, com o dono, em produção real (`lastro-pi.vercel.app`), depois do merge:** login com a conta Google real do dono completou; `avatar_url` do Google foi baixada e re-servida do bucket próprio — `read_network_requests` confirmou `GET .../storage/v1/object/public/avatares/{uid}/avatar.jpg` → **200**. Avatar (a foto real, não iniciais) renderizado na barra de topo de `/` e `/treino`, com "Sair" agora só em `/`. Última pendência da tarefa 4 fechada.
+
+**Alternativa descartada.** Adicionar o domínio de preview à allowlist do Supabase só pra viabilizar este teste — rejeitado: a allowlist de redirect é superfície de segurança do OAuth (E3-adjacente, mexe em auth), e o domínio de preview muda a cada branch — manter isso atualizado seria trabalho permanente por um teste pontual. Testar direto em produção, depois do merge, foi mais barato e não abre superfície nova.
+
+**Impacto.** Nenhuma mudança de schema. `src/app/page.tsx` ganhou o formulário de `sair`; `src/app/treino/page.tsx` perdeu. Achado de infra (redirect OAuth) é só conhecimento registrado — nada mudou na configuração do Supabase.
+
+**Como reverter.** Reverter o commit — os dois achados são independentes, mas foram registrados juntos por terem saído da mesma rodada de QA.
