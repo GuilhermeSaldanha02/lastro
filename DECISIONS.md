@@ -387,3 +387,19 @@ Também corrigidos, achados menores confirmados por leitura direta (sem precisar
 **Impacto.** Muda o que "conta" como treino feito nas estatísticas da home — sem migração, sem mudança de schema.
 
 **Como reverter.** Reverter o commit — os três pontos são independentes, mas foram feitos juntos por serem sintoma do mesmo achado.
+
+---
+
+## 2026-08-07 — PWA instalado sempre abre em Início, nunca retoma a última tela
+
+**O que mudou.** A pergunta em aberto da entrada anterior tinha causa: `manifest.webmanifest`/redirects de login já apontavam certo pra `/`, mas `start_url` só vale no **primeiro** lançamento do PWA depois de instalado — Chrome/Android, depois disso, costuma **restaurar a última página** ao reabrir o ícone (mesmo comportamento de restaurar aba, não é bug do app). `src/components/forcar-inicio-no-lancamento.tsx` (novo, montado no layout raiz) força `window.location.replace("/")` quando: (a) o app está rodando em modo instalado (`matchMedia("(display-mode: standalone)")`) e (b) a rota atual não é `/`, `/login` nem `/auth/callback`.
+
+**Por quê funciona sem também disparar em navegação interna.** O `useEffect` que faz a checagem roda uma vez por **carregamento de documento** — lançar o ícone do PWA, F5, aba nova — porque o layout raiz do App Router **persiste** entre rotas; clicar num `<Link>` dentro do app nunca remonta o layout raiz, então nunca reexecuta o efeito. É a distinção exata que se precisava: só no lançamento "frio", nunca ao navegar dentro do app já aberto.
+
+**Decisão explícita do dono, com o risco declarado antes:** perder a conveniência de "reabrir o ícone continua o treino em andamento" — o dono confirmou que quer sempre abrir em Início, mesmo perdendo isso.
+
+**Verificado:** lógica do guard testada isoladamente (roda em standalone + rota não-isenta → true; roda fora de standalone → false; roda em `/login` mesmo em standalone → false). Navegação normal (sem standalone) confirmada sem regressão — `/catalogo` sem sessão ainda bounce pro `/login` normalmente. **Não verificado com o PWA de fato instalado num aparelho** — `matchMedia("standalone")` só é `true` fora do navegador comum; fica para o dono confirmar no celular.
+
+**Impacto.** Componente novo, sem tocar rota nem dado. Só age quando `display-mode: standalone` é verdadeiro (nunca em navegador comum).
+
+**Como reverter.** Remover `<ForcarInicioNoLancamento />` de `src/app/layout.tsx` — o componente é aditivo.
