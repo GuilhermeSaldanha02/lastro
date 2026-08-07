@@ -30,8 +30,12 @@ export default function FormularioSerie({
   exercicios: Exercicio[];
   onRegistrar: (dados: DadosNovaSerie) => void | Promise<void>;
 }) {
-  const [exercicioId, setExercicioId] = useState(exercicios[0]?.id ?? "");
-  const [tipo, setTipo] = useState<"aquecimento" | "valendo">("valendo");
+  // Começa em branco de propósito — a pessoa escolhe o exercício e o tipo,
+  // nenhum dos dois vem pré-marcado. Com o catálogo crescendo, pré-marcar
+  // `exercicios[0]` viraria "o primeiro em ordem alfabética", que não tem
+  // relação nenhuma com o que a pessoa vai treinar (achado do dono, 2026-08-07).
+  const [exercicioId, setExercicioId] = useState("");
+  const [tipo, setTipo] = useState<"aquecimento" | "valendo" | "">("");
   const [erro, setErro] = useState<string | null>(null);
 
   const exercicioSelecionado = exercicios.find((e) => e.id === exercicioId);
@@ -49,6 +53,10 @@ export default function FormularioSerie({
 
     if (!exercicioId) {
       setErro("Exercício é obrigatório.");
+      return;
+    }
+    if (tipo === "") {
+      setErro("Escolha o tipo: aquecimento ou valendo.");
       return;
     }
     if (!Number.isFinite(reps) || reps <= 0) {
@@ -73,7 +81,7 @@ export default function FormularioSerie({
       rir = rirNumero;
     }
 
-    await onRegistrar({ exercicioId, tipo, reps, peso, rir, pesoCorporalIncluso });
+    await onRegistrar({ exercicioId, tipo: tipo as "aquecimento" | "valendo", reps, peso, rir, pesoCorporalIncluso });
     formulario.reset();
   }
 
@@ -90,6 +98,9 @@ export default function FormularioSerie({
           onChange={(e) => setExercicioId(e.target.value)}
           required
         >
+          <option value="" disabled>
+            Selecione o exercício
+          </option>
           {exercicios.map((exercicio) => (
             <option key={exercicio.id} value={exercicio.id}>
               {exercicio.nome}
@@ -112,8 +123,12 @@ export default function FormularioSerie({
           id="tipo"
           name="tipo"
           value={tipo}
-          onChange={(e) => setTipo(e.target.value as "aquecimento" | "valendo")}
+          onChange={(e) => setTipo(e.target.value as "aquecimento" | "valendo" | "")}
+          required
         >
+          <option value="" disabled>
+            Selecione o tipo
+          </option>
           <option value="valendo">Valendo</option>
           <option value="aquecimento">Aquecimento</option>
         </select>
