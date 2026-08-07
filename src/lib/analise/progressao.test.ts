@@ -111,4 +111,13 @@ describe("detectarPlato", () => {
   it("progresso nas últimas semanas não é platô", () => {
     expect(detectarPlato(pontos([100, 105, 110, 115]))).toBeNull();
   });
+
+  it("três semanas em 0 (ex.: assistida sem carga externa) É platô — os dois extremos são exatamente 0", () => {
+    const resultado = detectarPlato(pontos([50, 0, 0, 0]));
+    expect(resultado?.semanas).toBe(3);
+  });
+
+  it("sair de 0 pra qualquer valor positivo NUNCA é platô, mesmo com a divisão quebrando", () => {
+    expect(detectarPlato(pontos([50, 0, 0, 20]))).toBeNull();
+  });
 });

@@ -94,9 +94,18 @@ export async function carregarProgressao(
 
   if (seriesValendo.length === 0) return null;
 
+  const ultimaSemanaFechada = semanaAnaliseAtual(new Date());
+  const semanas = listarSemanas(ultimaSemanaFechada, SEMANAS_HISTORICO);
+  const semanasDoPeriodo = new Set(semanas);
+
   // Exercício -> nome e nº de sessões distintas (treinos), pra opção do
-  // seletor e pra escolher o padrão quando `exercicioId` não vem.
+  // seletor. Contagem SEPARADA pro período mostrado no gráfico — o padrão
+  // (sem `exercicioId` explícito) precisa de um exercício com sessão
+  // DENTRO das `SEMANAS_HISTORICO` semanas visíveis, senão a tela abre
+  // direto no estado "dados insuficientes" mesmo quando outro exercício
+  // tem histórico recente de sobra (achado do inspetor-qa, PR #12).
   const sessoesPorExercicio = new Map<string, Set<string>>();
+  const sessoesNoPeriodoPorExercicio = new Map<string, Set<string>>();
   const nomePorExercicio = new Map<string, string>();
   for (const s of seriesValendo) {
     nomePorExercicio.set(s.exercicioId, s.exercicio);
@@ -104,23 +113,33 @@ export async function carregarProgressao(
       sessoesPorExercicio.set(s.exercicioId, new Set());
     }
     sessoesPorExercicio.get(s.exercicioId)!.add(s.treinoId);
+
+    if (semanasDoPeriodo.has(s.semanaInicio)) {
+      if (!sessoesNoPeriodoPorExercicio.has(s.exercicioId)) {
+        sessoesNoPeriodoPorExercicio.set(s.exercicioId, new Set());
+      }
+      sessoesNoPeriodoPorExercicio.get(s.exercicioId)!.add(s.treinoId);
+    }
   }
 
   const opcoes: OpcaoExercicio[] = Array.from(nomePorExercicio.entries())
     .map(([id, nome]) => ({ id, nome }))
     .sort((a, b) => a.nome.localeCompare(b.nome, "pt-BR"));
 
-  const idEscolhido =
-    exercicioId && sessoesPorExercicio.has(exercicioId)
-      ? exercicioId
-      : Array.from(sessoesPorExercicio.entries()).sort(
-          (a, b) => b[1].size - a[1].size,
-        )[0][0];
+  // Padrão: mais sessões DENTRO do período mostrado; sem nenhum exercício
+  // com sessão no período, cai pro mais treinado no histórico todo (ainda
+  // assim mostra "dados insuficientes", mas por um motivo real, não por
+  // ter escolhido um exercício qualquer alheio ao que a tela desenha).
+  const rankingDoPeriodo = Array.from(sessoesNoPeriodoPorExercicio.entries()).sort(
+    (a, b) => b[1].size - a[1].size,
+  );
+  const idPadrao =
+    rankingDoPeriodo[0]?.[0] ??
+    Array.from(sessoesPorExercicio.entries()).sort((a, b) => b[1].size - a[1].size)[0][0];
+
+  const idEscolhido = exercicioId && sessoesPorExercicio.has(exercicioId) ? exercicioId : idPadrao;
 
   const exercicio = opcoes.find((o) => o.id === idEscolhido)!;
-
-  const ultimaSemanaFechada = semanaAnaliseAtual(new Date());
-  const semanas = listarSemanas(ultimaSemanaFechada, SEMANAS_HISTORICO);
 
   const seriesDoExercicio = seriesValendo.filter(
     (s) => s.exercicioId === idEscolhido,

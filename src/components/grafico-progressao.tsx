@@ -85,8 +85,14 @@ function GraficoConteudo({ dados }: { dados: DadosProgressao }) {
 
   const primeiro = comDado[0];
   const ultimo = comDado[comDado.length - 1];
-  const deltaPct = ((ultimo.e1rm! - primeiro.e1rm!) / primeiro.e1rm!) * 100;
-  const subindo = deltaPct > 0;
+  // primeiro.e1rm pode ser 0 (ex.: assistida registrada sem carga externa)
+  // — % contra uma base 0 não tem significado (Infinity), então a
+  // conclusão vira delta absoluto em kg nesse caso.
+  const baseValida = primeiro.e1rm! > 0;
+  const deltaPct = baseValida ? ((ultimo.e1rm! - primeiro.e1rm!) / primeiro.e1rm!) * 100 : 0;
+  const deltaKg = ultimo.e1rm! - primeiro.e1rm!;
+  const subindo = baseValida ? deltaPct > 0 : deltaKg > 0;
+  const caindo = baseValida ? deltaPct < 0 : deltaKg < 0;
   const melhorMarca = Math.max(...comDado.map((p) => p.e1rm!));
 
   const indicePrimeiro = dados.pontos.indexOf(primeiro);
@@ -106,32 +112,48 @@ function GraficoConteudo({ dados }: { dados: DadosProgressao }) {
     };
   });
 
-  const rotularExtremos = (indiceAlvo: number) =>
-    function RotuloExtremo(props: {
-      x?: number | string;
-      y?: number | string;
-      index?: number;
-      value?: unknown;
-    }) {
-      if (props.index !== indiceAlvo || typeof props.value !== "number") return null;
-      return (
-        <text
-          x={props.x}
-          y={Number(props.y ?? 0) - 14}
-          textAnchor="middle"
-          className="grafico-progressao__rotulo"
-        >
-          {formatarKg(props.value)}
-        </text>
-      );
-    };
+  // Primeiro/último ponto podem cair em QUALQUER uma das duas linhas —
+  // a de platô só tem dado quando há platô, e o último ponto está nela
+  // sempre que há (senão o rótulo do ponto mais recente nunca aparece,
+  // que é o caso comum sem platô). Por isso a MESMA função de rótulo vai
+  // nas duas <Line>: ela só desenha algo quando o índice bate E a linha em
+  // questão tem valor ali — não desenha duas vezes porque só uma linha tem
+  // valor definido em cada índice, exceto o ponto de junção do platô, onde
+  // desenhar duas vezes é inofensivo (mesmo texto, mesma posição).
+  function RotuloExtremos(props: {
+    x?: number | string;
+    y?: number | string;
+    index?: number;
+    value?: unknown;
+  }) {
+    if (
+      (props.index !== indicePrimeiro && props.index !== indiceUltimo) ||
+      typeof props.value !== "number"
+    ) {
+      return null;
+    }
+    return (
+      <text
+        x={props.x}
+        y={Number(props.y ?? 0) - 14}
+        textAnchor="middle"
+        className="grafico-progressao__rotulo"
+      >
+        {formatarKg(props.value)}
+      </text>
+    );
+  }
 
   return (
     <>
       <p className="grafico-progressao__conclusao">
-        {dados.exercicio.nome}: e1RM {subindo ? "subiu" : deltaPct < 0 ? "caiu" : "ficou estável"}{" "}
-        <strong>{Math.abs(deltaPct).toFixed(1)}%</strong> entre {formatarSemana(primeiro.semanaInicio)} e{" "}
-        {formatarSemana(ultimo.semanaInicio)}.
+        {dados.exercicio.nome}: e1RM {subindo ? "subiu" : caindo ? "caiu" : "ficou estável"}{" "}
+        <strong>
+          {baseValida
+            ? `${Math.abs(deltaPct).toFixed(1)}%`
+            : `${Math.abs(deltaKg).toFixed(1)} kg`}
+        </strong>{" "}
+        entre {formatarSemana(primeiro.semanaInicio)} e {formatarSemana(ultimo.semanaInicio)}.
         {dados.plato && (
           <span className="grafico-progressao__plato-nota">
             {" "}
@@ -155,7 +177,7 @@ function GraficoConteudo({ dados }: { dados: DadosProgressao }) {
             stroke="var(--lastro-linha)"
             strokeDasharray="2 3"
             label={{
-              value: `melhor marca: ${formatarKg(melhorMarca)}`,
+              value: `melhor marca no período: ${formatarKg(melhorMarca)}`,
               position: "insideTopRight",
               fill: "var(--lastro-txt-3)",
               fontSize: 11,
@@ -168,7 +190,7 @@ function GraficoConteudo({ dados }: { dados: DadosProgressao }) {
             connectNulls={false}
             dot={pontoInterativo("var(--lastro-alta)", false, setIndiceAtivo)}
             isAnimationActive={false}
-            label={rotularExtremos(indicePrimeiro)}
+            label={RotuloExtremos}
           />
           <Line
             dataKey="valorPlato"
@@ -178,7 +200,7 @@ function GraficoConteudo({ dados }: { dados: DadosProgressao }) {
             connectNulls={false}
             dot={pontoInterativo("var(--lastro-plato)", false, setIndiceAtivo)}
             isAnimationActive={false}
-            label={rotularExtremos(indiceUltimo)}
+            label={RotuloExtremos}
           />
         </LineChart>
       </ResponsiveContainer>

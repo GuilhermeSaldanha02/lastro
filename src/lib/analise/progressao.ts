@@ -71,7 +71,12 @@ export function detectarPlato(
   const valores = janela.map((p) => p.valor!);
   const minimo = Math.min(...valores);
   const maximo = Math.max(...valores);
-  if ((maximo - minimo) / minimo > PLATO_GRAFICO_TOLERANCIA) return null;
+  // minimo=0 (peso 0, ex.: assistida sem carga externa) quebra a variação
+  // relativa — 0/0 é NaN, x/0 é Infinity. Só é platô se os dois extremos
+  // forem exatamente 0; qualquer variação a partir de 0 é infinita, nunca
+  // platô.
+  const variacaoRelevante = minimo === 0 ? maximo !== 0 : (maximo - minimo) / minimo > PLATO_GRAFICO_TOLERANCIA;
+  if (variacaoRelevante) return null;
 
   return {
     semanaInicio: janela[0].semanaInicio,
