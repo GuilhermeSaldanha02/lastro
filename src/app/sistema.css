@@ -468,8 +468,12 @@
   }
 }
 
+/* Cinco seções em 360px: `min-width: 0` deixa os itens encolherem por
+   igual em vez de estourar a largura, e o rótulo não quebra em duas
+   linhas (o que empurraria a barra e comeria a área de toque). */
 .nav a {
   flex: 1;
+  min-width: 0;
   min-height: var(--lastro-alvo-min);
   display: flex;
   flex-direction: column;
@@ -479,6 +483,7 @@
   color: var(--lastro-txt-3);
   font-size: var(--lastro-t-meta);
   font-weight: var(--lastro-peso-medio);
+  white-space: nowrap;
 }
 
 /* O item ativo usa PESO além da cor — cor nunca é o único canal. */
@@ -989,6 +994,123 @@
 .enviar svg {
   width: var(--lastro-e-5);
   height: var(--lastro-e-5);
+}
+
+/* =====================================================================
+   HOME — painel de entrada. Todo número aqui é real (resumo-home.ts);
+   não há valor de exemplo em lugar nenhum desta tela.
+   ===================================================================== */
+
+/* Ação principal da home: o destaque é a barra escura, a mesma do topo —
+   reusa o peso visual que o app já tem, sem introduzir cor nova. */
+.destaque {
+  background: var(--lastro-grad-barra);
+  border-radius: var(--lastro-raio-2);
+  box-shadow: var(--lastro-elev-2), var(--lastro-bevel-forte);
+  padding: var(--lastro-e-5);
+  margin-bottom: var(--lastro-e-6);
+}
+
+.destaque__rotulo {
+  font-family: var(--lastro-fonte-num);
+  font-size: var(--lastro-t-meta);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--lastro-barra-txt);
+  opacity: 0.72;
+  margin-bottom: var(--lastro-e-4);
+}
+
+.metricas {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--lastro-e-3);
+}
+
+.metrica {
+  background: var(--lastro-grad-sup);
+  border: 1px solid var(--lastro-linha);
+  border-radius: var(--lastro-raio-1);
+  box-shadow: var(--lastro-elev-1), var(--lastro-bevel);
+  padding: var(--lastro-e-4) var(--lastro-e-3);
+  min-width: 0;
+}
+
+.metrica__rotulo {
+  font-size: var(--lastro-t-meta);
+  color: var(--lastro-txt-3);
+  line-height: 1.3;
+}
+
+/* Em 360px, três métricas dividem ~99px cada. "14,2k" + "kg" estourava a
+   caixa (medido em 2026-08-06) — a unidade cai para a linha de baixo em
+   vez de transbordar, e o valor pode quebrar se precisar. */
+.metrica__valor {
+  font-family: var(--lastro-fonte-num);
+  font-size: var(--lastro-t-4);
+  font-weight: var(--lastro-peso-medio);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
+  line-height: var(--lastro-el-apertada);
+  margin-top: var(--lastro-e-2);
+  overflow-wrap: anywhere;
+}
+
+.metrica__un {
+  display: block;
+  font-size: var(--lastro-t-meta);
+  color: var(--lastro-txt-2);
+  font-weight: var(--lastro-peso-normal);
+  letter-spacing: 0;
+}
+
+.metricas__nota {
+  font-size: var(--lastro-t-meta);
+  line-height: 1.5;
+  color: var(--lastro-txt-3);
+  margin-top: var(--lastro-e-3);
+  max-width: var(--lastro-medida-leitura);
+}
+
+/* Atalho para a Análise. Mostra o ESTADO real de quanto dado existe —
+   não um insight fixo, que seria invenção (E3). */
+.atalho {
+  display: flex;
+  flex-direction: column;
+  gap: var(--lastro-e-1);
+  min-height: var(--lastro-alvo-min);
+  justify-content: center;
+  margin-top: var(--lastro-e-6);
+  padding: var(--lastro-e-4) var(--lastro-e-5);
+  border: 1px solid var(--lastro-linha);
+  border-left: var(--lastro-barra-evidencia) solid var(--lastro-acao-borda);
+  border-radius: var(--lastro-raio-1);
+  background: var(--lastro-grad-sup);
+  box-shadow: var(--lastro-elev-1), var(--lastro-bevel);
+  color: var(--lastro-txt);
+  transition:
+    box-shadow var(--lastro-dur-1) ease,
+    transform var(--lastro-dur-1) ease;
+}
+
+.atalho:hover {
+  box-shadow: var(--lastro-elev-2), var(--lastro-bevel);
+}
+
+.atalho:active {
+  box-shadow: var(--lastro-elev-afundado);
+  transform: translateY(1px);
+}
+
+.atalho__titulo {
+  font-size: var(--lastro-t-corpo);
+  font-weight: var(--lastro-peso-forte);
+}
+
+.atalho__meta {
+  font-family: var(--lastro-fonte-num);
+  font-size: var(--lastro-t-meta);
+  color: var(--lastro-txt-3);
 }
 
 /* ---------- Escolha da pergunta: cinco alvos grandes ---------- */
