@@ -162,6 +162,140 @@
   cursor: not-allowed;
 }
 
+/* ---------- Ícone, confirmação e exclusão ----------
+   Toda exclusão é destrutiva e irreversível (on delete cascade no treino).
+   Duas etapas sempre: um alvo de 48px que não afirma nada sozinho, depois
+   uma confirmação inline explícita — nunca window.confirm(), que no
+   celular é um alerta de sistema fácil de tocar sem ler. */
+.botao-icone {
+  width: var(--lastro-alvo-min);
+  height: var(--lastro-alvo-min);
+  flex: none;
+  border: 1px solid transparent;
+  border-radius: var(--lastro-raio-1);
+  background: transparent;
+  color: var(--lastro-txt-3);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition:
+    background var(--lastro-dur-1) ease,
+    color var(--lastro-dur-1) ease;
+}
+
+.botao-icone:hover {
+  background: var(--lastro-sup-2);
+  color: var(--lastro-txt);
+}
+
+.botao-icone svg {
+  width: var(--lastro-e-5);
+  height: var(--lastro-e-5);
+}
+
+.confirma {
+  background: var(--lastro-grad-sup);
+  border: 1px solid var(--lastro-erro);
+  border-left: var(--lastro-barra-evidencia) solid var(--lastro-erro);
+  border-radius: var(--lastro-raio-1);
+  box-shadow: var(--lastro-elev-2), var(--lastro-bevel);
+  padding: var(--lastro-e-4);
+}
+
+.confirma__texto {
+  font-size: var(--lastro-t-corpo);
+  line-height: 1.5;
+  color: var(--lastro-txt);
+}
+
+.confirma__acoes {
+  display: flex;
+  gap: var(--lastro-alvo-folga);
+  margin-top: var(--lastro-e-4);
+}
+
+.confirma__acoes > * {
+  flex: 1;
+}
+
+.botao-destrutivo {
+  min-height: var(--lastro-alvo-min);
+  border: 1px solid var(--lastro-erro);
+  border-radius: var(--lastro-raio-2);
+  background: var(--lastro-erro);
+  color: #fff;
+  cursor: pointer;
+  font-size: var(--lastro-t-corpo);
+  font-weight: var(--lastro-peso-forte);
+  box-shadow: var(--lastro-elev-1), var(--lastro-bevel-forte);
+  transition:
+    box-shadow var(--lastro-dur-1) ease,
+    transform var(--lastro-dur-1) ease,
+    opacity var(--lastro-dur-1) ease;
+}
+
+.botao-destrutivo:active:not(:disabled) {
+  box-shadow: var(--lastro-elev-afundado);
+  transform: translateY(1px);
+}
+
+.botao-destrutivo:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Confirmar uma EDIÇÃO não é destrutivo — usa a tinta da ação, não o erro,
+   e fica no tamanho de controle inline (48px), não no porte da ação
+   primária de tela (72px, D3), porque aqui é uma correção dentro da
+   lista, não O botão da tela. */
+.botao-confirmar {
+  min-height: var(--lastro-alvo-min);
+  border: 1px solid var(--lastro-acao-borda);
+  border-radius: var(--lastro-raio-2);
+  background: var(--lastro-grad-sup);
+  color: var(--lastro-acao-tinta);
+  cursor: pointer;
+  font-size: var(--lastro-t-corpo);
+  font-weight: var(--lastro-peso-forte);
+  box-shadow: var(--lastro-elev-1), var(--lastro-bevel);
+  transition:
+    box-shadow var(--lastro-dur-1) ease,
+    transform var(--lastro-dur-1) ease,
+    opacity var(--lastro-dur-1) ease;
+}
+
+.botao-confirmar:active:not(:disabled) {
+  box-shadow: var(--lastro-elev-afundado);
+  transform: translateY(1px);
+}
+
+.botao-confirmar:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* A linha de série vira alvo de toque inteiro: tocar nela abre a edição —
+   um alvo de correção, não só leitura passiva. O ícone de excluir mora
+   nela, mas para o próprio toque, sem também abrir a edição. */
+.serie {
+  cursor: pointer;
+  transition: background var(--lastro-dur-1) ease;
+}
+
+.serie:hover {
+  background: var(--lastro-sup-2);
+}
+
+/* Sem margin-left próprio: a marca já tem margin-left:auto e ocupa todo o
+   espaço livre da linha, então o ícone de excluir cai naturalmente logo
+   depois dela, separado só pelo `gap` que `.serie` já define. Dar auto
+   aos dois faria o espaço livre se dividir entre ambos, abrindo um vão
+   no meio em vez de deixá-los colados à direita. */
+.serie__excluir {
+  flex: none;
+}
+
 /* Ação discreta de barra escura (sair, voltar). */
 .botao-barra {
   display: inline-flex;
@@ -437,30 +571,53 @@
   margin-top: var(--lastro-e-3);
 }
 
+/* `.item` é o cartão; `.item__link` é a parte que navega. Precisam ser
+   elementos diferentes — um <a> não pode conter outro alvo interativo
+   (o botão de excluir), e cada um tem seu próprio estado de toque. */
 .item {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
-  justify-content: space-between;
-  gap: var(--lastro-e-3);
-  min-height: var(--lastro-alvo-min);
-  padding: var(--lastro-e-3) var(--lastro-e-4);
   border: 1px solid var(--lastro-linha);
   border-radius: var(--lastro-raio-1);
   background: var(--lastro-grad-sup);
   box-shadow: var(--lastro-elev-1), var(--lastro-bevel);
   color: var(--lastro-txt);
-  transition:
-    box-shadow var(--lastro-dur-1) ease,
-    transform var(--lastro-dur-1) ease;
+  padding-right: var(--lastro-e-2);
+  transition: box-shadow var(--lastro-dur-1) ease;
 }
 
 .item:hover {
   box-shadow: var(--lastro-elev-2), var(--lastro-bevel);
 }
 
-.item:active {
-  box-shadow: var(--lastro-elev-afundado);
+.item__link {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--lastro-e-3);
+  min-height: var(--lastro-alvo-min);
+  padding: var(--lastro-e-3) var(--lastro-e-4);
+  color: inherit;
+  border-radius: var(--lastro-raio-1);
+  transition:
+    background var(--lastro-dur-1) ease,
+    transform var(--lastro-dur-1) ease;
+}
+
+.item__link:active {
+  background: var(--lastro-sup-2);
   transform: translateY(1px);
+}
+
+/* A confirmação de excluir não cabe ao lado do link em 360px — cai pra
+   linha de baixo, ocupando o cartão inteiro, em vez de espremer os dois. */
+.item .confirma {
+  flex: 1 1 100%;
+  margin: 0 var(--lastro-e-2) var(--lastro-e-2);
+  border: 1px solid var(--lastro-erro);
 }
 
 .item__data {

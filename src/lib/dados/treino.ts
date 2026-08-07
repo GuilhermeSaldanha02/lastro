@@ -36,6 +36,8 @@ export type Serie = {
 export type Treino = {
   id: string;
   data: string;
+  /** Quantas séries este treino tem, contando aquecimento. */
+  totalSeries: number;
 };
 
 export type TreinoComSeries = Treino & {
@@ -54,15 +56,31 @@ async function usuarioAutenticadoOuErro() {
   return { supabase, user };
 }
 
-/** Lista os treinos do usuário logado, mais recente primeiro. */
+/**
+ * Lista os treinos do usuário logado, mais recente primeiro, com a
+ * contagem de séries de cada um. A contagem não é enfeite: a confirmação
+ * de exclusão precisa dizer quantas séries somem junto, senão o dono
+ * confirma sem saber o tamanho do estrago.
+ */
 export async function listarTreinos(): Promise<Treino[]> {
   const { supabase } = await usuarioAutenticadoOuErro();
   const { data, error } = await supabase
     .from("treino")
-    .select("id, data")
+    .select("id, data, serie(count)")
     .order("data", { ascending: false });
   if (error) throw new Error(`Falha ao listar treinos: ${error.message}`);
-  return data ?? [];
+
+  type Linha = {
+    id: string;
+    data: string;
+    serie: { count: number }[] | null;
+  };
+
+  return ((data ?? []) as unknown as Linha[]).map((t) => ({
+    id: t.id,
+    data: t.data,
+    totalSeries: t.serie?.[0]?.count ?? 0,
+  }));
 }
 
 /** Busca um treino do usuário logado com as séries já registradas nele. */
@@ -107,6 +125,7 @@ export async function buscarTreino(
   return {
     id: treino.id,
     data: treino.data,
+    totalSeries: linhasSeries.length,
     series: linhasSeries.map((s) => ({
       id: s.id,
       exercicioId: s.exercicio_id,
@@ -240,4 +259,84 @@ export async function criarSerieRemoto(input: NovaSerieInput): Promise<void> {
     peso_corporal_incluso: input.pesoCorporalIncluso,
   });
   if (error) throw new Error(`Falha ao registrar série: ${error.message}`);
+}
+
+/* ====================================================================
+   CORREÇÃO — editar e excluir.
+
+   Adicionado em 2026-08-06 (ver DECISIONS.md). O banco já previa isto
+   desde o schema inicial (`grant ... update, delete` no SDD §3.4, e
+   `on delete cascade` de série para treino), mas nenhuma função de
+   aplicação existia: dava para registrar e nunca para corrigir.
+
+   Nenhuma destas funções faz `redirect`/`revalidatePath` quando é
+   chamada pela fila offline — quem chama já atualizou a UI de forma
+   otimista. As variantes de página fazem o `revalidatePath`.
+   ==================================================================== */
+
+export type AtualizacaoSerieInput = {
+  id: string;
+  tipo: "aquecimento" | "valendo";
+  reps: number;
+  peso: number;
+  rir: number | null;
+  pesoCorporalIncluso: boolean;
+};
+
+/**
+ * Corrige uma série já registrada. Mudar `reps`/`peso`/`tipo` muda o que
+ * o agregador calcula (volume, e1RM, contagem de séries valendo) — é
+ * exatamente o ponto: um peso digitado errado contamina a Análise
+ * Semanal até ser corrigido.
+ *
+ * A RLS filtra por `usuario_id`, então um id de outra pessoa não atualiza
+ * nada. `treino_id` e `exercicio_id` NÃO são atualizáveis aqui: mudar a
+ * que treino uma série pertence é outra operação, não uma correção.
+ */
+export async function atualizarSerieRemoto(
+  input: AtualizacaoSerieInput,
+): Promise<void> {
+  const { supabase } = await usuarioAutenticadoOuErro();
+
+  const { error } = await supabase
+    .from("serie")
+    .update({
+      tipo: input.tipo,
+      reps: input.reps,
+      peso: input.peso,
+      rir: input.rir,
+      peso_corporal_incluso: input.pesoCorporalIncluso,
+    })
+    .eq("id", input.id);
+  if (error) throw new Error(`Falha ao atualizar série: ${error.message}`);
+}
+
+/** Exclui uma série. A RLS impede excluir série de outro usuário. */
+export async function excluirSerieRemoto(id: string): Promise<void> {
+  const { supabase } = await usuarioAutenticadoOuErro();
+
+  const { error } = await supabase.from("serie").delete().eq("id", id);
+  if (error) throw new Error(`Falha ao excluir série: ${error.message}`);
+}
+
+/**
+ * Exclui um treino inteiro. O `on delete cascade` do schema (SDD §3.2)
+ * leva junto todas as séries dele — é destrutivo e irreversível, então a
+ * UI que chama isto pede confirmação explícita antes.
+ */
+export async function excluirTreinoRemoto(id: string): Promise<void> {
+  const { supabase } = await usuarioAutenticadoOuErro();
+
+  const { error } = await supabase.from("treino").delete().eq("id", id);
+  if (error) throw new Error(`Falha ao excluir treino: ${error.message}`);
+}
+
+/**
+ * Server Action da lista de treinos: exclui e revalida a página.
+ * Separada de `excluirTreinoRemoto` porque a fila offline chama a versão
+ * sem `revalidatePath` (não há página para revalidar num service worker).
+ */
+export async function excluirTreino(id: string): Promise<void> {
+  await excluirTreinoRemoto(id);
+  revalidatePath("/treino");
 }

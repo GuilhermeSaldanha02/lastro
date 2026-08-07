@@ -25,6 +25,9 @@ describe("outbox", () => {
       criar_serie: async () => {
         ordem.push("serie");
       },
+      atualizar_serie: async () => {},
+      excluir_serie: async () => {},
+      excluir_treino: async () => {},
     });
 
     expect(ordem).toEqual(["treino", "serie"]);
@@ -44,6 +47,9 @@ describe("outbox", () => {
       criar_serie: async () => {
         executado.push("serie");
       },
+      atualizar_serie: async () => {},
+      excluir_serie: async () => {},
+      excluir_treino: async () => {},
     });
 
     expect(executado).toEqual([]);
@@ -59,6 +65,9 @@ describe("outbox", () => {
         throw new Error("sem rede");
       },
       criar_serie: async () => {},
+      atualizar_serie: async () => {},
+      excluir_serie: async () => {},
+      excluir_treino: async () => {},
     });
 
     const [item] = await db.outbox.toArray();
@@ -78,6 +87,9 @@ describe("outbox", () => {
         }
       },
       criar_serie: async () => {},
+      atualizar_serie: async () => {},
+      excluir_serie: async () => {},
+      excluir_treino: async () => {},
     };
 
     const primeira = await sincronizar(executores);

@@ -9,6 +9,7 @@ import Link from "next/link";
 import { listarTreinos, criarTreino } from "@/lib/dados/treino";
 import { sair } from "@/lib/dados/auth";
 import AbaInferior from "@/components/aba-inferior";
+import ExcluirTreino from "@/components/excluir-treino";
 
 /** "2026-08-06" → "6 ago". A data já vem local; não há fuso a converter. */
 function formatarData(iso: string): string {
@@ -52,10 +53,17 @@ export default async function PaginaTreino() {
           <ul className="lista">
             {treinos.map((treino) => (
               <li key={treino.id}>
-                <Link href={`/treino/${treino.id}`} className="item">
-                  <span className="item__data">{formatarData(treino.data)}</span>
-                  <span className="item__meta">ver</span>
-                </Link>
+                <div className="item">
+                  <Link href={`/treino/${treino.id}`} className="item__link">
+                    <span className="item__data">{formatarData(treino.data)}</span>
+                    <span className="item__meta">ver</span>
+                  </Link>
+                  <ExcluirTreino
+                    id={treino.id}
+                    data={formatarData(treino.data)}
+                    series={treino.totalSeries}
+                  />
+                </div>
               </li>
             ))}
           </ul>

@@ -4,7 +4,17 @@
 // esvazia a fila quando a rede volta.
 import Dexie, { type EntityTable } from "dexie";
 
-export type TipoMutacao = "criar_treino" | "criar_serie";
+// Correção de série (editar/excluir) entra na MESMA fila que a criação, e
+// não em caminho próprio: a cena de uso é a mesma de D6 — errar o peso no
+// meio do treino, no subsolo sem sinal, e querer arrumar na hora. FIFO
+// garante a ordem: uma série criada e depois excluída offline chega ao
+// servidor como criação e então exclusão, nunca ao contrário.
+export type TipoMutacao =
+  | "criar_treino"
+  | "criar_serie"
+  | "atualizar_serie"
+  | "excluir_serie"
+  | "excluir_treino";
 
 export type MutacaoPendente = {
   id?: number;

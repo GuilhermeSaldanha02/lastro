@@ -60,6 +60,11 @@ Um app de treino **pessoal** que registra cada série executada e, uma vez por s
 - Iniciar treino, escolher exercício do catálogo, registrar série (reps + peso), marcar como aquecimento ou valendo.
 - Repetir a última série com um toque (a ação mais frequente do app).
 - Funciona **offline**: grava local primeiro, sincroniza quando a rede volta.
+- **Corrigir e apagar** (ADIÇÃO de escopo, 2026-08-06 — ver DECISIONS.md): registrar sem poder corrigir depois não é MVP, é armadilha — um peso digitado errado fica contaminando a Análise Semanal até alguém reparar. Por isso:
+  - **Editar uma série** (tipo, reps, peso, RIR, peso corporal). O exercício não é editável — trocar a que exercício uma série pertence é outra operação. Mesma fila offline da criação (D6): é a mesma cena, corrigir o erro no meio do treino, sem sinal.
+  - **Excluir uma série.** Mesma fila offline, pelo mesmo motivo.
+  - **Excluir um treino inteiro** (a partir da lista de treinos). Leva as séries dele junto (`on delete cascade`). É ação **online-only**, deliberadamente fora da fila offline: normalmente feita revendo o histórico com calma, não no meio do treino.
+  - Toda exclusão pede **confirmação inline explícita** — nunca `window.confirm()` do navegador, que no celular é um alerta de sistema fácil de tocar sem ler.
 
 **4.2 Registro e gráfico**
 - Histórico de treinos.
@@ -115,6 +120,9 @@ Um app de treino **pessoal** que registra cada série executada e, uma vez por s
 | A8 | Login com Google funciona em celular e PC, e o mesmo treino aparece nos dois | Teste manual nos dois dispositivos |
 | A9 | Todo exercício do catálogo tem nome em PT-BR de academia e dica de execução revisada | Revisão do seed, contagem de campos vazios = 0 |
 | A10 | O gate visual passa em viewport mobile real, com contraste AA **medido** e foco visível | Navegador real no celular + medição de contraste |
+| A11 | Editar peso/reps de uma série muda o que a Análise Semanal calcula para ela | Editar uma série já usada num teste do agregador, recalcular, conferir que o número mudou |
+| A12 | Excluir um treino leva as séries dele junto, e não aparece mais na lista nem entra em cálculo nenhum | Excluir um treino com séries, conferir que `select` por `treino_id` não retorna nada |
+| A13 | Nenhuma exclusão acontece sem uma segunda confirmação explícita na tela | Tocar excluir uma vez não apaga nada; só o segundo toque, no botão de confirmação, apaga |
 
 ---
 
