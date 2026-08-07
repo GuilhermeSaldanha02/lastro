@@ -368,7 +368,7 @@ Também corrigidos, achados menores confirmados por leitura direta (sem precisar
 
 ---
 
-## 2026-08-07 — Seleção de grupo muscular antes da lista de exercícios (NÃO mergeada)
+## 2026-08-07 — Seleção de grupo muscular antes da lista de exercícios
 
 **O que mudou.** `src/components/seletor-grupo-muscular.tsx` (novo) — antes de `FormularioSerie` aparecer, a pessoa escolhe um ou mais grupos musculares ("peito e ombro", "só perna"); a lista de exercícios do formulário filtra só pelos grupos escolhidos. `treino-detalhe.tsx` guarda a escolha em estado de sessão (`gruposEscolhidos`) — some "Trocar grupo" pra resetar, mas fechar/reabrir o formulário ("Outra série") mantém a escolha, não pergunta de novo a cada série. `treino/[id]/page.tsx` trocou `listarExercicios()` por `listarCatalogo()` pra ter o nome do grupo (não só o id).
 
@@ -376,8 +376,46 @@ Também corrigidos, achados menores confirmados por leitura direta (sem precisar
 
 **Verificado:** usuário QA efêmero (criado e removido) — seletor aparece com os 10 grupos, começa sem nada marcado (mesma regra do formulário, 2026-08-07 "sempre iniciar em branco"); marcar Peito+Ombro filtra o `<select>` de 87 pra exatas 22 opções (12+10); "Trocar grupo" volta ao seletor; registrar série e reabrir "Outra série" pula direto pro formulário com o grupo ainda escolhido. `tsc`/`test` (79)/`lint`/`build` verdes.
 
-**Pedido explícito do dono: NÃO subir PR nem mergear ainda** — fica só no branch `feat/selecao-grupo-muscular`, aguardando revisão dele.
+**Nota de processo:** ficou só no branch local, sem PR, por pedido explícito do dono — mergeada depois que ele revisou (2026-08-07, mesmo dia).
 
 **Impacto.** Muda o fluxo de "adicionar exercício" em `/treino/[id]` — primeira vez por sessão pede grupo antes do exercício.
 
 **Como reverter.** Reverter o commit — sem migração, sem dado tocado.
+
+---
+
+## 2026-08-07 — Treino vazio não conta em nada (achado do dono, QA manual)
+
+**O que mudou.** Três correções relacionadas, achadas testando manualmente pelo Chrome:
+
+1. **`criarTreino()` reaproveita o treino de hoje em vez de duplicar.** Antes, cada clique em "Iniciar treino de hoje" inseria uma linha nova em `treino`, mesmo se já existisse uma pra hoje sem nenhuma série. `src/lib/dados/treino.ts` agora consulta antes de inserir — se já existe treino de hoje, só redireciona pra ele.
+2. **`/treino` (Bancada) ficou sem checagem, ao contrário da home.** A home (`src/app/page.tsx`) já mostrava "Continuar treino de hoje" condicionalmente, mas `src/app/treino/page.tsx` sempre oferecia "Iniciar treino de hoje" como form estático, não importa o estado — clicar de novo criava outro treino vazio. Agora ela faz a mesma checagem da home e mostra "Continuar" quando já existe.
+3. **Treino sem nenhuma série não conta em `carregarResumoHome` (`src/lib/dados/resumo-home.ts`).** `treinosNaSemana`, `recentes` e `semanasFechadasComTreino` agora filtram por `(t.serie?.length ?? 0) > 0` antes de contar. `treinoDeHojeId` continua sem filtro — é o link de "continuar", precisa existir mesmo vazio.
+
+**Por quê.** O dono descreveu exatamente o sintoma: "toda hora eu clicar em iniciar treino mas não ter adicionado nada, contar, isso não deveria existir." Um treino vazio criado por clique acidental (ou por reabrir a tela sem lembrar que já tinha começado) não é um treino feito — não devia aparecer em "treinos recentes" nem inflar "Treinos: N" da semana.
+
+**Verificado:** usuário QA efêmero — cliquei "Iniciar treino de hoje" na Bancada, voltei pra Bancada sem adicionar nada: já mostrava "Continuar treino de hoje" (não "Iniciar" de novo), e o link levava pro MESMO id. Conferido direto no banco: só 1 linha em `treino`, 0 séries. Home mostrava "Treinos: 0" e "Nenhum treino ainda" em recentes, mesmo com o treino vazio existindo. `tsc`/`test` (79)/`lint`/`build` verdes.
+
+**O que NÃO mudei:** `listarTreinos()` (histórico completo em `/treino`) continua mostrando treinos vazios — de propósito, pra o dono conseguir ver e apagar um treino vazio que sobrou (via `ExcluirTreino`, já existente). Escondê-lo ali também deixaria um resíduo órfão sem jeito de limpar pela UI.
+
+**Pergunta em aberto, não resolvida aqui:** o dono também relatou "a página já deve abrir no início, ela tá abrindo em bancada" — não encontrei a causa (manifest `start_url` é `/`, login por e-mail redireciona pra `/`). Pode ser resíduo de sessão de teste anterior, ou outro fluxo específico. Fica pendente até o dono detalhar quando exatamente isso acontece.
+
+**Impacto.** Muda o que "conta" como treino feito nas estatísticas da home — sem migração, sem mudança de schema.
+
+**Como reverter.** Reverter o commit — os três pontos são independentes, mas foram feitos juntos por serem sintoma do mesmo achado.
+
+---
+
+## 2026-08-07 — PWA instalado sempre abre em Início, nunca retoma a última tela
+
+**O que mudou.** A pergunta em aberto da entrada anterior tinha causa: `manifest.webmanifest`/redirects de login já apontavam certo pra `/`, mas `start_url` só vale no **primeiro** lançamento do PWA depois de instalado — Chrome/Android, depois disso, costuma **restaurar a última página** ao reabrir o ícone (mesmo comportamento de restaurar aba, não é bug do app). `src/components/forcar-inicio-no-lancamento.tsx` (novo, montado no layout raiz) força `window.location.replace("/")` quando: (a) o app está rodando em modo instalado (`matchMedia("(display-mode: standalone)")`) e (b) a rota atual não é `/`, `/login` nem `/auth/callback`.
+
+**Por quê funciona sem também disparar em navegação interna.** O `useEffect` que faz a checagem roda uma vez por **carregamento de documento** — lançar o ícone do PWA, F5, aba nova — porque o layout raiz do App Router **persiste** entre rotas; clicar num `<Link>` dentro do app nunca remonta o layout raiz, então nunca reexecuta o efeito. É a distinção exata que se precisava: só no lançamento "frio", nunca ao navegar dentro do app já aberto.
+
+**Decisão explícita do dono, com o risco declarado antes:** perder a conveniência de "reabrir o ícone continua o treino em andamento" — o dono confirmou que quer sempre abrir em Início, mesmo perdendo isso.
+
+**Verificado:** lógica do guard testada isoladamente (roda em standalone + rota não-isenta → true; roda fora de standalone → false; roda em `/login` mesmo em standalone → false). Navegação normal (sem standalone) confirmada sem regressão — `/catalogo` sem sessão ainda bounce pro `/login` normalmente. **Não verificado com o PWA de fato instalado num aparelho** — `matchMedia("standalone")` só é `true` fora do navegador comum; fica para o dono confirmar no celular.
+
+**Impacto.** Componente novo, sem tocar rota nem dado. Só age quando `display-mode: standalone` é verdadeiro (nunca em navegador comum).
+
+**Como reverter.** Remover `<ForcarInicioNoLancamento />` de `src/app/layout.tsx` — o componente é aditivo.

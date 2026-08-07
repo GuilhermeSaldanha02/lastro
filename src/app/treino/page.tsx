@@ -8,6 +8,7 @@
 import Link from "next/link";
 import { listarTreinos, criarTreino } from "@/lib/dados/treino";
 import { sair } from "@/lib/dados/auth";
+import { dataLocalBrasil } from "@/lib/tempo";
 import AbaInferior from "@/components/aba-inferior";
 import ExcluirTreino from "@/components/excluir-treino";
 
@@ -25,6 +26,12 @@ function formatarData(iso: string): string {
 
 export default async function PaginaTreino() {
   const treinos = await listarTreinos();
+  // Mesma checagem da home (src/app/page.tsx) — sem isto, esta tela sempre
+  // oferecia "Iniciar treino de hoje" mesmo com um treino de hoje já em
+  // andamento, e clicar de novo criava outro (achado do dono, 2026-08-07;
+  // `criarTreino` agora reaproveita, mas o rótulo do botão ficava errado
+  // até essa correção).
+  const treinoDeHojeId = treinos.find((t) => t.data === dataLocalBrasil())?.id ?? null;
 
   return (
     <main className="tela">
@@ -71,11 +78,17 @@ export default async function PaginaTreino() {
       </div>
 
       <div className="acao-area">
-        <form action={criarTreino}>
-          <button type="submit" className="botao-primario">
-            Iniciar treino de hoje
-          </button>
-        </form>
+        {treinoDeHojeId ? (
+          <Link href={`/treino/${treinoDeHojeId}`} className="botao-primario">
+            Continuar treino de hoje
+          </Link>
+        ) : (
+          <form action={criarTreino}>
+            <button type="submit" className="botao-primario">
+              Iniciar treino de hoje
+            </button>
+          </form>
+        )}
       </div>
 
       <AbaInferior ativa="bancada" />
