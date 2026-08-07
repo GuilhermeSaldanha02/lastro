@@ -4,7 +4,7 @@
 // precisam compartilhar estado pra atualização otimista funcionar.
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { buscarTreino, listarExercicios } from "@/lib/dados/treino";
+import { buscarTreino, listarCatalogo } from "@/lib/dados/treino";
 import TreinoDetalhe from "@/components/treino-detalhe";
 import AbaInferior from "@/components/aba-inferior";
 
@@ -32,7 +32,7 @@ export default async function PaginaTreinoDetalhe({
   const { id } = await params;
   const [treino, exercicios] = await Promise.all([
     buscarTreino(id),
-    listarExercicios(),
+    listarCatalogo(),
   ]);
 
   if (!treino) notFound();

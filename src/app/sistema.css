@@ -198,6 +198,20 @@
     color var(--lastro-dur-1) ease;
 }
 
+/* Ação secundária de texto — alvo de toque cumprido por padding, não por
+   virar quadrado como `.botao-icone` (esta tem rótulo visível, não ícone). */
+.botao-textual {
+  min-height: var(--lastro-alvo-min);
+  padding: 0 var(--lastro-e-2);
+  border: none;
+  background: transparent;
+  color: var(--lastro-txt-3);
+  font-size: var(--lastro-t-meta);
+  font-weight: var(--lastro-peso-medio);
+  text-decoration: underline;
+  cursor: pointer;
+}
+
 .botao-icone:hover {
   background: var(--lastro-sup-2);
   color: var(--lastro-txt);
@@ -562,6 +576,41 @@
   height: var(--lastro-e-6);
   flex: none;
   accent-color: var(--lastro-acao-borda);
+}
+
+/* ---------- Seleção de grupo(s) muscular(es) antes do exercício ------- */
+.selecao-grupos {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--lastro-e-3);
+}
+
+.selecao-grupos__opcao {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--lastro-e-2);
+  min-height: var(--lastro-alvo-min);
+  padding: 0 var(--lastro-e-4);
+  border: 1px solid var(--lastro-controle);
+  border-radius: var(--lastro-raio-2);
+  background: var(--lastro-sup-1);
+  font-size: var(--lastro-t-corpo);
+  color: var(--lastro-txt-2);
+  cursor: pointer;
+}
+
+.selecao-grupos__opcao input {
+  width: var(--lastro-e-6);
+  height: var(--lastro-e-6);
+  flex: none;
+  accent-color: var(--lastro-acao-borda);
+}
+
+/* Marcado muda BORDA + PESO, não só a cor de fundo (nota C, §3.2). */
+.selecao-grupos__opcao:has(input:checked) {
+  border-color: var(--lastro-acao-borda);
+  font-weight: var(--lastro-peso-forte);
+  color: var(--lastro-txt);
 }
 
 .dupla {
