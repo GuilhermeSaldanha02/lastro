@@ -202,14 +202,33 @@ export async function listarCatalogo(): Promise<ExercicioDoCatalogo[]> {
 }
 
 /**
- * Inicia um treino novo para o usuário logado, com `data = hoje`.
- * Server Action — chamada direto do form de `src/app/treino/page.tsx`.
+ * Inicia um treino para o usuário logado, com `data = hoje` — ou reaproveita
+ * o de hoje se já existir. Server Action, chamada tanto de `src/app/page.tsx`
+ * quanto de `src/app/treino/page.tsx`.
+ *
+ * Sem a checagem de reaproveitamento, cada clique em "Iniciar treino de
+ * hoje" criava uma linha nova em `treino` — inclusive sem nenhuma série
+ * dentro. Clicar de novo (ex.: voltar pra tela sem ter adicionado nada
+ * ainda) empilhava treinos vazios que nunca desaparecem sozinhos (achado
+ * do dono, 2026-08-07).
  */
 export async function criarTreino(): Promise<void> {
   const { supabase, user } = await usuarioAutenticadoOuErro();
   // Calendário de Brasília, não UTC (src/lib/tempo.ts) — evita treino
   // noturno virar o dia seguinte e cair na semana ISO errada.
   const hoje = dataLocalBrasil();
+
+  const { data: existente, error: erroConsulta } = await supabase
+    .from("treino")
+    .select("id")
+    .eq("data", hoje)
+    .maybeSingle();
+  if (erroConsulta) {
+    throw new Error(`Falha ao verificar treino de hoje: ${erroConsulta.message}`);
+  }
+  if (existente) {
+    redirect(`/treino/${existente.id}`);
+  }
 
   const { data, error } = await supabase
     .from("treino")
