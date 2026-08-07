@@ -346,3 +346,22 @@ Também corrigidos, achados menores confirmados por leitura direta (sem precisar
 **Impacto.** Nenhuma migração — é comportamento de formulário, não schema.
 
 **Como reverter.** Voltar `useState(exercicios[0]?.id ?? "")` e `useState("valendo")`, e o `?  "Outra série"` incondicional em `treino-detalhe.tsx`.
+
+---
+
+## 2026-08-07 — Catálogo amplo: 87 exercícios, 3 grupos musculares novos
+
+**O que mudou.** `supabase/migrations/0003_catalogo_amplo.sql`, aplicada no Supabase hospedado (`npx supabase db push --linked`): 82 exercícios novos + os 5 de teste que já existiam = **87 exercícios**, cobrindo 10 grupos musculares. Três grupos novos saem de dentro de "pernas" (que cobria tudo sob o id `quadriceps`): **glúteo, posterior de coxa, panturrilha**. O `nome` do grupo `quadriceps` mudou de "Pernas" pra "Quadríceps" — fazia sentido como rótulo genérico antes da separação, não faz mais.
+
+**Escopo, decidido com o dono:**
+1. Catálogo **genérico amplo** (~80-100), não a rotina pessoal dele — diferente do que `SDD.md` §3.5 original previa ("os 10-15 exercícios que o dono faz", TODO bloqueado). Essa mudança de escopo é do dono, registrada aqui porque diverge do documento original.
+2. Separar glúteo/posterior de coxa/panturrilha de "pernas".
+3. `dica_execucao` fica `NULL` em toda linha nova — **não escrevi nenhuma**. FF7/ADR-007 é claro: dica de execução é conteúdo curado por humano, nunca gerado por LLM, mesmo que eu pesquise fontes reais. Isso conta como "gerado" de qualquer forma. A tela do catálogo já trata "sem dica" como estado honesto (87 de 87 exibem "Dica de execução ainda não escrita.").
+
+**Por quê este método (migração + `db push`), não `seed.sql`.** O projeto abandonou Postgres local (`DECISIONS.md` 2026-08-04) — só existe o banco hospedado. `seed.sql` nunca roda contra ele; só migração aplica. Atualizei o cabeçalho de `seed.sql` pra não afirmar mais "isto não é o catálogo real" (falso agora) sem prometer que o arquivo *é* o catálogo real (também falso — ele é fixture mínima pros testes do agregador, propósito diferente).
+
+**Verificado:** usuário QA efêmero (criado e removido) — `/catalogo` lista os 87 em 10 seções por grupo, com `UNILATERAL` marcado corretamente nos que contam reps por lado; o seletor de exercício em `FormularioSerie` mostra as 87 opções (88 com o placeholder). Contagem por grupo conferida via SQL direto no banco.
+
+**Impacto.** Nenhum código tocado — só dado. `tsc`/`test`/`lint`/`build` continuam verdes (nada mudou de comportamento de app).
+
+**Como reverter.** `delete from exercicio where criado_em > '2026-08-07'` reverteria as linhas novas (não as 5 de teste antigas, que são anteriores). Reverter os grupos musculares novos exigiria primeiro mover ou apagar os exercícios que os referenciam (FK).
