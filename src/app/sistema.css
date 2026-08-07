@@ -22,7 +22,10 @@
    a 390×844 em 2026-08-06. Aqui só entra respiro de leitura. */
 /* A barra é `fixed` — reserva a altura dela mais respiro, senão a
    última série/linha da lista renderiza embaixo da barra (2026-08-06). */
+/* A barra de topo também é `fixed` (2026-08-07) — mesmo motivo, mas no
+   topo: sem este padding, o primeiro conteúdo renderiza embaixo dela. */
 .corpo--com-nav {
+  padding-top: calc(var(--lastro-clearance-topo) + var(--lastro-e-4));
   padding-bottom: calc(var(--lastro-clearance-nav) + var(--lastro-e-6));
 }
 
@@ -56,10 +59,19 @@
 }
 
 /* ---------- Barra de topo: a única superfície escura ---------- */
+/* App é 100% mobile: a barra de topo também fica FIXA na viewport,
+   espelhando a aba inferior (2026-08-07). Sai do fluxo — `.corpo--com-nav`
+   reserva a altura dela como padding-top. */
 .barra-topo {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 20;
   background: var(--lastro-grad-barra);
   color: var(--lastro-barra-txt);
   padding: var(--lastro-e-4) var(--lastro-e-5);
+  padding-top: calc(var(--lastro-e-4) + env(safe-area-inset-top, 0px));
   box-shadow: var(--lastro-elev-2);
 }
 
@@ -813,6 +825,77 @@
   color: var(--lastro-txt-3);
   margin-top: var(--lastro-e-3);
   line-height: 1.5;
+}
+
+/* =====================================================================
+   GRÁFICO DE PROGRESSÃO (DESIGN.md §3.7) — companhia visual da Análise.
+   ===================================================================== */
+.grafico-progressao {
+  border: 1px solid var(--lastro-linha);
+  border-radius: var(--lastro-raio-1);
+  background: var(--lastro-grad-sup);
+  box-shadow: var(--lastro-elev-2), var(--lastro-bevel);
+  padding: var(--lastro-e-4) var(--lastro-e-5);
+  margin-bottom: var(--lastro-e-6);
+}
+
+.grafico-progressao__cabecalho {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--lastro-e-3);
+}
+
+.grafico-progressao__cabecalho .doc__secao {
+  margin: 0;
+}
+
+/* Select nativo — não é um alvo de toque frequente, mas ainda cumpre o piso. */
+.grafico-progressao__seletor {
+  min-height: var(--lastro-alvo-min);
+  border: 1px solid var(--lastro-controle);
+  border-radius: var(--lastro-raio-1);
+  background: var(--lastro-sup-1);
+  color: var(--lastro-txt-2);
+  font-size: var(--lastro-t-meta);
+  padding: 0 var(--lastro-e-3);
+}
+
+/* A conclusão em palavras vem ANTES do desenho (§3.7 item 2) — quem só lê
+   esta linha já sabe o resultado. */
+.grafico-progressao__conclusao {
+  font-size: var(--lastro-t-2);
+  color: var(--lastro-txt-2);
+  line-height: var(--lastro-el-corpo);
+  margin-top: var(--lastro-e-4);
+}
+
+.grafico-progressao__plato-nota {
+  color: var(--lastro-plato);
+  font-weight: var(--lastro-peso-medio);
+}
+
+.grafico-progressao__rotulo {
+  font-family: var(--lastro-fonte-num);
+  font-size: 11px;
+  fill: var(--lastro-txt);
+}
+
+.grafico-progressao__leitura-ativa {
+  font-family: var(--lastro-fonte-num);
+  font-size: var(--lastro-t-meta);
+  color: var(--lastro-txt);
+  background: var(--lastro-sup-2);
+  border-radius: var(--lastro-raio-1);
+  padding: var(--lastro-e-2) var(--lastro-e-3);
+  margin-top: var(--lastro-e-2);
+  display: inline-block;
+}
+
+.grafico-progressao__vazio {
+  color: var(--lastro-txt-3);
+  font-size: var(--lastro-t-corpo);
+  margin-top: var(--lastro-e-3);
 }
 
 /* =====================================================================

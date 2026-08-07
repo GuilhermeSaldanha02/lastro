@@ -155,6 +155,15 @@
      por último acima dela, senão o conteúdo esconde embaixo da barra. */
   --lastro-clearance-nav: calc(var(--lastro-alvo-min) + env(safe-area-inset-bottom, 0px));
 
+  /* A barra de topo é `position: fixed` (100% mobile, 2026-08-07) — sai do
+     fluxo. `.corpo--com-nav` soma isto ao padding-top, senão o primeiro
+     conteúdo da tela renderiza embaixo dela. Base medida em navegador
+     real (88.39px, contexto+título e a variante com `botao-barra`
+     lado a lado — mesma altura nos dois casos): ver DECISIONS.md
+     2026-08-07. Soma a área segura porque o padding-top da barra
+     também soma, mesmo raciocínio de `--lastro-clearance-nav`. */
+  --lastro-clearance-topo: calc(5.53rem + env(safe-area-inset-top, 0px));
+
   /* ---- Duração (respeitar prefers-reduced-motion) ---- */
   --lastro-dur-1: 120ms;
   --lastro-dur-2: 220ms;

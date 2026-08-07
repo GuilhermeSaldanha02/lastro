@@ -259,3 +259,57 @@ Também corrigidos, achados menores confirmados por leitura direta (sem precisar
 **Decisão pendente, não tomada aqui — é do dono:** adotar Serwist de verdade (o SW mínimo não tem estratégia de cache — funciona, mas não é robusto) e escrever os primeiros E2E com Playwright são candidatos à Fase 6 (Integração final), não urgência.
 
 **Como reverter.** Não há o que reverter — é registro de um fato sobre o código, não uma mudança nele.
+
+---
+
+## 2026-08-07 — CSS responsivo cai da lista; barra superior fixa entra; regra de platô do gráfico separada do PRD §10
+
+**O que mudou.** Três decisões do dono, resolvendo a tensão registrada em `PROGRESS.md` (pendência 3):
+
+1. **CSS responsivo pra tablet/desktop — cancelado.** Confirmado: a direção é 100% mobile, a tarefa registrada antes da Fase 3 foi superada pela decisão da barra inferior fixa. Não entra mais na lista de pendências.
+2. **Barra superior fixa — nova tarefa.** Além da aba inferior (`position: fixed` + `env(safe-area-inset-bottom)`), a barra superior também fica fixa, com `env(safe-area-inset-top)` equivalente.
+3. **Regra de platô do gráfico de progressão (§3.7 item 3) é descritiva, separada do limiar clínico do PRD §10.** O gráfico precisa de tracejado + anotação "há quantas semanas" pra passar o gate G6, mas o `N` de semanas de estagnação clínica (PRD §10) segue TODO, sem número inventado — como já era o precedente do projeto (peso corporal, entrada de 2026-08-04). São perguntas diferentes: o gráfico descreve o que os pontos mostram; o PRD §10 é o limiar que a Análise usa pra aconselhar ação.
+
+**Valor da regra descritiva, definido pelo dono após pesquisa (fontes: RITFit, FitnessAI, Carbon Performance, Barbell Medicine — convergem em 3-4 semanas sem melhora mensurável como o limiar comum de plateau; nenhuma dá % de tolerância, que é convenção de app):** **3 semanas consecutivas com variação de e1RM/volume dentro de 2% contam como platô.**
+
+**Por quê.** O gate visual (G6, `DESIGN.md` §4.1) bloqueia merge sem o platô desenhado — não dá pra esperar pesquisa clínica pra entregar a Fase 3. Separar as duas perguntas evita tanto inventar o `N` clínico (E3 — dado de saúde sobre o qual a Análise daria parecer) quanto travar o gráfico indefinidamente.
+
+**Alternativa descartada.** Esperar a pesquisa do PRD §10 antes de desenhar platô — descartado pelo dono porque bloqueia toda a Fase 3 por um número que serve a um propósito diferente (aconselhamento clínico, não descrição visual).
+
+**Impacto.** Gráfico de progressão pode ser construído agora. PRD §10 continua aberto — não foi resolvido, só desacoplado do gráfico.
+
+**Como reverter.** Trocar o par (3 semanas, 2%) por outro é barato — é constante isolada, não decisão estrutural. Se o PRD §10 depois definir um `N` clínico e o dono quiser unificar as duas regras, é decisão nova, não edição desta.
+
+---
+
+## 2026-08-07 — Gráfico de progressão: escopo, implementação, métrica única (e1RM)
+
+**O que mudou.** Duas decisões de escopo do dono, mais a implementação:
+
+1. **Onde o gráfico mora:** dentro de `/analise`, como companhia visual do parecer da semana — não uma rota nova, não dentro do catálogo. Alternativas descartadas: rota dedicada `/progresso` com seletor (mais flexível, mas sem lugar óbvio na navegação de 5 abas); dentro do catálogo por exercício (amarra o gráfico à dica de execução, que é conteúdo estático, não a leitura semanal).
+2. **Métrica plotada:** só **e1RM** por semana, não volume. `PRD.md` §4.2 pede os dois; e1RM foi escolhido por responder mais diretamente "está subindo minha força" (a pergunta que `DESIGN.md` §3.7 declara como a que o gráfico existe pra responder). Volume por exercício fica de fora desta entrega — extensível depois, é aditivo.
+3. **Seleção do exercício:** sem seletor explícito na primeira decisão do dono — implementado com seletor (seleciono automaticamente o exercício com mais sessões nas últimas 12 semanas como padrão, com `<select>` pra trocar). Não replica a lista `tendencia_e1rm` do agregador (SDD, Fase 1) exatamente — evita acoplar o gráfico ao pipeline que alimenta o LLM; é uma leitura própria, mais simples, sobre o mesmo dado bruto.
+
+**Peças novas:** `src/lib/analise/progressao.ts` (`calcularSeriesSemanais`, `detectarPlato` — puras, 11 testes) · `src/lib/dados/progressao.ts` (`carregarProgressao`, server, mesmo padrão de `resumo-home.ts`) · `src/app/api/progressao/route.ts` · `src/components/grafico-progressao.tsx` (Recharts, instalado nesta entrada — não estava no `package.json` apesar do ADR-004 já ter decidido por ele) · CSS em `sistema.css` (`.grafico-progressao*`). `npx tsc --noEmit`, `npm run test` (77 passando), `npm run lint`, `npm run build` — todos verdes.
+
+**Achado à parte, não resolvido aqui:** `limiares.ts` já tem `SEMANAS_ESTAGNACAO = 4` e `FAIXA_SERIES_SEMANAIS = [10, 20]` marcados como "RESOLVIDO" (comentário cita SDD §4.2 escolhendo um ponto dentro da faixa de `KNOWLEDGE.md`), mas `PRD.md` §10 e `PROGRESS.md` (pendência 6) ainda listam os dois como TODO — "assunto de saúde, fonte primária pesquisada, não número de memória". A implementação já usa os valores da SDD em produção; o PRD nunca foi atualizado pra refletir isso, nem a pesquisa de fonte primária que o PRD exige foi feita. Fica registrado — é uma divergência real entre o que o PRD promete e o que o código faz, mas mexer nela é fora do escopo desta tarefa (o dono não pediu, e são números que já estão em uso na Análise real).
+
+**Impacto.** `DESIGN.md` §3.7 tem entregável de código. Falta só o gate visual G6 (`DESIGN.md` §4.1) em navegador real — telas atrás de login, é o dono quem executa, mesma ressalva já registrada para `/treino` e `/analise`.
+
+**Como reverter.** Componente e rotas são aditivos — remover `<GraficoProgressao />` de `analise/page.tsx` tira o gráfico da tela sem quebrar nada. `recharts` fica como dependência não usada se isso acontecer.
+
+---
+
+## 2026-08-07 — Gate G6/C10/C11 do gráfico rodado contra dado real (usuário QA efêmero)
+
+**O que mudou.** O dono autorizou duas exceções pontuais às regras padrão pra fechar a verificação do gráfico de progressão: (1) criar um usuário de teste real no Supabase hospedado via `qa-treino-helper.sh criar-usuario` (mecanismo já existente no repo, usado pelo agente `qa-treino`); (2) inserir 6 semanas de série de teste pra esse usuário via SQL direto (`do $$ ... $$`), depois que ficou claro que a UI não permite registrar treino com data retroativa (`criarTreino()` em `src/lib/dados/treino.ts:216` sempre usa a data de hoje — registrar pela tela só dava pra criar 1 sessão por dia real).
+
+**Achado de processo:** a primeira tentativa de verificar contra `https://lastro-pi.vercel.app` deu 404 em `/api/progressao` — a produção roda `main`, não o branch `feat/grafico-progressao` (nunca foi deployado). A verificação real só foi possível contra `npm run dev` local, que aponta pro MESMO projeto Supabase hospedado (`.env.local`), então o dado é real, só a aplicação é que rodou local.
+
+**Resultado do gate (dado real, não sintético):** delta 22/06→27/07 = 14.3% (conferido à mão), platô detectado exatamente nas 3 semanas mais recentes (92.1/92.5/91.5 kg — variação 1.09% < 2%), rótulos diretos no primeiro/último ponto presentes, linha de referência "melhor marca" correta (92.5 kg = máximo real), alternativa textual completa em `role="list"` fora do gráfico, cada ponto focável por teclado com `aria-label` (K6), sem sobreposição barra-de-topo/conteúdo em 360×640 nem 390×844 (medido via `getBoundingClientRect`, não estimado), traço do platô com `stroke-dasharray="6 5"` real renderizado (distinção não depende só de cor).
+
+**Achado não corrigido:** `DESIGN.md` §4.2 (C10, C11) declara contraste esperado de 8.59 e 9.86 pros pares plato/sup-1 e alta/sup-1. Medido agora com a fórmula WCAG contra os tokens reais (`--lastro-plato: #8A5A0B`, `--lastro-alta: #1B6B3A`, `--lastro-sup-1: #FBF8F3`): **5.59 e 6.17** — os dois ainda passam o limiar de reprovação (3.0), mas a tabela do doc não bate com o CSS atual. Não fica claro se o doc nunca foi atualizado depois de uma mudança de cor, ou se a medição original tinha um erro. Fica registrado, sem correção — não foi pedido e os dois pares continuam dentro do limite de aceitação.
+
+**Impacto.** Gráfico de progressão passa no gate G6/C10/C11 com dado real. Usuário e séries de teste foram removidos (`limpar-usuario`, cascade = 0 linhas confirmado) — nenhum resíduo no banco de produção.
+
+**Como reverter.** Nada a reverter — verificação, não mudança de código.
