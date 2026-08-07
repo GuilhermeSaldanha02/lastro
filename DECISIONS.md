@@ -368,6 +368,22 @@ Também corrigidos, achados menores confirmados por leitura direta (sem precisar
 
 ---
 
+## 2026-08-07 — Seleção de grupo muscular antes da lista de exercícios
+
+**O que mudou.** `src/components/seletor-grupo-muscular.tsx` (novo) — antes de `FormularioSerie` aparecer, a pessoa escolhe um ou mais grupos musculares ("peito e ombro", "só perna"); a lista de exercícios do formulário filtra só pelos grupos escolhidos. `treino-detalhe.tsx` guarda a escolha em estado de sessão (`gruposEscolhidos`) — some "Trocar grupo" pra resetar, mas fechar/reabrir o formulário ("Outra série") mantém a escolha, não pergunta de novo a cada série. `treino/[id]/page.tsx` trocou `listarExercicios()` por `listarCatalogo()` pra ter o nome do grupo (não só o id).
+
+**Por quê não persistido no banco.** O app não prescreve programa (PRD §5, escopo negativo) — a escolha vive só no estado do componente, se recarregar a página ela some. É conveniência de tela pra filtrar 87 exercícios, não um plano salvo.
+
+**Verificado:** usuário QA efêmero (criado e removido) — seletor aparece com os 10 grupos, começa sem nada marcado (mesma regra do formulário, 2026-08-07 "sempre iniciar em branco"); marcar Peito+Ombro filtra o `<select>` de 87 pra exatas 22 opções (12+10); "Trocar grupo" volta ao seletor; registrar série e reabrir "Outra série" pula direto pro formulário com o grupo ainda escolhido. `tsc`/`test` (79)/`lint`/`build` verdes.
+
+**Nota de processo:** ficou só no branch local, sem PR, por pedido explícito do dono — mergeada depois que ele revisou (2026-08-07, mesmo dia).
+
+**Impacto.** Muda o fluxo de "adicionar exercício" em `/treino/[id]` — primeira vez por sessão pede grupo antes do exercício.
+
+**Como reverter.** Reverter o commit — sem migração, sem dado tocado.
+
+---
+
 ## 2026-08-07 — Treino vazio não conta em nada (achado do dono, QA manual)
 
 **O que mudou.** Três correções relacionadas, achadas testando manualmente pelo Chrome:

@@ -8,7 +8,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import type {
   AtualizacaoSerieInput,
-  Exercicio,
+  ExercicioDoCatalogo,
   NovaSerieInput,
   Serie,
 } from "@/lib/dados/treino";
@@ -25,6 +25,7 @@ import {
 } from "@/lib/offline/sincronizacao-em-segundo-plano";
 import FormularioSerie, { type DadosNovaSerie } from "./formulario-serie";
 import EditarSerie, { type DadosEdicaoSerie } from "./editar-serie";
+import SeletorGrupoMuscular, { type OpcaoGrupo } from "./seletor-grupo-muscular";
 
 async function sincronizarPendentes() {
   return sincronizar({
@@ -82,7 +83,7 @@ export default function TreinoDetalhe({
 }: {
   treinoId: string;
   seriesIniciais: Serie[];
-  exercicios: Exercicio[];
+  exercicios: ExercicioDoCatalogo[];
 }) {
   const [series, setSeries] = useState(seriesIniciais);
   const [formularioAberto, setFormularioAberto] = useState(false);
@@ -91,8 +92,26 @@ export default function TreinoDetalhe({
   // D7 — reflete a fila de verdade: só vira "sincronizado" quando uma
   // drenagem termina sem falha. Nunca é apresentado como erro.
   const [sincronizado, setSincronizado] = useState(false);
+  // Grupo(s) musculares do dia (pedido do dono, 2026-08-07) — filtra o
+  // exercício mostrado no formulário. Vive só nesta sessão de treino, não
+  // é persistido: o app não prescreve programa (PRD §5, escopo negativo),
+  // isto é conveniência de tela, não um plano salvo.
+  const [gruposEscolhidos, setGruposEscolhidos] = useState<string[]>([]);
   const grupos = useMemo(() => agruparPorExercicio(series), [series]);
   const ultima = series[series.length - 1];
+
+  const opcoesGrupo = useMemo<OpcaoGrupo[]>(() => {
+    const porId = new Map<string, string>();
+    for (const e of exercicios) porId.set(e.grupoMuscularPrimario, e.grupoMuscularNome);
+    return Array.from(porId.entries())
+      .map(([id, nome]) => ({ id, nome }))
+      .sort((a, b) => a.nome.localeCompare(b.nome, "pt-BR"));
+  }, [exercicios]);
+
+  const exerciciosFiltrados = useMemo(
+    () => exercicios.filter((e) => gruposEscolhidos.includes(e.grupoMuscularPrimario)),
+    [exercicios, gruposEscolhidos],
+  );
 
   /** Drena a fila e reflete o resultado no indicador de sync (D7). */
   const drenar = useCallback(async () => {
@@ -355,13 +374,24 @@ export default function TreinoDetalhe({
           })
         )}
 
-        {formularioAberto && (
+        {formularioAberto && gruposEscolhidos.length === 0 && (
+          <SeletorGrupoMuscular opcoes={opcoesGrupo} onConfirmar={setGruposEscolhidos} />
+        )}
+
+        {formularioAberto && gruposEscolhidos.length > 0 && (
           <section className="grupo">
             <div className="grupo__cab">
               <h2 className="grupo__nome">Registrar série</h2>
+              <button
+                type="button"
+                className="botao-textual"
+                onClick={() => setGruposEscolhidos([])}
+              >
+                Trocar grupo
+              </button>
             </div>
             <FormularioSerie
-              exercicios={exercicios}
+              exercicios={exerciciosFiltrados}
               onRegistrar={registrarPeloFormulario}
             />
           </section>
