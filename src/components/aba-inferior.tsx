@@ -3,7 +3,7 @@
 // por PESO além da cor: cor nunca é o único canal.
 import Link from "next/link";
 
-type Secao = "bancada" | "analise" | "catalogo" | "coach";
+type Secao = "inicio" | "bancada" | "analise" | "catalogo" | "coach";
 
 const SECOES: {
   id: Secao;
@@ -12,6 +12,12 @@ const SECOES: {
   /** Traçado, nunca preenchido — regra do padrão. */
   caminho: string;
 }[] = [
+  {
+    id: "inicio",
+    href: "/",
+    rotulo: "Início",
+    caminho: "M3 11l9-8 9 8M5 10v10h14V10",
+  },
   {
     id: "bancada",
     href: "/treino",

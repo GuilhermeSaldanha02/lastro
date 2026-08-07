@@ -11,10 +11,13 @@ export async function GET(request: Request) {
   // `next` vem da URL — só aceita caminho relativo. Sem esta trava, um
   // link forjado (`?next=//site-malicioso`) transformaria o callback num
   // redirecionamento aberto, usando o domínio do lastro como fachada.
-  const bruto = searchParams.get("next") ?? "/treino";
+  //
+  // A home ("/") é a porta de entrada única do app (2026-08-06) — login
+  // com Google também volta pra lá, não direto pro treino.
+  const bruto = searchParams.get("next") ?? "/";
   const proximo = bruto.startsWith("/") && !bruto.startsWith("//")
     ? bruto
-    : "/treino";
+    : "/";
 
   /**
    * Na Vercel o app roda atrás de um balanceador: `new URL(request.url).origin`

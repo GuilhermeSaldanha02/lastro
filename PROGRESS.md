@@ -378,3 +378,15 @@ Review integral do Inspetor · todas as fitness functions · E2E das 3 jornadas 
 ## Abordagens que falharam
 
 *(vazio — registrar aqui assim que algo não funcionar, com o motivo)*
+
+---
+
+## CRUD de treino e série · ✅ Concluída (2026-08-06)
+
+**Estado:** [AFK]. **Check executável:** `npx tsc --noEmit && npx vitest run && npx eslint . && npx next build` — todos limpos. Contraste e alvo de toque medidos em navegador real a 390px (ver DECISIONS.md da mesma data).
+
+**O que foi feito:** editar série, excluir série (fila offline, D6) e excluir treino inteiro (online-only), todos atrás de confirmação inline — nunca `window.confirm()`. Ver DECISIONS.md "2026-08-06 — CRUD de treino e série" para as decisões e para o estado em que parte deste trabalho foi encontrada (dados e um componente já existiam sem commit, sem estar ligados a nenhuma tela, e sem o projeto compilar).
+
+**NÃO verificado — e não dá pra verificar daqui:** nenhuma das três operações foi testada logada, num navegador real, contra o Supabase de verdade. Toda a verificação visual foi feita injetando a marcação real sobre a folha de estilo real (sem dado de servidor). Pendente: o dono abrir `/treino` logado, editar uma série, excluir uma série, excluir um treino, e confirmar que os três casos funcionam e que a Análise Semanal reflete a edição.
+
+**Nota sobre este documento:** `PROGRESS.md` ficou defasado durante boa parte da Fase 3 — trabalho de aplicação visual, catálogo e coach foi commitado sem atualizar este arquivo, quebrando a própria regra que ele declara ("atualizar é ação final obrigatória de toda tarefa"). As seções de Fase 3/4/5/6 abaixo **não refletem mais o estado real do código** — ficam como estão até uma passada dedicada de reconciliação, em vez de eu reescrever a história sem ter certeza de todos os detalhes.

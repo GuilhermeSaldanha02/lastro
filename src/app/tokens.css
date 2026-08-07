@@ -49,7 +49,7 @@
   --lastro-plato:  #8A5A0B; /* estagnação.  5.59:1 — âmbar, nunca vermelho */
   --lastro-queda:  #A33220; /* regressão.   6.53:1 */
   --lastro-sync:   #2E6076; /* sincronização (D7). 5.75:1. Jamais vermelho */
-  --lastro-erro:   #A32014; /* RESERVADO: falha real. 6.33:1 */
+  --lastro-erro:   #A32014; /* RESERVADO: falha real e ação destrutiva (excluir). 6.33:1 no fundo, 7.57:1 com texto branco */
   --lastro-foco:   #0B5CAB; /* 5.60:1 */
 
   /* ---- Espaçamento: base 4px. 48 (D1) cai exatamente na escala ---- */
@@ -149,6 +149,11 @@
   /* ---- Medidas de leitura ---- */
   --lastro-largura-entrada: 26rem; /* coluna do login */
   --lastro-medida-leitura:  34em;  /* medida confortável da prosa */
+
+  /* A aba inferior é `position: fixed` (100% mobile, 2026-08-06) — sai do
+     fluxo. Toda tela que a usa soma isto ao padding-bottom do que fica
+     por último acima dela, senão o conteúdo esconde embaixo da barra. */
+  --lastro-clearance-nav: calc(var(--lastro-alvo-min) + env(safe-area-inset-bottom, 0px));
 
   /* ---- Duração (respeitar prefers-reduced-motion) ---- */
   --lastro-dur-1: 120ms;

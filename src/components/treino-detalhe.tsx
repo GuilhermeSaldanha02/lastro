@@ -6,14 +6,25 @@
 // elevador derruba o sinal"), o registro continua funcionando — a série
 // fica na fila até o próximo evento `online`.
 import { useCallback, useEffect, useMemo, useState } from "react";
-import type { Exercicio, NovaSerieInput, Serie } from "@/lib/dados/treino";
-import { criarSerieRemoto } from "@/lib/dados/treino";
+import type {
+  AtualizacaoSerieInput,
+  Exercicio,
+  NovaSerieInput,
+  Serie,
+} from "@/lib/dados/treino";
+import {
+  atualizarSerieRemoto,
+  criarSerieRemoto,
+  excluirSerieRemoto,
+  excluirTreinoRemoto,
+} from "@/lib/dados/treino";
 import { enfileirar, sincronizar } from "@/lib/offline/outbox";
 import {
   ouvirPedidosDeSincronizacao,
   pedirSincronizacaoEmSegundoPlano,
 } from "@/lib/offline/sincronizacao-em-segundo-plano";
 import FormularioSerie, { type DadosNovaSerie } from "./formulario-serie";
+import EditarSerie, { type DadosEdicaoSerie } from "./editar-serie";
 
 async function sincronizarPendentes() {
   return sincronizar({
@@ -22,6 +33,21 @@ async function sincronizarPendentes() {
     criar_treino: async () => {},
     criar_serie: async (payload) => {
       await criarSerieRemoto(payload as unknown as NovaSerieInput);
+    },
+    atualizar_serie: async (payload) => {
+      await atualizarSerieRemoto(payload as unknown as AtualizacaoSerieInput);
+    },
+    excluir_serie: async (payload) => {
+      await excluirSerieRemoto((payload as { id: string }).id);
+    },
+    // Excluir o TREINO inteiro é ação online-only, disparada da lista
+    // (`/treino`, via `ExcluirTreino`) — decisão consciente, não omissão:
+    // é ação rara, geralmente feita revendo o histórico com calma, não no
+    // meio do treino sem sinal (D6 protege o registro, não a limpeza).
+    // Este handler existe só para a fila nunca ficar com um tipo sem
+    // executor, caso algo venha a enfileirar isto no futuro.
+    excluir_treino: async (payload) => {
+      await excluirTreinoRemoto((payload as { id: string }).id);
     },
   });
 }
@@ -60,6 +86,8 @@ export default function TreinoDetalhe({
 }) {
   const [series, setSeries] = useState(seriesIniciais);
   const [formularioAberto, setFormularioAberto] = useState(false);
+  const [editandoId, setEditandoId] = useState<string | null>(null);
+  const [excluindoId, setExcluindoId] = useState<string | null>(null);
   // D7 — reflete a fila de verdade: só vira "sincronizado" quando uma
   // drenagem termina sem falha. Nunca é apresentado como erro.
   const [sincronizado, setSincronizado] = useState(false);
@@ -161,6 +189,51 @@ export default function TreinoDetalhe({
     setFormularioAberto(false);
   }
 
+  /**
+   * Corrige uma série já registrada — mesma cena de D6 (errar o peso no
+   * meio do treino, sem sinal, e querer arrumar na hora), por isso a
+   * mesma fila offline da criação, não uma chamada direta.
+   */
+  async function editarSerie(id: string, dados: DadosEdicaoSerie): Promise<void> {
+    setSeries((atual) =>
+      atual.map((serie) => (serie.id === id ? { ...serie, ...dados } : serie)),
+    );
+
+    await enfileirar("atualizar_serie", {
+      id,
+      tipo: dados.tipo,
+      reps: dados.reps,
+      peso: dados.peso,
+      rir: dados.rir,
+      pesoCorporalIncluso: dados.pesoCorporalIncluso,
+    });
+
+    const resultado = await drenar();
+    if (resultado.falhou) {
+      void pedirSincronizacaoEmSegundoPlano();
+    }
+    setEditandoId(null);
+  }
+
+  /**
+   * Exclui uma série. Otimista, como o registro: some da lista na hora,
+   * a fila sobe quando a rede permitir. Não desfaz visualmente se a
+   * sincronização falhar — o item já saiu da tela porque foi essa a
+   * intenção do dono, e a fila garante que o servidor alcança essa
+   * intenção assim que possível.
+   */
+  async function excluirSerie(id: string): Promise<void> {
+    setSeries((atual) => atual.filter((serie) => serie.id !== id));
+    setExcluindoId(null);
+
+    await enfileirar("excluir_serie", { id });
+
+    const resultado = await drenar();
+    if (resultado.falhou) {
+      void pedirSincronizacaoEmSegundoPlano();
+    }
+  }
+
   return (
     <>
       <div className="corpo corpo--com-nav">
@@ -178,27 +251,105 @@ export default function TreinoDetalhe({
                   <span className="grupo__cont">{valendo} valendo</span>
                 </div>
 
-                {grupo.series.map((serie, indice) => (
-                  <div className="serie" key={serie.id}>
-                    <span className="serie__i">{indice + 1}</span>
-                    <span className="serie__v">
-                      {serie.reps}
-                      <span className="serie__x">×</span>
-                      {serie.peso}
-                      <span className="serie__un">kg</span>
-                    </span>
-                    {/* Cor nunca é o único canal: a palavra carrega o sentido. */}
-                    <span
-                      className={
-                        serie.tipo === "aquecimento"
-                          ? "marca marca--aquecimento"
-                          : "marca marca--valendo"
-                      }
+                {grupo.series.map((serie, indice) => {
+                  if (editandoId === serie.id) {
+                    return (
+                      <EditarSerie
+                        key={serie.id}
+                        serie={serie}
+                        onSalvar={(dados) => editarSerie(serie.id, dados)}
+                        onCancelar={() => setEditandoId(null)}
+                      />
+                    );
+                  }
+
+                  if (excluindoId === serie.id) {
+                    return (
+                      <div className="confirma" key={serie.id}>
+                        <p className="confirma__texto">
+                          Excluir a série {indice + 1} de {grupo.nome} —{" "}
+                          {serie.reps} × {serie.peso} kg? Não dá para desfazer.
+                        </p>
+                        <div className="confirma__acoes">
+                          <button
+                            type="button"
+                            className="botao-secundario"
+                            onClick={() => setExcluindoId(null)}
+                          >
+                            Cancelar
+                          </button>
+                          <button
+                            type="button"
+                            className="botao-destrutivo"
+                            onClick={() => void excluirSerie(serie.id)}
+                          >
+                            Excluir
+                          </button>
+                        </div>
+                      </div>
+                    );
+                  }
+
+                  return (
+                    // A linha inteira é o alvo de correção — tocar nela
+                    // abre a edição, um alcance maior que um lápis
+                    // minúsculo (D1: dedo suado, sem precisão fina). Só
+                    // excluir pede confirmação; abrir a edição não muda
+                    // nada até o dono apertar Salvar.
+                    <div
+                      className="serie"
+                      key={serie.id}
+                      role="button"
+                      tabIndex={0}
+                      onClick={() => setEditandoId(serie.id)}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter" || e.key === " ") {
+                          e.preventDefault();
+                          setEditandoId(serie.id);
+                        }
+                      }}
                     >
-                      {serie.tipo}
-                    </span>
-                  </div>
-                ))}
+                      <span className="serie__i">{indice + 1}</span>
+                      <span className="serie__v">
+                        {serie.reps}
+                        <span className="serie__x">×</span>
+                        {serie.peso}
+                        <span className="serie__un">kg</span>
+                      </span>
+                      {/* Cor nunca é o único canal: a palavra carrega o sentido. */}
+                      <span
+                        className={
+                          serie.tipo === "aquecimento"
+                            ? "marca marca--aquecimento"
+                            : "marca marca--valendo"
+                        }
+                      >
+                        {serie.tipo}
+                      </span>
+                      <button
+                        type="button"
+                        className="botao-icone serie__excluir"
+                        aria-label={`Excluir série ${indice + 1} de ${grupo.nome}`}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setExcluindoId(serie.id);
+                        }}
+                      >
+                        <svg
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          aria-hidden="true"
+                        >
+                          <path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3" />
+                        </svg>
+                      </button>
+                    </div>
+                  );
+                })}
               </section>
             );
           })

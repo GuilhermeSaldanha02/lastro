@@ -220,3 +220,26 @@ Também corrigidos, achados menores confirmados por leitura direta (sem precisar
 **Achados NÃO corrigidos, registrados como pendência conhecida (baixa severidade, não bloqueiam o PR):** a Análise não deixa explícito no parecer/UI qual semana está sendo analisada (achados #5/#6 do Inspetor); `grupos_sem_estimulo` sem teto de tamanho (achado #7); boilerplate do Next não customizado em `page.tsx`/`layout.tsx`. Nenhum desses compromete a correção dos números — são polimento, candidatos à Fase 3.
 
 **Como reverter.** Reverter o commit — `tempo.test.ts`, os 2 testes novos em `validador.test.ts` e o T-S3 em `estagnacao.test.ts` travam as 3 correções de lógica; removê-los sem reverter o código quebraria a suíte silenciosamente.
+
+---
+
+## 2026-08-06 — CRUD de treino e série: editar, excluir, com confirmação inline
+
+**O que mudou.** Adição de escopo ao PRD §4.1 (ADIÇÃO, não versão nova — complementa o MVP sem mudar direção): agora dá para **editar uma série**, **excluir uma série** e **excluir um treino inteiro**, cada exclusão atrás de confirmação explícita na tela, nunca `window.confirm()`.
+
+**Por quê.** Registrar sem poder corrigir não é MVP — é armadilha: um peso digitado errado ficava contaminando a Análise Semanal até alguém notar, e não havia como tirar um treino de teste ou duplicado da lista. O dono apontou a falta diretamente ("cadê a opção de apagar o dia de treino?").
+
+**Estado em que este trabalho foi encontrado.** Parte já existia, sem commit, no working tree: `atualizarSerieRemoto`, `excluirSerieRemoto`, `excluirTreinoRemoto`/`excluirTreino` em `src/lib/dados/treino.ts`, os três tipos novos em `TipoMutacao` (`src/lib/offline/db.ts`), e o componente `src/components/excluir-treino.tsx` já pronto. Nada disso estava commitado nem ligado a nenhuma tela — `tsc` não compilava (o mapa de executores da fila offline não cobria os 3 tipos novos, e `buscarTreino` não populava o campo `totalSeries` que a própria confirmação de exclusão precisa). Esta entrada documenta o trabalho **completo**: o que já existia mais o que faltava.
+
+**Decisões tomadas para fechar:**
+- **Editar/excluir série entram na MESMA fila offline da criação** (D6) — já decidido por quem começou o trabalho, mantido: é a mesma cena, corrigir um erro no meio do treino, sem sinal.
+- **Excluir treino é online-only**, deliberadamente. É ação mais rara, tipicamente feita revendo o histórico com calma — não é a cena que D6 protege.
+- **A linha da série inteira é o alvo de edição** (tocar nela abre o formulário), não um lápis pequeno — D1 (dedo suado, sem precisão fina). Só o ícone de excluir é um alvo à parte, com `stopPropagation` para não abrir a edição junto.
+- **Editar não pode trocar o exercício** da série — `atualizarSerieRemoto` não aceita `exercicioId`. Mudar a que exercício uma série pertence é operação diferente, fora de escopo aqui.
+- **Cor do botão destrutivo:** `--lastro-erro`, cujo comentário em `tokens.css` foi corrigido de "reservado a falha real" para "falha real e ação destrutiva" — esse era o escopo original do token antes da troca de paleta da Fase 3, só não tinha sido usado ainda.
+
+**Alternativa descartada.** `window.confirm()` nativo para a exclusão — mais rápido de implementar, descartado porque no celular é um alerta de sistema, fácil de tocar "OK" sem ler, e não mostra quantas séries somem junto.
+
+**Impacto.** PRD §4.1 e §7 (critérios A11–A13) atualizados. Nenhuma migração nova: o schema já previa isto desde o início (`grant update, delete`, `on delete cascade`, RLS `for all`) — só a camada de aplicação faltava.
+
+**Como reverter.** Reverter o commit desta entrada. Os testes de `outbox.test.ts` foram atualizados para cobrir os 3 executores novos — removê-los sem reverter o código quebraria a suíte silenciosamente.

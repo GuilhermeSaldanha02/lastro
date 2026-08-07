@@ -2,11 +2,11 @@
   "name": "lastro",
   "short_name": "lastro",
   "description": "Registro de treino e leitura semanal com IA — app pessoal.",
-  "start_url": "/treino",
+  "start_url": "/",
   "scope": "/",
   "display": "standalone",
-  "background_color": "#ffffff",
-  "theme_color": "#171717",
+  "background_color": "#F0EAE0",
+  "theme_color": "#17414F",
   "lang": "pt-BR",
   "icons": [
     {
