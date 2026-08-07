@@ -243,3 +243,19 @@ Também corrigidos, achados menores confirmados por leitura direta (sem precisar
 **Impacto.** PRD §4.1 e §7 (critérios A11–A13) atualizados. Nenhuma migração nova: o schema já previa isto desde o início (`grant update, delete`, `on delete cascade`, RLS `for all`) — só a camada de aplicação faltava.
 
 **Como reverter.** Reverter o commit desta entrada. Os testes de `outbox.test.ts` foram atualizados para cobrir os 3 executores novos — removê-los sem reverter o código quebraria a suíte silenciosamente.
+
+---
+
+## 2026-08-06 — Stack real diverge do ADR-004: Serwist e Playwright nunca adotados
+
+**O que mudou.** Nada no código — esta entrada só registra um drift que já existia e nunca tinha sido documentado. `ADR.md` (ADR-004) decidiu **Serwist** para o service worker e **Vitest + Playwright** para testes. O que foi construído: um `public/sw.js` **hand-rolled mínimo** (install/activate/fetch passthrough, sem estratégia de cache — suficiente pra passar o critério de instalabilidade do PWA) e **só Vitest**, sem nenhum teste E2E.
+
+**Por quê registrar agora.** `ADR.md` é append-only — a entrada original não se apaga nem se reescreve. Mas `ARCHITECTURE.md` (snapshot vivo) e `CLAUDE.md` (índice) citavam Serwist e Playwright como se estivessem em uso, o que é falso. Um agente novo lendo esses arquivos tentaria integrar Serwist a um service worker que não o usa.
+
+**Alternativa descartada.** Reescrever a entrada do ADR-004 para "corrigir" — descartado porque viola a própria regra do documento (decisão nova é entrada nova). Esta entrada é a correção, não uma edição da original.
+
+**Impacto.** Nenhum funcional. `ARCHITECTURE.md` e `CLAUDE.md` foram corrigidos para descrever a stack real, com nota apontando pra cá.
+
+**Decisão pendente, não tomada aqui — é do dono:** adotar Serwist de verdade (o SW mínimo não tem estratégia de cache — funciona, mas não é robusto) e escrever os primeiros E2E com Playwright são candidatos à Fase 6 (Integração final), não urgência.
+
+**Como reverter.** Não há o que reverter — é registro de um fato sobre o código, não uma mudança nele.

@@ -358,35 +358,58 @@ Quota checada com uma chamada direta à API antes de gastar esforço recriando d
 
 ---
 
-## Fase 3 — Registro e gráficos · ⬜ Não iniciada
-Histórico de treinos · e1RM e volume por exercício no tempo · volume semanal por grupo muscular. Gate visual em celular real com contraste AA **medido** (D8, A10).
+## Fase 3 — Identidade visual e telas · 🔶 Reconciliada em 2026-08-06
 
-## Fase 4 — Catálogo curado · ⬜ Não iniciada
-~100 exercícios em PT-BR real, com dicas de execução **escritas e revisadas** (FF7, A9) e aviso de que não substituem profissional. Trabalho de redação, não import de API.
+O que este bloco descrevia originalmente ("histórico de treinos · e1RM e volume por exercício no tempo · volume semanal por grupo muscular") **não é o que foi construído.** O que aconteceu de fato, numa sessão longa sem atualizar este arquivo no caminho:
 
-## Fase 5 — Coach 24h · ⬜ Não iniciada
-Chat de dúvidas pelo mesmo proxy server-side. **Não improvisa técnica de movimento** (ADR-007).
+**Concluído:**
+- Padrão visual "Areia & Azul Petróleo" (`DESIGN.md` §3, `src/app/tokens.css`, `src/app/sistema.css`) — aprovado pelo dono depois de 3 iterações de referência (moodboard gerado por IA, depois um segundo padrão de referência escolhido pelo dono).
+- Aplicado nas 8 telas que existem hoje: `/`, `/login`, `/treino`, `/treino/[id]`, `/analise`, `/catalogo`, `/coach`, e a aba inferior fixa com 5 seções.
+- Contraste AA e alvo de toque **medidos em navegador real**, não estimados — inclusive contra o Supabase real do dono, não só simulação (ver `DECISIONS.md` 2026-08-06).
+
+**NÃO concluído, e é o que a Fase 3 original pedia:**
+- **Gráfico de progressão** (e1RM e volume por exercício no tempo, volume semanal por grupo muscular) — `DESIGN.md` §3.7 já especifica o formato ("a pergunta é 'está subindo?', não 'quanto?'"), mas **nenhum componente de gráfico existe**. Não há `src/**/grafico*`. Fica para abrir a próxima sessão.
+- Gate visual **G6** (`DESIGN.md` §4.1, gráfico com platô) não pode nem começar sem o gráfico existir.
+
+## Fase 4 — Catálogo curado · 🔶 Infra pronta, conteúdo não escrito
+
+**Concluído:** a tela `/catalogo` existe, funciona, agrupa por grupo muscular, e **diz honestamente** quando a dica de execução não foi escrita em vez de esconder ou inventar (E3).
+
+**NÃO concluído:** o catálogo real de ~100 exercícios em PT-BR com dica de execução **escrita e revisada por humano** (FF7) nunca foi escrito. `supabase/seed.sql` segue com os 3 exercícios placeholder de teste, todos com `dica_execucao` nula. **Critério A9 do PRD não é atendido** ("contagem de campos vazios = 0"). Isto é trabalho de redação, não de código — precisa do dono ou de alguém que escreva e revise as dicas.
+
+## Fase 5 — Coach 24h · ✅ Concluída, verificação parcial
+
+`/coach` + `/api/coach` + o prompt do sistema (que recusa dar técnica de movimento, prescrever treino ou opinar sobre dor/sintoma) estão implementados e eram parte do padrão visual aplicado na Fase 3.
+
+**NÃO verificado:** nenhuma pergunta real foi enviada pelo Coach contra a API da Gemini de verdade — a tela foi validada com marcação injetada (mock), nunca com uma conversa real. Testar isso consome cota (~20 req/dia, `KNOWLEDGE.md` §3.2).
 
 ## Fase 6 — Integração final · ⬜ Não iniciada
-Review integral do Inspetor · todas as fitness functions · E2E das 3 jornadas · gate visual completo.
 
-**Pendências adiadas de fases anteriores, pra rodar aqui (não esquecer):**
-- **Tarefa 2.3 — ciclo completo de sincronização em celular real.** Já verificado: Background Sync implementado e testado com rede bloqueada no navegador (2026-08-05); app instalado abre em modo avião sem travar, no iPhone real (2026-08-06). **Falta**: registrar 3 séries com o app em modo avião de verdade, reconectar a rede, e conferir no PC que as séries chegaram sincronizadas — o ciclo fim a fim ainda não foi observado com o dono no controle. Adiado a pedido do dono em 2026-08-06 ("não precisa essa parte agora, anotar para os testes finais").
+Review integral do Inspetor · todas as fitness functions · E2E das 3 jornadas · gate visual completo em celular físico. Nada disto começou.
+
+---
+
+## Trabalho fora do plano de 6 fases — adicionado durante a Fase 3, concluído
+
+Surgiu de pedido direto do dono no meio da sessão, não estava em nenhum documento antes de acontecer:
+
+- **CRUD de treino e série** — editar série, excluir série (fila offline), excluir treino (online-only), todos com confirmação inline. PR #10, mergeado. Ver `DECISIONS.md` 2026-08-06. **Verificado contra o Supabase real** (ciclo criar → editar → excluir → confirmar que sumiu, sem deixar rastro no histórico real do dono).
+- **Home (`/`) como porta de entrada única do app** — painel com resumo real da semana (`src/lib/dados/resumo-home.ts`, reusa `calcularVolume` do mesmo agregador da Análise — sem número inventado), ação de continuar/iniciar treino, atalho pra Análise, treinos recentes. `manifest.webmanifest` e os dois pontos de login (e-mail e Google) redirecionam pra cá, não mais direto pro `/treino`.
+- **Aba inferior fixa de verdade** (`position: fixed`, com `env(safe-area-inset-bottom)` pra barra de gestos do iPhone) — o app é 100% mobile, pedido explícito do dono.
+
+---
+
+## Pendências consolidadas — não esquecer
+
+1. **Gráfico de progressão** (Fase 3 original) — não iniciado. Provável próximo passo de maior impacto: sem ele, a Análise Semanal (a peça-assinatura) não tem a companhia visual que `DESIGN.md` §3.7 desenha.
+2. **Conteúdo do catálogo** (Fase 4) — redação de ~100 dicas de execução revisadas. Trabalho humano, não técnico.
+3. **CSS responsivo pra tablet/desktop** (tarefa registrada antes da Fase 3) — **tensão não resolvida**: o dono disse explicitamente "o intuito é 100% mobile" ao pedir a barra fixa. Perguntar se essa tarefa ainda vale ou se foi superada por essa direção, antes de gastar esforço nela.
+4. **Dados de perfil do usuário** (nome, foto) — pedido do dono em 2026-08-06, explicitamente para a **próxima fase**, não esta. Hoje o cadastro por e-mail não guarda nome nenhum; o login por Google devolve nome e foto (`full_name`, `avatar_url` em `user_metadata`) mas nada é persistido nem mostrado em tela alguma.
+5. **Ciclo de sincronização offline em celular real** (tarefa 2.3, adiada desde 2026-08-06) — falta registrar séries em modo avião de verdade, reconectar, e conferir no PC.
+6. **Faixa de referência de volume por grupo muscular e `N` semanas de estagnação** (PRD §10) — conferido nesta reconciliação: seguem TODO, precisam de fonte primária pesquisada, não número de memória (assunto de saúde). Os outros dois TODOs de §10 (quota da Gemini, liberação semanal do botão) já estavam resolvidos e o PRD foi corrigido para refletir isso.
 
 ---
 
 ## Abordagens que falharam
 
 *(vazio — registrar aqui assim que algo não funcionar, com o motivo)*
-
----
-
-## CRUD de treino e série · ✅ Concluída (2026-08-06)
-
-**Estado:** [AFK]. **Check executável:** `npx tsc --noEmit && npx vitest run && npx eslint . && npx next build` — todos limpos. Contraste e alvo de toque medidos em navegador real a 390px (ver DECISIONS.md da mesma data).
-
-**O que foi feito:** editar série, excluir série (fila offline, D6) e excluir treino inteiro (online-only), todos atrás de confirmação inline — nunca `window.confirm()`. Ver DECISIONS.md "2026-08-06 — CRUD de treino e série" para as decisões e para o estado em que parte deste trabalho foi encontrada (dados e um componente já existiam sem commit, sem estar ligados a nenhuma tela, e sem o projeto compilar).
-
-**NÃO verificado — e não dá pra verificar daqui:** nenhuma das três operações foi testada logada, num navegador real, contra o Supabase de verdade. Toda a verificação visual foi feita injetando a marcação real sobre a folha de estilo real (sem dado de servidor). Pendente: o dono abrir `/treino` logado, editar uma série, excluir uma série, excluir um treino, e confirmar que os três casos funcionam e que a Análise Semanal reflete a edição.
-
-**Nota sobre este documento:** `PROGRESS.md` ficou defasado durante boa parte da Fase 3 — trabalho de aplicação visual, catálogo e coach foi commitado sem atualizar este arquivo, quebrando a própria regra que ele declara ("atualizar é ação final obrigatória de toda tarefa"). As seções de Fase 3/4/5/6 abaixo **não refletem mais o estado real do código** — ficam como estão até uma passada dedicada de reconciliação, em vez de eu reescrever a história sem ter certeza de todos os detalhes.

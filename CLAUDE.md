@@ -19,7 +19,7 @@ Responda sempre em **pt-BR** e instrua todo subagente a responder em pt-BR — a
 | Glossário do domínio, pesquisa, achados técnicos | `KNOWLEDGE.md` (carregue **por seção**) |
 | Histórico de decisões | `DECISIONS.md` |
 | Cores, espaçamento, tipografia, restrições de UI | `DESIGN.md` (fonte única) |
-| Spec técnica de uma tarefa | `SDD.md` *(ainda não existe — nasce na Fase 1)* |
+| Spec técnica da Fase 1 (a fatia vertical da peça-assinatura) | `SDD.md` |
 
 ---
 
@@ -42,15 +42,23 @@ Responda sempre em **pt-BR** e instrua todo subagente a responder em pt-BR — a
 
 ## Stack
 
-Next.js (App Router) na Vercel · Supabase (Auth + Postgres + RLS) · Dexie/IndexedDB + Serwist para offline · Recharts · `@google/genai` server-side · Vitest + Playwright.
+Next.js (App Router) na Vercel · Supabase (Auth + Postgres + RLS) · Dexie/IndexedDB + service worker hand-rolled para offline · Recharts (ainda não usado — gráfico não construído) · `@google/genai` server-side · Vitest.
 
-Alternativas descartadas e o motivo de cada uma: `ADR-004`. **Não rediscutir sem passar por lá.**
+Alternativas descartadas e o motivo de cada uma: `ADR-004`. **Não rediscutir sem passar por lá.** Onde a stack real diverge do que o ADR decidiu (Serwist, Playwright — nenhum dos dois foi adotado): `DECISIONS.md` 2026-08-06, "Stack real diverge do ADR-004".
 
 ---
 
 ## Comandos
 
-*(a preencher quando o projeto for inicializado na Fase 1)*
+```bash
+npm run dev     # dev server (porta padrão do Next)
+npm run build   # build de produção
+npm run start   # roda o build
+npm run lint    # eslint
+npm run test    # vitest run — 66 testes
+```
+
+Verificação completa antes de commit: `npx tsc --noEmit && npm run test && npm run lint && npm run build`.
 
 ---
 
