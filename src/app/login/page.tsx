@@ -34,6 +34,7 @@ function AvisoDeErroNaUrl() {
 export default function PaginaLogin() {
   const router = useRouter();
   const [modo, setModo] = useState<"entrar" | "criar-conta">("entrar");
+  const [nome, setNome] = useState("");
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
   const [mensagem, setMensagem] = useState<string | null>(null);
@@ -47,7 +48,7 @@ export default function PaginaLogin() {
     const resultado =
       modo === "entrar"
         ? await entrarComEmail(email, senha)
-        : await criarContaComEmail(email, senha);
+        : await criarContaComEmail(email, senha, nome);
 
     setCarregando(false);
 
@@ -90,6 +91,22 @@ export default function PaginaLogin() {
         </Suspense>
 
         <form className="formulario" onSubmit={aoEnviar}>
+          {modo === "criar-conta" && (
+            <div className="campo">
+              <label className="campo__rotulo" htmlFor="nome">
+                Nome
+              </label>
+              <input
+                id="nome"
+                type="text"
+                autoComplete="name"
+                value={nome}
+                onChange={(e) => setNome(e.target.value)}
+                required
+              />
+            </div>
+          )}
+
           <div className="campo">
             <label className="campo__rotulo" htmlFor="email">
               E-mail

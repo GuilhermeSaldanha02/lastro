@@ -8,9 +8,11 @@
 import Link from "next/link";
 import { listarTreinos, criarTreino } from "@/lib/dados/treino";
 import { sair } from "@/lib/dados/auth";
+import { obterPerfil } from "@/lib/dados/perfil";
 import { dataLocalBrasil } from "@/lib/tempo";
 import AbaInferior from "@/components/aba-inferior";
 import ExcluirTreino from "@/components/excluir-treino";
+import Avatar from "@/components/avatar";
 
 /** "2026-08-06" → "6 ago". A data já vem local; não há fuso a converter. */
 function formatarData(iso: string): string {
@@ -25,7 +27,7 @@ function formatarData(iso: string): string {
 }
 
 export default async function PaginaTreino() {
-  const treinos = await listarTreinos();
+  const [treinos, perfil] = await Promise.all([listarTreinos(), obterPerfil()]);
   // Mesma checagem da home (src/app/page.tsx) — sem isto, esta tela sempre
   // oferecia "Iniciar treino de hoje" mesmo com um treino de hoje já em
   // andamento, e clicar de novo criava outro (achado do dono, 2026-08-07;
@@ -41,11 +43,14 @@ export default async function PaginaTreino() {
             <p className="barra-topo__contexto">lastro</p>
             <h1 className="barra-topo__titulo">Treinos</h1>
           </div>
-          <form action={sair}>
-            <button type="submit" className="botao-barra">
-              Sair
-            </button>
-          </form>
+          <div className="barra-topo__usuario">
+            {perfil && <Avatar nome={perfil.nome} avatarUrl={perfil.avatarUrl} />}
+            <form action={sair}>
+              <button type="submit" className="botao-barra">
+                Sair
+              </button>
+            </form>
+          </div>
         </div>
       </header>
 

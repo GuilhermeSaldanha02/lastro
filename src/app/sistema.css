@@ -96,6 +96,34 @@
   gap: var(--lastro-e-3);
 }
 
+.barra-topo__usuario {
+  display: flex;
+  align-items: center;
+  gap: var(--lastro-e-3);
+}
+
+/* Foto ou iniciais — mesmo alvo de toque mínimo (D1) que os outros
+   ícones circulares da barra, ainda que não seja clicável hoje. */
+.avatar {
+  width: var(--lastro-alvo-min);
+  height: var(--lastro-alvo-min);
+  border-radius: 50%;
+  border: 1px solid var(--lastro-barra-traco);
+  object-fit: cover;
+  flex: none;
+}
+
+.avatar--iniciais {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(240, 234, 224, 0.12);
+  color: var(--lastro-barra-txt);
+  font-size: var(--lastro-t-meta);
+  font-weight: var(--lastro-peso-forte);
+  letter-spacing: 0.02em;
+}
+
 /* ---------- Ações ---------- */
 .botao-primario {
   width: 100%;

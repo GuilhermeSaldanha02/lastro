@@ -5,8 +5,10 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { buscarTreino, listarCatalogo } from "@/lib/dados/treino";
+import { obterPerfil } from "@/lib/dados/perfil";
 import TreinoDetalhe from "@/components/treino-detalhe";
 import AbaInferior from "@/components/aba-inferior";
+import Avatar from "@/components/avatar";
 
 const DIAS = [
   "domingo", "segunda", "terça", "quarta", "quinta", "sexta", "sábado",
@@ -30,9 +32,10 @@ export default async function PaginaTreinoDetalhe({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const [treino, exercicios] = await Promise.all([
+  const [treino, exercicios, perfil] = await Promise.all([
     buscarTreino(id),
     listarCatalogo(),
+    obterPerfil(),
   ]);
 
   if (!treino) notFound();
@@ -45,9 +48,12 @@ export default async function PaginaTreinoDetalhe({
             <p className="barra-topo__contexto">{formatarContexto(treino.data)}</p>
             <h1 className="barra-topo__titulo">Treino em andamento</h1>
           </div>
-          <Link href="/treino" className="botao-barra">
-            Treinos
-          </Link>
+          <div className="barra-topo__usuario">
+            {perfil && <Avatar nome={perfil.nome} avatarUrl={perfil.avatarUrl} />}
+            <Link href="/treino" className="botao-barra">
+              Treinos
+            </Link>
+          </div>
         </div>
       </header>
 

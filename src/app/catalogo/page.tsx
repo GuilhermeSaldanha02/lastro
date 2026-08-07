@@ -6,10 +6,12 @@
 // escrita, esta tela diz isso — não inventa, não esconde e não chama o
 // modelo. Vazio honesto vence texto plausível.
 import { listarCatalogo } from "@/lib/dados/treino";
+import { obterPerfil } from "@/lib/dados/perfil";
 import AbaInferior from "@/components/aba-inferior";
+import Avatar from "@/components/avatar";
 
 export default async function PaginaCatalogo() {
-  const exercicios = await listarCatalogo();
+  const [exercicios, perfil] = await Promise.all([listarCatalogo(), obterPerfil()]);
 
   // Agrupa por grupo muscular, preservando a ordem alfabética de nome que
   // veio do banco dentro de cada grupo.
@@ -31,8 +33,13 @@ export default async function PaginaCatalogo() {
   return (
     <main className="tela">
       <header className="barra-topo">
-        <p className="barra-topo__contexto">Catálogo</p>
-        <h1 className="barra-topo__titulo">Exercícios</h1>
+        <div className="barra-topo__acoes">
+          <div>
+            <p className="barra-topo__contexto">Catálogo</p>
+            <h1 className="barra-topo__titulo">Exercícios</h1>
+          </div>
+          {perfil && <Avatar nome={perfil.nome} avatarUrl={perfil.avatarUrl} />}
+        </div>
       </header>
 
       <div className="corpo corpo--com-nav">
