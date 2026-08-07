@@ -12,6 +12,7 @@ import { useState } from "react";
 import { PERGUNTAS, type NumeroPergunta } from "@/app/api/analise/perguntas";
 import Parecer from "@/components/parecer";
 import AbaInferior from "@/components/aba-inferior";
+import GraficoProgressao from "@/components/grafico-progressao";
 
 type Resultado = {
   parecer: string;
@@ -67,6 +68,8 @@ export default function PaginaAnalise() {
       </header>
 
       <div className="corpo corpo--com-nav">
+        <GraficoProgressao />
+
         <h2 className="doc__secao">Escolha a pergunta</h2>
         <ul className="perguntas">
           {(Object.keys(PERGUNTAS) as unknown as NumeroPergunta[]).map((numero) => (

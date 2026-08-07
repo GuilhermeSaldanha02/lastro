@@ -14,6 +14,17 @@ export const FAIXA_SERIES_SEMANAIS: [number, number] = [10, 20];
  */
 export const SEMANAS_ESTAGNACAO: number = 4;
 
+/**
+ * Platô do GRÁFICO de progressão (DESIGN.md §3.7) — regra descritiva/visual,
+ * DIFERENTE de SEMANAS_ESTAGNACAO acima (que é o limiar clínico que a Análise
+ * usa pra aconselhar ação, PRD §10, ainda TODO). Decidida com o dono em
+ * DECISIONS.md 2026-08-07, apoiada em pesquisa (RITFit, FitnessAI, Carbon
+ * Performance, Barbell Medicine convergem em 3–4 semanas sem melhora
+ * mensurável como o limiar comum de "plateau" em treino de força).
+ */
+export const PLATO_GRAFICO_SEMANAS: number = 3;
+export const PLATO_GRAFICO_TOLERANCIA: number = 0.02;
+
 /** Teto de reps para e1RM confiável. Convenção prática. Fonte: SDD §2/D1. */
 export const E1RM_REPS_MAX = 12;
 /** Piso de cobertura de RIR. Convenção prática. Fonte: SDD §2/D3. */
