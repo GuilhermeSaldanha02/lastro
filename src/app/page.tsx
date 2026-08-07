@@ -15,6 +15,7 @@ import { criarClienteServidor } from "@/lib/supabase/cliente-servidor";
 import { carregarResumoHome } from "@/lib/dados/resumo-home";
 import { criarTreino } from "@/lib/dados/treino";
 import { obterPerfil } from "@/lib/dados/perfil";
+import { sair } from "@/lib/dados/auth";
 import { dataLocalBrasil } from "@/lib/tempo";
 import AbaInferior from "@/components/aba-inferior";
 import Avatar from "@/components/avatar";
@@ -79,7 +80,14 @@ export default async function PaginaInicial() {
             <p className="barra-topo__contexto">lastro</p>
             <h1 className="barra-topo__titulo">Início</h1>
           </div>
-          {perfil && <Avatar nome={perfil.nome} avatarUrl={perfil.avatarUrl} />}
+          <div className="barra-topo__usuario">
+            {perfil && <Avatar nome={perfil.nome} avatarUrl={perfil.avatarUrl} />}
+            <form action={sair}>
+              <button type="submit" className="botao-barra">
+                Sair
+              </button>
+            </form>
+          </div>
         </div>
       </header>
 

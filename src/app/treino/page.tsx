@@ -7,7 +7,6 @@
 // primária fica na metade inferior, ao alcance do polegar (D2).
 import Link from "next/link";
 import { listarTreinos, criarTreino } from "@/lib/dados/treino";
-import { sair } from "@/lib/dados/auth";
 import { obterPerfil } from "@/lib/dados/perfil";
 import { dataLocalBrasil } from "@/lib/tempo";
 import AbaInferior from "@/components/aba-inferior";
@@ -43,14 +42,7 @@ export default async function PaginaTreino() {
             <p className="barra-topo__contexto">lastro</p>
             <h1 className="barra-topo__titulo">Treinos</h1>
           </div>
-          <div className="barra-topo__usuario">
-            {perfil && <Avatar nome={perfil.nome} avatarUrl={perfil.avatarUrl} />}
-            <form action={sair}>
-              <button type="submit" className="botao-barra">
-                Sair
-              </button>
-            </form>
-          </div>
+          {perfil && <Avatar nome={perfil.nome} avatarUrl={perfil.avatarUrl} />}
         </div>
       </header>
 
