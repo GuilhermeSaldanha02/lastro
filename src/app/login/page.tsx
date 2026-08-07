@@ -59,7 +59,10 @@ export default function PaginaLogin() {
       setMensagem("Conta criada — confirme seu e-mail antes de entrar.");
       return;
     }
-    router.push("/treino");
+    // A home (`/`) é a porta de entrada única do app — o dono pediu que
+    // tudo parta dela, não só o ícone instalado (ver ESCOPO/DECISIONS
+    // 2026-08-06). Login também volta pra lá, não direto pro treino.
+    router.push("/");
     router.refresh();
   }
 

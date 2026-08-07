@@ -20,8 +20,10 @@
    ocupa a própria altura. Reservar espaço aqui contava a nav duas vezes e
    empurrava a página 27px além do viewport, cortando os rótulos — medido
    a 390×844 em 2026-08-06. Aqui só entra respiro de leitura. */
+/* A barra é `fixed` — reserva a altura dela mais respiro, senão a
+   última série/linha da lista renderiza embaixo da barra (2026-08-06). */
 .corpo--com-nav {
-  padding-bottom: var(--lastro-e-6);
+  padding-bottom: calc(var(--lastro-clearance-nav) + var(--lastro-e-6));
 }
 
 /* ---------- Entrada ---------- */
@@ -318,8 +320,11 @@
 }
 
 /* ---------- Área de ação: metade inferior (D2) ---------- */
+/* Fica logo acima da barra fixa (`/treino`, `/treino/[id]`) — o botão
+   "Repetir última série" não pode nascer parcialmente embaixo dela. */
 .acao-area {
-  padding: var(--lastro-e-4) var(--lastro-e-5);
+  padding: var(--lastro-e-4) var(--lastro-e-5)
+    calc(var(--lastro-clearance-nav) + var(--lastro-e-4));
   border-top: 1px solid var(--lastro-linha);
   background: var(--lastro-fundo);
 }
@@ -434,13 +439,25 @@
 }
 
 /* ---------- Aba inferior: vidro, porque o conteúdo passa por baixo ---- */
+/* App é 100% mobile: a aba inferior fica FIXA na viewport, não no fluxo
+   da página (2026-08-06). Sai do fluxo por completo — toda tela que a usa
+   precisa reservar a própria altura dela + a área segura do sistema como
+   padding no que fica por último acima dela (ver `.corpo--com-nav`,
+   `.acao-area`, `.campo-conversa`). */
 .nav {
-  position: sticky;
+  position: fixed;
+  left: 0;
+  right: 0;
   bottom: 0;
+  z-index: 20;
   display: flex;
   border-top: 1px solid var(--lastro-linha);
   background: var(--lastro-vidro-opaco);
   box-shadow: var(--lastro-elev-nav), var(--lastro-bevel);
+  /* iPhone com barra de gestos: a barra de toque não pode ficar embaixo
+     dela. `viewport-fit: cover` (layout.tsx) é o que faz este valor
+     deixar de ser sempre 0. */
+  padding-bottom: env(safe-area-inset-bottom, 0px);
 }
 
 @supports (backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px)) {
@@ -918,11 +935,13 @@
   color: var(--lastro-txt-3);
 }
 
+/* Fica logo acima da barra fixa (`/coach`) — mesma razão de `.acao-area`. */
 .campo-conversa {
   display: flex;
   gap: var(--lastro-e-2);
   align-items: center;
-  padding: var(--lastro-e-3) var(--lastro-e-5);
+  padding: var(--lastro-e-3) var(--lastro-e-5)
+    calc(var(--lastro-clearance-nav) + var(--lastro-e-3));
   border-top: 1px solid var(--lastro-linha);
   background: var(--lastro-fundo);
 }

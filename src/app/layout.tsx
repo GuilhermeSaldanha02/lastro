@@ -37,6 +37,11 @@ export const viewport: Viewport = {
   // (--lastro-barra-a). Valor literal exigido pelo formato do manifesto:
   // metadata do Next não aceita `var()`.
   themeColor: "#17414F",
+  // A aba inferior é fixa e vai até a borda da tela (2026-08-06, "100%
+  // mobile"). Sem `cover`, o iPhone não estende o conteúdo sob a barra de
+  // gestos e `env(safe-area-inset-bottom)` (sistema.css) sempre mede 0 —
+  // a barra fica encostada na borda física, sem folga da barra de gestos.
+  viewportFit: "cover",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

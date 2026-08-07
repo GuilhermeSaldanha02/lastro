@@ -150,6 +150,11 @@
   --lastro-largura-entrada: 26rem; /* coluna do login */
   --lastro-medida-leitura:  34em;  /* medida confortável da prosa */
 
+  /* A aba inferior é `position: fixed` (100% mobile, 2026-08-06) — sai do
+     fluxo. Toda tela que a usa soma isto ao padding-bottom do que fica
+     por último acima dela, senão o conteúdo esconde embaixo da barra. */
+  --lastro-clearance-nav: calc(var(--lastro-alvo-min) + env(safe-area-inset-bottom, 0px));
+
   /* ---- Duração (respeitar prefers-reduced-motion) ---- */
   --lastro-dur-1: 120ms;
   --lastro-dur-2: 220ms;
