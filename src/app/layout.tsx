@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { IBM_Plex_Sans, IBM_Plex_Mono } from "next/font/google";
 import RegistrarServiceWorker from "@/components/registrar-service-worker";
+import ForcarInicioNoLancamento from "@/components/forcar-inicio-no-lancamento";
 import "./globals.css";
 
 // DESIGN.md §3.3 — duas famílias. Sans para tudo que se lê; Mono para
@@ -49,6 +50,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     <html lang="pt-BR" className={`${plexSans.variable} ${plexMono.variable}`}>
       <body>
         <RegistrarServiceWorker />
+        <ForcarInicioNoLancamento />
         {children}
       </body>
     </html>
