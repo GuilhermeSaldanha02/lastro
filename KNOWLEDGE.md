@@ -50,6 +50,26 @@
 
 Fontes: [Hevy vs Strong 2026](https://setgraph.app/ai-blog/hevy-vs-strong-app-comparison-2026) · [Alpha Progression](https://alphaprogression.com/en) · [Melhores apps de hipertrofia 2026](https://mesostrength.com/blog/best-hypertrophy-training-apps)
 
+### 2.1 Referências de DESENHO (não de feature) — pesquisa 2026-08-08
+
+Levantada a pedido do dono, para evoluir o visual sem trocar a base "Areia & Azul Petróleo". Distinta de §2 acima: lá o assunto é o que os concorrentes *fazem*; aqui é como eles *desenham*.
+
+**Hevy — capturas reais da App Store, olhadas (não só resenha).** Três achados estruturais transferíveis: (1) a faixa de resumo do treino (Tempo/Volume/Séries) **não usa cartão nenhum** — rótulo pequeno em cima, número embaixo, direto sobre o fundo; é por isso que sobra largura para o número; (2) a unidade fica **na mesma linha** do número (`6 800 kg`), nunca numa linha própria; (3) cartão só existe onde a coisa é objeto navegável (uma rotina), nunca para métrica. A linha de série ganha **fundo colorido na linha inteira** quando concluída — a cor preenche a linha, não um ícone. Estética geral: branca, fonte de sistema, azul — **genérica; copiar a estrutura, não o visual.**
+
+**WHOOP — o padrão de leitura de dado.** "One big number": uma métrica dominante em ~72pt, legível a distância de braço, todo o resto pequeno e secundário. Divulgação progressiva em 3 camadas (visão geral → tendência → dado bruto), "cada camada só adiciona complexidade quando o usuário pede". Cor estritamente semântica, nenhum acento arbitrário. **Oura** foi redesenhado com a mesma tese: cortar o ruído e focar em uma coisa grande.
+
+**Ergonomia (Steven Hoober, observação de 1.300 pessoas):** 49% seguram o celular com uma mão, 75% navegam com o polegar, zona natural = 25–40% inferiores da tela. Corrobora D2/D3 empiricamente.
+
+**Material 3 Expressive (Google — 46 estudos, 18 mil participantes):** em layouts com hierarquia tipográfica ampliada as pessoas identificam o elemento-chave **até 4× mais rápido**. É o argumento empírico a favor de aumentar o contraste de tamanho.
+
+**Botão "Sign in with Google" — guia oficial, requisito de verificação do app.** Variantes: Light (`#FFFFFF` + traço `#747775` 1px interno), Dark (`#131314` + `#8E918F`), Neutral (`#F2F2F2`, sem traço). Logo G colorido oficial obrigatório; **proibido** monocromático, proibido G sobre fundo não-padrão, proibido ícone sem botão com texto. Padding web 12/10/12px. Tipo especificado Google Sans Medium 14/20. Permite escalar preservando proporção.
+
+**Achado sobre o processo, não sobre design:** a galeria de referência permanente que as diretrizes mandam consultar antes de decisão visual (`3dgallery-eqrvxb8t.manus.space`) foi carregada e inspecionada — são **179 referências de WebGL/3D e e-commerce de luxo** (Three.js, GSAP, Lenis, Rolex, Louis Vuitton, Herman Miller). **Nada ali calibra um PWA de academia de uma mão só**, e o próprio `DESIGN.md` §3.0 já havia registrado que esse ramo é incompatível com D4 e D8. Só aproveita a régua de acabamento e a faixa de UI premium não-3D (Stripe, Linear, Vercel). O mandato aponta para um lugar inútil nesta classe de tarefa — pendência de documento.
+
+**Volume semanal por grupo muscular — fontes primárias localizadas (2026-08-08).** Complementam §3.6, que já resolveu a faixa 10–20 séries/semana. Candidatas para curadoria humana (FF7/ADR-007 proíbe gerar isto por LLM, e o que segue é **resumo de busca, não leitura do texto integral**): [The Resistance Training Dose Response — meta-regressões](https://pubmed.ncbi.nlm.nih.gov/41343037/) (PubMed) · [preprint aberto do mesmo estudo](https://sportrxiv.org/index.php/server/preprint/view/460) (SportRxiv) · [Quantificação de volume semanal por grupo muscular em atletas de físico](https://www.frontiersin.org/journals/sports-and-active-living/articles/10.3389/fspor.2025.1536360/full) (Frontiers). Marcos citados: ~4–8 séries/semana como mínimo efetivo, ~10–20 como faixa adaptativa, variação individual grande, retornos decrescentes. **Nada disso foi ligado no app.**
+
+Fontes de desenho: [Google branding guidelines](https://developers.google.com/identity/branding-guidelines) · [WHOOP design breakdown, 925studios](https://www.925studios.co/blog/whoop-design-breakdown) · [Oura app redesign](https://ouraring.com/blog/new-app-design/) · [Hevy na App Store](https://apps.apple.com/us/app/hevy-workout-tracker-gym-log/id1458862350) · [Material 3](https://m3.material.io/) · [Thumb zone / Hoober](https://parachutedesign.ca/blog/thumb-zone-ux/)
+
 ---
 
 ## 3. Achados técnicos
@@ -124,6 +144,10 @@ O LLM recebe métricas já calculadas e **apenas interpreta**. É a decisão de 
 ---
 
 ## 5. Lições
+
+**A fonte não tem a feature que o CSS estava pedindo — `slashed-zero` era um no-op (2026-08-08).** O dono reclamou duas vezes do zero pontuado do IBM Plex Mono. Antes de propor "desligar por CSS", abri os arquivos `.woff2` que o `next/font` já tinha baixado em `.next/dev/static/media/` com `fontTools` e conferi duas coisas: (1) o glifo `zero` tem **3 contornos** — externo, vazado, e um ponto centrado de 124×118 unidades — confirmando que é ponto, não barra; (2) o subset entregue **não tem a feature OpenType `zero`** nem nenhum stylistic set, só `ccmp/dnom/frac/numr`. Ou seja: `font-variant-numeric: slashed-zero` não faria absolutamente nada, e a única saída real é trocar a família. **Lição:** antes de propor uma propriedade tipográfica, inspecionar a tabela de features da fonte que o build realmente entrega — o subset do `next/font` é menor que a fonte completa, e a feature pode simplesmente não estar lá. Como efeito colateral: `font-variant-numeric: tabular-nums` em `tokens.css` também não tem `tnum` no subset (é inócuo em mono, onde todo glifo já tem a mesma largura, mas é declaração morta).
+
+**Especificação em texto não pega aritmética de layout — o mockup renderizado pegou (2026-08-08).** A prescrição do `diretor-arte` para a faixa de métricas dizia "espaço fino como separador de milhar". Ao renderizar o mockup de verdade e **medir**, `14 200 kg` deu 108px numa coluna de 101px — não cabia, e as três colunas saíam com larguras diferentes (108/96/96) porque `1fr` é `minmax(auto, 1fr)` e conteúdo `nowrap` empurra o mínimo. A forma compacta `14,2k kg` deu 100px e coube. **Lição:** conta de largura feita em prosa erra por poucos px, e poucos px são exatamente a diferença entre alinhar e não alinhar — construir a peça e medir antes de mandar aplicar. Corrigido também o vão da faixa (`--lastro-e-4` → `--lastro-e-3`) para subir a folga de 1px para 3,67px.
 
 **`cmd | tail` mascara o exit code real (2026-08-04).** Rodei `npx supabase start 2>&1 | tail -40` em background; a notificação de conclusão reportou "exit code 0", mas esse é o exit code do `tail`, não do comando piped. O `supabase start` tinha falhado de verdade (`LegacyHealthCheckTimeoutError`). Quase segui em frente achando que tinha dado certo. **Correção:** quando o exit code importa, gravar `echo "EXIT_CODE=$?" >> log` dentro do próprio arquivo de log, e ler essa linha — nunca confiar no status que a ferramenta de background reporta quando o comando passou por um pipe.
 
