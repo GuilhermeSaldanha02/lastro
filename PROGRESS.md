@@ -432,6 +432,14 @@ Surgiu de pedido direto do dono no meio da sessão, não estava em nenhum docume
    - **Bloqueado aguardando o dono:** (a) aprovar ou redirecionar a direção; (b) apontar A/B/C no zero do Plex Mono; (c) apontar A/B no tamanho de texto (§3.4 / D-b).
    - **Screenshot automático falhou de novo** (mesma causa da sessão anterior). Contornado para a pesquisa baixando as imagens de referência e lendo como arquivo; **o app rodando não foi visto**. O gate continua sendo o olho do dono.
 
+   **↳ 2026-08-08 (2) — REDIAGNÓSTICO: o problema não é alinhamento.** Ver `DECISIONS.md` 2026-08-08 (2). O dono respondeu à proposta — "funcional, mas feio, sem detalhes, sem vida". Os 10 movimentos anteriores eram **higiene**, não estética: consertam o quebrado, não produzem beleza. Idem `impeccable` — ele checa valor fora do sistema, e todos os valores do lastro estão *dentro* do sistema, só que **todos no mesmo degrau** (maior número em 30px com `--lastro-t-8` nunca usado; 7 componentes na mesma `elev-1`; todo cabeçalho no mesmo versalete de 14px). Não falta cor: falta diferença.
+   - **Restrição a entrar em `DESIGN.md` §3.0:** as referências que "têm vida" (WHOOP, Oura, Ultrahuman) são escuras, e é daí que vem a vitalidade delas. Em fundo areia claro **não se compra vida com brilho nem saturação** — só com contraste de escala, peso e densidade.
+   - **Deck v2 publicado**, mesmo endereço: 3 tratamentos de login como apostas distintas (Placa · Caderneta · Massa, com o botão do Google idêntico nos três), parecer no modelo Oura (sobrancelha + veredito em Plex Serif + evidências com palavra·cor·barra), volume `14,2 t` em vez de `14,2k kg`.
+   - **Erro meu, corrigido:** o deck v1 mostrava a aba inferior com 4 seções; são **5** (`aba-inferior.tsx`). O briefing do dono pegou.
+   - **Achado contra a minha própria proposta (E8):** eu tinha usado `t-8` no parecer, violando `DESIGN.md` §3.5 — em Modo Leitura o número é `t-5`. Só apareceu porque a peça foi construída e medida, não descrita.
+   - **Escopo levantado, NÃO aplicado:** coluna "antes 16 × 9" por série (padrão Hevy/Strong). Exige consulta ao histórico do exercício — é feature, decisão do dono.
+   - **Bloqueado aguardando o dono:** login A/B/C · zero do Plex Mono A/B/C · tamanho §3.4 A/B · coluna "anterior" entra ou não.
+
 ---
 
 ## Abordagens que falharam

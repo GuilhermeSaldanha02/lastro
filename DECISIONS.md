@@ -533,3 +533,37 @@ Também corrigidos, achados menores confirmados por leitura direta (sem precisar
 **Impacto.** Nenhum arquivo de `src/` tocado. Alterados: `KNOWLEDGE.md` (§2.1 nova, 2 lições em §5), `PROGRESS.md` (item 14), este arquivo. Branch `fix/consistencia-visual-telas` segue com os mesmos 3 commits, não mergeada.
 
 **Como reverter.** Reverter os 3 arquivos de documento (`git checkout -- KNOWLEDGE.md PROGRESS.md DECISIONS.md`) e ignorar o deck, que vive fora do repositório. Nada em `src/`, nada em `main`.
+
+## 2026-08-08 (2) — Rediagnóstico: o problema não era alinhamento, era ausência de voz
+
+**O que mudou.** O dono leu a proposta anterior e respondeu que o sistema "está funcional, mas feio, sem detalhes, sem vida", e que a skill `impeccable` também não tinha ajudado. Isso invalida o enquadramento da rodada anterior: os 10 movimentos propostos eram **higiene** (alinhamento, hierarquia, token), não estética. Consertam o que está quebrado; não produzem beleza. Registrado como rediagnóstico, não como ajuste.
+
+**Por que a auditoria de token nunca ia resolver.** `impeccable` verifica se um valor está *fora* do sistema. Todos os valores do lastro estão **dentro** do sistema — o problema é que estão todos no **mesmo degrau** dele: maior número da tela em 30px (com `--lastro-t-8` de 76px reservado e nunca usado), sete componentes distintos com a mesma `elev-1`, todo cabeçalho de seção no mesmo versalete cinza de 14px. Não falta cor: falta **diferença**.
+
+**A restrição que explica tudo, e que precisa estar escrita.** As três referências que o dono trouxe (WHOOP, Oura, Ultrahuman) são **escuras**, e não por acaso: dado colorido brilha sobre preto, e o fundo faz metade do trabalho. O lastro é areia `#F0EAE0` com uma tinta e um verde. **Num fundo claro e quente não se compra vitalidade com brilho nem saturação** — tentar produz wellness pastel, que é anti-referência declarada. Sobra uma moeda só: **contraste de escala, de peso e de densidade.** Esta frase deve entrar em `DESIGN.md` §3.0 como restrição derivada da paleta.
+
+**A ideia que organiza a estética, ancorada no produto.** "Lastro" é o peso que dá estabilidade e, em português, o que dá substância (lastro financeiro). A tese do PRD é que o log é infraestrutura e o produto é a leitura — ou seja, **os números lastreiam a leitura**. Logo, contraste de escala não é escolha de gosto: é a metáfora do produto. Cada tela tem um peso e o resto flutua em volta dele.
+
+**Quatro fontes de vida, em ordem de retorno:** (1) elevação volta a significar algo — cartão só onde se toca e navega, dado sobre a areia sem moldura (é remoção, custo zero); (2) os numerais viram a identidade — mono tabular grande com delta e sinal; (3) o parecer ganha voz de documento emitido — sobrancelha + veredito em **IBM Plex Serif**, mesma superfamília, auto-hospedável, nenhum fornecedor novo; (4) **um** momento de movimento — a série registrada acende a linha inteira.
+
+**Textura de papel: recusada em quase tudo, mantida num lugar só.** "Areia é granulada" não é justificativa, é decoração. Sobreviveu apenas no tratamento B do login, onde a ideia é a **caderneta de treino** — e caderneta é impressa em papel. Se o dono recusar o tratamento, a textura cai junto e nada mais depende dela.
+
+**Login entregue como 3 apostas, não 1 refino.** O dono citou o login pelo nome e decide apontando. **A** (Placa): escala pura, marca em 88px sobre risco pesado. **B** (Caderneta): serifada, campo com pauta em vez de caixa, grão de papel. **C** (Massa): o petróleo deixa de ser faixa de 88px e vira campo de 44% da tela. O botão do Google é **idêntico nos três** (variante Light, escala 1,2×), para que a única variável julgada seja personalidade.
+
+**Achado contra a própria proposta anterior (E8).** Ao construir o mockup, medi que eu havia usado `--lastro-t-8` (76px) no parecer da Análise — **violando o §3.5 do próprio `DESIGN.md`**, que reserva t-8 ao Modo Bancada e manda `--lastro-t-5` (38px) no Modo Leitura. Corrigido no deck. Um erro que só apareceu porque a peça foi construída e medida, não descrita.
+
+**Correção de erro da rodada anterior:** os mockups do deck v1 mostravam a aba inferior com **4 seções**; o app tem **5** (`aba-inferior.tsx`: Início, Bancada, Análise, Catálogo, Coach). O briefing do dono pegou isso. Corrigido em todas as 10 molduras.
+
+**Volume passa a ser `14,2 t`.** Hoje `formatarVolume` devolve `14,2k` e a UI acrescenta `kg`, produzindo **"14,2k kg"** — dois indicadores de magnitude na mesma expressão. Ideia veio do StrengthLog, que mostra "2.6 ton". Mais curto, mais limpo, e cabe folgado na faixa de 103px.
+
+**Alternativa descartada.** Buscar "vida" por saturação, brilho ou superfície escura — descartada porque quebraria a paleta aprovada e cairia na anti-referência (wellness pastel ou academia agressiva).
+
+**Levantado como escopo, não aplicado:** a coluna "antes 16 × 9" ao lado de cada série (Hevy e Strong mostram o resultado da sessão anterior junto do campo em edição). É a informação mais útil no momento do esforço e o lastro não tem — **mas é feature, exige consulta ao histórico do exercício, e é decisão do dono.** Aparece no mockup só para ele julgar o efeito.
+
+**Verificado, não só relatado (E8).** Medido no deck renderizado: três famílias carregadas (`document.fonts.check` true para Sans, Mono e Serif), zero rolagem horizontal, ressalvas do método **dentro** das duas molduras do parecer (197px e 14px de folga), as 10 molduras com nav de 5 abas, nenhum alvo de toque abaixo de 48px, faixa de métricas com 3 colunas iguais de 103px, e só "Treino em andamento" truncando (que é a demonstração da regressão R1). Contraste medido no escopo lastro: pauta do campo 3,40:1 (limite de componente, piso 3,0), alta 5,47, platô 4,95, queda 5,78, procedência 5,58 — todos acima do piso. **O que NÃO foi verificado: o app rodando.** A captura de tela do painel do navegador falhou pela terceira sessão seguida.
+
+**Impacto.** Nenhum arquivo de `src/` tocado. Deck v2 no mesmo endereço: <https://claude.ai/code/artifact/8bf7ef96-981e-4603-8b96-c7b6b6d8ae01>. Fonte em `scratchpad/deck/`.
+
+**Bloqueado aguardando o dono:** login A/B/C · zero do Plex Mono A/B/C · tamanho de texto A/B · a coluna "anterior" entra ou não.
+
+**Como reverter.** Nada em `src/`, nada em `main`. Reverter os documentos com `git checkout -- DECISIONS.md PROGRESS.md`.
