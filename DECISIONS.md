@@ -476,3 +476,30 @@ Também corrigidos, achados menores confirmados por leitura direta (sem precisar
 **Impacto.** Nenhuma mudança de schema. `src/app/page.tsx` ganhou o formulário de `sair`; `src/app/treino/page.tsx` perdeu. Achado de infra (redirect OAuth) é só conhecimento registrado — nada mudou na configuração do Supabase.
 
 **Como reverter.** Reverter o commit — os dois achados são independentes, mas foram registrados juntos por terem saído da mesma rodada de QA.
+
+---
+
+## 2026-08-07/08 — Polish visual reativo por print (branch `fix/consistencia-visual-telas`) — pausado, troca de abordagem decidida pelo dono
+
+**O que mudou.** O dono relatou insatisfação visual genérica ("muita coisa desalinhada, espaçamento errado, telas repetidas") e pediu uma passada de design. Em vez de acionar `diretor-arte` (que já existe em `.claude/agents/`, dono de `DESIGN.md`), a sessão rodou a skill externa `impeccable` num subagente Sonnet 5 (auditoria de código) seguida de correção reativa, tela por tela, a partir de prints reais do celular do dono — não de uma auditoria completa contra `DESIGN.md`.
+
+**Corrigido e commitado nesta branch (2 commits, não mergeados):**
+1. `barra-topo__titulo` não quebra mais em 2 linhas (`white-space: nowrap` + `text-overflow: ellipsis`, wrapper `barra-topo__info` com `min-width: 0`) — corrige o vazamento de conteúdo atrás do cabeçalho `fixed` na tela "Treino em andamento", único título longo o bastante pra quebrar em 375px.
+2. Respiro entre rótulo de data e título: `--lastro-e-1` (4px) → `--lastro-e-2` (8px).
+3. `.metrica__rotulo` (cards "Esta semana") ganhou `min-height: 2.6em` pra igualar a altura dos 3 rótulos e alinhar os números — **medido, não só lido**: os 3 `top` de `.metrica__valor` ficaram idênticos (369.75px) contra um usuário QA efêmero.
+4. `.selecao-grupos` (chips de grupo muscular) virou `grid-template-columns: 1fr 1fr` em vez de `flex-wrap` com largura de conteúdo — **medido**: os 10 chips ficaram com exatamente 162px cada, 2 colunas alinhadas.
+5. (De um subagente anterior, mesma branch) 3 literais fora de token migrados pra `tokens.css`: cor do avatar de iniciais, cor do botão destrutivo, tamanho de fonte do gráfico de progressão.
+
+**Não corrigido — reportado pelo dono como ainda errado no último print (2026-08-08):** o card "Séries valendo" segue desalinhado mesmo depois do fix #3. Hipótese não verificada: a altura TOTAL dos 3 cards ainda diverge porque só "Volume" tem a linha extra de unidade (`kg`) abaixo do número — igualar a altura do rótulo não iguala a altura do card inteiro. Não investigado a fundo.
+
+**Não mudado, decisão pendente do dono:** o zero pontuado do IBM Plex Mono (`--lastro-fonte-num`), sinalizado 2x pelo dono como visualmente ruim. `DESIGN.md` §3.3 documenta a fonte como escolha deliberada (superfamília com Plex Sans, avanço tabular monoespaçado, pré-cache offline via Serwist) — trocar reabre uma decisão de identidade e mexe no cache do PWA. Controller recusou trocar sem confirmação explícita do dono especificamente sobre isto.
+
+**Por que a abordagem foi pausada.** O dono identificou que o ciclo print→fix→print estava encontrando problema novo a cada rodada sem convergir, e que a skill `impeccable` (auditoria só de código, sem olho no navegador real) não estava rendendo — a causa real de cada bug só apareceu quando o dono mandou print real do celular, não quando o agente leu `tokens.css`/`sistema.css` sozinho. Decisão do dono: próxima sessão troca pra fluxo de agente já instalado no projeto (`diretor-arte`, Opus 5, dono de `DESIGN.md`) fazendo auditoria completa contra os tokens documentados, em vez de corrigir 1 print de cada vez.
+
+**Alternativa descartada.** Continuar o loop reativo pedindo mais prints — descartada pelo próprio dono, que pediu sessão nova com prompt novo em vez de continuar nesta.
+
+**Verificado, não só relatado (E8):** `tsc --noEmit`, `npm run lint` (0 erros, 1 warning pré-existente em `block-navigation.js`, não tocado) e `npm run build` limpos nos 2 commits. Medições de alinhamento feitas via `getComputedStyle`/`getBoundingClientRect` contra `localhost` autenticado por usuário QA efêmero (`qa-visual-fixo@lastro.test`, criado e apagado 3 vezes ao longo da sessão pelo script padrão do projeto, contagem confirmada = 0 toda vez). Screenshot automático da ferramenta de preview **não funcionou nesta sessão** (painel do navegador não compositava do lado do dono) — toda verificação visual foi por medição de DOM + prints reais mandados pelo dono, nunca por captura própria do controller. Isso é uma lacuna real: medição de DOM não substitui olho (padrão do projeto, `padrao-verificacao`), e a única razão de ter funcionado aqui é o dono ter mandado prints manualmente.
+
+**Impacto.** `sistema.css`, `tokens.css`, 6× `page.tsx` (barra de topo), `avatar`/`botao-destrutivo`/`grafico-progressao.tsx`. Nada em `main`. `.claude/launch.json` criado nesta sessão (config do preview local, `npm run dev` porta 3000/3002) — não existia antes, é infra reutilizável, não parte do fix.
+
+**Como reverter.** Branch não mergeada: `git checkout main` descarta tudo, ou manter a branch e só não mergear. Se a próxima sessão decidir recomeçar do zero visualmente, `git branch -D fix/consistencia-visual-telas` depois de confirmar que nada nela vale a pena reaproveitar.
