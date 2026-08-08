@@ -440,6 +440,14 @@ Surgiu de pedido direto do dono no meio da sessão, não estava em nenhum docume
    - **Escopo levantado, NÃO aplicado:** coluna "antes 16 × 9" por série (padrão Hevy/Strong). Exige consulta ao histórico do exercício — é feature, decisão do dono.
    - **Bloqueado aguardando o dono:** login A/B/C · zero do Plex Mono A/B/C · tamanho §3.4 A/B · coluna "anterior" entra ou não.
 
+   **↳ 2026-08-08 (3) — o dono trouxe 16 peças visuais. Relatório de absorção entregue, nada aplicado.** Ver `DECISIONS.md` 2026-08-08 (3). Estado: `fix/consistencia-visual-telas`, **nenhum arquivo de `src/` tocado**.
+   - **Insumo:** `C:\Users\danin\Downloads\lastro-pecas-modulares-para-claude.zip` (16 mockups `pecas/01..16.png` + 7 telas de terceiros em `referencias/`, só calibração) e o guia `Lastro — peças visuais separadas para o Claude.md`. **Ler por workstream, nunca as 16 de uma vez** (~3 MB cada). Assinatura = 07/08/09/10/11 · Bancada = 03/04/05/16 · sistema = 02/06/12/13/14/15.
+   - **Diretrizes v7:** o Passo 5 (agents + skills `padrao-*` + hooks) **já está instalado** neste projeto. Os passos de bootstrap (0/0.5/1/1.5/2) não se aplicam — reabririam o `PRD.md`, que está congelado.
+   - **A peça 08 valida a tese do rediagnóstico:** o salto de escala está no **veredito**, não no numeral, e o parecer lê como documento emitido (sobrancelha + risco + linha de emissão + evidência com barra lateral + "O QUE FAZER" numerado + assinatura).
+   - **Conflitos peça × contrato, verificados no código:** C1a `RPE` nas peças vs **RIR** no domínio (rejeitado o rótulo) · C1b RIR **não é exibido na linha de série hoje** → exibir é feature, não polimento · C2 peça mostra 4 abas, o app tem 5 (`aba-inferior.tsx:16-44`) · C3 hexes da peça ≠ `tokens.css` (Areia `#F3EDE3` vs `#F0EAE0`) — tokens vencem, cada um traz contraste medido · C4 veredito Sans bold na peça vs Plex Serif na proposta pendente · C5 a peça 08 **não tem moldura de celular** (pôster 1440×2560): tamanho absoluto dela não transfere, medir no navegador · C6 peça mostra `18.450 kg` e o código ainda produz **"14,2k kg"** (`page.tsx:39-40`) — a decisão de virar `14,2 t` existe desde 08/08 e **não foi implementada**.
+   - **CAUSA DA FALHA DE SCREENSHOT ACHADA:** `preview_start` sobe (porta 3002) e `read_page` funciona, mas `computer screenshot` devolve *"the Browser pane is not displayed, so the page is not compositing frames"*. **O painel Browser precisa estar aberto na janela do Claude Code.** Não é página pesada nem timeout. Enquanto não estiver aberto, o gate visual é o olho do dono — e isso fica declarado aqui (`padrao-verificacao` item 3).
+   - **Bloqueado aguardando o dono:** C1b (RIR na linha de série?) · C4 (Serif ou Sans no veredito?) · C5 (manchete pode passar de `t-5`?) · C6 (implementar `14,2 t` agora?) · as peças entram no repo (45 MB, exigiria LFS) ou ficam fora?
+
 ---
 
 ## Abordagens que falharam

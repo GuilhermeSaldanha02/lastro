@@ -567,3 +567,33 @@ Também corrigidos, achados menores confirmados por leitura direta (sem precisar
 **Bloqueado aguardando o dono:** login A/B/C · zero do Plex Mono A/B/C · tamanho de texto A/B · a coluna "anterior" entra ou não.
 
 **Como reverter.** Nada em `src/`, nada em `main`. Reverter os documentos com `git checkout -- DECISIONS.md PROGRESS.md`.
+
+## 2026-08-08 (3) — 16 peças visuais recebidas: o que se absorve, o que se rejeita
+
+**O que mudou.** O dono trouxe um pacote de **16 mockups conceituais** (`lastro-pecas-modulares-para-claude.zip`, em `Downloads`), um guia de uso e a `diretrizes-v7.md`. As peças são a resposta por apontamento às 4 decisões que a rodada anterior deixou bloqueadas. **Nenhum arquivo de `src/` foi tocado** — esta entrada é o relatório de absorção que o próprio guia exige ("explique quais peças foram absorvidas e quais foram descartadas, e por quê") antes de codificar.
+
+**Diretrizes v7 — nada a instalar.** O Passo 5 da v7 (`.claude/agents/`, `.claude/skills/padrao-*`, hooks em `.claude/settings.json`) já está em disco neste projeto, com 6 agentes e 7 padrões. Os Passos 0–2 são de bootstrap e **não se aplicam**: rodá-los reabriria o `PRD.md`, que está congelado. A v7 entra como conduta, não como sessão de inicialização.
+
+**O que as peças entregam que o deck v2 não tinha.** A peça 08 (parecer semanal) valida a tese do rediagnóstico e a corrige num ponto: **o maior salto de escala está no veredito, não no numeral.** O documento se lê como emitido — sobrancelha em versalete, risco verde curto, linha "Semana de … · Emitido em …", evidência com barra lateral colorida + rótulo + frase em negrito + prosa de procedência, "O QUE FAZER" numerado em blocos discretos, assinatura no rodapé. A peça 01 confirma as três remoções baratas já propostas (cartão só onde se toca, dado sobre a areia sem moldura, numeral mono tabular como identidade).
+
+**Conflitos entre as peças e contratos congelados — verificados no código, não em documento:**
+
+| # | A peça mostra | O projeto tem | Veredito |
+|---|---|---|---|
+| C1a | `RPE 7/8/9` na linha de série (01, 03) | **RIR** — nome de campo, função e contrato de API (`series-dificeis.ts`, `limiares.ts`, `validador.ts`) | Rejeitar o rótulo. RPE e RIR são escalas **inversas**: trocar o nome sem trocar a conta produz número plausível e errado, e o LLM depois interpreta esse número |
+| C1b | RIR/RPE visível em toda linha | **Não é exibido em lugar nenhum** — só capturado nos formulários (`formulario-serie.tsx:172`, `editar-serie.tsx:123`) | **Feature, não polimento.** Mesmo caso da coluna "anterior 16 × 9". Decisão do dono |
+| C2 | 4 abas (Treino de hoje · Análise semanal · Progresso · Histórico) | 5 abas (`aba-inferior.tsx:16-44`) | Rejeitar o conteúdo, absorver o tratamento da barra (peça 12) |
+| C3 | Areia `#F3EDE3`, Petróleo `#0E2A36`, Verde `#22B573` | `tokens.css`: `#F0EAE0`, barra `#17414F→#0E2833`, ação `#46C27B→#35A866` | **Tokens vencem.** Cada hex do `tokens.css` traz a razão de contraste **medida** ao lado; adotar o hex da peça invalida a medição inteira |
+| C4 | Veredito em Plex **Sans** bold | Proposta pendente do deck v2: Plex **Serif** | Decisão viva do dono — a peça contradiz uma proposta que ele ainda não julgou |
+| C5 | Manchete muito grande | §3.5 reserva `t-8` ao Modo Bancada; Modo Leitura para em `t-5` | **Não medir na peça:** a 08 não tem moldura de celular, é pôster 1440×2560. Só a *razão* veredito:corpo transfere, e a conferência é no navegador |
+| C6 | `Volume total 18.450 kg` | `page.tsx:39-40` ainda devolve `14,2k` + a UI acrescenta `kg` = **"14,2k kg"** | A decisão de 2026-08-08 (2) mandou virar `14,2 t` e **nunca foi implementada**. A peça mostra uma terceira variante. A decisão vence |
+
+**Causa da falha de screenshot — achada.** `preview_start lastro-dev` sobe (porta 3002) e `read_page` responde, mas `computer screenshot` falha com *"the Browser pane is not displayed, so the page is not compositing frames"*. **O painel Browser precisa estar visível na janela do Claude Code.** Não é página pesada nem timeout — é a hipótese que as duas sessões anteriores registraram sem diagnosticar. Enquanto o painel estiver fechado: `read_page`, `get_page_text` e `javascript_tool` funcionam (estrutura, texto e estilo computado seguem verificáveis); só o pixel não. Nesse regime o gate é o olho do dono, declarado na tarefa.
+
+**Alternativa descartada.** Absorver as peças como especificação — média entre os hexes da peça e os tokens, rótulo RPE junto do cálculo de RIR, barra de 4 abas. Descartado: é composição de fontes descasadas, e cada item acima tem uma fonte única que já venceu a discussão.
+
+**Impacto.** Nenhum arquivo de `src/` tocado. Alterados: `PROGRESS.md` (item 14, sub-entrada 3) e este arquivo. Rascunho longo do relatório fora do repositório.
+
+**Bloqueado aguardando o dono:** C1b · C4 · C5 · C6 · as peças entram no repo (45 MB, exigiria LFS) ou ficam fora.
+
+**Como reverter.** `git checkout -- PROGRESS.md DECISIONS.md`. Nada em `src/`, nada em `main`.
