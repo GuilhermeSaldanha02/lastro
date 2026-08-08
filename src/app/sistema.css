@@ -95,7 +95,7 @@
 .barra-topo__titulo {
   font-size: var(--lastro-t-3);
   font-weight: var(--lastro-peso-forte);
-  margin-top: var(--lastro-e-1);
+  margin-top: var(--lastro-e-2);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -619,14 +619,17 @@
 }
 
 /* ---------- Seleção de grupo(s) muscular(es) antes do exercício ------- */
+/* Grade de 2 colunas, não `flex-wrap` — largura de conteúdo variável
+   ("Abdômen" vs "Posterior de coxa") deixava a fileira torta, chip curto
+   sobrando espaço e chip longo espremido contra a borda (2026-08-07). */
 .selecao-grupos {
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
   gap: var(--lastro-e-3);
 }
 
 .selecao-grupos__opcao {
-  display: inline-flex;
+  display: flex;
   align-items: center;
   gap: var(--lastro-e-2);
   min-height: var(--lastro-alvo-min);
@@ -1208,10 +1211,14 @@
   min-width: 0;
 }
 
+/* Altura fixa de 2 linhas — "Séries valendo" quebra, "Treinos"/"Volume"
+   não; sem isso os 3 números do grid não caem na mesma linha
+   (2026-08-07). */
 .metrica__rotulo {
   font-size: var(--lastro-t-meta);
   color: var(--lastro-txt-3);
   line-height: 1.3;
+  min-height: 2.6em;
 }
 
 /* Em 360px, três métricas dividem ~99px cada. "14,2k" + "kg" estourava a
