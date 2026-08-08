@@ -15,7 +15,7 @@ export default async function PaginaAnalise() {
     <main className="tela">
       <header className="barra-topo">
         <div className="barra-topo__acoes">
-          <div>
+          <div className="barra-topo__info">
             <p className="barra-topo__contexto">Análise semanal</p>
             <h1 className="barra-topo__titulo">Semana fechada</h1>
           </div>

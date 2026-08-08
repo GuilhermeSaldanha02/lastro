@@ -38,7 +38,7 @@ export default async function PaginaTreino() {
     <main className="tela">
       <header className="barra-topo">
         <div className="barra-topo__acoes">
-          <div>
+          <div className="barra-topo__info">
             <p className="barra-topo__contexto">lastro</p>
             <h1 className="barra-topo__titulo">Treinos</h1>
           </div>

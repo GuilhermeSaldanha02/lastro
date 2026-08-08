@@ -83,10 +83,22 @@
   opacity: 0.72;
 }
 
+/* Título nunca quebra linha — o cabeçalho é `fixed` e a altura reservada
+   pra ele no conteúdo (`--lastro-clearance-topo`) assume 1 linha só; um
+   título de 2 linhas cresce o cabeçalho e esconde o topo do conteúdo por
+   trás dele (medido em "Treino em andamento" a 375px, 2026-08-07). */
+.barra-topo__info {
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
 .barra-topo__titulo {
   font-size: var(--lastro-t-3);
   font-weight: var(--lastro-peso-forte);
   margin-top: var(--lastro-e-1);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .barra-topo__acoes {
