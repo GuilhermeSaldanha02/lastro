@@ -36,11 +36,15 @@ function formatarData(iso: string, hojeISO: string): string {
   return `${dia} ${MESES[mes - 1]}`;
 }
 
-/** 14250 → "14,2k". Abaixo de 1000 mostra o número cheio. */
-function formatarVolume(kg: number): string {
-  if (kg === 0) return "0";
-  if (kg < 1000) return String(Math.round(kg));
-  return `${(kg / 1000).toFixed(1).replace(".", ",")}k`;
+/**
+ * 14250 → { valor: "14,2", unidade: "t" }. Abaixo de 1000 kg, kg cheio.
+ * Antes disso o valor saía como "14,2k" + "kg" fixo no template = "14,2k kg",
+ * dois indicadores de magnitude na mesma expressão (DECISIONS 2026-08-08).
+ */
+function formatarVolume(kg: number): { valor: string; unidade: string } {
+  if (kg === 0) return { valor: "0", unidade: "kg" };
+  if (kg < 1000) return { valor: String(Math.round(kg)), unidade: "kg" };
+  return { valor: (kg / 1000).toFixed(1).replace(".", ","), unidade: "t" };
 }
 
 export default async function PaginaInicial() {
@@ -123,8 +127,10 @@ export default async function PaginaInicial() {
           <div className="metrica">
             <p className="metrica__rotulo">Volume</p>
             <p className="metrica__valor">
-              {formatarVolume(resumo.volumeNaSemana)}
-              <span className="metrica__un">kg</span>
+              {formatarVolume(resumo.volumeNaSemana).valor}
+              <span className="metrica__un">
+                {formatarVolume(resumo.volumeNaSemana).unidade}
+              </span>
             </p>
           </div>
           <div className="metrica">
@@ -169,7 +175,10 @@ export default async function PaginaInicial() {
                     <span className="item__meta">
                       {treino.totalSeries}{" "}
                       {treino.totalSeries === 1 ? "série" : "séries"}
-                      {treino.volume > 0 && ` · ${formatarVolume(treino.volume)} kg`}
+                      {treino.volume > 0 &&
+                        ` · ${formatarVolume(treino.volume).valor} ${
+                          formatarVolume(treino.volume).unidade
+                        }`}
                     </span>
                   </Link>
                 </div>

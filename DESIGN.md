@@ -48,6 +48,8 @@ Isso não é detalhe de acabamento — é a restrição que decide o layout inte
 
 **Escala de elevação:** `elev-1` repouso (painel, item de lista) · `elev-2` levantado (bloco de evidência, barra de topo) · `elev-3` só a ação primária · `afundado` para campo, que é o inverso do botão: recebe em vez de saltar.
 
+**Restrição derivada da paleta (rediagnóstico, 2026-08-08).** Areia clara e quente não sustenta vitalidade por brilho nem saturação — as referências que "têm vida" (WHOOP, Oura, Ultrahuman) são escuras, e é de lá que vem a vitalidade delas. Tentar comprar vida com brilho ou saturação num fundo areia produz **wellness pastel**, anti-referência já declarada. A moeda que sobra é **contraste de escala, de peso e de densidade**: cada tela tem um elemento que pesa mais que os outros, e o resto flutua em volta dele. Onde um valor parecer "no mesmo degrau" dos vizinhos — mesma elevação, mesmo tamanho, mesmo peso — é sintoma desta restrição sendo ignorada, não da paleta estar errada. §3.6.2 aplica isto diretamente no veredito do parecer.
+
 > **Histórico.** A tese anterior — *"instrumento sóbrio, nada de gradiente, vidro, brilho ou 3D"*, derivada da leitura de uma galeria de referência e de ISA-101 (High-Performance HMI) — foi **reprovada pelo dono**. ISA-101 segue útil como disciplina (base quieta, cor que significa, sem bevel decorativo), mas é norma de controle de processo, para operador caçando falha; o `lastro` é instrumento de leitura para uma pessoa. Onde conflitarem, **o PRD vence**.
 
 **Referência consultada:** `https://3dgallery-eqrvxb8t.manus.space` — catálogo curado de 179 sites (Lusion, Active Theory, Obys, Awwwards, Godly, Linear, Stripe, luxo/e-commerce 3D). Lida por download do HTML, do CSS (`/assets/index-BAPlKeQi.css`) e do bundle JS. **Nada foi renderizado nem olhado** — ver §3.9.
@@ -180,7 +182,7 @@ Ambas são **IBM Plex, licença SIL Open Font License 1.1** — livres para auto
 
 - **`--lastro-t-corpo` é o piso do corpo (D4)** — o token foi fixado exatamente no valor que D4 exige. Nenhuma prosa, nenhum rótulo de campo, nenhum texto de botão abaixo dele.
 - **`--lastro-t-meta` é o único degrau abaixo do corpo, e existe para um único papel:** metadado não-corpo — a linha de procedência do parecer (§3.6.3) e rótulos em caixa alta com entreletra aberta. **Proibido na tela de registro**, que é lida em pé, a um braço.
-- Número em modo bancada: `--lastro-t-8`. Número dentro do parecer: `--lastro-t-5`. Título de seção do parecer: `--lastro-t-3`.
+- Número em modo bancada: `--lastro-t-8`. Número dentro do parecer: `--lastro-t-5`. Título de seção do parecer: `--lastro-t-3`. **Exceção nomeada:** o veredito do parecer (§3.6.2, item 2) usa `--lastro-t-6` — maior que o título de seção porque é o elemento que a restrição de §3.0 elege para pesar mais na tela. Nenhum outro texto do Modo Leitura passa de `--lastro-t-5` sem entrada equivalente aqui.
 - Corpo do parecer: `--lastro-t-1` com `--lastro-el-corpo` — é prosa lida sentada, não rótulo.
 
 ### 3.5 Dois modos de densidade, um só conjunto de tokens
@@ -221,7 +223,7 @@ Cada item abaixo, se aparecer na tela, **reprova o gate**:
 O parecer se apresenta como **peça emitida**, não como mensagem recebida. Estrutura fixa, de cima para baixo:
 
 1. **Cabeçalho de emissão.** A pergunta escolhida como título, em `--lastro-t-3`. Abaixo, em `--lastro-txt-3` e `--lastro-t-meta`: o intervalo da semana fechada e a data de emissão. Alinhado à esquerda, sobre `--lastro-fundo`, largura total da coluna de leitura. Isso é o que primeiro diz "documento" em vez de "mensagem".
-2. **Veredito.** Uma frase, `--lastro-t-3`, `--lastro-peso-forte`, `--lastro-txt`. É a resposta à pergunta, sem rodeio.
+2. **Veredito.** Uma frase, `--lastro-t-6`, `--lastro-peso-forte`, `--lastro-txt`. É a resposta à pergunta, sem rodeio. **Maior que o título do cabeçalho** (item 1, `--lastro-t-3`) — é o salto de escala que carrega a restrição de §3.0: o julgamento pesa mais que a pergunta, não o inverso. Antes de 2026-08-08 o veredito usava o mesmo `--lastro-t-3` do título; a correção existe porque título e veredito no mesmo degrau é exatamente o sintoma que §3.0 nomeia.
 3. **Blocos de evidência** — o coração da tela (§3.6.3).
 4. **Prosa de leitura.** Um a três parágrafos em `--lastro-t-1` / `--lastro-el-corpo`, largura de coluna limitada. A prosa *conecta* as evidências; ela não é onde os números moram.
 5. **O que fazer** (só na pergunta 5 do PRD §3). Lista curta, cada item ancorado num bloco de evidência acima.

@@ -607,3 +607,21 @@ Também corrigidos, achados menores confirmados por leitura direta (sem precisar
 **Bloqueado aguardando o dono:** C1b · C4 · C5 · C6 · as peças entram no repo (45 MB, exigiria LFS) ou ficam fora.
 
 **Como reverter.** `git checkout -- PROGRESS.md DECISIONS.md`. Nada em `src/`, nada em `main`.
+
+## 2026-08-08 (4) — Backlog aprovado: DESIGN.md amendado, C6 implementado
+
+**O que mudou.** O dono aprovou minha recomendação para C4/C5/C6 e pediu backlog fatiado em vez de tudo de uma vez. Ordem: C6 → `DESIGN.md` → seed QA → parecer (cabeçalho, evidência, gráfico, estados) → gate final. Esta entrada cobre os dois primeiros itens.
+
+**C6 implementado.** `formatarVolume` em `src/app/page.tsx` passou a devolver `{ valor, unidade }` em vez de string fixa: abaixo de 1000 kg mostra kg cheio, a partir daí `t` com 1 casa decimal. Os dois pontos de uso (card "Volume" da semana e meta de "Treinos recentes") atualizados. `tsc --noEmit` limpo. Verificado no navegador (Chrome + computer-use, método da entrada anterior): card "Volume" mostra `0 kg`, caso zero correto — o caso `≥1000 kg → t` só é observável com dado real, revalidação fica pendurada na tarefa de seed do QA.
+
+**`DESIGN.md` amendado — duas entradas, autoconsistência conferida (P2):**
+- **§3.0** ganhou a restrição do rediagnóstico por escrito: fundo areia claro não sustenta vitalidade por brilho/saturação (produz wellness pastel); a moeda que sobra é contraste de escala, peso e densidade. Isso deixa de ser um argumento solto no `DECISIONS.md` de 08/08 e vira regra citável.
+- **§3.6.2 item 2 (Veredito)** subiu de `--lastro-t-3` (24px, igual ao título do cabeçalho) para `--lastro-t-6` (48px) — nomeado como exceção em §3.4. É a aplicação direta da restrição de §3.0: título e veredito no mesmo degrau era o próprio sintoma que o rediagnóstico descreveu. Conferido: nenhuma outra menção a tamanho de veredito no documento ficou desatualizada.
+
+**Por que `--lastro-t-6` e não `--lastro-t-8`.** `t-8` (76px) é reservado ao Modo Bancada (número lido a um braço) — usá-lo no parecer é a mesma violação de §3.5 que a sessão de 08/08 já tinha se pego cometendo. `t-6` cria o salto de escala sem invadir o degrau do outro modo.
+
+**Nada em `src/components/parecer.tsx` ainda usa este token** — o componente não tem conceito de veredito hoje. A amenda é preparatória; a construção é a próxima tarefa do backlog (cabeçalho de emissão, peça 08).
+
+**Impacto.** `src/app/page.tsx` (C6). `DESIGN.md` (§3.0, §3.4, §3.6.2). Nenhuma migration, nenhum contrato de API tocado.
+
+**Como reverter.** `git checkout -- src/app/page.tsx DESIGN.md`.
