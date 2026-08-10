@@ -44,7 +44,7 @@ export default async function PaginaTreinoDetalhe({
     <main className="tela">
       <header className="barra-topo">
         <div className="barra-topo__acoes">
-          <div>
+          <div className="barra-topo__info">
             <p className="barra-topo__contexto">{formatarContexto(treino.data)}</p>
             <h1 className="barra-topo__titulo">Treino em andamento</h1>
           </div>

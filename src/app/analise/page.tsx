@@ -4,18 +4,23 @@
 // a parte interativa (perguntas, chamada à API, parecer) vive em
 // `components/analise-interativa.tsx`.
 import { obterPerfil } from "@/lib/dados/perfil";
+import { carregarResumoHome } from "@/lib/dados/resumo-home";
+import { dataLocalBrasil } from "@/lib/tempo";
 import AbaInferior from "@/components/aba-inferior";
 import Avatar from "@/components/avatar";
 import AnaliseInterativa from "@/components/analise-interativa";
 
 export default async function PaginaAnalise() {
-  const perfil = await obterPerfil();
+  const [perfil, resumo] = await Promise.all([
+    obterPerfil(),
+    carregarResumoHome(dataLocalBrasil()),
+  ]);
 
   return (
     <main className="tela">
       <header className="barra-topo">
         <div className="barra-topo__acoes">
-          <div>
+          <div className="barra-topo__info">
             <p className="barra-topo__contexto">Análise semanal</p>
             <h1 className="barra-topo__titulo">Semana fechada</h1>
           </div>
@@ -23,7 +28,7 @@ export default async function PaginaAnalise() {
         </div>
       </header>
 
-      <AnaliseInterativa />
+      <AnaliseInterativa semanasFechadasComTreino={resumo.semanasFechadasComTreino} />
 
       <AbaInferior ativa="analise" />
     </main>

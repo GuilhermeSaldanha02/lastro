@@ -48,6 +48,8 @@ Isso não é detalhe de acabamento — é a restrição que decide o layout inte
 
 **Escala de elevação:** `elev-1` repouso (painel, item de lista) · `elev-2` levantado (bloco de evidência, barra de topo) · `elev-3` só a ação primária · `afundado` para campo, que é o inverso do botão: recebe em vez de saltar.
 
+**Restrição derivada da paleta (rediagnóstico, 2026-08-08).** Areia clara e quente não sustenta vitalidade por brilho nem saturação — as referências que "têm vida" (WHOOP, Oura, Ultrahuman) são escuras, e é de lá que vem a vitalidade delas. Tentar comprar vida com brilho ou saturação num fundo areia produz **wellness pastel**, anti-referência já declarada. A moeda que sobra é **contraste de escala, de peso e de densidade**: cada tela tem um elemento que pesa mais que os outros, e o resto flutua em volta dele. Onde um valor parecer "no mesmo degrau" dos vizinhos — mesma elevação, mesmo tamanho, mesmo peso — é sintoma desta restrição sendo ignorada, não da paleta estar errada. §3.6.2 aplica isto diretamente no veredito do parecer.
+
 > **Histórico.** A tese anterior — *"instrumento sóbrio, nada de gradiente, vidro, brilho ou 3D"*, derivada da leitura de uma galeria de referência e de ISA-101 (High-Performance HMI) — foi **reprovada pelo dono**. ISA-101 segue útil como disciplina (base quieta, cor que significa, sem bevel decorativo), mas é norma de controle de processo, para operador caçando falha; o `lastro` é instrumento de leitura para uma pessoa. Onde conflitarem, **o PRD vence**.
 
 **Referência consultada:** `https://3dgallery-eqrvxb8t.manus.space` — catálogo curado de 179 sites (Lusion, Active Theory, Obys, Awwwards, Godly, Linear, Stripe, luxo/e-commerce 3D). Lida por download do HTML, do CSS (`/assets/index-BAPlKeQi.css`) e do bundle JS. **Nada foi renderizado nem olhado** — ver §3.9.
@@ -160,8 +162,9 @@ Consequência obrigatória, não recomendação — **em toda ocorrência, no gr
 |---|---|---|
 | Números — carga, reps, volume, e1RM, percentual | `--lastro-fonte-num` (IBM Plex Mono) | **Monoespaçada garante avanço tabular por construção.** Não depende de o arquivo trazer a tabela OpenType `tnum`: a largura é igual porque a fonte é monoespaçada, ponto. Coluna de série não "dança" quando 9 vira 10, e o olho compara linha a linha em movimento |
 | Texto — prosa do parecer, rótulo, botão | `--lastro-fonte-txt` (IBM Plex Sans) | Desenhada junto com a Mono na mesma superfamília: mesma altura-x, mesmo esqueleto, nenhum choque quando um número aparece dentro de uma frase — que é exatamente o que o parecer faz o tempo todo. Personalidade de instrumento técnico, coerente com o nome |
+| Veredito do parecer — **e só ele** | `--lastro-fonte-serif` (IBM Plex Serif, 600) | C4 (aprovado 2026-08-08): documento emitido ganha voz de documento só na frase que carrega o julgamento — a peça-assinatura, não o resto do app. Mesma superfamília e licença das outras duas; **proibido** usar em qualquer outro lugar — isso reabriria a discussão de "quarta família espalhada" que a tabela original evitava |
 
-Ambas são **IBM Plex, licença SIL Open Font License 1.1** — livres para auto-hospedagem.
+Todas as três são **IBM Plex, licença SIL Open Font License 1.1** — livres para auto-hospedagem.
 
 **Por que não `font-variant-numeric: tabular-nums` numa fonte proporcional:** essa via só funciona se o arquivo `.woff2` embarcado realmente trouxer a feature `tnum`, o que é verificável apenas inspecionando o binário. Monoespaçada resolve estruturalmente. **Ainda assim** o CSS de número declara `font-variant-numeric: tabular-nums slashed-zero;` **puramente como reforço oportunista**: se o `.woff2` embarcado trouxer `tnum` ou `zero`, ganha-se a garantia extra e o zero cortado que separa 0 de O na leitura rápida; se não trouxer, o navegador ignora e a largura continua igual pela monoespaçagem. **Nenhuma dessas duas features é afirmada aqui como presente** — só se confirmam inspecionando o binário que for de fato embarcado, e isso é item de build (§4.5), não premissa deste documento. A garantia que este documento assume é uma só: largura igual por construção.
 
@@ -180,7 +183,7 @@ Ambas são **IBM Plex, licença SIL Open Font License 1.1** — livres para auto
 
 - **`--lastro-t-corpo` é o piso do corpo (D4)** — o token foi fixado exatamente no valor que D4 exige. Nenhuma prosa, nenhum rótulo de campo, nenhum texto de botão abaixo dele.
 - **`--lastro-t-meta` é o único degrau abaixo do corpo, e existe para um único papel:** metadado não-corpo — a linha de procedência do parecer (§3.6.3) e rótulos em caixa alta com entreletra aberta. **Proibido na tela de registro**, que é lida em pé, a um braço.
-- Número em modo bancada: `--lastro-t-8`. Número dentro do parecer: `--lastro-t-5`. Título de seção do parecer: `--lastro-t-3`.
+- Número em modo bancada: `--lastro-t-8`. Número dentro do parecer: `--lastro-t-5`. Título de seção do parecer: `--lastro-t-3`. **Exceção nomeada:** o veredito do parecer (§3.6.2, item 2) usa `--lastro-t-6` — maior que o título de seção porque é o elemento que a restrição de §3.0 elege para pesar mais na tela. Nenhum outro texto do Modo Leitura passa de `--lastro-t-5` sem entrada equivalente aqui.
 - Corpo do parecer: `--lastro-t-1` com `--lastro-el-corpo` — é prosa lida sentada, não rótulo.
 
 ### 3.5 Dois modos de densidade, um só conjunto de tokens
@@ -221,7 +224,7 @@ Cada item abaixo, se aparecer na tela, **reprova o gate**:
 O parecer se apresenta como **peça emitida**, não como mensagem recebida. Estrutura fixa, de cima para baixo:
 
 1. **Cabeçalho de emissão.** A pergunta escolhida como título, em `--lastro-t-3`. Abaixo, em `--lastro-txt-3` e `--lastro-t-meta`: o intervalo da semana fechada e a data de emissão. Alinhado à esquerda, sobre `--lastro-fundo`, largura total da coluna de leitura. Isso é o que primeiro diz "documento" em vez de "mensagem".
-2. **Veredito.** Uma frase, `--lastro-t-3`, `--lastro-peso-forte`, `--lastro-txt`. É a resposta à pergunta, sem rodeio.
+2. **Veredito.** Uma frase, `--lastro-t-6`, `--lastro-peso-forte`, `--lastro-txt`. É a resposta à pergunta, sem rodeio. **Maior que o título do cabeçalho** (item 1, `--lastro-t-3`) — é o salto de escala que carrega a restrição de §3.0: o julgamento pesa mais que a pergunta, não o inverso. Antes de 2026-08-08 o veredito usava o mesmo `--lastro-t-3` do título; a correção existe porque título e veredito no mesmo degrau é exatamente o sintoma que §3.0 nomeia.
 3. **Blocos de evidência** — o coração da tela (§3.6.3).
 4. **Prosa de leitura.** Um a três parágrafos em `--lastro-t-1` / `--lastro-el-corpo`, largura de coluna limitada. A prosa *conecta* as evidências; ela não é onde os números moram.
 5. **O que fazer** (só na pergunta 5 do PRD §3). Lista curta, cada item ancorado num bloco de evidência acima.
@@ -237,6 +240,8 @@ Nada disso é centralizado, nada é cartão flutuante com sombra. É documento: 
 - **Linha 1 — o exercício, pelo nome que o dono usou.** `--lastro-t-corpo`, `--lastro-peso-forte`, `--lastro-txt`. Nome de academia em PT-BR, o mesmo do catálogo (PRD §4.5).
 - **Linha 2 — o número, em `--lastro-fonte-num`, `--lastro-t-5`, `--lastro-txt`.** Grande, tabular, com unidade. Quando há comparação, dois números lado a lado com o delta entre eles no sinal correspondente. É a linha que se lê de relance.
 - **Linha 3 — a procedência.** `--lastro-t-meta`, `--lastro-txt-3`, `--lastro-fonte-num` para as partes numéricas. Formato: **janela · quantas séries valendo sustentam o número · origem do cálculo.** Exemplo de forma (valores ilustrativos): `4 semanas · 14 séries valendo · calculado no dispositivo`.
+
+**Qual sinal é dono da cor do bloco, quando dois sinais discordam do mesmo exercício.** `tendência_e1rm` (janela de comparação, 4 semanas) e a leitura de platô do gráfico (§3.7, 3 semanas) são medidas diferentes e podem discordar — um exercício pode subir na janela de 4 semanas e estar achatado nas últimas 3. **O bloco de evidência é dono da janela de comparação** (`tendencia_e1rm`/`estagnacoes`, a mesma que a prosa do parecer interpreta): é a cor e o delta dela que vão na barra lateral e na Linha 2. A leitura de platô do gráfico (§3.7) vive só no gráfico — os dois nunca competem pela mesma barra lateral. Se um dia a UI precisar mostrar as duas leituras no mesmo card, a segunda vem como texto qualificado ("subiu na janela de 4 semanas; achatado nas últimas 3"), nunca como uma segunda cor. Decisão registrada em `DECISIONS.md` 2026-08-08, motivada por §3.6.6: duas cores para o mesmo exercício sem regra de precedência é o erro que aquele parágrafo já proíbe entre exercícios diferentes.
 
 **Por que isso responde "é sobre ELE":** um bloco desses é impossível de escrever sem os dados dele. Ele carrega nome de exercício do log dele, número dele, e a contagem de séries dele. É a materialização visual do critério A6 do PRD — *se o bloco pudesse ter sido escrito sem olhar os dados, ele falhou*. E como o bloco é visualmente separado, dá para auditá-lo sem ler a prosa.
 

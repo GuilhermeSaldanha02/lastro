@@ -476,3 +476,280 @@ Também corrigidos, achados menores confirmados por leitura direta (sem precisar
 **Impacto.** Nenhuma mudança de schema. `src/app/page.tsx` ganhou o formulário de `sair`; `src/app/treino/page.tsx` perdeu. Achado de infra (redirect OAuth) é só conhecimento registrado — nada mudou na configuração do Supabase.
 
 **Como reverter.** Reverter o commit — os dois achados são independentes, mas foram registrados juntos por terem saído da mesma rodada de QA.
+
+---
+
+## 2026-08-07/08 — Polish visual reativo por print (branch `fix/consistencia-visual-telas`) — pausado, troca de abordagem decidida pelo dono
+
+**O que mudou.** O dono relatou insatisfação visual genérica ("muita coisa desalinhada, espaçamento errado, telas repetidas") e pediu uma passada de design. Em vez de acionar `diretor-arte` (que já existe em `.claude/agents/`, dono de `DESIGN.md`), a sessão rodou a skill externa `impeccable` num subagente Sonnet 5 (auditoria de código) seguida de correção reativa, tela por tela, a partir de prints reais do celular do dono — não de uma auditoria completa contra `DESIGN.md`.
+
+**Corrigido e commitado nesta branch (2 commits, não mergeados):**
+1. `barra-topo__titulo` não quebra mais em 2 linhas (`white-space: nowrap` + `text-overflow: ellipsis`, wrapper `barra-topo__info` com `min-width: 0`) — corrige o vazamento de conteúdo atrás do cabeçalho `fixed` na tela "Treino em andamento", único título longo o bastante pra quebrar em 375px.
+2. Respiro entre rótulo de data e título: `--lastro-e-1` (4px) → `--lastro-e-2` (8px).
+3. `.metrica__rotulo` (cards "Esta semana") ganhou `min-height: 2.6em` pra igualar a altura dos 3 rótulos e alinhar os números — **medido, não só lido**: os 3 `top` de `.metrica__valor` ficaram idênticos (369.75px) contra um usuário QA efêmero.
+4. `.selecao-grupos` (chips de grupo muscular) virou `grid-template-columns: 1fr 1fr` em vez de `flex-wrap` com largura de conteúdo — **medido**: os 10 chips ficaram com exatamente 162px cada, 2 colunas alinhadas.
+5. (De um subagente anterior, mesma branch) 3 literais fora de token migrados pra `tokens.css`: cor do avatar de iniciais, cor do botão destrutivo, tamanho de fonte do gráfico de progressão.
+
+**Não corrigido — reportado pelo dono como ainda errado no último print (2026-08-08):** o card "Séries valendo" segue desalinhado mesmo depois do fix #3. Hipótese não verificada: a altura TOTAL dos 3 cards ainda diverge porque só "Volume" tem a linha extra de unidade (`kg`) abaixo do número — igualar a altura do rótulo não iguala a altura do card inteiro. Não investigado a fundo.
+
+**Não mudado, decisão pendente do dono:** o zero pontuado do IBM Plex Mono (`--lastro-fonte-num`), sinalizado 2x pelo dono como visualmente ruim. `DESIGN.md` §3.3 documenta a fonte como escolha deliberada (superfamília com Plex Sans, avanço tabular monoespaçado, pré-cache offline via Serwist) — trocar reabre uma decisão de identidade e mexe no cache do PWA. Controller recusou trocar sem confirmação explícita do dono especificamente sobre isto.
+
+**Por que a abordagem foi pausada.** O dono identificou que o ciclo print→fix→print estava encontrando problema novo a cada rodada sem convergir, e que a skill `impeccable` (auditoria só de código, sem olho no navegador real) não estava rendendo — a causa real de cada bug só apareceu quando o dono mandou print real do celular, não quando o agente leu `tokens.css`/`sistema.css` sozinho. Decisão do dono: próxima sessão troca pra fluxo de agente já instalado no projeto (`diretor-arte`, Opus 5, dono de `DESIGN.md`) fazendo auditoria completa contra os tokens documentados, em vez de corrigir 1 print de cada vez.
+
+**Alternativa descartada.** Continuar o loop reativo pedindo mais prints — descartada pelo próprio dono, que pediu sessão nova com prompt novo em vez de continuar nesta.
+
+**Verificado, não só relatado (E8):** `tsc --noEmit`, `npm run lint` (0 erros, 1 warning pré-existente em `block-navigation.js`, não tocado) e `npm run build` limpos nos 2 commits. Medições de alinhamento feitas via `getComputedStyle`/`getBoundingClientRect` contra `localhost` autenticado por usuário QA efêmero (`qa-visual-fixo@lastro.test`, criado e apagado 3 vezes ao longo da sessão pelo script padrão do projeto, contagem confirmada = 0 toda vez). Screenshot automático da ferramenta de preview **não funcionou nesta sessão** (painel do navegador não compositava do lado do dono) — toda verificação visual foi por medição de DOM + prints reais mandados pelo dono, nunca por captura própria do controller. Isso é uma lacuna real: medição de DOM não substitui olho (padrão do projeto, `padrao-verificacao`), e a única razão de ter funcionado aqui é o dono ter mandado prints manualmente.
+
+**Impacto.** `sistema.css`, `tokens.css`, 6× `page.tsx` (barra de topo), `avatar`/`botao-destrutivo`/`grafico-progressao.tsx`. Nada em `main`. `.claude/launch.json` criado nesta sessão (config do preview local, `npm run dev` porta 3000/3002) — não existia antes, é infra reutilizável, não parte do fix.
+
+**Como reverter.** Branch não mergeada: `git checkout main` descarta tudo, ou manter a branch e só não mergear. Se a próxima sessão decidir recomeçar do zero visualmente, `git branch -D fix/consistencia-visual-telas` depois de confirmar que nada nela vale a pena reaproveitar.
+
+## 2026-08-08 — Troca de abordagem executada: auditoria estrutural + pesquisa de referências, proposta entregue como peça visual (nada aplicado)
+
+**O que mudou.** A sessão anterior parou o ciclo print→fix→print. Esta sessão executou a troca decidida: acionou o `diretor-arte` (Opus 5, dono de `DESIGN.md`) para auditoria estrutural completa das 7 telas contra os tokens, e depois — a pedido do dono — levantou pesquisa de referências de design mobile e de apps de treino para **evoluir** o desenho mantendo a base "Areia & Azul Petróleo".
+
+**A causa raiz do "Séries valendo", achada e diferente da hipótese registrada.** `DECISIONS.md` 2026-08-07/08 supunha divergência de **altura** de card. Está errado: os 3 cards são itens de grid com `align-items: stretch`, então as alturas já são idênticas por construção. O que estoura é **largura**: 375 − 40 (padding do corpo) − 24 (2 vãos) = 311 ÷ 3 = 103,67px por card, − 26px (padding + 2 bordas) = **77,67px úteis**. O valor é mono 30px ≈ 17,4px/caractere → cabem 4,4 caracteres. `formatarVolume` devolve `14,2k` (5 caracteres, 87px) a partir de ~10.000 kg, e quebra. Abaixo disso devolve `9,9k` (4 caracteres) e **não** reproduz. **Isso reconcilia a contradição do registro anterior:** a medição que deu os 3 topos idênticos (369,75px) foi contra usuário QA efêmero, de volume baixo — os topos eram idênticos de verdade; o print do dono é que era dado real. **Consequência de processo: o gate desta área tem pré-condição de dado (V0, volume ≥ 10.000 kg), senão não mede nada.**
+
+**Regressão introduzida por esta própria branch, registrada e não corrigida ainda.** O fix "título não quebra em 2 linhas" (`white-space: nowrap` + `ellipsis`) trocou quebra por corte: em `/treino/[id]` sobram ~185px para o título (335 − avatar 48 − vão 12 − botão "Treinos" ~78 − vão 12) e "Treino em andamento" em t-3/600 pede ~237px. É a única das 7 telas onde isso acontece. Correção prescrita: encurtar o título para "Treino" (a data já vive em `.barra-topo__contexto`) **e** remover o `.botao-barra` "Treinos", que duplica "Bancada" da aba inferior.
+
+**Decisão de método: a proposta virou peça visual, não documento.** O registro anterior prova que auditoria em texto não converte — a skill `impeccable` não achou os bugs, e o próprio dono recusou decidir no abstrato duas vezes (zero do Plex Mono, regra §3.4). Por isso a entrega desta rodada é um **deck renderizado**, com mockups antes/depois em 375×812 escala 1:1 usando os tokens reais, para o dono abrir no celular e **apontar**: <https://claude.ai/code/artifact/8bf7ef96-981e-4603-8b96-c7b6b6d8ae01>. Fonte em `scratchpad/deck/` (`deck.src.html` + `build.py`, que embute as fontes como data URI).
+
+**Alternativa descartada:** entregar a auditoria e a pesquisa como um segundo documento longo em Markdown. Descartada porque repetiria exatamente o modo de falha já registrado — o dono valida com o olho, e a rodada anterior gastou uma auditoria inteira que ele abandonou antes de agir sobre ela.
+
+**Tese aprovada pelo `diretor-arte`, aguardando o dono.** O app deixa de ser grade de cartõezinhos equivalentes e passa a ter **uma coisa grande por tela**; cartão passa a significar *porta* (só onde se toca e navega), e `--lastro-t-8` (76px), reservado há duas fases e nunca usado, vira o instrumento da hierarquia. **Nenhuma cor da paleta muda.** 10 movimentos nomeados, 7 tokens novos, 1 alterado (`.metrica__valor` t-4 → t-3).
+
+**"Séries valendo" — 3 opções comparadas, recomendação C.** (A) subgrid + t-3: corrige, mas mantém 26px de moldura por coluna, deixa linha de unidade vazia em 2 dos 3 cards e depende de `subgrid` (E9/P6). (B) empilhar em largura total: elimina a aritmética, mas custa ~270px contra ~110px e joga "Análise Semanal" abaixo da dobra. **(C) faixa sem cartão (Hevy): recomendada** — sem borda/padding/fundo a coluna vai a 103,67px, a unidade cabe inline, e os 6 elementos viram itens de um único grid, então os topos são idênticos por construção, sem `subgrid` e sem `min-height`.
+
+**Achado só possível por ter construído a peça (E8 na prática).** Ao renderizar e **medir** o mockup, `14 200 kg` (a forma com espaço fino que a especificação em texto pedia) deu 108px numa coluna de 101px — não cabia, e as colunas saíam desiguais (108/96/96), porque `1fr` é `minmax(auto, 1fr)` e conteúdo `nowrap` empurra o mínimo. Corrigido na proposta: espaço fino **só** no número herói; na faixa continua `14,2k`, e o vão da faixa desce de `--lastro-e-4` para `--lastro-e-3` (folga de 1px → 3,67px). Registrado em `KNOWLEDGE.md` §5.
+
+**Zero do IBM Plex Mono — verificado na fonte, e a pergunta mudou.** Inspecionados com `fontTools` os `.woff2` que o `next/font` já baixou: o glifo `zero` tem **3 contornos**, o terceiro um ponto centrado de 124×118 unidades (é ponto, não barra — a reclamação do dono procede), e o subset **não tem a feature OpenType `zero`** (só `ccmp/dnom/frac/numr`). Portanto `font-variant-numeric: slashed-zero` seria no-op: **não dá para corrigir por CSS, só trocando a família** — 38 usos e o cache offline do PWA. As 3 opções reais (manter / mono do sistema / abandonar o mono nos números) foram renderizadas lado a lado no deck, em tamanho grande e pequeno, para o dono apontar. **Nada decidido, nada tocado.**
+
+**Botão do Google no login — os dois conflitos resolvidos, um vira exceção declarada.** (a) O guia pede texto 14/20 e D4/§3.4 impõem piso de 16px: resolvido **por escala**, não por exceção — fator 1,2× dá altura 48px (= `--lastro-alvo-min` exato), texto 16,8px, logo 21,6px, paddings 14,4/12/14,4; as duas regras passam a valer juntas. (b) Fundo estranho à paleta é assumido de propósito (o guia proíbe tingir), mas **a variante importa**: Neutral `#F2F2F2` sobre a areia `#F0EAE0` daria ~1,05:1 e o botão sumiria como caixa — por isso variante **Light**, com o traço `#747775` obrigatório cumprindo o limite de 3:1. **A exceção declarada é outra e é obrigatória:** o guia especifica Google Sans, não auto-hospedável, contra a regra de zero requisição a terceiro (§3.3 item 1) — usa-se a fonte do app no peso médio, e isso entra no `DESIGN.md` como exceção nomeada (P2), não silenciosa.
+
+**Achado sobre as diretrizes, não sobre o app.** A galeria de referência permanente que o prompt do `diretor-arte` manda consultar antes de decisão visual foi carregada: 179 referências de WebGL/3D e e-commerce de luxo. Não calibra um PWA de academia de uma mão só — e `DESIGN.md` §3.0 já registrava que esse ramo é incompatível com D4 e D8. **O mandato aponta para um lugar inútil nesta classe de tarefa**; deveria ser reescrito para a régua de acabamento não-3D (Stripe, Linear, Vercel). Pendência de documento.
+
+**Verificado, não só relatado (E8).** Contraste do próprio deck **medido** (não estimado) nos dois temas: pior par de texto 4,66:1 no claro e 5,54:1 no escuro, ambos acima do piso AA. Fontes reais carregadas (`document.fonts.check` = true nas duas famílias), zero rolagem horizontal do corpo, zero estouro nas 8 molduras de 812px, colunas da faixa medidas em 103px iguais. **O que NÃO foi verificado:** o app rodando. A captura de tela automática do painel do navegador **falhou de novo** (mesma causa da sessão anterior — não compositava). Contornei para a pesquisa baixando as imagens de referência e lendo como arquivo, mas nenhuma tela do `lastro` real foi vista nesta sessão.
+
+**Impacto.** Nenhum arquivo de `src/` tocado. Alterados: `KNOWLEDGE.md` (§2.1 nova, 2 lições em §5), `PROGRESS.md` (item 14), este arquivo. Branch `fix/consistencia-visual-telas` segue com os mesmos 3 commits, não mergeada.
+
+**Como reverter.** Reverter os 3 arquivos de documento (`git checkout -- KNOWLEDGE.md PROGRESS.md DECISIONS.md`) e ignorar o deck, que vive fora do repositório. Nada em `src/`, nada em `main`.
+
+## 2026-08-08 (2) — Rediagnóstico: o problema não era alinhamento, era ausência de voz
+
+**O que mudou.** O dono leu a proposta anterior e respondeu que o sistema "está funcional, mas feio, sem detalhes, sem vida", e que a skill `impeccable` também não tinha ajudado. Isso invalida o enquadramento da rodada anterior: os 10 movimentos propostos eram **higiene** (alinhamento, hierarquia, token), não estética. Consertam o que está quebrado; não produzem beleza. Registrado como rediagnóstico, não como ajuste.
+
+**Por que a auditoria de token nunca ia resolver.** `impeccable` verifica se um valor está *fora* do sistema. Todos os valores do lastro estão **dentro** do sistema — o problema é que estão todos no **mesmo degrau** dele: maior número da tela em 30px (com `--lastro-t-8` de 76px reservado e nunca usado), sete componentes distintos com a mesma `elev-1`, todo cabeçalho de seção no mesmo versalete cinza de 14px. Não falta cor: falta **diferença**.
+
+**A restrição que explica tudo, e que precisa estar escrita.** As três referências que o dono trouxe (WHOOP, Oura, Ultrahuman) são **escuras**, e não por acaso: dado colorido brilha sobre preto, e o fundo faz metade do trabalho. O lastro é areia `#F0EAE0` com uma tinta e um verde. **Num fundo claro e quente não se compra vitalidade com brilho nem saturação** — tentar produz wellness pastel, que é anti-referência declarada. Sobra uma moeda só: **contraste de escala, de peso e de densidade.** Esta frase deve entrar em `DESIGN.md` §3.0 como restrição derivada da paleta.
+
+**A ideia que organiza a estética, ancorada no produto.** "Lastro" é o peso que dá estabilidade e, em português, o que dá substância (lastro financeiro). A tese do PRD é que o log é infraestrutura e o produto é a leitura — ou seja, **os números lastreiam a leitura**. Logo, contraste de escala não é escolha de gosto: é a metáfora do produto. Cada tela tem um peso e o resto flutua em volta dele.
+
+**Quatro fontes de vida, em ordem de retorno:** (1) elevação volta a significar algo — cartão só onde se toca e navega, dado sobre a areia sem moldura (é remoção, custo zero); (2) os numerais viram a identidade — mono tabular grande com delta e sinal; (3) o parecer ganha voz de documento emitido — sobrancelha + veredito em **IBM Plex Serif**, mesma superfamília, auto-hospedável, nenhum fornecedor novo; (4) **um** momento de movimento — a série registrada acende a linha inteira.
+
+**Textura de papel: recusada em quase tudo, mantida num lugar só.** "Areia é granulada" não é justificativa, é decoração. Sobreviveu apenas no tratamento B do login, onde a ideia é a **caderneta de treino** — e caderneta é impressa em papel. Se o dono recusar o tratamento, a textura cai junto e nada mais depende dela.
+
+**Login entregue como 3 apostas, não 1 refino.** O dono citou o login pelo nome e decide apontando. **A** (Placa): escala pura, marca em 88px sobre risco pesado. **B** (Caderneta): serifada, campo com pauta em vez de caixa, grão de papel. **C** (Massa): o petróleo deixa de ser faixa de 88px e vira campo de 44% da tela. O botão do Google é **idêntico nos três** (variante Light, escala 1,2×), para que a única variável julgada seja personalidade.
+
+**Achado contra a própria proposta anterior (E8).** Ao construir o mockup, medi que eu havia usado `--lastro-t-8` (76px) no parecer da Análise — **violando o §3.5 do próprio `DESIGN.md`**, que reserva t-8 ao Modo Bancada e manda `--lastro-t-5` (38px) no Modo Leitura. Corrigido no deck. Um erro que só apareceu porque a peça foi construída e medida, não descrita.
+
+**Correção de erro da rodada anterior:** os mockups do deck v1 mostravam a aba inferior com **4 seções**; o app tem **5** (`aba-inferior.tsx`: Início, Bancada, Análise, Catálogo, Coach). O briefing do dono pegou isso. Corrigido em todas as 10 molduras.
+
+**Volume passa a ser `14,2 t`.** Hoje `formatarVolume` devolve `14,2k` e a UI acrescenta `kg`, produzindo **"14,2k kg"** — dois indicadores de magnitude na mesma expressão. Ideia veio do StrengthLog, que mostra "2.6 ton". Mais curto, mais limpo, e cabe folgado na faixa de 103px.
+
+**Alternativa descartada.** Buscar "vida" por saturação, brilho ou superfície escura — descartada porque quebraria a paleta aprovada e cairia na anti-referência (wellness pastel ou academia agressiva).
+
+**Levantado como escopo, não aplicado:** a coluna "antes 16 × 9" ao lado de cada série (Hevy e Strong mostram o resultado da sessão anterior junto do campo em edição). É a informação mais útil no momento do esforço e o lastro não tem — **mas é feature, exige consulta ao histórico do exercício, e é decisão do dono.** Aparece no mockup só para ele julgar o efeito.
+
+**Verificado, não só relatado (E8).** Medido no deck renderizado: três famílias carregadas (`document.fonts.check` true para Sans, Mono e Serif), zero rolagem horizontal, ressalvas do método **dentro** das duas molduras do parecer (197px e 14px de folga), as 10 molduras com nav de 5 abas, nenhum alvo de toque abaixo de 48px, faixa de métricas com 3 colunas iguais de 103px, e só "Treino em andamento" truncando (que é a demonstração da regressão R1). Contraste medido no escopo lastro: pauta do campo 3,40:1 (limite de componente, piso 3,0), alta 5,47, platô 4,95, queda 5,78, procedência 5,58 — todos acima do piso. **O que NÃO foi verificado: o app rodando.** A captura de tela do painel do navegador falhou pela terceira sessão seguida.
+
+**Impacto.** Nenhum arquivo de `src/` tocado. Deck v2 no mesmo endereço: <https://claude.ai/code/artifact/8bf7ef96-981e-4603-8b96-c7b6b6d8ae01>. Fonte em `scratchpad/deck/`.
+
+**Bloqueado aguardando o dono:** login A/B/C · zero do Plex Mono A/B/C · tamanho de texto A/B · a coluna "anterior" entra ou não.
+
+**Como reverter.** Nada em `src/`, nada em `main`. Reverter os documentos com `git checkout -- DECISIONS.md PROGRESS.md`.
+
+## 2026-08-08 (3) — 16 peças visuais recebidas: o que se absorve, o que se rejeita
+
+**O que mudou.** O dono trouxe um pacote de **16 mockups conceituais** (`lastro-pecas-modulares-para-claude.zip`, em `Downloads`), um guia de uso e a `diretrizes-v7.md`. As peças são a resposta por apontamento às 4 decisões que a rodada anterior deixou bloqueadas. **Nenhum arquivo de `src/` foi tocado** — esta entrada é o relatório de absorção que o próprio guia exige ("explique quais peças foram absorvidas e quais foram descartadas, e por quê") antes de codificar.
+
+**Diretrizes v7 — nada a instalar.** O Passo 5 da v7 (`.claude/agents/`, `.claude/skills/padrao-*`, hooks em `.claude/settings.json`) já está em disco neste projeto, com 6 agentes e 7 padrões. Os Passos 0–2 são de bootstrap e **não se aplicam**: rodá-los reabriria o `PRD.md`, que está congelado. A v7 entra como conduta, não como sessão de inicialização.
+
+**O que as peças entregam que o deck v2 não tinha.** A peça 08 (parecer semanal) valida a tese do rediagnóstico e a corrige num ponto: **o maior salto de escala está no veredito, não no numeral.** O documento se lê como emitido — sobrancelha em versalete, risco verde curto, linha "Semana de … · Emitido em …", evidência com barra lateral colorida + rótulo + frase em negrito + prosa de procedência, "O QUE FAZER" numerado em blocos discretos, assinatura no rodapé. A peça 01 confirma as três remoções baratas já propostas (cartão só onde se toca, dado sobre a areia sem moldura, numeral mono tabular como identidade).
+
+**Conflitos entre as peças e contratos congelados — verificados no código, não em documento:**
+
+| # | A peça mostra | O projeto tem | Veredito |
+|---|---|---|---|
+| C1a | `RPE 7/8/9` na linha de série (01, 03) | **RIR** — nome de campo, função e contrato de API (`series-dificeis.ts`, `limiares.ts`, `validador.ts`) | Rejeitar o rótulo. RPE e RIR são escalas **inversas**: trocar o nome sem trocar a conta produz número plausível e errado, e o LLM depois interpreta esse número |
+| C1b | RIR/RPE visível em toda linha | **Não é exibido em lugar nenhum** — só capturado nos formulários (`formulario-serie.tsx:172`, `editar-serie.tsx:123`) | **Feature, não polimento.** Mesmo caso da coluna "anterior 16 × 9". Decisão do dono |
+| C2 | 4 abas (Treino de hoje · Análise semanal · Progresso · Histórico) | 5 abas (`aba-inferior.tsx:16-44`) | Rejeitar o conteúdo, absorver o tratamento da barra (peça 12) |
+| C3 | Areia `#F3EDE3`, Petróleo `#0E2A36`, Verde `#22B573` | `tokens.css`: `#F0EAE0`, barra `#17414F→#0E2833`, ação `#46C27B→#35A866` | **Tokens vencem.** Cada hex do `tokens.css` traz a razão de contraste **medida** ao lado; adotar o hex da peça invalida a medição inteira |
+| C4 | Veredito em Plex **Sans** bold | Proposta pendente do deck v2: Plex **Serif** | Decisão viva do dono — a peça contradiz uma proposta que ele ainda não julgou |
+| C5 | Manchete muito grande | §3.5 reserva `t-8` ao Modo Bancada; Modo Leitura para em `t-5` | **Não medir na peça:** a 08 não tem moldura de celular, é pôster 1440×2560. Só a *razão* veredito:corpo transfere, e a conferência é no navegador |
+| C6 | `Volume total 18.450 kg` | `page.tsx:39-40` ainda devolve `14,2k` + a UI acrescenta `kg` = **"14,2k kg"** | A decisão de 2026-08-08 (2) mandou virar `14,2 t` e **nunca foi implementada**. A peça mostra uma terceira variante. A decisão vence |
+
+**GATE VISUAL DESTRAVADO — o método que funciona.** `preview_start lastro-dev` sobe (porta 3002) e `read_page` responde, mas `computer screenshot` do painel interno falha com *"the Browser pane is not displayed, so the page is not compositing frames"* — **e abrir o painel não resolveu**; o `computer screenshot` da extensão do Chrome também estoura (CDP `Page.captureScreenshot`, 30s). Não é página pesada nem timeout de render.
+
+**O que funciona é a combinação:** a extensão Claude-in-Chrome **navega e redimensiona** (`mcp__claude-in-chrome__navigate` / `resize_window`) e o **computer-use captura a tela** (`mcp__computer-use__screenshot` + `zoom`, Chrome concedido em tier `read`). Três pré-condições descobertas na prática, todas obrigatórias:
+
+1. **A janela do Chrome não pode estar maximizada** — o Chrome ignora `resize_window` em janela maximizada, e sem isso a captura sai em 1366px, largura em que o app (100% mobile) não foi desenhado.
+2. **A aba que a extensão controla precisa estar em primeiro plano na janela** — ela navega uma aba de fundo sem trazê-la pra frente, e a captura mostra a aba ativa, não a dela. Um clique do dono resolve, uma vez por sessão.
+3. `read_page` / `get_page_text` / `javascript_tool` funcionam o tempo todo, independentemente disso — não dependem de composição de frames.
+
+**Primeira observação real do app rodando em 390×844** (Início e Análise, conta real do dono): a tela de Análise **confirma o rediagnóstico por evidência visual**, não por medição. As 5 perguntas são 5 cartões areia idênticos — mesma `elev-1`, mesmo raio, mesmo peso de texto — sem nenhuma hierarquia entre a pergunta mais usada e as outras. `PROGRESSÃO` e `ESCOLHA A PERGUNTA` saem no mesmo versalete cinza de 14px do `ESTA SEMANA` da Início. O único elemento com voz na tela é a barra de topo escura — que é justamente o par sobrancelha + título que a peça 08 usa no cabeçalho do parecer. **A direção da peça já está certa no único lugar onde o app a aplica.**
+
+**Limite do gate hoje:** a conta do dono está com `Volume 0 kg / Séries valendo 0` e sem semana fechada com treino, então (a) o parecer não renderiza e (b) o desalinhamento do card "Séries valendo" não reproduz (só com volume ≥ 10.000 kg). O gate da peça-assinatura exige dado seedado — usuário QA efêmero, como na tarefa do gráfico.
+
+**Alternativa descartada.** Absorver as peças como especificação — média entre os hexes da peça e os tokens, rótulo RPE junto do cálculo de RIR, barra de 4 abas. Descartado: é composição de fontes descasadas, e cada item acima tem uma fonte única que já venceu a discussão.
+
+**Impacto.** Nenhum arquivo de `src/` tocado. Alterados: `PROGRESS.md` (item 14, sub-entrada 3) e este arquivo. Rascunho longo do relatório fora do repositório.
+
+**Bloqueado aguardando o dono:** C1b · C4 · C5 · C6 · as peças entram no repo (45 MB, exigiria LFS) ou ficam fora.
+
+**Como reverter.** `git checkout -- PROGRESS.md DECISIONS.md`. Nada em `src/`, nada em `main`.
+
+## 2026-08-08 (4) — Backlog aprovado: DESIGN.md amendado, C6 implementado
+
+**O que mudou.** O dono aprovou minha recomendação para C4/C5/C6 e pediu backlog fatiado em vez de tudo de uma vez. Ordem: C6 → `DESIGN.md` → seed QA → parecer (cabeçalho, evidência, gráfico, estados) → gate final. Esta entrada cobre os dois primeiros itens.
+
+**C6 implementado.** `formatarVolume` em `src/app/page.tsx` passou a devolver `{ valor, unidade }` em vez de string fixa: abaixo de 1000 kg mostra kg cheio, a partir daí `t` com 1 casa decimal. Os dois pontos de uso (card "Volume" da semana e meta de "Treinos recentes") atualizados. `tsc --noEmit` limpo. Verificado no navegador (Chrome + computer-use, método da entrada anterior): card "Volume" mostra `0 kg`, caso zero correto — o caso `≥1000 kg → t` só é observável com dado real, revalidação fica pendurada na tarefa de seed do QA.
+
+**`DESIGN.md` amendado — duas entradas, autoconsistência conferida (P2):**
+- **§3.0** ganhou a restrição do rediagnóstico por escrito: fundo areia claro não sustenta vitalidade por brilho/saturação (produz wellness pastel); a moeda que sobra é contraste de escala, peso e densidade. Isso deixa de ser um argumento solto no `DECISIONS.md` de 08/08 e vira regra citável.
+- **§3.6.2 item 2 (Veredito)** subiu de `--lastro-t-3` (24px, igual ao título do cabeçalho) para `--lastro-t-6` (48px) — nomeado como exceção em §3.4. É a aplicação direta da restrição de §3.0: título e veredito no mesmo degrau era o próprio sintoma que o rediagnóstico descreveu. Conferido: nenhuma outra menção a tamanho de veredito no documento ficou desatualizada.
+
+**Por que `--lastro-t-6` e não `--lastro-t-8`.** `t-8` (76px) é reservado ao Modo Bancada (número lido a um braço) — usá-lo no parecer é a mesma violação de §3.5 que a sessão de 08/08 já tinha se pego cometendo. `t-6` cria o salto de escala sem invadir o degrau do outro modo.
+
+**Nada em `src/components/parecer.tsx` ainda usa este token** — o componente não tem conceito de veredito hoje. A amenda é preparatória; a construção é a próxima tarefa do backlog (cabeçalho de emissão, peça 08).
+
+**Impacto.** `src/app/page.tsx` (C6). `DESIGN.md` (§3.0, §3.4, §3.6.2). Nenhuma migration, nenhum contrato de API tocado.
+
+**Como reverter.** `git checkout -- src/app/page.tsx DESIGN.md`.
+
+## 2026-08-08 (5) — Backlog fatiado: achado de arquitetura, decisão do dono, replanejamento
+
+**O que mudou.** Ao planejar as tarefas #4/#5 (cabeçalho e cards de evidência do parecer), achei que `/api/analise` **já calcula** `resumo` (ResumoCompacto, tudo que §3.6.3 precisa) antes de chamar o Gemini — só não devolve ao cliente. `parecer.tsx` já documentava isso como "LIMITAÇÃO CONHECIDA" havia sessões. Consultei o revisor antes de tocar um contrato documentado (SDD §6.2); ele apontou dois problemas reais antes de eu escrever código.
+
+**Problema 1 — devolver `ResumoCompacto` inteiro ao cliente era o desenho errado.** Ele é o payload do PROMPT (dimensionado contra `MAX_BYTES_RESUMO`, moldado pro LLM), não o contrato da TELA. Devolvê-lo cru acopla o formato que a UI lê ao formato que o prompt usa — qualquer ajuste futuro de prompt muda silenciosamente o que a tela recebe. Decisão: uma fatia própria, tipada, com só os campos que §3.6.3 usa.
+
+**Problema 2 — a seed provou um caso real de dois sinais discordando do mesmo exercício.** O parecer descreveu Levantamento Terra e Desenvolvimento como "subiu X%" (comparação de 4 semanas, `tendencia_e1rm`) mesmo semeados como platô nas últimas 3 semanas (regra do gráfico, `PLATO_GRAFICO_SEMANAS`). Os dois cálculos estão corretos — são janelas diferentes, ambas documentadas em `limiares.ts`. O gap é que **nada em `DESIGN.md` dizia qual sinal pinta a barra lateral do card quando os dois discordam**, e §3.6.6 já proíbe exatamente essa ambiguidade entre exercícios diferentes — faltava a regra para o mesmo exercício.
+
+**Decidido e escrito em `DESIGN.md` §3.6.3:** o bloco de evidência é dono da **janela de comparação** (`tendencia_e1rm`/`estagnacoes`, a mesma que a prosa interpreta). A leitura de platô do gráfico vive só no gráfico (§3.7/peça 10) — as duas nunca competem pela mesma barra lateral. Se algum dia a UI precisar mostrar as duas leituras juntas, a segunda entra como texto qualificado, nunca como segunda cor.
+
+**Achado à parte, não é bug:** a prosa chamou Remada Curvada (semeada em queda constante) de "estagnação de 4 semanas sem progresso". Conferido em `estagnacao.ts`: a definição é "sem novo máximo por N semanas", que **inclui queda por construção** (uma semana em declínio nunca bate o máximo corrente, logo conta pro streak). É o comportamento documentado, não um bug do agregador — mas é um lembrete de que "estagnação" no código é mais amplo que "platô" na leitura comum, e a prosa devia deixar isso claro quando descrever regressão como estagnação.
+
+**Pergunta ao dono: como montar o número do card, já que `ResumoCompacto` só tem e1RM + contagem de sessões por exercício, não volume nem séries valendo por exercício** (só por grupo muscular). Duas opções — usar o que já existe (e1RM + sessões, sem tocar o agregador testado) ou estender o agregador pra ter peso×reps e séries valendo por exercício, igual à peça 09. **O dono escolheu estender o agregador.** É fase nova (E4), não retoque: `tipos.ts` (`ResumoCompacto`), `agregar.ts` (testado, SDD §D2), testes novos, e checar se o resumo ainda cabe em `MAX_BYTES_RESUMO`.
+
+**Backlog replanejado, em ordem:**
+1. Agregador — `volume_por_exercicio` em `ResumoCompacto` (peso, reps, séries valendo, delta) — tarefa nova, maior do que as anteriores.
+2. API — fatia de evidência própria (não `ResumoCompacto` cru) devolvida junto de `parecer`; amendar SDD §6.2.
+3. Cabeçalho de emissão + veredito (peça 08) — não depende do agregador, pode andar em paralelo.
+4. Cards de evidência (peça 09) — depende de 1 e 2.
+5. Gráfico (peça 10), estados (peça 11), gate final — como já estava.
+
+**Dois soltos que o revisor apontou, registrados agora:**
+- **Usuário QA efêmero:** `qa-lastro-parecer@example.com` / UUID `343f521f-ac58-4924-a4cf-87038bcb9812`, 5 semanas fechadas (Mondays 2026-06-29 a 2026-07-27), volume da semana mais recente **10.420 kg**. Agachamento Livre e Supino Reto em alta, Levantamento Terra e Desenvolvimento em platô (últimas 3 semanas), Remada Curvada em queda. Verificado ponta a ponta contra `/api/analise` real. **Fica vivo até o gate final** (tarefa "Gate final"), que deve rodar `./scripts/qa-treino-helper.sh limpar-usuario qa-lastro-parecer@example.com` ao terminar.
+- **`.claude/launch.json` está untracked.** É o que faz `preview_start lastro-dev` funcionar nesta sessão (a configuração do dev server, porta 3000→3002 quando 3000 está ocupada). Se a sessão terminar sem commitá-lo, a próxima precisa recriá-lo (conteúdo: `{"name":"lastro-dev","runtimeExecutable":"npm","runtimeArgs":["run","dev"],"port":3000}`). Ainda não commitado — decisão de manter fora do controle de versão ou commitar fica para o dono.
+
+**Impacto.** `DESIGN.md` (§3.6.3, regra de precedência). `DECISIONS.md`, `PROGRESS.md`. Nenhum arquivo de `src/` tocado ainda nesta rodada — a extensão do agregador é a próxima tarefa.
+
+**Como reverter.** `git checkout -- DESIGN.md DECISIONS.md PROGRESS.md`.
+
+## 2026-08-08 (6) — Agregador estendido, API devolve evidência, verificado ponta a ponta
+
+**O que mudou.** Tarefas #9 e #10 do backlog concluídas e commitadas (`a4168e3`, `a08dc51`). `ResumoCompacto` ganhou `volume_por_exercicio` (peso×reps×séries valendo por exercício, top set do treino mais recente). `/api/analise` devolve `evidencia` — fatia própria que funde `tendencia_e1rm` (dono do sinal alta/platô/queda) com `volume_por_exercicio` (os números da Linha 2) — nas 3 branches, inclusive o fallback determinístico. 89 testes, `tsc`/lint limpos.
+
+**Achado durante a verificação ponta a ponta: o tempo real passou por baixo do seed.** A seed original (tarefa #3) cobria 5 semanas terminando em 2026-07-27, calculada quando "agora" da sessão era 2026-08-08. Entre então e a verificação desta tarefa, o relógio real avançou o suficiente para a "semana atual" da análise rolar para 2026-08-03 — a seed ficou uma semana pra trás, `evidencia.blocos` voltou vazio na primeira chamada. **Não é bug do código**, é a natureza de dado semeado com data fixa numa sessão longa. Corrigido semeando a 6ª semana (treino 2026-08-05, mesmas 5 exercícios, tendências continuadas). Reverificado: os 3 sinais saem corretos com dado real —
+
+- **Alta:** Agachamento Livre (+7,9%), Supino Reto (+11,5%)
+- **Platô:** Levantamento Terra e Desenvolvimento Militar, `delta_pct` exatamente `0` — a zona-morta de classificação nem precisou arredondar
+- **Queda:** Remada Curvada (-8,1%), com `semanas_sem_progresso: 4` presente como campo qualificado — **não** reclassificado como platô, confirmando a regra de precedência escrita em `DESIGN.md` §3.6.3
+
+**Lição para sessões futuras com QA seedado por data fixa:** se a sessão atravessar uma virada de semana ISO (segunda-feira 00:00 em `America/Sao_Paulo`), a "semana atual" da análise rola e o seed mais recente vira "semana anterior" sem dado. Verificar `resumo.periodo.semana_atual_inicio` contra a data real antes de reusar um seed antigo — não assumir que ele continua válido só porque passou uma vez.
+
+**Impacto.** Nenhum arquivo de `src/` tocado nesta entrada (só documentação); o código já foi commitado nas duas entradas anteriores. Seed em Supabase: `qa-lastro-parecer@example.com` agora com 6 semanas (2026-06-29 a 2026-08-03).
+
+**Próximo passo:** tarefa #4 do backlog — cabeçalho de emissão + veredito do parecer (peça 08), que não depende de mais nada.
+
+**Como reverter.** `git checkout -- DECISIONS.md`. Seed no Supabase seguirá limpo pelo `limpar-usuario` na tarefa "Gate final".
+
+## 2026-08-10 — Tarefa 4 concluída: cabeçalho + veredito, verificado no navegador real
+
+**O que mudou.** Peça 08 (cabeçalho de emissão + veredito) construída e commitada (`f92d16c`). `PROGRESS.md`/backlog seguem em #5 (cards de evidência).
+
+**Achado que bloqueava a tarefa, resolvido antes de escrever componente.** A resposta real da API trazia markdown cru (`###`, `**`, `*`, crase) — `parecer.tsx` renderiza como `<p>{texto}</p>`, sem parser, então isso apareceria como asteriscos literais na tela. E a primeira frase (que vira o veredito em destaque) saía genérica ("sim, você está progredindo"), sem exercício nem número — o oposto do que a peça-assinatura pede. Os dois são o mesmo tipo de defeito: prompt sem trava suficiente. Corrigido em `prompt.ts` (`SYSTEM_INSTRUCTION`): proíbe markdown, exige que a 1ª frase cite exercício+número, exige decimal em vírgula (o modelo escrevia "11.5" em inglês). **Verificado empiricamente contra a API real nas perguntas 1, 2 e 5 antes de tocar em UI** — 3/3 vieram específicas, sem markdown, com vírgula.
+
+**`separarVeredito`** (`src/lib/texto/`) corta a 1ª frase do parecer; testado com o texto real capturado da API (não só fixture sintética). `formatarDataCurta` extraída de `page.tsx` para `tempo.ts` — fonte única (E10), reusada pelo cabeçalho do parecer.
+
+**Verificado no navegador real — o método que funciona nesta máquina, achado nesta sessão.** Nem o painel interno nem o `computer` (desktop) da extensão capturam de forma confiável aqui: o desktop screenshot ficou preso mostrando uma janela/aba **desatualizada** por várias tentativas (inclusive depois de F5, de limpar service worker e cookies via `javascript_tool`, e de abrir aba nova) — a extensão via `get_page_text`/`read_page` sempre mostrou o estado real e correto, só a captura de imagem do **desktop** ficava obsoleta. **O que resolveu:** usar `mcp__claude-in-chrome__computer{action:"screenshot"}` (escopo da aba, dentro da extensão) em vez de `mcp__computer-use__screenshot` (escopo do desktop). Login como usuário QA também exigiu limpar cookies manualmente via `document.cookie` — o botão "Sair" da UI e um simples reload não derrubaram a sessão anterior de forma confiável.
+
+**Confirmado visualmente:** sobrancelha "ANÁLISE SEMANAL" pequena → título `t-3` → linha "Semana de 3 ago — 9 ago · Emitido em 10 de ago. de 2026" (junta `evidencia.periodo` com a data de emissão, como `DESIGN.md` §3.6.2 pede) → risco → veredito em `t-6`, claramente maior e mais pesado que o título. O salto de escala da restrição de §3.0 está na tela, não só no código.
+
+**Achado para o dono julgar, não decidido aqui:** em viewport de 375–500px, uma frase composta longa em `t-6` ocupa ~8 linhas e domina a tela inteira. É fiel à decisão de §3.0/§3.6.2, mas vale o olho real antes de fechar a tarefa 8 (gate final) — se parecer exagerado, a correção é limitar o comprimento da frase no prompt (pedir concisão), não reduzir o token.
+
+**Impacto.** `src/app/api/analise/prompt.ts`, `src/lib/texto/` (novo), `src/lib/tempo.ts`, `src/app/page.tsx`, `src/components/parecer.tsx`, `src/components/analise-interativa.tsx`, `src/app/sistema.css`. `.claude/launch.json` finalmente commitado (estava untracked desde a sessão anterior). 94 testes, `tsc`/lint limpos.
+
+**Como reverter.** `git revert f92d16c`.
+
+## 2026-08-10 (2) — Tarefa 5 concluída: cards de evidência, verificados no navegador
+
+**O que mudou.** Peça 09 construída e commitada (`c23a13d`). Backlog segue em #6 (gráfico).
+
+**`BlocoEvidencia`** (`src/components/`) renderiza cada item de `evidencia.blocos` com coluna de sinal (ícone + palavra "Alta"/"Platô"/"Queda"), exercício, número (`peso × reps` do top set), procedência (`janela · séries valendo · calculado no dispositivo`) e delta à direita. `formatarDelta` (`src/lib/texto/`) decide o texto do delta por sinal: alta só o percentual, queda percentual+janela, platô usa o streak real de `semanas_sem_progresso` quando o mesmo exercício também está em `estagnacoes`, e cai para a janela de comparação quando não está — os dois critérios existem porque são famílias diferentes (delta≈0 na janela de 4 semanas vs. streak de 4+ semanas sem novo máximo), confirmado com o seed real: Levantamento Terra e Desenvolvimento saem "platô" sem estar em `estagnacoes`.
+
+**Dois achados corrigidos ao ver renderizado, não só testado:**
+1. `peso_referencia` saía com **ponto** decimal ("102.5") — JSX faz `String(n)` puro, sem localização. `formatarPeso` adicionado.
+2. Ao escrever o CSS do layout (coluna de sinal, coluna de delta), usei `rem` **literal** em `sistema.css` por engano — viola a regra de fonte única do projeto (só `tokens.css` pode ter literal). Corrigido antes de commitar: dois tokens novos, `--lastro-evidencia-col-sinal`/`--lastro-evidencia-col-delta`.
+
+**Verificado no navegador real** (extensão Chrome, login QA): os 3 sinais (alta verde, platô âmbar, queda terracota) renderizam com cor + ícone + palavra + delta — a redundância de 3 canais que §3.2 nota C e §3.6.6 exigem, não só cor. Cores reusam tokens já medidos (`--lastro-alta`/`--lastro-plato`/`--lastro-queda`), nenhum contraste novo a validar — medição rigorosa fica pra tarefa 8 (gate final).
+
+**Impacto.** `src/components/bloco-evidencia.tsx` (novo), `src/components/parecer.tsx`, `src/lib/texto/formatar-delta.ts` (novo), `src/app/sistema.css`, `src/app/tokens.css`. 104 testes (10 novos), `tsc`/lint limpos.
+
+**Como reverter.** `git revert c23a13d`.
+
+## 2026-08-10 (3) — Tarefas 6 e 7: gráfico já pronto, estado "dados insuficientes" construído
+
+**Tarefa 6 (peça 10, gráfico) — nenhum código necessário.** Conferi `grafico-progressao.tsx` contra os 7 itens de `DESIGN.md` §3.7 um a um: rotulagem direta ✓, conclusão em palavras em `t-2` acima do desenho ✓, platô desenhado com `strokeDasharray` em `--lastro-plato` + anotação "há N semanas" ✓, linha de referência única ("melhor marca") ✓, alvo de toque ✓, alternativa textual pro leitor de tela ✓, stack viável (Recharts) ✓. Já tinha sido construído e verificado numa sessão anterior (`PROGRESS.md` item 1, 2026-08-07) e eu mesmo vi renderizando corretamente com dado real várias vezes nesta sessão. Rodei também a verificação executável de literais (`grep` de §3.8) em `sistema.css` — vazia, nenhuma violação. Marcado concluído sem commit novo.
+
+**Tarefa 7 (peça 11) — o estado "sem dados suficientes" não existia.** As outras três (gerando, erro da API, pronto) já estavam corretas desde a tarefa 10 (a evidência estruturada passou a vir nas 3 branches da rota). Mas a lista de 5 perguntas ficava sempre clicável, mesmo com uma semana só de dado — o app dependia do LLM escrever na prosa que faltava informação, quando `DESIGN.md` §3.6.5 exige um bloqueio **determinístico**, com o número exato de semanas que faltam, antes de qualquer chamada à API.
+
+**`MINIMO_SEMANAS_PARECER = 3`** (`limiares.ts`) — mesmo número já citado informalmente em sessões anteriores e no mockup de referência ("São necessárias 3"), não é limiar estatístico novo. Reusa `semanasFechadasComTreino`, que a Home já calculava (`carregarResumoHome`) — sem duplicar consulta (E10). Abaixo do piso, `/analise` esconde a lista de perguntas e mostra "Você tem N semana(s) fechada(s). São necessárias 3 para calcular a análise semanal." + CTA "Registrar treino", em cor neutra (nunca `--lastro-erro`).
+
+**Verificado no navegador com um usuário QA descartável** — criado com 1 semana, testado, **deletado logo em seguida** (cascade confirmado, 0 linhas). Não usei o QA principal (6 semanas, ainda serve pra tarefa 8) nem tentei logar como o dono (login dele é Google OAuth; não tenho a senha e não é apropriado automatizar login pessoal dele).
+
+**Impacto.** `src/lib/analise/limiares.ts`, `src/app/analise/page.tsx`, `src/components/analise-interativa.tsx`. 104 testes, `tsc`/lint limpos. Commit `6d12a5b`.
+
+**Estado do backlog:** só falta a tarefa 8 — gate final com contraste medido e o olho do dono.
+
+**Como reverter.** `git revert 6d12a5b`.
+
+## 2026-08-10 (4) — Gate final: contraste medido, navegador real, build limpo
+
+**O backlog inteiro do parecer semanal (peça-assinatura) está fechado.** 8 tarefas, commits `0ac5f0c` → `6d12a5b`, todas verificadas no navegador real com dado real (não só teste unitário).
+
+**Contraste medido — fórmula do próprio `DESIGN.md` §3.2 (linearização sRGB), rodada ao vivo no `/analise` renderizado, não estimado:**
+
+| Elemento | Cor | Fundo | Tamanho/peso | Contraste |
+|---|---|---|---|---|
+| `.doc__veredito` | `--lastro-txt` | `--lastro-fundo` | 48px / 600 | **11.54:1** |
+| `.evidencia__numero` | `--lastro-txt` | `--lastro-grad-sup` (pior stop) | 38px / 500 | **12.39:1** |
+| `.evidencia__procedencia` | `--lastro-txt-3` | `--lastro-grad-sup` | 14px / 400 | **5.99:1** |
+| Rótulo "Alta" (ícone+palavra) | `--lastro-alta` | fundo | 14px / 600 | **5.47:1** |
+| Rótulo "Platô" | `--lastro-plato` | fundo | 14px / 600 | **4.95:1** |
+| Rótulo "Queda" | `--lastro-queda` | fundo | 14px / 600 | **5.78:1** |
+| Delta "Alta" | `--lastro-alta` | `--lastro-grad-sup` | 14px / 600 | **5.87:1** |
+| Delta "Platô" | `--lastro-plato` | `--lastro-grad-sup` | 14px / 600 | **5.31:1** |
+| Delta "Queda" | `--lastro-queda` | `--lastro-grad-sup` | 14px / 600 | **6.21:1** |
+
+Método aferido contra os canônicos WCAG antes de medir (`#FFFFFF/#000000 = 21.00`, `#FFFFFF/#777777 = 4.48` — bateram). Todos os valores folgados acima do piso AA (4.5:1 texto normal, 3:1 texto grande) — nenhum elemento novo desta sessão introduziu risco de contraste, porque todos reusam tokens já medidos em `tokens.css` (nenhuma cor nova).
+
+**`npm run build` limpo** (produção, Turbopack, `/analise` e `/api/analise` compilam). `npx tsc --noEmit` limpo. 104 testes. `npm run lint`: 0 erros.
+
+**O que fica pro dono — a parte que não se automatiza.** Confirmei estrutura, texto, cor e contraste; **não substituo o olho do dono** (`padrao-verificacao` item 3). Ele precisa:
+1. Logar em `http://localhost:3002` com a conta dele (Google) e olhar `/analise` no celular de verdade — o app é 100% mobile, viewport de desktop engana.
+2. Julgar se o veredito em `t-6` (visto ocupando ~8 linhas numa tela de 375-500px) está bom ou exagerado — é fiel à decisão, mas ninguém tinha visto renderizado antes de hoje.
+3. Decidir se quer a conta QA (`qa-lastro-parecer@example.com`) mantida viva por mais uma sessão pra ele mesmo olhar os 3 sinais com dado real, ou se já pode limpar (`./scripts/qa-treino-helper.sh limpar-usuario qa-lastro-parecer@example.com`). **Não limpei nesta entrada** — decisão do dono.
+
+**Impacto.** Nenhum arquivo de `src/` tocado nesta entrada (é documentação do gate). Branch `fix/consistencia-visual-telas` segue não mergeada — merge é decisão do dono, depois do olho dele.
+
+**Como reverter.** N/A (só documentação).

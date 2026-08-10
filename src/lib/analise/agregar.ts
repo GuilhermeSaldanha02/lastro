@@ -7,6 +7,7 @@ import {
   LOOKBACK_ESTAGNACAO_SEMANAS,
   MAX_GRUPOS,
   MAX_TENDENCIA_E1RM,
+  MAX_VOLUME_POR_EXERCICIO,
 } from "./limiares";
 import { calcularPrs, type EntradaPr } from "./prs";
 import { calcularSeriesDificeis } from "./series-dificeis";
@@ -174,6 +175,63 @@ export function montarResumoCompacto(entrada: {
       }
       return item;
     });
+
+  // ---------- volume_por_exercicio ----------
+  // Espelha volume_por_grupo_muscular, mas por exercicioId — DESIGN.md
+  // §3.6.3, Linha 2 do bloco de evidência ("80kg × 6").
+  const seriesAtualPorExercicio = new Map<string, SerieValendo[]>();
+  for (const s of seriesValendoSemanaAtual) {
+    if (!seriesAtualPorExercicio.has(s.exercicioId)) {
+      seriesAtualPorExercicio.set(s.exercicioId, []);
+    }
+    seriesAtualPorExercicio.get(s.exercicioId)!.push(s);
+  }
+  const seriesAnteriorPorExercicio = new Map<string, SerieValendo[]>();
+  for (const s of seriesValendoSemanaAnterior) {
+    if (!seriesAnteriorPorExercicio.has(s.exercicioId)) {
+      seriesAnteriorPorExercicio.set(s.exercicioId, []);
+    }
+    seriesAnteriorPorExercicio.get(s.exercicioId)!.push(s);
+  }
+
+  const volume_por_exercicio = Array.from(seriesAtualPorExercicio.entries())
+    .map(([exercicioId, series]) => {
+      const volume = calcularVolume(series);
+      const volumeAnterior = seriesAnteriorPorExercicio.has(exercicioId)
+        ? calcularVolume(seriesAnteriorPorExercicio.get(exercicioId)!)
+        : 0;
+
+      // Top set: maior peso do treino MAIS RECENTE em que o exercício
+      // apareceu esta semana — não é média nem soma (comentário do tipo).
+      const dataMaisRecente = series.reduce(
+        (max, s) => (s.data > max ? s.data : max),
+        series[0].data,
+      );
+      const setsDoTreinoMaisRecente = series.filter(
+        (s) => s.data === dataMaisRecente,
+      );
+      const topSet = setsDoTreinoMaisRecente.reduce((max, s) =>
+        s.peso > max.peso ? s : max,
+      );
+
+      const item: ResumoCompacto["volume_por_exercicio"][number] = {
+        exercicio: series[0].exercicio,
+        grupo_muscular: series[0].grupoMuscular,
+        series_valendo: series.length,
+        volume: arredondar(volume, 1),
+        peso_referencia: topSet.peso,
+        reps_referencia: topSet.reps,
+      };
+      if (volumeAnterior > 0) {
+        item.delta_volume_pct = arredondar(
+          ((volume - volumeAnterior) / volumeAnterior) * 100,
+          1,
+        );
+      }
+      return item;
+    })
+    .sort((a, b) => b.volume - a.volume)
+    .slice(0, MAX_VOLUME_POR_EXERCICIO);
 
   // ---------- tendencia_e1rm ----------
   // Agrupa por exercício -> por sessão (treino), dentro da janela de comparação.
@@ -364,6 +422,7 @@ export function montarResumoCompacto(entrada: {
     faixa_referencia_series: FAIXA_SERIES_SEMANAIS,
     volume_semanal,
     volume_por_grupo_muscular,
+    volume_por_exercicio,
     tendencia_e1rm: tendenciaE1rmFinal,
     frequencia,
     estagnacoes,

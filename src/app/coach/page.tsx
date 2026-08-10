@@ -14,7 +14,7 @@ export default async function PaginaCoach() {
     <main className="tela">
       <header className="barra-topo">
         <div className="barra-topo__acoes">
-          <div>
+          <div className="barra-topo__info">
             <p className="barra-topo__contexto">Coach</p>
             <h1 className="barra-topo__titulo">Tirar uma dúvida</h1>
           </div>

@@ -18,6 +18,7 @@ import type {
 } from "@/lib/analise/tipos";
 import { dataLocalBrasil } from "@/lib/tempo";
 import { ClienteParecerGemini } from "./gemini";
+import { montarEvidenciaParaTela } from "./evidencia";
 import { montarPrompt } from "./prompt";
 import { validarNumeros } from "./validador";
 import { perguntaValida } from "./perguntas";
@@ -199,8 +200,10 @@ export async function POST(request: Request) {
     respostaBruta: respostaUm,
   });
 
+  const evidencia = montarEvidenciaParaTela(resumo);
+
   if (resultado.ok) {
-    return NextResponse.json({ parecer: respostaUm });
+    return NextResponse.json({ parecer: respostaUm, evidencia });
   }
 
   // 1ª falha (SDD §6.4, tabela): uma nova chamada, com o parecer rejeitado
@@ -225,12 +228,15 @@ export async function POST(request: Request) {
   });
 
   if (resultado.ok) {
-    return NextResponse.json({ parecer: respostaDois });
+    return NextResponse.json({ parecer: respostaDois, evidencia });
   }
 
   // 2ª falha: não exibir parecer do LLM. Fallback determinístico + aviso.
+  // A evidência estruturada é do agregador, não do LLM — continua íntegra
+  // mesmo quando a prosa falha (DESIGN.md §3.6.5, estado "Erro da API").
   return NextResponse.json({
     parecer: fallbackDeterministico(resumo),
     avisoFalhaInterpretativa: true,
+    evidencia,
   });
 }

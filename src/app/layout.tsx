@@ -1,12 +1,12 @@
 import type { Metadata, Viewport } from "next";
-import { IBM_Plex_Sans, IBM_Plex_Mono } from "next/font/google";
+import { IBM_Plex_Sans, IBM_Plex_Mono, IBM_Plex_Serif } from "next/font/google";
 import RegistrarServiceWorker from "@/components/registrar-service-worker";
 import ForcarInicioNoLancamento from "@/components/forcar-inicio-no-lancamento";
 import "./globals.css";
 
-// DESIGN.md §3.3 — duas famílias. Sans para tudo que se lê; Mono para
-// número, unidade, metadado e rótulo de sistema. É a troca de família que
-// destaca o dado, não a cor.
+// DESIGN.md §3.3 — Sans para tudo que se lê; Mono para número, unidade,
+// metadado e rótulo de sistema. É a troca de família que destaca o dado,
+// não a cor. (Terceira família, Serif, abaixo — uso único: o veredito.)
 const plexSans = IBM_Plex_Sans({
   variable: "--fonte-plex-sans",
   weight: ["400", "500", "600", "700"],
@@ -17,6 +17,18 @@ const plexSans = IBM_Plex_Sans({
 const plexMono = IBM_Plex_Mono({
   variable: "--fonte-plex-mono",
   weight: ["400", "500", "600"],
+  subsets: ["latin"],
+  display: "swap",
+});
+
+// DESIGN.md §3.3 — terceira família, uso ÚNICO: o veredito do parecer
+// (.doc__veredito). Mesma superfamília IBM Plex, mesma licença SIL OFL —
+// "documento emitido" ganha voz própria só onde já é a peça-assinatura,
+// sem virar uma 4ª família espalhada pelo resto do app (C4, aprovado
+// 2026-08-08, implementado 2026-08-10 — ficou pendente na tarefa 4).
+const plexSerif = IBM_Plex_Serif({
+  variable: "--fonte-plex-serif",
+  weight: ["600"],
   subsets: ["latin"],
   display: "swap",
 });
@@ -47,7 +59,10 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="pt-BR" className={`${plexSans.variable} ${plexMono.variable}`}>
+    <html
+      lang="pt-BR"
+      className={`${plexSans.variable} ${plexMono.variable} ${plexSerif.variable}`}
+    >
       <body>
         <RegistrarServiceWorker />
         <ForcarInicioNoLancamento />

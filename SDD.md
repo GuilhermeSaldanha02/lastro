@@ -128,6 +128,24 @@ export type ResumoCompacto = {
     posicao_na_faixa: 'abaixo' | 'dentro' | 'acima';
   }>;
 
+  /**
+   * Volume por EXERCÍCIO (não por grupo), semana atual — adicionado
+   * 2026-08-08 para alimentar o bloco de evidência do parecer (DESIGN.md
+   * §3.6.3, Linha 2: "80kg × 6"). `peso_referencia`/`reps_referencia` são
+   * o TOP SET (maior peso) do treino mais recente da semana em que o
+   * exercício apareceu — nunca média nem soma, para não inventar um par
+   * peso×reps que nenhuma série real tem (E3).
+   */
+  volume_por_exercicio: Array<{
+    exercicio: string;
+    grupo_muscular: string;
+    series_valendo: number;
+    volume: number;                      // Σ(reps × peso), kg, 1 casa
+    peso_referencia: number;             // top set, kg
+    reps_referencia: number;             // reps do top set
+    delta_volume_pct?: number;           // vs. semana anterior, ausente se não há
+  }>;
+
   tendencia_e1rm: Array<{
     exercicio: string;                   // nome PT-BR do catálogo
     grupo_muscular: string;
@@ -196,12 +214,12 @@ export type ResumoCompacto = {
 | # | Propriedade | Como se garante |
 |---|---|---|
 | C1 | **Orçamento de tamanho.** `JSON.stringify(resumo).length ≤ MAX_BYTES_RESUMO` | Teste `T-R1` (§4.5) com fixture de carga máxima |
-| C2 | **Toda lista tem teto.** `volume_por_grupo_muscular` ≤ 12 · `tendencia_e1rm` ≤ 8 (top por volume) · `estagnacoes` ≤ 5 · `prs` ≤ 5 · `grupos_sem_estimulo` ≤ 12 | Constantes em `limiares.ts`; teste `T-R2` |
+| C2 | **Toda lista tem teto.** `volume_por_grupo_muscular` ≤ 12 · `volume_por_exercicio` ≤ 8 (top por volume, `MAX_VOLUME_POR_EXERCICIO`) · `tendencia_e1rm` ≤ 8 (top por volume) · `estagnacoes` ≤ 5 · `prs` ≤ 5 · `grupos_sem_estimulo` ≤ 12 | Constantes em `limiares.ts`; teste `T-R2` |
 | C3 | **`versao` no objeto.** Agregador e prompt versionam juntos | Route handler rejeita `versao !== 1` |
 | C4 | **A data de referência é parâmetro injetado**, nunca `new Date()` dentro de `src/lib/analise/` | Teste é determinístico; FF3 (pureza) é integral, não parcial |
 | C5 | **Um objeto serve as 5 perguntas.** A pergunta é escolhida no route handler, não no agregador | Sem projeções por pergunta na Fase 1 |
 
-**O orçamento C1 foi somado contra os tetos de C2, não chutado — refeito nesta revisão para incluir `volume_semanal` (achado 5 do QA).** Com a carga máxima que C2 permite: 12 grupos × ~170 B = 2.040 · 8 exercícios × ~130 B = 1.040 · 5 estagnações × ~105 B = 525 · 5 PRs × ~82 B = 410 · `volume_semanal` com `JANELA_SEMANAS = 4` entradas × ~45 B = 180 · `periodo` + `frequencia` + `series_dificeis` + `faixa_referencia_series` ≈ 400. **Total ≈ 4,6 KB.** Daí `MAX_BYTES_RESUMO = 6144` — o teto precisa ficar **acima** do que os próprios tetos de lista produzem, senão T-R1 reprova no fixture que T-R1 manda construir. Se um teto de C2 subir, C1 sobe junto e a soma é refeita.
+**O orçamento C1 foi somado contra os tetos de C2, não chutado — refeito nesta revisão para incluir `volume_semanal` (achado 5 do QA) e, em 2026-08-08, `volume_por_exercicio`.** Com a carga máxima que C2 permite: 12 grupos × ~170 B = 2.040 · 8 exercícios (`tendencia_e1rm`) × ~130 B = 1.040 · 8 exercícios (`volume_por_exercicio`, campos extra `peso_referencia`/`reps_referencia`) × ~150 B ≈ 1.200 · 5 estagnações × ~105 B = 525 · 5 PRs × ~82 B = 410 · `volume_semanal` com `JANELA_SEMANAS = 4` entradas × ~45 B = 180 · `periodo` + `frequencia` + `series_dificeis` + `faixa_referencia_series` ≈ 400. **Total ≈ 5,8 KB.** Daí `MAX_BYTES_RESUMO = 6144` — o teto ainda fica **acima** do que os tetos de lista produzem, confirmado por `T-R1` reexecutado com `volume_por_exercicio` no fixture de carga máxima (passa; a margem ficou mais apertada que antes — se outro campo entrar em `ResumoCompacto`, refazer esta conta antes de assumir que ainda cabe). Se um teto de C2 subir, C1 sobe junto e a soma é refeita.
 
 **Por que um objeto só e não cinco:** as cinco perguntas do PRD §3 se alimentam de subconjuntos sobrepostos das mesmas métricas. Cinco projeções seriam cinco superfícies para testar e cinco chances de divergir. Com 4 KB de teto, o custo de mandar tudo é irrelevante — e a pergunta 5 ("o que mudar?") precisa de tudo mesmo.
 
@@ -702,6 +720,20 @@ src/app/api/analise/perguntas.ts    ← as 5 perguntas do PRD §3
 
 Rejeições: sem sessão → 401 · `pergunta` fora de 1–5 → 400 · `resumo.versao !== 1` → 500 com log.
 
+**Resposta (adicionado 2026-08-08 — antes só `{ parecer }`):**
+
+```ts
+{
+  parecer: string;
+  avisoFalhaInterpretativa?: boolean;   // só na 2ª falha (§6.4)
+  evidencia: EvidenciaParaTela;         // ver src/app/api/analise/evidencia.ts
+}
+```
+
+`evidencia` é uma **fatia própria**, não `ResumoCompacto` cru — devolver o resumo inteiro acoplaria o contrato da tela ao payload do prompt (DECISIONS.md 2026-08-08). Ela existe nas **3 branches** da rota, inclusive o fallback determinístico: a evidência vem do agregador, não do LLM, então continua íntegra quando a prosa falha (DESIGN.md §3.6.5, estado "Erro da API" — os blocos ficam na tela, só a prosa falta).
+
+Um bloco de `evidencia.blocos[]` só existe quando o exercício tem **tanto** `tendencia_e1rm` **quanto** `volume_por_exercicio` no resumo — sem os dois, a Linha 2 de §3.6.3 (peso × reps) não teria como ser preenchida sem inventar um número. `sinal` (`"alta" | "plato" | "queda"`) vem **só** do sinal de `tendencia_e1rm.delta_pct` (zona-morta de ±1 ponto percentual = platô); `estagnacoes`, quando o mesmo exercício aparece lá, vira o campo `semanas_sem_progresso` — texto qualificado, nunca uma segunda cor (DESIGN.md §3.6.3, regra de precedência — achado real do seed QA: um exercício em queda constante também dispara `estagnacoes`, porque a definição de estagnação é "sem novo máximo", que inclui declínio).
+
 ### 6.3 Como o resumo vira prompt
 
 Três blocos, nesta ordem:
@@ -737,7 +769,7 @@ export function validarNumeros(
 
 **As duas metades, e por que a segunda não é opcional.** Ausência de intruso prova só que o modelo **não inventou** número — um parecer com **zero** números passa nesse teste e é exatamente o conselho genérico que o PRD §3 chama de falha. Por isso o validador também exige a metade positiva. **Correção sobre uma versão anterior desta spec:** a metade positiva não pode casar contra o mesmo conjunto branco da anti-intruso — "nas últimas 4 semanas" citaria `contexto` (o tamanho da janela) e passaria como se fosse específico do dono, quando é genérico o bastante para servir a qualquer pessoa. Por isso o conjunto branco é **dividido em dois**, com papéis diferentes:
 
-- **Conjunto DADOS** — valores numéricos substantivos de `resumo`: volumes, e1RMs, deltas percentuais, `series_dificeis.total`/`series_valendo`/`series_valendo_com_rir`, `frequencia.treinos_semana_atual`, `estagnacoes[].semanas_sem_progresso`, `prs[].valor`. **Isto é o que prova que o parecer é sobre este dono.**
+- **Conjunto DADOS** — valores numéricos substantivos de `resumo`: volumes (inclui `volume_por_exercicio[].volume`/`.peso_referencia`/`.reps_referencia`, 2026-08-08), e1RMs, deltas percentuais, `series_dificeis.total`/`series_valendo`/`series_valendo_com_rir`, `frequencia.treinos_semana_atual`, `estagnacoes[].semanas_sem_progresso`, `prs[].valor`. **Isto é o que prova que o parecer é sobre este dono.**
 - **Conjunto CONTEXTO** — `janela_semanas`, `semanas_com_dados`, comprimento de listas, limiares citados no prompt (`E1RM_REPS_MAX`, `COBERTURA_RIR_MINIMA` etc.) e — ver correção de data abaixo — os componentes numéricos das datas de `periodo`. **Isto só evita falso positivo de "intruso"; nunca conta como prova de especificidade.**
 
 Algoritmo:
