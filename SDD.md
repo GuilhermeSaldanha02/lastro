@@ -720,6 +720,20 @@ src/app/api/analise/perguntas.ts    ← as 5 perguntas do PRD §3
 
 Rejeições: sem sessão → 401 · `pergunta` fora de 1–5 → 400 · `resumo.versao !== 1` → 500 com log.
 
+**Resposta (adicionado 2026-08-08 — antes só `{ parecer }`):**
+
+```ts
+{
+  parecer: string;
+  avisoFalhaInterpretativa?: boolean;   // só na 2ª falha (§6.4)
+  evidencia: EvidenciaParaTela;         // ver src/app/api/analise/evidencia.ts
+}
+```
+
+`evidencia` é uma **fatia própria**, não `ResumoCompacto` cru — devolver o resumo inteiro acoplaria o contrato da tela ao payload do prompt (DECISIONS.md 2026-08-08). Ela existe nas **3 branches** da rota, inclusive o fallback determinístico: a evidência vem do agregador, não do LLM, então continua íntegra quando a prosa falha (DESIGN.md §3.6.5, estado "Erro da API" — os blocos ficam na tela, só a prosa falta).
+
+Um bloco de `evidencia.blocos[]` só existe quando o exercício tem **tanto** `tendencia_e1rm` **quanto** `volume_por_exercicio` no resumo — sem os dois, a Linha 2 de §3.6.3 (peso × reps) não teria como ser preenchida sem inventar um número. `sinal` (`"alta" | "plato" | "queda"`) vem **só** do sinal de `tendencia_e1rm.delta_pct` (zona-morta de ±1 ponto percentual = platô); `estagnacoes`, quando o mesmo exercício aparece lá, vira o campo `semanas_sem_progresso` — texto qualificado, nunca uma segunda cor (DESIGN.md §3.6.3, regra de precedência — achado real do seed QA: um exercício em queda constante também dispara `estagnacoes`, porque a definição de estagnação é "sem novo máximo", que inclui declínio).
+
 ### 6.3 Como o resumo vira prompt
 
 Três blocos, nesta ordem:
