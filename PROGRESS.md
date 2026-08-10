@@ -464,6 +464,13 @@ Surgiu de pedido direto do dono no meio da sessão, não estava em nenhum docume
    - **Achado para o dono julgar:** o veredito em `t-6` ocupa ~8 linhas em viewport de 375–500px quando a frase é longa — fiel à decisão, mas vale o olho real antes do gate final (tarefa 8). Se parecer exagerado, a correção é pedir concisão no prompt, não reduzir o token.
    - **Próximo passo concreto:** tarefa #5 — cards de evidência com barra lateral (peça 09), consumindo `evidencia.blocos` que a API já devolve.
 
+   **↳ 2026-08-10 (2) — BACKLOG DA PEÇA-ASSINATURA FECHADO.** Tarefas #5 a #8 concluídas na mesma sessão. Commits `c23a13d` (cards de evidência) → `29877f0` (gate final). Ver `DECISIONS.md` das mesmas datas para detalhe de cada uma.
+   - **#5 cards de evidência** — `BlocoEvidencia` novo, 3 canais (cor+ícone+palavra) por sinal, nunca só cor.
+   - **#6 gráfico** — já estava pronto de sessão anterior (2026-08-07); conferido contra os 7 itens de `DESIGN.md` §3.7, sem gap. Nenhum código novo.
+   - **#7 estado "dados insuficientes"** — não existia; construído (`MINIMO_SEMANAS_PARECER = 3`), verificado com usuário QA descartável (criado, testado, deletado na mesma sessão).
+   - **#8 gate final** — contraste medido ao vivo no navegador (fórmula do §3.2, método aferido contra os canônicos WCAG antes de medir): todos os elementos novos entre 4.95:1 e 12.39:1, folgados acima do piso AA. `npm run build` de produção limpo. 104 testes, `tsc`/lint limpos.
+   - **O que só o dono resolve, aberto:** olhar `/analise` no celular real (viewport de desktop engana); julgar se o veredito em `t-6` fica bom ou exagerado numa frase longa; decidir se mantém ou limpa a conta QA (`qa-lastro-parecer@example.com`, 6 semanas seedadas); decidir sobre merge de `fix/consistencia-visual-telas` — branch segue não mergeada, 20 commits à frente de `main`.
+
 ---
 
 ## Abordagens que falharam
