@@ -41,6 +41,16 @@ export const LOOKBACK_ESTAGNACAO_SEMANAS = SEMANAS_ESTAGNACAO + 1;
 export const MAX_TENDENCIA_E1RM = 8;
 /** Mesmo teto de `MAX_TENDENCIA_E1RM` — os cards de evidência pareiam exercício a exercício. */
 export const MAX_VOLUME_POR_EXERCICIO = 8;
+
+/**
+ * Piso de semanas fechadas com treino pra liberar a Análise Semanal
+ * (DESIGN.md §3.6.5, estado "Sem dados suficientes"). Abaixo disso a tela
+ * bloqueia a lista de perguntas — nunca deixa o LLM ser quem avisa que
+ * faltam dados. Convenção prática, mesmo número já usado no mockup de
+ * referência da peça-assinatura (2026-08-10) e citado em sessões
+ * anteriores como piso informal — não é limiar estatístico.
+ */
+export const MINIMO_SEMANAS_PARECER = 3;
 export const MAX_ESTAGNACOES = 5;
 export const MAX_PRS = 5;
 export const MAX_GRUPOS = 12;
