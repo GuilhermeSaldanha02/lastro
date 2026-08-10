@@ -690,3 +690,19 @@ Também corrigidos, achados menores confirmados por leitura direta (sem precisar
 **Impacto.** `src/app/api/analise/prompt.ts`, `src/lib/texto/` (novo), `src/lib/tempo.ts`, `src/app/page.tsx`, `src/components/parecer.tsx`, `src/components/analise-interativa.tsx`, `src/app/sistema.css`. `.claude/launch.json` finalmente commitado (estava untracked desde a sessão anterior). 94 testes, `tsc`/lint limpos.
 
 **Como reverter.** `git revert f92d16c`.
+
+## 2026-08-10 (2) — Tarefa 5 concluída: cards de evidência, verificados no navegador
+
+**O que mudou.** Peça 09 construída e commitada (`c23a13d`). Backlog segue em #6 (gráfico).
+
+**`BlocoEvidencia`** (`src/components/`) renderiza cada item de `evidencia.blocos` com coluna de sinal (ícone + palavra "Alta"/"Platô"/"Queda"), exercício, número (`peso × reps` do top set), procedência (`janela · séries valendo · calculado no dispositivo`) e delta à direita. `formatarDelta` (`src/lib/texto/`) decide o texto do delta por sinal: alta só o percentual, queda percentual+janela, platô usa o streak real de `semanas_sem_progresso` quando o mesmo exercício também está em `estagnacoes`, e cai para a janela de comparação quando não está — os dois critérios existem porque são famílias diferentes (delta≈0 na janela de 4 semanas vs. streak de 4+ semanas sem novo máximo), confirmado com o seed real: Levantamento Terra e Desenvolvimento saem "platô" sem estar em `estagnacoes`.
+
+**Dois achados corrigidos ao ver renderizado, não só testado:**
+1. `peso_referencia` saía com **ponto** decimal ("102.5") — JSX faz `String(n)` puro, sem localização. `formatarPeso` adicionado.
+2. Ao escrever o CSS do layout (coluna de sinal, coluna de delta), usei `rem` **literal** em `sistema.css` por engano — viola a regra de fonte única do projeto (só `tokens.css` pode ter literal). Corrigido antes de commitar: dois tokens novos, `--lastro-evidencia-col-sinal`/`--lastro-evidencia-col-delta`.
+
+**Verificado no navegador real** (extensão Chrome, login QA): os 3 sinais (alta verde, platô âmbar, queda terracota) renderizam com cor + ícone + palavra + delta — a redundância de 3 canais que §3.2 nota C e §3.6.6 exigem, não só cor. Cores reusam tokens já medidos (`--lastro-alta`/`--lastro-plato`/`--lastro-queda`), nenhum contraste novo a validar — medição rigorosa fica pra tarefa 8 (gate final).
+
+**Impacto.** `src/components/bloco-evidencia.tsx` (novo), `src/components/parecer.tsx`, `src/lib/texto/formatar-delta.ts` (novo), `src/app/sistema.css`, `src/app/tokens.css`. 104 testes (10 novos), `tsc`/lint limpos.
+
+**Como reverter.** `git revert c23a13d`.
