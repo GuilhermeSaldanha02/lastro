@@ -808,6 +808,7 @@
    julgamento pesa mais que a pergunta. Corrigido 2026-08-10; antes usava
    o mesmo t-3 do título, o sintoma que §3.0 descreve. */
 .doc__veredito {
+  font-family: var(--lastro-fonte-serif);
   font-size: var(--lastro-t-6);
   font-weight: var(--lastro-peso-forte);
   line-height: var(--lastro-el-titulo);

@@ -74,6 +74,8 @@
   /* ---- Tipografia ---- */
   --lastro-fonte-txt: var(--fonte-plex-sans), system-ui, sans-serif;
   --lastro-fonte-num: var(--fonte-plex-mono), ui-monospace, monospace;
+  /* Uso único: o veredito do parecer (DESIGN.md §3.3, C4 aprovado 2026-08-08). */
+  --lastro-fonte-serif: var(--fonte-plex-serif), Georgia, serif;
 
   /* ---- Escala de tamanho. Piso 14px, e 14 só para metadado não-corpo ---- */
   --lastro-t-meta:  14px;
