@@ -672,3 +672,21 @@ Também corrigidos, achados menores confirmados por leitura direta (sem precisar
 **Próximo passo:** tarefa #4 do backlog — cabeçalho de emissão + veredito do parecer (peça 08), que não depende de mais nada.
 
 **Como reverter.** `git checkout -- DECISIONS.md`. Seed no Supabase seguirá limpo pelo `limpar-usuario` na tarefa "Gate final".
+
+## 2026-08-10 — Tarefa 4 concluída: cabeçalho + veredito, verificado no navegador real
+
+**O que mudou.** Peça 08 (cabeçalho de emissão + veredito) construída e commitada (`f92d16c`). `PROGRESS.md`/backlog seguem em #5 (cards de evidência).
+
+**Achado que bloqueava a tarefa, resolvido antes de escrever componente.** A resposta real da API trazia markdown cru (`###`, `**`, `*`, crase) — `parecer.tsx` renderiza como `<p>{texto}</p>`, sem parser, então isso apareceria como asteriscos literais na tela. E a primeira frase (que vira o veredito em destaque) saía genérica ("sim, você está progredindo"), sem exercício nem número — o oposto do que a peça-assinatura pede. Os dois são o mesmo tipo de defeito: prompt sem trava suficiente. Corrigido em `prompt.ts` (`SYSTEM_INSTRUCTION`): proíbe markdown, exige que a 1ª frase cite exercício+número, exige decimal em vírgula (o modelo escrevia "11.5" em inglês). **Verificado empiricamente contra a API real nas perguntas 1, 2 e 5 antes de tocar em UI** — 3/3 vieram específicas, sem markdown, com vírgula.
+
+**`separarVeredito`** (`src/lib/texto/`) corta a 1ª frase do parecer; testado com o texto real capturado da API (não só fixture sintética). `formatarDataCurta` extraída de `page.tsx` para `tempo.ts` — fonte única (E10), reusada pelo cabeçalho do parecer.
+
+**Verificado no navegador real — o método que funciona nesta máquina, achado nesta sessão.** Nem o painel interno nem o `computer` (desktop) da extensão capturam de forma confiável aqui: o desktop screenshot ficou preso mostrando uma janela/aba **desatualizada** por várias tentativas (inclusive depois de F5, de limpar service worker e cookies via `javascript_tool`, e de abrir aba nova) — a extensão via `get_page_text`/`read_page` sempre mostrou o estado real e correto, só a captura de imagem do **desktop** ficava obsoleta. **O que resolveu:** usar `mcp__claude-in-chrome__computer{action:"screenshot"}` (escopo da aba, dentro da extensão) em vez de `mcp__computer-use__screenshot` (escopo do desktop). Login como usuário QA também exigiu limpar cookies manualmente via `document.cookie` — o botão "Sair" da UI e um simples reload não derrubaram a sessão anterior de forma confiável.
+
+**Confirmado visualmente:** sobrancelha "ANÁLISE SEMANAL" pequena → título `t-3` → linha "Semana de 3 ago — 9 ago · Emitido em 10 de ago. de 2026" (junta `evidencia.periodo` com a data de emissão, como `DESIGN.md` §3.6.2 pede) → risco → veredito em `t-6`, claramente maior e mais pesado que o título. O salto de escala da restrição de §3.0 está na tela, não só no código.
+
+**Achado para o dono julgar, não decidido aqui:** em viewport de 375–500px, uma frase composta longa em `t-6` ocupa ~8 linhas e domina a tela inteira. É fiel à decisão de §3.0/§3.6.2, mas vale o olho real antes de fechar a tarefa 8 (gate final) — se parecer exagerado, a correção é limitar o comprimento da frase no prompt (pedir concisão), não reduzir o token.
+
+**Impacto.** `src/app/api/analise/prompt.ts`, `src/lib/texto/` (novo), `src/lib/tempo.ts`, `src/app/page.tsx`, `src/components/parecer.tsx`, `src/components/analise-interativa.tsx`, `src/app/sistema.css`. `.claude/launch.json` finalmente commitado (estava untracked desde a sessão anterior). 94 testes, `tsc`/lint limpos.
+
+**Como reverter.** `git revert f92d16c`.
