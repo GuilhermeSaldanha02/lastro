@@ -654,3 +654,21 @@ Também corrigidos, achados menores confirmados por leitura direta (sem precisar
 **Impacto.** `DESIGN.md` (§3.6.3, regra de precedência). `DECISIONS.md`, `PROGRESS.md`. Nenhum arquivo de `src/` tocado ainda nesta rodada — a extensão do agregador é a próxima tarefa.
 
 **Como reverter.** `git checkout -- DESIGN.md DECISIONS.md PROGRESS.md`.
+
+## 2026-08-08 (6) — Agregador estendido, API devolve evidência, verificado ponta a ponta
+
+**O que mudou.** Tarefas #9 e #10 do backlog concluídas e commitadas (`a4168e3`, `a08dc51`). `ResumoCompacto` ganhou `volume_por_exercicio` (peso×reps×séries valendo por exercício, top set do treino mais recente). `/api/analise` devolve `evidencia` — fatia própria que funde `tendencia_e1rm` (dono do sinal alta/platô/queda) com `volume_por_exercicio` (os números da Linha 2) — nas 3 branches, inclusive o fallback determinístico. 89 testes, `tsc`/lint limpos.
+
+**Achado durante a verificação ponta a ponta: o tempo real passou por baixo do seed.** A seed original (tarefa #3) cobria 5 semanas terminando em 2026-07-27, calculada quando "agora" da sessão era 2026-08-08. Entre então e a verificação desta tarefa, o relógio real avançou o suficiente para a "semana atual" da análise rolar para 2026-08-03 — a seed ficou uma semana pra trás, `evidencia.blocos` voltou vazio na primeira chamada. **Não é bug do código**, é a natureza de dado semeado com data fixa numa sessão longa. Corrigido semeando a 6ª semana (treino 2026-08-05, mesmas 5 exercícios, tendências continuadas). Reverificado: os 3 sinais saem corretos com dado real —
+
+- **Alta:** Agachamento Livre (+7,9%), Supino Reto (+11,5%)
+- **Platô:** Levantamento Terra e Desenvolvimento Militar, `delta_pct` exatamente `0` — a zona-morta de classificação nem precisou arredondar
+- **Queda:** Remada Curvada (-8,1%), com `semanas_sem_progresso: 4` presente como campo qualificado — **não** reclassificado como platô, confirmando a regra de precedência escrita em `DESIGN.md` §3.6.3
+
+**Lição para sessões futuras com QA seedado por data fixa:** se a sessão atravessar uma virada de semana ISO (segunda-feira 00:00 em `America/Sao_Paulo`), a "semana atual" da análise rola e o seed mais recente vira "semana anterior" sem dado. Verificar `resumo.periodo.semana_atual_inicio` contra a data real antes de reusar um seed antigo — não assumir que ele continua válido só porque passou uma vez.
+
+**Impacto.** Nenhum arquivo de `src/` tocado nesta entrada (só documentação); o código já foi commitado nas duas entradas anteriores. Seed em Supabase: `qa-lastro-parecer@example.com` agora com 6 semanas (2026-06-29 a 2026-08-03).
+
+**Próximo passo:** tarefa #4 do backlog — cabeçalho de emissão + veredito do parecer (peça 08), que não depende de mais nada.
+
+**Como reverter.** `git checkout -- DECISIONS.md`. Seed no Supabase seguirá limpo pelo `limpar-usuario` na tarefa "Gate final".
