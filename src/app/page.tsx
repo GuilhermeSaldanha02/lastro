@@ -16,24 +16,17 @@ import { carregarResumoHome } from "@/lib/dados/resumo-home";
 import { criarTreino } from "@/lib/dados/treino";
 import { obterPerfil } from "@/lib/dados/perfil";
 import { sair } from "@/lib/dados/auth";
-import { dataLocalBrasil } from "@/lib/tempo";
+import { dataLocalBrasil, formatarDataCurta } from "@/lib/tempo";
 import AbaInferior from "@/components/aba-inferior";
 import Avatar from "@/components/avatar";
-
-const MESES = [
-  "jan", "fev", "mar", "abr", "mai", "jun",
-  "jul", "ago", "set", "out", "nov", "dez",
-];
 
 /** "2026-08-06" → "6 ago". Relativo quando é hoje ou ontem. */
 function formatarData(iso: string, hojeISO: string): string {
   if (iso === hojeISO) return "hoje";
-  const [ano, mes, dia] = iso.split("-").map(Number);
   const ontem = new Date(`${hojeISO}T00:00:00Z`);
   ontem.setUTCDate(ontem.getUTCDate() - 1);
   if (iso === ontem.toISOString().slice(0, 10)) return "ontem";
-  if (!ano || !mes || !dia) return iso;
-  return `${dia} ${MESES[mes - 1]}`;
+  return formatarDataCurta(iso);
 }
 
 /**

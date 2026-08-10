@@ -11,3 +11,15 @@ export function dataLocalBrasil(instante: Date = new Date()): string {
     instante,
   );
 }
+
+const MESES_ABREVIADOS = [
+  "jan", "fev", "mar", "abr", "mai", "jun",
+  "jul", "ago", "set", "out", "nov", "dez",
+];
+
+/** "2026-08-06" → "6 ago". Fonte única (E10) — usada pela home e pelo cabeçalho do parecer. */
+export function formatarDataCurta(iso: string): string {
+  const [, mes, dia] = iso.split("-").map(Number);
+  if (!mes || !dia) return iso;
+  return `${dia} ${MESES_ABREVIADOS[mes - 1]}`;
+}

@@ -12,32 +12,43 @@
 // visíveis junto do parecer, nunca atrás de accordion ou letra miúda
 // (SDD §7.1). É o que separa este app de conselho genérico inventado.
 //
-// LIMITAÇÃO CONHECIDA: `/api/analise` devolve só prosa (`{ parecer }`).
-// Os blocos de evidência de §3.6.3 — exercício, número tabular e linha de
-// procedência — existem no sistema (`.evidencia` em sistema.css) mas
-// ainda não têm dado: dependem de a rota passar a devolver o resumo
-// estruturado junto do texto. Enquanto isso, os números vivem na prosa.
+// LIMITAÇÃO CONHECIDA (parcial): os blocos de evidência de §3.6.3
+// (exercício, número tabular, barra lateral) chegam pela prop `evidencia`
+// (2026-08-10, `/api/analise` já devolve `evidencia`) mas ainda não são
+// renderizados aqui — é a próxima tarefa do backlog. O cabeçalho e o
+// veredito desta tarefa já usam `evidencia.periodo`.
+import { formatarDataCurta } from "@/lib/tempo";
+import { separarVeredito } from "@/lib/texto/separar-veredito";
+import type { EvidenciaParaTela } from "@/app/api/analise/evidencia";
+
 export default function Parecer({
   pergunta,
   texto,
   avisoFalhaInterpretativa,
+  evidencia,
 }: {
   pergunta: string | null;
   texto: string;
   avisoFalhaInterpretativa?: boolean;
+  evidencia?: EvidenciaParaTela;
 }) {
   const emissao = new Date().toLocaleDateString("pt-BR", {
     day: "numeric",
     month: "short",
     year: "numeric",
   });
+  const { veredito, corpo } = separarVeredito(texto);
 
   return (
     <article className="doc">
       <header className="doc__emissao">
-        <p className="doc__selo">Parecer emitido</p>
+        <p className="doc__selo">Análise semanal</p>
         {pergunta && <h2 className="doc__pergunta">{pergunta}</h2>}
-        <p className="doc__meta">emitido {emissao}</p>
+        <p className="doc__meta">
+          {evidencia
+            ? `Semana de ${formatarDataCurta(evidencia.periodo.semana_atual_inicio)} — ${formatarDataCurta(evidencia.periodo.semana_atual_fim)} · Emitido em ${emissao}`
+            : `Emitido em ${emissao}`}
+        </p>
       </header>
 
       {avisoFalhaInterpretativa && (
@@ -48,7 +59,12 @@ export default function Parecer({
         </p>
       )}
 
-      <p className="doc__prosa">{texto}</p>
+      {/* Veredito: a PRIMEIRA FRASE, destacada acima do título do
+          cabeçalho (DESIGN.md §3.6.2/§3.0) — é o julgamento, não a
+          pergunta, que carrega o peso visual da tela. */}
+      <p className="doc__veredito">{veredito}</p>
+
+      {corpo && <p className="doc__prosa">{corpo}</p>}
 
       {/* Rodapé de método: texto fixo, nunca gerado. Procedência se mostra
           com número e com o que foi excluído da conta, não com adesivo. */}

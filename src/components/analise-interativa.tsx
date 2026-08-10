@@ -16,12 +16,14 @@
 // botão — o botão fica sempre disponível, sem bloqueio de calendário.
 import { useState } from "react";
 import { PERGUNTAS, type NumeroPergunta } from "@/app/api/analise/perguntas";
+import type { EvidenciaParaTela } from "@/app/api/analise/evidencia";
 import Parecer from "@/components/parecer";
 import GraficoProgressao from "@/components/grafico-progressao";
 
 type Resultado = {
   parecer: string;
   avisoFalhaInterpretativa?: boolean;
+  evidencia: EvidenciaParaTela;
 };
 
 export default function AnaliseInterativa() {
@@ -114,6 +116,7 @@ export default function AnaliseInterativa() {
           pergunta={perguntaEmitida ? PERGUNTAS[perguntaEmitida] : null}
           texto={resultado.parecer}
           avisoFalhaInterpretativa={resultado.avisoFalhaInterpretativa}
+          evidencia={resultado.evidencia}
         />
       )}
     </div>

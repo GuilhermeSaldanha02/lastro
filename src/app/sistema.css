@@ -803,6 +803,18 @@
   margin: var(--lastro-e-6) 0 var(--lastro-e-3);
 }
 
+/* O veredito é MAIOR que o título do cabeçalho (.doc__pergunta, t-3) —
+   é o salto de escala que carrega a restrição de DESIGN.md §3.0: o
+   julgamento pesa mais que a pergunta. Corrigido 2026-08-10; antes usava
+   o mesmo t-3 do título, o sintoma que §3.0 descreve. */
+.doc__veredito {
+  font-size: var(--lastro-t-6);
+  font-weight: var(--lastro-peso-forte);
+  line-height: var(--lastro-el-titulo);
+  color: var(--lastro-txt);
+  margin-bottom: var(--lastro-e-6);
+}
+
 /* A prosa CONECTA as evidências; os números não moram nela. Número no
    meio da frase muda de família e ganha peso — nunca cor. */
 .doc__prosa {
