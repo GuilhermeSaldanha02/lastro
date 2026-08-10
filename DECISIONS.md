@@ -722,3 +722,34 @@ Também corrigidos, achados menores confirmados por leitura direta (sem precisar
 **Estado do backlog:** só falta a tarefa 8 — gate final com contraste medido e o olho do dono.
 
 **Como reverter.** `git revert 6d12a5b`.
+
+## 2026-08-10 (4) — Gate final: contraste medido, navegador real, build limpo
+
+**O backlog inteiro do parecer semanal (peça-assinatura) está fechado.** 8 tarefas, commits `0ac5f0c` → `6d12a5b`, todas verificadas no navegador real com dado real (não só teste unitário).
+
+**Contraste medido — fórmula do próprio `DESIGN.md` §3.2 (linearização sRGB), rodada ao vivo no `/analise` renderizado, não estimado:**
+
+| Elemento | Cor | Fundo | Tamanho/peso | Contraste |
+|---|---|---|---|---|
+| `.doc__veredito` | `--lastro-txt` | `--lastro-fundo` | 48px / 600 | **11.54:1** |
+| `.evidencia__numero` | `--lastro-txt` | `--lastro-grad-sup` (pior stop) | 38px / 500 | **12.39:1** |
+| `.evidencia__procedencia` | `--lastro-txt-3` | `--lastro-grad-sup` | 14px / 400 | **5.99:1** |
+| Rótulo "Alta" (ícone+palavra) | `--lastro-alta` | fundo | 14px / 600 | **5.47:1** |
+| Rótulo "Platô" | `--lastro-plato` | fundo | 14px / 600 | **4.95:1** |
+| Rótulo "Queda" | `--lastro-queda` | fundo | 14px / 600 | **5.78:1** |
+| Delta "Alta" | `--lastro-alta` | `--lastro-grad-sup` | 14px / 600 | **5.87:1** |
+| Delta "Platô" | `--lastro-plato` | `--lastro-grad-sup` | 14px / 600 | **5.31:1** |
+| Delta "Queda" | `--lastro-queda` | `--lastro-grad-sup` | 14px / 600 | **6.21:1** |
+
+Método aferido contra os canônicos WCAG antes de medir (`#FFFFFF/#000000 = 21.00`, `#FFFFFF/#777777 = 4.48` — bateram). Todos os valores folgados acima do piso AA (4.5:1 texto normal, 3:1 texto grande) — nenhum elemento novo desta sessão introduziu risco de contraste, porque todos reusam tokens já medidos em `tokens.css` (nenhuma cor nova).
+
+**`npm run build` limpo** (produção, Turbopack, `/analise` e `/api/analise` compilam). `npx tsc --noEmit` limpo. 104 testes. `npm run lint`: 0 erros.
+
+**O que fica pro dono — a parte que não se automatiza.** Confirmei estrutura, texto, cor e contraste; **não substituo o olho do dono** (`padrao-verificacao` item 3). Ele precisa:
+1. Logar em `http://localhost:3002` com a conta dele (Google) e olhar `/analise` no celular de verdade — o app é 100% mobile, viewport de desktop engana.
+2. Julgar se o veredito em `t-6` (visto ocupando ~8 linhas numa tela de 375-500px) está bom ou exagerado — é fiel à decisão, mas ninguém tinha visto renderizado antes de hoje.
+3. Decidir se quer a conta QA (`qa-lastro-parecer@example.com`) mantida viva por mais uma sessão pra ele mesmo olhar os 3 sinais com dado real, ou se já pode limpar (`./scripts/qa-treino-helper.sh limpar-usuario qa-lastro-parecer@example.com`). **Não limpei nesta entrada** — decisão do dono.
+
+**Impacto.** Nenhum arquivo de `src/` tocado nesta entrada (é documentação do gate). Branch `fix/consistencia-visual-telas` segue não mergeada — merge é decisão do dono, depois do olho dele.
+
+**Como reverter.** N/A (só documentação).
