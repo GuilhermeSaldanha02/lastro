@@ -155,6 +155,10 @@
   --lastro-largura-entrada: 26rem; /* coluna do login */
   --lastro-medida-leitura:  34em;  /* medida confortável da prosa */
 
+  /* ---- Bloco de evidência (peça 09) ---- */
+  --lastro-evidencia-col-sinal: 3.5rem; /* coluna ícone+rótulo, cabe "Platô" sem quebrar */
+  --lastro-evidencia-col-delta: 6.5rem; /* coluna do delta à direita, cabe "sem mudança há 4 semanas" em 2 linhas */
+
   /* A aba inferior é `position: fixed` (100% mobile, 2026-08-06) — sai do
      fluxo. Toda tela que a usa soma isto ao padding-bottom do que fica
      por último acima dela, senão o conteúdo esconde embaixo da barra. */

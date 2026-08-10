@@ -12,11 +12,7 @@
 // visíveis junto do parecer, nunca atrás de accordion ou letra miúda
 // (SDD §7.1). É o que separa este app de conselho genérico inventado.
 //
-// LIMITAÇÃO CONHECIDA (parcial): os blocos de evidência de §3.6.3
-// (exercício, número tabular, barra lateral) chegam pela prop `evidencia`
-// (2026-08-10, `/api/analise` já devolve `evidencia`) mas ainda não são
-// renderizados aqui — é a próxima tarefa do backlog. O cabeçalho e o
-// veredito desta tarefa já usam `evidencia.periodo`.
+import BlocoEvidencia from "@/components/bloco-evidencia";
 import { formatarDataCurta } from "@/lib/tempo";
 import { separarVeredito } from "@/lib/texto/separar-veredito";
 import type { EvidenciaParaTela } from "@/app/api/analise/evidencia";
@@ -63,6 +59,21 @@ export default function Parecer({
           cabeçalho (DESIGN.md §3.6.2/§3.0) — é o julgamento, não a
           pergunta, que carrega o peso visual da tela. */}
       <p className="doc__veredito">{veredito}</p>
+
+      {/* Blocos de evidência (§3.6.3) — ANTES da prosa. A ordem conta a
+          arquitetura: o agregador já tinha os números prontos antes de o
+          LLM escrever uma palavra (§3.6.4 item 2). */}
+      {evidencia && evidencia.blocos.length > 0 && (
+        <div className="evidencias">
+          {evidencia.blocos.map((bloco) => (
+            <BlocoEvidencia
+              key={bloco.exercicio}
+              bloco={bloco}
+              janelaSemanas={evidencia.periodo.janela_semanas}
+            />
+          ))}
+        </div>
+      )}
 
       {corpo && <p className="doc__prosa">{corpo}</p>}
 

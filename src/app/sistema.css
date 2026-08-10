@@ -861,10 +861,14 @@
   left: 0;
 }
 
-/* ---------- Bloco de evidência: 3 linhas, barra lateral no sinal ------
-   Pronto no sistema. Só recebe dado real quando /api/analise passar a
-   devolver o resumo estruturado junto da prosa. */
+/* ---------- Bloco de evidência: barra lateral no sinal, 3 canais ------
+   Peça 09. Cor NUNCA é o único canal (§3.2 nota C): ícone + palavra
+   (.evidencia__sinal) e o texto do delta (.evidencia__delta) também
+   identificam alta/platô/queda — a cor é redundante, não a única prova. */
 .evidencia {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--lastro-e-4);
   border: 1px solid var(--lastro-linha);
   border-left: var(--lastro-barra-evidencia) solid var(--lastro-linha);
   border-radius: var(--lastro-raio-1);
@@ -877,9 +881,47 @@
   margin-top: var(--lastro-e-3);
 }
 
+.evidencias {
+  margin-bottom: var(--lastro-e-8);
+}
+
 .evidencia--alta  { border-left-color: var(--lastro-alta); }
 .evidencia--plato { border-left-color: var(--lastro-plato); }
 .evidencia--queda { border-left-color: var(--lastro-queda); }
+
+/* Coluna de sinal: ícone grande + palavra, na cor do sinal — mesmo par
+   ícone+palavra dos cartões "Plateau/Em progresso/Queda" da peça 01. */
+.evidencia__sinal {
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--lastro-e-1);
+  min-width: var(--lastro-evidencia-col-sinal);
+  padding-right: var(--lastro-e-4);
+  border-right: 1px solid var(--lastro-linha);
+  text-align: center;
+}
+
+.evidencia__icone {
+  font-size: var(--lastro-t-3);
+  line-height: 1;
+}
+
+.evidencia__rotulo {
+  font-size: var(--lastro-t-meta);
+  font-weight: var(--lastro-peso-forte);
+  letter-spacing: 0.02em;
+}
+
+.evidencia--alta  .evidencia__icone, .evidencia--alta  .evidencia__rotulo { color: var(--lastro-alta); }
+.evidencia--plato .evidencia__icone, .evidencia--plato .evidencia__rotulo { color: var(--lastro-plato); }
+.evidencia--queda .evidencia__icone, .evidencia--queda .evidencia__rotulo { color: var(--lastro-queda); }
+
+.evidencia__corpo {
+  flex: 1 1 auto;
+  min-width: 0;
+}
 
 .evidencia__exercicio {
   font-size: var(--lastro-t-corpo);
@@ -910,13 +952,16 @@
 .evidencia__seta { color: var(--lastro-txt-3); font-size: var(--lastro-t-2); }
 
 /* O delta é o CANAL DE TEXTO obrigatório: cada sinal traz a palavra e o
-   número que o identificam. Dois blocos distinguidos só pela cor reprovam. */
+   número que o identificam (formatarDelta, src/lib/texto/). Dois blocos
+   distinguidos só pela cor reprovam. */
 .evidencia__delta {
-  display: block;
+  flex: 0 0 auto;
+  max-width: var(--lastro-evidencia-col-delta);
   font-family: var(--lastro-fonte-num);
   font-size: var(--lastro-t-meta);
   font-weight: var(--lastro-peso-forte);
-  margin-top: var(--lastro-e-2);
+  text-align: right;
+  line-height: 1.4;
 }
 
 .evidencia--alta  .evidencia__delta { color: var(--lastro-alta); }
