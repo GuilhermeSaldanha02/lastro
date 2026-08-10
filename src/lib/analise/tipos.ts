@@ -101,6 +101,25 @@ export type ResumoCompacto = {
     posicao_na_faixa: "abaixo" | "dentro" | "acima";
   }>;
 
+  /**
+   * Volume por EXERCÍCIO (não por grupo), semana atual — DESIGN.md §3.6.3,
+   * Linha 2 do bloco de evidência ("80kg × 6"). `peso_referencia` e
+   * `reps_referencia` vêm do set de MAIOR peso do treino mais recente da
+   * semana em que o exercício apareceu — não é média nem soma, é o "top
+   * set" que o dono de fato registrou, para não inventar um par que
+   * nenhuma série real tem.
+   */
+  volume_por_exercicio: Array<{
+    exercicio: string;
+    grupo_muscular: string;
+    series_valendo: number;
+    volume: number;
+    peso_referencia: number;
+    reps_referencia: number;
+    /** Ausente se não há semana anterior com dados deste exercício. */
+    delta_volume_pct?: number;
+  }>;
+
   tendencia_e1rm: Array<{
     exercicio: string;
     grupo_muscular: string;

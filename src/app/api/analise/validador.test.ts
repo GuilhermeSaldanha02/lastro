@@ -28,6 +28,17 @@ function resumoBase(): ResumoCompacto {
         posicao_na_faixa: "dentro",
       },
     ],
+    volume_por_exercicio: [
+      {
+        exercicio: "Supino reto",
+        grupo_muscular: "peito",
+        series_valendo: 14,
+        volume: 1300,
+        peso_referencia: 80,
+        reps_referencia: 6,
+        delta_volume_pct: 8,
+      },
+    ],
     tendencia_e1rm: [
       {
         exercicio: "Supino reto",

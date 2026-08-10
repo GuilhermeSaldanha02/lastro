@@ -97,6 +97,11 @@ function coletarDados(resumo: ResumoCompacto): number[] {
     if (g.delta_volume_pct !== undefined) dados.push(g.delta_volume_pct);
   }
 
+  for (const e of resumo.volume_por_exercicio) {
+    dados.push(e.series_valendo, e.volume, e.peso_referencia, e.reps_referencia);
+    if (e.delta_volume_pct !== undefined) dados.push(e.delta_volume_pct);
+  }
+
   for (const t of resumo.tendencia_e1rm) {
     dados.push(t.e1rm_atual, t.e1rm_inicial, t.delta_pct, t.sessoes);
   }

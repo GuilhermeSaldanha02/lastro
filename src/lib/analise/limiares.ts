@@ -39,6 +39,8 @@ export const JANELA_SEMANAS = 4;
 export const LOOKBACK_ESTAGNACAO_SEMANAS = SEMANAS_ESTAGNACAO + 1;
 
 export const MAX_TENDENCIA_E1RM = 8;
+/** Mesmo teto de `MAX_TENDENCIA_E1RM` — os cards de evidência pareiam exercício a exercício. */
+export const MAX_VOLUME_POR_EXERCICIO = 8;
 export const MAX_ESTAGNACOES = 5;
 export const MAX_PRS = 5;
 export const MAX_GRUPOS = 12;

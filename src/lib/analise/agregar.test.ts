@@ -7,6 +7,7 @@ import {
   MAX_GRUPOS,
   MAX_PRS,
   MAX_TENDENCIA_E1RM,
+  MAX_VOLUME_POR_EXERCICIO,
 } from "./limiares";
 import { montarResumoCompacto } from "./agregar";
 import type { ExercicioBruto, TreinoBruto } from "./tipos";
@@ -104,6 +105,32 @@ describe("montarResumoCompacto — fixture F1", () => {
   it("T-V3: delta_volume_pct do peito vs. semana anterior = +20,0%", () => {
     const peito = resumo.volume_por_grupo_muscular.find((g) => g.grupo_muscular === "peito");
     expect(peito?.delta_volume_pct).toBeCloseTo(20.0, 1);
+  });
+
+  // T-V7 — volume_por_exercicio (DESIGN.md §3.6.3, Linha 2 do bloco de evidência)
+  it("T-V7: volume_por_exercicio do supino tem series_valendo, volume, delta e top set corretos", () => {
+    const supinoEv = resumo.volume_por_exercicio.find((e) => e.exercicio === "Supino reto com barra");
+    expect(supinoEv).toBeDefined();
+    expect(supinoEv?.series_valendo).toBe(3);
+    expect(supinoEv?.volume).toBe(1200);
+    expect(supinoEv?.delta_volume_pct).toBeCloseTo(20.0, 1);
+    // top set = maior peso do treino MAIS RECENTE (t1, 2026-07-30) — as 3
+    // séries do supino nessa semana são todas a 50kg (10, 8 e 6 reps);
+    // empate de peso resolve para a primeira encontrada (10 reps).
+    expect(supinoEv?.peso_referencia).toBe(50);
+    expect(supinoEv?.reps_referencia).toBe(10);
+  });
+
+  // Regra da Presença — exercício sem série valendo na semana atual não
+  // aparece em volume_por_exercicio (nem com volume 0).
+  it("Regra da Presença: exercício sem série valendo esta semana está ausente de volume_por_exercicio", () => {
+    const nomesPresentes = resumo.volume_por_exercicio.map((e) => e.exercicio);
+    // Nenhum exercício do catálogo fora de F1 (ex.: um hipotético não
+    // registrado) pode aparecer — a lista só contém quem tem série real.
+    expect(nomesPresentes).toEqual(
+      expect.arrayContaining(["Supino reto com barra", "Rosca direta", "Cadeira extensora"]),
+    );
+    expect(nomesPresentes.length).toBe(3);
   });
 
   // T-D1 — fixture ISOLADA (só o supino, sem rosca/cadeira na semana atual),
@@ -248,6 +275,7 @@ describe("montarResumoCompacto — janela vazia (T-R4)", () => {
     ).not.toThrow();
     const resumo = montarResumoCompacto({ treinos: [], exercicios, agora });
     expect(resumo.volume_por_grupo_muscular).toEqual([]);
+    expect(resumo.volume_por_exercicio).toEqual([]);
     expect(resumo.tendencia_e1rm).toEqual([]);
     expect(resumo.estagnacoes).toEqual([]);
     expect(resumo.prs).toEqual([]);
@@ -273,6 +301,10 @@ describe("montarResumoCompacto — semana anterior sem dados (T-R5)", () => {
     expect(peito).toBeDefined();
     expect("delta_volume_pct" in peito!).toBe(false);
     expect("delta_series_pct" in peito!).toBe(false);
+
+    const supinoEv = resumo.volume_por_exercicio.find((e) => e.exercicio === "Supino reto com barra");
+    expect(supinoEv).toBeDefined();
+    expect("delta_volume_pct" in supinoEv!).toBe(false);
   });
 });
 
@@ -400,6 +432,10 @@ describe("montarResumoCompacto — orçamento de tamanho (T-R1)", () => {
     });
 
     expect(resumo.volume_por_grupo_muscular.length).toBeLessThanOrEqual(MAX_GRUPOS);
+    expect(resumo.volume_por_exercicio.length).toBeLessThanOrEqual(MAX_VOLUME_POR_EXERCICIO);
+    // 30 exercícios têm série valendo na semana atual (todos os grupos de
+    // exerciciosGrandes) — bem acima do teto, prova que o corte é exercitado.
+    expect(resumo.volume_por_exercicio.length).toBe(MAX_VOLUME_POR_EXERCICIO);
     expect(resumo.tendencia_e1rm.length).toBeLessThanOrEqual(MAX_TENDENCIA_E1RM);
     expect(resumo.estagnacoes.length).toBeLessThanOrEqual(MAX_ESTAGNACOES);
     expect(resumo.prs.length).toBeLessThanOrEqual(MAX_PRS);

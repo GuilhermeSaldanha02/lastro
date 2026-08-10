@@ -39,6 +39,7 @@ function comprimentosDeLista(resumo: ResumoCompacto): number[] {
   return [
     resumo.volume_semanal.length,
     resumo.volume_por_grupo_muscular.length,
+    resumo.volume_por_exercicio.length,
     resumo.tendencia_e1rm.length,
     resumo.estagnacoes.length,
     resumo.prs.length,
