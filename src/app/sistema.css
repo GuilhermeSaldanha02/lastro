@@ -407,6 +407,16 @@
   margin-top: var(--lastro-e-6);
 }
 
+/* A barra de topo é `position: fixed` — sai do fluxo, então o navegador
+   não sabe que precisa desviar dela ao rolar um campo focado pra vista
+   (comportamento nativo do teclado virtual no celular). Sem isto, o
+   primeiro grupo pode ficar atrás da barra depois do foco/scroll
+   automático (relato do dono, 2026-08-10). `scroll-margin-top` corrige
+   isso na rolagem nativa, sem JS. */
+.grupo {
+  scroll-margin-top: var(--lastro-clearance-topo);
+}
+
 .grupo__cab {
   display: flex;
   justify-content: space-between;
@@ -598,6 +608,9 @@
   border-radius: var(--lastro-raio-1);
   background: var(--lastro-campo-fundo);
   box-shadow: var(--lastro-elev-afundado);
+  /* O campo é quem de fato recebe o foco — é ele que o navegador rola pra
+     vista (teclado virtual do celular), não o `.grupo` que o envolve. */
+  scroll-margin-top: var(--lastro-clearance-topo);
   font-size: var(--lastro-t-corpo);
 }
 
