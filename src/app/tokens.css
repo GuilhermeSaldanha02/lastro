@@ -105,6 +105,7 @@
   --lastro-raio-2:     14px;
   --lastro-raio-3:     20px;
   --lastro-raio-balao: 18px; /* SÓ o coach 24h */
+  --lastro-raio-pilula: 999px; /* SÓ a aba inferior — arredondamento total, satura na metade da altura */
 
   /* ---- Foco (D9) ---- */
   --lastro-foco-espessura: 3px;
@@ -163,8 +164,14 @@
 
   /* A aba inferior é `position: fixed` (100% mobile, 2026-08-06) — sai do
      fluxo. Toda tela que a usa soma isto ao padding-bottom do que fica
-     por último acima dela, senão o conteúdo esconde embaixo da barra. */
-  --lastro-clearance-nav: calc(var(--lastro-alvo-min) + env(safe-area-inset-bottom, 0px));
+     por último acima dela, senão o conteúdo esconde embaixo da barra.
+     2026-08-10: virou pílula flutuante (não encosta mais no rodapé) —
+     a conta ganhou o respiro vertical interno da pílula (e-2 em cima e
+     embaixo) mais a folga que a separa da borda da tela (e-3). */
+  --lastro-clearance-nav: calc(
+    var(--lastro-alvo-min) + var(--lastro-e-2) * 2 + var(--lastro-e-3) +
+      env(safe-area-inset-bottom, 0px)
+  );
 
   /* A barra de topo é `position: fixed` (100% mobile, 2026-08-07) — sai do
      fluxo. `.corpo--com-nav` soma isto ao padding-top, senão o primeiro
