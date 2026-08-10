@@ -706,3 +706,19 @@ Também corrigidos, achados menores confirmados por leitura direta (sem precisar
 **Impacto.** `src/components/bloco-evidencia.tsx` (novo), `src/components/parecer.tsx`, `src/lib/texto/formatar-delta.ts` (novo), `src/app/sistema.css`, `src/app/tokens.css`. 104 testes (10 novos), `tsc`/lint limpos.
 
 **Como reverter.** `git revert c23a13d`.
+
+## 2026-08-10 (3) — Tarefas 6 e 7: gráfico já pronto, estado "dados insuficientes" construído
+
+**Tarefa 6 (peça 10, gráfico) — nenhum código necessário.** Conferi `grafico-progressao.tsx` contra os 7 itens de `DESIGN.md` §3.7 um a um: rotulagem direta ✓, conclusão em palavras em `t-2` acima do desenho ✓, platô desenhado com `strokeDasharray` em `--lastro-plato` + anotação "há N semanas" ✓, linha de referência única ("melhor marca") ✓, alvo de toque ✓, alternativa textual pro leitor de tela ✓, stack viável (Recharts) ✓. Já tinha sido construído e verificado numa sessão anterior (`PROGRESS.md` item 1, 2026-08-07) e eu mesmo vi renderizando corretamente com dado real várias vezes nesta sessão. Rodei também a verificação executável de literais (`grep` de §3.8) em `sistema.css` — vazia, nenhuma violação. Marcado concluído sem commit novo.
+
+**Tarefa 7 (peça 11) — o estado "sem dados suficientes" não existia.** As outras três (gerando, erro da API, pronto) já estavam corretas desde a tarefa 10 (a evidência estruturada passou a vir nas 3 branches da rota). Mas a lista de 5 perguntas ficava sempre clicável, mesmo com uma semana só de dado — o app dependia do LLM escrever na prosa que faltava informação, quando `DESIGN.md` §3.6.5 exige um bloqueio **determinístico**, com o número exato de semanas que faltam, antes de qualquer chamada à API.
+
+**`MINIMO_SEMANAS_PARECER = 3`** (`limiares.ts`) — mesmo número já citado informalmente em sessões anteriores e no mockup de referência ("São necessárias 3"), não é limiar estatístico novo. Reusa `semanasFechadasComTreino`, que a Home já calculava (`carregarResumoHome`) — sem duplicar consulta (E10). Abaixo do piso, `/analise` esconde a lista de perguntas e mostra "Você tem N semana(s) fechada(s). São necessárias 3 para calcular a análise semanal." + CTA "Registrar treino", em cor neutra (nunca `--lastro-erro`).
+
+**Verificado no navegador com um usuário QA descartável** — criado com 1 semana, testado, **deletado logo em seguida** (cascade confirmado, 0 linhas). Não usei o QA principal (6 semanas, ainda serve pra tarefa 8) nem tentei logar como o dono (login dele é Google OAuth; não tenho a senha e não é apropriado automatizar login pessoal dele).
+
+**Impacto.** `src/lib/analise/limiares.ts`, `src/app/analise/page.tsx`, `src/components/analise-interativa.tsx`. 104 testes, `tsc`/lint limpos. Commit `6d12a5b`.
+
+**Estado do backlog:** só falta a tarefa 8 — gate final com contraste medido e o olho do dono.
+
+**Como reverter.** `git revert 6d12a5b`.
