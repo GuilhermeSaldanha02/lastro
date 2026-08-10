@@ -458,8 +458,11 @@ Surgiu de pedido direto do dono no meio da sessão, não estava em nenhum docume
    - **Achado de arquitetura:** `/api/analise` já calcula `resumo` (tudo que o parecer precisa) antes de chamar o Gemini, mas só devolve `{ parecer }` — os blocos de evidência de `DESIGN.md` §3.6.3 não têm dado estruturado ainda, só CSS. Consultei o revisor antes de tocar o contrato: devolver `ResumoCompacto` inteiro seria o desenho errado (acopla o contrato da tela ao payload do prompt). Fatia própria, tipada.
    - **Achado da seed:** o mesmo exercício pode estar "em alta" pela janela de comparação (`tendencia_e1rm`, 4 semanas) e "em platô" pela regra do gráfico (`PLATO_GRAFICO_SEMANAS`, 3 semanas) ao mesmo tempo — os dois cálculos corretos, discordando. `DESIGN.md` §3.6.3 não tinha regra de qual sinal pinta a barra lateral do card. **Resolvido:** o card é dono da janela de comparação; o platô fica só no gráfico. Escrito em `DESIGN.md`.
    - **Dono decidiu:** estender o agregador (`volume_por_exercicio` em `ResumoCompacto`) em vez de usar só e1RM+sessões — é fase nova, não retoque.
-   - **`.claude/launch.json` segue untracked** — é o que faz o preview funcionar nesta sessão (porta 3000→3002). Se a sessão terminar sem commitá-lo, recriar com `{"name":"lastro-dev","runtimeExecutable":"npm","runtimeArgs":["run","dev"],"port":3000}`.
-   - **Próximo passo concreto:** estender `agregar.ts`/`tipos.ts` com `volume_por_exercicio`, testes novos, depois a API, depois o cabeçalho do parecer (peça 08) e os cards (peça 09).
+   - **`.claude/launch.json` commitado** (`f92d16c`) — não fica mais untracked.
+   - **Backlog concluído nesta sessão:** #9 agregador (`a4168e3`), #10 API/evidência (`a08dc51`), #4 cabeçalho+veredito (`f92d16c`). 94 testes, `tsc`/lint limpos em todos.
+   - **Achado de tooling, resolvido:** `mcp__computer-use__screenshot` (escopo desktop) prendeu numa janela desatualizada várias vezes nesta sessão, mesmo após reload/limpar cookies/service worker. `mcp__claude-in-chrome__computer{action:"screenshot"}` (escopo da aba, dentro da extensão) sempre mostrou o estado real. Preferir a extensão para captura daqui pra frente.
+   - **Achado para o dono julgar:** o veredito em `t-6` ocupa ~8 linhas em viewport de 375–500px quando a frase é longa — fiel à decisão, mas vale o olho real antes do gate final (tarefa 8). Se parecer exagerado, a correção é pedir concisão no prompt, não reduzir o token.
+   - **Próximo passo concreto:** tarefa #5 — cards de evidência com barra lateral (peça 09), consumindo `evidencia.blocos` que a API já devolve.
 
 ---
 
