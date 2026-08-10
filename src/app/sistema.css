@@ -514,26 +514,30 @@
   flex: none;
 }
 
-/* ---------- Aba inferior: vidro, porque o conteúdo passa por baixo ---- */
+/* ---------- Aba inferior: pílula flutuante em vidro ------------------- */
 /* App é 100% mobile: a aba inferior fica FIXA na viewport, não no fluxo
    da página (2026-08-06). Sai do fluxo por completo — toda tela que a usa
-   precisa reservar a própria altura dela + a área segura do sistema como
-   padding no que fica por último acima dela (ver `.corpo--com-nav`,
-   `.acao-area`, `.campo-conversa`). */
+   precisa reservar a própria altura dela + a folga que a separa da borda
+   como padding no que fica por último acima dela (ver `.corpo--com-nav`,
+   `.acao-area`, `.campo-conversa`).
+   2026-08-10: virou pílula flutuante (pedido do dono, inspirado no
+   Instagram — só o FORMATO, cores e vidro continuam as nossas: a barra
+   de topo segue sendo a única superfície escura do padrão, DESIGN.md
+   §3.0). Antes ia de ponta a ponta e encostava no rodapé; agora sobra
+   margem dos três lados e o raio satura em pílula (`--lastro-raio-
+   pilula`). Sem `border-top` — o que ancorava a barra na borda era essa
+   linha; flutuando, é a sombra que faz esse trabalho. */
 .nav {
   position: fixed;
-  left: 0;
-  right: 0;
-  bottom: 0;
+  left: var(--lastro-e-4);
+  right: var(--lastro-e-4);
+  bottom: calc(env(safe-area-inset-bottom, 0px) + var(--lastro-e-3));
   z-index: 20;
   display: flex;
-  border-top: 1px solid var(--lastro-linha);
+  padding: var(--lastro-e-2) var(--lastro-e-2);
+  border-radius: var(--lastro-raio-pilula);
   background: var(--lastro-vidro-opaco);
-  box-shadow: var(--lastro-elev-nav), var(--lastro-bevel);
-  /* iPhone com barra de gestos: a barra de toque não pode ficar embaixo
-     dela. `viewport-fit: cover` (layout.tsx) é o que faz este valor
-     deixar de ser sempre 0. */
-  padding-bottom: env(safe-area-inset-bottom, 0px);
+  box-shadow: var(--lastro-elev-3), var(--lastro-bevel);
 }
 
 @supports (backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px)) {
@@ -556,14 +560,19 @@
   align-items: center;
   justify-content: center;
   gap: var(--lastro-e-1);
+  border-radius: var(--lastro-raio-pilula);
   color: var(--lastro-txt-3);
   font-size: var(--lastro-t-meta);
   font-weight: var(--lastro-peso-medio);
   white-space: nowrap;
+  transition: background var(--lastro-dur-1) ease, color var(--lastro-dur-1) ease;
 }
 
-/* O item ativo usa PESO além da cor — cor nunca é o único canal. */
+/* O item ativo ganha uma pílula de fundo própria — o efeito mais
+   chamativo do formato Instagram, com nossas cores. PESO do texto
+   continua diferente também: cor nunca é o único canal. */
 .nav a[aria-current="page"] {
+  background: var(--lastro-sup-2);
   color: var(--lastro-acao-tinta);
   font-weight: var(--lastro-peso-forte);
 }

@@ -753,3 +753,17 @@ Método aferido contra os canônicos WCAG antes de medir (`#FFFFFF/#000000 = 21.
 **Impacto.** Nenhum arquivo de `src/` tocado nesta entrada (é documentação do gate). Branch `fix/consistencia-visual-telas` segue não mergeada — merge é decisão do dono, depois do olho dele.
 
 **Como reverter.** N/A (só documentação).
+
+## 2026-08-10 (5) — Nav inferior vira pílula flutuante (pedido do dono)
+
+**O que mudou.** `.nav` (`aba-inferior.tsx`/`sistema.css`) deixou de ir de ponta a ponta e ficar colada no rodapé para flutuar como uma pílula com margem dos três lados (`--lastro-e-4` lateral, `--lastro-e-3` + área segura embaixo), raio total (`--lastro-raio-pilula`, token novo, 999px). Item ativo ganhou uma pílula de fundo própria (`--lastro-sup-2`) atrás do ícone+rótulo, além do peso/cor que já existia.
+
+**Origem do pedido:** o dono mandou um print da barra inferior do Instagram (pílula escura flutuante, só ícones, pílula de destaque no item ativo) e perguntou se dava pra adaptar. Passou pelo processo de brainstorm antes de qualquer código — a primeira leitura minha ("copiar a barra do Instagram") estava errada; o dono corrigiu explicitamente: **"quero que você adapte na realidade, não que crie igual... a tela preta e símbolos não têm nada a ver com a nossa bar."** Absorvido: o formato (pílula flutuante, destaque do item ativo). Rejeitado: a paleta escura (violaria DESIGN.md §3.0 — a barra de topo é a ÚNICA superfície escura do padrão, decisão já registrada) e a ausência de rótulos (o dono pediu explicitamente pra manter o texto).
+
+**`--lastro-clearance-nav` recalculado**, não só reduzido — a pílula flutuante soma respiro vertical interno (`e-2` × 2) e a folga que a separa da borda (`e-3`) ao que já existia (altura do alvo + área segura). Sem isso o conteúdo por trás ficaria menos protegido do que antes, quando a barra encostava direto no rodapé.
+
+**Verificado no navegador real** (extensão Chrome, login QA), em 4 telas (Início, Coach, Análise, Bancada): pílula flutua com margem visível dos três lados, item ativo mostra a pílula de fundo clara, nenhum conteúdo fica escondido atrás dela. Contraste da combinação nova (verde-ação sobre `--lastro-sup-2`, que não existia antes — o item ativo antes ficava sobre o vidro da barra, não sobre uma superfície própria) medido ao vivo: **5,69:1** (ativo) e **6,30:1** (inativo) — ambos folgados acima do piso AA. Alvo de toque do item ativo: 48px de altura, bate `--lastro-alvo-min`.
+
+**Impacto.** `src/app/tokens.css` (token novo + `--lastro-clearance-nav` recalculado), `src/app/sistema.css` (`.nav` reescrita). Nenhum arquivo `.tsx` tocado — `aba-inferior.tsx` não mudou, só o CSS que o estiliza. `tsc`, 104 testes, lint e `npm run build` limpos. Branch `feat/nav-inferior-pilula`.
+
+**Como reverter.** `git checkout -- src/app/tokens.css src/app/sistema.css` ou `git revert` do commit.
