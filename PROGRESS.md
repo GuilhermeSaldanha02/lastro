@@ -450,6 +450,17 @@ Surgiu de pedido direto do dono no meio da sessão, não estava em nenhum docume
    - **Limite do gate:** conta do dono está em `Volume 0 kg`, sem semana fechada — o parecer não renderiza e o bug do card "Séries valendo" não reproduz (precisa de ≥ 10.000 kg). **Gate da peça-assinatura exige usuário QA efêmero seedado**, como na tarefa do gráfico.
    - **Bloqueado aguardando o dono:** C1b (RIR na linha de série?) · C4 (Serif ou Sans no veredito?) · C5 (manchete pode passar de `t-5`?) · C6 (implementar `14,2 t` agora?) · as peças entram no repo (45 MB, exigiria LFS) ou ficam fora?
 
+   **↳ 2026-08-08 (4) — dono aprovou C4 (Serif), C5 (t-6) e C6 (toneladas); backlog fatiado, execução iniciada.** Ver `DECISIONS.md` 2026-08-08 (4) e (5).
+   - **C6 implementado e commitado** (`0ac5f0c`): `formatarVolume` em `page.tsx` devolve `{valor, unidade}`, kg abaixo de 1000, `t` acima.
+   - **`DESIGN.md` amendado** (mesmo commit): §3.0 ganha a restrição do rediagnóstico por escrito; §3.6.2 sobe o veredito de `t-3` pra `t-6`, nomeado em §3.4.
+   - **Gate visual funcionando de verdade nesta sessão** (extensão Chrome + computer-use, Chrome não-maximizado): Início mostra `Volume 0 kg` correto; Análise mostra as 5 perguntas como cartões idênticos, confirmando o rediagnóstico por evidência, não só por medição.
+   - **Usuário QA efêmero criado e seedado:** `qa-lastro-parecer@example.com`, UUID `343f521f-ac58-4924-a4cf-87038bcb9812`. 5 semanas fechadas (treinos 2026-07-01 a 2026-07-29, Mondays 06-29 a 07-27), Agachamento Livre e Supino Reto em alta, Levantamento Terra e Desenvolvimento em platô, Remada Curvada em queda. Volume da semana mais recente: **10.420 kg**. Verificado ponta a ponta contra `/api/analise` real (as 4 tendências saíram corretas na prosa). **Fica vivo até a tarefa "Gate final"** — que deve rodar `./scripts/qa-treino-helper.sh limpar-usuario qa-lastro-parecer@example.com` ao terminar. Não esquecer.
+   - **Achado de arquitetura:** `/api/analise` já calcula `resumo` (tudo que o parecer precisa) antes de chamar o Gemini, mas só devolve `{ parecer }` — os blocos de evidência de `DESIGN.md` §3.6.3 não têm dado estruturado ainda, só CSS. Consultei o revisor antes de tocar o contrato: devolver `ResumoCompacto` inteiro seria o desenho errado (acopla o contrato da tela ao payload do prompt). Fatia própria, tipada.
+   - **Achado da seed:** o mesmo exercício pode estar "em alta" pela janela de comparação (`tendencia_e1rm`, 4 semanas) e "em platô" pela regra do gráfico (`PLATO_GRAFICO_SEMANAS`, 3 semanas) ao mesmo tempo — os dois cálculos corretos, discordando. `DESIGN.md` §3.6.3 não tinha regra de qual sinal pinta a barra lateral do card. **Resolvido:** o card é dono da janela de comparação; o platô fica só no gráfico. Escrito em `DESIGN.md`.
+   - **Dono decidiu:** estender o agregador (`volume_por_exercicio` em `ResumoCompacto`) em vez de usar só e1RM+sessões — é fase nova, não retoque.
+   - **`.claude/launch.json` segue untracked** — é o que faz o preview funcionar nesta sessão (porta 3000→3002). Se a sessão terminar sem commitá-lo, recriar com `{"name":"lastro-dev","runtimeExecutable":"npm","runtimeArgs":["run","dev"],"port":3000}`.
+   - **Próximo passo concreto:** estender `agregar.ts`/`tipos.ts` com `volume_por_exercicio`, testes novos, depois a API, depois o cabeçalho do parecer (peça 08) e os cards (peça 09).
+
 ---
 
 ## Abordagens que falharam

@@ -625,3 +625,32 @@ Também corrigidos, achados menores confirmados por leitura direta (sem precisar
 **Impacto.** `src/app/page.tsx` (C6). `DESIGN.md` (§3.0, §3.4, §3.6.2). Nenhuma migration, nenhum contrato de API tocado.
 
 **Como reverter.** `git checkout -- src/app/page.tsx DESIGN.md`.
+
+## 2026-08-08 (5) — Backlog fatiado: achado de arquitetura, decisão do dono, replanejamento
+
+**O que mudou.** Ao planejar as tarefas #4/#5 (cabeçalho e cards de evidência do parecer), achei que `/api/analise` **já calcula** `resumo` (ResumoCompacto, tudo que §3.6.3 precisa) antes de chamar o Gemini — só não devolve ao cliente. `parecer.tsx` já documentava isso como "LIMITAÇÃO CONHECIDA" havia sessões. Consultei o revisor antes de tocar um contrato documentado (SDD §6.2); ele apontou dois problemas reais antes de eu escrever código.
+
+**Problema 1 — devolver `ResumoCompacto` inteiro ao cliente era o desenho errado.** Ele é o payload do PROMPT (dimensionado contra `MAX_BYTES_RESUMO`, moldado pro LLM), não o contrato da TELA. Devolvê-lo cru acopla o formato que a UI lê ao formato que o prompt usa — qualquer ajuste futuro de prompt muda silenciosamente o que a tela recebe. Decisão: uma fatia própria, tipada, com só os campos que §3.6.3 usa.
+
+**Problema 2 — a seed provou um caso real de dois sinais discordando do mesmo exercício.** O parecer descreveu Levantamento Terra e Desenvolvimento como "subiu X%" (comparação de 4 semanas, `tendencia_e1rm`) mesmo semeados como platô nas últimas 3 semanas (regra do gráfico, `PLATO_GRAFICO_SEMANAS`). Os dois cálculos estão corretos — são janelas diferentes, ambas documentadas em `limiares.ts`. O gap é que **nada em `DESIGN.md` dizia qual sinal pinta a barra lateral do card quando os dois discordam**, e §3.6.6 já proíbe exatamente essa ambiguidade entre exercícios diferentes — faltava a regra para o mesmo exercício.
+
+**Decidido e escrito em `DESIGN.md` §3.6.3:** o bloco de evidência é dono da **janela de comparação** (`tendencia_e1rm`/`estagnacoes`, a mesma que a prosa interpreta). A leitura de platô do gráfico vive só no gráfico (§3.7/peça 10) — as duas nunca competem pela mesma barra lateral. Se algum dia a UI precisar mostrar as duas leituras juntas, a segunda entra como texto qualificado, nunca como segunda cor.
+
+**Achado à parte, não é bug:** a prosa chamou Remada Curvada (semeada em queda constante) de "estagnação de 4 semanas sem progresso". Conferido em `estagnacao.ts`: a definição é "sem novo máximo por N semanas", que **inclui queda por construção** (uma semana em declínio nunca bate o máximo corrente, logo conta pro streak). É o comportamento documentado, não um bug do agregador — mas é um lembrete de que "estagnação" no código é mais amplo que "platô" na leitura comum, e a prosa devia deixar isso claro quando descrever regressão como estagnação.
+
+**Pergunta ao dono: como montar o número do card, já que `ResumoCompacto` só tem e1RM + contagem de sessões por exercício, não volume nem séries valendo por exercício** (só por grupo muscular). Duas opções — usar o que já existe (e1RM + sessões, sem tocar o agregador testado) ou estender o agregador pra ter peso×reps e séries valendo por exercício, igual à peça 09. **O dono escolheu estender o agregador.** É fase nova (E4), não retoque: `tipos.ts` (`ResumoCompacto`), `agregar.ts` (testado, SDD §D2), testes novos, e checar se o resumo ainda cabe em `MAX_BYTES_RESUMO`.
+
+**Backlog replanejado, em ordem:**
+1. Agregador — `volume_por_exercicio` em `ResumoCompacto` (peso, reps, séries valendo, delta) — tarefa nova, maior do que as anteriores.
+2. API — fatia de evidência própria (não `ResumoCompacto` cru) devolvida junto de `parecer`; amendar SDD §6.2.
+3. Cabeçalho de emissão + veredito (peça 08) — não depende do agregador, pode andar em paralelo.
+4. Cards de evidência (peça 09) — depende de 1 e 2.
+5. Gráfico (peça 10), estados (peça 11), gate final — como já estava.
+
+**Dois soltos que o revisor apontou, registrados agora:**
+- **Usuário QA efêmero:** `qa-lastro-parecer@example.com` / UUID `343f521f-ac58-4924-a4cf-87038bcb9812`, 5 semanas fechadas (Mondays 2026-06-29 a 2026-07-27), volume da semana mais recente **10.420 kg**. Agachamento Livre e Supino Reto em alta, Levantamento Terra e Desenvolvimento em platô (últimas 3 semanas), Remada Curvada em queda. Verificado ponta a ponta contra `/api/analise` real. **Fica vivo até o gate final** (tarefa "Gate final"), que deve rodar `./scripts/qa-treino-helper.sh limpar-usuario qa-lastro-parecer@example.com` ao terminar.
+- **`.claude/launch.json` está untracked.** É o que faz `preview_start lastro-dev` funcionar nesta sessão (a configuração do dev server, porta 3000→3002 quando 3000 está ocupada). Se a sessão terminar sem commitá-lo, a próxima precisa recriá-lo (conteúdo: `{"name":"lastro-dev","runtimeExecutable":"npm","runtimeArgs":["run","dev"],"port":3000}`). Ainda não commitado — decisão de manter fora do controle de versão ou commitar fica para o dono.
+
+**Impacto.** `DESIGN.md` (§3.6.3, regra de precedência). `DECISIONS.md`, `PROGRESS.md`. Nenhum arquivo de `src/` tocado ainda nesta rodada — a extensão do agregador é a próxima tarefa.
+
+**Como reverter.** `git checkout -- DESIGN.md DECISIONS.md PROGRESS.md`.
