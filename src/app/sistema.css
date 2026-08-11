@@ -526,7 +526,15 @@
    §3.0). Antes ia de ponta a ponta e encostava no rodapé; agora sobra
    margem dos três lados e o raio satura em pílula (`--lastro-raio-
    pilula`). Sem `border-top` — o que ancorava a barra na borda era essa
-   linha; flutuando, é a sombra que faz esse trabalho. */
+   linha; flutuando, é a sombra que faz esse trabalho.
+   2026-08-10 (2): achado do dono — pra quem enxerga menos (usuário mais
+   velho), o vidro quase branco "sumia" e os rótulos em --lastro-txt-3
+   ficavam apagados demais (--lastro-txt-3 é o tom mais fraco do sistema,
+   reservado a metadado, nunca pensado pra navegação primária). Vidro
+   passou a ser tingido do petróleo da barra de topo (`--lastro-vidro-
+   nav`, bem diluído — amarra as duas pontas da tela sem escurecer o
+   padrão), e o texto/ícone inativo subiu pra --lastro-txt-2 com mais
+   peso. */
 .nav {
   position: fixed;
   left: var(--lastro-e-4);
@@ -536,13 +544,13 @@
   display: flex;
   padding: var(--lastro-e-2) var(--lastro-e-2);
   border-radius: var(--lastro-raio-pilula);
-  background: var(--lastro-vidro-opaco);
+  background: var(--lastro-vidro-nav-opaco);
   box-shadow: var(--lastro-elev-3), var(--lastro-bevel);
 }
 
 @supports (backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px)) {
   .nav {
-    background: var(--lastro-vidro);
+    background: var(--lastro-vidro-nav);
     -webkit-backdrop-filter: var(--lastro-vidro-desfoque);
     backdrop-filter: var(--lastro-vidro-desfoque);
   }
@@ -561,9 +569,9 @@
   justify-content: center;
   gap: var(--lastro-e-1);
   border-radius: var(--lastro-raio-pilula);
-  color: var(--lastro-txt-3);
+  color: var(--lastro-txt-2);
   font-size: var(--lastro-t-meta);
-  font-weight: var(--lastro-peso-medio);
+  font-weight: var(--lastro-peso-forte);
   white-space: nowrap;
   transition: background var(--lastro-dur-1) ease, color var(--lastro-dur-1) ease;
 }
@@ -574,7 +582,7 @@
 .nav a[aria-current="page"] {
   background: var(--lastro-sup-2);
   color: var(--lastro-acao-tinta);
-  font-weight: var(--lastro-peso-forte);
+  font-weight: var(--lastro-peso-max);
 }
 
 .nav svg {

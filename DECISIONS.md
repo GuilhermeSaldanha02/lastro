@@ -767,3 +767,18 @@ Método aferido contra os canônicos WCAG antes de medir (`#FFFFFF/#000000 = 21.
 **Impacto.** `src/app/tokens.css` (token novo + `--lastro-clearance-nav` recalculado), `src/app/sistema.css` (`.nav` reescrita). Nenhum arquivo `.tsx` tocado — `aba-inferior.tsx` não mudou, só o CSS que o estiliza. `tsc`, 104 testes, lint e `npm run build` limpos. Branch `feat/nav-inferior-pilula`.
 
 **Como reverter.** `git checkout -- src/app/tokens.css src/app/sistema.css` ou `git revert` do commit.
+
+## 2026-08-10 (6) — Nav inferior: legibilidade pra usuário mais velho, tingimento em petróleo
+
+**O que mudou.** Duas correções na pílula recém-criada (entrada anterior), a partir de feedback direto do dono sobre acessibilidade real, não WCAG numérico: *"pensando na usabilidade, se alguém mais velho for utilizar, pode tá muito apagado."*
+
+1. **Texto/ícone inativo:** subiu de `--lastro-txt-3` (o tom mais fraco do sistema, reservado a metadado — nunca pensado pra navegação primária) para `--lastro-txt-2`, com peso 500→600. Item ativo sobe junto, 600→700 (`--lastro-peso-max`), pra manter a diferença de peso entre os dois estados.
+2. **Fundo da pílula tingido de petróleo:** o dono pediu explicitamente a cor da barra de topo (`--lastro-barra-a`), bem diluída — não o verde de ação (checado com ele antes de mexer: "verde é a ação, e só a ação" continua valendo, essa é OUTRA cor, já reservada ao topo). Tokens novos `--lastro-vidro-nav` (`rgba(23,65,79,0.16)`) e `--lastro-vidro-nav-opaco` (`#CDCFC9`, fallback sólido) substituem os antigos `--lastro-vidro`/`--lastro-vidro-opaco` (baseados em sup-1, quase brancos) só na aba inferior — os tokens antigos continuam existindo pra quem mais usa.
+
+**Achado de medição — a primeira tentativa de medir deu errado, corrigido antes de aceitar o número.** `getComputedStyle(nav).backgroundColor` devolve o `rgba` **cru**, sem misturar com o que está atrás — medir contraste direto contra isso dá `1.36:1` (leitura de um fundo quase preto que não existe na tela). O fundo é translúcido; o contraste real depende do que está atrás. Composto à mão (alpha blend correto) contra `--lastro-fundo` (o backdrop real, confirmado via `getComputedStyle(document.body)`): **5,16:1** — passa AA. Testado também contra o backdrop mais claro possível (`--lastro-sup-1`) — contraste só melhora (fundo mais claro favorece texto escuro), então `--lastro-fundo` já é o pior caso.
+
+**Verificado no navegador real:** ícones/rótulos claramente mais escuros e mais pesados; a pílula lê como tingida (cinza-esverdeada), não mais quase-branca — visualmente ligada à barra de topo sem ficar escura. `npx tsc`, testes, lint e `npm run build` limpos.
+
+**Impacto.** `src/app/tokens.css` (2 tokens novos), `src/app/sistema.css` (`.nav`/`.nav a`/`[aria-current]`). Nenhum `.tsx` tocado.
+
+**Como reverter.** `git checkout -- src/app/tokens.css src/app/sistema.css` ou `git revert` do commit.
