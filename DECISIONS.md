@@ -782,3 +782,21 @@ Método aferido contra os canônicos WCAG antes de medir (`#FFFFFF/#000000 = 21.
 **Impacto.** `src/app/tokens.css` (2 tokens novos), `src/app/sistema.css` (`.nav`/`.nav a`/`[aria-current]`). Nenhum `.tsx` tocado.
 
 **Como reverter.** `git checkout -- src/app/tokens.css src/app/sistema.css` ou `git revert` do commit.
+
+## 2026-08-11 (2) — Nav: petróleo de verdade, corrigido depois de feedback direto no celular
+
+**O que mudou.** Dois PRs seguidos (#25) corrigindo a pílula da entrada anterior (PR #22 — vidro quase transparente tingido, "não ficou legal" segundo o dono depois de testar no aparelho real).
+
+**Correção 1 — cor.** O dono pediu o oposto do que eu tinha feito: a pílula precisa **ser** a cor petróleo (mais clara que `--lastro-barra-a`, não um vidro diluído em 16% de alpha). Sem fundo areia no item ativo — destaque só por **traço mais grosso** do ícone (`--lastro-nav-traco-ativo`, 2→2.75) e **peso maior** da letra (600→700). Calibrado por contraste medido em três voltas: 0.55 de alpha reprovou (2,24:1/2,91:1), 0.78 com texto a 0.94 de opacidade bateu (**4,78:1/5,16:1**).
+
+**Correção 2 — o contorno "sumiu".** O dono reclamou "cadê a alteração que pedi" sobre o contorno dos ícones. Testando eu mesmo (não só relatando), achei a causa: o contorno usava sombra **escura**, que ficou invisível porque a Correção 1, na mesma leva, também escureceu o fundo da pílula. Contorno escuro sobre fundo escuro não aparece — erro meu, de não re-checar uma decisão anterior (o contorno) contra uma mudança nova (o fundo). Trocado para halo **claro** (mesma tinta do texto, blur 2px, opacidade 0.9) — visível na captura.
+
+**`DESIGN.md` §3.0/D5 amendado de novo:** duas superfícies petróleo agora (a barra de topo continua a mais escura das duas), não mais uma só.
+
+**Fluxo desta vez:** implementei tudo local primeiro, sem commit, aguardando aprovação visual — o dono pediu explicitamente pra não empurrar até ele olhar. Só depois de ele confirmar (mesmo indiretamente, ao pedir "subir pra main pra eu testar no aparelho") é que commitei, empurrei, abri PR e mergeei.
+
+**Impacto.** `src/app/tokens.css`, `src/app/sistema.css`, `DESIGN.md`. Nenhum `.tsx` tocado. `tsc`, 104 testes, lint e build limpos nos dois commits.
+
+**Ainda em aberto:** confirmação do dono no aparelho real, depois do deploy da Vercel completar.
+
+**Como reverter.** `git revert ea69168`.
