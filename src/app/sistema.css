@@ -58,7 +58,8 @@
   margin-top: var(--lastro-e-2);
 }
 
-/* ---------- Barra de topo: a única superfície escura ---------- */
+/* ---------- Barra de topo: a mais escura das duas superfícies petróleo
+   (a outra é a pílula da aba inferior, mais clara — 2026-08-11) -------- */
 /* App é 100% mobile: a barra de topo também fica FIXA na viewport,
    espelhando a aba inferior (2026-08-07). Sai do fluxo — `.corpo--com-nav`
    reserva a altura dela como padding-top. */
@@ -528,13 +529,17 @@
    pilula`). Sem `border-top` — o que ancorava a barra na borda era essa
    linha; flutuando, é a sombra que faz esse trabalho.
    2026-08-10 (2): achado do dono — pra quem enxerga menos (usuário mais
-   velho), o vidro quase branco "sumia" e os rótulos em --lastro-txt-3
-   ficavam apagados demais (--lastro-txt-3 é o tom mais fraco do sistema,
-   reservado a metadado, nunca pensado pra navegação primária). Vidro
-   passou a ser tingido do petróleo da barra de topo (`--lastro-vidro-
-   nav`, bem diluído — amarra as duas pontas da tela sem escurecer o
-   padrão), e o texto/ícone inativo subiu pra --lastro-txt-2 com mais
-   peso. */
+   velho), o vidro quase branco "sumia". Vidro passou a ser tingido do
+   petróleo da barra de topo, bem diluído.
+   2026-08-11: corrigido — a diluição (2) ficou fraca demais e o dono
+   pediu o inverso do que eu tinha feito. A pílula É a cor petróleo
+   (mais clara que a barra de topo, não uma barra escura igual), texto/
+   ícone claros nela (`--lastro-barra-txt`), como a barra de topo já faz.
+   Isso torna a pílula uma SEGUNDA superfície petróleo do padrão — DESIGN.md
+   §3.0 amendado (era "a única superfície escura"). Item ativo NÃO ganha
+   fundo próprio (dono: "não vai ficar legal") — se destaca por traço
+   mais grosso do ícone e peso maior da letra (`--lastro-nav-traco-ativo`,
+   `--lastro-peso-max`), nunca só por cor. */
 .nav {
   position: fixed;
   left: var(--lastro-e-4);
@@ -569,25 +574,31 @@
   justify-content: center;
   gap: var(--lastro-e-1);
   border-radius: var(--lastro-raio-pilula);
-  color: var(--lastro-txt-2);
+  color: var(--lastro-nav-txt-fraco);
   font-size: var(--lastro-t-meta);
   font-weight: var(--lastro-peso-forte);
   white-space: nowrap;
-  transition: background var(--lastro-dur-1) ease, color var(--lastro-dur-1) ease;
+  transition: color var(--lastro-dur-1) ease;
 }
 
-/* O item ativo ganha uma pílula de fundo própria — o efeito mais
-   chamativo do formato Instagram, com nossas cores. PESO do texto
-   continua diferente também: cor nunca é o único canal. */
+/* O item ativo se destaca por TRAÇO e PESO, nunca por fundo (dono,
+   2026-08-11) — cor nunca é o único canal, e aqui nem é o canal
+   principal: o traço do ícone engrossa e a letra ganha peso máximo. */
 .nav a[aria-current="page"] {
-  background: var(--lastro-sup-2);
-  color: var(--lastro-acao-tinta);
+  color: var(--lastro-barra-txt);
   font-weight: var(--lastro-peso-max);
 }
 
 .nav svg {
   width: var(--lastro-e-5);
   height: var(--lastro-e-5);
+  stroke-width: var(--lastro-nav-traco);
+  filter: var(--lastro-nav-contorno);
+  transition: stroke-width var(--lastro-dur-1) ease;
+}
+
+.nav a[aria-current="page"] svg {
+  stroke-width: var(--lastro-nav-traco-ativo);
 }
 
 /* ---------- Campo: o inverso do botão — afunda em vez de saltar ------- */
