@@ -146,6 +146,16 @@
   --lastro-vidro-desfoque: blur(14px) saturate(1.4);
   --lastro-elev-nav:       0 -2px 10px rgba(var(--lastro-sombra-cor), 0.07);
 
+  /* Vidro tingido de petróleo — SÓ a pílula da aba inferior (2026-08-10,
+     pedido do dono: "a cor que está no topo do app", bem diluída, pra
+     amarrar visualmente as duas pontas da tela sem escurecer o padrão).
+     Mesma técnica de --lastro-avatar-iniciais-fundo (rgba do tom puro em
+     alpha baixo), na direção oposta: tom escuro bem diluído sobre fundo
+     claro, não o inverso. --lastro-vidro-nav-opaco é o composto sólido
+     sobre --lastro-fundo, pra quando backdrop-filter não existe. */
+  --lastro-vidro-nav:       rgba(23, 65, 79, 0.16); /* --lastro-barra-a na base */
+  --lastro-vidro-nav-opaco: #CDCFC9;
+
   /* Traço fraco sobre a barra escura — limite de controle secundário
      em superfície escura, onde --lastro-controle sumiria. */
   --lastro-barra-traco: rgba(240, 234, 224, 0.38);
