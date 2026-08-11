@@ -146,15 +146,42 @@
   --lastro-vidro-desfoque: blur(14px) saturate(1.4);
   --lastro-elev-nav:       0 -2px 10px rgba(var(--lastro-sombra-cor), 0.07);
 
-  /* Vidro tingido de petróleo — SÓ a pílula da aba inferior (2026-08-10,
-     pedido do dono: "a cor que está no topo do app", bem diluída, pra
-     amarrar visualmente as duas pontas da tela sem escurecer o padrão).
-     Mesma técnica de --lastro-avatar-iniciais-fundo (rgba do tom puro em
-     alpha baixo), na direção oposta: tom escuro bem diluído sobre fundo
-     claro, não o inverso. --lastro-vidro-nav-opaco é o composto sólido
-     sobre --lastro-fundo, pra quando backdrop-filter não existe. */
-  --lastro-vidro-nav:       rgba(23, 65, 79, 0.16); /* --lastro-barra-a na base */
-  --lastro-vidro-nav-opaco: #CDCFC9;
+  /* Vidro tingido de petróleo — SÓ a pílula da aba inferior. Pedido do
+     dono: "a cor que está no topo do app", mais clara que a barra pra
+     não ficar tão escura — amarra visualmente as duas pontas da tela.
+     2026-08-11: corrigido depois de ver no celular — a primeira tentativa
+     (alpha 0.16) ficou diluída demais, quase não lia como petróleo, e o
+     item ativo com fundo areia (--lastro-sup-2) "não ficou legal" (dono).
+     Removido o fundo do item ativo. Alpha calibrado em duas voltas pela
+     razão de contraste MEDIDA (não estimada): 0.55 deu 2,24:1/2,91:1
+     (reprova), 0.78 deu 4,41:1 no texto inativo (quase, mas não bate
+     4,5:1) — fechou em 0.78 pro fundo + opacidade do texto inativo
+     subindo (--lastro-nav-txt-fraco). --lastro-vidro-nav-opaco é o
+     composto sólido sobre --lastro-fundo, pra quando backdrop-filter
+     não existe. */
+  --lastro-vidro-nav:       rgba(23, 65, 79, 0.78); /* --lastro-barra-a na base */
+  --lastro-vidro-nav-opaco: #476670; /* composto sobre --lastro-fundo em alpha 0.78 */
+
+  /* Contorno/brilho no ícone — pedido do dono pensando em usuário 50+:
+     "os símbolos... se possível até ter um contorno", pra destacar mais.
+     2026-08-11: primeira tentativa usava sombra ESCURA — invisível,
+     porque o fundo da pílula também é escuro agora (petróleo). Corrigido
+     pra um halo CLARO (a mesma tinta do ícone, mais espalhada) — engorda
+     a silhueta visualmente, funciona sobre fundo escuro. */
+  --lastro-nav-contorno: drop-shadow(0 0 2px rgba(240, 234, 224, 0.9));
+
+  /* Traço do ícone da aba inferior — o item ativo se destaca por traço
+     mais grosso e peso de fonte maior, não por fundo (dono, 2026-08-11:
+     "com traços mais grossos, inclusive as letras"). Cor nunca é o único
+     canal (§3.2 nota C): aqui os canais são traço + peso + opacidade. */
+  --lastro-nav-traco:        2;
+  --lastro-nav-traco-ativo:  2.75;
+
+  /* Item inativo da aba inferior: mesma tinta clara da barra de topo,
+     diluída — mesmo padrão de --lastro-acao-txt-fraco (rgba do tom
+     sólido, não `opacity` no elemento, pra o contraste real dar pra
+     medir sem composição escondida). Ativo usa --lastro-barra-txt cheio. */
+  --lastro-nav-txt-fraco: rgba(240, 234, 224, 0.94);
 
   /* Traço fraco sobre a barra escura — limite de controle secundário
      em superfície escura, onde --lastro-controle sumiria. */

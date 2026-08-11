@@ -4,7 +4,9 @@
 >
 > **Estado em 2026-08-06:** a identidade estética foi **APROVADA pelo dono** — padrão *"Areia & Azul Petróleo"*, com matéria (gradiente, vidro, bevel, sombra). Os valores vivem em `src/app/tokens.css`, que é o espelho executável de §3.1; as classes, em `src/app/sistema.css`. A referência navegável é `design/padrao-visual.html`, que traz a aferição de contraste rodando na própria página.
 >
-> **Uma restrição funcional foi revista pelo dono nesta data: D5.** O tema padrão passou a ser **claro** (areia), não escuro. A justificativa original de D5 (academia com luz baixa, tela clara cansa à noite) continua válida como risco conhecido; o dono a aceitou conscientemente em favor do padrão escolhido. A única superfície escura que sobrou é a barra de topo.
+> **Uma restrição funcional foi revista pelo dono nesta data: D5.** O tema padrão passou a ser **claro** (areia), não escuro. A justificativa original de D5 (academia com luz baixa, tela clara cansa à noite) continua válida como risco conhecido; o dono a aceitou conscientemente em favor do padrão escolhido.
+>
+> **2026-08-11 — revisto de novo.** A pílula da aba inferior deixou de ser vidro areia e passou a ser petróleo (mais claro que a barra de topo), a pedido do dono. **Duas superfícies petróleo agora, não uma** — a barra de topo continua a mais escura das duas; a pílula é uma versão mais clara da mesma tinta, amarrando as duas pontas da tela. Onde este documento disser "a única superfície escura", leia "a barra de topo é a mais escura das duas superfícies petróleo".
 
 ---
 
@@ -24,7 +26,7 @@ Isso não é detalhe de acabamento — é a restrição que decide o layout inte
 | D2 | **Ações primárias na metade inferior da tela**, ao alcance do polegar | Uma mão só. Botão no topo obriga a reposicionar o aparelho |
 | D3 | **"Repetir última série" é o botão mais proeminente do app** | É a ação mais frequente do fluxo de treino. Se ela custar mais de um toque, o log é abandonado |
 | D4 | **Legível a um braço de distância** — corpo nunca abaixo de 16px | O celular fica apoiado no banco, não na mão, entre séries |
-| D5 | ~~Tema escuro como padrão~~ → **Tema claro (areia) como padrão** | **REVISTA pelo dono em 2026-08-06.** A justificativa original — academia com luz baixa, tela clara cansa à noite — segue válida e vira risco aceito. A barra de topo é a única superfície escura |
+| D5 | ~~Tema escuro como padrão~~ → **Tema claro (areia) como padrão** | **REVISTA pelo dono em 2026-08-06.** A justificativa original — academia com luz baixa, tela clara cansa à noite — segue válida e vira risco aceito. Duas superfícies petróleo (barra de topo e a pílula da aba inferior, 2026-08-11); o resto do padrão segue areia |
 | D6 | **Nenhuma ação de registro espera resposta de rede** | ADR/ARCHITECTURE: registrar série é offline-first. A UI confirma na hora |
 | D7 | **Estado de sincronização sempre visível, nunca alarmante** | O usuário precisa saber que o dado está salvo local, sem que isso pareça erro |
 | D8 | **Contraste AA medido, não estimado** | Gate de acessibilidade é critério do gate visual, não fase posterior |
