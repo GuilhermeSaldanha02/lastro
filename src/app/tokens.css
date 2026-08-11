@@ -162,11 +162,13 @@
   --lastro-vidro-nav:       rgba(23, 65, 79, 0.78); /* --lastro-barra-a na base */
   --lastro-vidro-nav-opaco: #476670; /* composto sobre --lastro-fundo em alpha 0.78 */
 
-  /* Contorno sutil no ícone — pedido do dono pensando em usuário 50+:
-     "os símbolos... se possível até ter um contorno". `drop-shadow`
-     segue a silhueta do traço (funciona em ícone de linha, não só
-     preenchido), reforçando a borda contra qualquer fundo por trás. */
-  --lastro-nav-contorno: drop-shadow(0 0 1px rgba(14, 40, 51, 0.6));
+  /* Contorno/brilho no ícone — pedido do dono pensando em usuário 50+:
+     "os símbolos... se possível até ter um contorno", pra destacar mais.
+     2026-08-11: primeira tentativa usava sombra ESCURA — invisível,
+     porque o fundo da pílula também é escuro agora (petróleo). Corrigido
+     pra um halo CLARO (a mesma tinta do ícone, mais espalhada) — engorda
+     a silhueta visualmente, funciona sobre fundo escuro. */
+  --lastro-nav-contorno: drop-shadow(0 0 2px rgba(240, 234, 224, 0.9));
 
   /* Traço do ícone da aba inferior — o item ativo se destaca por traço
      mais grosso e peso de fonte maior, não por fundo (dono, 2026-08-11:
