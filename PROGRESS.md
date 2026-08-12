@@ -245,13 +245,13 @@ Quota checada com uma chamada direta à API antes de gastar esforço recriando d
 
 ## ▶ PONTO DE RETOMADA — ler primeiro (2026-08-12)
 
-**Estado do repo:** branch `feat/ajustes-nav-perfil` (não mergeada), PR aberto. `main` local está atrás dela mas sincronizada com o remoto até o commit `4bf97a4`. `tsc`/`test` (108 passando)/`lint`/`build` verdes na branch, rodados do zero antes do PR.
+**Estado do repo:** `main`, PR #26 mergeado (2026-08-12), branch `feat/ajustes-nav-perfil` apagada. **Confirmado pelo dono no aparelho real** — "tudo está rodando corretamente". `tsc`/`test` (108 passando)/`lint`/`build` verdes, rodados do zero antes do PR.
 
 **O que mudou nesta sessão (item 17 em "Pendências consolidadas" tem o relato completo):** a pílula de navegação trocou "Coach" por "Ajustes" (engrenagem); Coach, edição de perfil e "Sair" agora moram todos dentro de `/ajustes` e `/perfil`, sem repetição. Fecha o item 13 (upload manual de foto), pendente desde 2026-08-07.
 
 **Achado de arquitetura que vale lembrar em qualquer Server Action futura chamada por Client Component:** `"use server"` inline dentro de uma função só isola aquela função se o resto do arquivo também não tiver código server-only (`next/headers`/`next/cache`) usado por OUTRAS funções não-action. Se tiver, o Turbopack deste Next.js 16.3.0 quebra o build inteiro — só `npm run build` pega isso, nem `tsc` nem os primeiros reviews de spec pegaram. Regra prática: Server Action chamada por Client Component sempre em arquivo próprio, nunca dividindo arquivo com função server-only comum.
 
-**Próximo passo: você olhar `/ajustes` e `/perfil` no aparelho real, testar o upload de foto com uma imagem sua, e decidir sobre o merge do PR.** Mesma regra de sempre pra mudança que toca a pílula — não mergeei sozinho.
+**Próximo passo:** nenhuma pendência aberta desta sessão. Ver "Pendências consolidadas" para o backlog geral do projeto (catálogo de dicas de execução, sync offline em celular real, etc.).
 
 **Pendências que continuam abertas, sem mudança nesta sessão:** as 6 decisões de `DESIGN.md` §5 abaixo já foram resolvidas faz tempo (Fase 3 avançou muito além disso — ver "Pendências consolidadas" pro estado real, este parágrafo ficou como registro histórico da época).
 
@@ -473,7 +473,7 @@ Surgiu de pedido direto do dono no meio da sessão, não estava em nenhum docume
     **Bug real pego no code-quality-review (2ª rodada), antes de existir usuário real testando:** `caminho = ${user.id}/avatar.${extensao}` é determinístico por formato — com `upsert:true`, trocar de foto duas vezes seguidas no mesmo formato (ex.: dois JPEGs) gerava a mesma `publicUrl`, e nem o banco nem o cache do navegador percebiam a mudança na segunda troca. Corrigido com cache-buster (`?v=${Date.now()}`) persistido na própria `avatar_url`. Também foi nessa rodada que se acrescentou `revalidatePath("/", "layout")` (padrão já usado em `criarTreino`), pra garantir que o avatar novo apareça em toda tela sem depender só do estado local do componente.
     **Verificado ponta a ponta no navegador real** (usuário QA efêmero `qa-lastro-ajustes@example.com`, extensão Chrome — o painel interno de novo não compositou frame nenhum, mesma limitação já registrada; o método que funciona continua sendo extensão + upload de arquivo real via `file_upload`, não clique em seletor nativo): pílula mostra "Ajustes" com engrenagem, rótulo sem quebra de linha; `/ajustes` mostra card do perfil + linha Coach + botão Sair; `/perfil` mostra avatar + botão "Trocar foto"; upload de uma foto JPEG real trocou o avatar na tela **sem reload** e sem apertar F5; conferido no Postgres que `usuario.avatar_url` gravou com o cache-buster; navegação pra Início mostrou o avatar novo (confirma o `revalidatePath`) e confirmou que **não há mais botão Sair na Início**; `/coach` abre normal a partir do link dentro de Ajustes, com "Ajustes" continuando em destaque na pílula; "Sair" encerrou a sessão de verdade e redirecionou pra `/login`. Usuário QA removido ao final, cascade confirmado = 0.
     `tsc`/`test` (108 passando, 4 novos de `validarArquivoAvatar`)/`lint`/`build` verdes, rodados do zero (`rm -rf .next`) antes do PR.
-    **Não mergeado ainda** — branch `feat/ajustes-nav-perfil`, PR aberto. Falta o dono confirmar no aparelho real antes do merge (mesma regra de toda mudança que toca a pílula).
+    **Mergeado na `main`** ([PR #26](https://github.com/GuilhermeSaldanha02/lastro/pull/26)), branch `feat/ajustes-nav-perfil` apagada. **Confirmado pelo dono no aparelho real, mesmo dia:** "tudo está rodando corretamente".
 
 ---
 
