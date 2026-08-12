@@ -4,6 +4,7 @@
 // perfil já existente e, no caso do Google, baixa o avatar pra Storage.
 import { criarClienteServidor } from "@/lib/supabase/cliente-servidor";
 import type { SupabaseClient, User } from "@supabase/supabase-js";
+import { validarArquivoAvatar } from "./validar-avatar";
 
 export type Perfil = {
   nome: string;
@@ -73,4 +74,60 @@ export async function sincronizarAvatarGoogle(
   } = supabase.storage.from(CAMINHO_BUCKET).getPublicUrl(caminho);
 
   await supabase.from("usuario").update({ avatar_url: publicUrl }).eq("id", user.id);
+}
+
+export { validarArquivoAvatar } from "./validar-avatar";
+
+export type ResultadoAtualizarAvatar =
+  | { ok: true; avatarUrl: string }
+  | { ok: false; erro: string };
+
+/**
+ * Upload manual de foto — quem cadastrou por e-mail não tem `avatar_url`
+ * do Google pra baixar (`sincronizarAvatarGoogle` acima não se aplica).
+ * Chamada direto do componente cliente de `/perfil`. `"use server"`
+ * inline (não no topo do arquivo) deixa só esta função virar Server
+ * Action, sem tentar transformar `sincronizarAvatarGoogle` (que recebe
+ * `SupabaseClient`/`User`, não serializável) em uma.
+ */
+export async function atualizarAvatarManual(
+  arquivo: File,
+): Promise<ResultadoAtualizarAvatar> {
+  "use server";
+
+  const validacao = validarArquivoAvatar(arquivo);
+  if (!validacao.ok) return validacao;
+
+  const supabase = await criarClienteServidor();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return { ok: false, erro: "Sessão ausente — entre de novo." };
+
+  const extensao = arquivo.type.includes("png") ? "png" : "jpg";
+  const caminho = `${user.id}/avatar.${extensao}`;
+
+  const { error: erroUpload } = await supabase.storage
+    .from(CAMINHO_BUCKET)
+    .upload(caminho, arquivo, { contentType: arquivo.type, upsert: true });
+  if (erroUpload) {
+    return { ok: false, erro: "Não foi possível enviar a foto. Tente de novo." };
+  }
+
+  const {
+    data: { publicUrl },
+  } = supabase.storage.from(CAMINHO_BUCKET).getPublicUrl(caminho);
+
+  const { error: erroAtualizar } = await supabase
+    .from("usuario")
+    .update({ avatar_url: publicUrl })
+    .eq("id", user.id);
+  if (erroAtualizar) {
+    return {
+      ok: false,
+      erro: "Foto enviada, mas não deu para salvar o perfil. Tente de novo.",
+    };
+  }
+
+  return { ok: true, avatarUrl: publicUrl };
 }
