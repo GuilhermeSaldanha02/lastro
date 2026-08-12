@@ -2,6 +2,7 @@
 // A criação da linha em `usuario` é responsabilidade do trigger da
 // migração 0004 (dispara no INSERT em auth.users); este arquivo só lê o
 // perfil já existente e, no caso do Google, baixa o avatar pra Storage.
+import { revalidatePath } from "next/cache";
 import { criarClienteServidor } from "@/lib/supabase/cliente-servidor";
 import type { SupabaseClient, User } from "@supabase/supabase-js";
 import { validarArquivoAvatar } from "./validar-avatar";
@@ -76,8 +77,6 @@ export async function sincronizarAvatarGoogle(
   await supabase.from("usuario").update({ avatar_url: publicUrl }).eq("id", user.id);
 }
 
-export { validarArquivoAvatar } from "./validar-avatar";
-
 export type ResultadoAtualizarAvatar =
   | { ok: true; avatarUrl: string }
   | { ok: false; erro: string };
@@ -118,9 +117,15 @@ export async function atualizarAvatarManual(
     data: { publicUrl },
   } = supabase.storage.from(CAMINHO_BUCKET).getPublicUrl(caminho);
 
+  // Cache-buster: o caminho é determinístico por formato (upsert sobrescreve
+  // o mesmo arquivo), então trocar de foto duas vezes com o mesmo formato
+  // gera a mesma `publicUrl` — sem isso, nem o banco muda nem o navegador
+  // rebusca a imagem.
+  const avatarUrl = `${publicUrl}?v=${Date.now()}`;
+
   const { error: erroAtualizar } = await supabase
     .from("usuario")
-    .update({ avatar_url: publicUrl })
+    .update({ avatar_url: avatarUrl })
     .eq("id", user.id);
   if (erroAtualizar) {
     return {
@@ -129,5 +134,7 @@ export async function atualizarAvatarManual(
     };
   }
 
-  return { ok: true, avatarUrl: publicUrl };
+  revalidatePath("/", "layout");
+
+  return { ok: true, avatarUrl };
 }
