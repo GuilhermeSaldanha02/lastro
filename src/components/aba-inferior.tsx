@@ -3,7 +3,7 @@
 // por PESO além da cor: cor nunca é o único canal.
 import Link from "next/link";
 
-type Secao = "inicio" | "bancada" | "analise" | "catalogo" | "coach";
+type Secao = "inicio" | "bancada" | "analise" | "catalogo" | "ajustes";
 
 const SECOES: {
   id: Secao;
@@ -37,10 +37,11 @@ const SECOES: {
     caminho: "M5 4h11a2 2 0 012 2v14H7a2 2 0 01-2-2V4zM9 8h6M9 12h6",
   },
   {
-    id: "coach",
-    href: "/coach",
-    rotulo: "Coach",
-    caminho: "M20 12a8 8 0 01-11.6 7.1L4 20l1-4.2A8 8 0 1120 12z",
+    id: "ajustes",
+    href: "/ajustes",
+    rotulo: "Ajustes",
+    caminho:
+      "M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 11-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 11-2.83-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 112.83-2.83l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 112.83 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1zM12 9a3 3 0 100 6 3 3 0 000-6z",
   },
 ];
 
