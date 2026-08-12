@@ -720,6 +720,13 @@
   font-weight: var(--lastro-peso-medio);
 }
 
+/* O input nativo de arquivo some da tela; o botão estilizado abaixo
+   dispara o clique nele. Sem isto o navegador desenha seu próprio
+   controle de upload, fora do sistema visual. */
+.campo-arquivo-oculto {
+  display: none;
+}
+
 /* Ausência de dado NÃO é erro: é começo. Estado neutro, sem cor de sinal. */
 .vazio {
   border: 1px dashed var(--lastro-controle);
