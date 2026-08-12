@@ -817,6 +817,6 @@ Método aferido contra os canônicos WCAG antes de medir (`#FFFFFF/#000000 = 21.
 
 **Impacto.** `src/components/aba-inferior.tsx`, `src/app/ajustes/page.tsx` (novo), `src/app/perfil/page.tsx` (novo), `src/components/editar-perfil.tsx` (novo), `src/lib/dados/atualizar-avatar.ts` (novo), `src/lib/dados/validar-avatar.ts` (novo), `src/lib/dados/perfil.ts`, `src/app/coach/page.tsx`, `src/app/page.tsx`, `src/app/sistema.css` (1 regra utilitária, sem token novo). `DESIGN.md` não mudou — nenhuma cor/tipografia nova, só reuso de classes já medidas.
 
-**Ainda em aberto:** branch `feat/ajustes-nav-perfil` não mergeada — PR aberto, dono confirma no aparelho real antes.
+**Mergeado.** [PR #26](https://github.com/GuilhermeSaldanha02/lastro/pull/26) na `main`, branch apagada. Confirmado pelo dono no aparelho real, mesmo dia: "tudo está rodando corretamente".
 
-**Como reverter.** `git revert` dos commits da branch, ou simplesmente não mergear o PR.
+**Como reverter.** `git revert` do merge commit do PR #26.
