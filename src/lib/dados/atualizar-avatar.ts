@@ -1,3 +1,6 @@
+// lastro · item 9 do backlog (2026-08-12) — upload manual de foto de
+// perfil, em arquivo próprio (não em `perfil.ts`): ver o porquê no JSDoc
+// de `atualizarAvatarManual` abaixo.
 "use server";
 
 import { revalidatePath } from "next/cache";
