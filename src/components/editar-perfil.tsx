@@ -6,7 +6,7 @@
 // chamada de rede; `atualizarAvatarManual` valida de novo no servidor
 // (defesa contra cliente adulterado — ver perfil.ts).
 import { useRef, useState, type ChangeEvent } from "react";
-import { atualizarAvatarManual } from "@/lib/dados/perfil";
+import { atualizarAvatarManual } from "@/lib/dados/atualizar-avatar";
 import { validarArquivoAvatar } from "@/lib/dados/validar-avatar";
 import Avatar from "./avatar";
 
