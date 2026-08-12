@@ -800,3 +800,23 @@ Método aferido contra os canônicos WCAG antes de medir (`#FFFFFF/#000000 = 21.
 **Ainda em aberto:** confirmação do dono no aparelho real, depois do deploy da Vercel completar.
 
 **Como reverter.** `git revert ea69168`.
+
+## 2026-08-12 — Ajustes na pílula: Coach vira sub-tela, perfil e Sair ganham lar
+
+**O que mudou.** Pedido direto do dono, passou por brainstorm antes do código (`AskUserQuestion` em 3 pontos): a 5ª posição da pílula, hoje "Coach", vira "Ajustes" (engrenagem, rótulo escolhido entre "Config"/"Ajustes"/"Perfil"/"Configuração (sem abreviar)" — "Ajustes" venceu por caber no mesmo padrão de tamanho dos outros rótulos). Dentro de `/ajustes`: card de perfil (leva pra `/perfil`, novo), linha "Coach" (leva pra `/coach`, que continua existindo, só sem link direto na pílula) e botão "Sair" (que só existia na Início até aqui — saiu de lá, "evita repetição" nas palavras do dono). `/perfil` ganhou upload de foto de verdade, fechando o item 13 de `PROGRESS.md` (pendente desde 2026-08-07: quem cadastra por e-mail não tem avatar do Google pra baixar).
+
+**Por que Coach perde o acesso de 1 toque.** Decisão explícita do dono, não inferida: perfil e Sair não tinham lugar nenhum (perfil nem tela própria tinha), e juntar os três embaixo de uma coisa só "otimiza" a pílula. Coach continua inteiro, só a 1 toque a mais de distância.
+
+**Processo:** `brainstorming` → spec (`docs/superpowers/specs/2026-08-12-ajustes-nav-perfil-design.md`) → `writing-plans` (`docs/superpowers/plans/2026-08-12-ajustes-nav-perfil.md`, 10 tasks) → `subagent-driven-development` (implementador + spec-reviewer + code-quality-reviewer por task). Detalhe de execução, achados e verificação ponta a ponta: `PROGRESS.md`, item 17 de "Pendências consolidadas".
+
+**Achado de arquitetura, o mais caro da sessão.** O plano assumia que `"use server"` **inline** dentro do corpo de uma função isolava só ela pro bundle do cliente, deixando o resto do arquivo (`perfil.ts`, com `obterPerfil`/`sincronizarAvatarGoogle` usando `next/headers`/`next/cache`) livre. Errado para o Turbopack deste Next 16.3.0: `npm run build` (não `tsc`, não os testes, não os dois primeiros reviews — só o build de produção) quebrou com `Error: You're importing a module that depends on "next/headers"`. Corrigido movendo a Server Action pra arquivo próprio (`src/lib/dados/atualizar-avatar.ts`), `"use server"` no topo do arquivo inteiro — o padrão que `treino.ts`/`auth.ts` já usavam. Regra geral daqui pra frente: Server Action chamada por Client Component nunca divide arquivo com função server-only comum.
+
+**Bug pego no review antes de existir usuário real:** caminho de upload determinístico por formato (`{uid}/avatar.jpg`) + `upsert:true` fazia a segunda troca de foto do mesmo formato gerar a mesma URL — nem banco nem navegador percebiam a mudança. Corrigido com cache-buster (`?v=timestamp`) persistido na própria `avatar_url`, e `revalidatePath("/", "layout")` acrescentado (padrão já usado em `criarTreino`) pra não depender só de estado local do componente.
+
+**Verificado no navegador real** (usuário QA efêmero, extensão Chrome — painel interno de novo não compositou frame, mesma limitação de sempre; upload real via `file_upload` da extensão, não clique em seletor nativo): fluxo completo pílula → Ajustes → Perfil → upload → avatar atualizado em outras telas sem reload → Sair encerrando sessão de verdade. Detalhe telha por telha em `PROGRESS.md`.
+
+**Impacto.** `src/components/aba-inferior.tsx`, `src/app/ajustes/page.tsx` (novo), `src/app/perfil/page.tsx` (novo), `src/components/editar-perfil.tsx` (novo), `src/lib/dados/atualizar-avatar.ts` (novo), `src/lib/dados/validar-avatar.ts` (novo), `src/lib/dados/perfil.ts`, `src/app/coach/page.tsx`, `src/app/page.tsx`, `src/app/sistema.css` (1 regra utilitária, sem token novo). `DESIGN.md` não mudou — nenhuma cor/tipografia nova, só reuso de classes já medidas.
+
+**Ainda em aberto:** branch `feat/ajustes-nav-perfil` não mergeada — PR aberto, dono confirma no aparelho real antes.
+
+**Como reverter.** `git revert` dos commits da branch, ou simplesmente não mergear o PR.
