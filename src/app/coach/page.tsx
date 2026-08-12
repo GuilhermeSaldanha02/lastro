@@ -24,7 +24,7 @@ export default async function PaginaCoach() {
 
       <CoachInterativo />
 
-      <AbaInferior ativa="coach" />
+      <AbaInferior ativa="ajustes" />
     </main>
   );
 }
