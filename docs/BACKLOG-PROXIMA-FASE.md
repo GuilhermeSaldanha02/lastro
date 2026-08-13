@@ -79,9 +79,24 @@ O item 11 de `PROGRESS.md` estabeleceu que `/` e `/treino` ganharam a mesma chec
 
 **Por que ele tem razão, e não é só gosto:** a Início é a **porta de entrada única do app** — decisão registrada desde 2026-08-06, e o motivo de `forcar-inicio-no-lancamento.tsx` existir. A ação primária "iniciar/continuar treino" já mora lá e na Bancada. Um terceiro botão verde de ação primária, numa tela cujo propósito é **ler**, compete com a leitura e dilui a hierarquia — `DESIGN.md` §3.0 diz que cada tela tem **um** elemento que pesa mais, e em `/analise` esse elemento é o parecer (ou, na sua ausência, a explicação de por que ele não existe ainda).
 
-**Escopo da correção:** remover o botão do estado "dados insuficientes" em `/analise`. O texto explicativo permanece — ele é honesto e necessário (E3).
+**Escopo da correção:** o botão que manda pra outra tela sai. O texto explicativo permanece — ele é honesto e necessário (E3).
 
-**✅ Decidido pelo dono (2026-08-13):** o estado vazio fica **só com o texto**, sem link nenhum de substituição. O caminho pra treinar já está a um toque na pílula (sempre visível) e na Início; a Análise é tela de leitura, e quanto menos ela empurra pra outro lugar, mais cumpre o próprio papel.
+**✅ Decidido pelo dono (2026-08-13, revisando a decisão da mesma manhã):** a tela **pode continuar com um botão** — mas tem que ser a ação **da própria Análise**, não um atalho pra outro lugar. Palavras dele: *"pode sim continuar com um botão, mas exemplo, 'Solicitar Análise', mas ela fica incolor enquanto não está disponível, só após os dias que ele poder realmente efetuar, aí funciona."*
+
+**⚠️ Achado do código que muda o desenho — ler antes de implementar.** Não existe botão "Solicitar Análise" no app. Com `semanasFechadasComTreino >= MINIMO_SEMANAS_PARECER` (3), `analise-interativa.tsx:97-114` mostra **direto os 5 cards de pergunta**, e **clicar numa pergunta _é_ a solicitação** — cada uma dispara o parecer daquela pergunta. Não há um passo intermediário de "solicitar". Ou seja, a ideia do dono não encaixa 1:1 no fluxo atual, e existem duas formas de realizá-la:
+
+| | Desenho | Problema |
+|---|---|---|
+| **(a)** | Estado vazio ganha um botão "Solicitar Análise" desabilitado; quando habilita, ele é substituído pela lista de perguntas | O botão **desaparece no exato momento em que passaria a funcionar**. O dono nunca chega a clicar nele — vira um rótulo de espera disfarçado de botão |
+| **(b)** ✅ | Os **5 cards de pergunta aparecem sempre**, incolores/inativos enquanto faltam semanas, com o texto explicativo acima. Quando a 3ª semana fecha, simplesmente ficam clicáveis | Nenhum — é literalmente "fica incolor enquanto não está disponível, e aí funciona" |
+
+**Recomendação: (b).** Além de não ter o defeito de (a), ela entrega algo que o estado atual não entrega: **a pessoa vê desde o primeiro dia o que a Análise vai oferecer** — as 5 perguntas que ela poderá fazer. Hoje, com menos de 3 semanas, o app não dá nenhuma pista do que está sendo construído. E compõe naturalmente com **B2**: no estado de espera aparecem o card primário e os 4 secundários, todos inativos, já na hierarquia final.
+
+**Três pontos técnicos a resolver na implementação:**
+
+1. **Acessibilidade — não usar `disabled` puro.** Um `<button disabled>` sai da ordem de tabulação e leitores de tela o ignoram, então quem navega por teclado nunca descobre que a Análise existe e está esperando dados. Usar **`aria-disabled="true"`** com o clique inerte, mantendo o elemento focável; assim o percurso K3 de `DESIGN.md` §4.3 continua válido. O `<p className="vazio">` acima já tem `aria-live="polite"`, que explica o motivo.
+2. **Contraste no estado inativo, medir.** `.botao-primario:disabled` hoje é `opacity: 0.55`. A WCAG isenta controle inativo do piso de contraste, **mas aqui os cards inativos carregam a única pista do que vem** — se ficarem ilegíveis, a vantagem principal de (b) se perde. Medir e decidir o valor com o olho, não herdar o 0.55 sem conferir.
+3. **Isto NÃO reverte a tarefa 1.0d** (2026-08-05, "botão sempre disponível, sem bloqueio"). Aquela decisão é sobre **cadência semanal** — não obrigar a esperar a segunda-feira pra pedir o parecer. Esta é sobre **suficiência de dados** — 3 semanas fechadas, `MINIMO_SEMANAS_PARECER`. São regras diferentes e compatíveis; não confundir uma com a outra ao mexer no código.
 
 ---
 
@@ -196,6 +211,7 @@ Especificado pelo `diretor-arte` em 2026-08-13. Reproduzido aqui porque é a par
 | G0.1 | Usuário QA com **≥ 3 semanas fechadas** e **volume semanal ≥ 10.000 kg** | Sem 3 semanas o parecer não renderiza; **sem 10.000 kg o bug do card "Séries valendo" não reproduz** |
 | G0.2 | Uma conta **sem `avatar_url`** e uma **com foto real** | O bug A1 só existe na variante iniciais; precisa confirmar que a variante foto não regrediu |
 | G0.3 | Um **treino aberto de hoje** com ≥ 1 série | Para A4 (Continuar vs Iniciar) ser testável |
+| G0.3b | **Uma segunda conta QA com 1 ou 2 semanas fechadas** (menos que `MINIMO_SEMANAS_PARECER`) | Para o estado de espera de B1 ser testável. **A conta de G0.1 não serve** — ela tem 3+ semanas e nunca mostra o estado de espera |
 | G0.4 | Chrome **não-maximizado**, aba da extensão em primeiro plano | Senão o resize é ignorado e sai 1366px |
 | G0.5 | `./scripts/qa-treino-helper.sh limpar-usuario …` ao final, cascade = 0 | Higiene estabelecida |
 
@@ -212,7 +228,8 @@ Viewports obrigatórios de `DESIGN.md` §4.1: **360×640**, **390×844**, **1280
 | G1.1 | `/perfil`, conta **sem foto** | 360, 390 | O círculo não é distinguível do fundo a um braço de distância; **ou** o preenchimento aparece mas a aresta não |
 | G1.2 | `/perfil`, conta **com foto** | 360, 390 | Qualquer mudança em relação a antes da correção |
 | G1.3 | **As 7 telas com barra de topo**, conta sem foto | 390 | Qualquer diferença perceptível no avatar da barra — a correção não podia tocar lá |
-| G1.4 | `/analise` | 360, 390, 1280 | Os 5 cards seguem no mesmo degrau; **ou** o card primário compete com a conclusão do gráfico |
+| G1.4 | `/analise`, conta com **≥ 3 semanas** (estado ativo) | 360, 390, 1280 | Os 5 cards seguem no mesmo degrau; **ou** o card primário compete com a conclusão do gráfico |
+| G1.4b | `/analise`, conta com **< 3 semanas** (estado de espera, B1) | 360, 390 | Os 5 cards não aparecem inativos; **ou** aparecem mas ilegíveis; **ou** o texto explicativo sumiu; **ou** sobrou algum botão que leva pra fora da tela |
 | G1.5 | `/catalogo` | 360, 390 | A frase de placeholder ainda se repete card a card |
 | G1.6 | `/` com volume ≥ 10.000 kg | 360 | Card "Séries valendo" desalinhado, ou número quebrando linha |
 | G1.7 | `/coach` | **360** | Qualquer sobreposição entre campo de texto, botão de envio e pílula — **é o lugar mais provável de quebrar em 360px e nunca foi testado lá** |
@@ -238,7 +255,8 @@ Viewports obrigatórios de `DESIGN.md` §4.1: **360×640**, **390×844**, **1280
 | # | Percurso | Reprova se |
 |---|---|---|
 | G3.1 | `/perfil` só com `Tab`: alcançar "Trocar foto", acionar com `Enter` e `Espaço` | Foco entra no `<span>` do avatar (é `aria-hidden`, não pode receber foco); ou o anel some sobre a superfície |
-| G3.2 | **K3 de §4.3** — escolher pergunta da Análise só com teclado, **nas duas variantes novas** | Alguma variante sem anel visível; ordem de tabulação ≠ ordem visual |
+| G3.2 | **K3 de §4.3** — escolher pergunta da Análise só com teclado, **nas duas variantes novas** (primária e secundária) | Alguma variante sem anel visível; ordem de tabulação ≠ ordem visual |
+| G3.2b | **Estado de espera (B1) só com teclado**, conta com < 3 semanas | Os cards inativos **não são alcançáveis por `Tab`** — é o sintoma de terem sido feitos com `disabled` puro em vez de `aria-disabled`, e significa que quem usa teclado nunca descobre que a Análise está esperando dados |
 | G3.3 | Anel de foco em todo controle tocado na rodada | `outline-offset: 0`, anel `inset`, ou `outline: none` sem substituto — Nota B de §3.2 |
 | G3.4 | `/catalogo` com teclado, após a mudança do placeholder | Card deixa de ser alcançável, ou a ordem muda |
 
@@ -265,7 +283,7 @@ Não é obrigação — é o que faz mais sentido em risco e dependência:
 **Leva 1 — higiene visual (tudo CSS/UI, nenhuma mudança de dados)**
 
 1. **A1** (avatar invisível) — P0. Isolado, correção já especificada linha a linha, zero tokens novos.
-2. **B1** (botão redundante em `/analise`) + **B2** (hierarquia dos 5 cards) — as duas mexem na mesma tela, faz sentido irem juntas e passarem pelo mesmo gate.
+2. **B1** (estado de espera da Análise) + **B2** (hierarquia dos 5 cards) — **fazer juntas, não é só conveniência:** a solução (b) de B1 exibe os mesmos 5 cards no estado de espera, já na hierarquia que B2 define. Implementar separado significa desenhar a lista de perguntas duas vezes.
 3. **A2** (placeholder do catálogo) + **A3** (rótulo → "Treinos") + **A4** (verificar se "Continuar" é regressão) — pequenos e independentes.
 
 Depois da leva 1, rodar o gate visual da seção G inteiro. Ele foi escrito exatamente para esse conjunto.
