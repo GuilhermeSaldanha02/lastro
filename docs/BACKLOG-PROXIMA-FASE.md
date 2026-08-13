@@ -53,7 +53,13 @@ Três fontes, nesta ordem:
 
 ### A3 · Rótulo divergente: "Treinos" (barra de topo) vs "Bancada" (pílula)
 
-Um lugar, dois nomes. A pessoa não tem certeza de que está no mesmo lugar. **Escolher um nome e usar nos dois.** Recomendação do `diretor-arte`: a pílula é a fonte de verdade (ela é o mapa do app; a barra é a legenda da tela atual). **Qual dos dois nomes vence é decisão do dono** — é vocabulário de produto, não de design.
+Um lugar, dois nomes. A pessoa não tem certeza de que está no mesmo lugar.
+
+**✅ Decidido pelo dono (2026-08-13): "Treinos" vence.** O item da pílula passa de "Bancada" para **"Treinos"**, batendo com a barra de topo, que já diz isso.
+
+**Atenção ao aplicar — o alcance é maior que trocar uma string:** "Bancada" não é só um rótulo de UI, é vocabulário do projeto. Aparece como **"Modo Bancada"** em `DESIGN.md` §3.5 (o regime de densidade para registro, em pé, com pressa, oposto ao "Modo Leitura") e em vários pontos de `PROGRESS.md`/`DECISIONS.md`. A decisão do dono é sobre **o rótulo que o usuário lê na pílula**, não sobre aposentar o conceito de design. Trocar o rótulo; **manter "Modo Bancada"** como nome do regime nos documentos de design, e deixar isso explícito num comentário para ninguém "unificar" os dois depois por engano.
+
+Também conferir se `aba-inferior.tsx` usa o `id: "bancada"` internamente — o `id` pode continuar como está (é chave interna, não texto visível); só o campo `rotulo` muda.
 
 ### A4 · Verificar: "Continuar" vs "Iniciar" nas duas telas — possível regressão
 
@@ -63,7 +69,7 @@ O item 11 de `PROGRESS.md` estabeleceu que `/` e `/treino` ganharam a mesma chec
 
 ---
 
-## B — Achado do dono (2026-08-13, aparelho real)
+## B — Achados do dono e correções de hierarquia (2026-08-13)
 
 ### B1 · Botão "Registrar treino" na Análise é redundante
 
@@ -73,7 +79,26 @@ O item 11 de `PROGRESS.md` estabeleceu que `/` e `/treino` ganharam a mesma chec
 
 **Por que ele tem razão, e não é só gosto:** a Início é a **porta de entrada única do app** — decisão registrada desde 2026-08-06, e o motivo de `forcar-inicio-no-lancamento.tsx` existir. A ação primária "iniciar/continuar treino" já mora lá e na Bancada. Um terceiro botão verde de ação primária, numa tela cujo propósito é **ler**, compete com a leitura e dilui a hierarquia — `DESIGN.md` §3.0 diz que cada tela tem **um** elemento que pesa mais, e em `/analise` esse elemento é o parecer (ou, na sua ausência, a explicação de por que ele não existe ainda).
 
-**Escopo da correção:** remover o botão do estado "dados insuficientes" em `/analise`. O texto explicativo permanece — ele é honesto e necessário (E3). **Decisão pendente do dono:** o estado vazio fica só com o texto, ou ganha um link discreto (não botão primário verde) para a Bancada?
+**Escopo da correção:** remover o botão do estado "dados insuficientes" em `/analise`. O texto explicativo permanece — ele é honesto e necessário (E3).
+
+**✅ Decidido pelo dono (2026-08-13):** o estado vazio fica **só com o texto**, sem link nenhum de substituição. O caminho pra treinar já está a um toque na pílula (sempre visível) e na Início; a Análise é tela de leitura, e quanto menos ela empurra pra outro lugar, mais cumpre o próprio papel.
+
+---
+
+### B2 · Hierarquia dos 5 cards de pergunta em `/analise`
+
+**O problema, confirmado por evidência visual em 2026-08-13:** as 5 perguntas são cinco cartões idênticos — mesma elevação, mesmo raio, mesmo peso de fonte, sem nenhuma diferença entre eles. É o sintoma que o rediagnóstico de 2026-08-08 já tinha nomeado ("não falta cor: falta diferença") e cuja correção nunca saiu do papel.
+
+**Não é só estética:** cinco alvos de peso idêntico obrigam a ler as cinco frases inteiras antes de decidir. Em pé, com pressa, é o pior formato possível de escolha.
+
+**Recomendação do `diretor-arte`, aceita:** **não** retomar o deck de 10 movimentos (está bloqueado em decisões do dono que continuam abertas). Em vez disso, promover **uma** pergunta a primária — card maior, `--lastro-peso-forte`, `elev-2`, largura total, mais respiro — e densificar as outras quatro (mesmo `--lastro-t-corpo`, `elev-1` ou sem elevação, altura menor). CSS puro, zero tokens novos, não depende de nenhuma decisão pendente.
+
+**✅ Decidido pelo dono (2026-08-13): a primária é "O que mudar na próxima semana?"** — é a pergunta 5 do `PRD.md`, a única que produz ação, e a que alguém em pé quer sem ler as outras quatro.
+
+**Dois limites rígidos ao aplicar:**
+
+1. **Teto de `--lastro-t-3` no card primário.** `DESIGN.md` §3.0 diz que cada tela tem **um** elemento que pesa mais, e em `/analise` esse elemento é a conclusão em palavras do gráfico de progressão (§3.7 item 2). O card primário precisa pesar mais que os quatro irmãos e **menos** que a conclusão do gráfico. Passar disso cria dois pesos competindo — exatamente o que a restrição existe pra impedir.
+2. **`--lastro-alvo-min` (48px) e `--lastro-alvo-folga` intactos nos quatro secundários.** Densificar não pode comer o alvo de toque — D1 é inegociável.
 
 ---
 
@@ -97,13 +122,22 @@ O dono notou que este item "bate exatamente com o 1", e está certo: a versão �
 
 Quanto pôr de cada lado da barra para chegar no peso alvo. Elimina conta de cabeça entre séries — cena de uso do `DESIGN.md` §1 (em pé, suado, com pressa).
 
-**Ponto em aberto para a próxima sessão:** o conjunto de anilhas disponíveis varia por academia. Assumir um padrão brasileiro, ou deixar configurável? (Se configurável, onde mora — Ajustes?)
+**✅ Decidido pelo dono (2026-08-13): configurável**, não conjunto fixo — o inventário de anilhas varia por academia, e um padrão chutado erra pra qualquer pessoa que treine em lugar diferente.
+
+**A decidir na implementação** (não agora): onde a configuração mora (o lugar natural é `/ajustes`, que agora existe justamente pra isso), se persiste no banco ou só local, e se a barra também é configurável (barra olímpica de 20 kg é o padrão, mas existem barras de 15 kg, W, e barra de agachamento mais pesada). **Cuidado com o escopo:** isso pode virar uma tela de inventário grande — a versão mínima útil é uma lista de pesos disponíveis e o peso da barra, nada além disso.
 
 ### C4 · Recorde pessoal visível (pesquisa #4)
 
-**Achado do código:** `calcularPrs` **já está pronto e testado** (`src/lib/analise/prs.ts` + `prs.test.ts`), e é usado por `agregar.ts` — mas o resultado só alimenta o texto do parecer. **Nenhuma tela do app mostra um recorde.** É funcionalidade construída e invisível.
+**Achado do código — importante, muda o desenho:** `calcularPrs` **já está pronto e testado** (`src/lib/analise/prs.ts` + `prs.test.ts`) e é usado por `agregar.ts`, mas ele é **semanal e em lote**: compara o e1RM/volume *da semana* contra o máximo histórico (`e1rmSemanaAtual` vs `e1rmMaximoHistoricoAnterior`) e alimenta só o texto do parecer. Ele responde *"bati recorde esta semana?"* — **não** *"esta série que acabei de fazer é meu recorde?"*.
 
-Strong dispara uma animação ao bater PR; aqui bastaria marcar a série. **Decisão do dono pendente:** onde o PR aparece — na linha da série no momento em que acontece, no histórico do exercício, ou nos dois?
+Ou seja: **PR na linha da série, em tempo real, NÃO sai de graça do que já existe.** Precisa de outro cálculo, comparando a série sendo registrada contra o histórico completo daquele exercício, no momento do registro. **Nenhuma tela do app mostra um recorde hoje** — a funcionalidade existente é invisível ao usuário.
+
+**✅ Decidido pelo dono (2026-08-13): os dois lugares, nesta ordem** — recomendação aceita.
+
+1. **Na linha da série, no momento em que acontece** — construir junto com **C1**, aproveitando a mesma consulta. C1 já vai precisar carregar o histórico do exercício no registro; estender essa consulta para trazer também o "melhor de todos os tempos" torna a detecção em tempo real quase gratuita. É onde o PR tem significado máximo: acabou de fazer, o app avisa na hora.
+2. **No histórico do exercício** — depois. Depende de existir uma tela de histórico por exercício, que **hoje não existe**.
+
+**⚠️ Regra que precisa ser decidida na implementação:** com pouco histórico, *toda* série vira PR e o marcador perde o sentido. Precisa de um piso — por exemplo, só marcar a partir de N sessões anteriores daquele exercício. O valor de N é decisão a fechar na hora, com o dono, **não** um número tirado de memória (mesmo padrão dos outros limiares do projeto: se não tem fonte, o documento tem que dizer que é convenção — ver `KNOWLEDGE.md` §3.7).
 
 ### C5 · Excluir a própria conta (pesquisa #7)
 
@@ -132,7 +166,7 @@ Ofertados na pesquisa de 2026-08-13, o dono não aprovou. **Não estão descarta
 |---|---|---|
 | E1 | **C1b — exibir RIR na linha de série.** Verificado no código: `treino-detalhe.tsx` mostra `reps × peso kg` + rótulo (aquecimento/valendo), **sem RIR**. É feature nova, não polimento | 2026-08-08 |
 | E2 | **Zero pontuado do IBM Plex Mono** (`--lastro-fonte-num`). Sinalizado 2× pelo dono como esteticamente ruim; `DESIGN.md` §3.3 documenta o estado atual como escolha deliberada. Não é bug — é preferência não resolvida | 2026-08-08 |
-| E3 | **Os 5 cards de pergunta idênticos em `/analise`.** Confirmado por evidência visual em 2026-08-13 que o sintoma persiste. Recomendação do `diretor-arte`: **não** retomar o deck de 10 movimentos (está bloqueado em decisões abertas do dono); em vez disso, promover **uma** pergunta a primária (sugestão: "O que mudar na próxima semana?" — é a única que produz ação) e densificar as outras quatro. CSS puro, zero tokens novos. **Teto rígido: `--lastro-t-3`** — o card primário não pode competir com a conclusão do gráfico, que é o elemento mais pesado da tela por §3.7. **Qual pergunta vira a primária é decisão do dono** | 2026-08-08 |
+| E3 | ~~Qual pergunta vira a primária em `/analise`~~ — **✅ decidido em 2026-08-13, ver seção B2 abaixo** | resolvido |
 
 ---
 
@@ -224,12 +258,24 @@ O dono abre `/perfil` (sem foto), `/analise` e `/catalogo` **no celular dele** e
 
 ## Sugestão de ordem de ataque
 
+**Todas as decisões de produto que travavam a lista foram fechadas pelo dono em 2026-08-13** — nada aqui está bloqueado esperando resposta. Só restam decisões técnicas que se fecham na hora de implementar (estão marcadas item a item).
+
 Não é obrigação — é o que faz mais sentido em risco e dependência:
 
-1. **A1** (avatar invisível) — P0, isolado, correção já especificada, sem decisão pendente.
-2. **B1** (botão redundante na Análise) — achado direto do dono; só precisa que ele responda se o estado vazio fica com texto puro ou ganha link discreto.
-3. **A2** (placeholder do catálogo) + **A3** (nome Treinos/Bancada) + **A4** (verificar regressão) — pequenos, independentes, fecham a higiene.
-4. **E3** (hierarquia dos 5 cards) — precisa que o dono escolha qual pergunta é a primária.
-5. **C1 + C2** (histórico por exercício e repetir a série certa) — a maior entrega de valor da lista, e a mais pesada: mexe em dados, não só em UI.
-6. **C4** (PR visível) — barato, já que o cálculo existe; depende de C1 se o PR aparecer no histórico.
-7. **C3** (calculadora de anilhas) e **C5** (excluir conta) — independentes, podem entrar a qualquer momento.
+**Leva 1 — higiene visual (tudo CSS/UI, nenhuma mudança de dados)**
+
+1. **A1** (avatar invisível) — P0. Isolado, correção já especificada linha a linha, zero tokens novos.
+2. **B1** (botão redundante em `/analise`) + **B2** (hierarquia dos 5 cards) — as duas mexem na mesma tela, faz sentido irem juntas e passarem pelo mesmo gate.
+3. **A2** (placeholder do catálogo) + **A3** (rótulo → "Treinos") + **A4** (verificar se "Continuar" é regressão) — pequenos e independentes.
+
+Depois da leva 1, rodar o gate visual da seção G inteiro. Ele foi escrito exatamente para esse conjunto.
+
+**Leva 2 — a entrega de valor real (mexe em dados, não só em tela)**
+
+4. **C1 + C2 + C4(1)** — histórico por exercício, repetir a série certa, e PR na linha da série. **São três itens, uma consulta só:** carregar o histórico do exercício no momento do registro serve aos três. Fazer separado significaria escrever a mesma consulta três vezes. É a maior entrega da lista e a mais pesada.
+
+**Leva 3 — independentes, entram quando der**
+
+5. **C5** (excluir conta) — o cascade já funciona; falta só a porta na UI.
+6. **C3** (calculadora de anilhas) — cuidado com escopo: a versão mínima é lista de pesos + peso da barra, nada além.
+7. **C4(2)** (PR no histórico do exercício) — depende de existir uma tela de histórico por exercício, que hoje não existe. É o item mais distante da lista.
