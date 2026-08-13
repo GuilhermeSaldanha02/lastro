@@ -820,3 +820,19 @@ Método aferido contra os canônicos WCAG antes de medir (`#FFFFFF/#000000 = 21.
 **Mergeado.** [PR #26](https://github.com/GuilhermeSaldanha02/lastro/pull/26) na `main`, branch apagada. Confirmado pelo dono no aparelho real, mesmo dia: "tudo está rodando corretamente".
 
 **Como reverter.** `git revert` do merge commit do PR #26.
+
+## 2026-08-12 (2) — `fix/consistencia-visual-telas` reconciliada: já estava tudo na `main`
+
+**O que aconteceu.** Ao revisar o backlog, a branch `fix/consistencia-visual-telas` (aberta 2026-08-07, PROGRESS.md item 14) aparecia como "pausada, não mergeada, 20 commits à frente de `main`". Rodei `git merge-base --is-ancestor fix/consistencia-visual-telas main` pra checar o estado real antes do dono decidir o que fazer com ela — **deu positivo**: o tip da branch (`fb7e671`) já era ancestral direto da `main`. `git diff main...fix/consistencia-visual-telas --stat` confirmou zero diferença de conteúdo.
+
+**Conclusão:** não existe mais nada pra mergear. Em algum momento entre 08/10 e agora o trabalho da branch entrou na `main` por outro caminho (provavelmente as sessões de correção da cor petróleo da nav, que tocaram os mesmos arquivos), e a branch só ficou como ponteiro órfão — nunca apagada. Não é perda de trabalho, é limpeza de referência.
+
+**Ação:** `git branch -d` local (delete seguro, só funciona porque git confirma que está mergeada) + `git push origin --delete` remoto. `PROGRESS.md` item 14 corrigido pra refletir isso.
+
+**O que continua genuinamente em aberto** (não é sobre a branch, é sobre decisão do dono — confirmado por leitura direta do código hoje, não só do doc):
+- **C1b — RIR na linha de série.** Conferido em `src/components/treino-detalhe.tsx`: a linha da série mostra `reps × peso kg` + o rótulo (aquecimento/valendo), **sem RIR**. Continua sendo feature nova, não polimento — decisão do dono.
+- **Zero pontuado do IBM Plex Mono** (`--lastro-fonte-num`) — sinalizado 2x pelo dono como visualmente ruim, mas nunca decidido trocar; `DESIGN.md` §3.3 documenta o estado atual como escolha deliberada, não como pendência técnica.
+
+**Impacto.** Só `PROGRESS.md`. Nenhum arquivo de `src/` tocado — é reconciliação de registro, não mudança de produto.
+
+**Como reverter.** N/A (só documentação; a branch apagada pode ser recriada a partir do commit `fb7e671` se algum dia precisar, mas ele já está na história da `main`).
