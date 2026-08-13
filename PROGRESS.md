@@ -243,7 +243,9 @@ Quota checada com uma chamada direta à API antes de gastar esforço recriando d
 
 ---
 
-## ▶ PONTO DE RETOMADA — ler primeiro (2026-08-12)
+## ▶ PONTO DE RETOMADA — ler primeiro (2026-08-13)
+
+> **➡️ O trabalho da próxima sessão está em [`docs/BACKLOG-PROXIMA-FASE.md`](docs/BACKLOG-PROXIMA-FASE.md).** Documento autocontido, escrito em 2026-08-13: correções verificadas (incluindo um P0 — avatar invisível em `/perfil`), 5 funcionalidades aprovadas pelo dono, decisões de design ainda abertas, e o roteiro completo do gate visual. **Comece por lá**, não por este arquivo.
 
 **Estado do repo:** `main`, PR #26 mergeado (2026-08-12), branch `feat/ajustes-nav-perfil` apagada. **Confirmado pelo dono no aparelho real** — "tudo está rodando corretamente". `tsc`/`test` (108 passando)/`lint`/`build` verdes, rodados do zero antes do PR.
 
@@ -251,7 +253,7 @@ Quota checada com uma chamada direta à API antes de gastar esforço recriando d
 
 **Achado de arquitetura que vale lembrar em qualquer Server Action futura chamada por Client Component:** `"use server"` inline dentro de uma função só isola aquela função se o resto do arquivo também não tiver código server-only (`next/headers`/`next/cache`) usado por OUTRAS funções não-action. Se tiver, o Turbopack deste Next.js 16.3.0 quebra o build inteiro — só `npm run build` pega isso, nem `tsc` nem os primeiros reviews de spec pegaram. Regra prática: Server Action chamada por Client Component sempre em arquivo próprio, nunca dividindo arquivo com função server-only comum.
 
-**Próximo passo:** nenhuma pendência aberta desta sessão. Ver "Pendências consolidadas" para o backlog geral do projeto (catálogo de dicas de execução, sync offline em celular real, etc.).
+**Próximo passo: [`docs/BACKLOG-PROXIMA-FASE.md`](docs/BACKLOG-PROXIMA-FASE.md).** Escrito em 2026-08-13 a partir de três fontes: auditoria de usabilidade (controller navegou as 7 telas no Chrome real com conta QA seedada; `diretor-arte` analisou as evidências contra `DESIGN.md`), um achado do dono no aparelho real (botão redundante em `/analise`), e pesquisa de mercado cruzada com o escopo negativo do `PRD.md` §5. Ordem de ataque sugerida no fim do documento. As "Pendências consolidadas" abaixo continuam valendo como histórico e como fonte dos débitos antigos.
 
 **Pendências que continuam abertas, sem mudança nesta sessão:** as 6 decisões de `DESIGN.md` §5 abaixo já foram resolvidas faz tempo (Fase 3 avançou muito além disso — ver "Pendências consolidadas" pro estado real, este parágrafo ficou como registro histórico da época).
 

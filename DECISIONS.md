@@ -836,3 +836,33 @@ Método aferido contra os canônicos WCAG antes de medir (`#FFFFFF/#000000 = 21.
 **Impacto.** Só `PROGRESS.md`. Nenhum arquivo de `src/` tocado — é reconciliação de registro, não mudança de produto.
 
 **Como reverter.** N/A (só documentação; a branch apagada pode ser recriada a partir do commit `fb7e671` se algum dia precisar, mas ele já está na história da `main`).
+
+## 2026-08-13 — Auditoria de usabilidade + escopo da próxima fase aprovado pelo dono
+
+**Contexto.** O dono pediu uma auditoria de usabilidade do estado atual do app, com o agente de design navegando o Chrome. **O agente não navegou** — a doutrina do `diretor-arte` (`.claude/agents/diretor-arte.md`) proíbe explicitamente alegar ter olhado tela ("Você NÃO executa o gate visual — você o especifica"). O arranjo que respeita as duas coisas: **o controller navegou o app real** (extensão Chrome, usuário QA efêmero com 4 semanas de dado real, removido ao final com cascade = 0), capturou as 7 telas, e o agente analisou as evidências contra `DESIGN.md`.
+
+**Achado P0 — avatar de iniciais invisível em `/perfil`.** Não é baixo contraste: preenchimento (`--lastro-avatar-iniciais-fundo`), letra (`--lastro-barra-txt`) e **borda** (`--lastro-barra-traco`) compõem os três para a própria areia `#F0EAE0` do fundo. O agente achou a terceira propriedade (a borda) que o relato do controller não continha — uma correção que só trocasse fundo e letra deixaria o círculo sem aresta.
+
+Causa raiz que importa mais que o sintoma: `<Avatar>` foi desenhado com o **default seguro no contexto errado** — só funciona dentro de `.barra-topo`, e falha em silêncio em qualquer outro lugar. `/perfil` (2026-08-12) foi só o primeiro lugar a exercitar isso. **Correção especificada: inverter o default** (variante clara vira base, petróleo vira override sob `.barra-topo`), não adicionar classe opt-in — porque opt-in alguém esquece de aplicar e o bug volta. Zero tokens novos: os três pares já estavam medidos em §3.2.
+
+**Rejeitado com razão registrada:** chip petróleo fora da barra criaria uma **terceira** superfície petróleo, contra §3.0 que fixa duas. Não se reescreve §3.0 por um elemento de 48px.
+
+**Achado do dono, no aparelho real (mesmo dia): botão "Registrar treino" em `/analise` é redundante.** *"se já existe o iniciar treino no início, não precisa desse ícone"*. Ele tem razão por decisão já registrada, não por gosto: a Início é a porta de entrada única do app (2026-08-06), e um terceiro botão verde de ação primária numa tela cujo propósito é **ler** dilui a hierarquia que §3.0 exige (um elemento pesa mais por tela).
+
+**Escopo da próxima fase — pesquisa de mercado cruzada com o `PRD.md` §5.** Pesquisados Hevy e Strong (as réguas nomeadas em §8 do PRD) e a literatura sobre abandono de log. Achado central da pesquisa: **o que mata o hábito é fricção, não falta de recurso.** 7 candidatos levados ao dono, filtrados pelo escopo negativo. **Aprovados 5:**
+
+| Item | Observação verificada no código |
+|---|---|
+| Coluna "anterior" na linha de série | Levantado em 2026-08-08, nunca decidido. Exige histórico por exercício — é feature de dados |
+| Repetir última série (corrigir semântica) | **Já existe** (`treino-detalhe.tsx:152`/`:407`) mas repete a última do **treino inteiro**, não do exercício. O dono notou que "bate exatamente com o 1" — e bate: vira uma coisa só |
+| Calculadora de anilhas | Novo. Em aberto: conjunto de anilhas fixo ou configurável |
+| Recorde pessoal visível | **`calcularPrs` já está pronto e testado** (`src/lib/analise/prs.ts`), mas só alimenta o texto do parecer — **nenhuma tela mostra um PR**. Funcionalidade construída e invisível |
+| Excluir a própria conta | Cascade já funciona (é o que o `qa-treino-helper.sh` usa). Falta só a porta na UI |
+
+**Não aprovados, registrados e não esquecidos:** cronômetro de descanso automático e exportar histórico (CSV/JSON). **Recomendados como não-fazer** (nem oferecidos, contrariam §5): rotinas/templates salvos (chega perto de prescrever programa), supersets, heatmap muscular, medidas corporais, integração Health/Fit.
+
+**Sobre os 5 cards idênticos de `/analise`:** confirmado por evidência visual que o sintoma do rediagnóstico de 2026-08-08 persiste. Recomendação do agente: **não** retomar o deck de 10 movimentos (bloqueado em decisões abertas do dono); promover **uma** pergunta a primária e densificar as outras quatro, com teto rígido em `--lastro-t-3` para não competir com a conclusão do gráfico (§3.7). Qual pergunta vira primária é decisão do dono.
+
+**Impacto.** `docs/BACKLOG-PROXIMA-FASE.md` (novo, autocontido), `PROGRESS.md` (ponto de retomada aponta pra ele), este arquivo. **Nenhum arquivo de `src/` tocado** — nada foi implementado nesta sessão, de propósito: o dono pediu o documento para começar num chat novo.
+
+**Como reverter.** N/A (só documentação).
