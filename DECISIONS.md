@@ -866,3 +866,71 @@ Causa raiz que importa mais que o sintoma: `<Avatar>` foi desenhado com o **defa
 **Impacto.** `docs/BACKLOG-PROXIMA-FASE.md` (novo, autocontido), `PROGRESS.md` (ponto de retomada aponta pra ele), este arquivo. **Nenhum arquivo de `src/` tocado** — nada foi implementado nesta sessão, de propósito: o dono pediu o documento para começar num chat novo.
 
 **Como reverter.** N/A (só documentação).
+
+---
+
+## 2026-08-13 (2) — Proposta do dono ("configuração de treinos") avaliada contra `PRD.md` §5/§9 — Scope Change em aberto, decisão pendente
+
+**Contexto.** Ao decidir onde morar o botão "repetir" para corrigir C2 (`repetirUltimaSerie` usa `series[series.length - 1]` — a última série do **treino inteiro**, `src/components/treino-detalhe.tsx:101,152`, não a última do exercício específico), foram apresentadas ao dono duas opções técnicas restritas (mover o botão para dentro de cada grupo de exercício já registrado, vs. manter o botão único e adicionar um por exercício no formulário). A resposta foi além do que foi perguntado — texto literal do dono:
+
+> "quero ambos, por isso precisa ser revisto a tela, chamar dois agentes e pesquisar sobre e ver qual a melhor maneira de manter sem que o usuario tenha algum conflito, uma das maneira que eu pensei e abrir um tela chamada, configuração de treinos, assim a pessoa podendo montar os treinos dela antes e no dia ela selecionar, treino já montado ou treino novo, caso for treino novo configura, não sei como, so estou falando oque vem de pensamento, procurar com eles (agentes) e pesquisa a melhor maneira de realizar isso"
+
+Ou seja: uma tela nova onde a pessoa monta treinos com antecedência (uma lista de exercícios salva) e, no dia, escolhe "treino já montado" (carrega a lista) ou "treino novo" (fluxo atual).
+
+**O que `PRD.md` §5 diz, citação exata:**
+> "❌ Planos e periodizações gerados automaticamente. O app **analisa** o que foi feito; não prescreve programa."
+
+**O que `PRD.md` §9 já resolveu no portão de aprovação (2026-08-04), citação exata:**
+> "**Sem tela de configuração de rotina.** O dono anota o que treinou; a Análise **deriva o padrão real dos dados registrados** em vez de comparar com uma divisão declarada. Consequência: a pergunta 'meu volume está equilibrado?' não compara com um plano — ela detecta o padrão efetivo e aponta grupos musculares negligenciados. Isso mede o que foi feito, não o que foi prometido, e elimina uma tela inteira do MVP."
+
+Essa decisão (ADR-008, `DECISIONS.md` 2026-08-04 "Sem tela de rotina") já descartou explicitamente a alternativa "Configurador de divisão (ABC / Upper-Lower / Full body)".
+
+E o próprio `docs/BACKLOG-PROXIMA-FASE.md` seção D, escrito nesta mesma sessão (2026-08-13), já registra: "**Também levantados pela pesquisa e recomendados como NÃO fazer** (não foram nem oferecidos ao dono, porque contrariam o `PRD.md` §5): rotinas/templates salvos (chega perto de prescrever programa)..." — a pesquisa de mercado já tinha visto essa categoria de feature e a descartou preventivamente, sem nem apresentar ao dono, exatamente por esse motivo.
+
+**Avaliação, sem condescendência.** A ideia do dono não é literalmente "plano gerado automaticamente" — a lista de exercícios seria escrita manualmente por ele, não gerada por IA nem prescrita pelo app. Nesse sentido estrito, não viola a letra de §5 (que fala de geração **automática**). Mas ela reproduz **exatamente** a "tela de configuração de rotina" que §9 resolveu não ter, com a mesma alternativa ("Configurador de divisão") já descartada por nome no ADR-008. E é, por definição, o item "rotinas/templates salvos" que a pesquisa desta sessão classificou como "chega perto de prescrever programa" e nem chegou a oferecer. Uma tela onde o dono pré-declara "treino A = supino, agachamento, remada" e depois seleciona "treino A" no dia é uma divisão declarada com nome — a diferença entre isso e "prescrever programa" é de grau, não de tipo: o app passaria a ter o conceito de "um treino planejado com antecedência" na estrutura de dados, algo que §9 rejeitou deliberadamente em nome de medir o que foi feito, não o que foi prometido. **Não existe leitura honesta em que isso "cabe no MVP como está".**
+
+**Classificação (protocolo de Scope Change).** **ADIÇÃO condicionada a reabrir uma decisão já resolvida** — não é "não é scope change": toca `PRD.md` §5 e §9 diretamente e contraria ADR-008 por nome. Também não é "VERSÃO NOVA": não muda a tese do produto (a Análise Semanal continua sendo a peça-assinatura; isto é sobre a tela de registro). Mas por reabrir uma decisão já fechada no portão de aprovação, não pode ser implementada em silêncio — precisa de confirmação explícita do dono, atualização do texto do PRD §9 (não do congelamento geral) e registro aqui, o que esta entrada já inicia.
+
+**Três opções apresentadas — nenhuma decidida aqui.**
+
+**Opção 1 — Só corrigir C2, sem tela nova (mínimo, já dentro do backlog aprovado).**
+**Os dois pontos de entrada sobrevivem** — o botão único de 1 toque (repete a última série do exercício em foco no momento) e um "repetir" dentro do formulário por exercício —, ambos passam a filtrar por `exercicioId` antes de pegar a última série, e ambos chamam a mesma função (`repetirUltimaSerieDoExercicio(exercicioId)`), não duas lógicas paralelas. É o mesmo padrão "um handler, duas entradas" que o dono já aprovou em B1 (botão "Solicitar Análise" + card primário disparando `perguntar(numeroPerguntaPrimaria)`). Construído junto com C1 (coluna "anterior" na linha, que já exige a mesma consulta de histórico por exercício — o backlog já trata os dois como uma coisa só). Zero telas novas, zero mudança no PRD. Resolve o bug relatado e verificado nesta sessão, sem aposentar nada que ele pediu para manter ("quero ambos" — resposta à pergunta A/B original). **Não** resolve a ambição maior do dono (montar um treino com antecedência para reaproveitar em outro dia) — só corrige o que já estava quebrado.
+
+**Opção 2 — Tela "Configuração de Treinos", como o dono descreveu.**
+Nova tela: criar/nomear um "treino salvo" (lista de exercícios, sem prescrever séries/reps/carga — isso continua sendo decidido no registro do dia). Ao iniciar um treino, escolher "treino já montado" (pré-popula os exercícios a registrar) ou "treino novo" (fluxo atual, sem alteração). Isso **reabre e reverte** a decisão §9/ADR-008. Exige: atualizar `PRD.md` §9 com a nova decisão (não editar em silêncio — é o próprio protocolo de Scope Change), avaliar impacto em ADR/SDD, e decidir explicitamente que a pergunta "meu volume está equilibrado?" continua comparando com o padrão real dos dados (não passa a comparar com o plano salvo — isso sim cruzaria para prescrição). É a opção de maior escopo das três.
+
+**Opção 3 — Híbrida: "repetir treino anterior" a partir do histórico real, sem tela de configuração.**
+Em vez de uma tela onde o dono pré-cadastra treinos do zero antes de qualquer sessão real acontecer, ao iniciar um treino novo o app mostra os últimos treinos distintos já registrados (por combinação de exercícios) como atalho, com uma ação "usar esses exercícios de novo" — carrega a lista de exercícios daquele treino passado, sem criar peso, reps ou séries automaticamente. Não existe conceito de "treino planejado com antecedência" na estrutura de dados — é derivado do que já foi feito, coerente com a letra de §9 ("a Análise deriva o padrão real dos dados registrados"). Atende à motivação real do dono (não escolher exercício por exercício do zero toda vez) sem reabrir §9 nem chegar perto de §5. Ainda é ADIÇÃO de escopo (feature nova, precisa entrar no PRD como complemento), mas não exige reverter nada já decidido.
+
+**Recomendação deste agente, para levar ao dono — não é decisão tomada.** Opção 1 acontece de qualquer forma — é bug verificado, já dentro do escopo aprovado, sem Scope Change. Entre Opção 2 e Opção 3, a diferença real não é "quanto trabalho" — é se a lista de exercícios de um "treino já montado" é **escrita com antecedência, num dia em que a pessoa não está treinando** (Opção 2, reabre §9/ADR-008), ou **derivada de um treino que já aconteceu de verdade** (Opção 3, mantém §9 intacto). Opção 3 entrega a experiência "treino já montado" que o dono descreveu — a diferença é só de onde a lista vem, não se o recurso existe. Não é prêmio de consolação por Opção 2; é uma resposta real, só que sem reabrir uma decisão que ele mesmo tomou conscientemente em 2026-08-04. Mas só ele sabe se "montar antes de qualquer treino acontecer" é parte do que ele quer — por isso a pergunta abaixo, não um menu.
+
+**Nota sobre a forma de perguntar.** Apresentar 1/2/3 lado a lado tende a voltar como "quero todas" — foi exatamente o que aconteceu na rodada B1 deste mesmo backlog ("quero manter sim os cards... também quero o que lhe disse o botão, ambos") e é o padrão da resposta que gerou esta entrada ("quero ambos"). Opção 1 não é opcional — ela resolve o bug e entra de qualquer forma. O que precisa ir ao dono é uma pergunta única, que separa Opção 2 de Opção 3 sem forçá-lo a escolher lados que ele pode não ver como excludentes.
+
+**Impacto.** Nenhum código tocado. `PRD.md` **não foi editado** (está congelado; qualquer uma das três opções, se aprovada, gera edição registrada separadamente). Esta entrada é a análise de escopo pedida pelo dono antes de qualquer linha de implementação de C1/C2.
+
+**Como reverter.** N/A — é registro de análise, não mudança de código ou de contrato.
+
+---
+
+## 2026-08-13 (3) — Decisão do dono: Opção 2 confirmada, com limites explícitos — reversão consciente de `PRD.md` §9/ADR-008
+
+**O que mudou.** O dono respondeu à pergunta discriminante da entrada anterior (2026-08-13 (2)), de próprio punho:
+
+> "eu quero que a pessoa possa fazer como eu lhe disse, mas que elas tambem possa ter como configurar (não peso e nem repetições) mas os exercicios que ela ja faz, ai questão de series e pesos ela prenche normalmente, mas ai como lhe disse dessa de exercicios ela ja pode (opcional) ja configurar os exercicios que faz, essa pagina vai ficar lá em configurações"
+
+Confirma **Opção 2** ("Tela Configuração de Treinos", pré-cadastro escrito com antecedência) e não Opção 3 (derivada de treino já realizado) — o dono quer poder montar a lista de exercícios **antes** de qualquer sessão real acontecer. Com quatro limites que o próprio texto já fixa, sem margem de interpretação:
+
+1. **A pré-configuração é só a lista de exercícios.** Nunca série, peso ou reps — isso "ela prenche normalmente", no fluxo de registro do dia, sem mudança. O "treino salvo" é uma lista de `exercicioId`, nada além disso.
+2. **É opcional.** Quem não configura nada usa o app exatamente como hoje. "Treino novo" continua existindo e é o caminho padrão para quem não montou nada — não é substituído, é complementado.
+3. **A tela mora em `/ajustes` (Configurações)**, não em rota nova solta na navegação principal.
+4. **No dia do treino, a pessoa escolhe** entre o(s) treino(s) já montado(s) (pré-popula os exercícios a registrar) ou começar do zero (fluxo atual, inalterado).
+
+**Por quê isso é reversão consciente, não silenciosa, de `PRD.md` §5 e §9.** §9 (2026-08-04) resolveu explicitamente "Sem tela de configuração de rotina" e descartou por nome o "Configurador de divisão (ABC / Upper-Lower / Full body)" — é ADR-008. A tela que o dono pediu agora é, por definição, esse configurador. A diferença que evita cruzar para §5 ("não prescreve programa") é o mesmo limite que o dono impôs sozinho, sem ser perguntado sobre isso: a lista de exercícios não carrega série/peso/reps, e a pergunta "meu volume está equilibrado?" continua **derivando o padrão real dos dados registrados**, não comparando com o treino salvo — o treino salvo é atalho de UI para o registro do dia, não um plano que a Análise passa a usar como referência. Essa distinção não muda com esta decisão: nenhuma métrica da Análise Semanal passa a ler a tabela de treinos salvos.
+
+**Classificação (protocolo de Scope Change).** **ADIÇÃO** — complementa o MVP (uma tela nova em Ajustes, opcional, sem prescrição de série/peso/carga), não muda a tese do produto (a Análise Semanal continua a peça-assinatura, continua medindo o que foi feito). Não é VERSÃO NOVA.
+
+**Alternativa descartada.** Opção 3 (derivar "treino já montado" do histórico real, sem tela de pré-cadastro) — era a recomendação deste agente por manter §9 intacto sem reabri-la, mas o dono, ao responder, deixou claro que quer o pré-cadastro escrito com antecedência ("configurar os exercícios que faz" antes do dia), não uma sugestão derivada de sessões passadas. Opção 1 (só corrigir C2, sem tela nova) segue implementada de qualquer forma — é bug já verificado, dentro do escopo aprovado, independente desta decisão.
+
+**Impacto.** `PRD.md` §9 editado nesta mesma entrada de trabalho para registrar a decisão revista (ver diff em `PRD.md`). `ADR.md` e `SDD.md` **não tocados aqui** — ficam com o `arquiteto`, que escreve a spec técnica em paralelo. Nenhum código implementado ainda.
+
+**Como reverter.** Editar `PRD.md` §9 de volta e registrar nova entrada aqui — nunca reescrever esta. Nenhuma migração de dado envolvida ainda, porque nada foi implementado.

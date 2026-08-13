@@ -123,6 +123,7 @@ Um app de treino **pessoal** que registra cada série executada e, uma vez por s
 | A11 | Editar peso/reps de uma série muda o que a Análise Semanal calcula para ela | Editar uma série já usada num teste do agregador, recalcular, conferir que o número mudou |
 | A12 | Excluir um treino leva as séries dele junto, e não aparece mais na lista nem entra em cálculo nenhum | Excluir um treino com séries, conferir que `select` por `treino_id` não retorna nada |
 | A13 | Nenhuma exclusão acontece sem uma segunda confirmação explícita na tela | Tocar excluir uma vez não apaga nada; só o segundo toque, no botão de confirmação, apaga |
+| A14 | Um treino salvo em `/ajustes` guarda só a lista de exercícios (sem série, peso ou reps); iniciar um treino sem escolher nenhum treino salvo funciona exatamente como hoje | Criar um treino salvo, iniciar um treino "novo" sem selecioná-lo, conferir que o fluxo de registro é idêntico ao anterior a esta feature; inspecionar o schema/payload do treino salvo e confirmar ausência de campos de série/peso/reps |
 
 ---
 
@@ -135,7 +136,16 @@ Um app de treino **pessoal** que registra cada série executada e, uma vez por s
 
 ## 9. Decisões resolvidas no portão de aprovação (2026-08-04)
 
-**Sem tela de configuração de rotina.** O dono anota o que treinou; a Análise **deriva o padrão real dos dados registrados** em vez de comparar com uma divisão declarada. Consequência: a pergunta "meu volume está equilibrado?" não compara com um plano — ela detecta o padrão efetivo e aponta grupos musculares negligenciados. Isso mede o que foi feito, não o que foi prometido, e elimina uma tela inteira do MVP.
+**Sem tela de configuração de rotina — decisão original de 2026-08-04, revista e ampliada em 2026-08-13 (ver abaixo).** O dono anota o que treinou; a Análise **deriva o padrão real dos dados registrados** em vez de comparar com uma divisão declarada. Consequência: a pergunta "meu volume está equilibrado?" não compara com um plano — ela detecta o padrão efetivo e aponta grupos musculares negligenciados. Isso mede o que foi feito, não o que foi prometido. **Esta consequência continua valendo integralmente após a revisão abaixo:** nenhuma métrica da Análise Semanal passa a ler treino salvo — o "porquê" de 2026-08-04 segue sendo o motivo pelo qual a Análise não muda.
+
+**Revisão de 2026-08-13 — tela de Configuração de Treinos aprovada, com limites explícitos (Scope Change, ADIÇÃO — ver `DECISIONS.md` "2026-08-13 (2)" e "2026-08-13 (3)").** O dono pediu, e aprovou com estes limites de próprio punho, uma tela em **`/ajustes`** (Configurações) onde é possível pré-cadastrar treinos com antecedência:
+
+- A pré-configuração é **só a lista de exercícios** de um treino salvo — **nunca série, peso ou reps**. Isso continua sendo preenchido normalmente no dia, no fluxo de registro atual, sem nenhuma mudança.
+- É **opcional**. "Treino novo" continua existindo e é o caminho padrão para quem não montou nada — não é substituído, é complementado.
+- A tela mora em **`/ajustes`**, não em rota nova solta na navegação principal.
+- No dia do treino, a pessoa escolhe entre o(s) treino(s) já montado(s) (pré-popula os exercícios a registrar) ou começar do zero (fluxo atual, inalterado).
+
+Isto reabre conscientemente o "Sem tela de configuração de rotina" acima e o ADR-008 (que descartava por nome o "Configurador de divisão") — é reversão **aprovada e registrada**, não silenciosa. O limite que evita cruzar para o escopo negativo do §5 ("não prescreve programa") é o mesmo que o dono impôs sozinho: sem série/peso/reps na pré-configuração, e a Análise Semanal segue derivando o padrão dos dados reais, nunca do treino salvo.
 
 **RIR entra na UI.** Campo opcional por série valendo. Habilita a métrica de **série difícil**, definida em `KNOWLEDGE.md` §1 — **fonte única, não repetir o limiar aqui.** Mede estímulo real melhor que volume bruto.
 
