@@ -116,12 +116,15 @@
 }
 
 /* Foto ou iniciais — mesmo alvo de toque mínimo (D1) que os outros
-   ícones circulares da barra, ainda que não seja clicável hoje. */
+   ícones circulares da barra, ainda que não seja clicável hoje.
+   Base = corpo claro (fora da barra); .barra-topo abaixo restaura o
+   petróleo. Não inverter — a base é o caso comum desde que /perfil
+   passou a usar <Avatar> fora da barra (2026-08-13, achado A1). */
 .avatar {
   width: var(--lastro-alvo-min);
   height: var(--lastro-alvo-min);
   border-radius: 50%;
-  border: 1px solid var(--lastro-barra-traco);
+  border: 1px solid var(--lastro-controle);
   object-fit: cover;
   flex: none;
 }
@@ -130,11 +133,22 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  background: var(--lastro-avatar-iniciais-fundo);
-  color: var(--lastro-barra-txt);
+  background: var(--lastro-sup-2);
+  color: var(--lastro-txt);
   font-size: var(--lastro-t-meta);
   font-weight: var(--lastro-peso-forte);
   letter-spacing: 0.02em;
+}
+
+/* Petróleo original — só dentro da barra de topo. Não tocar: a
+   correção acima não pode mudar nenhum pixel aqui (A1). */
+.barra-topo .avatar {
+  border-color: var(--lastro-barra-traco);
+}
+
+.barra-topo .avatar--iniciais {
+  background: var(--lastro-avatar-iniciais-fundo);
+  color: var(--lastro-barra-txt);
 }
 
 /* ---------- Ações ---------- */
@@ -160,18 +174,22 @@
     transform var(--lastro-dur-1) ease;
 }
 
-.botao-primario:hover:not(:disabled) {
+.botao-primario:hover:not(:disabled):not([aria-disabled="true"]) {
   background: var(--lastro-grad-acao-h);
 }
 
 /* Pressionar afunda pela SOMBRA, não escurecendo o preenchimento:
    escurecer derrubaria a tinta escura para 3.76:1 e reprovaria. */
-.botao-primario:active:not(:disabled) {
+.botao-primario:active:not(:disabled):not([aria-disabled="true"]) {
   box-shadow: var(--lastro-elev-1), var(--lastro-elev-afundado);
   transform: translateY(1px);
 }
 
-.botao-primario:disabled {
+/* [aria-disabled] cobre "Solicitar Análise" (B1) — precisa continuar
+   focável e no percurso de Tab, por isso nunca usa o atributo `disabled`
+   nativo, só a mesma pista visual dele (G3.2b). */
+.botao-primario:disabled,
+.botao-primario[aria-disabled="true"] {
   opacity: 0.55;
   cursor: not-allowed;
 }
@@ -1138,14 +1156,6 @@
   max-width: var(--lastro-medida-leitura);
 }
 
-/* Dica ausente é estado NEUTRO, não erro: é o que ainda não foi escrito. */
-.ficha__pendente {
-  font-family: var(--lastro-fonte-num);
-  font-size: var(--lastro-t-meta);
-  color: var(--lastro-txt-3);
-  margin-top: var(--lastro-e-2);
-}
-
 .nota-metodo {
   font-size: var(--lastro-t-meta);
   line-height: 1.6;
@@ -1398,7 +1408,17 @@
   color: var(--lastro-txt-3);
 }
 
-/* ---------- Escolha da pergunta: cinco alvos grandes ---------- */
+/* Atalho pra pergunta primária, acima da lista (B1). Reaproveita
+   .botao-primario — mesma pista visual de ação principal da tela. */
+.botao-solicitar-analise {
+  margin-top: var(--lastro-e-4);
+  margin-bottom: var(--lastro-e-4);
+}
+
+/* ---------- Escolha da pergunta: hierarquia 1 primária + 4 secundárias
+   (B2, 2026-08-13) — cinco cartões idênticos obrigavam a ler as cinco
+   frases inteiras antes de decidir; a primária ("O que mudar na próxima
+   semana?") é a única que produz ação. ---------- */
 .perguntas {
   list-style: none;
 }
@@ -1409,34 +1429,48 @@
 
 .pergunta {
   width: 100%;
-  min-height: var(--lastro-alvo-min);
-  padding: var(--lastro-e-3) var(--lastro-e-4);
+  min-height: var(--lastro-alvo-min); /* D1 — vale pra primária e secundárias */
   text-align: left;
   border: 1px solid var(--lastro-controle);
   border-radius: var(--lastro-raio-2);
   background: var(--lastro-grad-sup);
-  box-shadow: var(--lastro-elev-1), var(--lastro-bevel);
   color: var(--lastro-txt);
   cursor: pointer;
-  font-size: var(--lastro-t-corpo);
-  font-weight: var(--lastro-peso-medio);
   transition:
     box-shadow var(--lastro-dur-1) ease,
     transform var(--lastro-dur-1) ease;
 }
 
-.pergunta:hover:not(:disabled) {
+.pergunta:hover:not([aria-disabled="true"]) {
   box-shadow: var(--lastro-elev-2), var(--lastro-bevel);
 }
 
-.pergunta:active:not(:disabled) {
+.pergunta:active:not([aria-disabled="true"]) {
   box-shadow: var(--lastro-elev-afundado);
   transform: translateY(1px);
 }
 
-.pergunta:disabled {
+/* [aria-disabled] em vez de `disabled` — precisa continuar alcançável por
+   Tab enquanto os dados são insuficientes (G3.2b). */
+.pergunta[aria-disabled="true"] {
   opacity: 0.55;
   cursor: not-allowed;
+}
+
+/* Teto: precisa pesar menos que a conclusão do gráfico (--lastro-t-2,
+   ver .grafico-progressao__conclusao) — dois pesos competindo reprova
+   §3.0. font-size fica em --lastro-t-1, abaixo desse teto. */
+.pergunta--primaria {
+  padding: var(--lastro-e-4) var(--lastro-e-5);
+  box-shadow: var(--lastro-elev-2), var(--lastro-bevel);
+  font-size: var(--lastro-t-1);
+  font-weight: var(--lastro-peso-forte);
+}
+
+.pergunta--secundaria {
+  padding: var(--lastro-e-2) var(--lastro-e-4);
+  font-size: var(--lastro-t-corpo);
+  font-weight: var(--lastro-peso-medio);
 }
 
 /* Estado "gerando": esqueleto na altura das linhas que virão.

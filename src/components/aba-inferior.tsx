@@ -19,9 +19,11 @@ const SECOES: {
     caminho: "M3 11l9-8 9 8M5 10v10h14V10",
   },
   {
+    // id interno continua "bancada" (Modo Bancada, DESIGN.md §3.5) —
+    // só o rótulo visível mudou pra bater com a barra de topo (A3, 2026-08-13).
     id: "bancada",
     href: "/treino",
-    rotulo: "Bancada",
+    rotulo: "Treinos",
     caminho: "M4 8v8M20 8v8M8 6v12M16 6v12M8 12h8",
   },
   {

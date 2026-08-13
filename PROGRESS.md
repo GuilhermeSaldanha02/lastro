@@ -243,19 +243,35 @@ Quota checada com uma chamada direta à API antes de gastar esforço recriando d
 
 ---
 
-## ▶ PONTO DE RETOMADA — ler primeiro (2026-08-13)
+## ▶ PONTO DE RETOMADA — ler primeiro (2026-08-13, sessão da Leva 1)
 
-> **➡️ O trabalho da próxima sessão está em [`docs/BACKLOG-PROXIMA-FASE.md`](docs/BACKLOG-PROXIMA-FASE.md).** Documento autocontido, escrito em 2026-08-13: correções verificadas (incluindo um P0 — avatar invisível em `/perfil`), 5 funcionalidades aprovadas pelo dono, decisões de design ainda abertas, e o roteiro completo do gate visual. **Comece por lá**, não por este arquivo.
+> **➡️ Próximo passo: fechar o resto do gate visual da seção G de [`docs/BACKLOG-PROXIMA-FASE.md`](docs/BACKLOG-PROXIMA-FASE.md) — falta só os viewports exatos 360/390 (G1) e o G5 no aparelho do dono; G2 do avatar já fechou.** A Leva 1 inteira (A1, B1+B2, A2+A3+A4) está implementada e **verificada a olho num navegador real** nesta sessão, na branch `chore/leva-1-higiene-visual`, ainda **sem PR aberto**.
 
-**Estado do repo:** `main`, PR #26 mergeado (2026-08-12), branch `feat/ajustes-nav-perfil` apagada. **Confirmado pelo dono no aparelho real** — "tudo está rodando corretamente". `tsc`/`test` (108 passando)/`lint`/`build` verdes, rodados do zero antes do PR.
+**O que foi implementado (branch `chore/leva-1-higiene-visual`):**
+- **A1 (P0) — avatar de iniciais invisível em `/perfil`.** `src/app/sistema.css`: base de `.avatar`/`.avatar--iniciais` virou corpo claro (`--lastro-sup-2`/`--lastro-txt`/`--lastro-controle`); `.barra-topo .avatar`/`.avatar--iniciais` restaura o petróleo original. Emenda em `DESIGN.md` §3.1.
+- **B1 — botão "Solicitar Análise" + estado de espera.** `src/components/analise-interativa.tsx`: botão e os 5 cards agora sempre visíveis (inclusive com < 3 semanas fechadas), `aria-disabled` em vez de `disabled` puro (continuam alcançáveis por `Tab`), botão dispara a mesma pergunta que o card primário (`PERGUNTA_PRIMARIA`, novo export em `src/app/api/analise/perguntas.ts`).
+- **B2 — hierarquia dos 5 cards.** `.pergunta--primaria` (maior, `--lastro-t-1`, peso forte, `elev-2`) vs `.pergunta--secundaria` (densificado, `min-height` 48px preservado). Card primário fica abaixo da conclusão do gráfico em peso (§3.0).
+- **A2 — placeholder do catálogo.** `src/app/catalogo/page.tsx`: removida a linha "Dica de execução ainda não escrita." card a card; a nota `.nota-metodo` que já existia foi movida pro topo do corpo (antes só ficava no fim, depois de todos os grupos — não cumpria "comunicar uma vez, no topo"). CSS órfão `.ficha__pendente` removido.
+- **A3 — rótulo "Bancada" → "Treinos"** na pílula (`src/components/aba-inferior.tsx`); `id` interno e "Modo Bancada" nos documentos de design intactos.
+- **A4 — verificado sem regressão** por leitura de código: `/` e `/treino` usam exatamente a mesma condição (`treino.data === dataLocalBrasil()`), sem depender de contagem de série. Confirmação visual real (G1.9) ainda depende do gate.
 
-**O que mudou nesta sessão (item 17 em "Pendências consolidadas" tem o relato completo):** a pílula de navegação trocou "Coach" por "Ajustes" (engrenagem); Coach, edição de perfil e "Sair" agora moram todos dentro de `/ajustes` e `/perfil`, sem repetição. Fecha o item 13 (upload manual de foto), pendente desde 2026-08-07.
+**Verificação rodada nesta sessão:** `tsc`/`test` (108 passando)/`lint` (0 erros)/`build`, todos verdes, do zero (`rm -rf .next`).
 
-**Achado de arquitetura que vale lembrar em qualquer Server Action futura chamada por Client Component:** `"use server"` inline dentro de uma função só isola aquela função se o resto do arquivo também não tiver código server-only (`next/headers`/`next/cache`) usado por OUTRAS funções não-action. Se tiver, o Turbopack deste Next.js 16.3.0 quebra o build inteiro — só `npm run build` pega isso, nem `tsc` nem os primeiros reviews de spec pegaram. Regra prática: Server Action chamada por Client Component sempre em arquivo próprio, nunca dividindo arquivo com função server-only comum.
+**Verificação visual real, olhada de verdade (extensão Claude in Chrome, não o painel interno — esse não composita frame nenhum neste ambiente), com usuário QA `qa-gate-2026-08-13@example.com` (removido ao final, cascade = 0):**
+- **A1 confirmado a olho.** `/perfil` sem foto: o círculo de iniciais "Q" aparece nítido — fundo areia, letra escura, borda visível — contra o corpo claro. `/catalogo` e `/coach`: avatar na barra de topo continua petróleo, sem nenhuma diferença perceptível.
+- **A2 confirmado a olho.** `/catalogo` mostra "102 de 102 exercícios estão sem dica..." **uma vez, no topo**, antes dos grupos; nenhum card repete a frase.
+- **A3 confirmado a olho.** Pílula mostra "Treinos" nas telas `/`, `/treino`, `/analise`, `/catalogo`, batendo com a barra de topo.
+- **A4 confirmado a olho, sem regressão.** Criado treino de hoje pela UI (clique real em "Iniciar treino de hoje"); `/` e `/treino` **as duas** viraram "Continuar treino de hoje" depois.
+- **B1 confirmado a olho.** Estado de espera (0 semanas fechadas) mostra a explicação + botão "Solicitar Análise" em verde claramente esmaecido (não sumiu, ainda lê "Solicitar Análise") + os 5 cards. Foco por teclado (`Tab`) alcança o card primário com **anel de foco visível** (outline azul nítido na captura) — não é `disabled` puro, o percurso K3 funciona.
+- **B2 confirmado a olho.** "O que mudar na próxima semana?" aparece visivelmente maior, em negrito, acima dos 4 secundários, que ficam visualmente mais densos/finos — a hierarquia lê à primeira vista, sem precisar ler as 5 frases.
 
-**Próximo passo: [`docs/BACKLOG-PROXIMA-FASE.md`](docs/BACKLOG-PROXIMA-FASE.md).** Escrito em 2026-08-13 a partir de três fontes: auditoria de usabilidade (controller navegou as 7 telas no Chrome real com conta QA seedada; `diretor-arte` analisou as evidências contra `DESIGN.md`), um achado do dono no aparelho real (botão redundante em `/analise`), e pesquisa de mercado cruzada com o escopo negativo do `PRD.md` §5. Ordem de ataque sugerida no fim do documento. As "Pendências consolidadas" abaixo continuam valendo como histórico e como fonte dos débitos antigos.
+**G2 (contraste numérico) fechado pra A1, calculado depois da confirmação visual — não estimado antes.** As cores computadas no Chrome real bateram exatamente com os tokens (`--lastro-sup-2`/`--lastro-txt`/`--lastro-controle`/`--lastro-fundo`); rodando a fórmula WCAG de `DESIGN.md` §3.2 sobre esses hex: **G2.1** (letra sobre preenchimento) = **9.99:1**, acima do piso 4.5 — reflexo no `DESIGN.md` §3.1. **G2.2** (aresta contra o fundo) = **3.40:1**, exatamente o limite de componente já documentado — passa o piso 3.0 sem folga, registrado como aceitável porque é o mesmo valor que `--lastro-controle` já carrega em todo o resto do sistema. **G2.3** (barra) confirmado inalterado por `getComputedStyle` bit a bit igual ao que já existia.
 
-**Pendências que continuam abertas, sem mudança nesta sessão:** as 6 decisões de `DESIGN.md` §5 abaixo já foram resolvidas faz tempo (Fase 3 avançou muito além disso — ver "Pendências consolidadas" pro estado real, este parágrafo ficou como registro histórico da época).
+**Limitação real deste ambiente, registrada pra não virar suposição:** o `resize_window` da extensão não aplicou nenhum valor pedido (tentado 390×844, 360×640, 800×600) — o viewport ficou preso em ~500×542 mesmo com o Chrome desmaximizado a pedido do dono. As capturas acima são reais (pixels de verdade, não `getComputedStyle`) mas **não nos dois viewports mandatórios** (360×640, 390×844) — 500px já é estreito o bastante pra pegar a maioria dos problemas de layout mobile, mas não é o piso oficial. G2 (contraste numérico medido) também não foi calculado nesta sessão — as cores conferem visualmente e batem com os tokens documentados, mas não houve medição `getComputedStyle` + fórmula WCAG desta vez. G5 (o dono no celular dele) continua sendo o fechamento final, como sempre foi.
+
+**Estado do repo antes desta sessão:** `main`, PR #26 mergeado (2026-08-12). `tsc`/`test`/`lint`/`build` verdes.
+
+**Achado de arquitetura (herdado, ainda vale):** `"use server"` inline dentro de uma função só isola aquela função se o resto do arquivo também não tiver código server-only (`next/headers`/`next/cache`) usado por OUTRAS funções não-action — senão o Turbopack deste Next.js 16.3.0 quebra o build inteiro, e só `npm run build` pega isso.
 
 ---
 
