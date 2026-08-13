@@ -43,6 +43,18 @@ export default async function PaginaCatalogo() {
       </header>
 
       <div className="corpo corpo--com-nav">
+        {semDica > 0 && (
+          // Comunica a ausência UMA vez, no topo — não card a card (A2,
+          // 2026-08-13). Antes de rolar qualquer grupo, quem varre a lista
+          // já sabe que "sem dica" é esperado, não bug.
+          <p className="nota-metodo">
+            {semDica} de {exercicios.length}{" "}
+            {exercicios.length === 1 ? "exercício está" : "exercícios estão"} sem
+            dica. Elas são escritas e revisadas por pessoa, nunca geradas — por
+            isso o campo fica vazio até você preencher.
+          </p>
+        )}
+
         {exercicios.length === 0 ? (
           <p className="vazio">O catálogo ainda não foi semeado.</p>
         ) : (
@@ -62,28 +74,13 @@ export default async function PaginaCatalogo() {
                     )}
                   </h3>
 
-                  {exercicio.dicaExecucao ? (
+                  {exercicio.dicaExecucao && (
                     <p className="ficha__dica">{exercicio.dicaExecucao}</p>
-                  ) : (
-                    // Estado neutro, sem cor de sinal: não é erro, é o que
-                    // ainda não foi escrito (DESIGN.md §3.6.5, "sem dados").
-                    <p className="ficha__pendente">
-                      Dica de execução ainda não escrita.
-                    </p>
                   )}
                 </article>
               ))}
             </section>
           ))
-        )}
-
-        {semDica > 0 && (
-          <p className="nota-metodo">
-            {semDica} de {exercicios.length}{" "}
-            {exercicios.length === 1 ? "exercício está" : "exercícios estão"} sem
-            dica. Elas são escritas e revisadas por pessoa, nunca geradas — por
-            isso o campo fica vazio até você preencher.
-          </p>
         )}
 
         <p className="aviso-saude">

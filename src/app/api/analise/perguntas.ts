@@ -13,6 +13,11 @@ export const PERGUNTAS: Record<NumeroPergunta, string> = {
   5: "O que mudar na próxima semana?",
 };
 
+/** A única pergunta que produz ação — decidido pelo dono em 2026-08-13
+ *  (backlog B1/B2). É a que o botão "Solicitar Análise" dispara e a que
+ *  vira o card primário em /analise. */
+export const PERGUNTA_PRIMARIA: NumeroPergunta = 5;
+
 export function perguntaValida(valor: unknown): valor is NumeroPergunta {
   return valor === 1 || valor === 2 || valor === 3 || valor === 4 || valor === 5;
 }

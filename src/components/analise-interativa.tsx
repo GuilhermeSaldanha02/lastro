@@ -14,9 +14,12 @@
 // FORA desta tarefa (SDD §7.2, §8): gráficos, histórico de pareceres,
 // compartilhar/exportar, gate visual, e a regra de liberação semanal do
 // botão — o botão fica sempre disponível, sem bloqueio de calendário.
-import Link from "next/link";
 import { useState } from "react";
-import { PERGUNTAS, type NumeroPergunta } from "@/app/api/analise/perguntas";
+import {
+  PERGUNTAS,
+  PERGUNTA_PRIMARIA,
+  type NumeroPergunta,
+} from "@/app/api/analise/perguntas";
 import type { EvidenciaParaTela } from "@/app/api/analise/evidencia";
 import { MINIMO_SEMANAS_PARECER } from "@/lib/analise/limiares";
 import Parecer from "@/components/parecer";
@@ -73,46 +76,78 @@ export default function AnaliseInterativa({
     }
   }
 
+  const dadosSuficientes = semanasFechadasComTreino >= MINIMO_SEMANAS_PARECER;
+  // Inativo cobre as duas regras — dados insuficientes (B1) e uma pergunta
+  // já em voo — sem confundir uma com a outra (nota 3 de B1: isto não
+  // reabre a tarefa 1.0d, que é sobre cadência semanal, não sobre
+  // suficiência de dados).
+  const inativo = !dadosSuficientes || carregando !== null;
+  const secundarias = (Object.keys(PERGUNTAS) as unknown as NumeroPergunta[])
+    .map(Number)
+    .filter((numero) => numero !== PERGUNTA_PRIMARIA) as NumeroPergunta[];
+
+  function perguntarSeAtivo(numero: NumeroPergunta) {
+    if (inativo) return;
+    perguntar(numero);
+  }
+
   return (
     <div className="corpo corpo--com-nav">
       <GraficoProgressao />
 
-      {semanasFechadasComTreino < MINIMO_SEMANAS_PARECER ? (
-        /* Estado "sem dados suficientes" (DESIGN.md §3.6.5): diz o que
-           falta e QUANTO falta, em número — nunca deixa o LLM ser quem
-           avisa isso. Neutro (--lastro-txt-2), nunca --lastro-erro: não
-           é erro, é começo. */
-        <section className="doc" aria-live="polite">
-          <h2 className="doc__secao">Análise semanal</h2>
-          <p className="vazio">
-            Você tem {semanasFechadasComTreino}{" "}
-            {semanasFechadasComTreino === 1 ? "semana fechada" : "semanas fechadas"}.
-            São necessárias {MINIMO_SEMANAS_PARECER} para calcular a análise
-            semanal.
-          </p>
-          <Link href="/" className="botao-primario">
-            Registrar treino
-          </Link>
-        </section>
-      ) : (
-        <>
-          <h2 className="doc__secao">Escolha a pergunta</h2>
-          <ul className="perguntas">
-            {(Object.keys(PERGUNTAS) as unknown as NumeroPergunta[]).map((numero) => (
-              <li key={numero}>
-                <button
-                  type="button"
-                  className="pergunta"
-                  onClick={() => perguntar(Number(numero) as NumeroPergunta)}
-                  disabled={carregando !== null}
-                >
-                  {PERGUNTAS[Number(numero) as NumeroPergunta]}
-                </button>
-              </li>
-            ))}
-          </ul>
-        </>
+      <h2 className="doc__secao">Análise semanal</h2>
+
+      {!dadosSuficientes && (
+        // Estado "sem dados suficientes" (DESIGN.md §3.6.5): diz o que
+        // falta e QUANTO falta, em número — nunca deixa o LLM ser quem
+        // avisa isso. Neutro (--lastro-txt-2), nunca --lastro-erro: não
+        // é erro, é começo.
+        <p className="vazio" aria-live="polite">
+          Você tem {semanasFechadasComTreino}{" "}
+          {semanasFechadasComTreino === 1 ? "semana fechada" : "semanas fechadas"}.
+          São necessárias {MINIMO_SEMANAS_PARECER} para calcular a análise
+          semanal.
+        </p>
       )}
+
+      {/* Botão + 5 cards de pergunta convivem sempre visíveis, mesma regra
+          de disponibilidade nos dois (B1, 2026-08-13): inativos por
+          aria-disabled — nunca `disabled` puro, senão some da ordem de
+          tabulação — até 3 semanas fecharem. O botão dispara a mesma
+          pergunta que o card primário: um só handler, duas entradas. */}
+      <button
+        type="button"
+        className="botao-primario botao-solicitar-analise"
+        aria-disabled={inativo}
+        onClick={() => perguntarSeAtivo(PERGUNTA_PRIMARIA)}
+      >
+        Solicitar Análise
+      </button>
+
+      <ul className="perguntas">
+        <li>
+          <button
+            type="button"
+            className="pergunta pergunta--primaria"
+            aria-disabled={inativo}
+            onClick={() => perguntarSeAtivo(PERGUNTA_PRIMARIA)}
+          >
+            {PERGUNTAS[PERGUNTA_PRIMARIA]}
+          </button>
+        </li>
+        {secundarias.map((numero) => (
+          <li key={numero}>
+            <button
+              type="button"
+              className="pergunta pergunta--secundaria"
+              aria-disabled={inativo}
+              onClick={() => perguntarSeAtivo(numero)}
+            >
+              {PERGUNTAS[numero]}
+            </button>
+          </li>
+        ))}
+      </ul>
 
       {/* Estado "gerando" (DESIGN.md §3.6.5): esqueleto na altura das
           linhas que virão. Sem reticências pulsantes, sem spinner, sem
