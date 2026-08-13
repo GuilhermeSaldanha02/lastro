@@ -81,22 +81,22 @@ O item 11 de `PROGRESS.md` estabeleceu que `/` e `/treino` ganharam a mesma chec
 
 **Escopo da correção:** o botão que manda pra outra tela sai. O texto explicativo permanece — ele é honesto e necessário (E3).
 
-**✅ Decidido pelo dono (2026-08-13, revisando a decisão da mesma manhã):** a tela **pode continuar com um botão** — mas tem que ser a ação **da própria Análise**, não um atalho pra outro lugar. Palavras dele: *"pode sim continuar com um botão, mas exemplo, 'Solicitar Análise', mas ela fica incolor enquanto não está disponível, só após os dias que ele poder realmente efetuar, aí funciona."*
+**✅ Decidido pelo dono (2026-08-13, em duas rodadas — esta é a versão final).** Primeira rodada: a tela pode continuar com um botão, mas tem que ser ação da própria Análise, não atalho pra outro lugar ("pode sim continuar com um botão, mas exemplo, 'Solicitar Análise', mas ela fica incolor enquanto não está disponível, só após os dias que ele poder realmente efetuar, aí funciona"). Segunda rodada, depois de eu apresentar duas opções que pareciam mutuamente exclusivas (só botão OU só os 5 cards): **o dono quer os dois juntos** — "quero manter sim os cards como o recomendado mais também quero o que lhe disse o botão, ambos seguir a regra que falei".
 
-**⚠️ Achado do código que muda o desenho — ler antes de implementar.** Não existe botão "Solicitar Análise" no app. Com `semanasFechadasComTreino >= MINIMO_SEMANAS_PARECER` (3), `analise-interativa.tsx:97-114` mostra **direto os 5 cards de pergunta**, e **clicar numa pergunta _é_ a solicitação** — cada uma dispara o parecer daquela pergunta. Não há um passo intermediário de "solicitar". Ou seja, a ideia do dono não encaixa 1:1 no fluxo atual, e existem duas formas de realizá-la:
+**Desenho final — botão + 5 cards, mesma regra de disponibilidade nos dois:**
 
-| | Desenho | Problema |
-|---|---|---|
-| **(a)** | Estado vazio ganha um botão "Solicitar Análise" desabilitado; quando habilita, ele é substituído pela lista de perguntas | O botão **desaparece no exato momento em que passaria a funcionar**. O dono nunca chega a clicar nele — vira um rótulo de espera disfarçado de botão |
-| **(b)** ✅ | Os **5 cards de pergunta aparecem sempre**, incolores/inativos enquanto faltam semanas, com o texto explicativo acima. Quando a 3ª semana fecha, simplesmente ficam clicáveis | Nenhum — é literalmente "fica incolor enquanto não está disponível, e aí funciona" |
+- **Botão "Solicitar Análise"**, acima da lista de perguntas. Inativo/incolor enquanto `semanasFechadasComTreino < MINIMO_SEMANAS_PARECER`; ativo quando a 3ª semana fecha.
+- **Os 5 cards de pergunta continuam sempre visíveis** (não somem no estado de espera — essa parte da recomendação original se manteve), na hierarquia de **B2** (1 primário + 4 secundários), também inativos/incolores até ter dado suficiente.
+- **O que o botão faz quando ativo — perguntado ao dono, resposta escolhida:** ele é um **atalho para a pergunta primária** ("O que mudar na próxima semana?", decidida em B2). Clicar no botão dispara o mesmo parecer que clicar no card primário dispararia. As outras 4 perguntas continuam disponíveis nos cards secundários, para quem quer uma pergunta diferente da primária.
 
-**Recomendação: (b).** Além de não ter o defeito de (a), ela entrega algo que o estado atual não entrega: **a pessoa vê desde o primeiro dia o que a Análise vai oferecer** — as 5 perguntas que ela poderá fazer. Hoje, com menos de 3 semanas, o app não dá nenhuma pista do que está sendo construído. E compõe naturalmente com **B2**: no estado de espera aparecem o card primário e os 4 secundários, todos inativos, já na hierarquia final.
+**Por que isso não é redundante, mesmo o botão e o card primário fazendo a mesma coisa:** o botão dá à pessoa com pressa uma ação única, no topo, sem precisar identificar qual dos 5 cards é o "principal" — o card primário já é visualmente maior (B2), mas o botão é ainda mais rápido de achar. Quem quer outra pergunta rola e escolhe entre os cards, incluindo o primário de novo se preferir.
 
-**Três pontos técnicos a resolver na implementação:**
+**Três pontos técnicos a resolver na implementação, valem para o botão E para os 5 cards:**
 
-1. **Acessibilidade — não usar `disabled` puro.** Um `<button disabled>` sai da ordem de tabulação e leitores de tela o ignoram, então quem navega por teclado nunca descobre que a Análise existe e está esperando dados. Usar **`aria-disabled="true"`** com o clique inerte, mantendo o elemento focável; assim o percurso K3 de `DESIGN.md` §4.3 continua válido. O `<p className="vazio">` acima já tem `aria-live="polite"`, que explica o motivo.
-2. **Contraste no estado inativo, medir.** `.botao-primario:disabled` hoje é `opacity: 0.55`. A WCAG isenta controle inativo do piso de contraste, **mas aqui os cards inativos carregam a única pista do que vem** — se ficarem ilegíveis, a vantagem principal de (b) se perde. Medir e decidir o valor com o olho, não herdar o 0.55 sem conferir.
+1. **Acessibilidade — não usar `disabled` puro.** Um `<button disabled>` sai da ordem de tabulação e leitores de tela o ignoram, então quem navega por teclado nunca descobre que a Análise existe e está esperando dados. Usar **`aria-disabled="true"`** com o clique inerte, mantendo o elemento focável; assim o percurso K3 de `DESIGN.md` §4.3 continua válido. O `<p className="vazio">` já existente tem `aria-live="polite"`, que explica o motivo.
+2. **Contraste no estado inativo, medir.** `.botao-primario:disabled` hoje é `opacity: 0.55`. A WCAG isenta controle inativo do piso de contraste, **mas aqui o botão e os cards carregam a única pista do que vem** — se ficarem ilegíveis, a vantagem de mostrá-los cedo se perde. Medir e decidir o valor com o olho, não herdar o 0.55 sem conferir. Vale tanto para o botão quanto para os 5 cards.
 3. **Isto NÃO reverte a tarefa 1.0d** (2026-08-05, "botão sempre disponível, sem bloqueio"). Aquela decisão é sobre **cadência semanal** — não obrigar a esperar a segunda-feira pra pedir o parecer. Esta é sobre **suficiência de dados** — 3 semanas fechadas, `MINIMO_SEMANAS_PARECER`. São regras diferentes e compatíveis; não confundir uma com a outra ao mexer no código.
+4. **Um só handler, duas entradas.** O botão e o card primário disparam a mesma pergunta — implementar como duas UI chamando a mesma função (`perguntar(numeroPerguntaPrimaria)`), não duplicar a lógica de disparo do parecer.
 
 ---
 
@@ -228,8 +228,9 @@ Viewports obrigatórios de `DESIGN.md` §4.1: **360×640**, **390×844**, **1280
 | G1.1 | `/perfil`, conta **sem foto** | 360, 390 | O círculo não é distinguível do fundo a um braço de distância; **ou** o preenchimento aparece mas a aresta não |
 | G1.2 | `/perfil`, conta **com foto** | 360, 390 | Qualquer mudança em relação a antes da correção |
 | G1.3 | **As 7 telas com barra de topo**, conta sem foto | 390 | Qualquer diferença perceptível no avatar da barra — a correção não podia tocar lá |
-| G1.4 | `/analise`, conta com **≥ 3 semanas** (estado ativo) | 360, 390, 1280 | Os 5 cards seguem no mesmo degrau; **ou** o card primário compete com a conclusão do gráfico |
-| G1.4b | `/analise`, conta com **< 3 semanas** (estado de espera, B1) | 360, 390 | Os 5 cards não aparecem inativos; **ou** aparecem mas ilegíveis; **ou** o texto explicativo sumiu; **ou** sobrou algum botão que leva pra fora da tela |
+| G1.4 | `/analise`, conta com **≥ 3 semanas** (estado ativo) | 360, 390, 1280 | Os 5 cards seguem no mesmo degrau; **ou** o card primário compete com a conclusão do gráfico; **ou** o botão "Solicitar Análise" está ausente/inativo apesar de haver dado suficiente |
+| G1.4b | `/analise`, conta com **< 3 semanas** (estado de espera, B1) | 360, 390 | O botão "Solicitar Análise" **ou** os 5 cards não aparecem inativos; **ou** aparecem mas ilegíveis; **ou** o texto explicativo sumiu; **ou** algum dos dois leva pra fora da tela |
+| G1.4c | `/analise`, conta com **≥ 3 semanas**: clicar em "Solicitar Análise" | 390 | O parecer que abre **não é** o da pergunta primária ("O que mudar na próxima semana?") — o botão e o card primário precisam disparar exatamente o mesmo resultado |
 | G1.5 | `/catalogo` | 360, 390 | A frase de placeholder ainda se repete card a card |
 | G1.6 | `/` com volume ≥ 10.000 kg | 360 | Card "Séries valendo" desalinhado, ou número quebrando linha |
 | G1.7 | `/coach` | **360** | Qualquer sobreposição entre campo de texto, botão de envio e pílula — **é o lugar mais provável de quebrar em 360px e nunca foi testado lá** |
@@ -256,7 +257,7 @@ Viewports obrigatórios de `DESIGN.md` §4.1: **360×640**, **390×844**, **1280
 |---|---|---|
 | G3.1 | `/perfil` só com `Tab`: alcançar "Trocar foto", acionar com `Enter` e `Espaço` | Foco entra no `<span>` do avatar (é `aria-hidden`, não pode receber foco); ou o anel some sobre a superfície |
 | G3.2 | **K3 de §4.3** — escolher pergunta da Análise só com teclado, **nas duas variantes novas** (primária e secundária) | Alguma variante sem anel visível; ordem de tabulação ≠ ordem visual |
-| G3.2b | **Estado de espera (B1) só com teclado**, conta com < 3 semanas | Os cards inativos **não são alcançáveis por `Tab`** — é o sintoma de terem sido feitos com `disabled` puro em vez de `aria-disabled`, e significa que quem usa teclado nunca descobre que a Análise está esperando dados |
+| G3.2b | **Estado de espera (B1) só com teclado**, conta com < 3 semanas | O botão "Solicitar Análise" **ou** os cards inativos **não são alcançáveis por `Tab`** — é o sintoma de terem sido feitos com `disabled` puro em vez de `aria-disabled`, e significa que quem usa teclado nunca descobre que a Análise está esperando dados |
 | G3.3 | Anel de foco em todo controle tocado na rodada | `outline-offset: 0`, anel `inset`, ou `outline: none` sem substituto — Nota B de §3.2 |
 | G3.4 | `/catalogo` com teclado, após a mudança do placeholder | Card deixa de ser alcançável, ou a ordem muda |
 
@@ -283,7 +284,7 @@ Não é obrigação — é o que faz mais sentido em risco e dependência:
 **Leva 1 — higiene visual (tudo CSS/UI, nenhuma mudança de dados)**
 
 1. **A1** (avatar invisível) — P0. Isolado, correção já especificada linha a linha, zero tokens novos.
-2. **B1** (estado de espera da Análise) + **B2** (hierarquia dos 5 cards) — **fazer juntas, não é só conveniência:** a solução (b) de B1 exibe os mesmos 5 cards no estado de espera, já na hierarquia que B2 define. Implementar separado significa desenhar a lista de perguntas duas vezes.
+2. **B1** (botão "Solicitar Análise" + estado de espera) + **B2** (hierarquia dos 5 cards) — **fazer juntas, não é só conveniência:** B1 exibe o botão e os 5 cards sempre visíveis, inclusive no estado de espera, já na hierarquia que B2 define, e o botão dispara a mesma pergunta que o card primário. Implementar separado significa desenhar a lista de perguntas duas vezes e arriscar o botão e o card primário divergirem.
 3. **A2** (placeholder do catálogo) + **A3** (rótulo → "Treinos") + **A4** (verificar se "Continuar" é regressão) — pequenos e independentes.
 
 Depois da leva 1, rodar o gate visual da seção G inteiro. Ele foi escrito exatamente para esse conjunto.
