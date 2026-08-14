@@ -282,17 +282,75 @@ O tom é de **observação de instrumento**, não de cobrança. Regras:
 
 > **`N` semanas de estagnação e as faixas de referência por grupo muscular são TODOs abertos do PRD §10, com fonte primária pendente.** Qualquer número desses que apareça em texto de exemplo neste documento é **ilustrativo**. A UI lê o valor real do agregador; nenhum limiar é literal em componente.
 
-### 3.7 O gráfico de progressão — sem obrigar a ler eixo
+### 3.7 O gráfico de progressão — vários exercícios, sem seletor
 
-A pergunta que o gráfico responde não é "quanto?", é "**está subindo?**". O eixo fica como recurso de conferência, nunca como via principal.
+> **Aprovada pelo dono em 2026-08-14**, depois de ver uma prévia visual da composição (pequenos múltiplos). Esta seção foi **reescrita por inteiro** nesta data, a partir de um redesenho estrutural pedido pelo dono depois de ver a tela `/analise` renderizada de verdade. Confirmação final ainda depende do gate no aparelho dele (§3.9) — a aprovação aqui é sobre a composição, não substitui esse passo.
+>
+> **Cogitado e descartado na mesma conversa:** um segundo gráfico, de volume por grupo muscular ("estou treinando esse grupo o suficiente?"). A conta (`volumePorGrupoMuscular`, `src/lib/analise/volume.ts`) já existe e já alimenta a pergunta "Meu volume está equilibrado?" da Análise Semanal, em texto, sob demanda — um gráfico fixo repetiria essa informação sem necessidade. Fica fora, registrado aqui pra não ser reproposto sem essa razão.
 
-1. **Rotulagem direta.** Primeiro e último ponto rotulados no próprio gráfico, em `--lastro-fonte-num`. Sem legenda lateral, sem obrigar a cruzar cor com nome.
-2. **A conclusão em palavras, acima do desenho.** Uma linha em `--lastro-t-2`: o delta em número e o intervalo, em português — a leitura já feita. Quem só lê essa linha já sabe o resultado; o desenho é a prova.
-3. **Platô é desenhado, não deduzido.** O trecho sem mudança vira segmento **tracejado** em `--lastro-plato`, com anotação ancorada dizendo há quantas semanas. Trecho de progressão é **contínuo** em `--lastro-alta`. Traço diferente + rótulo em texto — a nota C de §3.2 torna isso obrigatório.
-4. **Sem grade de fundo densa.** No máximo uma linha de referência horizontal com propósito declarado (ex.: melhor marca), rotulada nela mesma.
-5. **Área de toque.** Ponto do gráfico tem alvo de no mínimo `--lastro-alvo-min`, mesmo que o marcador desenhado seja pequeno.
-6. **Alternativa textual.** Todo gráfico tem um resumo em texto acessível a leitor de tela, com os mesmos números dos rótulos diretos. Sem isso, o gráfico reprova.
-7. **Viável na stack (Recharts, CLAUDE.md):** rotulagem direta com componentes de rótulo próprios, linha de referência e segmentos com `strokeDasharray` distinto. Nada aqui exige biblioteca fora da stack.
+**O que motivou a reescrita.** O gráfico anterior mostrava um exercício por vez, escolhido por um `<select>` no cabeçalho. Renderizado, esse seletor ficou visualmente indistinguível dos cards de pergunta da Análise Semanal logo abaixo — mesmo raio, mesma altura — e obrigava a escolher um exercício para "revelar" o gráfico. Reação do dono, literal:
+
+> "não, precisa ser revisto esse gráfico, pois minha ideia não era para mostrar ali por cada tipo de exercício, aí fica ruim dessa maneira, eu imaginei sim o gráfico e já deve sim aparecer"
+
+Perguntado se a base deveria deixar de ser "por exercício" (PRD §4.2 pede explicitamente "por exercício: evolução de e1RM... no tempo", então abandonar isso pede revisão de PRD, não só de UI) ou manter por exercício sem seletor, a resposta:
+
+> "sem precisar do seletor, qual a melhor maneira? um gráfico como deveria, mas na lateral cada nome e todos partindo do zero? será que assim pegaria?"
+
+A pergunta é genuína, não uma decisão fechada — a recomendação abaixo responde a ela, aceitando uma parte da ideia e recusando duas partes, com o motivo técnico de cada recusa.
+
+**A pergunta continua a mesma:** não "quanto?", **"está subindo?"** — agora respondida para vários exercícios ao mesmo tempo, sem seletor e sem exigir escolha para o gráfico aparecer.
+
+#### 3.7.1 A composição: pequenos múltiplos, não um canvas só com várias linhas sobrepostas
+
+A ideia do dono (uma linha por exercício, todas no mesmo desenho, com legenda lateral de nomes) foi considerada e **recusada nesta forma**, por dois motivos técnicos, não de gosto:
+
+1. **Sobrepor várias linhas quebra a área de toque e o teclado (item 5 desta seção e gate K6, §4.3).** Cada ponto já exige um alvo de `--lastro-alvo-min` (48px) navegável por foco. Com 4 exercícios × até 12 semanas de histórico, um canvas único teria de acomodar dezenas de alvos de 48px empilhados numa tela de 200px de altura — inviável em qualquer viewport, incluindo o desktop (K6 exige alcançar **cada ponto de cada série** só com teclado).
+2. **Distinguir mais de duas linhas só por matiz não sobrevive à paleta do sistema.** O `lastro` não tem uma paleta categórica reservada para "N séries quaisquer" — só tokens semânticos, cada um com papel fixo (`--lastro-alta` é sempre progressão, `--lastro-plato` é sempre estagnação, nunca identidade de exercício; §3.2 nota C proíbe emprestar cor de um papel para outro). Mesmo usando a rampa de tinta neutra (`--lastro-txt`/`txt-2`/`txt-3`/`--lastro-controle`), a razão de contraste **entre elas** — não contra o fundo — é baixa o bastante (`txt-2` contra `txt-3` gira perto de 1.2:1) para duas linhas próximas ficarem indistinguíveis a um braço de distância (D4), em luz ruim, exatamente a cena de uso (§1).
+
+**A composição que resolve isso: pequenos múltiplos empilhados — um mini-gráfico por exercício, cada um com sua própria linha e sua própria escala.** Não é um select nem uma legenda: é a mesma estrutura de hoje (nome do exercício + conclusão em palavras + desenho), repetida uma vez por exercício, em pilha vertical, sem exigir nenhuma escolha para aparecer.
+
+- Cada linha usa **os mesmos tokens semânticos de sempre** — `--lastro-alta` contínuo para o trecho de progressão, `--lastro-plato` tracejado para o trecho de platô — porque cada mini-gráfico só tem UMA série. O canal de cor nunca precisa carregar "de quem é essa linha", só "o que esse trecho significa", que é o papel que ele já tinha. Nenhuma cor nova, nenhum token novo.
+- O **nome do exercício vira o cabeçalho do próprio painel** (`--lastro-t-1`, `--lastro-peso-forte`, `--lastro-txt`), imediatamente acima do desenho a que pertence. Isso **é** rotulagem direta — o nome está colado na linha, não numa legenda separada que obriga cruzar cor com texto. O item 1 original ("sem legenda lateral, sem obrigar a cruzar cor com nome") **não muda**; é cumprido por uma composição diferente.
+- A área de toque de cada ponto (48px) some sobre um canvas menor, mas de uma série só por vez — sem sobreposição, o problema do item 1 desta subseção desaparece.
+
+#### 3.7.2 Escala: em kg absoluto por painel, não normalizado a partir de zero
+
+A segunda parte do pedido do dono — "todos partindo do zero" — foi entendida como normalizar cada série (delta % ou delta kg desde a primeira marca) para caber Supino (~80kg) e Rosca (~15kg) na mesma escala visual. **Recomendação: não normalizar.** Com pequenos múltiplos cada painel já tem escala própria — o problema que a normalização resolveria (escalas incompatíveis num canvas compartilhado) não existe mais nesta composição. E normalizar introduz uma distorção que o dono não pediu: numa escala de "% desde o início", um Rosca que sobe de 15kg para 21kg (+40%) desenha uma subida mais dramática que um Supino que sobe de 80kg para 86kg (+8%), quando ambos ganharam 6kg — a mesma distorção que o código atual já evita internamente (`baseValida`, quando a base é 0) fica maior, não menor, se virar a base de comparação entre exercícios diferentes. Kg absoluto por painel, com a própria escala do exercício, é o que se confere direto contra o que o dono registrou — e é exatamente essa conferência que §3.0/D8 pedem.
+
+A conclusão em palavras (item 2 abaixo) continua a carregar o delta em **%** quando a base é válida (mesma regra de hoje) — isso já resolve "está subindo, e quanto, proporcionalmente" sem exigir que o desenho normalize.
+
+#### 3.7.3 Quantos exercícios, e quais
+
+**Teto: até 4 painéis simultâneos**, ordenados pelo mesmo critério que já decide o exercício padrão hoje (`sessoesNoPeriodoPorExercicio`, `src/lib/dados/progressao.ts`) — mais sessões dentro da janela de `SEMANAS_HISTORICO` primeiro. Só entram exercícios com **pelo menos 2 semanas com sessão elegível para e1RM** (a mesma barra de "suficiente" que já existe por exercício, §3.7 item 6 de hoje) — um exercício com 1 sessão não vira painel, do mesmo jeito que hoje não vira gráfico.
+
+Por que 4, e não um número maior: é orçamento de altura de tela, não de paleta. Em 360×640 (piso do gate, §4.1), a barra de topo e a folga da aba inferior já consomem uma fatia fixa; cada painel — cabeçalho do nome, conclusão em uma ou duas linhas, mini-desenho — pede em torno de 150–180px. Quatro painéis cabem com rolagem curta antes da seção da Análise Semanal; um quinto empurraria o botão "Solicitar Análise" para muito longe da dobra, e a essa altura o exercício adicional já é o menos treinado do período — o menos provável de interessar a leitura da semana.
+
+Menos de 4 exercícios elegíveis: mostra só os que existem (1, 2 ou 3 painéis). Zero exercícios elegíveis: mesma tela vazia global de hoje ("ainda não há sessões suficientes de nenhum exercício").
+
+Não há afordância para "ver mais" além do teto nesta proposta — é escopo deliberado, não esquecimento: a tela responde "os exercícios que mais apareceram esta janela estão subindo?", não "todo o catálogo". Se o dono quiser auditar um exercício fora do top 4, isso é outra necessidade (histórico completo por exercício), fora do que este gráfico se propõe a responder.
+
+#### 3.7.4 Regras por painel (preservadas do desenho anterior, agora aplicadas por exercício)
+
+1. **Rotulagem direta.** Nome do exercício como cabeçalho do painel (não legenda); primeiro e último ponto da série rotulados no próprio desenho, em `--lastro-fonte-num`.
+2. **A conclusão em palavras, acima do desenho de cada painel.** Uma linha em `--lastro-t-2`: o delta em número (% quando a base é válida, kg quando não) e o intervalo, em português. Quem só lê essa linha já sabe o resultado daquele exercício; o desenho é a prova.
+3. **Platô é desenhado, não deduzido — por painel.** O trecho sem mudança vira segmento **tracejado** em `--lastro-plato`, com anotação ancorada dizendo há quantas semanas. Trecho de progressão é **contínuo** em `--lastro-alta`. Como cada painel tem uma série só, o canal de traço fica livre para significar platô/progressão — não precisa significar "de qual exercício é esta linha", que já é resolvido pelo cabeçalho.
+4. **Sem grade de fundo densa, por painel.** No máximo uma linha de referência horizontal com propósito declarado (ex.: melhor marca daquele exercício), rotulada nela mesma.
+5. **Área de toque.** Ponto do gráfico tem alvo de no mínimo `--lastro-alvo-min`, mesmo que o marcador desenhado seja pequeno. Sem sobreposição de séries, o teto de 4 exercícios não aproxima o total de alvos por painel do problema do item 1 de §3.7.1.
+6. **Alternativa textual, por painel.** Cada painel tem um resumo em texto acessível a leitor de tela, com os mesmos números dos rótulos diretos, precedido pelo nome do exercício (a lista de leitura de tela deixa de ser uma só para o gráfico; vira uma por painel, cada uma anunciando de qual exercício fala antes dos números).
+7. **Viável na stack (Recharts, CLAUDE.md):** cada painel é a mesma `LineChart` de hoje, repetida; nada aqui exige componente ou biblioteca fora do que já está em uso.
+
+#### 3.7.5 Para quem for implementar — mudança de contrato de dados
+
+`src/lib/dados/progressao.ts` já busca **todos** os exercícios numa única consulta (`treino`/`serie` sem filtro, linhas 69–74) e hoje reduz isso a um exercício em memória (linha 144). A proposta não pede consulta nova nem mais pesada — pede trocar essa redução de "um exercício, escolhido por `exercicioId` opcional" para "até 4, ranqueados, sem parâmetro nenhum":
+
+- `DadosProgressao` deixa de ser `{ exercicio, opcoes, pontos, plato }` (um exercício) e passa a ser uma lista de painéis, cada um com o formato que `{ exercicio, pontos, plato }` já tem hoje — a função `calcularSeriesSemanais`/`detectarPlato` roda uma vez por exercício selecionado, igual já roda hoje para o exercício único.
+- `opcoes` (a lista para popular o `<select>`) perde a função — não há mais seletor. O ranking que hoje monta `opcoes` (`sessoesNoPeriodoPorExercicio`) passa a decidir DIRETAMENTE quais até 4 exercícios entram na lista, em vez de só decidir o padrão de um `<select>`.
+- `?exercicioId=` na rota `/api/progressao` e o callback `carregar(exercicioId)` do componente ficam sem uso — não há mais escolha do usuário a comunicar ao servidor.
+- `<select className="grafico-progressao__seletor">` sai do componente; no lugar, um `.map` sobre os painéis, cada um renderizando o que `GraficoConteudo` já faz hoje.
+
+#### 3.7.6 O gate não muda
+
+O roteiro de §4 — G6 (celular real e desktop, "só a cor distingue platô de progressão" continua reprovando; "falta a conclusão em palavras acima do desenho" continua reprovando, agora por painel) e K6 (alcançar cada ponto e a anotação de platô só com teclado) — **continua válido exatamente como está escrito**, sem precisar de revisão. Isso por si só é um sinal de que a composição em pequenos múltiplos cabe no sistema existente: nenhuma regra de acessibilidade ou de contraste precisou ceder para acomodar "vários exercícios ao mesmo tempo". A única leitura adicional para o controller do gate: G6 e K6 agora se aplicam **a cada painel visível**, não a um gráfico só.
 
 ### 3.8 Autoconsistência — onde os literais moram agora
 
