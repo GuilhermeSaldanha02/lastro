@@ -203,6 +203,8 @@
 }
 
 .botao-secundario {
+  display: block; /* também usado em <Link> (achado do dono, 2026-08-14) —
+    <a> é inline por padrão e ignora width:100% sem isto. */
   width: 100%;
   min-height: var(--lastro-alvo-min);
   border: 1px solid var(--lastro-controle);
@@ -732,6 +734,16 @@
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: var(--lastro-e-3);
+}
+
+/* Quando um lado da dupla é um .campo (rótulo + input) e o outro é um
+   botão solto sem rótulo (ex.: "Adicionar anilha"), o grid estica os
+   dois pela mesma altura (align-items: stretch, padrão) — o botão vira
+   mais alto que o campo e o centro dele some acima do input, desalinhado
+   (achado do dono, 2026-08-14). Ancora o botão embaixo, na mesma linha
+   de base do input. */
+.dupla > .botao-secundario {
+  align-self: end;
 }
 
 .dupla .campo + .campo {
