@@ -243,9 +243,36 @@ Quota checada com uma chamada direta à API antes de gastar esforço recriando d
 
 ---
 
-## ▶ PONTO DE RETOMADA — ler primeiro (2026-08-13, sessão da Leva 1)
+## ▶ PONTO DE RETOMADA — ler primeiro (2026-08-14, sessão da Leva 2)
 
-> **➡️ Próximo passo: fechar o resto do gate visual da seção G de [`docs/BACKLOG-PROXIMA-FASE.md`](docs/BACKLOG-PROXIMA-FASE.md) — falta só os viewports exatos 360/390 (G1) e o G5 no aparelho do dono; G2 do avatar já fechou.** A Leva 1 inteira (A1, B1+B2, A2+A3+A4) está implementada e **verificada a olho num navegador real** nesta sessão, na branch `chore/leva-1-higiene-visual`, ainda **sem PR aberto**.
+> **➡️ Próximo passo: fechar o resto do gate visual da seção G** (viewports exatos 360/390 e G5 no aparelho do dono — pendência herdada da Leva 1, sem mudança) **e decidir a Leva 3** (C5 excluir conta, C3 calculadora de anilhas, C4 parte 2 — histórico do exercício). Leva 2 (C1+C2+C4 parte 1) **e** a tela nova de Configuração de Treinos (Scope Change aprovado nesta sessão) estão implementadas, verificadas de ponta a ponta num Chrome real, e **já mergeadas em `main`** (PRs #34 e um terceiro ainda a abrir/mergear pra `feat/modelo-treino` — conferir `git log`/`gh pr list` antes de presumir).
+
+**O que foi implementado nesta sessão (2026-08-14):**
+
+1. **C1+C2+C4 parte 1** (branch `feat/historico-exercicio-c1-c2-c4`, PR #34, mergeado): `historicoDoExercicio` em `src/lib/dados/treino.ts` (uma consulta só, `tipo=valendo`, serve as três features). "Última vez: 16 × 9 kg" no formulário ao escolher o exercício (C1); "Usar esses valores" preenche reps/peso por exercício específico, sem abrir o botão global de 1 toque (C2 — o botão global foi preservado repetindo a última série do treino inteiro, decisão explícita do dono: "quero ambos"). PR na linha da série (C4 parte 1) via `src/lib/analise/recorde-serie.ts` (`ehRecorde`, testado, 8 casos) — piso de `MINIMO_SESSOES_PARA_RECORDE = 3` sessões anteriores (decidido com o dono), nunca persiste no banco.
+2. **Scope Change aprovado e implementado: "Configuração de Treinos"** (branch `feat/modelo-treino`). O dono pediu uma tela pra pré-montar listas de exercícios (nunca série/peso/reps) e escolher entre elas ou "treino novo" ao iniciar o dia. Isso reabre `PRD.md` §9 / ADR-008 ("sem tela de configuração de rotina") — reabertura **consciente e registrada**, não silenciosa: `analista-produto` e `arquiteto` (dois subagentes, rodados em paralelo a pedido do dono) analisaram escopo e viabilidade técnica antes de qualquer código, registraram em `DECISIONS.md` (entradas "2026-08-13 (2)" e "(3)"), atualizaram `PRD.md` §9/§7 (A14), e escreveram `ADR.md` (ADR-009 + fitness function **FF8**: nenhum módulo de `src/lib/analise/` ou `src/app/api/` pode ler `modelo_treino*`) e `SDD.md` §9 (schema completo) **antes** da implementação.
+   - Migration `0007_modelo_treino.sql` aplicada no banco hospedado (`npx supabase db push --linked`, confirmado com `information_schema.tables`).
+   - `src/lib/dados/modelo-treino.ts` — online-only de propósito (D6 protege o registro da série, não a escolha do que treinar antes de começar); nenhuma função passa pela fila outbox.
+   - `/ajustes/modelos` (listar/excluir) e `/ajustes/modelos/novo` (criar — reaproveita `SeletorGrupoMuscular`).
+   - `IniciarTreino` (novo componente): se não há modelo salvo, comportamento idêntico ao original (`<form action={criarTreino}>`, um clique). Se há pelo menos um, abre a escolha "Treino novo" vs. nome do modelo.
+   - `TreinoDetalhe` ganha `exerciciosPreSelecionados` (prop nova, opcional) — `agruparPorExercicio` **não mudou nenhuma linha**, a pré-seleção é filtrada e renderizada ao lado.
+
+**Verificação rodada nesta sessão (as duas branches, cada uma isolada):** `tsc`/`test` (116 passando, 8 novos)/`lint` (0 erros)/`build`, verdes, do zero (`rm -rf .next`), antes de cada PR.
+
+**Verificação funcional real num Chrome real (extensão Claude in Chrome — caiu a conexão 3 vezes nesta sessão, sempre recuperou; painel interno usado como fallback quando a extensão não respondia), com usuários QA seedados e removidos ao final (cascade = 0 em todos):**
+- **C1/C2/C4:** seedados 3 treinos anteriores de "Supino reto com barra" (8×60, 8×60, 8×62) via SQL direto. Escolher o exercício no formulário mostrou "Última vez: 8 × 60 kg"; "Usar esses valores" preencheu `tipo/reps/peso` corretamente; registrar 8×70kg (acima do e1RM máximo do histórico) marcou **RECORDE** na hora; repetir esse mesmo valor pelo botão global **não** marcou recorde de novo (não pode superar a si mesmo).
+- **RLS de `modelo_treino`/`modelo_treino_exercicio` (FF5):** dois usuários de teste via `curl` direto no PostgREST com `Authorization: Bearer <token>` de cada um — usuário B viu **0 linhas** dos dados de A nas duas tabelas; usuário A viu os próprios normalmente.
+- **FF8 (checado por busca, não por leitura de código):** `grep -ril "modelo_treino" src/lib/analise/ src/app/api/` → 0 ocorrências. `src/lib/dados/ src/app/ajustes/ src/components/` → 3 arquivos (camada de dados usa, análise não usa).
+- **Fluxo ponta a ponta:** criado modelo "Peito de teste" (Crucifixo reto com halteres + Supino reto com barra) em `/ajustes/modelos/novo`; `/treino` sem modelo nenhum mostrou o botão original (`type="submit"`); depois de criar o modelo, o mesmo botão virou `type="button"` e abriu "Como começar? — Treino novo / Peito de teste"; escolher o modelo navegou pra `/treino/{id}?modelo={id}` com as duas seções vazias ("0 valendo") já visíveis; registrar uma série real de "Supino reto com barra" fez a seção virar "1 valendo" **sem duplicar** — a de "Crucifixo" continuou vazia ao lado. Excluir o modelo em `/ajustes/modelos` (confirmação inline, não `window.confirm`) não afetou o treino já criado (`/treino` continuou mostrando "Continuar treino de hoje").
+
+**Limitação de ambiente que voltou a aparecer:** a extensão Claude in Chrome desconectou 3 vezes durante a sessão (recuperou sozinha em segundos, sem ação do dono além de confirmar que o Chrome estava de pé). O `resize_window` continua preso a um tamanho fixo (~500×542) independente do valor pedido — mesma limitação já registrada na sessão de 2026-08-13, não é regressão nova.
+
+**Estado do repo antes desta sessão:** `main` no commit `ebf83e7` (PR #33 mergeado, Leva 1 completa).
+
+---
+
+<details>
+<summary>Sessão anterior (2026-08-13 — Leva 1), preservada como histórico</summary>
 
 **O que foi implementado (branch `chore/leva-1-higiene-visual`):**
 - **A1 (P0) — avatar de iniciais invisível em `/perfil`.** `src/app/sistema.css`: base de `.avatar`/`.avatar--iniciais` virou corpo claro (`--lastro-sup-2`/`--lastro-txt`/`--lastro-controle`); `.barra-topo .avatar`/`.avatar--iniciais` restaura o petróleo original. Emenda em `DESIGN.md` §3.1.
@@ -272,6 +299,8 @@ Quota checada com uma chamada direta à API antes de gastar esforço recriando d
 **Estado do repo antes desta sessão:** `main`, PR #26 mergeado (2026-08-12). `tsc`/`test`/`lint`/`build` verdes.
 
 **Achado de arquitetura (herdado, ainda vale):** `"use server"` inline dentro de uma função só isola aquela função se o resto do arquivo também não tiver código server-only (`next/headers`/`next/cache`) usado por OUTRAS funções não-action — senão o Turbopack deste Next.js 16.3.0 quebra o build inteiro, e só `npm run build` pega isso.
+
+</details>
 
 ---
 
