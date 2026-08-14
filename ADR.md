@@ -137,3 +137,16 @@ Esta entrada não reescreve a ADR-008 — ela continua valendo como registro da 
 **Consequências.** A escolha "treino já montado vs. treino novo" acontece inteiramente na camada de UI/preenchimento (`src/lib/dados/treino.ts`, `treino-detalhe.tsx`) — o registro em `serie` continua idêntico nos dois casos, e é isso, não a escolha de origem, que a Análise enxerga. Especificação técnica completa (schema, migration, decisão de offline, fluxo de UI, o que fica de fora) em `SDD.md` §9.
 
 **Alternativa descartada.** Guardar a lista como "sugestão" dentro do próprio fluxo de Análise (ex.: usar `modelo_treino` para prever o próximo treino ou alimentar o prompt da Gemini) — isso seria exatamente a comparação executado vs. planejado que a ADR-008 proibiu, com um nome diferente.
+
+## ADR-010 — Cliente admin (service role) só para excluir a própria conta
+
+**Contexto.** Backlog C5 pede a porta de UI para excluir a conta — a exclusão em cascata no schema já existia e já era verificada (`qa-treino-helper.sh limpar-usuario`), mas nunca foi exposta ao dono. `auth.users` não é alcançável pela `anon key`/RLS comum: apagar uma linha ali exige `auth.admin.deleteUser`, que só funciona com a `service_role key` — uma chave nova neste projeto, que ignora toda RLS. Isso é dependência sensível o bastante pra merecer entrada própria, não só um comentário no código (mesmo padrão do ADR-004: dependência nova pede justificativa de uma linha e registro aqui).
+
+**Decisão.** `src/lib/supabase/cliente-admin.ts` — único ponto do projeto que usa `SUPABASE_SERVICE_ROLE_KEY`. Duas garantias estruturais, não só de prosa:
+
+1. **Nunca recebe um id vindo do cliente.** `excluirConta()` (`src/lib/dados/conta.ts`) não tem parâmetro nenhum — o alvo é sempre `auth.getUser()` da sessão corrente, obtido pelo cliente normal (`criarClienteServidor`) **antes** de o cliente admin ser criado. Não existe caminho de código em que um usuário apague a conta de outro.
+2. **Escopo de uso travado a uma função.** O cliente admin só é chamado por `auth.admin.deleteUser`. Qualquer uso novo (ex.: outra rotina administrativa) exige passar pelo mesmo raciocínio e ganhar entrada própria — não é "já que a chave existe, reaproveita".
+
+**Por que não RLS/policy comum.** RLS filtra linha dentro de uma tabela que o Postgres deixa o `authenticated` tocar; `auth.users` é schema gerenciado pelo Supabase, sem `grant delete` disponível pro role `authenticated` mesmo com policy favorável — não é uma omissão de configuração, é o desenho do produto. A `service_role key` é o único caminho documentado pelo próprio Supabase para excluir uma conta pelo backend.
+
+**Consequência de segurança prática.** `SUPABASE_SERVICE_ROLE_KEY` não tem prefixo `NEXT_PUBLIC_` (nunca entra no bundle do cliente) e vive só em `.env.local` (`.gitignore` já cobre `.env.*`). `cliente-admin.ts` não tem `"use client"` nem é importado por nenhum Client Component — só por `src/lib/dados/conta.ts`, que é `"use server"`.
