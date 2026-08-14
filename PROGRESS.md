@@ -247,6 +247,52 @@ Quota checada com uma chamada direta à API antes de gastar esforço recriando d
 
 > **➡️ Backlog original (`docs/BACKLOG-PROXIMA-FASE.md`) completo — todos os itens A, B e C implementados.** Único trabalho que resta, cross-cutting: **o gate visual completo** (viewports exatos 360/390 e G5 no aparelho do dono — a extensão não deixou simular o tamanho exato nesta sessão nem na anterior). Tudo verificado de ponta a ponta num Chrome real ou por SQL direto contra o banco hospedado; branch `feat/historico-exercicio-pr` aberta, PR ainda não mergeado nesta sessão — conferir `git log`/`gh pr list` antes de presumir.
 
+### ⏸️ ABERTO — diagnóstico do "design piorou" nas telas de Ajustes (2026-08-14, sessão seguinte)
+
+**Estado: diagnosticado e medido, NADA implementado. O dono viu a proposta e não gostou — decisão pendente com ele.** Não reabrir por conta própria; esperar ele solicitar.
+
+O dono olhou `/ajustes`, `/perfil`, `/ajustes/modelos` e `/ajustes/anilhas` no celular e disse que o design e o alinhamento pioraram nas duas telas mais novas. Palavras dele: *"a distância dos quadrados, os números dentro das cápsulas — pode ver que está tudo desalinhado e isso segue para os outros casos"*. Marcou também: "Criar modelo" deveria ser botão primário; alinhamento do campo × botão "Adicionar"; e "cor/contraste geral" destoando.
+
+**Antes de tudo: as screenshots do dono são de 12:31 e o PR #40 entrou às 12:43 — são de um build ANTERIOR a ele.** Conferido com `git log`. Isso muda o que ainda está quebrado; ver a tabela abaixo. O PR #40 mexeu em 12 linhas de CSS, só.
+
+**Quatro causas distintas (parecer do `diretor-arte`, contexto limpo), não uma.** Registrado aqui porque a sessão anterior já tentou o caminho de achar-um-bug-e-consertar (PR #40) e não resolveu:
+
+| # | Causa | Estado hoje na `main` |
+|---|---|---|
+| 1 | **O interior do cartão mora no `.item__link`, não no `.item`.** `.item` só carrega o casco (borda, superfície, elevação, raio); `padding`, `min-height: var(--lastro-alvo-min)` e `justify-content: space-between` vivem no `.item__link`. `/ajustes`, `/treino`, home e `/catalogo/[id]` usam o par completo. `anilhas-form.tsx` e `ajustes/modelos/page.tsx` põem filho **direto** no `.item` | ❌ **quebrado** |
+| 2 | **Densidade.** 6 cartões `--lastro-elev-1` de ~50px + vãos de `--lastro-e-3` = ~348px pra dizer 6 números; em 360×640 o corpo útil é ~460px. É o sintoma que `DESIGN.md` §3.0 manda reprovar ("no mesmo degrau dos vizinhos"). O `.item` foi desenhado pra **linha navegável** — anilha e modelo não navegam | ❌ **quebrado** |
+| 3 | **"Cor destoa" não é cor.** Papel tipográfico invertido: `.item__data` é `--lastro-fonte-num` (Plex **Mono**) 400 em `--lastro-t-1`; `.atalho__titulo` de `/ajustes` é Plex Sans 600 em `--lastro-t-corpo`. Mono 400/18px tem haste mais fina que Sans 600/16px → **o texto maior lê mais fraco que o menor**. Some-se: nome de modelo está num slot de DADO NUMÉRICO, o que §3.3 não permite | ❌ **quebrado** |
+| 4 | **`display: block` do PR #40 quebrou a centralização em `<a>`.** `.botao-secundario` não tem padding vertical nem `align-items`; `<button>` o UA centraliza sozinho, `<a>` não. Regressão introduzida pela própria tentativa de conserto | ❌ **quebrado** |
+| — | Bases do campo × botão "Adicionar" (`.dupla > .botao-secundario { align-self: end }`) | ✅ **já corrigido pelo #40** — a foto do dono é anterior |
+
+**Medido no navegador, na `main` atual, viewport 375px — não estimado:**
+
+| | Anilhas (nova) | `/ajustes` (antiga, não reclamada) |
+|---|---|---|
+| Texto até a aresta esquerda | **1 px** | 17 px |
+| x da lixeira | **44,2 / 55 / 65,8 / 76,6 px** — muda por linha | meta sempre a 25 px da direita |
+| Espaço morto à direita | **210 a 243 px** | 0 |
+
+Ou seja: o "está tudo desalinhado" do dono é literal e mensurável — 32 px de variação da lixeira entre "5 kg" e "1.25 kg". **Cor conferida e descartada como causa:** fundo (`linear-gradient(rgb(255,253,250)…`) e borda (`rgb(207,195,177)`) são **bit a bit idênticos** nas duas telas.
+
+Causa 4 medida à parte: `<a class="botao-secundario">` põe o texto a **3px do topo / 25px da base** de uma caixa de 48px; o mesmo `<button>` fica em 13,2/14,8 (centrado).
+
+**Proposta apresentada ao dono e REPROVADA por ele:** trocar os cartões de anilha/modelo por linha com divisória (anatomia do `.serie`), valor em `--lastro-t-4` com "kg" em span separado, lixeira ancorada por `margin-left: auto`. Prévia renderizada com o CSS e as fontes reais mostrou lixeira no mesmo x nas 6 linhas (291px) e altura da lista caindo de 360 → 294px. **O dono viu e disse que não gostou** — vai avaliar outra direção. A posição de "Criar modelo" (rodapé via `.acao-area` vs. onde está) também ficou **em aberto**, a pedido dele.
+
+**O que continua valendo independentemente da direção visual que ele escolher:** as 4 causas acima são diagnóstico, não proposta. Qualquer solução tem de resolver 1, 3 e 4; a 2 depende da direção que o dono escolher. **Restrição inegociável em qualquer caminho:** `/ajustes`, `/treino`, home e `/catalogo/[id]` têm de sair **pixel-idênticos** — o que favorece solução aditiva (seletor irmão do `.item__link`) sobre editar `.item`.
+
+**Achado adjacente, não corrigido:** `editar-perfil.tsx:54` renderiza o nome do usuário como `<p>{nome}</p>` **sem classe nenhuma** — default do navegador, fora do sistema visual, numa das telas em que o dono disse que "a cor destoa". Vale corrigir junto quando a direção for decidida.
+
+O parecer completo do `diretor-arte` inclui uma emenda pronta pra `DESIGN.md` §3.10 (contrato do cartão de lista) e um roteiro de gate com 8 medições (M1–M8) — **não aplicados**, porque a direção visual ainda não foi decidida.
+
+**➡️ A direção que o dono deu logo depois de reprovar a proposta (2026-08-14), literal:**
+
+> *"quero que entre nos navegadores, olhe as referências de aplicativos e designer, ui/ux como elas trabalha em cima da interação do cliente, quero que faça um estudo para se embasar e com isso os agentes possa trabalhar, como está hoje precisa mudar já, construímos muita coisas, mas tá na hora de dar um foco nas interação e no visual, **nada de linhas soltas, nada de blocos soltos, não é um site, é um aplicativo então ele deve agir como um**"*
+
+Isso **reprova de uma vez as duas composições que eu ofereci**: cartão empilhado é "bloco solto", linha com divisória é "linha solta". O problema não é qual das duas — é que ambas são vocabulário de **página web**, e o produto é um **aplicativo**. O trabalho seguinte não é escolher entre elas: é levantar referência real de app (padrão de lista agrupada, hierarquia por contenção, feedback de interação, transição entre telas) e só então propor. Estudo a fazer antes de qualquer CSS.
+
+---
+
 **C4 parte 2 — histórico do exercício com PR** (branch `feat/historico-exercicio-pr`): última peça do backlog original. `/catalogo/[id]` lista as séries valendo de um exercício, mais recente primeiro, cada uma marcada "recorde" se foi PR **no momento em que aconteceu** — não só a maior de todos os tempos. `marcarRecordesHistoricos` (`src/lib/analise/recorde-serie.ts`, 2 testes novos) aplica `ehRecorde` retroativamente contra o prefixo cronológico de cada série, reaproveitando a mesma regra e o mesmo piso (3 sessões anteriores) de C4 parte 1 — sem lógica nova, só uma composição nova da mesma peça. Cards do catálogo viram `<Link>` pra essa tela; cada linha do histórico linka de volta pro treino de origem. Verificado num Chrome real com 6 sessões seedadas (50→55→60→65→60→70kg): marcou recorde exatamente nas duas sessões esperadas (65kg e 70kg), confirmado clique levando ao treino certo.
 
 **Leva 3 (2026-08-14, branch `feat/calculadora-anilhas`) — C3 e C5:**
