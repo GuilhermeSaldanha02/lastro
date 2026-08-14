@@ -637,6 +637,19 @@
   color: var(--lastro-txt-2);
 }
 
+/* "Última vez" (C1) — texto + atalho de reaproveitar lado a lado. */
+.campo__historico {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--lastro-e-3);
+  margin-top: var(--lastro-e-2);
+}
+
+.campo__historico .campo__nota {
+  margin: 0;
+}
+
 .campo__rotulo {
   display: block;
   font-size: var(--lastro-t-meta);

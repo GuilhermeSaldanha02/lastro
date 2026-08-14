@@ -140,6 +140,59 @@ export async function buscarTreino(
   };
 }
 
+export type SerieHistorica = {
+  reps: number;
+  peso: number;
+  rir: number | null;
+  pesoCorporalIncluso: boolean;
+  criadoEm: string;
+  /** Pra contar SESSÕES distintas (piso de PR), não só séries — um treino
+   * pode ter várias séries do mesmo exercício e ainda ser uma sessão só. */
+  treinoId: string;
+};
+
+/**
+ * Histórico de séries VALENDO de um exercício específico, mais recente
+ * primeiro — fonte única pra três funcionalidades (backlog C1/C2/C4,
+ * 2026-08-13): "última vez" na linha de registro, "repetir" por exercício
+ * (não a última série do treino inteiro), e detecção de PR em tempo real.
+ * Aquecimento nunca entra (FF4) — não é "o que a pessoa fez de verdade" pra
+ * fins de comparação, é preparação.
+ */
+export async function historicoDoExercicio(
+  exercicioId: string,
+): Promise<SerieHistorica[]> {
+  const { supabase } = await usuarioAutenticadoOuErro();
+  const { data, error } = await supabase
+    .from("serie")
+    .select("reps, peso, rir, peso_corporal_incluso, criado_em, treino_id")
+    .eq("exercicio_id", exercicioId)
+    .eq("tipo", "valendo")
+    .order("criado_em", { ascending: false })
+    .limit(200);
+  if (error) {
+    throw new Error(`Falha ao buscar histórico do exercício: ${error.message}`);
+  }
+
+  type Linha = {
+    reps: number;
+    peso: number;
+    rir: number | null;
+    peso_corporal_incluso: boolean;
+    criado_em: string;
+    treino_id: string;
+  };
+
+  return ((data ?? []) as Linha[]).map((s) => ({
+    reps: s.reps,
+    peso: Number(s.peso),
+    rir: s.rir,
+    pesoCorporalIncluso: s.peso_corporal_incluso,
+    criadoEm: s.criado_em,
+    treinoId: s.treino_id,
+  }));
+}
+
 /** Catálogo de exercícios disponíveis para o formulário (SDD §5.1). */
 export async function listarExercicios(): Promise<Exercicio[]> {
   const { supabase } = await usuarioAutenticadoOuErro();
