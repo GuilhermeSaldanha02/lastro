@@ -243,9 +243,16 @@ Quota checada com uma chamada direta à API antes de gastar esforço recriando d
 
 ---
 
-## ▶ PONTO DE RETOMADA — ler primeiro (2026-08-14, sessão da Leva 2)
+## ▶ PONTO DE RETOMADA — ler primeiro (2026-08-14, sessão das Levas 2 e 3)
 
-> **➡️ Próximo passo: fechar o resto do gate visual da seção G** (viewports exatos 360/390 e G5 no aparelho do dono — pendência herdada da Leva 1, sem mudança) **e decidir a Leva 3** (C5 excluir conta, C3 calculadora de anilhas, C4 parte 2 — histórico do exercício). Leva 2 (C1+C2+C4 parte 1) **e** a tela nova de Configuração de Treinos (Scope Change aprovado nesta sessão) estão implementadas, verificadas de ponta a ponta num Chrome real, e **já mergeadas em `main`** (PRs #34 e um terceiro ainda a abrir/mergear pra `feat/modelo-treino` — conferir `git log`/`gh pr list` antes de presumir).
+> **➡️ Próximo passo: C4 parte 2 (histórico do exercício com PR) — o último item do backlog original — e o gate visual completo** (viewports exatos 360/390 e G5 no aparelho do dono, pendência que atravessa a sessão inteira). Levas 2 e 3 (exceto C4 parte 2) estão implementadas, verificadas de ponta a ponta num Chrome real ou por SQL direto contra o banco hospedado, e mergeadas em `main` — confira `git log`/`gh pr list` antes de presumir o que falta.
+
+**Leva 3 (2026-08-14, branch `feat/calculadora-anilhas`) — C3 e C5:**
+
+- **C3 — calculadora de anilhas.** Configurável (decisão do dono, 2026-08-13): peso da barra + inventário de anilhas, migration `0008_config_anilhas.sql` (colunas em `usuario`, sem tabela nova — mesmo raciocínio de custo/benefício de `modelo_treino_exercicio`). Conta pura em `src/lib/anilhas.ts` (`calcularAnilhas`, greedy da maior anilha pra menor, nunca ultrapassa o alvo), 7 casos testados. Tela `/ajustes/anilhas`: configurar + calculadora ao vivo na mesma página. Verificado num Chrome real: 87,5kg com o inventário padrão devolveu "1× 20 kg + 1× 10 kg + 1× 2,5 kg + 1× 1,25 kg" — bate exato com o teste automatizado.
+- **C5 — excluir a própria conta.** Precisou de uma peça nova que o backlog não previa: a `service_role key` do Supabase (`SUPABASE_SERVICE_ROLE_KEY`, documentada em `.env.example`) — `auth.users` não é alcançável por RLS comum, só por `auth.admin.deleteUser`. Registrado em `ADR.md` (ADR-010) com duas garantias estruturais: o cliente admin (`src/lib/supabase/cliente-admin.ts`) nunca recebe um id vindo do cliente (o alvo é sempre a sessão autenticada corrente), e só é usado por essa função. Botão "Excluir conta" em `/ajustes`, confirmação inline (nunca `window.confirm`) dizendo exatamente o que some. **Verificado ponta a ponta com dado real:** criei conta QA, cliquei "Excluir conta" na UI, `/ajustes` redirecionou pra `/login`, e `select count(*) from auth.users where email = ...` confirmou **0** — a conta sumiu de verdade, não só a sessão.
+- Antes de codar, carreguei a skill `security-review` (ECC) a pedido do dono — gatilho explícito do índice pra "chave de API nova, exclusão de dado pessoal".
+- `tsc`/`test` (123 passando, 7 novos)/`lint`/`build` verdes. Build também confirmado sem vazar a chave: `grep -rl "criarClienteAdmin\|SUPABASE_SERVICE_ROLE_KEY" .next/static` voltou vazio.
 
 **O que foi implementado nesta sessão (2026-08-14):**
 

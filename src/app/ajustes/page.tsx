@@ -6,6 +6,7 @@ import Link from "next/link";
 import { obterPerfil } from "@/lib/dados/perfil";
 import { sair } from "@/lib/dados/auth";
 import AbaInferior from "@/components/aba-inferior";
+import ExcluirConta from "@/components/excluir-conta";
 
 export default async function PaginaAjustes() {
   const perfil = await obterPerfil();
@@ -46,6 +47,14 @@ export default async function PaginaAjustes() {
                   </Link>
                 </div>
               </li>
+              <li>
+                <div className="item">
+                  <Link href="/ajustes/anilhas" className="item__link">
+                    <span className="atalho__titulo">Anilhas</span>
+                    <span className="atalho__meta">Configurar e calcular</span>
+                  </Link>
+                </div>
+              </li>
             </ul>
 
             <form action={sair}>
@@ -53,6 +62,8 @@ export default async function PaginaAjustes() {
                 Sair
               </button>
             </form>
+
+            <ExcluirConta />
           </div>
         ) : (
           <p className="vazio">Entre para ver seus ajustes.</p>
