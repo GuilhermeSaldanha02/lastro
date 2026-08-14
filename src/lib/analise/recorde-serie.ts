@@ -38,3 +38,20 @@ export function ehRecorde(
 
   return e1rmNova > e1rmMaximoAnterior;
 }
+
+/**
+ * Marca, pra cada série de um histórico em ordem CRONOLÓGICA (mais antiga
+ * primeiro), se ELA foi recorde no momento em que aconteceu — mesma regra
+ * de `ehRecorde`, aplicada retroativamente contra tudo que veio antes dela
+ * (backlog C4 parte 2, "no histórico do exercício"). Índice a índice, não
+ * é só "qual é a maior de todas": duas séries diferentes podem ter sido
+ * cada uma o recorde do seu momento, mesmo que uma tenha peso menor que a
+ * outra que veio depois.
+ */
+export function marcarRecordesHistoricos(
+  historicoCronologico: SerieHistoricaParaComparar[],
+): boolean[] {
+  return historicoCronologico.map((serie, indice) =>
+    ehRecorde(serie, historicoCronologico.slice(0, indice)),
+  );
+}

@@ -1,5 +1,9 @@
 import { describe, expect, it } from "vitest";
-import { ehRecorde, type SerieHistoricaParaComparar } from "./recorde-serie";
+import {
+  ehRecorde,
+  marcarRecordesHistoricos,
+  type SerieHistoricaParaComparar,
+} from "./recorde-serie";
 
 function historicoDe(n: number, reps: number, peso: number): SerieHistoricaParaComparar[] {
   return Array.from({ length: n }, (_, i) => ({
@@ -58,5 +62,30 @@ describe("ehRecorde", () => {
   it("T-R8: e1RM empatado com o máximo histórico -> não é recorde (precisa superar, não igualar)", () => {
     const historico = historicoDe(3, 8, 80);
     expect(ehRecorde({ reps: 8, peso: 80 }, historico)).toBe(false);
+  });
+});
+
+describe("marcarRecordesHistoricos", () => {
+  it("T-R9: marca cada série como recorde do PRÓPRIO momento, não só a maior de todas", () => {
+    const cronologico: SerieHistoricaParaComparar[] = [
+      { reps: 8, peso: 50, treinoId: "t1" },
+      { reps: 8, peso: 55, treinoId: "t2" },
+      { reps: 8, peso: 60, treinoId: "t3" },
+      { reps: 8, peso: 65, treinoId: "t4" }, // 3 sessões anteriores, piso ok, supera 60 -> PR
+      { reps: 8, peso: 60, treinoId: "t5" }, // abaixo do máximo anterior (65) -> não é PR
+      { reps: 8, peso: 70, treinoId: "t6" }, // supera 65 -> PR
+    ];
+    expect(marcarRecordesHistoricos(cronologico)).toEqual([
+      false,
+      false,
+      false,
+      true,
+      false,
+      true,
+    ]);
+  });
+
+  it("T-R10: histórico vazio -> array vazio", () => {
+    expect(marcarRecordesHistoricos([])).toEqual([]);
   });
 });

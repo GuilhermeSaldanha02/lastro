@@ -209,6 +209,24 @@ export async function listarExercicios(): Promise<Exercicio[]> {
   }));
 }
 
+/** Um exercício específico — cabeçalho da tela de histórico (backlog C4 parte 2). */
+export async function buscarExercicio(id: string): Promise<Exercicio | null> {
+  const { supabase } = await usuarioAutenticadoOuErro();
+  const { data, error } = await supabase
+    .from("exercicio")
+    .select("id, nome, grupo_muscular_primario, unilateral")
+    .eq("id", id)
+    .maybeSingle();
+  if (error) throw new Error(`Falha ao buscar exercício: ${error.message}`);
+  if (!data) return null;
+  return {
+    id: data.id,
+    nome: data.nome,
+    grupoMuscularPrimario: data.grupo_muscular_primario,
+    unilateral: data.unilateral,
+  };
+}
+
 export type ExercicioDoCatalogo = Exercicio & {
   grupoMuscularNome: string;
   /**

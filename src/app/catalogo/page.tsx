@@ -5,6 +5,7 @@
 // gerada por IA. É assunto de saúde e cai no E3. Onde a dica ainda não foi
 // escrita, esta tela diz isso — não inventa, não esconde e não chama o
 // modelo. Vazio honesto vence texto plausível.
+import Link from "next/link";
 import { listarCatalogo } from "@/lib/dados/treino";
 import { obterPerfil } from "@/lib/dados/perfil";
 import AbaInferior from "@/components/aba-inferior";
@@ -66,7 +67,11 @@ export default async function PaginaCatalogo() {
               </div>
 
               {grupo.itens.map((exercicio) => (
-                <article className="ficha" key={exercicio.id}>
+                <Link
+                  href={`/catalogo/${exercicio.id}`}
+                  className="ficha"
+                  key={exercicio.id}
+                >
                   <h3 className="ficha__nome">
                     {exercicio.nome}
                     {exercicio.unilateral && (
@@ -77,7 +82,7 @@ export default async function PaginaCatalogo() {
                   {exercicio.dicaExecucao && (
                     <p className="ficha__dica">{exercicio.dicaExecucao}</p>
                   )}
-                </article>
+                </Link>
               ))}
             </section>
           ))

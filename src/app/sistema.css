@@ -1108,12 +1108,23 @@
 /* =====================================================================
    CATÁLOGO DE EXERCÍCIOS
    ===================================================================== */
+/* Virou <Link> pro histórico do exercício (backlog C4 parte 2) — display
+   block e alvo de toque mínimo porque <a> é inline por padrão (D1). */
 .ficha {
+  display: block;
+  min-height: var(--lastro-alvo-min);
   border: 1px solid var(--lastro-linha);
   border-radius: var(--lastro-raio-1);
   background: var(--lastro-grad-sup);
   box-shadow: var(--lastro-elev-1), var(--lastro-bevel);
   padding: var(--lastro-e-4) var(--lastro-e-5);
+  color: var(--lastro-txt);
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.ficha:active {
+  background: var(--lastro-sup-2);
 }
 
 .ficha + .ficha {
