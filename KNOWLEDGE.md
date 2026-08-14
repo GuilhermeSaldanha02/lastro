@@ -6,7 +6,7 @@
 
 - [1. Glossário do domínio](#1-glossário-do-domínio) — definições travadas no grill; corrompem a matemática se mudarem
 - [2. Pesquisa de mercado](#2-pesquisa-de-mercado) — o que os concorrentes fazem e onde está o buraco
-- [3. Achados técnicos](#3-achados-técnicos) — Gemini, dados de exercício, offline
+- [3. Achados técnicos](#3-achados-técnicos) — Gemini, dados de exercício, offline; §3.8 pesquisa preliminar sobre "configuração de treinos" (escopo não aprovado)
 - [4. Perguntas em aberto](#4-perguntas-em-aberto) — o que ainda não sabemos e não pode ser inventado
 - [5. Lições](#5-lições) — erros cometidos e o que aprendemos
 
@@ -127,6 +127,48 @@ O LLM recebe métricas já calculadas e **apenas interpreta**. É a decisão de 
 **Decisão para o app:** usar **3–4 semanas** como gatilho de alerta, e **dizer na tela que é convenção prática, não critério clínico validado**. Emprestar autoridade científica a um número que a literatura não sustenta é exatamente o E3 que este projeto se proibiu.
 
 **Valor adotado no código: 4** (`SEMANAS_ESTAGNACAO`, `SDD.md` §4.2, decidido durante o QA da Fase 1). Motivo: alinha com `JANELA_SEMANAS = 4` — um único horizonte mental no produto, em vez de dois períodos arbitrários distintos — e é o extremo mais conservador da faixa acima, gerando menos alerta de estagnação em falso. **Fonte única do número em código:** `SDD.md` §4.2 / `src/lib/analise/limiares.ts`; esta seção permanece a fonte da faixa da literatura, não do valor adotado (P7).
+
+### 3.8 "Configuração de treinos" (treino pré-montado) — pesquisa preliminar, escopo NÃO aprovado
+
+*Escrito pelo `arquiteto` em 2026-08-13, a pedido do dono, em paralelo à avaliação de escopo do `analista-produto`. Isto é pesquisa e recomendação técnica, não decisão de produto — o arquiteto não decide se a tela existe. Nada aqui foi implementado.*
+
+**A ideia do dono, nas palavras dele:** uma tela "configuração de treinos" onde a pessoa monta listas de exercícios com antecedência (sem prescrever série/carga), e no dia escolhe "treino já montado" (pré-selecionado) ou "treino novo" (fluxo atual).
+
+**1. Padrão de mercado — linha entre "atalho reaproveitável" e "programa prescrito".** Verificado por busca (2026-08-13): Hevy separa explicitamente **routine** (template criado pelo próprio usuário — lista de exercícios que ele monta ou salva a partir de um treino já feito, editável, sem limite de conteúdo prescrito) de **program** (26 programas + 8 categorias de rotina, **prontos, escritos pelo Hevy/terceiros**, isso sim é prescrição). A linha real não é "existe uma lista reaproveitável" — é **quem escreve o conteúdo e o que a lista contém**: se é só "quais exercícios", montada e editada livremente pelo próprio dono, e sem série/carga/repetição alvo, fica do lado do atalho. Se o app sugerir séries, cargas, progressão ou algum programa pronto, cruza para prescrição. Fontes: [Hevy — Gym Routines](https://www.hevyapp.com/features/gym-routines/) · [Hevy — Workout Routine Library](https://www.hevyapp.com/features/gym-workout-routines/) · [Hevy vs Strong 2026](https://setgraph.app/ai-blog/hevy-vs-strong-app-comparison-2026). Base geral de domínio (não verificada nesta busca pontual): Strong segue o mesmo padrão (templates do usuário, sem programas prescritos no núcleo do app).
+
+**2. Choque com ADR-008/PRD §9 — não é o mesmo eixo, mas precisa de ADR novo se aprovado.** `ADR-008` e `PRD.md` §9 dizem "sem tela de configuração de rotina" — mas a razão registrada é especificamente **não comparar executado vs. planejado**; a Análise deriva o padrão real dos dados, não de uma divisão declarada. Uma `modelo_treino` que guarda só "quais exercícios" e **nunca é lida por `src/lib/analise/`** não toca essa razão — não é "declarar uma divisão para a Análise comparar", é lista de atalho para preencher o formulário mais rápido. Ainda assim, ADR-008 é append-only e não se reescreve: aprovação exige **entrada nova no ADR**, com a restrição no formato de fitness function — *"nenhum módulo de `src/lib/analise/` importa ou consulta `modelo_treino`"* — como o jeito de manter ADR-008 verdadeiro por construção, não por promessa em prosa.
+
+**Fato que o `analista-produto` pode não ter:** a própria pesquisa de mercado de 2026-08-13 que gerou `docs/BACKLOG-PROXIMA-FASE.md` já avaliou "rotinas/templates salvos" e **recomendou não fazer, sem sequer oferecer ao dono** (seção D do backlog: "chega perto de prescrever programa"). A ideia nova do dono não é idêntica (é mais restrita: só lista de exercícios, sem série/carga), mas é o mesmo território que já foi avaliado e recusado uma vez nesta mesma rodada — vale checar se o `analista-produto` está ciente antes de reavaliar do zero.
+
+**3. Schema, SE aprovado.** Duas tabelas novas, seguindo o precedente de RLS já usado em `usuario` (migração `0004_perfil_usuario.sql`, `for all using (id = auth.uid())`) e no par `treino`/`serie`:
+
+```sql
+create table public.modelo_treino (
+  id          uuid primary key default gen_random_uuid(),
+  usuario_id  uuid not null references auth.users(id) on delete cascade,
+  nome        text not null,
+  criado_em   timestamptz not null default now()
+);
+
+create table public.modelo_treino_exercicio (
+  id               uuid primary key default gen_random_uuid(),
+  modelo_treino_id uuid not null references public.modelo_treino(id) on delete cascade,
+  exercicio_id     uuid not null references public.exercicio(id),
+  ordem            smallint not null
+);
+```
+
+Deliberadamente **sem** `reps`/`peso`/`rir`/`tipo` — é exatamente a ausência desses campos que mantém isto do lado "lista de atalho" e não "programa prescrito" (ver item 1). `modelo_treino_exercicio` herda RLS por join (mesmo padrão que faria sentido para `serie`, mas aqui sem o trigger de herança de `0001` — não há necessidade de negar linha por `treino_id` inexistente, o `on delete cascade` já cobre).
+
+**4. Offline — correção de premissa e o risco real.** O prompt original presumiu que "o Dexie já espelha o schema remoto localmente"; **não espelha**. `src/lib/offline/db.ts` hoje é só uma fila (`outbox`) de mutações pendentes — não existe cache de leitura de nenhuma tabela remota, nem de `treino`, nem de `serie`, nem de `exercicio`. Isso muda a resposta:
+
+- **Criar/editar um modelo** é trabalho de bancada calma (ADR-008-adjacente: não é a cena do subsolo sem sinal) — pode ser **online-only**, igual a `excluir_treino` hoje (Server Action direta, sem passar pela fila). Baixo risco, precedente já existe.
+- **Ler a lista de modelos para escolher "treino já montado" no início do treino** é diferente: isso **está dentro da cena que D6 protege** (subsolo da academia, sem sinal, decidir na hora). Se a tela de escolha depender de rede, ela quebra exatamente na cena para a qual o app existe. Isso exigiria **cache de leitura local de uma entidade pela primeira vez no projeto** — nenhuma tabela hoje tem isso; `outbox` é fila de escrita, não espelho de leitura. É trabalho novo de categoria, não extensão do padrão existente, e é o ponto técnico que parece grátis (mostrar a Fase 1 tela) e não é (mostrar a Fase 1 offline).
+- Alternativa mais barata, se aprovado: fallback gracioso — sem cache, "treino novo" (fluxo atual, já 100% offline) continua sempre disponível; "treino já montado" fica indisponível sem rede, com aviso. Evita construir cache de leitura no MVP da feature, ao custo de a conveniência não funcionar exatamente na cena de maior necessidade signal-wise.
+
+**5. Acoplamento com C1/C2/C4 (aprovados, ainda não implementados) — checado no código real.** `src/components/treino-detalhe.tsx` **já agrupa as séries por exercício** (`agruparPorExercicio`, linha 62) — a tela de treino de hoje já se lê "exercício → suas séries", não uma lista plana. C1 (coluna "anterior" por exercício) e C2 (corrigir "repetir última série" para ser por exercício) constroem sobre essa estrutura de agrupamento que **já existe**; uma futura tela de modelo (lista de "slots" de exercício sem série ainda) reusaria o mesmo conceito de agrupamento, não um novo. **Conclusão: ortogonal, não retrabalho.** Implementar C1/C2/C4 agora não cria dívida caso a tela de configuração seja aprovada depois — e se for aprovada, o agrupamento que C1/C2 reforçam facilita a tela nova, não o contrário.
+
+**Recomendação ao dono:** seguir com C1/C2/C4 agora, como o backlog já aprovou, independente de quando (ou se) a tela de configuração for decidida. São eixos diferentes: C1/C2/C4 são leitura sobre `serie` já existente; a tela nova é dado de planejamento novo (`modelo_treino`), fora do caminho da Análise. Esperar uma decisão de escopo para começar a outra é bloqueio desnecessário.
 
 ---
 

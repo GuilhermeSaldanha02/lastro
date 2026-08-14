@@ -11,8 +11,10 @@
 // escolhido, lido do catálogo (`exercicio.unilateral`). A tela só mostra um
 // indicador de texto quando o exercício selecionado for unilateral — o dono
 // não re-declara isso a cada série (SDD §5.1).
-import { useState, type FormEvent } from "react";
-import type { Exercicio } from "@/lib/dados/treino";
+import { useEffect, useRef, useState, type FormEvent } from "react";
+import type { Exercicio, SerieHistorica } from "@/lib/dados/treino";
+import { historicoDoExercicio } from "@/lib/dados/treino";
+import { ehRecorde } from "@/lib/analise/recorde-serie";
 
 export type DadosNovaSerie = {
   exercicioId: string;
@@ -21,6 +23,9 @@ export type DadosNovaSerie = {
   peso: number;
   rir: number | null;
   pesoCorporalIncluso: boolean;
+  /** Calculado aqui (não no pai) porque é aqui que o histórico já foi
+   * buscado — evita uma segunda consulta pra mesma informação (C4). */
+  ehRecordePessoal: boolean;
 };
 
 export default function FormularioSerie({
@@ -37,8 +42,41 @@ export default function FormularioSerie({
   const [exercicioId, setExercicioId] = useState("");
   const [tipo, setTipo] = useState<"aquecimento" | "valendo" | "">("");
   const [erro, setErro] = useState<string | null>(null);
+  // Histórico do exercício escolhido — fonte única pra "última vez" (C1),
+  // "repetir por exercício" (C2) e detecção de PR (C4). `null` = ainda não
+  // buscado ou a busca falhou; a UI degrada em silêncio nos dois casos —
+  // sem rede (D6, elevador sem sinal) isto não pode virar erro visível.
+  const [historico, setHistorico] = useState<SerieHistorica[] | null>(null);
+  const repsRef = useRef<HTMLInputElement>(null);
+  const pesoRef = useRef<HTMLInputElement>(null);
 
   const exercicioSelecionado = exercicios.find((e) => e.id === exercicioId);
+
+  useEffect(() => {
+    let cancelado = false;
+    const buscar = exercicioId
+      ? historicoDoExercicio(exercicioId)
+      : Promise.resolve(null);
+    buscar
+      .then((dados) => {
+        if (!cancelado) setHistorico(dados);
+      })
+      .catch(() => {
+        if (!cancelado) setHistorico(null);
+      });
+    return () => {
+      cancelado = true;
+    };
+  }, [exercicioId]);
+
+  const ultimaDoHistorico = historico?.[0] ?? null;
+
+  function usarUltimosValores() {
+    if (!ultimaDoHistorico) return;
+    setTipo("valendo");
+    if (repsRef.current) repsRef.current.value = String(ultimaDoHistorico.reps);
+    if (pesoRef.current) pesoRef.current.value = String(ultimaDoHistorico.peso);
+  }
 
   async function aoEnviar(evento: FormEvent<HTMLFormElement>) {
     evento.preventDefault();
@@ -81,7 +119,21 @@ export default function FormularioSerie({
       rir = rirNumero;
     }
 
-    await onRegistrar({ exercicioId, tipo: tipo as "aquecimento" | "valendo", reps, peso, rir, pesoCorporalIncluso });
+    // PR só existe pra série valendo (FF4) e só compara contra séries
+    // elegíveis a e1RM do próprio exercício (backlog C4).
+    const ehRecordePessoal =
+      tipo === "valendo" &&
+      ehRecorde({ reps, peso }, historico ?? []);
+
+    await onRegistrar({
+      exercicioId,
+      tipo: tipo as "aquecimento" | "valendo",
+      reps,
+      peso,
+      rir,
+      pesoCorporalIncluso,
+      ehRecordePessoal,
+    });
     formulario.reset();
   }
 
@@ -115,6 +167,20 @@ export default function FormularioSerie({
         </p>
       )}
 
+      {/* "Última vez" (C1) — só séries VALENDO entram no histórico (FF4),
+          então isto nunca mostra um aquecimento como referência. Some em
+          silêncio sem rede ou sem histórico — nunca vira erro (D6). */}
+      {ultimaDoHistorico && (
+        <div className="campo__historico">
+          <p className="campo__nota">
+            Última vez: {ultimaDoHistorico.reps} × {ultimaDoHistorico.peso} kg
+          </p>
+          <button type="button" className="botao-textual" onClick={usarUltimosValores}>
+            Usar esses valores
+          </button>
+        </div>
+      )}
+
       <div className="campo">
         <label className="campo__rotulo" htmlFor="tipo">
           Tipo
@@ -140,6 +206,7 @@ export default function FormularioSerie({
             Reps
           </label>
           <input
+            ref={repsRef}
             id="reps"
             name="reps"
             type="number"
@@ -155,6 +222,7 @@ export default function FormularioSerie({
             Peso (kg)
           </label>
           <input
+            ref={pesoRef}
             id="peso"
             name="peso"
             type="number"

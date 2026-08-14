@@ -897,3 +897,181 @@ Isso entrega a tarefa **1.6** ao dono: ele lê os 3 pareceres e diz se convence.
 - Assinatura do cliente Supabase no App Router (`@supabase/ssr`, manuseio de cookies) — §3.1.
 - Assinatura de `@google/genai`: construção do cliente, `generateContent`, campo de saída estruturada, leitura do texto — §6.1. Mitigado pela interface `ClienteParecer`.
 - Registrar `E1RM_REPS_MAX = 12` e `COBERTURA_RIR_MINIMA = 0,60` em `KNOWLEDGE.md` §1 ao fechar a 1.3, com o rótulo de convenção prática — para que este SDD deixe de ser a fonte deles (P7).
+
+---
+
+## 9. Modelo de treino (lista de exercícios reaproveitável) — spec técnica
+
+> **Autoridade desta seção:** `ADR-009` decide o **por quê** e o limite estrutural (FF8). `KNOWLEDGE.md` §3.8 é a pesquisa preliminar que embasou a aprovação. Esta seção decide o **como**. Diferente das seções 3–7 (Fase 1), esta é uma fatia posterior — não altera nada do que já está implementado nas tarefas 1.1–1.5.
+
+### 9.0 Escopo desta seção — e o que está FORA
+
+**DENTRO:** tabela(s) nova(s), RLS, migration, tela de configuração em `/ajustes`, e a mudança no fluxo de "Iniciar treino de hoje" para oferecer a escolha quando há pelo menos um modelo salvo.
+
+**FORA — declarado explicitamente:**
+
+| Fora | Por quê |
+|---|---|
+| Editar um modelo depois de criado | Mínimo viável é criar e excluir; editar é iteração 2, não bloqueia o valor da feature |
+| Reordenar exercícios dentro de um modelo | A ordem de criação já é uma ordem razoável; reordenar é refinamento de UX, não a decisão de produto aprovada |
+| Limite explícito no número de modelos salvos | Nenhum pedido do dono sustenta um teto artificial agora; se o uso real mostrar necessidade, vira ADR/migration própria depois |
+| Cache de leitura local (Dexie) de `modelo_treino` | Decisão explícita §9.2: online-only nesta iteração |
+| Qualquer leitura de `modelo_treino` por `src/lib/analise/` ou pelo route handler da Gemini | Proibido por ADR-009/FF8, não "fora por enquanto" — fora por construção |
+| Modelo compartilhável entre usuários, ou modelo de terceiros (tipo *program* do Hevy) | Fora do escopo aprovado pelo dono; ver KNOWLEDGE.md §3.8 item 1, essa é exatamente a linha que manteria isto do lado "atalho", não "prescrição" |
+
+Se uma implementação desta seção encostar em qualquer linha da coluna "Fora", ela saiu do escopo — pare e replaneje.
+
+### 9.1 Schema, RLS e migration
+
+**Nomes** seguem `KNOWLEDGE.md` §1: `treino`/`serie`/`exercicio` já são os termos do domínio; um treino pré-montado é um **modelo** desse treino — não "rotina" nem "programa" (ambos carregam conotação de prescrição que o escopo aprovado exclui, ver ADR-009). Daí `modelo_treino` e `modelo_treino_exercicio`.
+
+Próxima migration livre: `0007` (última existente é `0006_catalogo_maquinas_hammer_lifefitness.sql`).
+
+```sql
+-- supabase/migrations/0007_modelo_treino.sql
+
+-- ============ modelo_treino: lista de exercícios reaproveitável ============
+-- ADR-009 / FF8: esta tabela e a seguinte NUNCA são lidas por
+-- src/lib/analise/ nem pelo route handler da Gemini. Deliberadamente sem
+-- coluna de série, peso, reps, rir ou tipo — é o que mantém isto do lado
+-- "lista de atalho" e não "programa prescrito" (KNOWLEDGE.md §3.8 item 1).
+create table public.modelo_treino (
+  id          uuid primary key default gen_random_uuid(),
+  usuario_id  uuid not null references auth.users(id) on delete cascade,
+  nome        text not null,
+  criado_em   timestamptz not null default now()
+);
+create index modelo_treino_usuario_idx on public.modelo_treino (usuario_id, criado_em desc);
+
+alter table public.modelo_treino enable row level security;
+
+create policy modelo_treino_proprio on public.modelo_treino
+  for all to authenticated
+  using (usuario_id = (select auth.uid()))
+  with check (usuario_id = (select auth.uid()));
+
+-- SEM `update`: editar um modelo depois de criado é FORA de escopo (§9.0).
+-- Omitir o grant torna esse limite verdadeiro por construção, não por
+-- convenção de código — o mesmo raciocínio do FF8 aplicado ao Postgres.
+grant select, insert, delete on public.modelo_treino to authenticated;
+
+-- ============ modelo_treino_exercicio: quais exercícios, em que ordem ============
+create table public.modelo_treino_exercicio (
+  id               uuid primary key default gen_random_uuid(),
+  modelo_treino_id uuid not null references public.modelo_treino(id) on delete cascade,
+  exercicio_id     uuid not null references public.exercicio(id),
+  ordem            smallint not null
+);
+create index modelo_treino_exercicio_modelo_idx
+  on public.modelo_treino_exercicio (modelo_treino_id, ordem);
+
+alter table public.modelo_treino_exercicio enable row level security;
+
+-- Sem usuario_id denormalizado aqui (diverge do padrão treino/serie de
+-- propósito): não há trigger de herança porque o `on delete cascade` de
+-- modelo_treino_id já impede linha órfã, e o volume desta tabela (algumas
+-- dezenas de linhas por usuário, no máximo) não paga o custo de
+-- denormalizar só para simplificar a policy. RLS por EXISTS/join é FF5
+-- válida do mesmo jeito — a fitness function pede "toda tabela com dado
+-- de usuário tem RLS por auth.uid()", não que a checagem seja direta.
+create policy modelo_treino_exercicio_proprio on public.modelo_treino_exercicio
+  for all to authenticated
+  using (
+    exists (
+      select 1 from public.modelo_treino m
+      where m.id = modelo_treino_exercicio.modelo_treino_id
+        and m.usuario_id = (select auth.uid())
+    )
+  )
+  with check (
+    exists (
+      select 1 from public.modelo_treino m
+      where m.id = modelo_treino_exercicio.modelo_treino_id
+        and m.usuario_id = (select auth.uid())
+    )
+  );
+
+-- SEM `update` pelo mesmo motivo acima: reordenar é FORA (§9.0). Delete
+-- existe porque excluir o modelo inteiro cobre a única forma de "desfazer".
+grant select, insert, delete on public.modelo_treino_exercicio to authenticated;
+```
+
+**Justificativa do que não é óbvio:**
+
+| Escolha | Por quê |
+|---|---|
+| Sem `reps`/`peso`/`rir`/`tipo` em nenhuma das duas tabelas | Não é omissão a ser preenchida depois — é o limite estrutural do ADR-009. Se um dia crescer para incluir esses campos, isso é uma decisão de produto nova (voltar a prescrever), não uma extensão natural desta spec |
+| `modelo_treino_exercicio` sem `usuario_id` denormalizado | Diverge do padrão de `serie` (§3.2) porque ali a denormalização paga por si (RLS trivial + FF5 vira contagem direta numa tabela de alto volume). Aqui o volume é baixo e o `on delete cascade` já veda linha órfã — denormalizar seria complexidade sem retorno |
+| `exercicio_id` **sem** cascade | Mesmo motivo do `serie` (§3.2): catálogo não some por acidente. Se um exercício for descontinuado do catálogo, o modelo que o referencia quebra visivelmente (FK), não silenciosamente |
+| `ordem smallint`, sem `unique` composto | A UI define a ordem na criação; não há edição nesta iteração (§9.0), então não existe reordenação que precise de constraint de unicidade agora |
+
+### 9.2 Decisão sobre offline: online-only
+
+**Decisão: as duas operações desta feature — administrar modelos em `/ajustes` e escolher "já montado vs. novo" ao iniciar o treino de hoje — são online-only, sem fila outbox e sem cache de leitura no Dexie.**
+
+Isso é uma correção da hesitação registrada em `KNOWLEDGE.md` §3.8 item 4 (que apontava a leitura de modelos no início do treino como dentro da cena que D6 protege). Discordo daquela nota preliminar, por uma linha: **D6 protege o registro da série durante o treino — a queda de sinal no meio do exercício — não a escolha do que treinar antes de começar.** A pessoa decide "já montado ou novo" no vestiário, na entrada da academia, olhando o celular parado — não no meio de uma série, sem sinal, com o elevador descendo (a cena que o PRD J1 nomeia). Se a rede cair exatamente nesse instante de escolha, o fallback já existe de graça: "treino novo" é o fluxo atual, 100% funcional offline hoje, sem mudança nenhuma. Ninguém fica impedido de treinar — fica impedido, na pior hipótese, de usar o atalho de preenchimento.
+
+Isso também segue o precedente já estabelecido pelo próprio projeto: `excluirTreino`/`excluirTreinoRemoto` (`src/lib/dados/treino.ts:346-359`, comentado em `treino-detalhe.tsx:44-49`) já é online-only por decisão consciente, pela mesma classe de razão — "ação rara, de bancada calma, fora da cena sem sinal". `modelo_treino` é a mesma classe: administrado com calma, lido uma vez no início do treino, nunca no meio.
+
+**Consequência prática:** `src/lib/dados/modelo-treino.ts` (novo módulo, §9.3) não tem contraparte na fila (`src/lib/offline/outbox.ts`) — nenhum `tipo` novo entra no union de payloads da fila, ao contrário de `criar_serie`/`atualizar_serie`/`excluir_serie`. Se a leitura de modelos falhar por falta de rede na tela de "Iniciar treino de hoje", a UI cai no comportamento idêntico ao atual (§9.4) — não é um estado de erro visível, é a ausência silenciosa da opção extra.
+
+Isto NÃO é a "primeira leitura com cache local" que a nota preliminar temia construir — continua não existindo cache de leitura de tabela nenhuma no projeto, e esta spec não muda isso.
+
+### 9.3 Fluxo de UI, por arquivo
+
+**Novo módulo de dados:**
+
+```
+src/lib/dados/modelo-treino.ts
+```
+Segue o padrão de `src/lib/dados/treino.ts` (Server Actions, `usuarioAutenticadoOuErro`, sem cache): `listarModelos()`, `buscarModelo(id)`, `criarModelo(nome, exercicioIds[])`, `excluirModelo(id)`. Todas as quatro são online-only (§9.2) — nenhuma passa por `enfileirar`/`sincronizar`.
+
+**Tela de configuração — nova rota dentro de `/ajustes`:**
+
+```
+src/app/ajustes/modelos/page.tsx          ← lista os modelos do usuário, link para criar novo
+src/app/ajustes/modelos/novo/page.tsx     ← formulário: nome + seleção de exercícios do catálogo
+src/components/modelo-treino-form.tsx     ← client component da seleção (reusa SeletorGrupoMuscular, src/components/seletor-grupo-muscular.tsx, já usado no formulário de série)
+```
+
+`src/app/ajustes/page.tsx` (lido nesta sessão — hoje só tem Perfil, Coach, Sair) ganha uma terceira entrada na `<ul className="lista">`, no mesmo padrão do item "Coach" (linhas 33-40): link para `/ajustes/modelos`, rótulo "Modelos de treino" / meta "Montar listas de exercícios".
+
+**Mudança no fluxo "Iniciar treino de hoje":**
+
+`criarTreino` (`src/lib/dados/treino.ts:215-242`) hoje cria o treino e redireciona direto para `/treino/{id}`, sem pergunta nenhuma. Ela **não muda** — continua sendo o que cria a linha em `treino`. O que muda é o que vem **antes** dela, na tela (`src/app/page.tsx:100-106` e `src/app/treino/page.tsx:83`, os dois pontos onde o botão "Iniciar treino de hoje" existe hoje):
+
+- **Se `listarModelos()` retorna lista vazia** (usuário nunca configurou nada, ou é usuário existente antes desta feature): o botão continua exatamente como é hoje — `<form action={criarTreino}>`, um clique, sem tela extra. **Comportamento idêntico ao atual, sem exceção** — este é o caso que domina numericamente enquanto a feature é nova, e é o caso que a KNOWLEDGE.md §3.8 recomendação já blindava (ortogonal a C1/C2/C4).
+- **Se existe pelo menos um modelo salvo:** o botão abre um passo intermediário — "Treino novo" (aciona `criarTreino` exatamente como hoje, sem pré-seleção) ou "Usar um modelo" (lista os modelos por nome; escolher um aciona uma variante nova, `criarTreinoComModelo(modeloId)`, que faz o que `criarTreino` faz e **além disso** carrega os `exercicio_id` do modelo para a tela de treino.
+
+  **Decisão explícita sobre `agruparPorExercicio` (`treino-detalhe.tsx:62-77`), porque a função como está hoje não consegue expressar "exercício sem nenhuma série ainda":** ela itera `series: Serie[]` e só cria um grupo quando encontra uma série daquele exercício — zero séries, zero grupo. Em vez de forçar a função a inventar séries fantasma para caber no formato, `TreinoDetalhe` ganha uma prop nova, opcional, `exerciciosPreSelecionados?: { exercicioId: string; nome: string }[]` — a lista crua vinda do modelo. O componente renderiza esses exercícios como seções "vazias, prontas para a primeira série" **antes** das seções que `agruparPorExercicio` já produz a partir de `series`, com o mesmo cabeçalho visual, e filtra da lista de pré-selecionados qualquer `exercicioId` que já apareça em `agruparPorExercicio(series)` (evita seção duplicada assim que a primeira série de um exercício pré-selecionado é registrada). **`agruparPorExercicio` em si não muda uma linha** — a função continua recebendo só `series` e continua não sabendo que modelos existem; toda a lógica de pré-seleção fica no componente, que já é `"use client"` e já orquestra estado (`useState`, linha 88).
+
+`criarTreinoComModelo` vive em `src/lib/dados/treino.ts` (perto de `criarTreino`, mesma dependência de `dataLocalBrasil`/reaproveitamento do treino de hoje) e lê `modelo_treino_exercicio` só para saber **quais** `exercicio_id` pré-listar — nunca grava nada em `modelo_treino*`, só em `treino`. A leitura de `modelo_treino_exercicio` para popular a tela continua sendo I/O puro de `src/lib/dados/`, nunca de `src/lib/analise/` (FF8).
+
+**Se o treino de hoje já existe** (usuário voltou à tela depois de já ter começado): a home renderiza "Continuar treino de hoje" (`src/app/page.tsx:93-99`), não o botão de iniciar — o caminho de escolha "já montado vs. novo" fica inalcançável nesse caso, exatamente como hoje o botão de iniciar já some quando há treino em andamento. `criarTreinoComModelo` nunca roda sobre um treino que já tem séries; a pré-seleção só faz sentido no primeiro carregamento de um treino vazio.
+
+### 9.4 O que NÃO muda
+
+- `criarTreino()` sem argumento continua existindo e continua sendo o caminho de quem nunca configurou nada — nenhuma migração de comportamento é exigida do usuário atual (o dono, hoje, sem modelo nenhum salvo).
+- `agruparPorExercicio` (`treino-detalhe.tsx:62-77`) não muda **nenhuma linha**: continua recebendo só `series: Serie[]`. A pré-seleção entra por uma prop nova e separada (`exerciciosPreSelecionados`, §9.3), renderizada ao lado do resultado de `agruparPorExercicio`, nunca dentro dele.
+- `src/lib/analise/` não ganha import novo, não ganha campo novo no resumo, não ganha menção a modelo em nenhum prompt.
+- `excluirModelo` some a lista de exercícios, nunca apaga `treino`/`serie` já registrados a partir dela — não há vínculo de chave estrangeira entre `modelo_treino` e `treino`, de propósito: um treino criado a partir de um modelo é, dali em diante, um treino normal, indistinguível de um criado do zero.
+
+### 9.5 Check executável
+
+Passagem contínua, sem atalho:
+
+1. **Migration aplica limpo:** `npx supabase db reset` (ou `db push` no ambiente de teste) roda `0007_modelo_treino.sql` sem erro, sobre o schema das migrations 0001–0006 já aplicadas.
+2. **RLS isola por usuário (FF5):** com dois usuários de teste, usuário A cria um modelo com 2 exercícios; consulta autenticada como usuário B em `modelo_treino` e em `modelo_treino_exercicio` retorna 0 linhas para o modelo de A.
+3. **FF8, checado por busca, não por leitura de código.** Contagem explícita, não status de saída do `grep` — `grep` sem match devolve exit 1, e diretório inexistente devolve exit 2; um script que só olha "passou/falhou" do próprio `grep` confunde os dois com "achou zero", o mesmo modo de falha que este SDD já documenta para a FF2 (§6, nota sobre `.next/`). Confirmar antes que os diretórios-alvo existem — `src/lib/analise/` e `src/app/api/` existem hoje (verificado nesta sessão: `agregar.ts` etc. no primeiro, `analise/coach/progressao/` no segundo).
+   ```bash
+   N_PROIBIDO=$(grep -ril "modelo_treino" src/lib/analise/ src/app/api/ 2>/dev/null | wc -l)
+   test "$N_PROIBIDO" -eq 0 && echo "FF8 OK: $N_PROIBIDO ocorrências (esperado 0)" || echo "FF8 FALHOU: $N_PROIBIDO ocorrências"
+
+   N_ESPERADO=$(grep -ril "modelo_treino" src/lib/dados/ src/app/ajustes/ src/components/ 2>/dev/null | wc -l)
+   test "$N_ESPERADO" -gt 0 && echo "camada de dados OK: $N_ESPERADO arquivo(s)" || echo "suspeito: 0 arquivos usam modelo_treino em lugar nenhum"
+   ```
+   `$N_PROIBIDO` igual a `0` é a passagem/reprovação binária da fitness function — não "parece que não usa". `$N_ESPERADO` maior que zero é o teste de sanidade complementar: confirma que a busca em si funciona (achou os arquivos que deveria achar) antes de confiar no zero do primeiro grupo.
+4. **Fluxo ponta a ponta, manual:** usuário sem modelo nenhum vê o botão "Iniciar treino de hoje" idêntico ao que existe hoje (screenshot antes/depois desta feature, comparados). Usuário com 1 modelo salvo vê a escolha "Treino novo" vs. nome do modelo; escolher o modelo abre `/treino/{id}` com os exercícios do modelo já visíveis, zero séries registradas em cada um. Excluir o modelo em `/ajustes/modelos` não afeta nenhum treino já criado a partir dele.
+5. **Offline, negativo (confirma §9.2, não regride D6):** com a rede desligada, "Registrar série" continua funcionando (FF6, já coberto pela Fase 1) e "Treino novo" continua disponível; "Usar um modelo" pode falhar ao carregar a lista — isso é aceitável e esperado, não é uma regressão a corrigir nesta spec.
+
+Dono aprova lendo os 5 pontos acima executados, não a spec em prosa.

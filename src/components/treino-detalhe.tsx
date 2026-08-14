@@ -27,6 +27,14 @@ import FormularioSerie, { type DadosNovaSerie } from "./formulario-serie";
 import EditarSerie, { type DadosEdicaoSerie } from "./editar-serie";
 import SeletorGrupoMuscular, { type OpcaoGrupo } from "./seletor-grupo-muscular";
 
+/**
+ * `ehRecordePessoal` é só de tela (C4) — nunca persiste no banco, nunca
+ * entra em `NovaSerieInput`. É calculado no momento do registro e existe
+ * só pra marcar o selo na hora; recarregar a página não precisa lembrar
+ * disso (o registro em si não se perde, só o selo).
+ */
+type SerieUI = Serie & { ehRecordePessoal?: boolean };
+
 async function sincronizarPendentes() {
   return sincronizar({
     // Sincronização de treino ainda não existe (só séries, por ora) — a
@@ -59,8 +67,8 @@ async function sincronizarPendentes() {
  * contagem exposta é só de séries VALENDO: aquecimento não entra em
  * volume, e1RM nem contagem (PRD A2).
  */
-function agruparPorExercicio(series: Serie[]) {
-  const grupos: { exercicioId: string; nome: string; series: Serie[] }[] = [];
+function agruparPorExercicio(series: SerieUI[]) {
+  const grupos: { exercicioId: string; nome: string; series: SerieUI[] }[] = [];
   for (const serie of series) {
     const existente = grupos.find((g) => g.exercicioId === serie.exercicioId);
     if (existente) {
@@ -85,7 +93,7 @@ export default function TreinoDetalhe({
   seriesIniciais: Serie[];
   exercicios: ExercicioDoCatalogo[];
 }) {
-  const [series, setSeries] = useState(seriesIniciais);
+  const [series, setSeries] = useState<SerieUI[]>(seriesIniciais);
   const [formularioAberto, setFormularioAberto] = useState(false);
   const [editandoId, setEditandoId] = useState<string | null>(null);
   const [excluindoId, setExcluindoId] = useState<string | null>(null);
@@ -158,6 +166,8 @@ export default function TreinoDetalhe({
       peso: ultima.peso,
       rir: ultima.rir,
       pesoCorporalIncluso: ultima.pesoCorporalIncluso,
+      // Repetir a série exata que já foi feita não pode superá-la — nunca é PR.
+      ehRecordePessoal: false,
     });
   }
 
@@ -165,7 +175,7 @@ export default function TreinoDetalhe({
     const exercicio = exercicios.find((e) => e.id === dados.exercicioId);
     if (!exercicio) throw new Error("Exercício não encontrado no catálogo.");
 
-    const novaSerie: Serie = {
+    const novaSerie: SerieUI = {
       id: crypto.randomUUID(),
       exercicioId: dados.exercicioId,
       exercicioNome: exercicio.nome,
@@ -175,6 +185,7 @@ export default function TreinoDetalhe({
       peso: dados.peso,
       rir: dados.rir,
       pesoCorporalIncluso: dados.pesoCorporalIncluso,
+      ehRecordePessoal: dados.ehRecordePessoal,
     };
     const ordem = series.length + 1;
 
@@ -345,6 +356,11 @@ export default function TreinoDetalhe({
                       >
                         {serie.tipo}
                       </span>
+                      {/* PR na hora (C4) — só existe enquanto a tela está
+                          aberta, não persiste no banco (ver SerieUI). */}
+                      {serie.ehRecordePessoal && (
+                        <span className="marca marca--recorde">recorde</span>
+                      )}
                       <button
                         type="button"
                         className="botao-icone serie__excluir"

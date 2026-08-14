@@ -115,3 +115,25 @@ Asserções objetivas, checadas ao fim de cada fase do roadmap. Falhou um eixo �
 **Consequências.** Elimina uma tela do MVP e mede o que foi feito em vez do que foi prometido — que é a única coisa que interessa numa ferramenta de honestidade sobre o próprio treino.
 
 **Alternativa descartada.** Configurador de divisão ABC/Upper-Lower/Full body — mais tela, mais manutenção, e a comparação com o plano declarado tende a lisonjear.
+
+---
+
+## ADR-009 — Lista de exercícios reaproveitável (`modelo_treino`) não é a rotina que a ADR-008 proibiu
+
+**Contexto.** ADR-008 decidiu "sem tela de rotina" pela razão registrada ali: evitar que a Análise compare executado vs. planejado, porque essa comparação tende a lisonjear e o produto existe para medir o que foi feito, não o que foi prometido. Em 2026-08-13 o dono aprovou uma tela nova, dentro de `/ajustes`, onde a pessoa pode (opcional) montar uma lista de exercícios que costuma fazer — só a lista, nunca série/peso/reps — e no dia do treino escolher entre um treino "já montado" (a lista pré-selecionada) ou "treino novo" (fluxo atual, do zero). `KNOWLEDGE.md` §3.8 registra a pesquisa preliminar que embasa esta entrada, inclusive o precedente de mercado (Hevy *routine* vs. *program* — ver §3.8 item 1).
+
+Esta entrada não reescreve a ADR-008 — ela continua valendo como registro da razão original. Esta entrada existe porque a nova tela toca a mesma palavra ("rotina"/"treino pré-montado") sem tocar a mesma razão, e isso precisa estar demonstrado, não só afirmado.
+
+**Decisão.** Aprovada a tabela `modelo_treino` (+ `modelo_treino_exercicio`), com uma restrição estrutural, não de prosa: **nenhum módulo de `src/lib/analise/` importa, consulta ou recebe dado de `modelo_treino`/`modelo_treino_exercicio`, em nenhuma forma — nem linha crua, nem métrica derivada, nem menção em prompt à Gemini.** A tabela guarda exclusivamente `exercicio_id` + `ordem`; não existe coluna de série, peso, reps, rir ou tipo, e não pode passar a existir sem uma entrada nova de ADR.
+
+**Por que isso não fere a razão da ADR-008.** A razão da ADR-008 é sobre a Análise: não comparar executado vs. planejado, não deixar o dono declarar uma divisão que a Análise usaria como vara de medir a si mesma. `modelo_treino` nunca chega perto da Análise — é conveniência de preenchimento do formulário em `treino-detalhe.tsx` (pré-seleciona quais exercícios abrir, nada além disso). O agregador (`src/lib/analise/`) continua recebendo só `serie` — o que foi de fato registrado — exatamente como antes desta tela existir. Se `modelo_treino` um dia for lido por `src/lib/analise/`, a razão original volta a valer e a ADR-008 foi violada de fato, não só de nome; a fitness function abaixo é o que impede isso de acontecer em silêncio.
+
+**Fitness function nova — FF8.** Vive aqui, não na tabela de `ADR-006`, porque `ADR-006` é append-only e esta função nasceu depois. A Revisão de Arquitetura ao fim de cada fase lê `ADR-006` **e** toda fitness function declarada em ADR posterior — FF8 não é opcional só por morar fora da tabela original.
+
+| # | Asserção | Como se checa |
+|---|---|---|
+| **FF8** | Nenhum módulo de `src/lib/analise/` importa `modelo_treino`/`modelo_treino_exercicio`, direta ou indiretamente | Busca por `modelo_treino` em `src/lib/analise/`: zero ocorrências. Busca complementar por `from("modelo_treino` e `.modelo_treino_exercicio` em todo `src/`: só aparecem em `src/lib/dados/` (camada de dados) e nos componentes de `/ajustes`/formulário de treino — nunca em `src/lib/analise/` nem em `src/app/api/analise/` (route handler da Gemini) |
+
+**Consequências.** A escolha "treino já montado vs. treino novo" acontece inteiramente na camada de UI/preenchimento (`src/lib/dados/treino.ts`, `treino-detalhe.tsx`) — o registro em `serie` continua idêntico nos dois casos, e é isso, não a escolha de origem, que a Análise enxerga. Especificação técnica completa (schema, migration, decisão de offline, fluxo de UI, o que fica de fora) em `SDD.md` §9.
+
+**Alternativa descartada.** Guardar a lista como "sugestão" dentro do próprio fluxo de Análise (ex.: usar `modelo_treino` para prever o próximo treino ou alimentar o prompt da Gemini) — isso seria exatamente a comparação executado vs. planejado que a ADR-008 proibiu, com um nome diferente.

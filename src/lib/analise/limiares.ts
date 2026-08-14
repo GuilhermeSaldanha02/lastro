@@ -51,6 +51,15 @@ export const MAX_VOLUME_POR_EXERCICIO = 8;
  * anteriores como piso informal — não é limiar estatístico.
  */
 export const MINIMO_SEMANAS_PARECER = 3;
+/**
+ * Piso de sessões ANTERIORES daquele exercício pra marcar PR na linha da
+ * série (backlog C4, 2026-08-13). Sem isso, com pouco histórico toda série
+ * vira "recorde" e o marcador perde o sentido. Decidido com o dono — não é
+ * limiar estatístico, é convenção prática (mesmo padrão de
+ * MINIMO_SEMANAS_PARECER acima, ainda que a unidade seja diferente: sessões
+ * do exercício, não semanas fechadas).
+ */
+export const MINIMO_SESSOES_PARA_RECORDE = 3;
 export const MAX_ESTAGNACOES = 5;
 export const MAX_PRS = 5;
 export const MAX_GRUPOS = 12;
