@@ -245,7 +245,9 @@ Quota checada com uma chamada direta à API antes de gastar esforço recriando d
 
 ## ▶ PONTO DE RETOMADA — ler primeiro (2026-08-14, sessão das Levas 2 e 3)
 
-> **➡️ Próximo passo: C4 parte 2 (histórico do exercício com PR) — o último item do backlog original — e o gate visual completo** (viewports exatos 360/390 e G5 no aparelho do dono, pendência que atravessa a sessão inteira). Levas 2 e 3 (exceto C4 parte 2) estão implementadas, verificadas de ponta a ponta num Chrome real ou por SQL direto contra o banco hospedado, e mergeadas em `main` — confira `git log`/`gh pr list` antes de presumir o que falta.
+> **➡️ Backlog original (`docs/BACKLOG-PROXIMA-FASE.md`) completo — todos os itens A, B e C implementados.** Único trabalho que resta, cross-cutting: **o gate visual completo** (viewports exatos 360/390 e G5 no aparelho do dono — a extensão não deixou simular o tamanho exato nesta sessão nem na anterior). Tudo verificado de ponta a ponta num Chrome real ou por SQL direto contra o banco hospedado; branch `feat/historico-exercicio-pr` aberta, PR ainda não mergeado nesta sessão — conferir `git log`/`gh pr list` antes de presumir.
+
+**C4 parte 2 — histórico do exercício com PR** (branch `feat/historico-exercicio-pr`): última peça do backlog original. `/catalogo/[id]` lista as séries valendo de um exercício, mais recente primeiro, cada uma marcada "recorde" se foi PR **no momento em que aconteceu** — não só a maior de todos os tempos. `marcarRecordesHistoricos` (`src/lib/analise/recorde-serie.ts`, 2 testes novos) aplica `ehRecorde` retroativamente contra o prefixo cronológico de cada série, reaproveitando a mesma regra e o mesmo piso (3 sessões anteriores) de C4 parte 1 — sem lógica nova, só uma composição nova da mesma peça. Cards do catálogo viram `<Link>` pra essa tela; cada linha do histórico linka de volta pro treino de origem. Verificado num Chrome real com 6 sessões seedadas (50→55→60→65→60→70kg): marcou recorde exatamente nas duas sessões esperadas (65kg e 70kg), confirmado clique levando ao treino certo.
 
 **Leva 3 (2026-08-14, branch `feat/calculadora-anilhas`) — C3 e C5:**
 
