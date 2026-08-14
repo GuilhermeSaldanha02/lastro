@@ -1068,28 +1068,6 @@
   margin-bottom: var(--lastro-e-6);
 }
 
-.grafico-progressao__cabecalho {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: var(--lastro-e-3);
-}
-
-.grafico-progressao__cabecalho .doc__secao {
-  margin: 0;
-}
-
-/* Select nativo — não é um alvo de toque frequente, mas ainda cumpre o piso. */
-.grafico-progressao__seletor {
-  min-height: var(--lastro-alvo-min);
-  border: 1px solid var(--lastro-controle);
-  border-radius: var(--lastro-raio-1);
-  background: var(--lastro-sup-1);
-  color: var(--lastro-txt-2);
-  font-size: var(--lastro-t-meta);
-  padding: 0 var(--lastro-e-3);
-}
-
 /* A conclusão em palavras vem ANTES do desenho (§3.7 item 2) — quem só lê
    esta linha já sabe o resultado. */
 .grafico-progressao__conclusao {

@@ -1,9 +1,13 @@
 // lastro · DESIGN.md §3.7 — gráfico de progressão, companhia visual da
 // Análise Semanal. A pergunta que ele responde não é "quanto?", é "está
 // subindo?" — o eixo é recurso de conferência, nunca via principal.
+//
+// Redesenho 2026-08-14: pequenos múltiplos — até 4 painéis (um por
+// exercício), sem seletor. O servidor já filtra e rankeia
+// (carregarProgressao); este componente só desenha o que chega.
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Line,
   LineChart,
@@ -11,7 +15,7 @@ import {
   ResponsiveContainer,
   XAxis,
 } from "recharts";
-import type { DadosProgressao } from "@/lib/dados/progressao";
+import type { PainelProgressao } from "@/lib/dados/progressao";
 
 type PontoGrafico = {
   semanaInicio: string;
@@ -28,7 +32,7 @@ function formatarKg(valor: number): string {
   return `${valor.toFixed(1)} kg`;
 }
 
-/** Ponto interativo: alvo de toque/foco de --lastro-alvo-min mesmo com marcador pequeno (§3.7 item 5). */
+/** Ponto interativo: alvo de toque/foco de --lastro-alvo-min mesmo com marcador pequeno (§3.7.4 item 5). */
 function pontoInterativo(cor: string, ativo: boolean, aoAtivar: (indice: number | null) => void) {
   return function PontoInterativo(props: {
     cx?: number;
@@ -68,21 +72,15 @@ function pontoInterativo(cor: string, ativo: boolean, aoAtivar: (indice: number 
   };
 }
 
-function GraficoConteudo({ dados }: { dados: DadosProgressao }) {
+/**
+ * Um painel — um exercício. O servidor só entrega painéis com pelo menos
+ * 2 semanas elegíveis para e1RM (T-E6), então este componente não repete
+ * essa checagem: se chegou até aqui, tem dado suficiente pra desenhar.
+ */
+function PainelConteudo({ painel }: { painel: PainelProgressao }) {
   const [indiceAtivo, setIndiceAtivo] = useState<number | null>(null);
 
-  const comDado = dados.pontos.filter((p) => p.e1rm !== undefined);
-  const suficiente = comDado.length >= 2;
-
-  if (!suficiente) {
-    return (
-      <p className="grafico-progressao__vazio">
-        Ainda não há pelo menos 2 semanas com sessão de {dados.exercicio.nome}{" "}
-        elegível para e1RM — a progressão aparece a partir da 2ª.
-      </p>
-    );
-  }
-
+  const comDado = painel.pontos.filter((p) => p.e1rm !== undefined);
   const primeiro = comDado[0];
   const ultimo = comDado[comDado.length - 1];
   // primeiro.e1rm pode ser 0 (ex.: assistida registrada sem carga externa)
@@ -94,15 +92,22 @@ function GraficoConteudo({ dados }: { dados: DadosProgressao }) {
   const subindo = baseValida ? deltaPct > 0 : deltaKg > 0;
   const caindo = baseValida ? deltaPct < 0 : deltaKg < 0;
   const melhorMarca = Math.max(...comDado.map((p) => p.e1rm!));
+  // A linha de referência só soma informação nova quando o pico não é o
+  // primeiro nem o último ponto — nesses dois casos o rótulo de extremo
+  // (RotuloExtremos) já mostra o mesmo número bem ali, e a etiqueta da
+  // linha de referência (fixa no canto superior direito) colide com ele
+  // visualmente em telas estreitas, sobretudo quando a tendência é de
+  // subida (o extremo mais alto cai perto do topo do gráfico).
+  const melhorMarcaEhExtremo = melhorMarca === primeiro.e1rm || melhorMarca === ultimo.e1rm;
 
-  const indicePrimeiro = dados.pontos.indexOf(primeiro);
-  const indiceUltimo = dados.pontos.indexOf(ultimo);
+  const indicePrimeiro = painel.pontos.indexOf(primeiro);
+  const indiceUltimo = painel.pontos.indexOf(ultimo);
 
-  const inicioPlato = dados.plato
-    ? dados.pontos.findIndex((p) => p.semanaInicio === dados.plato!.semanaInicio)
+  const inicioPlato = painel.plato
+    ? painel.pontos.findIndex((p) => p.semanaInicio === painel.plato!.semanaInicio)
     : -1;
 
-  const serie: PontoGrafico[] = dados.pontos.map((p, i) => {
+  const serie: PontoGrafico[] = painel.pontos.map((p, i) => {
     const noPlato = inicioPlato >= 0 && i >= inicioPlato;
     const naJuncao = inicioPlato >= 0 && i === inicioPlato;
     return {
@@ -147,17 +152,17 @@ function GraficoConteudo({ dados }: { dados: DadosProgressao }) {
   return (
     <>
       <p className="grafico-progressao__conclusao">
-        {dados.exercicio.nome}: e1RM {subindo ? "subiu" : caindo ? "caiu" : "ficou estável"}{" "}
+        e1RM {subindo ? "subiu" : caindo ? "caiu" : "ficou estável"}{" "}
         <strong>
           {baseValida
             ? `${Math.abs(deltaPct).toFixed(1)}%`
             : `${Math.abs(deltaKg).toFixed(1)} kg`}
         </strong>{" "}
         entre {formatarSemana(primeiro.semanaInicio)} e {formatarSemana(ultimo.semanaInicio)}.
-        {dados.plato && (
+        {painel.plato && (
           <span className="grafico-progressao__plato-nota">
             {" "}
-            Platô há {dados.plato.semanas} semanas.
+            Platô há {painel.plato.semanas} semanas.
           </span>
         )}
       </p>
@@ -172,17 +177,19 @@ function GraficoConteudo({ dados }: { dados: DadosProgressao }) {
             axisLine={{ stroke: "var(--lastro-linha)" }}
             interval="preserveStartEnd"
           />
-          <ReferenceLine
-            y={melhorMarca}
-            stroke="var(--lastro-linha)"
-            strokeDasharray="2 3"
-            label={{
-              value: `melhor marca no período: ${formatarKg(melhorMarca)}`,
-              position: "insideTopRight",
-              fill: "var(--lastro-txt-3)",
-              fontSize: "var(--lastro-t-meta)",
-            }}
-          />
+          {!melhorMarcaEhExtremo && (
+            <ReferenceLine
+              y={melhorMarca}
+              stroke="var(--lastro-linha)"
+              strokeDasharray="2 3"
+              label={{
+                value: `melhor marca: ${formatarKg(melhorMarca)}`,
+                position: "insideTopRight",
+                fill: "var(--lastro-txt-3)",
+                fontSize: "var(--lastro-t-meta)",
+              }}
+            />
+          )}
           <Line
             dataKey="valorProgressao"
             stroke="var(--lastro-alta)"
@@ -205,17 +212,18 @@ function GraficoConteudo({ dados }: { dados: DadosProgressao }) {
         </LineChart>
       </ResponsiveContainer>
 
-      {indiceAtivo !== null && dados.pontos[indiceAtivo]?.e1rm !== undefined && (
+      {indiceAtivo !== null && painel.pontos[indiceAtivo]?.e1rm !== undefined && (
         <p aria-live="polite" className="grafico-progressao__leitura-ativa">
-          Semana de {formatarSemana(dados.pontos[indiceAtivo].semanaInicio)}:{" "}
-          {formatarKg(dados.pontos[indiceAtivo].e1rm!)}
+          Semana de {formatarSemana(painel.pontos[indiceAtivo].semanaInicio)}:{" "}
+          {formatarKg(painel.pontos[indiceAtivo].e1rm!)}
         </p>
       )}
 
       <ul className="so-leitor-de-tela">
         {comDado.map((p) => (
           <li key={p.semanaInicio}>
-            Semana de {formatarSemana(p.semanaInicio)}: e1RM {formatarKg(p.e1rm!)}
+            {painel.exercicio.nome} — semana de {formatarSemana(p.semanaInicio)}: e1RM{" "}
+            {formatarKg(p.e1rm!)}
           </li>
         ))}
       </ul>
@@ -224,28 +232,21 @@ function GraficoConteudo({ dados }: { dados: DadosProgressao }) {
 }
 
 export default function GraficoProgressao() {
-  const [dados, setDados] = useState<DadosProgressao | null | undefined>(undefined);
+  const [paineis, setPaineis] = useState<PainelProgressao[] | undefined>(undefined);
   const [erro, setErro] = useState(false);
 
-  const carregar = useCallback((exercicioId?: string) => {
-    const url = exercicioId
-      ? `/api/progressao?exercicioId=${encodeURIComponent(exercicioId)}`
-      : "/api/progressao";
-    fetch(url)
+  useEffect(() => {
+    fetch("/api/progressao")
       .then((resposta) => {
         if (!resposta.ok) throw new Error("falha");
         return resposta.json();
       })
       .then((json) => {
-        setDados(json as DadosProgressao | null);
+        setPaineis(json as PainelProgressao[]);
         setErro(false);
       })
       .catch(() => setErro(true));
   }, []);
-
-  useEffect(() => {
-    carregar();
-  }, [carregar]);
 
   if (erro) {
     return (
@@ -255,38 +256,32 @@ export default function GraficoProgressao() {
     );
   }
 
-  if (dados === undefined) {
+  if (paineis === undefined) {
     return <div className="esqueleto" style={{ height: 200 }} />;
   }
 
-  return (
-    <section className="grafico-progressao" aria-label="Gráfico de progressão">
-      <div className="grafico-progressao__cabecalho">
-        <h2 className="doc__secao">Progressão</h2>
-        {dados && dados.opcoes.length > 1 && (
-          <select
-            className="grafico-progressao__seletor"
-            value={dados.exercicio.id}
-            onChange={(evento) => carregar(evento.target.value)}
-            aria-label="Exercício do gráfico"
-          >
-            {dados.opcoes.map((opcao) => (
-              <option key={opcao.id} value={opcao.id}>
-                {opcao.nome}
-              </option>
-            ))}
-          </select>
-        )}
-      </div>
+  if (paineis.length === 0) {
+    return (
+      <p className="grafico-progressao__vazio">
+        Ainda não há sessões suficientes de nenhum exercício pra desenhar progressão —
+        registre pelo menos 2 treinos com o mesmo exercício.
+      </p>
+    );
+  }
 
-      {dados === null ? (
-        <p className="grafico-progressao__vazio">
-          Ainda não há sessões suficientes de nenhum exercício pra desenhar progressão —
-          registre pelo menos 2 treinos com o mesmo exercício.
-        </p>
-      ) : (
-        <GraficoConteudo dados={dados} />
-      )}
-    </section>
+  return (
+    <div>
+      <h2 className="doc__secao">Progressão</h2>
+      {paineis.map((painel) => (
+        <section
+          className="grafico-progressao"
+          key={painel.exercicio.id}
+          aria-label={`Progressão de ${painel.exercicio.nome}`}
+        >
+          <h3 className="grupo__nome">{painel.exercicio.nome}</h3>
+          <PainelConteudo painel={painel} />
+        </section>
+      ))}
+    </div>
   );
 }

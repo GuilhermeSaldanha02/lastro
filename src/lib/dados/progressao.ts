@@ -19,12 +19,14 @@ import type { SerieValendo } from "@/lib/analise/tipos";
 
 export type OpcaoExercicio = { id: string; nome: string };
 
-export type DadosProgressao = {
+/** Um painel do gráfico (DESIGN.md §3.7.1) — um exercício, sua própria escala. */
+export type PainelProgressao = {
   exercicio: OpcaoExercicio;
-  opcoes: OpcaoExercicio[];
   pontos: PontoSemanal[];
   plato: Plato | null;
 };
+
+const TETO_PAINEIS = 4;
 
 type LinhaSerie = {
   tipo: "aquecimento" | "valendo";
@@ -48,15 +50,14 @@ type LinhaTreino = {
 const SEMANAS_HISTORICO = 12;
 
 /**
- * Carrega o histórico semanal de um exercício para o gráfico. Sem
- * `exercicioId`, escolhe o exercício com mais sessões no histórico —
- * o mais provável de interessar a leitura da semana. `null` quando o
- * dono ainda não tem nenhum exercício com sessão suficiente (T-E6: 1
- * sessão não conta progressão, precisa de pelo menos 2 pra ter delta).
+ * Carrega até `TETO_PAINEIS` painéis de progressão (DESIGN.md §3.7.3) —
+ * os exercícios com mais sessões no período, cada um com pelo menos 2
+ * semanas elegíveis para e1RM (T-E6: 1 sessão não conta progressão,
+ * precisa de pelo menos 2 pra ter delta). Sem seletor — a lista inteira
+ * já vem pronta pra desenhar, sem escolha do usuário (§3.7, redesenho
+ * 2026-08-14).
  */
-export async function carregarProgressao(
-  exercicioId?: string,
-): Promise<DadosProgressao | null> {
+export async function carregarProgressao(): Promise<PainelProgressao[]> {
   const supabase = await criarClienteServidor();
   const {
     data: { user },
@@ -92,18 +93,16 @@ export async function carregarProgressao(
       })),
   );
 
-  if (seriesValendo.length === 0) return null;
+  if (seriesValendo.length === 0) return [];
 
   const ultimaSemanaFechada = semanaAnaliseAtual(new Date());
   const semanas = listarSemanas(ultimaSemanaFechada, SEMANAS_HISTORICO);
   const semanasDoPeriodo = new Set(semanas);
 
-  // Exercício -> nome e nº de sessões distintas (treinos), pra opção do
-  // seletor. Contagem SEPARADA pro período mostrado no gráfico — o padrão
-  // (sem `exercicioId` explícito) precisa de um exercício com sessão
-  // DENTRO das `SEMANAS_HISTORICO` semanas visíveis, senão a tela abre
-  // direto no estado "dados insuficientes" mesmo quando outro exercício
-  // tem histórico recente de sobra (achado do inspetor-qa, PR #12).
+  // Exercício -> nome e sessões distintas (treinos) — total e dentro do
+  // período mostrado, separadas (mesma razão de antes: o ranking prioriza
+  // quem tem sessão DENTRO das SEMANAS_HISTORICO semanas visíveis, com
+  // fallback pro histórico todo pra quem não tem nenhuma no período).
   const sessoesPorExercicio = new Map<string, Set<string>>();
   const sessoesNoPeriodoPorExercicio = new Map<string, Set<string>>();
   const nomePorExercicio = new Map<string, string>();
@@ -122,32 +121,40 @@ export async function carregarProgressao(
     }
   }
 
-  const opcoes: OpcaoExercicio[] = Array.from(nomePorExercicio.entries())
-    .map(([id, nome]) => ({ id, nome }))
-    .sort((a, b) => a.nome.localeCompare(b.nome, "pt-BR"));
+  // Ranking: mais sessões DENTRO do período primeiro; depois, o resto por
+  // sessões no histórico todo (união sem repetir id) — mesma lógica de
+  // fallback que já existia pro exercício único, agora aplicada à lista
+  // inteira de candidatos a painel.
+  const rankingDoPeriodo = Array.from(sessoesNoPeriodoPorExercicio.entries())
+    .sort((a, b) => b[1].size - a[1].size)
+    .map(([id]) => id);
+  const rankingGeral = Array.from(sessoesPorExercicio.entries())
+    .sort((a, b) => b[1].size - a[1].size)
+    .map(([id]) => id);
+  const idsRankeados = [
+    ...rankingDoPeriodo,
+    ...rankingGeral.filter((id) => !rankingDoPeriodo.includes(id)),
+  ];
 
-  // Padrão: mais sessões DENTRO do período mostrado; sem nenhum exercício
-  // com sessão no período, cai pro mais treinado no histórico todo (ainda
-  // assim mostra "dados insuficientes", mas por um motivo real, não por
-  // ter escolhido um exercício qualquer alheio ao que a tela desenha).
-  const rankingDoPeriodo = Array.from(sessoesNoPeriodoPorExercicio.entries()).sort(
-    (a, b) => b[1].size - a[1].size,
-  );
-  const idPadrao =
-    rankingDoPeriodo[0]?.[0] ??
-    Array.from(sessoesPorExercicio.entries()).sort((a, b) => b[1].size - a[1].size)[0][0];
+  const paineis: PainelProgressao[] = [];
+  for (const exercicioId of idsRankeados) {
+    if (paineis.length >= TETO_PAINEIS) break;
 
-  const idEscolhido = exercicioId && sessoesPorExercicio.has(exercicioId) ? exercicioId : idPadrao;
+    const seriesDoExercicio = seriesValendo.filter((s) => s.exercicioId === exercicioId);
+    const pontos = calcularSeriesSemanais(seriesDoExercicio, semanas);
+    const comDado = pontos.filter((p) => p.e1rm !== undefined);
+    if (comDado.length < 2) continue; // T-E6 — sem painel sem pelo menos 2 semanas elegíveis
 
-  const exercicio = opcoes.find((o) => o.id === idEscolhido)!;
+    const plato = detectarPlato(
+      pontos.map((p) => ({ semanaInicio: p.semanaInicio, valor: p.e1rm })),
+    );
 
-  const seriesDoExercicio = seriesValendo.filter(
-    (s) => s.exercicioId === idEscolhido,
-  );
-  const pontos = calcularSeriesSemanais(seriesDoExercicio, semanas);
-  const plato = detectarPlato(
-    pontos.map((p) => ({ semanaInicio: p.semanaInicio, valor: p.e1rm })),
-  );
+    paineis.push({
+      exercicio: { id: exercicioId, nome: nomePorExercicio.get(exercicioId)! },
+      pontos,
+      plato,
+    });
+  }
 
-  return { exercicio, opcoes, pontos, plato };
+  return paineis;
 }
