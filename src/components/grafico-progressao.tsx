@@ -231,7 +231,19 @@ function PainelConteudo({ painel }: { painel: PainelProgressao }) {
   );
 }
 
-export default function GraficoProgressao() {
+export default function GraficoProgressao({
+  onStatus,
+  ocultarQuandoVazio,
+}: {
+  /** Avisa o pai se há painel pra mostrar, assim que a busca resolve —
+   * usado pra combinar o aviso "sem dado" com o da Análise Semanal
+   * (evita dois avisos empilhados dizendo a mesma coisa, achado do dono
+   * 2026-08-14). */
+  onStatus?: (temPainel: boolean) => void;
+  /** Quando true e não há painel, não renderiza o próprio texto de vazio
+   * — o pai já está mostrando um aviso combinado. */
+  ocultarQuandoVazio?: boolean;
+}) {
   const [paineis, setPaineis] = useState<PainelProgressao[] | undefined>(undefined);
   const [erro, setErro] = useState(false);
 
@@ -242,10 +254,13 @@ export default function GraficoProgressao() {
         return resposta.json();
       })
       .then((json) => {
-        setPaineis(json as PainelProgressao[]);
+        const dados = json as PainelProgressao[];
+        setPaineis(dados);
         setErro(false);
+        onStatus?.(dados.length > 0);
       })
       .catch(() => setErro(true));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   if (erro) {
@@ -261,6 +276,7 @@ export default function GraficoProgressao() {
   }
 
   if (paineis.length === 0) {
+    if (ocultarQuandoVazio) return null;
     return (
       <p className="grafico-progressao__vazio">
         Ainda não há sessões suficientes de nenhum exercício pra desenhar progressão —

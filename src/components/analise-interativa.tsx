@@ -76,6 +76,11 @@ export default function AnaliseInterativa({
     }
   }
 
+  // null = ainda não sabemos (busca do gráfico em voo). Só usado pra decidir
+  // se o aviso de "sem dado" da Análise Semanal se combina com o do
+  // gráfico ou fica sozinho — nunca bloqueia nada além do texto do aviso.
+  const [graficoTemPainel, setGraficoTemPainel] = useState<boolean | null>(null);
+
   const dadosSuficientes = semanasFechadasComTreino >= MINIMO_SEMANAS_PARECER;
   // Inativo cobre as duas regras — dados insuficientes (B1) e uma pergunta
   // já em voo — sem confundir uma com a outra (nota 3 de B1: isto não
@@ -93,7 +98,10 @@ export default function AnaliseInterativa({
 
   return (
     <div className="corpo corpo--com-nav">
-      <GraficoProgressao />
+      <GraficoProgressao
+        onStatus={(temPainel) => setGraficoTemPainel(temPainel)}
+        ocultarQuandoVazio={!dadosSuficientes}
+      />
 
       <h2 className="doc__secao">Análise semanal</h2>
 
@@ -102,7 +110,17 @@ export default function AnaliseInterativa({
         // falta e QUANTO falta, em número — nunca deixa o LLM ser quem
         // avisa isso. Neutro (--lastro-txt-2), nunca --lastro-erro: não
         // é erro, é começo.
+        //
+        // Combinado com o aviso do gráfico quando os dois estão vazios
+        // (achado do dono, 2026-08-14: dois avisos de "ainda não há dado"
+        // empilhados liam repetitivo) — um parágrafo só, não dois.
         <p className="vazio" aria-live="polite">
+          {graficoTemPainel === false && (
+            <>
+              Ainda não há pelo menos 2 semanas do mesmo exercício pra desenhar
+              progressão.{" "}
+            </>
+          )}
           Você tem {semanasFechadasComTreino}{" "}
           {semanasFechadasComTreino === 1 ? "semana fechada" : "semanas fechadas"}.
           São necessárias {MINIMO_SEMANAS_PARECER} para calcular a análise
