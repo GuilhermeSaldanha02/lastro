@@ -6,6 +6,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { buscarTreino, listarCatalogo } from "@/lib/dados/treino";
 import { obterPerfil } from "@/lib/dados/perfil";
+import { buscarModelo } from "@/lib/dados/modelo-treino";
 import TreinoDetalhe from "@/components/treino-detalhe";
 import AbaInferior from "@/components/aba-inferior";
 import Avatar from "@/components/avatar";
@@ -28,10 +29,13 @@ function formatarContexto(iso: string): string {
 
 export default async function PaginaTreinoDetalhe({
   params,
+  searchParams,
 }: {
   params: Promise<{ id: string }>;
+  searchParams: Promise<{ modelo?: string }>;
 }) {
   const { id } = await params;
+  const { modelo: modeloId } = await searchParams;
   const [treino, exercicios, perfil] = await Promise.all([
     buscarTreino(id),
     listarCatalogo(),
@@ -39,6 +43,14 @@ export default async function PaginaTreinoDetalhe({
   ]);
 
   if (!treino) notFound();
+
+  // Pré-seleção só faz sentido no primeiro carregamento de um treino vazio
+  // (SDD §9.3) — um treino que já tem série não tem mais "exercício ainda
+  // não começado" pra oferecer.
+  const exerciciosPreSelecionados =
+    modeloId && treino.series.length === 0
+      ? (await buscarModelo(modeloId))?.exercicios
+      : undefined;
 
   return (
     <main className="tela">
@@ -61,6 +73,7 @@ export default async function PaginaTreinoDetalhe({
         treinoId={treino.id}
         seriesIniciais={treino.series}
         exercicios={exercicios}
+        exerciciosPreSelecionados={exerciciosPreSelecionados}
       />
 
       <AbaInferior ativa="bancada" />

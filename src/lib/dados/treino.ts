@@ -294,6 +294,41 @@ export async function criarTreino(): Promise<void> {
   redirect(`/treino/${data.id}`);
 }
 
+/**
+ * Mesma coisa que `criarTreino`, mas o destino carrega o modelo escolhido
+ * na querystring (SDD §9.3) — a tela de treino usa isso só pra pré-listar
+ * os exercícios do modelo (`buscarModelo`, `src/lib/dados/modelo-treino.ts`),
+ * nunca grava nada em `modelo_treino*`. `modeloId` não é validado aqui
+ * (RLS de `modelo_treino` cuida disso na leitura, na tela de destino) —
+ * esta função só decide PARA ONDE redirecionar.
+ */
+export async function criarTreinoComModelo(modeloId: string): Promise<void> {
+  const { supabase, user } = await usuarioAutenticadoOuErro();
+  const hoje = dataLocalBrasil();
+
+  const { data: existente, error: erroConsulta } = await supabase
+    .from("treino")
+    .select("id")
+    .eq("data", hoje)
+    .maybeSingle();
+  if (erroConsulta) {
+    throw new Error(`Falha ao verificar treino de hoje: ${erroConsulta.message}`);
+  }
+  if (existente) {
+    redirect(`/treino/${existente.id}?modelo=${modeloId}`);
+  }
+
+  const { data, error } = await supabase
+    .from("treino")
+    .insert({ usuario_id: user.id, data: hoje })
+    .select("id")
+    .single();
+  if (error) throw new Error(`Falha ao criar treino: ${error.message}`);
+
+  revalidatePath("/treino");
+  redirect(`/treino/${data.id}?modelo=${modeloId}`);
+}
+
 export type NovaSerieInput = {
   id: string;
   treinoId: string;

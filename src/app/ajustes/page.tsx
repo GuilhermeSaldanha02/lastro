@@ -38,6 +38,14 @@ export default async function PaginaAjustes() {
                   </Link>
                 </div>
               </li>
+              <li>
+                <div className="item">
+                  <Link href="/ajustes/modelos" className="item__link">
+                    <span className="atalho__titulo">Modelos de treino</span>
+                    <span className="atalho__meta">Montar listas de exercícios</span>
+                  </Link>
+                </div>
+              </li>
             </ul>
 
             <form action={sair}>
