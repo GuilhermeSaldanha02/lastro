@@ -6,18 +6,25 @@
 // "Novo PR em Agachamento" fixo — E3 e PRD §7: sem treino, os números
 // vêm zerados e a tela diz isso, em vez de parecer cheia mentindo.
 //
-// O que NÃO existe aqui, de propósito: cartão de "próximo treino
-// planejado" com nome e lista de exercícios. O app não prescreve programa
-// (PRD §5, escopo negativo) — ele analisa o que foi feito. A ação real é
-// "iniciar treino de hoje", que é o que o botão faz.
+// O que NÃO existe aqui: cartão passivo de "próximo treino planejado" com
+// nome e lista de exercícios sugeridos pelo app. O app não prescreve
+// programa (PRD §5, escopo negativo) — ele analisa o que foi feito. A ação
+// real é "iniciar treino de hoje". SDD §9 (2026-08-13, Scope Change
+// aprovado em PRD §9) acrescenta uma exceção estreita e opcional: se o
+// PRÓPRIO dono já salvou um modelo (só lista de exercícios, nunca
+// série/peso/reps), o botão oferece escolher entre ele e "treino novo" —
+// isso não é o app sugerindo nada, é reaproveitar o que a pessoa mesma
+// montou. Sem modelo nenhum, o comportamento é idêntico ao original.
 import Link from "next/link";
 import { criarClienteServidor } from "@/lib/supabase/cliente-servidor";
 import { carregarResumoHome } from "@/lib/dados/resumo-home";
 import { criarTreino } from "@/lib/dados/treino";
 import { obterPerfil } from "@/lib/dados/perfil";
+import { listarModelos } from "@/lib/dados/modelo-treino";
 import { dataLocalBrasil, formatarDataCurta } from "@/lib/tempo";
 import AbaInferior from "@/components/aba-inferior";
 import Avatar from "@/components/avatar";
+import IniciarTreino from "@/components/iniciar-treino";
 
 /** "2026-08-06" → "6 ago". Relativo quando é hoje ou ontem. */
 function formatarData(iso: string, hojeISO: string): string {
@@ -63,9 +70,10 @@ export default async function PaginaInicial() {
   }
 
   const hoje = dataLocalBrasil();
-  const [resumo, perfil] = await Promise.all([
+  const [resumo, perfil, modelos] = await Promise.all([
     carregarResumoHome(hoje),
     obterPerfil(),
+    listarModelos(),
   ]);
 
   return (
@@ -97,6 +105,8 @@ export default async function PaginaInicial() {
             >
               Continuar treino de hoje
             </Link>
+          ) : modelos.length > 0 ? (
+            <IniciarTreino modelos={modelos} />
           ) : (
             <form action={criarTreino}>
               <button type="submit" className="botao-primario">

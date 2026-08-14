@@ -88,10 +88,16 @@ export default function TreinoDetalhe({
   treinoId,
   seriesIniciais,
   exercicios,
+  exerciciosPreSelecionados,
 }: {
   treinoId: string;
   seriesIniciais: Serie[];
   exercicios: ExercicioDoCatalogo[];
+  /** Vem de um modelo escolhido ao iniciar o treino (SDD §9.3) — exercícios
+   * sem nenhuma série ainda. `agruparPorExercicio` não consegue expressar
+   * isso (só cria grupo a partir de série existente), por isso é uma prop
+   * separada, renderizada ao lado, nunca dentro dela. */
+  exerciciosPreSelecionados?: { exercicioId: string; nome: string }[];
 }) {
   const [series, setSeries] = useState<SerieUI[]>(seriesIniciais);
   const [formularioAberto, setFormularioAberto] = useState(false);
@@ -107,6 +113,14 @@ export default function TreinoDetalhe({
   const [gruposEscolhidos, setGruposEscolhidos] = useState<string[]>([]);
   const grupos = useMemo(() => agruparPorExercicio(series), [series]);
   const ultima = series[series.length - 1];
+
+  // Filtra os já pré-selecionados que já viraram grupo de verdade (primeira
+  // série registrada) — evita seção duplicada.
+  const pendentesDoModelo = useMemo(() => {
+    if (!exerciciosPreSelecionados) return [];
+    const jaTemGrupo = new Set(grupos.map((g) => g.exercicioId));
+    return exerciciosPreSelecionados.filter((e) => !jaTemGrupo.has(e.exercicioId));
+  }, [exerciciosPreSelecionados, grupos]);
 
   const opcoesGrupo = useMemo<OpcaoGrupo[]>(() => {
     const porId = new Map<string, string>();
@@ -267,7 +281,19 @@ export default function TreinoDetalhe({
   return (
     <>
       <div className="corpo corpo--com-nav">
-        {series.length === 0 ? (
+        {/* Exercícios do modelo escolhido, ainda sem nenhuma série (SDD
+            §9.3) — mesmo cabeçalho visual dos grupos de verdade, só sem
+            linhas de série dentro. Sempre ANTES dos grupos de série real. */}
+        {pendentesDoModelo.map((exercicio) => (
+          <section className="grupo" key={exercicio.exercicioId}>
+            <div className="grupo__cab">
+              <h2 className="grupo__nome">{exercicio.nome}</h2>
+              <span className="grupo__cont">0 valendo</span>
+            </div>
+          </section>
+        ))}
+
+        {series.length === 0 && pendentesDoModelo.length === 0 ? (
           <p className="vazio">
             Nenhuma série registrada ainda. Comece pela primeira aqui embaixo.
           </p>
