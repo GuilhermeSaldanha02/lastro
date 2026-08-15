@@ -1,8 +1,38 @@
 import type { Metadata, Viewport } from "next";
 import { IBM_Plex_Sans, IBM_Plex_Mono, IBM_Plex_Serif } from "next/font/google";
 import RegistrarServiceWorker from "@/components/registrar-service-worker";
-import ForcarInicioNoLancamento from "@/components/forcar-inicio-no-lancamento";
 import "./globals.css";
+
+// Pedido do dono (2026-08-07) — abrir o app instalado (ícone na tela
+// inicial) deve sempre levar pra "Início", nunca reabrir onde a última
+// sessão parou. O Chrome/Android costuma restaurar a última página do
+// PWA em vez de navegar pro `start_url` do manifesto — não é bug do app,
+// é comportamento da plataforma, mas o dono prefere sempre abrir do zero
+// na Início, mesmo perdendo a conveniência de retomar um treino direto.
+//
+// Trilha A, item A3 — a checagem rodava num `useEffect`, que só executa
+// DEPOIS da primeira pintura: no PWA instalado, a tela errada aparecia
+// por um instante antes do salto.
+//
+// A primeira tentativa usou `<Script strategy="beforeInteractive">` (a
+// API dedicada do Next pra isso) e a doc dela parecia bater: "injetado no
+// HTML… executado antes de qualquer hidratação". Só que inspecionar o
+// runtime (node_modules/next/dist/client/app-bootstrap.js) mostrou que
+// "antes da hidratação" não é "antes da pintura" — o `<Script>` vira uma
+// fila (`self.__next_s.push`) processada por um bundle carregado com
+// `async`, e o `<main>` da SSR pode pintar antes desse bundle terminar de
+// baixar. A doc que resolve isso de verdade é outra:
+// node_modules/next/dist/docs/01-app/02-guides/
+// preventing-flash-before-hydration.md — usar `<script>` cru com
+// `dangerouslySetInnerHTML`, não o componente `<Script>`. É essa
+// diferença que garante "antes da pintura": o parser do navegador
+// executa um `<script>` inline de verdade de forma síncrona, ao
+// encontrá-lo, e só então segue pro resto do `<body>`.
+//
+// `display-mode: standalone` só é legível no cliente (não há header nem
+// user-agent confiável pra isso no servidor) — por isso continua sendo
+// JavaScript no navegador, não uma checagem no servidor.
+const ROTAS_ISENTAS_DE_FORCAR_INICIO = ["/", "/login", "/auth/callback"];
 
 // DESIGN.md §3.3 — Sans para tudo que se lê; Mono para número, unidade,
 // metadado e rótulo de sistema. É a troca de família que destaca o dado,
@@ -63,9 +93,23 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       lang="pt-BR"
       className={`${plexSans.variable} ${plexMono.variable} ${plexSerif.variable}`}
     >
+      <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function () {
+              try {
+                var ROTAS_ISENTAS = ${JSON.stringify(ROTAS_ISENTAS_DE_FORCAR_INICIO)};
+                var emPwaInstalado = window.matchMedia("(display-mode: standalone)").matches;
+                if (emPwaInstalado && ROTAS_ISENTAS.indexOf(window.location.pathname) === -1) {
+                  window.location.replace("/");
+                }
+              } catch (erro) {}
+            })();`,
+          }}
+        />
+      </head>
       <body>
         <RegistrarServiceWorker />
-        <ForcarInicioNoLancamento />
         {children}
       </body>
     </html>

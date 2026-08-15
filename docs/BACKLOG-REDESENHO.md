@@ -4,7 +4,7 @@
 >
 > **Nada aqui foi implementado** quando este documento foi escrito. Tudo é decisão já tomada pelo dono ou achado verificado por medição — não é lista de ideias.
 >
-> **Estado em 2026-08-15 (sessão seguinte):** **A1 e A2** saíram — estão marcados ✅ abaixo. Todo o resto continua por fazer.
+> **Estado em 2026-08-15 (sessão seguinte):** **A1, A2 e A3** saíram — estão marcados ✅ abaixo. Todo o resto continua por fazer.
 
 ---
 
@@ -86,7 +86,9 @@ Detalhe e evidência em `DECISIONS.md` (2026-08-15).
 **Decisão do dono pendente:** fundir numa tela só (o formulário já traz a marca) ou manter as duas de propósito. Não decidir sozinho — a home como "porta de entrada única" foi decisão dele em 2026-08-06 (`DECISIONS.md`).
 **Casa com:** o item D10 (o `/login` é a tela que prova o redesenho). Fazer junto economiza uma passagem.
 
-### A3 · `ForcarInicioNoLancamento` pisca · **MÉDIO**
+### A3 · `ForcarInicioNoLancamento` pisca · **MÉDIO** · ✅ **FEITO (2026-08-15)**
+
+> Implementado na branch `fix/pisca-forcar-inicio-no-lancamento` — a checagem virou `<script>` cru em `app/layout.tsx`, dentro de `<head>`, seguindo `node_modules/next/dist/docs/01-app/02-guides/preventing-flash-before-hydration.md`. Detalhe, e uma tentativa inicial errada que ensinou algo: `PROGRESS.md`, bloco "✅ A3". O texto abaixo é o enunciado original, mantido como registro.
 
 `src/components/forcar-inicio-no-lancamento.tsx` faz `window.location.replace("/")` dentro de `useEffect` — ou seja, **depois** da pintura. No PWA instalado, a tela errada aparece e só então salta.
 
