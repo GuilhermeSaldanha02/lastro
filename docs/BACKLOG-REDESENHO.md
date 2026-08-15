@@ -4,7 +4,7 @@
 >
 > **Nada aqui foi implementado** quando este documento foi escrito. Tudo é decisão já tomada pelo dono ou achado verificado por medição — não é lista de ideias.
 >
-> **Estado em 2026-08-15 (sessão seguinte):** **A1, A2 e A3** saíram — estão marcados ✅ abaixo. Todo o resto continua por fazer.
+> **Estado em 2026-08-15 (sessão seguinte):** **toda a Trilha A está fechada** — A1, A2, A3 e A4 (investigação) marcados ✅ abaixo. Só a Trilha B (o redesenho) continua por fazer.
 
 ---
 
@@ -96,7 +96,9 @@ O comportamento foi pedido pelo dono (2026-08-07) e continua correto. **O que se
 **Fazer:** decidir onde a checagem roda antes da pintura (script bloqueante no `<head>`, ou tratar no servidor). Cuidado: `display-mode: standalone` só é legível no cliente.
 **Check:** abrir o PWA instalado numa rota não isenta e não ver a tela intermediária.
 
-### A4 · Suspeita não confirmada: service worker servindo a página offline · **FÁCIL (investigação)**
+### A4 · Suspeita não confirmada: service worker servindo a página offline · **FÁCIL (investigação)** · ✅ **INVESTIGADO (2026-08-15)**
+
+> Mecanismo confirmado por teste de rede direto: é artefato do `next dev` reiniciando o processo em recarregamentos completos, janela que não existe em `npm run start`/produção. Nenhum código mudado. Detalhe: `PROGRESS.md`, bloco "✅ A4". O texto abaixo é o enunciado original, mantido como registro.
 
 Durante os testes desta sessão, a aba de `/login` carregou com o título **"lastro — sem conexão"** — `public/offline.html`, servido pelo `sw.js` em qualquer falha de navegação (`sw.js:28-30`). Pode ser uma terceira fonte de "tela A depois tela B".
 

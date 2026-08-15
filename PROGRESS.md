@@ -255,7 +255,17 @@ Quota checada com uma chamada direta à API antes de gastar esforço recriando d
 >
 > ⚠️ **Antes de codar qualquer coisa da Trilha B:** o vocabulário das 10 peças precisa virar seção do `DESIGN.md` (item E5). Hoje ele só existe em artifact, e artifact não é fonte durável de projeto.
 >
-> **Atualização (2026-08-15, sessão seguinte): A1, A2 e A3 estão feitos e mergeados.** A4 e toda a Trilha B não foram começados.
+> **Atualização (2026-08-15, sessão seguinte): A1, A2, A3 e A4 (investigação) estão fechados.** Só a Trilha B não foi começada.
+
+### ✅ A4 — investigação concluída: artefato do dev server, não bug de produção (2026-08-15)
+
+**A suspeita:** durante testes de uma sessão anterior, `/login` carregou uma vez com o título "lastro — sem conexão" (`public/offline.html`, servido pelo `sw.js` em qualquer falha de navegação). Não confirmado em produção; suspeita de artefato do `npm run dev`.
+
+**Mecanismo confirmado, sem precisar reproduzir no aparelho físico do dono.** `sw.js:27-33` intercepta toda navegação com `fetch(request).catch(() => caches.match("/offline.html"))` — **qualquer** rejeição do `fetch`, não só "sem internet de verdade", cai no fallback. Testado diretamente: 60 requisições em sequência rápida contra `/login` do dev server, reiniciando o servidor no meio (`preview_stop` + `preview_start`) — as tentativas 39 a 42 vieram com conexão recusada (`000`, TCP fechado), exatamente a janela em que o processo do `next dev` reinicia. Um navegador de verdade fazendo essa mesma requisição de navegação, nesse instante, recebe a mesma rejeição — e o service worker mostra `offline.html`, com o mesmo título que o dono viu.
+
+**Por que isso não é bug de produção:** `next dev`/Turbopack reinicia o processo Node inteiro em recarregamentos completos (visto nesta mesma sessão: o `next-env.d.ts` sendo regenerado é sintoma desse mesmo mecanismo). `npm run start` — e o runtime da Vercel em produção — é um processo estável, sem observador de arquivo, sem reinício por edição de código. A janela de "porta fechada por ~1s" que causa o sintoma **só existe em desenvolvimento**.
+
+**Resultado:** suspeita confirmada como mecanismo, mas isolada ao ambiente de dev. Nenhum código mudado — o comportamento do `sw.js` (tratar qualquer falha de rede como "offline") é a "rede de segurança mínima" pretendida desde a implementação original, e nada nesta investigação achou um caso real de produção em que isso dispare incorretamente. Item fechado sem PR.
 
 ### ✅ A3 — piscada do `ForcarInicioNoLancamento` corrigida (2026-08-15)
 
