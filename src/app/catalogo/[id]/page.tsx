@@ -9,6 +9,8 @@ import { dataLocalBrasil, formatarDataCurta } from "@/lib/tempo";
 import AbaInferior from "@/components/aba-inferior";
 import SetaNavegacao from "@/components/seta-navegacao";
 import EtiquetaRecorde from "@/components/etiqueta-recorde";
+import TituloTela from "@/components/titulo-tela";
+import VoltarFlutuante from "@/components/voltar-flutuante";
 
 export default async function PaginaHistoricoExercicio({
   params,
@@ -33,19 +35,10 @@ export default async function PaginaHistoricoExercicio({
 
   return (
     <main className="tela">
-      <header className="barra-topo">
-        <div className="barra-topo__acoes">
-          <div className="barra-topo__info">
-            <p className="barra-topo__contexto">Catálogo</p>
-            <h1 className="barra-topo__titulo">{exercicio.nome}</h1>
-          </div>
-          <Link href="/catalogo" className="botao-barra">
-            Catálogo
-          </Link>
-        </div>
-      </header>
+      <VoltarFlutuante href="/catalogo" rotulo="Catálogo" />
+      <TituloTela contexto="Catálogo" titulo={exercicio.nome} comVoltar />
 
-      <div className="corpo corpo--com-nav">
+      <div className="corpo corpo--com-nav corpo--titulo-conteudo">
         {historico.length === 0 ? (
           <p className="vazio">
             Nenhuma série valendo registrada ainda para {exercicio.nome}.
