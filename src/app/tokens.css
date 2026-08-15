@@ -129,14 +129,15 @@
     0 2px 4px rgba(var(--lastro-sombra-cor), 0.1),
     0 10px 24px rgba(var(--lastro-sombra-cor), 0.14);
   --lastro-elev-afundado: inset 0 2px 4px rgba(var(--lastro-sombra-cor), 0.12);
-  --lastro-bevel:       inset 0 1px 0 rgba(255, 255, 255, 0.75);
-  --lastro-bevel-forte: inset 0 1px 0 rgba(255, 255, 255, 0.22);
+  /* Só a pílula de navegação (`.nav`) usa bevel agora — trava (DESIGN.md
+     §6, redesenho E3/D3). Toda superfície areia perdeu o fio claro
+     superior; a pílula é intocável, então o token que ela consome fica. */
+  --lastro-bevel: inset 0 1px 0 rgba(255, 255, 255, 0.75);
 
   /* Gradientes: no máximo dois passos, sempre do claro para o escuro.
      Texto sobre gradiente é medido contra o passo de PIOR caso.        */
   --lastro-grad-acao:   linear-gradient(180deg, var(--lastro-acao-a) 0%, var(--lastro-acao-b) 100%);
   --lastro-grad-acao-h: linear-gradient(180deg, var(--lastro-acao-a-h) 0%, var(--lastro-acao-b-h) 100%);
-  --lastro-grad-sup:    linear-gradient(180deg, #FFFDFA 0%, #F7F2E9 100%);
   --lastro-grad-barra:  linear-gradient(180deg, var(--lastro-barra-a) 0%, var(--lastro-barra-b) 100%);
   --lastro-campo-fundo: #FFFDFA;
 
