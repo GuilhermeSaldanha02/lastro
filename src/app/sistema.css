@@ -78,6 +78,7 @@
 
 .barra-topo__contexto {
   font-family: var(--lastro-fonte-num);
+  font-variant-numeric: tabular-nums;
   font-size: var(--lastro-t-meta);
   letter-spacing: 0.1em;
   text-transform: uppercase;
@@ -196,9 +197,9 @@
 
 .botao-primario__estado {
   font-family: var(--lastro-fonte-num);
+  font-variant-numeric: tabular-nums;
   font-size: var(--lastro-t-meta);
   font-weight: var(--lastro-peso-normal);
-  font-variant-numeric: tabular-nums;
   color: var(--lastro-acao-txt-fraco);
 }
 
@@ -455,6 +456,7 @@
 
 .grupo__cont {
   font-family: var(--lastro-fonte-num);
+  font-variant-numeric: tabular-nums;
   font-size: var(--lastro-t-meta);
   color: var(--lastro-txt-3);
   white-space: nowrap;
@@ -470,18 +472,18 @@
 
 .serie__i {
   font-family: var(--lastro-fonte-num);
+  font-variant-numeric: tabular-nums;
   font-size: var(--lastro-t-meta);
   color: var(--lastro-txt-3);
   width: var(--lastro-e-5);
   flex: none;
-  font-variant-numeric: tabular-nums;
 }
 
 .serie__v {
   font-family: var(--lastro-fonte-num);
+  font-variant-numeric: tabular-nums;
   font-size: var(--lastro-t-4);
   font-weight: var(--lastro-peso-medio);
-  font-variant-numeric: tabular-nums;
   letter-spacing: -0.02em;
 }
 
@@ -502,6 +504,7 @@
 .marca {
   margin-left: auto;
   font-family: var(--lastro-fonte-num);
+  font-variant-numeric: tabular-nums;
   font-size: var(--lastro-t-meta);
   text-transform: uppercase;
   letter-spacing: 0.05em;
@@ -518,6 +521,7 @@
   align-items: center;
   gap: var(--lastro-e-2);
   font-family: var(--lastro-fonte-num);
+  font-variant-numeric: tabular-nums;
   font-size: var(--lastro-t-meta);
   color: var(--lastro-sync); /* JAMAIS --lastro-erro */
 }
@@ -839,12 +843,13 @@
 
 .item__data {
   font-family: var(--lastro-fonte-num);
-  font-size: var(--lastro-t-1);
   font-variant-numeric: tabular-nums;
+  font-size: var(--lastro-t-1);
 }
 
 .item__meta {
   font-family: var(--lastro-fonte-num);
+  font-variant-numeric: tabular-nums;
   font-size: var(--lastro-t-meta);
   color: var(--lastro-txt-3);
 }
@@ -866,6 +871,7 @@
 
 .doc__selo {
   font-family: var(--lastro-fonte-num);
+  font-variant-numeric: tabular-nums;
   font-size: var(--lastro-t-meta);
   letter-spacing: 0.1em;
   text-transform: uppercase;
@@ -880,6 +886,7 @@
 
 .doc__meta {
   font-family: var(--lastro-fonte-num);
+  font-variant-numeric: tabular-nums;
   font-size: var(--lastro-t-meta);
   color: var(--lastro-txt-3);
   margin-top: var(--lastro-e-3);
@@ -887,6 +894,7 @@
 
 .doc__secao {
   font-family: var(--lastro-fonte-num);
+  font-variant-numeric: tabular-nums;
   font-size: var(--lastro-t-meta);
   letter-spacing: 0.1em;
   text-transform: uppercase;
@@ -928,6 +936,7 @@
 
 .doc__metodo h2 {
   font-family: var(--lastro-fonte-num);
+  font-variant-numeric: tabular-nums;
   font-size: var(--lastro-t-meta);
   letter-spacing: 0.1em;
   text-transform: uppercase;
@@ -1022,6 +1031,7 @@
 
 .evidencia__numero {
   font-family: var(--lastro-fonte-num);
+  font-variant-numeric: tabular-nums;
   font-size: var(--lastro-t-5);
   font-weight: var(--lastro-peso-medio);
   line-height: var(--lastro-el-apertada);
@@ -1029,7 +1039,6 @@
   display: flex;
   align-items: baseline;
   gap: var(--lastro-e-2);
-  font-variant-numeric: tabular-nums;
   letter-spacing: -0.03em;
 }
 
@@ -1050,6 +1059,7 @@
   flex: 0 0 auto;
   max-width: var(--lastro-evidencia-col-delta);
   font-family: var(--lastro-fonte-num);
+  font-variant-numeric: tabular-nums;
   font-size: var(--lastro-t-meta);
   font-weight: var(--lastro-peso-forte);
   text-align: right;
@@ -1062,6 +1072,7 @@
 
 .evidencia__procedencia {
   font-family: var(--lastro-fonte-num);
+  font-variant-numeric: tabular-nums;
   font-size: var(--lastro-t-meta);
   color: var(--lastro-txt-3);
   margin-top: var(--lastro-e-3);
@@ -1096,12 +1107,14 @@
 
 .grafico-progressao__rotulo {
   font-family: var(--lastro-fonte-num);
+  font-variant-numeric: tabular-nums;
   font-size: var(--lastro-t-meta);
   fill: var(--lastro-txt);
 }
 
 .grafico-progressao__leitura-ativa {
   font-family: var(--lastro-fonte-num);
+  font-variant-numeric: tabular-nums;
   font-size: var(--lastro-t-meta);
   color: var(--lastro-txt);
   background: var(--lastro-sup-2);
@@ -1154,6 +1167,7 @@
 
 .ficha__flag {
   font-family: var(--lastro-fonte-num);
+  font-variant-numeric: tabular-nums;
   font-size: var(--lastro-t-meta);
   font-weight: var(--lastro-peso-normal);
   text-transform: uppercase;
@@ -1231,6 +1245,7 @@
 .balao__quem {
   display: block;
   font-family: var(--lastro-fonte-num);
+  font-variant-numeric: tabular-nums;
   font-size: var(--lastro-t-meta);
   letter-spacing: 0.06em;
   text-transform: uppercase;
@@ -1241,6 +1256,7 @@
 /* Estado, não animação: sem reticências pulsantes em lugar nenhum do app. */
 .balao--pensando {
   font-family: var(--lastro-fonte-num);
+  font-variant-numeric: tabular-nums;
   font-size: var(--lastro-t-meta);
   color: var(--lastro-txt-3);
 }
@@ -1318,6 +1334,7 @@
 
 .destaque__rotulo {
   font-family: var(--lastro-fonte-num);
+  font-variant-numeric: tabular-nums;
   font-size: var(--lastro-t-meta);
   letter-spacing: 0.1em;
   text-transform: uppercase;
@@ -1356,9 +1373,9 @@
    vez de transbordar, e o valor pode quebrar se precisar. */
 .metrica__valor {
   font-family: var(--lastro-fonte-num);
+  font-variant-numeric: tabular-nums;
   font-size: var(--lastro-t-4);
   font-weight: var(--lastro-peso-medio);
-  font-variant-numeric: tabular-nums;
   letter-spacing: -0.02em;
   line-height: var(--lastro-el-apertada);
   margin-top: var(--lastro-e-2);
@@ -1418,6 +1435,7 @@
 
 .atalho__meta {
   font-family: var(--lastro-fonte-num);
+  font-variant-numeric: tabular-nums;
   font-size: var(--lastro-t-meta);
   color: var(--lastro-txt-3);
 }
