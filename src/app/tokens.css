@@ -114,6 +114,7 @@
   --lastro-raio-3:     20px;
   --lastro-raio-balao: 18px; /* SÓ o coach 24h */
   --lastro-raio-pilula: 999px; /* SÓ a aba inferior — arredondamento total, satura na metade da altura */
+  --lastro-raio-chip:   999px; /* DESIGN.md §6.5, peça 5 (M7) — arredondamento total do chip de seleção. Mesmo valor de --lastro-raio-pilula, token separado porque aquele é travado só pra aba inferior */
 
   /* ---- Foco (D9) ---- */
   --lastro-foco-espessura: 3px;

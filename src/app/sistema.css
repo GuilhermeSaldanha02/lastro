@@ -787,6 +787,58 @@
   color: var(--lastro-txt);
 }
 
+/* ---------- Chips de seleção (DESIGN.md §6.5, peça 5, M7) ----------
+   Diferente de `.selecao-grupos` (grade de 2 colunas, escolhida em
+   2026-08-07 porque largura desigual numa grade fica torta): aqui
+   `flex-wrap` é o padrão certo, porque largura desigual é o esperado
+   num chip — "Peito" e "Posterior de coxa" lado a lado, cada um do
+   próprio tamanho, é a própria peça (Strava, Structured), não um
+   defeito. Escopo: só grupo muscular, onde a peça é nomeada
+   (`SeletorGrupoMuscular`) — `.selecao-grupos` continua servindo a
+   lista de exercícios de `modelo-treino-form.tsx`, que não é peça 5. */
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--lastro-e-2);
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--lastro-alvo-min);
+  padding: 0 var(--lastro-e-4);
+  border: 1px solid var(--lastro-controle);
+  border-radius: var(--lastro-raio-chip);
+  background: var(--lastro-sup-1);
+  font-size: var(--lastro-papel-corpo);
+  color: var(--lastro-txt-2);
+  cursor: pointer;
+}
+
+.chip input {
+  /* Mesmo padrão de leitor de tela de `.selecao-grupos__opcao`: o
+     `<input>` continua no DOM e focável, só visualmente escondido — o
+     chip inteiro já comunica o estado marcado por borda + peso. */
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+}
+
+/* Marcado muda BORDA + PESO, não só a cor de fundo (nota C, §3.2, mesma
+   regra de `.selecao-grupos__opcao` acima). */
+.chip:has(input:checked) {
+  border-color: var(--lastro-acao-borda);
+  font-weight: var(--lastro-peso-forte);
+  color: var(--lastro-txt);
+}
+
+.chip:has(input:focus-visible) {
+  outline: var(--lastro-foco-espessura) solid var(--lastro-foco);
+  outline-offset: var(--lastro-foco-afast);
+}
+
 .dupla {
   display: grid;
   grid-template-columns: 1fr 1fr;
