@@ -81,17 +81,21 @@
   /* Uso único: o veredito do parecer (DESIGN.md §3.3, C4 aprovado 2026-08-08). */
   --lastro-fonte-serif: var(--fonte-fraunces), Georgia, serif;
 
-  /* ---- Escala de tamanho. Piso 14px, e 14 só para metadado não-corpo ---- */
-  --lastro-t-meta:  14px;
-  --lastro-t-corpo: 16px; /* D4 — piso do corpo */
-  --lastro-t-1:     18px;
-  --lastro-t-2:     20px;
-  --lastro-t-3:     24px;
-  --lastro-t-4:     30px;
-  --lastro-t-5:     38px;
-  --lastro-t-6:     48px;
-  --lastro-t-7:     60px;
-  --lastro-t-8:     76px; /* número em modo bancada, lido a um braço */
+  /* ---- Papéis tipográficos (DESIGN.md §6.2, Trilha B item E2) ----
+     Seis papéis nomeados substituem a escala numerada de 8 tamanhos.
+     Regra: quem implementa escolhe o PAPEL, nunca o pixel — um tamanho
+     usado sem papel atribuído reprova. Bancada (76px) ainda não tem
+     consumidor: fica definida como alvo documentado (D2). */
+  --lastro-papel-rotulo:        14px; /* metadado não-corpo */
+  --lastro-papel-corpo:         16px; /* D4 — piso do corpo, Modo Bancada */
+  /* Único uso: .doc__prosa — Modo Leitura mantém piso próprio (§3.5,
+     "dois regimes de densidade", decisão mantida em 2026-08-06; E2 não
+     revoga essa distinção, só nomeia os papéis). */
+  --lastro-papel-corpo-leitura: 18px;
+  --lastro-papel-secao:         20px;
+  --lastro-papel-titulo-tela:   30px;
+  --lastro-papel-numero-heroi:  48px;
+  --lastro-papel-bancada:       76px; /* número em modo bancada, lido a um braço */
 
   /* ---- Entrelinha ---- */
   --lastro-el-apertada: 1.1;

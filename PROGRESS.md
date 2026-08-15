@@ -256,6 +256,56 @@ Quota checada com uma chamada direta à API antes de gastar esforço recriando d
 > ⚠️ ~~Antes de codar qualquer coisa da Trilha B: o vocabulário das 10 peças precisa virar seção do DESIGN.md (item E5).~~ **Feito — ver bloco abaixo.**
 >
 > **Atualização (2026-08-15, sessão seguinte): A1, A2, A3, A4 (investigação) e E5 estão fechados.** O resto da Trilha B (E1-E4, Nível 2, Nível 3) não foi começado.
+>
+> **Atualização (2026-08-15, mesma sessão): o Nível 1 inteiro está fechado — E1, E2, E3, E4.** Blocos abaixo, mais recentes primeiro. `DESIGN.md` §3.3/§3.4/§3.5 foram reescritos para bater com o código (não só §6, que já documentava o alvo). Pendente: Nível 2 (M1-M9) e Nível 3 (H1-H4), nenhum começado.
+
+### ✅ E2 — os 6 papéis tipográficos substituem a escala numerada (2026-08-15)
+
+`--lastro-t-meta`/`--lastro-t-corpo`/`--lastro-t-1..8` (8 tamanhos numerados) viraram `--lastro-papel-rotulo` (14) / `-corpo` (16) / `-corpo-leitura` (18) / `-secao` (20) / `-titulo-tela` (30) / `-numero-heroi` (48) / `-bancada` (76, definido, ainda sem consumidor). Sete tokens, não seis — a variante `corpo-leitura` não estava no vocabulário original de `DESIGN.md` §6.2 e foi decidida nesta sessão (ver HITL abaixo).
+
+**Mapa completo, seletor → papel** (`sistema.css`): `t-meta`→Rótulo (35 ocorrências) e `t-corpo`→Corpo (17 ocorrências) foram substituições mecânicas 1:1, sem decisão. Os oito usos de `t-1..t-6` exigiram escolha de papel, um a um:
+
+| Seletor | Antes | Papel novo | Observação |
+|---|---|---|---|
+| `.entrada__marca h1` | t-6 (48) | Número herói (48) | sem mudança de valor |
+| `.barra-topo__titulo`, `.doc__pergunta` | t-3 (24) | Título de tela (30) | |
+| `.botao-primario`, `.grafico-progressao__conclusao`, `.evidencia__seta` | t-2 (20) | Seção (20) | sem mudança |
+| `.evidencia__icone`, `.evidencia__de` | t-3 (24) | Seção (20) | reclassificados como rótulo secundário do bloco, não título — evita empatar com `.evidencia__numero` |
+| `.evidencia__numero` | t-5 (38) | Título de tela (30) | ver nota de risco abaixo |
+| `.grupo__nome`, `.serie__x`, `.item__data`, `.pergunta--primaria`, `.esqueleto` (altura, uso não-tipográfico) | t-1 (18) | Corpo (16) | |
+| `.doc__prosa` | t-1 (18) | Corpo-leitura (18) | sem mudança de valor — ver HITL |
+| `.doc__veredito` | t-6 (48) | Número herói (48) | sem mudança |
+| `.metrica__valor` | t-4 (30) | Número herói (48) | salto deliberado — número, não título |
+| `.serie__v` | t-4 (30) | **Título de tela (30)**, não Número herói | ver nota de risco abaixo — é o único caso onde a recomendação inicial foi revertida por medição |
+
+**HITL — `--lastro-papel-corpo` (16px) colide com §3.5.** `DESIGN.md` §3.4/§3.5 já documentavam dois regimes de densidade: o corpo do Modo Bancada tem piso 16px (D4), mas o corpo do Modo Leitura (`.doc__prosa`, o parecer) sempre foi 18px — decisão mantida em 2026-08-06 (`DESIGN.md` §5 item 3). Colapsar os dois em "Corpo = 16px" revogaria essa decisão sem dizer isso. Perguntei ao dono: **manter os dois regimes** (Corpo-leitura, 18px, só para `.doc__prosa`) ou achatar em 16px. Resposta: manter os dois regimes. `tokens.css` e `DESIGN.md` §3.4 documentam o sétimo token como consequência dessa resposta, não como capricho de implementação.
+
+**Risco medido antes de decidir, não depois — `.serie__v` e `.metrica__valor` são os dois saltos grandes (30→48).** A recomendação inicial (de uma consulta ao `advisor`) era mapear os dois pra Número herói, com a razão "são números, não títulos". Testei os dois com medição real de DOM no Chrome (`getBoundingClientRect`/`scrollWidth` vs `clientWidth`, via extensão, injetando a marcação real das classes no app rodando em `localhost:3002`, sem precisar de usuário autenticado nem dado real):
+
+- `.metrica__valor` dentro do grid real de 3 colunas (`display: grid; grid-template-columns: repeat(3, 1fr)`) a 375px: sem overflow, mesmo com `"14,2kkg"` (o caso que o comentário original em `sistema.css:1371` já registrava como apertado a 30px). Manteve Número herói.
+- `.serie__v` dentro da linha real de série (índice + valor + "x" + valor + unidade + marca) a 375px de conteúdo: **overflow horizontal confirmado** (`scrollWidth` 340px contra 335px disponíveis, medido com só os elementos essenciais da linha — uma linha real com mais elementos estouraria mais). Reduzido para Título de tela (30px, o mesmo valor de antes — zero regressão), documentado com o número medido em `sistema.css` e `DESIGN.md` §3.4.
+
+Isso deixa `--lastro-papel-bancada` (76px) sem consumidor — como o vocabulário original já previa ("definida como alvo documentado"), não uma lacuna desta implementação.
+
+**Também corrigido: `.pergunta--primaria` vs `.pergunta--secundaria`.** As duas ficam visíveis ao mesmo tempo na tela `/analise` (`analise-interativa.tsx`) — antes eram 18px/bold vs 16px/medium; agora as duas são Corpo (16px), distinguidas só pelo peso da fonte. É uma decisão implícita em E2 (a escala foi de 8 degraus pra 6 papéis, perder um degrau de tamanho é o preço), documentada com um comentário em `sistema.css` para não parecer acidente numa leitura futura.
+
+**`DESIGN.md` — sincronizado, não só `§6`.** Além de `§6.1`/`§6.2` (que já documentavam o alvo, agora marcados "implementados"), reescrevi `§3.3` (família — essa troca é do E1, veja abaixo, e nunca tinha sido sincronizada), `§3.4` (papéis, antes escala numerada), `§3.5` (tabela dos dois regimes), `§3.6.2`/`§3.6.3`/`§3.6.4`/`§3.7.4` (referências de tamanho no corpo do parecer e do gráfico), `§3.8`/`§4.5`/`§5` (referências de tamanho no gate e nas decisões resolvidas), e o banner de estado no topo do arquivo. Motivo: a doc é "fonte única" por regra própria (`§3` cabeçalho) — deixar `§3` descrevendo tokens que não existem mais no código quebra essa garantia, mesmo que `§6` estivesse certo.
+
+**Verificação:** `npx tsc --noEmit` · `npm run test` (133/133) · `npm run lint` (0 erros) · `npm run build` — todos verdes, rodados de novo depois da correção de `.serie__v`. Busca confirmando zero sobra: `--lastro-t-(meta|corpo|1|2|3|4|5|6|7|8)\b` em `src/` volta vazio (só resta em comentários que citam o nome antigo de propósito, como histórico).
+
+### ✅ E1 — troca de família (E1) e E3/E4 (bevel, gradiente, movimento) (2026-08-15)
+
+Três itens do Nível 1 completados antes de E2 nesta mesma sessão, cada um em branch própria, PR própria, os quatro comandos de verificação rodados antes de cada merge:
+
+- **E1 — família.** `layout.tsx` trocou `IBM_Plex_Sans/Mono/Serif` por `Bricolage_Grotesque`/`Archivo`/`Fraunces` (`next/font/google`, eixos variáveis declarados por fonte). `tokens.css` aponta os três papéis (`--lastro-fonte-txt/num/serif`) pros novos tokens. Consequência obrigatória, não opcional: Archivo é condensada proporcional (a Mono garantia coluna alinhada por ser monoespaçada) — todo seletor de número em `sistema.css` ganhou `font-variant-numeric: tabular-nums` explícito (24 seletores, verificado por contagem batendo 1:1 com o uso de `--lastro-fonte-num`, 6 duplicatas de um script de auto-inserção corrigidas manualmente).
+- **E3 — bevel e gradiente.** `--lastro-bevel-forte` e `--lastro-grad-sup` removidos de `tokens.css`; todo `box-shadow`/`background` que os usava em `sistema.css` caiu pra elevação/superfície plana. `.nav` é a única exceção mantida (trava explícita do backlog) — `--lastro-bevel` (sem "-forte") continua em `tokens.css` só por causa dela, com comentário dizendo isso.
+- **E4 — tokens de movimento.** `--lastro-dur-3/4/5/6` (250/300/350/400ms) e `--lastro-curva-padrao`/`--lastro-curva-enfatizada` entraram em `tokens.css`, completando a faixa do M3 que antes só tinha 120/220ms. **Só os tokens** — nenhum componente foi cabeado a eles ainda; isso é trabalho do Nível 2, não deste item.
+
+**Erro cometido e corrigido durante E3:** um commit foi feito direto em `main` por esquecimento de criar a branch antes. Detectado imediatamente (`git branch --show-current` voltou `main`), corrigido sem perda: `git branch feat/e3-...` (pra não perder o commit) → `git reset --hard origin/main` (limpa `main` local) → `git checkout feat/e3-...`. Nenhum `push` tinha acontecido, sem limpeza remota necessária.
+
+**Outro false start, documentado em vez de escondido (A3, mas relevante aqui porque o mesmo padrão apareceu de novo em E1's verificação de fonte):** nada a corrigir em E1/E3/E4 além do acima — os quatro comandos de verificação passaram limpos em cada merge.
+
+**Lacuna de processo encontrada ao escrever este bloco:** os três itens foram implementados e mergeados, mas **`PROGRESS.md` e `docs/BACKLOG-REDESENHO.md` não foram atualizados na hora** — só agora, junto com E2. Regra do projeto é atualizar como último passo de cada tarefa; não foi seguida à risca aqui. Registrado para não repetir: cada item de backlog fecha com os dois documentos atualizados **antes** de passar pro próximo, não em lote no fim.
 
 ### ✅ E5 — vocabulário do redesenho virou seção do DESIGN.md (2026-08-15)
 

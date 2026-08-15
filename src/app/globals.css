@@ -34,7 +34,7 @@ body {
   background: var(--lastro-fundo);
   color: var(--lastro-txt);
   font-family: var(--lastro-fonte-txt);
-  font-size: var(--lastro-t-corpo); /* D4 — piso do corpo */
+  font-size: var(--lastro-papel-corpo); /* D4 — piso do corpo */
   line-height: var(--lastro-el-corpo);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;

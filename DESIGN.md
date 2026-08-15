@@ -9,6 +9,8 @@
 > **2026-08-11 — revisto de novo.** A pílula da aba inferior deixou de ser vidro areia e passou a ser petróleo (mais claro que a barra de topo), a pedido do dono. **Duas superfícies petróleo agora, não uma** — a barra de topo continua a mais escura das duas; a pílula é uma versão mais clara da mesma tinta, amarrando as duas pontas da tela. Onde este documento disser "a única superfície escura", leia "a barra de topo é a mais escura das duas superfícies petróleo".
 >
 > **2026-08-15 — §6 acrescentado (item E5 do redesenho).** O vocabulário das 10 peças do redesenho, decidido pelo dono e antes só em artifact, virou seção durável deste documento. **Nada em §6 está implementado ainda** — §3 continua sendo a tipografia e os tokens que o código de fato usa até a Trilha B (`docs/BACKLOG-REDESENHO.md`) chegar em cada peça.
+>
+> **2026-08-15 — Nível 1 da Trilha B implementado (E1, E2, E3, E4).** §3.3, §3.4 e §3.5 foram reescritos para bater com o código: a família passou de IBM Plex Sans/Mono/Serif para Bricolage Grotesque/Archivo/Fraunces (E1); a escala numerada `--lastro-t-meta`/`--lastro-t-corpo`/`--lastro-t-1..8` foi substituída pelos seis papéis nomeados de §6.2 (E2); bevel e gradiente saíram das superfícies areia, com `.nav` como única exceção mantida (E3); tokens de duração/curva M3 entraram em `tokens.css` (E4). Onde §3 e §6 hoje dizem a mesma coisa, §6 fica com o texto histórico da decisão e §3 com o que o código executa.
 
 ---
 
@@ -115,7 +117,7 @@ Fórmula WCAG 2.x (linearização sRGB, `L = 0.2126R + 0.7152G + 0.0722B`, `(Lma
 
 **Mudança de método (2026-08-06):** as razões deixaram de ser aritmética sobre hex escritos à mão e passam a ser **medidas sobre as cores computadas de uma página renderizada**. `design/padrao-visual.html` roda a matriz inteira na própria página, no navegador. Reproduzir a medição é abrir o arquivo e rolar até §06.
 
-Limiares: **4.5:1** texto normal · **3:1** texto grande (≥ `--lastro-t-3` em `--lastro-peso-forte`, ou ≥ `--lastro-t-4`) e limite de componente de interface.
+Limiares: **4.5:1** texto normal · **3:1** texto grande (≥24px em `--lastro-peso-forte` — Seção ou Título de tela em negrito —, ou ≥30px — Título de tela) e limite de componente de interface.
 
 **Regra nova, que o gradiente obriga:** onde há gradiente, o texto é medido contra o **passo de pior caso**, nunca contra uma média nem contra o passo mais favorável.
 
@@ -164,51 +166,55 @@ Consequência obrigatória, não recomendação — **em toda ocorrência, no gr
 
 ### 3.3 Tipografia
 
+> **Trocada em 2026-08-15 (E1, DESIGN.md §6.1).** A família deixou de ser IBM Plex Sans/Mono/Serif e passou a ser Bricolage Grotesque/Archivo/Fraunces. Os três papéis não mudaram — só o token de fonte que cada um resolve.
+
 | Papel | Família | Por quê |
 |---|---|---|
-| Números — carga, reps, volume, e1RM, percentual | `--lastro-fonte-num` (IBM Plex Mono) | **Monoespaçada garante avanço tabular por construção.** Não depende de o arquivo trazer a tabela OpenType `tnum`: a largura é igual porque a fonte é monoespaçada, ponto. Coluna de série não "dança" quando 9 vira 10, e o olho compara linha a linha em movimento |
-| Texto — prosa do parecer, rótulo, botão | `--lastro-fonte-txt` (IBM Plex Sans) | Desenhada junto com a Mono na mesma superfamília: mesma altura-x, mesmo esqueleto, nenhum choque quando um número aparece dentro de uma frase — que é exatamente o que o parecer faz o tempo todo. Personalidade de instrumento técnico, coerente com o nome |
-| Veredito do parecer — **e só ele** | `--lastro-fonte-serif` (IBM Plex Serif, 600) | C4 (aprovado 2026-08-08): documento emitido ganha voz de documento só na frase que carrega o julgamento — a peça-assinatura, não o resto do app. Mesma superfamília e licença das outras duas; **proibido** usar em qualquer outro lugar — isso reabriria a discussão de "quarta família espalhada" que a tabela original evitava |
+| Texto — prosa, rótulo, botão, tudo que se lê no dia a dia | `--lastro-fonte-txt` (Bricolage Grotesque, variável) | C1 (DECISIONS.md 2026-08-15): personalidade contemporânea sem virar genérica, `opsz`/`wdth` variáveis cobrem título e corpo com um arquivo só |
+| Números — carga, reps, volume, e1RM, percentual | `--lastro-fonte-num` (Archivo, variável, eixo `wdth`) | C2: condensada proporcional destaca o dado pela família, não só pela cor. **Deixou de ser monoespaçada** — o avanço tabular passou a depender de `font-variant-numeric: tabular-nums`, agora **obrigatório** em todo seletor de número (antes era reforço oportunista, §3.3 anterior a 2026-08-15) |
+| Veredito do parecer — **e só ele** | `--lastro-fonte-serif` (Fraunces, variável) | C4 (aprovado 2026-08-08, família trocada em 2026-08-15): documento emitido ganha voz de documento só na frase que carrega o julgamento — a peça-assinatura, não o resto do app. **Proibido** usar em qualquer outro lugar — isso reabriria a discussão de "quarta família espalhada" que a tabela original evitava |
 
-Todas as três são **IBM Plex, licença SIL Open Font License 1.1** — livres para auto-hospedagem.
+Carregadas via `next/font/google` em `src/app/layout.tsx`, cada uma com o eixo variável declarado explicitamente (`axes`) — não a fonte inteira, só os eixos que o app usa. Licenças SIL Open Font License.
 
-**Por que não `font-variant-numeric: tabular-nums` numa fonte proporcional:** essa via só funciona se o arquivo `.woff2` embarcado realmente trouxer a feature `tnum`, o que é verificável apenas inspecionando o binário. Monoespaçada resolve estruturalmente. **Ainda assim** o CSS de número declara `font-variant-numeric: tabular-nums slashed-zero;` **puramente como reforço oportunista**: se o `.woff2` embarcado trouxer `tnum` ou `zero`, ganha-se a garantia extra e o zero cortado que separa 0 de O na leitura rápida; se não trouxer, o navegador ignora e a largura continua igual pela monoespaçagem. **Nenhuma dessas duas features é afirmada aqui como presente** — só se confirmam inspecionando o binário que for de fato embarcado, e isso é item de build (§4.5), não premissa deste documento. A garantia que este documento assume é uma só: largura igual por construção.
+**Por que `font-variant-numeric: tabular-nums` é obrigatório agora, e não opcional.** Com a Mono, a largura igual entre dígitos vinha de a fonte ser monoespaçada — `tabular-nums` era só reforço, o navegador podia ignorar sem quebrar nada. A Archivo é **condensada proporcional**: sem `tabular-nums` explícito, a coluna de série "dança" quando 9 vira 10. Todo seletor com `font-family: var(--lastro-fonte-num)` em `sistema.css` declara `font-variant-numeric: tabular-nums` — verificado por contagem (24 seletores de número, 24 declarações da propriedade, 2026-08-15).
 
-**Carregamento sem depender de rede no meio do treino** (J1: o elevador derruba o sinal):
+**Carregamento sem depender de rede no meio do treino** (J1: o elevador derruba o sinal) — reescrito em 2026-08-15, E1 trocou o mecanismo de carregamento, não só a família:
 
-1. **Zero requisição a terceiro.** Nenhum `<link>` para `fonts.googleapis.com`. Os `.woff2` moram em `/public/fonts/` e são servidos pela mesma origem.
-2. **Só os cortes usados**, estáticos, um arquivo por peso: Plex Sans 400 e 600; Plex Mono 500 e 600. Subconjunto `latin` + `latin-ext` — cobre `ã õ ç á é í ó ú â ê ô` do PT-BR.
-3. `<link rel="preload" as="font" type="font/woff2" crossorigin>` para os quatro, no `<head>` do layout raiz.
-4. `@font-face` com `font-display: swap` — se algo atrasar, o texto aparece na pilha de sistema e troca depois. Nunca tela em branco esperando fonte.
-5. **Serwist (já na stack, CLAUDE.md) faz precache dos quatro arquivos.** Depois da primeira visita, a fonte vem do service worker. É isso que torna verdadeira a frase "não depende de rede", e não a auto-hospedagem sozinha.
-6. A pilha de fallback já está declarada dentro de `--lastro-fonte-txt` e `--lastro-fonte-num` (§3.1) e **não se repete em lugar nenhum**. A fallback numérica também é monoespaçada, então a largura tabular sobrevive à troca.
+1. **Zero requisição a terceiro em runtime.** `next/font/google` baixa e auto-hospeda os três arquivos variáveis **em build time**; o navegador nunca busca em `fonts.googleapis.com`. `layout.tsx` declara só os eixos variáveis usados (`axes: [...]` por fonte) — não a família inteira.
+2. Subconjunto `latin` (`subsets: ["latin"]`) — cobre `ã õ ç á é í ó ú â ê ô` do PT-BR.
+3. Preload e `@font-face` são gerados e injetados pelo próprio `next/font` — não há `<link rel="preload">` nem `@font-face` manual em nenhum arquivo do projeto.
+4. `display: "swap"` declarado em cada fonte — se algo atrasar, o texto aparece na pilha de sistema e troca depois. Nunca tela em branco esperando fonte.
+5. **Serwist (já na stack, CLAUDE.md) faz precache dos arquivos de fonte que o build gera.** Depois da primeira visita, a fonte vem do service worker — é isso que torna verdadeira a frase "não depende de rede", e não a auto-hospedagem do `next/font` sozinha.
+6. A pilha de fallback está declarada dentro de `--lastro-fonte-txt`/`--lastro-fonte-num`/`--lastro-fonte-serif` (`tokens.css`) e **não se repete em lugar nenhum**. O fallback de `--lastro-fonte-num` deixou de ser monoespaçado (§3.3) — Archivo é condensada proporcional, um fallback monoespaçado ficaria mais largo que ela e quebraria layout antes da fonte carregar.
 
-**Verificar no build, não presumir:** se a versão variável de IBM Plex Sans estiver disponível no pacote adotado, ela substitui os dois estáticos e reduz bytes. Isso é otimização a conferir na Fase de implementação — **não é premissa deste documento**.
+### 3.4 Papéis tipográficos — regra de uso
 
-### 3.4 Escala de tamanho — regra de uso
+> **Reescrita em 2026-08-15 (E2, DESIGN.md §6.2).** A escala numerada de 8 degraus (`--lastro-t-meta`/`--lastro-t-corpo`/`--lastro-t-1..8`) foi substituída por seis papéis nomeados. **Regra do gate: quem implementa escolhe o papel, nunca o pixel — tamanho usado sem papel atribuído reprova.**
 
-- **`--lastro-t-corpo` é o piso do corpo (D4)** — o token foi fixado exatamente no valor que D4 exige. Nenhuma prosa, nenhum rótulo de campo, nenhum texto de botão abaixo dele.
-- **`--lastro-t-meta` é o único degrau abaixo do corpo, e existe para um único papel:** metadado não-corpo — a linha de procedência do parecer (§3.6.3) e rótulos em caixa alta com entreletra aberta. **Proibido na tela de registro**, que é lida em pé, a um braço.
-- Número em modo bancada: `--lastro-t-8`. Número dentro do parecer: `--lastro-t-5`. Título de seção do parecer: `--lastro-t-3`. **Exceção nomeada:** o veredito do parecer (§3.6.2, item 2) usa `--lastro-t-6` — maior que o título de seção porque é o elemento que a restrição de §3.0 elege para pesar mais na tela. Nenhum outro texto do Modo Leitura passa de `--lastro-t-5` sem entrada equivalente aqui.
-- Corpo do parecer: `--lastro-t-1` com `--lastro-el-corpo` — é prosa lida sentada, não rótulo.
+- **`--lastro-papel-corpo` (16px) é o piso do corpo (D4)** — fixado exatamente no valor que D4 exige. Nenhuma prosa, nenhum rótulo de campo, nenhum texto de botão abaixo dele. **`--lastro-papel-corpo-leitura` (18px)** é a variante do Modo Leitura, único uso: `.doc__prosa` (§3.5) — mantém a distinção de regime que §5 item 3 registra como decisão do dono, não a revoga.
+- **`--lastro-papel-rotulo` (14px) é o único degrau abaixo do corpo, e existe para um único papel:** metadado não-corpo — a linha de procedência do parecer (§3.6.3) e rótulos em caixa alta com entreletra aberta. **Proibido na tela de registro**, que é lida em pé, a um braço.
+- **`--lastro-papel-secao` (20px)** — seção, conclusão de gráfico, ação primária, itens secundários de um bloco de evidência.
+- **`--lastro-papel-titulo-tela` (30px)** — título de tela (barra de topo, cabeçalho do parecer), e o número do bloco de evidência (`.evidencia__numero`).
+- **`--lastro-papel-numero-heroi` (48px)** — marca do app (`.entrada__marca h1`), métrica do dashboard (`.metrica__valor`). **Exceção nomeada:** o veredito do parecer (§3.6.2, item 2) também usa este papel — maior que o título de seção porque é o elemento que a restrição de §3.0 elege para pesar mais na tela.
+- **`--lastro-papel-bancada` (76px)** — número em modo bancada, lido a um braço. **Definido, ainda sem consumidor** — `.serie__v` (o número que mais se aproximaria deste papel) mede 335px de linha em conteúdo a 375px; a esse tamanho o alvo `--lastro-papel-numero-heroi` (48px) já quebra a linha, então `.serie__v` usa Título de tela (30px, valor idêntico ao anterior) em vez deste papel — medido em 2026-08-15, não decisão a priori.
 
 ### 3.5 Dois modos de densidade, um só conjunto de tokens
 
 O app tem duas cenas opostas: **registro** (em pé, com pressa, suado, uma mão, luz ruim) e **leitura do parecer** (domingo, sentado, com calma, às vezes no PC). Tratar as duas igual prejudica as duas.
 
-**Decisão: sim, tratamentos visuais diferentes — mas é uma só paleta e uma só escala.** São dois *regimes de densidade*, não dois temas. Paleta, famílias e escala são idênticas; o que muda é qual degrau se usa.
+**Decisão: sim, tratamentos visuais diferentes — mas é uma só paleta e uma só escala.** São dois *regimes de densidade*, não dois temas. Paleta, famílias e escala são idênticas; o que muda é qual papel se usa.
 
 | | **Modo Bancada** (registro) | **Modo Leitura** (parecer, gráfico, histórico) |
 |---|---|---|
 | Unidade de layout | um alvo por linha, largura total | coluna de leitura, medida confortável |
-| Número | `--lastro-t-8`, `--lastro-el-apertada` | `--lastro-t-5`, dentro de prosa |
-| Texto | `--lastro-t-corpo` para cima, sem `--lastro-t-meta` | `--lastro-t-1` de corpo, `--lastro-t-meta` liberado para procedência |
+| Número | Título de tela (30px), `--lastro-el-apertada` | Título de tela (30px), dentro de prosa |
+| Texto | Corpo (16px) para cima, sem Rótulo | Corpo-leitura (18px), Rótulo liberado para procedência |
 | Espaço entre blocos | `--lastro-e-6` a `--lastro-e-8` | `--lastro-e-8` a `--lastro-e-16` |
 | Ação primária | `--lastro-alvo-acao`, largura total, metade inferior (D2, D3) | botões normais, `--lastro-alvo-min` |
 | Elementos por tela | poucos, grandes, redundância zero | densidade maior é aceitável: há tempo de leitura |
 | Movimento | quase nenhum — `--lastro-dur-1`, só confirmação de toque | transição de entrada em `--lastro-dur-2` |
 
-**Justificativa:** um parecer de três parágrafos em `--lastro-t-8` vira rolagem infinita e some com a hierarquia; um botão de registrar série em `--lastro-t-corpo` numa lista densa erra o toque com dedo suado. A cena manda (§1).
+**Justificativa:** um parecer de três parágrafos em Bancada (76px) vira rolagem infinita e some com a hierarquia; um botão de registrar série em Corpo (16px) numa lista densa erra o toque com dedo suado. A cena manda (§1).
 
 ### 3.6 A peça-assinatura: a tela do parecer da Análise Semanal
 
@@ -229,10 +235,10 @@ Cada item abaixo, se aparecer na tela, **reprova o gate**:
 
 O parecer se apresenta como **peça emitida**, não como mensagem recebida. Estrutura fixa, de cima para baixo:
 
-1. **Cabeçalho de emissão.** A pergunta escolhida como título, em `--lastro-t-3`. Abaixo, em `--lastro-txt-3` e `--lastro-t-meta`: o intervalo da semana fechada e a data de emissão. Alinhado à esquerda, sobre `--lastro-fundo`, largura total da coluna de leitura. Isso é o que primeiro diz "documento" em vez de "mensagem".
-2. **Veredito.** Uma frase, `--lastro-t-6`, `--lastro-peso-forte`, `--lastro-txt`. É a resposta à pergunta, sem rodeio. **Maior que o título do cabeçalho** (item 1, `--lastro-t-3`) — é o salto de escala que carrega a restrição de §3.0: o julgamento pesa mais que a pergunta, não o inverso. Antes de 2026-08-08 o veredito usava o mesmo `--lastro-t-3` do título; a correção existe porque título e veredito no mesmo degrau é exatamente o sintoma que §3.0 nomeia.
+1. **Cabeçalho de emissão.** A pergunta escolhida como título, em Título de tela (30px). Abaixo, em `--lastro-txt-3` e Rótulo (14px): o intervalo da semana fechada e a data de emissão. Alinhado à esquerda, sobre `--lastro-fundo`, largura total da coluna de leitura. Isso é o que primeiro diz "documento" em vez de "mensagem".
+2. **Veredito.** Uma frase, Número herói (48px), `--lastro-peso-forte`, `--lastro-txt`, `--lastro-fonte-serif`. É a resposta à pergunta, sem rodeio. **Maior que o título do cabeçalho** (item 1, Título de tela) — é o salto de escala que carrega a restrição de §3.0: o julgamento pesa mais que a pergunta, não o inverso. Antes de 2026-08-08 o veredito usava o mesmo tamanho do título; a correção existe porque título e veredito no mesmo degrau é exatamente o sintoma que §3.0 nomeia.
 3. **Blocos de evidência** — o coração da tela (§3.6.3).
-4. **Prosa de leitura.** Um a três parágrafos em `--lastro-t-1` / `--lastro-el-corpo`, largura de coluna limitada. A prosa *conecta* as evidências; ela não é onde os números moram.
+4. **Prosa de leitura.** Um a três parágrafos em Corpo-leitura (18px) / `--lastro-el-corpo`, largura de coluna limitada. A prosa *conecta* as evidências; ela não é onde os números moram.
 5. **O que fazer** (só na pergunta 5 do PRD §3). Lista curta, cada item ancorado num bloco de evidência acima.
 
 Nada disso é centralizado, nada é cartão flutuante com sombra. É documento: margem esquerda estável, hierarquia por tamanho e peso, ar entre seções em `--lastro-e-8`+.
@@ -243,9 +249,9 @@ Nada disso é centralizado, nada é cartão flutuante com sombra. É documento: 
 
 **Bloco de evidência** — superfície `--lastro-sup-2`, `--lastro-raio-2`, padding `--lastro-e-5`, e uma **barra vertical de `--lastro-barra-evidencia`** na borda esquerda, na cor do sinal (`--lastro-alta`, `--lastro-plato` ou `--lastro-queda`). Três linhas, sempre nesta ordem:
 
-- **Linha 1 — o exercício, pelo nome que o dono usou.** `--lastro-t-corpo`, `--lastro-peso-forte`, `--lastro-txt`. Nome de academia em PT-BR, o mesmo do catálogo (PRD §4.5).
-- **Linha 2 — o número, em `--lastro-fonte-num`, `--lastro-t-5`, `--lastro-txt`.** Grande, tabular, com unidade. Quando há comparação, dois números lado a lado com o delta entre eles no sinal correspondente. É a linha que se lê de relance.
-- **Linha 3 — a procedência.** `--lastro-t-meta`, `--lastro-txt-3`, `--lastro-fonte-num` para as partes numéricas. Formato: **janela · quantas séries valendo sustentam o número · origem do cálculo.** Exemplo de forma (valores ilustrativos): `4 semanas · 14 séries valendo · calculado no dispositivo`.
+- **Linha 1 — o exercício, pelo nome que o dono usou.** Corpo (16px), `--lastro-peso-forte`, `--lastro-txt`. Nome de academia em PT-BR, o mesmo do catálogo (PRD §4.5).
+- **Linha 2 — o número, em `--lastro-fonte-num`, Título de tela (30px), `--lastro-txt`.** Grande, tabular, com unidade. Quando há comparação, dois números lado a lado com o delta entre eles no sinal correspondente. É a linha que se lê de relance.
+- **Linha 3 — a procedência.** Rótulo (14px), `--lastro-txt-3`, `--lastro-fonte-num` para as partes numéricas. Formato: **janela · quantas séries valendo sustentam o número · origem do cálculo.** Exemplo de forma (valores ilustrativos): `4 semanas · 14 séries valendo · calculado no dispositivo`.
 
 **Qual sinal é dono da cor do bloco, quando dois sinais discordam do mesmo exercício.** `tendência_e1rm` (janela de comparação, 4 semanas) e a leitura de platô do gráfico (§3.7, 3 semanas) são medidas diferentes e podem discordar — um exercício pode subir na janela de 4 semanas e estar achatado nas últimas 3. **O bloco de evidência é dono da janela de comparação** (`tendencia_e1rm`/`estagnacoes`, a mesma que a prosa do parecer interpreta): é a cor e o delta dela que vão na barra lateral e na Linha 2. A leitura de platô do gráfico (§3.7) vive só no gráfico — os dois nunca competem pela mesma barra lateral. Se um dia a UI precisar mostrar as duas leituras no mesmo card, a segunda vem como texto qualificado ("subiu na janela de 4 semanas; achatado nas últimas 3"), nunca como uma segunda cor. Decisão registrada em `DECISIONS.md` 2026-08-08, motivada por §3.6.6: duas cores para o mesmo exercício sem regra de precedência é o erro que aquele parágrafo já proíbe entre exercícios diferentes.
 
@@ -259,7 +265,7 @@ A regra inegociável do PRD §3 e da CLAUDE.md — o agregador calcula, o LLM s�
 
 1. **Toda evidência é citável.** Número + unidade + janela + `n` de séries valendo (§3.6.3, linha 3). Chute de modelo não vem com denominador. Isso comunica determinismo melhor que qualquer selo.
 2. **A ordem de aparição na tela conta a arquitetura.** O agregador roda local e termina antes de o LLM começar a escrever. Portanto, no estado `gerando`, **os blocos de evidência já aparecem preenchidos**, com números e procedência definitivos, enquanto só a prosa está pendente (§3.6.5). O dono vê que a conta já estava pronta antes do texto existir.
-3. **Rodapé de método.** Uma linha em `--lastro-t-meta` / `--lastro-txt-3`: quais métricas alimentaram este parecer e que séries de aquecimento foram excluídas (regra 3 da CLAUDE.md). Texto fixo, não gerado.
+3. **Rodapé de método.** Uma linha em Rótulo (14px) / `--lastro-txt-3`: quais métricas alimentaram este parecer e que séries de aquecimento foram excluídas (regra 3 da CLAUDE.md). Texto fixo, não gerado.
 
 #### 3.6.5 Os quatro estados
 
@@ -312,7 +318,7 @@ A ideia do dono (uma linha por exercício, todas no mesmo desenho, com legenda l
 **A composição que resolve isso: pequenos múltiplos empilhados — um mini-gráfico por exercício, cada um com sua própria linha e sua própria escala.** Não é um select nem uma legenda: é a mesma estrutura de hoje (nome do exercício + conclusão em palavras + desenho), repetida uma vez por exercício, em pilha vertical, sem exigir nenhuma escolha para aparecer.
 
 - Cada linha usa **os mesmos tokens semânticos de sempre** — `--lastro-alta` contínuo para o trecho de progressão, `--lastro-plato` tracejado para o trecho de platô — porque cada mini-gráfico só tem UMA série. O canal de cor nunca precisa carregar "de quem é essa linha", só "o que esse trecho significa", que é o papel que ele já tinha. Nenhuma cor nova, nenhum token novo.
-- O **nome do exercício vira o cabeçalho do próprio painel** (`--lastro-t-1`, `--lastro-peso-forte`, `--lastro-txt`), imediatamente acima do desenho a que pertence. Isso **é** rotulagem direta — o nome está colado na linha, não numa legenda separada que obriga cruzar cor com texto. O item 1 original ("sem legenda lateral, sem obrigar a cruzar cor com nome") **não muda**; é cumprido por uma composição diferente.
+- O **nome do exercício vira o cabeçalho do próprio painel** (Corpo, `--lastro-peso-forte`, `--lastro-txt`), imediatamente acima do desenho a que pertence. Isso **é** rotulagem direta — o nome está colado na linha, não numa legenda separada que obriga cruzar cor com texto. O item 1 original ("sem legenda lateral, sem obrigar a cruzar cor com nome") **não muda**; é cumprido por uma composição diferente.
 - A área de toque de cada ponto (48px) some sobre um canvas menor, mas de uma série só por vez — sem sobreposição, o problema do item 1 desta subseção desaparece.
 
 #### 3.7.2 Escala: em kg absoluto por painel, não normalizado a partir de zero
@@ -334,7 +340,7 @@ Não há afordância para "ver mais" além do teto nesta proposta — é escopo 
 #### 3.7.4 Regras por painel (preservadas do desenho anterior, agora aplicadas por exercício)
 
 1. **Rotulagem direta.** Nome do exercício como cabeçalho do painel (não legenda); primeiro e último ponto da série rotulados no próprio desenho, em `--lastro-fonte-num`.
-2. **A conclusão em palavras, acima do desenho de cada painel.** Uma linha em `--lastro-t-2`: o delta em número (% quando a base é válida, kg quando não) e o intervalo, em português. Quem só lê essa linha já sabe o resultado daquele exercício; o desenho é a prova.
+2. **A conclusão em palavras, acima do desenho de cada painel.** Uma linha em Seção (20px): o delta em número (% quando a base é válida, kg quando não) e o intervalo, em português. Quem só lê essa linha já sabe o resultado daquele exercício; o desenho é a prova.
 3. **Platô é desenhado, não deduzido — por painel.** O trecho sem mudança vira segmento **tracejado** em `--lastro-plato`, com anotação ancorada dizendo há quantas semanas. Trecho de progressão é **contínuo** em `--lastro-alta`. Como cada painel tem uma série só, o canal de traço fica livre para significar platô/progressão — não precisa significar "de qual exercício é esta linha", que já é resolvido pelo cabeçalho.
 4. **Sem grade de fundo densa, por painel.** No máximo uma linha de referência horizontal com propósito declarado (ex.: melhor marca daquele exercício), rotulada nela mesma.
 5. **Área de toque.** Ponto do gráfico tem alvo de no mínimo `--lastro-alvo-min`, mesmo que o marcador desenhado seja pequeno. Sem sobreposição de séries, o teto de 4 exercícios não aproxima o total de alvos por painel do problema do item 1 de §3.7.1.
@@ -366,7 +372,7 @@ Desde 2026-08-06 o bloco `:root` vive em **`src/app/tokens.css`**, não neste ar
 
 - **razões de contraste** em §3.2 e §4.2 — resultado de medição, não valor de design;
 - **limiares do WCAG** (4.5 e 3.0) — norma externa, não decisão nossa;
-- os literais `48px` e `16px` em **D1 e D4 (§2)** — restrições congeladas, anteriores ao gate. Os tokens `--lastro-alvo-min` e `--lastro-t-corpo` valem exatamente isso, e é o token que o código usa;
+- os literais `48px` e `16px` em **D1 e D4 (§2)** — restrições congeladas, anteriores ao gate. Os tokens `--lastro-alvo-min` e `--lastro-papel-corpo` valem exatamente isso, e é o token que o código usa;
 - os **hex da tabela de §3.1** — reprodução para leitura humana; o valor que executa é o do `tokens.css`;
 - o **nome das famílias** em §3.3 e §5, citado para justificar e para o dono aprovar.
 
@@ -460,8 +466,8 @@ Anel de foco: `--lastro-foco-espessura` sólido em `--lastro-foco`, com `--lastr
 | F1 | Aba de rede: recarregar G1 e G2 | Qualquer requisição de fonte para host de terceiro |
 | F2 | Segunda visita **em modo offline** (aba avião / SW ativo) | Fonte não vem do cache do service worker; texto some ou cai em fallback permanente |
 | F3 | Coluna de números com dígitos variando (9→10→100) em G1 e G2 | Largura da coluna muda entre quadros |
-| F4 | Menor texto renderizado em G1 | Qualquer texto abaixo de `--lastro-t-corpo` na tela de registro |
-| F5 | Menor texto renderizado em G2 | Qualquer texto abaixo de `--lastro-t-meta`, ou prosa abaixo de `--lastro-t-corpo` |
+| F4 | Menor texto renderizado em G1 | Qualquer texto abaixo de Corpo (`--lastro-papel-corpo`) na tela de registro |
+| F5 | Menor texto renderizado em G2 | Qualquer texto abaixo de Rótulo (`--lastro-papel-rotulo`), ou prosa abaixo de Corpo-leitura (`--lastro-papel-corpo-leitura`) |
 
 ### 4.6 Fonte única
 
@@ -478,11 +484,11 @@ Anel de foco: `--lastro-foco-espessura` sólido em `--lastro-foco`, com `--lastr
 | # | O que estava em aberto | Decisão |
 |---|---|---|
 | 1 | **A personalidade** (§3.0) | **Reprovada** a proposta de instrumento sóbrio sem gradiente nem 3D. Aprovado o padrão *"Areia & Azul Petróleo"* **com matéria** — gradiente, vidro, bevel e sombra. Razão do dono, registrada: sem elevação, "parece que fica algo solto" |
-| 2 | **O par tipográfico** | **IBM Plex Sans + IBM Plex Mono**, confirmado. Carregado por `next/font/google`, com `display: swap` e subset latin — não há quatro arquivos para auto-hospedar |
+| 2 | **O par tipográfico** | **IBM Plex Sans + IBM Plex Mono**, confirmado em 2026-08-06. Trocado em 2026-08-15 por Bricolage Grotesque + Archivo (E1, §3.3) — mesma decisão de arquitetura (carregado por `next/font/google`, `display: swap`, subset latin), família diferente |
 | 3 | **Os dois regimes de densidade** (§3.5) | **Mantidos.** Modo Bancada e Modo Leitura seguem com tratamentos diferentes |
 | 4 | **O parecer como documento datado** (§3.6) | **Mantido**, e reforçado: a proibição de conversa deixou de ser geral e passou a ter escopo (ver abaixo) |
 | 5 | **Âmbar para platô** em vez de vermelho | **Mantido.** `--lastro-plato` é âmbar; vermelho segue proibido em estagnação |
-| 6 | **O tamanho da linha de procedência** | **Mantida em `--lastro-t-meta`.** No tema claro ela deixou de ser a razão mais apertada do sistema: `--lastro-txt-3` entrega 4.83:1 no pior caso, com margem sobre o limiar |
+| 6 | **O tamanho da linha de procedência** | **Mantida em Rótulo (`--lastro-papel-rotulo`, 14px desde sempre — só o nome do token mudou em 2026-08-15, E2).** No tema claro ela deixou de ser a razão mais apertada do sistema: `--lastro-txt-3` entrega 4.83:1 no pior caso, com margem sobre o limiar |
 
 **A revisão que veio junto e não estava na lista: D5.** O tema padrão passou de escuro para **claro**. É restrição funcional revista pelo dono, com o risco original — academia com luz baixa, leitura noturna — aceito conscientemente.
 
@@ -502,11 +508,11 @@ Anel de foco: `--lastro-foco-espessura` sólido em `--lastro-foco`, com `--lastr
 >
 > **Travas que continuam valendo em toda a Trilha B:** nenhum pigmento da paleta muda (§3.1) e a pílula de navegação (`.nav`, `aba-inferior.tsx`, tokens `--lastro-nav-*`/`--lastro-vidro-nav*`) fica intacta. Nada em §6 autoriza mexer nas duas.
 >
-> **Estado:** nada abaixo está em produção. `§3.3` (IBM Plex Sans/Mono/Serif) e a escala `--lastro-t-1..8` continuam sendo o que o código executa até cada peça ser implementada.
+> **Estado (atualizado 2026-08-15):** Nível 1 (E1, E2, E3, E4 — "só token, sem mudar marcação") está **em produção**; §3.3/§3.4/§3.5 já refletem isso. §6.1 (famílias), §6.2 (papéis), §6.7 (M3) descrevem o que o código executa agora, não mais um alvo futuro. O que **continua** só decidido, não implementado, é o restante da Trilha B: §6.3 (superfícies), §6.4 (regra verbo×substantivo), §6.5 (as 10 peças) e §6.6 (mapa de telas) — Nível 2 (M1-M9) e Nível 3 (H1-H4) do backlog.
 >
-> **Sobre os literais que aparecem abaixo (tamanho em px, duração em ms, `cubic-bezier`):** são o **alvo decidido**, não valor executável — viram token quando E1/E2/E4 (`docs/BACKLOG-REDESENHO.md`) forem implementados. Continuam fora da lista de exceções de §3.8 até lá; §3.8 ganha entrada nova no dia em que E1/E2/E4 tirarem esses números daqui e os colocarem em `tokens.css`.
+> **Sobre os literais que ainda aparecem abaixo em §6.3–§6.6 (tamanho em px, duração em ms):** continuam sendo o **alvo decidido**, não valor executável, e fora da lista de exceções de §3.8 até a peça correspondente ser implementada — mesma regra de antes, agora só para o que falta.
 
-### 6.1 As três famílias (D1) — substituem §3.3 quando implementadas
+### 6.1 As três famílias (D1) — implementadas em §3.3 (E1, 2026-08-15)
 
 | Papel | Família | Eixos variáveis |
 |---|---|---|
@@ -520,9 +526,9 @@ Não é meio-termo entre as opções descartadas (tudo Archivo, ou tudo Fraunces
 
 **Reprova:** uma quarta família aparecendo fora deste papel; Archivo sem `tabular-nums` em coluna de série.
 
-### 6.2 Os 6 papéis tipográficos (D2)
+### 6.2 Os 6 papéis tipográficos (D2) — implementados em §3.4 (E2, 2026-08-15)
 
-Substituem `--lastro-t-meta`/`--lastro-t-corpo`/`--lastro-t-1..8` por papéis **nomeados**, não números crus:
+Substituíram `--lastro-t-meta`/`--lastro-t-corpo`/`--lastro-t-1..8` por papéis **nomeados**, não números crus. O mapa de cada seletor de `sistema.css` para o papel escolhido, com a justificativa de cada caso não-óbvio, está em §3.4.
 
 | Papel | Tamanho |
 |---|---|
@@ -596,7 +602,9 @@ Cada peça vem de um app premiado (Apple Design Award ou finalista), recriada na
 
 **Ordem sugerida de propagação** (`docs/BACKLOG-REDESENHO.md`, item H4): `/ajustes/anilhas` (pequena, exercita quase tudo) → `/analise` (peça-assinatura) → `/treino/[id]` (a mais complexa) → o resto. Uma tela por PR, olhada no celular antes da seguinte.
 
-### 6.7 Padrões de transição (D7)
+### 6.7 Padrões de transição (D7) — tokens em `tokens.css` desde E4 (2026-08-15), aplicação pendente
+
+E4 só criou os tokens de duração e curva abaixo em `tokens.css` (`--lastro-dur-3..6`, `--lastro-curva-padrao`, `--lastro-curva-enfatizada`). **Nenhum componente foi cabeado a eles ainda** — aplicar duração/curva à pílula, sub-tela, folha e segmentado é trabalho do Nível 2 (backlog), não deste item.
 
 Conjunto contido do Material 3 — **sem container transform**, que o próprio M3 chama de "o mais expressivo" e o dono recusou por excesso.
 

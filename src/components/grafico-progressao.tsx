@@ -172,7 +172,7 @@ function PainelConteudo({ painel }: { painel: PainelProgressao }) {
           <XAxis
             dataKey="semanaInicio"
             tickFormatter={formatarSemana}
-            tick={{ fill: "var(--lastro-txt-3)", fontSize: "var(--lastro-t-meta)" }}
+            tick={{ fill: "var(--lastro-txt-3)", fontSize: "var(--lastro-papel-rotulo)" }}
             tickLine={false}
             axisLine={{ stroke: "var(--lastro-linha)" }}
             interval="preserveStartEnd"
@@ -186,7 +186,7 @@ function PainelConteudo({ painel }: { painel: PainelProgressao }) {
                 value: `melhor marca: ${formatarKg(melhorMarca)}`,
                 position: "insideTopRight",
                 fill: "var(--lastro-txt-3)",
-                fontSize: "var(--lastro-t-meta)",
+                fontSize: "var(--lastro-papel-rotulo)",
               }}
             />
           )}
