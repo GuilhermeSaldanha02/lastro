@@ -93,33 +93,39 @@ export default function AnilhasForm({ configInicial }: { configInicial: ConfigAn
         {anilhas.length === 0 ? (
           <p className="vazio">Nenhuma anilha configurada ainda.</p>
         ) : (
-          <ul className="lista">
+          // Anilha é DADO, não navegação — nunca leva a lugar nenhum, só se
+          // lê e se remove (§6.3, peça 2). `.item`/`.lista` (recipiente com
+          // borda) ficam reservados às linhas que navegam; aqui a grade sem
+          // cartão é o padrão certo, medido a 360px: 6 anilhas em grade = 3
+          // colunas × 2 linhas × 88px, contra 372px das 6 linhas de antes.
+          <div className="grade-anilhas">
             {anilhas.map((peso) => (
-              <li key={peso}>
-                <div className="item">
-                  <span className="item__data">{formatarKg(peso)} kg</span>
-                  <button
-                    type="button"
-                    className="botao-icone"
-                    aria-label={`Remover anilha de ${formatarKg(peso)} kg`}
-                    onClick={() => removerAnilha(peso)}
+              <div className="anilha" key={peso}>
+                <p className="anilha__valor">
+                  {formatarKg(peso)}
+                  <span className="anilha__un">kg</span>
+                </p>
+                <button
+                  type="button"
+                  className="botao-icone"
+                  aria-label={`Remover anilha de ${formatarKg(peso)} kg`}
+                  onClick={() => removerAnilha(peso)}
+                >
+                  <svg
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    aria-hidden="true"
                   >
-                    <svg
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      aria-hidden="true"
-                    >
-                      <path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3" />
-                    </svg>
-                  </button>
-                </div>
-              </li>
+                    <path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3" />
+                  </svg>
+                </button>
+              </div>
             ))}
-          </ul>
+          </div>
         )}
 
         <div className="dupla">
