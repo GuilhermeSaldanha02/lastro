@@ -4,7 +4,7 @@
 >
 > **Nada aqui foi implementado** quando este documento foi escrito. Tudo é decisão já tomada pelo dono ou achado verificado por medição — não é lista de ideias.
 >
-> **Estado em 2026-08-15 (sessão seguinte):** **toda a Trilha A está fechada** — A1, A2, A3 e A4 (investigação) marcados ✅ abaixo. Na Trilha B, **E5 (o pré-requisito) também está feito** — o vocabulário agora mora em `DESIGN.md` §6. O resto do Nível 1 (E1-E4) e os Níveis 2 e 3 continuam por fazer.
+> **Estado em 2026-08-15 (sessão seguinte):** **toda a Trilha A está fechada** — A1, A2, A3 e A4 (investigação) marcados ✅ abaixo. Na Trilha B, **o Nível 1 inteiro está fechado** — E5 (pré-requisito), E1, E2, E3 e E4, todos ✅ abaixo. Os Níveis 2 (M1-M9) e 3 (H1-H4) continuam por fazer.
 
 ---
 
@@ -115,20 +115,32 @@ Durante os testes desta sessão, a aba de `/login` carregou com o título **"las
 
 *Efeito visual grande, risco baixo. É o melhor retorno por hora do backlog inteiro.*
 
-### E1 · Trocar as três famílias · [D1]
+### E1 · Trocar as três famílias · [D1] · ✅ **FEITO (2026-08-15)**
+
+> `layout.tsx` importa `Bricolage_Grotesque, Archivo, Fraunces` de `next/font/google`, cada uma com os eixos variáveis declarados (`axes`). `tokens.css` aponta os três papéis pros novos tokens de fonte. Detalhe: `PROGRESS.md`, bloco "✅ E1". O texto abaixo é o enunciado original, mantido como registro.
+
 `src/app/layout.tsx` importa hoje `IBM_Plex_Sans/Mono/Serif` de `next/font/google`. Trocar por **Fraunces** (`opsz,wght,SOFT,WONK`), **Archivo** (`wdth,wght`) e **Bricolage Grotesque** (`opsz,wdth,wght`). Todas conferidas por requisição real à API do Google Fonts, com os eixos variáveis confirmados.
 **Cuidado:** Archivo é a fonte do **dado** — precisa de `font-variant-numeric: tabular-nums`, que dispensa a monoespaçada de hoje.
 **Check:** `npm run build` limpo e nenhuma requisição externa de fonte em produção (o Next hospeda local).
 
-### E2 · Os 6 papéis tipográficos · [D2]
+### E2 · Os 6 papéis tipográficos · [D2] · ✅ **FEITO (2026-08-15)**
+
+> `tokens.css` define `--lastro-papel-rotulo/corpo/corpo-leitura/secao/titulo-tela/numero-heroi/bancada`; todo `font-size` de `sistema.css` foi remapeado para um desses sete tokens (o sétimo, `corpo-leitura`, é a variante de 18px do Modo Leitura para `.doc__prosa` — decisão do dono, ver `PROGRESS.md`). `.serie__v` ficou em Título de tela (30px), não Número herói (48px): a medição real da linha (335px de conteúdo a 375px de viewport) mostrou que 48px quebra a linha; 30px é o mesmo valor de antes, sem regressão. Detalhe completo, inclusive o mapa seletor→papel e a justificativa de cada caso não-óbvio: `DESIGN.md` §3.4 e `PROGRESS.md`, bloco "✅ E2". O texto abaixo é o enunciado original, mantido como registro.
+
 Substituir `--lastro-t-meta/corpo/1..8` por **papéis nomeados**: Rótulo (14) · Corpo (16) · Seção (20) · Título de tela (30) · Número herói (48) · Bancada (76).
 **Regra que vale como gate:** quem implementa escolhe o **papel**, nunca o pixel.
 **Reprova:** tamanho usado sem papel atribuído.
 
-### E3 · Tirar bevel e gradiente das superfícies · [parte da D3]
+### E3 · Tirar bevel e gradiente das superfícies · [parte da D3] · ✅ **FEITO (2026-08-15)**
+
+> `--lastro-bevel-forte` e `--lastro-grad-sup` foram removidos de `tokens.css`; todo `box-shadow`/`background` que os usava em `sistema.css` caiu pra elevação/superfície plana, exceto `.nav` (trava — mantém `--lastro-bevel`). Detalhe: `PROGRESS.md`, bloco "✅ E3". O texto abaixo é o enunciado original, mantido como registro.
+
 `--lastro-bevel` aparece 20× e o gradiente de superfície 12×. É o que mais data o visual, e **não toca em cor nenhuma**.
 
-### E4 · Tokens de movimento · [D7]
+### E4 · Tokens de movimento · [D7] · ✅ **FEITO (2026-08-15)**
+
+> `--lastro-dur-3/4/5/6` (250/300/350/400ms) e `--lastro-curva-padrao`/`--lastro-curva-enfatizada` entraram em `tokens.css`. **Só os tokens — nenhum componente foi cabeado a eles ainda** (isso é Nível 2). Detalhe: `PROGRESS.md`, bloco "✅ E4".
+
 Hoje só existem 120ms e 220ms — falta a faixa média. Acrescentar as durações do M3 (250/300/350/400) e as curvas: padrão `cubic-bezier(0.2,0,0,1)`, enfatizada decelerando `cubic-bezier(0.05,0.7,0.1,1)`.
 
 ### E5 · **Escrever o vocabulário no `DESIGN.md`** · [pré-requisito de tudo] · ✅ **FEITO (2026-08-15)**
