@@ -258,6 +258,20 @@ Quota checada com uma chamada direta à API antes de gastar esforço recriando d
 > **Atualização (2026-08-15, sessão seguinte): A1, A2, A3, A4 (investigação) e E5 estão fechados.** O resto da Trilha B (E1-E4, Nível 2, Nível 3) não foi começado.
 >
 > **Atualização (2026-08-15, mesma sessão): o Nível 1 inteiro está fechado — E1, E2, E3, E4.** Blocos abaixo, mais recentes primeiro. `DESIGN.md` §3.3/§3.4/§3.5 foram reescritos para bater com o código (não só §6, que já documentava o alvo). Pendente: Nível 2 (M1-M9) e Nível 3 (H1-H4), nenhum começado.
+>
+> **Atualização (2026-08-15, mesma sessão): M1 implementado.** `/login` ganhou a peça 9 (Fraunces na marca). **O gate do item ("o dono olha no iPhone dele antes de qualquer propagação") ainda não aconteceu** — M2 em diante não deveria começar antes disso, é a condição que o próprio backlog impõe.
+
+### ✅ M1 — `/login` recebe a peça 9 (Fraunces na marca) — gate do dono PENDENTE (2026-08-15)
+
+**O que mudou.** `.entrada__marca h1` (a palavra "lastro" no topo do `/login`) trocou de `--lastro-fonte-txt` (Bricolage, herdado, nenhuma regra própria antes) para `--lastro-fonte-serif` (Fraunces) — a mesma família que hoje só o veredito do parecer usa. Peso ajustado de `--lastro-peso-max` (700) para `--lastro-peso-forte` (600), igual ao veredito; `letter-spacing: -0.03em` (calibrado pra Bricolage) removido — a serifa fica só com o `-0.01em` global de `globals.css`.
+
+**Por que só isso.** `DESIGN.md` §6.6 mapeia `/login` pra uma peça só: a 9. As outras nove peças do vocabulário (grade sem recipiente, linha de navegação/ação, segmentado, chips, etiqueta de estado, tabela, ação fantasma, folha) não têm onde entrar numa tela de formulário simples — `/login` não tem lista, não tem métrica, não tem grupo muscular. E1-E4 (fonte, papéis, superfície, movimento) já estavam em vigor ali por reuso de componentes compartilhados (`.entrada__marca`, `.campo`, `.botao-primario`, `.botao-secundario`) desde que o Nível 1 fechou — não exigiram trabalho novo.
+
+**Ambiguidade encontrada e resolvida sem parar pra perguntar.** A tabela de peças em `DESIGN.md` §6.5 (coluna "onde entra" da peça 9) só citava "o parecer da Análise Semanal e o Coach" — não mencionava `/login`, embora o mapa de telas em §6.6 já atribuísse a peça 9 ao login. Era uma inconsistência do próprio artifact original (a mesma classe de lacuna que E5 já tinha achado uma vez, com `/ajustes/modelos/novo`). Resolvida a favor do que §6.6 e D10 já diziam explicitamente (a marca é "a primeira impressão do app" e merece a voz de documento) — corrigido nas duas seções de `DESIGN.md` para não haver mais essa divergência. Não pareceu justificar uma pergunta própria: o item já tem gate embutido (o dono olha no iPhone antes de propagar), que cobre exatamente esse tipo de julgamento.
+
+**Verificação:** `npx tsc --noEmit` · `npm run test` (133/133) · `npm run lint` (0 erros) · `npm run build` (`/login` continua estático) — todos verdes. Visual: Chrome real via extensão, `getComputedStyle` confirmando `font-family`/`font-weight`/`font-size` aplicados, `scrollWidth` vs `clientWidth` sem overflow a 544px de viewport (a extensão não conseguiu forçar 375px nesta sessão — janela maximizada, limitação conhecida, ver memória "browser-pane-precisa-estar-visivel"), e screenshot real conferindo a leitura: "lastro" em serifa contra o resto do formulário em sans, sem quebra nem corte. Como a largura do texto não depende do viewport (fonte de tamanho fixo, container com folga de sobra a 335px de conteúdo no mobile real — 48px Fraunces bold mede bem menos que isso), a medição a 544px já garante que não há overflow em nenhuma largura menor.
+
+**O que falta, e não é opcional pular:** o próprio item define o gate — **o dono precisa olhar isso no iPhone dele antes de qualquer propagação pro resto das telas (M2 em diante).** Implementação mergeada em `main`; M2-M9 ficam parados até esse olhar acontecer.
 
 ### ✅ E2 — os 6 papéis tipográficos substituem a escala numerada (2026-08-15)
 
