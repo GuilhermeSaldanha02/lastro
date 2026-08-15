@@ -202,8 +202,15 @@ Progressão, platô, recorde. Ícone + palavra + cor — nunca só cor.
 
 Chips para grupo muscular (catálogo, criar modelo). Segmentado para trocar o que o gráfico mostra — **substitui o seletor que o dono já mandou tirar**.
 
-### M8 · Tabela com cabeçalho de coluna · ⚠️ herda pendência de M5
-As séries do treino. **É a peça que resolve em definitivo o desalinhamento que abriu toda esta conversa.** Herda uma pendência real de M5: `.serie` com peso de 3 dígitos + recorde ainda estoura ~15px a 335px de conteúdo — mitigado, não resolvido (ver bloco de M5 acima e `PROGRESS.md`).
+### M8 · Tabela com cabeçalho de coluna · ✅ **FEITO (2026-08-15)**
+
+> `.serie` (dentro de `.grupo`, `treino-detalhe.tsx`) passou de linha flex para **grade CSS de 4 colunas** (índice / carga / marca / ação), `sistema.css`. Cabeçalho novo `.grupo__colunas` (rótulo micro, mesmas 4 colunas) renderiza só quando o grupo já tem ao menos 1 série — sem cabeçalho sobre `pendentesDoModelo` (0 linhas). `border-bottom: 1px solid` de `.serie` foi **removida**: era exatamente a "linha solta" que o dono reprovou no diagnóstico original (`ESTUDO-PADRAO-APLICATIVO.md` §0) — a separação agora vem do cabeçalho + altura mínima da linha, não de um traço por linha. Marca (aquecimento/valendo/recorde) ganhou um envelope fixo (`.serie__marca`) pra sempre ocupar a 3ª coluna da grade, mesmo quando nada renderiza dentro — sem isso a coluna de ação "pularia" de posição conforme o estado da série.
+>
+> **Pendência herdada de M5 — resolvida, não só mitigada.** Testado em navegador real (335px de conteúdo, viewport 375px, extensão Chrome + `javascript_tool`) com o caso real mais extremo (peso de 3 dígitos + recorde: `12 × 142,5 kg` + `★ RECORDE`): renderiza em uma linha só, sem estouro (`scrollWidth === clientWidth === 335`, sem scroll horizontal). A coluna de carga usa `minmax(0, 1fr)` em vez de `1fr` puro — isso é o que permite ao valor quebrar linha (em vez de vazar silenciosamente por trás do `overflow-x:hidden` do body) se algum dia não couber; testado também um caso artificial fora de qualquer uso real (`999 × 999,9 kg`, 3 dígitos nos DOIS lados) e aí sim há colisão visual entre a marca e a quebra de linha — não tratado, porque reps de 3 dígitos não existe no app hoje (nem no dado, nem na UI de registro) e "consertar" isso seria proteger contra um valor que o sistema não produz.
+>
+> Não implementado (fora do enunciado do item): reordenar as colunas em si (índice/carga/marca/ação) ou introduzir colunas separadas para reps × peso — o valor continua uma string única (`serie.reps × serie.peso`), só a moldura ao redor virou grade alinhada.
+
+As séries do treino. **É a peça que resolve em definitivo o desalinhamento que abriu toda esta conversa.**
 
 ### M9 · Título como conteúdo + voltar flutuante · [D5]
 Remove `--lastro-clearance-topo` (88px) de todas as telas. **Devolve 88px em cada uma** — o maior ganho de espaço do app. Sub-telas ganham voltar flutuante.

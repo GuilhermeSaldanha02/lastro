@@ -423,15 +423,6 @@
   background: var(--lastro-sup-2);
 }
 
-/* Sem margin-left próprio: a marca já tem margin-left:auto e ocupa todo o
-   espaço livre da linha, então o ícone de excluir cai naturalmente logo
-   depois dela, separado só pelo `gap` que `.serie` já define. Dar auto
-   aos dois faria o espaço livre se dividir entre ambos, abrindo um vão
-   no meio em vez de deixá-los colados à direita. */
-.serie__excluir {
-  flex: none;
-}
-
 /* Ação discreta de barra escura (sair, voltar). */
 .botao-barra {
   display: inline-flex;
@@ -508,12 +499,41 @@
   white-space: nowrap;
 }
 
+/* Cabeçalho de coluna (DESIGN.md §6.5, peça 7, M8) — rótulo micro acima
+   das séries, mesmas 4 colunas de `.serie` (índice / carga / marca /
+   ação), para que os dois fiquem alinhados. Só existe quando o grupo já
+   tem série — um cabeçalho sobre zero linhas (pendentesDoModelo) lê como
+   quebrado, não como vazio intencional. */
+.grupo__colunas {
+  display: grid;
+  grid-template-columns: var(--lastro-e-5) minmax(0, 1fr) auto var(--lastro-alvo-min);
+  gap: var(--lastro-e-4);
+  margin-bottom: var(--lastro-e-1);
+  font-size: var(--lastro-papel-rotulo);
+  color: var(--lastro-txt-3);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* Linha de série vira grade de 4 colunas alinhadas ao cabeçalho acima
+   (índice / carga / marca / ação de excluir), no lugar da fila flexível
+   anterior. Sem `border-bottom`: o dono reprovou "linha solta" (traço
+   correndo direto sobre o fundo) no diagnóstico original — a separação
+   agora vem do cabeçalho + ritmo da própria altura mínima, não de um
+   traço por linha (ESTUDO-PADRAO-APLICATIVO.md §0; ESTUDO-REDESENHO.md,
+   "só recebe moldura o que responde ao toque").
+   `minmax(0, 1fr)` na coluna de carga deixa o valor quebrar linha em vez
+   de estourar a largura da tela quando o peso tem 3 dígitos — herda a
+   pendência do M5 (ver comentário em `.serie__v`): reduz o estouro
+   silencioso (`overflow-x:hidden` no body escondia o corte), mas o
+   espaço para nunca quebrar linha só existe depois do H2 (lixeira sai da
+   linha). */
 .serie {
-  display: flex;
+  display: grid;
+  grid-template-columns: var(--lastro-e-5) minmax(0, 1fr) auto var(--lastro-alvo-min);
   align-items: center;
   gap: var(--lastro-e-4);
   min-height: var(--lastro-alvo-min);
-  border-bottom: 1px solid var(--lastro-linha);
 }
 
 .serie__i {
@@ -521,8 +541,14 @@
   font-variant-numeric: tabular-nums;
   font-size: var(--lastro-papel-rotulo);
   color: var(--lastro-txt-3);
-  width: var(--lastro-e-5);
-  flex: none;
+}
+
+/* Envelope estável da 3ª coluna: sempre presente no DOM (mesmo vazio),
+   pra marca nunca "pular" pra coluna da ação de excluir quando nenhum
+   estado se aplica. */
+.serie__marca {
+  display: flex;
+  justify-content: flex-end;
 }
 
 /* Número herói (48px) causa overflow horizontal na linha da série — medido

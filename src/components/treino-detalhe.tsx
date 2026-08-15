@@ -308,6 +308,18 @@ export default function TreinoDetalhe({
                   <span className="grupo__cont">{valendo} valendo</span>
                 </div>
 
+                {/* Cabeçalho de coluna (DESIGN.md §6.5, peça 7, M8) — só
+                    quando existe ao menos 1 série; ver nota em
+                    `.grupo__colunas` no sistema.css. */}
+                {grupo.series.length > 0 && (
+                  <div className="grupo__colunas">
+                    <span />
+                    <span>carga × reps</span>
+                    <span />
+                    <span />
+                  </div>
+                )}
+
                 {grupo.series.map((serie, indice) => {
                   if (editandoId === serie.id) {
                     return (
@@ -373,23 +385,30 @@ export default function TreinoDetalhe({
                         {serie.peso}
                         <span className="serie__un">kg</span>
                       </span>
-                      {/* Cor nunca é o único canal: a palavra carrega o sentido.
-                          "valendo" some quando é recorde — recorde só existe
-                          em série valendo (aquecimento nunca conta pra PR,
-                          ver marcarRecordesHistoricos), então mostrar os dois
-                          juntos é redundante e, medido a 335px de conteúdo
-                          real, também estourava a linha (achado no M5,
-                          2026-08-15). "aquecimento" nunca compete com
-                          recorde, por isso continua sempre visível. */}
-                      {serie.tipo === "aquecimento" && (
-                        <span className="marca marca--aquecimento">aquecimento</span>
-                      )}
-                      {serie.tipo === "valendo" && !serie.ehRecordePessoal && (
-                        <span className="marca marca--valendo">valendo</span>
-                      )}
-                      {/* PR na hora (C4) — só existe enquanto a tela está
-                          aberta, não persiste no banco (ver SerieUI). */}
-                      {serie.ehRecordePessoal && <EtiquetaRecorde />}
+                      {/* Envelope fixo da 3ª coluna da grade (M8) — mantém a
+                          marca (quando existe) alinhada com o cabeçalho,
+                          mesmo quando nenhuma das três condições abaixo
+                          renderiza nada. */}
+                      <span className="serie__marca">
+                        {/* Cor nunca é o único canal: a palavra carrega o
+                            sentido. "valendo" some quando é recorde —
+                            recorde só existe em série valendo (aquecimento
+                            nunca conta pra PR, ver marcarRecordesHistoricos),
+                            então mostrar os dois juntos é redundante e,
+                            medido a 335px de conteúdo real, também estourava
+                            a linha (achado no M5, 2026-08-15). "aquecimento"
+                            nunca compete com recorde, por isso continua
+                            sempre visível. */}
+                        {serie.tipo === "aquecimento" && (
+                          <span className="marca marca--aquecimento">aquecimento</span>
+                        )}
+                        {serie.tipo === "valendo" && !serie.ehRecordePessoal && (
+                          <span className="marca marca--valendo">valendo</span>
+                        )}
+                        {/* PR na hora (C4) — só existe enquanto a tela está
+                            aberta, não persiste no banco (ver SerieUI). */}
+                        {serie.ehRecordePessoal && <EtiquetaRecorde />}
+                      </span>
                       <button
                         type="button"
                         className="botao-icone serie__excluir"
