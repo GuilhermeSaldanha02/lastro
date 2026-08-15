@@ -280,6 +280,46 @@
   cursor: pointer;
 }
 
+/* Ação fantasma — DESIGN.md §6.5, peça 8 (M6). Diferente de
+   `.botao-textual`: não é um link utilitário sublinhado, é uma AÇÃO
+   ("Adicionar", "Criar modelo") que precisa continuar lendo como ação —
+   só não pode competir em peso visual com a ação primária da tela
+   (Hevy "+ Add Set"; o desequilíbrio nomeado é "Adicionar" vs "Salvar
+   configuração" em `/ajustes/anilhas`, ESTUDO-PADRAO-APLICATIVO.md).
+   Cor de tinta (mesma de aba ativa/link, §3.1) marca "isto age" sem
+   preenchimento nem borda — o peso vem da cor e do peso da fonte, não
+   de matéria. */
+.acao-fantasma {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--lastro-e-1);
+  min-height: var(--lastro-alvo-min);
+  padding: 0 var(--lastro-e-3);
+  border: none;
+  border-radius: var(--lastro-raio-1);
+  background: transparent;
+  color: var(--lastro-acao-tinta);
+  font-size: var(--lastro-papel-corpo);
+  font-weight: var(--lastro-peso-forte);
+  cursor: pointer;
+  transition: background var(--lastro-dur-1) ease;
+}
+
+.acao-fantasma:hover:not(:disabled) {
+  background: var(--lastro-sup-2);
+}
+
+.acao-fantasma:active:not(:disabled) {
+  background: var(--lastro-sup-2);
+  transform: translateY(1px);
+}
+
+.acao-fantasma:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
 .botao-icone:hover {
   background: var(--lastro-sup-2);
   color: var(--lastro-txt);
@@ -759,7 +799,8 @@
    mais alto que o campo e o centro dele some acima do input, desalinhado
    (achado do dono, 2026-08-14). Ancora o botão embaixo, na mesma linha
    de base do input. */
-.dupla > .botao-secundario {
+.dupla > .botao-secundario,
+.dupla > .acao-fantasma {
   align-self: end;
 }
 

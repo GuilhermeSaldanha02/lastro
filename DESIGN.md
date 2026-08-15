@@ -579,7 +579,7 @@ Cada peça vem de um app premiado (Apple Design Award ou finalista), recriada na
 | 5 | Chips de seleção | Strava · Structured | Grupo muscular no catálogo e na criação de modelo | Lista vertical de caixas de seleção pra grupo muscular |
 | 6 | Etiqueta de estado — **implementada (M5, 2026-08-15)** | Gentler Streak · Oura | Progressão, platô, recorde | Estado marcado só por cor — precisa de ícone + palavra + cor, os três canais (§3.2 nota E, a mesma regra já vale para o parecer) |
 | 7 | Tabela com cabeçalho de coluna | Hevy | As séries do treino | Séries sem cabeçalho de coluna alinhado — é a peça que fecha o desalinhamento que abriu a sessão do diagnóstico de design |
-| 8 | Ação fantasma dentro da seção | Hevy | "Adicionar série", "adicionar anilha", "criar modelo" | Ação secundária com o mesmo peso visual da ação primária da tela |
+| 8 | Ação fantasma dentro da seção — **implementada em parte (M6, 2026-08-15)** | Hevy | "Adicionar série" ⚠️ **pendente até H1** (hoje é o gatilho fixo de `.acao-area`, D2/D3 — converter agora esvaziaria a única forma de registrar série na tela), "adicionar anilha" ✅, "criar modelo" ✅ | Ação secundária com o mesmo peso visual da ação primária da tela |
 | 9 | Prosa com título em serifa | Oura | O parecer da Análise Semanal, o Coach e a marca do `/login` (§6.6, D10) — a voz do produto | Fraunces usada fora do parecer, do Coach e da marca (mesma proibição que já vale pra Plex Serif em §3.3) — **mas o alcance dela dentro do parecer cresce, ver nota abaixo** |
 | 10 | Folha com alça | Strava · Structured | Adicionar anilha, editar série, criar modelo, editar perfil | Tarefa curta abrindo em rota cheia em vez de folha; folha sem fechar arrastando pra baixo |
 
