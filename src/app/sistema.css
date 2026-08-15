@@ -867,6 +867,38 @@
   color: var(--lastro-txt-3);
 }
 
+/* ---------- Grade de dados sem recipiente (DESIGN.md §6.3, peça 2) ----
+   M3 — cada anilha é dado, não navegação: nunca leva a lugar nenhum, só
+   se lê e se remove. Sem borda, sem cartão, sem sombra — só a grade e a
+   folga entre células fazem o agrupamento (Gentler Streak, §6.5). */
+.grade-anilhas {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--lastro-e-4) var(--lastro-e-3);
+}
+
+.anilha {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--lastro-e-1);
+}
+
+.anilha__valor {
+  font-family: var(--lastro-fonte-num);
+  font-variant-numeric: tabular-nums;
+  font-size: var(--lastro-papel-secao);
+  font-weight: var(--lastro-peso-forte);
+  letter-spacing: -0.02em;
+}
+
+.anilha__un {
+  font-size: var(--lastro-papel-rotulo);
+  color: var(--lastro-txt-3);
+  font-weight: var(--lastro-peso-normal);
+  margin-left: 2px;
+}
+
 /* =====================================================================
    PARECER DA ANÁLISE SEMANAL — documento emitido, nunca conversa.
    Reprova aqui: rabicho, avatar, alternância de lado, campo de

@@ -262,6 +262,8 @@ Quota checada com uma chamada direta à API antes de gastar esforço recriando d
 > **Atualização (2026-08-15, mesma sessão): M1 implementado.** `/login` ganhou a peça 9 (Fraunces na marca). **O gate do item ("o dono olha no iPhone dele antes de qualquer propagação") ainda não aconteceu** — M2 em diante não deveria começar antes disso, é a condição que o próprio backlog impõe.
 >
 > **Atualização (2026-08-15, mesma sessão): bug real achado pelo dono no gate do M1, corrigido.** Ao olhar `/login` e `/` no iPhone dele (o próprio gate do M1 fazendo o trabalho que deveria fazer), o dono viu `.metrica__valor` ("30,2t" e "142") quebrando de forma feia — número partindo no meio ("30," numa linha, "2" na outra). Era regressão de E2: Número herói (48px) não cabe na coluna de 3 com números reais de 4+ dígitos. Corrigido — ver bloco "✅ fix — `.metrica__valor` estourava a grade de 3 colunas" abaixo.
+>
+> **Atualização (2026-08-15, mesma sessão): gate do M1 confirmado pelo dono.** M2 auditado e já satisfeito (nenhum código mudado). M3 implementado — `/ajustes/anilhas` vira grade sem recipiente. Pendente: M4-M9 (Nível 2) e Nível 3 inteiro, nenhum começado.
 
 ### ✅ fix — `.metrica__valor` estourava a grade de 3 colunas em Número herói (2026-08-15)
 
@@ -275,7 +277,32 @@ Quota checada com uma chamada direta à API antes de gastar esforço recriando d
 
 **Verificação:** `npx tsc --noEmit` · `npm run test` (133/133) · `npm run lint` (0 erros) · `npm run build` — todos verdes. Visual: Chrome real via extensão, reproduzindo a marcação e a largura reais (390px, grade de 3 colunas), com screenshot confirmando a correção antes do merge.
 
-### ✅ M1 — `/login` recebe a peça 9 (Fraunces na marca) — gate do dono PENDENTE (2026-08-15)
+### ✅ M3 — `/ajustes/anilhas` vira grade sem recipiente (2026-08-15)
+
+**O que mudou.** `anilhas-form.tsx`: a lista de anilhas trocou `<ul class="lista"><li><div class="item">` (o padrão "navega" — recipiente com borda, sombra no hover) por `.grade-anilhas`/`.anilha` — grid de 3 colunas, sem borda, sem fundo, sem sombra. Cada célula tem só o valor (`--lastro-fonte-num`, `tabular-nums`, papel Seção 20px, `peso-forte`), a unidade "kg" (papel Rótulo, `--lastro-txt-3`) e o botão de remover já existente (`.botao-icone`, 48×48).
+
+**Por que só `/ajustes/anilhas`.** É o exemplo medido no próprio texto do item ("6 anilhas em grade = 3 colunas × 2 linhas × 88px, contra 372px"). `.metrica`/`.metricas` (Início) já é grid desde antes do redesenho, mas ainda tem borda e sombra — tirar isso também é peça 2 (§6.5), só que `/` não é o exemplo que M3 mede, e mexer lá agora seria escopo não pedido. Fica para a propagação (H4, Nível 3), junto com `/analise`, `/treino/[id]` e o resto — a mesma ordem que `DESIGN.md` §6.6 já sugere.
+
+**`.item`/`.lista` não foram tocados.** São usados em `/ajustes`, `/catalogo/[id]`, `/`, `/treino` e `/ajustes/modelos` para linhas que **navegam** de verdade (levam a outra tela) — aí o recipiente com borda é o padrão correto (§6.3, "navega"). Só `anilhas-form.tsx` estava usando esse padrão pra um dado que não navega a lugar nenhum; corrigido nesse arquivo só.
+
+**Verificação:** `npx tsc --noEmit` · `npm run test` (133/133) · `npm run lint` (0 erros) · `npm run build` — todos verdes. Visual: Chrome real via extensão, marcação real injetada com 6 pesos típicos (20/15/10/5/2,5/1,25 kg, incluindo o caso de vírgula decimal que já tinha causado bug em `.metrica__valor`) — células medidas em **84px** de altura (meta do backlog: 88px, ~5% de diferença), grid de 320px sem overflow horizontal, botão de remover com o alvo de toque cheio de 48×48 (D1), e screenshot confirmando a leitura: números alinhados, sem cartão, grade limpa.
+
+### ✅ M2 — "rótulo micro + valor grande" já satisfeito, sem trabalho novo (2026-08-15)
+
+**Por que uma auditoria em vez de um PR.** Consultei o `advisor` antes de abrir branch: M2 tem uma linha só de especificação ("a peça mais reusada do app: volume, e1RM, carga, frequência"), sem lista de telas/seletores como M1 teve via §6.6. A cláusula `Reprova:` da peça 1 ("número solto sem rótulo acima, ou rótulo no mesmo papel tipográfico do número") é um **teste**, não um desenho — dizer que ela reprova em algum lugar não diz o que construir ali. Levantamento salvo aqui em vez de assumido:
+
+| Local | Rótulo acima? | Papel diferente do número? | Status |
+|---|---|---|---|
+| `.metrica__rotulo` + `.metrica__valor` (Início) | sim | sim (Rótulo 14 vs Título de tela 30) | passa |
+| `.evidencia__rotulo` + `.evidencia__numero` (parecer) | sim | sim | passa |
+| Campos do formulário de série (reps/peso/RIR) | sim (`<label>` padrão) | sim | passa |
+| Linha de série no treino (`.serie__i/__v/__x/__un`) | não | — | falha — território de M8 (peça 7, cabeçalho de coluna) |
+| Histórico do exercício (`/catalogo/[id]`) | não | — | falha — essa tela já está escalada pra um redesenho maior (peças 1·2·4·7 juntas) |
+| `/perfil` | nenhuma métrica hoje | — | nada a fazer — trabalho futuro |
+
+Os dois lugares que já são "métrica isolada" (o padrão que peça 1 de fato descreve) já cumprem, porque E2 já resolveu a separação de papéis tipográficos. Os que falham pertencem a itens futuros do próprio backlog. **Reportado ao dono, que confirmou seguir pra M3 sem pedir nenhuma correção adicional aqui.** Nenhum código mudado; os quatro comandos de verificação não se aplicam.
+
+### ✅ M1 — `/login` recebe a peça 9 (Fraunces na marca) — gate do dono confirmado (2026-08-15)
 
 **O que mudou.** `.entrada__marca h1` (a palavra "lastro" no topo do `/login`) trocou de `--lastro-fonte-txt` (Bricolage, herdado, nenhuma regra própria antes) para `--lastro-fonte-serif` (Fraunces) — a mesma família que hoje só o veredito do parecer usa. Peso ajustado de `--lastro-peso-max` (700) para `--lastro-peso-forte` (600), igual ao veredito; `letter-spacing: -0.03em` (calibrado pra Bricolage) removido — a serifa fica só com o `-0.01em` global de `globals.css`.
 
@@ -285,7 +312,7 @@ Quota checada com uma chamada direta à API antes de gastar esforço recriando d
 
 **Verificação:** `npx tsc --noEmit` · `npm run test` (133/133) · `npm run lint` (0 erros) · `npm run build` (`/login` continua estático) — todos verdes. Visual: Chrome real via extensão, `getComputedStyle` confirmando `font-family`/`font-weight`/`font-size` aplicados, `scrollWidth` vs `clientWidth` sem overflow a 544px de viewport (a extensão não conseguiu forçar 375px nesta sessão — janela maximizada, limitação conhecida, ver memória "browser-pane-precisa-estar-visivel"), e screenshot real conferindo a leitura: "lastro" em serifa contra o resto do formulário em sans, sem quebra nem corte. Como a largura do texto não depende do viewport (fonte de tamanho fixo, container com folga de sobra a 335px de conteúdo no mobile real — 48px Fraunces bold mede bem menos que isso), a medição a 544px já garante que não há overflow em nenhuma largura menor.
 
-**O que falta, e não é opcional pular:** o próprio item define o gate — **o dono precisa olhar isso no iPhone dele antes de qualquer propagação pro resto das telas (M2 em diante).** Implementação mergeada em `main`; M2-M9 ficam parados até esse olhar acontecer.
+**Gate confirmado (2026-08-15, mesma sessão).** O dono olhou `/login` no iPhone (junto com um achado real em `.metrica__valor`, corrigido à parte — bloco acima) e confirmou seguir pra M2. Liberado propagar.
 
 ### ✅ E2 — os 6 papéis tipográficos substituem a escala numerada (2026-08-15)
 

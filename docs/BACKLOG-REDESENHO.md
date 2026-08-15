@@ -155,19 +155,23 @@ As 10 peças, os 2 padrões de superfície, a regra verbo × substantivo, os pap
 
 *Uma peça por vez, cada uma provada numa tela antes de propagar.*
 
-### M1 · A tela de prova: `/login` · [D10] · [HITL] · ✅ **IMPLEMENTADO (2026-08-15), gate do dono PENDENTE**
+### M1 · A tela de prova: `/login` · [D10] · [HITL] · ✅ **FEITO (2026-08-15) — gate do dono confirmado**
 
-> A2 (fusão das duas telas de entrada) já estava feita antes desta sessão (Trilha A) — `/login` já herdava E1-E4 por reuso de componentes compartilhados (`.entrada__marca`, `.botao-primario`, `.botao-secundario`). O trabalho novo de M1 foi só a peça 9: a marca "lastro" ganhou `--lastro-fonte-serif` (Fraunces), peso `--lastro-peso-forte` (600, igual ao veredito) — antes herdava Bricolage do corpo do texto. `letter-spacing: -0.03em` (calibrado pra Bricolage) foi removido; a serifa fica só com o `-0.01em` global de `globals.css`. Verificado sem overflow em 544px (extensão não conseguiu forçar 375px nesta sessão — janela do Chrome maximizada) e por medição de `scrollWidth`/`clientWidth`; a 48px fixo, "lastro" cabe com folga também nos 335px de conteúdo do mobile real. Detalhe: `PROGRESS.md`, bloco "✅ M1".
->
-> **O gate ("o dono olha no iPhone dele") ainda não aconteceu.** Implementação mergeada em `main`, mas **M2 em diante não deve começar antes desse olhar real** — é a condição que o próprio item impõe antes de propagar a direção pras outras telas.
+> A2 (fusão das duas telas de entrada) já estava feita antes desta sessão (Trilha A) — `/login` já herdava E1-E4 por reuso de componentes compartilhados (`.entrada__marca`, `.botao-primario`, `.botao-secundario`). O trabalho novo de M1 foi só a peça 9: a marca "lastro" ganhou `--lastro-fonte-serif` (Fraunces), peso `--lastro-peso-forte` (600, igual ao veredito) — antes herdava Bricolage do corpo do texto. No meio do caminho, o dono achou pelo próprio gate um bug real em `.metrica__valor` (regressão de E2, não de M1) — corrigido à parte, ver `PROGRESS.md`. **O dono confirmou ter olhado `/login` no iPhone e aprovou seguir.** Detalhe: `PROGRESS.md`, bloco "✅ M1".
 
 A primeira tela a receber a direção nova. Exercita E1–E4 e estabelece a personalidade. **Fazer junto com A2**, porque as duas mexem na mesma entrada.
 **Gate:** o dono olha no iPhone dele antes de qualquer propagação.
 
-### M2 · Rótulo micro + valor grande
+### M2 · Rótulo micro + valor grande · ✅ **JÁ SATISFEITO (2026-08-15), sem trabalho novo**
+
+> Auditoria (não build) antes de abrir branch, a pedido de uma consulta ao `advisor` — o item tinha uma linha só de especificação, sem lista de seletores como M1 teve via §6.6. Todo lugar do app onde um número aparece foi conferido contra a cláusula `Reprova:` da peça 1 ("número solto sem rótulo acima, ou rótulo no mesmo papel do número"). Os dois lugares que já são "métrica isolada" — `.metrica__rotulo`+`.metrica__valor` (Início) e `.evidencia__rotulo`+`.evidencia__numero` (parecer) — já cumprem, porque E2 já separou os papéis. Os campos do formulário de série também cumprem (`<label>` padrão). Os lugares que **não** cumprem (linha de série no treino, histórico do exercício) pertencem a M8 (peça 7, cabeçalho de coluna) e ao redesenho maior de `/catalogo/[id]`, não a este item isoladamente. Detalhe: `PROGRESS.md`, bloco "✅ M2".
+
 A peça mais reusada do app: volume, e1RM, carga, frequência.
 
-### M3 · Grade de métricas sem recipiente · [D3]
+### M3 · Grade de métricas sem recipiente · [D3] · ✅ **FEITO (2026-08-15)**
+
+> Escopo: só `/ajustes/anilhas`, o exemplo medido no próprio enunciado do item — não `.metrica` (Início), que já é grid mas não teve a borda removida aqui; isso é propagação (H4), não M3. `anilhas-form.tsx` trocou `<ul class="lista"><li><div class="item">` (recipiente com borda, o padrão "navega") por `.grade-anilhas`/`.anilha` — grid de 3 colunas, sem borda nem sombra, só valor + unidade + botão de remover. Medido no Chrome real com 6 pesos típicos (20/15/10/5/2,5/1,25 kg): células de **84px** de altura (meta do backlog: 88px), grid de 320px de largura útil sem overflow, botão de remover com o alvo de toque cheio de 48×48 (D1). Detalhe: `PROGRESS.md`, bloco "✅ M3".
+
 **Medido a 360px:** 6 anilhas em grade = 3 colunas × 2 linhas × **88px**, contra **372px** das 6 linhas de hoje. Devolve 284px no aparelho mais estreito.
 
 ### M4 · Linha de navegação e linha de ação · [D3, D4]
