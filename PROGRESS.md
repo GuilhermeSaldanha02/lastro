@@ -243,7 +243,21 @@ Quota checada com uma chamada direta à API antes de gastar esforço recriando d
 
 ---
 
-## ▶ PONTO DE RETOMADA — ler primeiro (2026-08-14, sessão das Levas 2 e 3)
+## ▶ PONTO DE RETOMADA — ler primeiro (2026-08-15, sessão do redesenho)
+
+> **➡️ O trabalho seguinte é o redesenho, e ele já está decidido e destrinchado. Comece por `docs/BACKLOG-REDESENHO.md`** — é autocontido e diz o que fazer, em que ordem e com que esforço.
+>
+> As **10 decisões do dono** (tipografia, escala, superfície, ação, barra de topo, folha, movimento, destrutivo, háptico, primeira tela) estão em `DECISIONS.md` 2026-08-15, cada uma com a evidência que a sustenta e a alternativa descartada.
+>
+> O backlog tem **duas trilhas**: a **A** são três defeitos reais no fluxo de entrada (parâmetro de retorno morto nas duas pontas, duas telas de entrada, redirecionamento que pisca) — separados a pedido do dono porque valem por si; a **B** é o redesenho, dividido em fácil (só token) / médio (componentes) / difícil (rota, estado, movimento).
+>
+> **Nada do redesenho foi implementado.** Nenhum CSS foi tocado nesta sessão — só documentos. `main` limpa.
+>
+> ⚠️ **Antes de codar qualquer coisa da Trilha B:** o vocabulário das 10 peças precisa virar seção do `DESIGN.md` (item E5). Hoje ele só existe em artifact, e artifact não é fonte durável de projeto.
+
+---
+
+## Sessão anterior — ponto de retomada (2026-08-14, Levas 2 e 3)
 
 > **➡️ Backlog original (`docs/BACKLOG-PROXIMA-FASE.md`) completo — todos os itens A, B e C implementados.** Único trabalho que resta, cross-cutting: **o gate visual completo** (viewports exatos 360/390 e G5 no aparelho do dono — a extensão não deixou simular o tamanho exato nesta sessão nem na anterior). Tudo verificado de ponta a ponta num Chrome real ou por SQL direto contra o banco hospedado; branch `feat/historico-exercicio-pr` aberta, PR ainda não mergeado nesta sessão — conferir `git log`/`gh pr list` antes de presumir.
 
