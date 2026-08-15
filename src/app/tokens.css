@@ -222,4 +222,22 @@
   /* ---- Duração (respeitar prefers-reduced-motion) ---- */
   --lastro-dur-1: 120ms;
   --lastro-dur-2: 220ms;
+
+  /* Faixa média do M3, acrescentada pro redesenho (DESIGN.md §6.7,
+     Trilha B, item E4) — a 1 e a 2 acima cobrem só confirmação de toque
+     e transição de entrada rápida (§3.5); faltava a faixa que cobre
+     sub-tela, folha e segmentado. Nenhum seletor usa estes ainda —
+     ficam prontos pra quando E1-E3 e o Nível 2 (M1-M9) chegarem em cada
+     peça. Ver DESIGN.md §6.7 pra qual duração serve qual transição. */
+  --lastro-dur-3: 250ms;
+  --lastro-dur-4: 300ms;
+  --lastro-dur-5: 350ms;
+  --lastro-dur-6: 400ms;
+
+  /* As duas curvas do M3 que o redesenho usa — DESIGN.md §6.7.
+     Padrão: a maioria das transições contidas (sub-tela, segmentado).
+     Enfatizada decelerando: entrada com peso, reservada pra folha
+     subindo (D7 — nunca container transform). */
+  --lastro-curva-padrao: cubic-bezier(0.2, 0, 0, 1);
+  --lastro-curva-enfatizada: cubic-bezier(0.05, 0.7, 0.1, 1);
 }
