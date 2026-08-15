@@ -1383,11 +1383,19 @@
 
 /* Em 360px, três métricas dividem ~99px cada. "14,2k" + "kg" estourava a
    caixa (medido em 2026-08-06) — a unidade cai para a linha de baixo em
-   vez de transbordar, e o valor pode quebrar se precisar. */
+   vez de transbordar, e o valor pode quebrar se precisar.
+
+   Número herói (48px) quebrava no meio do número mesmo com a unidade já
+   na linha de baixo: "30,2" sem quebra mede 92,5px, e a coluna só tem
+   83px (medido em iPhone real, 2026-08-15 — o teste de E2 usou números
+   mais curtos que couberam por coincidência e não pegou isto). Título
+   de tela (30px) é o mesmo ajuste já feito em `.serie__v` pelo mesmo
+   motivo: número real, não título — mas a coluna de 3 não aguenta o
+   papel maior. */
 .metrica__valor {
   font-family: var(--lastro-fonte-num);
   font-variant-numeric: tabular-nums;
-  font-size: var(--lastro-papel-numero-heroi);
+  font-size: var(--lastro-papel-titulo-tela);
   font-weight: var(--lastro-peso-medio);
   letter-spacing: -0.02em;
   line-height: var(--lastro-el-apertada);
