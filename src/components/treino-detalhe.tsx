@@ -281,7 +281,7 @@ export default function TreinoDetalhe({
 
   return (
     <>
-      <div className="corpo corpo--com-nav">
+      <div className="corpo corpo--com-nav corpo--titulo-conteudo">
         {/* Exercícios do modelo escolhido, ainda sem nenhuma série (SDD
             §9.3) — mesmo cabeçalho visual dos grupos de verdade, só sem
             linhas de série dentro. Sempre ANTES dos grupos de série real. */}

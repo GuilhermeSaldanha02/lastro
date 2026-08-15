@@ -212,7 +212,18 @@ Chips para grupo muscular (catálogo, criar modelo). Segmentado para trocar o qu
 
 As séries do treino. **É a peça que resolve em definitivo o desalinhamento que abriu toda esta conversa.**
 
-### M9 · Título como conteúdo + voltar flutuante · [D5]
+### M9 · Título como conteúdo + voltar flutuante · [D5] · ✅ **FEITO EM PARTE (2026-08-15)**
+
+> **Mecanismo construído + 2 das 13 telas convertidas, exatamente como o próprio item pedia** ("tratar como item de propagação, não de uma tela"). Componentes novos `TituloTela` e `VoltarFlutuante` (`src/components/`), classes novas `.titulo-tela`/`.titulo-tela__*`/`.voltar-flutuante`/`.corpo--titulo-conteudo` (`sistema.css`). `.barra-topo` e `--lastro-clearance-topo` **não foram removidos** — continuam existindo e valendo para as 11 telas ainda não convertidas; só deixam de ser usados nas 2 telas convertidas nesta PR.
+>
+> **Convertidas:** `/catalogo/[id]` (o caso mais simples — sem avatar) e `/treino/[id]` (o caso mais carregado — avatar + link de volta, achado como o cabeçalho mais cheio do app). São as **únicas duas telas que já tinham link de "voltar pro pai"** (`botao-barra` → "Catálogo" / "Treinos") — as únicas que de fato exercitam a metade "voltar flutuante" do item; o resto das telas depende da aba inferior, não de um link de volta.
+>
+> **Achado corrigido antes do merge:** a primeira versão sobrepunha o círculo de voltar (fixo, 48px, canto superior esquerdo) ao rótulo de contexto do título ("CATÁLOGO" renderizava atrás do círculo). Corrigido com um modificador `.titulo-tela--com-voltar` que empurra o título pra baixo do círculo — só aplicado nas telas que também renderizam `VoltarFlutuante`.
+>
+> **Decisão explícita, não escondida:** `.grupo` (`sistema.css`) ainda usa `scroll-margin-top: var(--lastro-clearance-topo)` — em `/treino/[id]` isso virou uma reserva sem função (o motivo original, compensar a barra fixa no foco de campo pelo teclado, não existe mais ali), mas a classe é compartilhada com `/ajustes/modelos/novo` (ainda não convertida), onde o offset continua sendo o fix real de 2026-08-10. Fica assim até a propagação chegar nessa tela também.
+>
+> **Pendente — as 11 telas restantes**, na ordem sugerida por H4 (`DESIGN.md` §6.6): `/ajustes/anilhas` → `/analise` → o resto de `/ajustes/*` e `/perfil` → `/`, `/treino`, `/catalogo`, `/coach`. Cada uma remove a superfície petróleo mais escura (a barra) daquela tela — registrado explicitamente em `DESIGN.md` §2, nota da D5, pra não ler como acidente.
+
 Remove `--lastro-clearance-topo` (88px) de todas as telas. **Devolve 88px em cada uma** — o maior ganho de espaço do app. Sub-telas ganham voltar flutuante.
 **Cuidado:** toca as 13 telas. É "médio" por peça e **difícil no agregado** — tratar como item de propagação, não de uma tela.
 

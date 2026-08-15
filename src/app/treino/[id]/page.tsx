@@ -2,7 +2,6 @@
 // nele, e o formulário pra adicionar mais uma.
 // D6: a lista + o formulário vivem juntos em `TreinoDetalhe` (client) —
 // precisam compartilhar estado pra atualização otimista funcionar.
-import Link from "next/link";
 import { notFound } from "next/navigation";
 import { buscarTreino, listarCatalogo } from "@/lib/dados/treino";
 import { obterPerfil } from "@/lib/dados/perfil";
@@ -10,6 +9,8 @@ import { buscarModelo } from "@/lib/dados/modelo-treino";
 import TreinoDetalhe from "@/components/treino-detalhe";
 import AbaInferior from "@/components/aba-inferior";
 import Avatar from "@/components/avatar";
+import TituloTela from "@/components/titulo-tela";
+import VoltarFlutuante from "@/components/voltar-flutuante";
 
 const DIAS = [
   "domingo", "segunda", "terça", "quarta", "quinta", "sexta", "sábado",
@@ -54,20 +55,13 @@ export default async function PaginaTreinoDetalhe({
 
   return (
     <main className="tela">
-      <header className="barra-topo">
-        <div className="barra-topo__acoes">
-          <div className="barra-topo__info">
-            <p className="barra-topo__contexto">{formatarContexto(treino.data)}</p>
-            <h1 className="barra-topo__titulo">Treino em andamento</h1>
-          </div>
-          <div className="barra-topo__usuario">
-            {perfil && <Avatar nome={perfil.nome} avatarUrl={perfil.avatarUrl} />}
-            <Link href="/treino" className="botao-barra">
-              Treinos
-            </Link>
-          </div>
-        </div>
-      </header>
+      <VoltarFlutuante href="/treino" rotulo="Treinos" />
+      <TituloTela
+        contexto={formatarContexto(treino.data)}
+        titulo="Treino em andamento"
+        acessorio={perfil && <Avatar nome={perfil.nome} avatarUrl={perfil.avatarUrl} />}
+        comVoltar
+      />
 
       <TreinoDetalhe
         treinoId={treino.id}

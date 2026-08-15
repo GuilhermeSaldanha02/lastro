@@ -29,6 +29,16 @@
   padding-bottom: calc(var(--lastro-clearance-nav) + var(--lastro-e-6));
 }
 
+/* M9 (D5) — telas convertidas pra "título como conteúdo" não têm mais
+   `.barra-topo` fixa, então `.corpo--com-nav` não precisa reservar
+   `--lastro-clearance-topo` (88px) no topo; a aba inferior continua fixa,
+   por isso o padding de baixo de `.corpo--com-nav` continua valendo.
+   Usada junto com `.corpo--com-nav`, nunca sozinha — vence por vir depois
+   na cascata (mesma especificidade, uma classe só). */
+.corpo--titulo-conteudo {
+  padding-top: 0;
+}
+
 /* ---------- Entrada ---------- */
 .tela--entrada {
   justify-content: center;
@@ -156,6 +166,74 @@
 .barra-topo .avatar--iniciais {
   background: var(--lastro-avatar-iniciais-fundo);
   color: var(--lastro-barra-txt);
+}
+
+/* ---------- Título como conteúdo + voltar flutuante (D5, M9) ----------
+   Substitui `.barra-topo` fixa em telas convertidas — o título rola junto
+   com o resto, não fica preso no topo. `env(safe-area-inset-top)` sobe pro
+   título: sem barra opaca cobrindo o notch, é o próprio conteúdo que
+   precisa desviar dele agora (antes era `.barra-topo` que fazia isso). */
+.titulo-tela {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--lastro-e-3);
+  padding: calc(var(--lastro-e-5) + env(safe-area-inset-top, 0px)) var(--lastro-e-5)
+    var(--lastro-e-4);
+}
+
+.titulo-tela__info {
+  min-width: 0;
+}
+
+.titulo-tela__contexto {
+  font-family: var(--lastro-fonte-num);
+  font-variant-numeric: tabular-nums;
+  font-size: var(--lastro-papel-rotulo);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--lastro-txt-3);
+}
+
+.titulo-tela__titulo {
+  font-size: var(--lastro-papel-titulo-tela);
+  font-weight: var(--lastro-peso-forte);
+  margin-top: var(--lastro-e-2);
+}
+
+/* Quando a tela também tem `.voltar-flutuante` (círculo de 48px fixo no
+   canto), o título precisa nascer ABAIXO dele — sem isto o contexto
+   ("CATÁLOGO") renderiza atrás do círculo, os dois na mesma faixa
+   horizontal (achado visual no M9, 2026-08-15). */
+.titulo-tela.titulo-tela--com-voltar {
+  padding-top: calc(
+    var(--lastro-alvo-min) + var(--lastro-e-4) + var(--lastro-e-2) +
+      env(safe-area-inset-top, 0px)
+  );
+}
+
+/* Botão circular flutuante sobre o conteúdo. Fica no TOPO, não na metade
+   inferior: é navegação, não a ação primária que D2 reserva pra baixo —
+   colidiria com `.acao-area` se ficasse lá embaixo. */
+.voltar-flutuante {
+  position: fixed;
+  top: calc(var(--lastro-e-4) + env(safe-area-inset-top, 0px));
+  left: var(--lastro-e-4);
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--lastro-alvo-min);
+  height: var(--lastro-alvo-min);
+  border-radius: 50%;
+  background: var(--lastro-sup-1);
+  color: var(--lastro-txt);
+  box-shadow: var(--lastro-elev-2);
+}
+
+.voltar-flutuante svg {
+  width: var(--lastro-e-5);
+  height: var(--lastro-e-5);
 }
 
 /* ---------- Ações ---------- */
@@ -471,7 +549,14 @@
    (comportamento nativo do teclado virtual no celular). Sem isto, o
    primeiro grupo pode ficar atrás da barra depois do foco/scroll
    automático (relato do dono, 2026-08-10). `scroll-margin-top` corrige
-   isso na rolagem nativa, sem JS. */
+   isso na rolagem nativa, sem JS.
+   M9 (2026-08-15): `/treino/[id]` não tem mais `.barra-topo` fixa — aqui
+   esse offset virou reserva sem função (espaço vazio extra acima do campo
+   focado, não incorreto, só desnecessário). Não removido porque `.grupo`
+   ainda é compartilhada com `/ajustes/modelos/novo` (`SeletorGrupoMuscular`),
+   que continua com a barra fixa — lá o offset segue sendo o mesmo bug real
+   de 2026-08-10. Decisão explícita: fica assim até a propagação do M9
+   converter também essa tela. */
 .grupo {
   scroll-margin-top: var(--lastro-clearance-topo);
 }
