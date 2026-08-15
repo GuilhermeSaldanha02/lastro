@@ -263,7 +263,7 @@ Quota checada com uma chamada direta à API antes de gastar esforço recriando d
 >
 > **Atualização (2026-08-15, mesma sessão): bug real achado pelo dono no gate do M1, corrigido.** Ao olhar `/login` e `/` no iPhone dele (o próprio gate do M1 fazendo o trabalho que deveria fazer), o dono viu `.metrica__valor` ("30,2t" e "142") quebrando de forma feia — número partindo no meio ("30," numa linha, "2" na outra). Era regressão de E2: Número herói (48px) não cabe na coluna de 3 com números reais de 4+ dígitos. Corrigido — ver bloco "✅ fix — `.metrica__valor` estourava a grade de 3 colunas" abaixo.
 >
-> **Atualização (2026-08-15, mesma sessão): gate do M1 confirmado pelo dono.** M2 auditado e já satisfeito (nenhum código mudado). M3 implementado — `/ajustes/anilhas` vira grade sem recipiente. Pendente: M4-M9 (Nível 2) e Nível 3 inteiro, nenhum começado.
+> **Atualização (2026-08-15, mesma sessão): gate do M1 confirmado pelo dono.** M2 auditado e já satisfeito (nenhum código mudado). M3 implementado — `/ajustes/anilhas` vira grade sem recipiente. M4 implementado — seta em toda linha de navegação (`.item__link`); achado e corrigido um rótulo em verbo ("ver") que reprovava a própria regra que M4 instala; "linha de ação" (a outra metade de D4) documentada como definida sem consumidor. Pendente: M5-M9 (Nível 2) e Nível 3 inteiro, nenhum começado.
 
 ### ✅ fix — `.metrica__valor` estourava a grade de 3 colunas em Número herói (2026-08-15)
 
@@ -276,6 +276,18 @@ Quota checada com uma chamada direta à API antes de gastar esforço recriando d
 **Correção:** `.metrica__valor` volta pra Título de tela (30px) — mesmo papel e mesmo motivo já usados em `.serie__v` (E2): número real que não cabe no papel maior, medido, não escolhido a priori. Testado de novo com o valor real que quebrou (`30,2t`) e um caso mais largo (`142`+`séries`, unidade mais longa que `kg`) — ambos cabem numa linha só agora, com a unidade caindo pra linha de baixo como o desenho sempre previu.
 
 **Verificação:** `npx tsc --noEmit` · `npm run test` (133/133) · `npm run lint` (0 erros) · `npm run build` — todos verdes. Visual: Chrome real via extensão, reproduzindo a marcação e a largura reais (390px, grade de 3 colunas), com screenshot confirmando a correção antes do merge.
+
+### ✅ M4 — seta em toda linha de navegação; "ação dentro de lista" fica definida sem consumidor (2026-08-15)
+
+**O que mudou.** Toda linha que usa `.item__link` ganhou uma seta de navegação (`<SetaNavegacao/>`, componente novo em `src/components/seta-navegacao.tsx`, SVG decorativo com `aria-hidden`, reusado em vez de repetido em cada arquivo): `/ajustes` (Coach, Modelos de treino, Anilhas — 3 linhas), `/` e `/treino` (histórico de treino), `/catalogo/[id]` (histórico de série por exercício). CSS novo em `sistema.css`: `.item__conteudo` (assume a distribuição `justify-content: space-between` que `.item__link` fazia sozinho antes, entre rótulo e meta) e `.item__seta` (ícone, `--lastro-e-5`, `--lastro-txt-3`); `.item__link` virou um flex simples de 2 filhos — conteúdo (`flex:1`) + seta (`flex:none`) — em vez de um `justify-content` com 3-4 filhos, que espalharia a seta pro meio da linha em vez do canto (risco apontado pelo `advisor` antes de eu escrever qualquer CSS).
+
+**Achado no caminho — reprova real da própria regra que M4 instala.** `/treino/page.tsx` tinha `<span class="item__meta">ver</span>` — um VERBO como rótulo secundário numa linha de navegação, exatamente o que a cláusula `Reprova:` de §6.4 proíbe. A seta já entrega esse recado visualmente; troquei "ver" pela metadata real (`{n} séries`), o mesmo padrão que `/` (Início) já usava pra essa mesma lista de treinos — não inventei formato novo, só apliquei o que já existia ao lado.
+
+**Por que só a metade "navega" foi implementada.** Antes de escrever CSS, auditei se existe hoje alguma "linha de ação dentro de lista" (o padrão que §6.4 define como mesmo recipiente, sem seta, rótulo em verbo). Não existe — o único candidato próximo, "Sair" em `/ajustes`, já é um `.botao-secundario` avulso, fora do sistema de linhas, e nada nele reprova a regra hoje. Documentei o padrão como definido-sem-consumidor em `DESIGN.md` §6.4 (mesma situação já registrada pra `--lastro-papel-bancada` em E2) em vez de inventar um uso pra ele — lição direta de M2.
+
+**`.item`/`.lista` fora de escopo, de propósito.** `/ajustes/modelos` usa `.item` sem `.item__link` (nome do modelo + botão de excluir, sem navegação nenhuma) — é DADO dentro do recipiente de "navega", a mesma classe de defeito que M3 corrigiu em `/ajustes/anilhas`. Não corrigido aqui: M4 é sobre a seta e o rótulo, não sobre auditar todo uso de `.item`. Fica registrado em `DESIGN.md` §6.3 como pendência conhecida, não escondida.
+
+**Verificação:** `npx tsc --noEmit` · `npm run test` (133/133) · `npm run lint` (0 erros) · `npm run build` — todos verdes. Visual: Chrome real via extensão, os três casos reais reproduzidos a 360px (piso do gate, §4.1) — a linha mais apertada (`/catalogo/[id]` com o crachá "recorde" presente, o pior caso real com mais filhos dentro de `.item__conteudo`), a linha de `/ajustes` com texto de duas linhas (`atalho__meta` quebrando), e a linha de `/treino` com botão de excluir ao lado da seta. Nenhum overflow horizontal medido (`scrollWidth === clientWidth` nos três), screenshot confirmando a leitura visual: seta sempre no canto, nunca no meio da linha.
 
 ### ✅ M3 — `/ajustes/anilhas` vira grade sem recipiente (2026-08-15)
 

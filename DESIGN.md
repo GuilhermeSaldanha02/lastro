@@ -556,11 +556,15 @@ Decididos pelo que a linha **É**, não por preferência de tela em tela:
 
 **Reprova:** dado (número que só se lê, nunca se toca pra navegar) dentro de um recipiente com borda; item que navega sem recipiente nem chevron.
 
+> **Implementado (M3/M4, 2026-08-15).** "Dado" — `/ajustes/anilhas` (`.grade-anilhas`/`.anilha`). "Navega" — toda linha com `.item__link` ganhou seta (`SetaNavegacao`, `sistema.css` `.item__seta`): `/ajustes` (Coach, Modelos de treino, Anilhas), `/` e `/treino` (histórico de treino), `/catalogo/[id]` (histórico de série). `.item`/`.lista` continuam reservados a linhas que navegam de verdade — `/ajustes/modelos` usa `.item` pra uma lista de DADO (nome do modelo, sem link), fora do escopo de M3/M4 e ainda não corrigido.
+
 ### 6.4 A regra verbo × substantivo (D4)
 
 Ação usa o **mesmo recipiente da navegação, sem chevron** — a seta ausente é pista fraca sozinha, então um segundo canal por classe gramatical compensa: **rótulo de navegação é substantivo; rótulo de ação é verbo.**
 
 **Reprova:** rótulo de navegação em verbo; rótulo de ação em substantivo; ação com chevron.
+
+> **Implementado em parte (M4, 2026-08-15).** O lado "navega" está em produção (nota acima). O lado "ação dentro de lista" **não tem consumidor ainda** — auditado e nenhuma linha de ação existe hoje dentro de uma `.lista` (o candidato mais próximo, "Sair" em `/ajustes`, já é um `.botao-secundario` avulso, fora do sistema de linhas, e nada nele reprova a regra). Fica definida, sem CSS órfã: quando um caso real aparecer (ex.: M6), reusa `.item`/`.item__link` sem `.item__seta`. Mesmo padrão de "papel definido, sem consumidor" já usado em `--lastro-papel-bancada` (E2). De passagem, um achado real: `/treino` tinha "ver" como rótulo secundário numa linha de navegação — um verbo, a reprova exata desta regra — corrigido para a metadata real (`{n} séries`).
 
 ### 6.5 As dez peças
 

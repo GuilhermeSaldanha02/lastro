@@ -7,6 +7,7 @@ import { buscarExercicio, historicoDoExercicio } from "@/lib/dados/treino";
 import { marcarRecordesHistoricos } from "@/lib/analise/recorde-serie";
 import { dataLocalBrasil, formatarDataCurta } from "@/lib/tempo";
 import AbaInferior from "@/components/aba-inferior";
+import SetaNavegacao from "@/components/seta-navegacao";
 
 export default async function PaginaHistoricoExercicio({
   params,
@@ -54,16 +55,21 @@ export default async function PaginaHistoricoExercicio({
               <li key={`${serie.treinoId}-${serie.criadoEm}-${indice}`}>
                 <div className="item">
                   <Link href={`/treino/${serie.treinoId}`} className="item__link">
-                    <span className="item__data">
-                      {formatarDataCurta(dataLocalBrasil(new Date(serie.criadoEm)))}
+                    <span className="item__conteudo">
+                      <span className="item__data">
+                        {formatarDataCurta(dataLocalBrasil(new Date(serie.criadoEm)))}
+                      </span>
+                      <span className="serie__v">
+                        {serie.reps}
+                        <span className="serie__x">×</span>
+                        {serie.peso}
+                        <span className="serie__un">kg</span>
+                      </span>
+                      {marcas[indice] && (
+                        <span className="marca marca--recorde">recorde</span>
+                      )}
                     </span>
-                    <span className="serie__v">
-                      {serie.reps}
-                      <span className="serie__x">×</span>
-                      {serie.peso}
-                      <span className="serie__un">kg</span>
-                    </span>
-                    {marcas[indice] && <span className="marca marca--recorde">recorde</span>}
+                    <SetaNavegacao />
                   </Link>
                 </div>
               </li>

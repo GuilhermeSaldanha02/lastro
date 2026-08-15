@@ -33,6 +33,7 @@ import { dataLocalBrasil, formatarDataCurta } from "@/lib/tempo";
 import AbaInferior from "@/components/aba-inferior";
 import Avatar from "@/components/avatar";
 import IniciarTreino from "@/components/iniciar-treino";
+import SetaNavegacao from "@/components/seta-navegacao";
 
 /** "2026-08-06" → "6 ago". Relativo quando é hoje ou ontem. */
 function formatarData(iso: string, hojeISO: string): string {
@@ -163,17 +164,20 @@ export default async function PaginaInicial() {
               <li key={treino.id}>
                 <div className="item">
                   <Link href={`/treino/${treino.id}`} className="item__link">
-                    <span className="item__data">
-                      {formatarData(treino.data, hoje)}
+                    <span className="item__conteudo">
+                      <span className="item__data">
+                        {formatarData(treino.data, hoje)}
+                      </span>
+                      <span className="item__meta">
+                        {treino.totalSeries}{" "}
+                        {treino.totalSeries === 1 ? "série" : "séries"}
+                        {treino.volume > 0 &&
+                          ` · ${formatarVolume(treino.volume).valor} ${
+                            formatarVolume(treino.volume).unidade
+                          }`}
+                      </span>
                     </span>
-                    <span className="item__meta">
-                      {treino.totalSeries}{" "}
-                      {treino.totalSeries === 1 ? "série" : "séries"}
-                      {treino.volume > 0 &&
-                        ` · ${formatarVolume(treino.volume).valor} ${
-                          formatarVolume(treino.volume).unidade
-                        }`}
-                    </span>
+                    <SetaNavegacao />
                   </Link>
                 </div>
               </li>

@@ -7,6 +7,7 @@ import { obterPerfil } from "@/lib/dados/perfil";
 import { sair } from "@/lib/dados/auth";
 import AbaInferior from "@/components/aba-inferior";
 import ExcluirConta from "@/components/excluir-conta";
+import SetaNavegacao from "@/components/seta-navegacao";
 
 export default async function PaginaAjustes() {
   const perfil = await obterPerfil();
@@ -34,24 +35,33 @@ export default async function PaginaAjustes() {
               <li>
                 <div className="item">
                   <Link href="/coach" className="item__link">
-                    <span className="atalho__titulo">Coach</span>
-                    <span className="atalho__meta">Tirar uma dúvida</span>
+                    <span className="item__conteudo">
+                      <span className="atalho__titulo">Coach</span>
+                      <span className="atalho__meta">Tirar uma dúvida</span>
+                    </span>
+                    <SetaNavegacao />
                   </Link>
                 </div>
               </li>
               <li>
                 <div className="item">
                   <Link href="/ajustes/modelos" className="item__link">
-                    <span className="atalho__titulo">Modelos de treino</span>
-                    <span className="atalho__meta">Montar listas de exercícios</span>
+                    <span className="item__conteudo">
+                      <span className="atalho__titulo">Modelos de treino</span>
+                      <span className="atalho__meta">Montar listas de exercícios</span>
+                    </span>
+                    <SetaNavegacao />
                   </Link>
                 </div>
               </li>
               <li>
                 <div className="item">
                   <Link href="/ajustes/anilhas" className="item__link">
-                    <span className="atalho__titulo">Anilhas</span>
-                    <span className="atalho__meta">Configurar e calcular</span>
+                    <span className="item__conteudo">
+                      <span className="atalho__titulo">Anilhas</span>
+                      <span className="atalho__meta">Configurar e calcular</span>
+                    </span>
+                    <SetaNavegacao />
                   </Link>
                 </div>
               </li>
