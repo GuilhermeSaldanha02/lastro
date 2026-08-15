@@ -8,6 +8,7 @@ import { marcarRecordesHistoricos } from "@/lib/analise/recorde-serie";
 import { dataLocalBrasil, formatarDataCurta } from "@/lib/tempo";
 import AbaInferior from "@/components/aba-inferior";
 import SetaNavegacao from "@/components/seta-navegacao";
+import EtiquetaRecorde from "@/components/etiqueta-recorde";
 
 export default async function PaginaHistoricoExercicio({
   params,
@@ -65,9 +66,7 @@ export default async function PaginaHistoricoExercicio({
                         {serie.peso}
                         <span className="serie__un">kg</span>
                       </span>
-                      {marcas[indice] && (
-                        <span className="marca marca--recorde">recorde</span>
-                      )}
+                      {marcas[indice] && <EtiquetaRecorde />}
                     </span>
                     <SetaNavegacao />
                   </Link>

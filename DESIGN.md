@@ -577,7 +577,7 @@ Cada peça vem de um app premiado (Apple Design Award ou finalista), recriada na
 | 3 | Linha de navegação e linha de ação | Oura | Toda lista do app — a base de §6.3 e §6.4 | Linha de ação com chevron; linha de navegação com rótulo em verbo |
 | 4 | Controle segmentado | Structured | Trocar o que o gráfico da Análise mostra; filtrar histórico do exercício | `<select>` usado pra essa troca — o próprio seletor que o dono mandou tirar em 2026-08-14 |
 | 5 | Chips de seleção | Strava · Structured | Grupo muscular no catálogo e na criação de modelo | Lista vertical de caixas de seleção pra grupo muscular |
-| 6 | Etiqueta de estado | Gentler Streak · Oura | Progressão, platô, recorde | Estado marcado só por cor — precisa de ícone + palavra + cor, os três canais (§3.2 nota E, a mesma regra já vale para o parecer) |
+| 6 | Etiqueta de estado — **implementada (M5, 2026-08-15)** | Gentler Streak · Oura | Progressão, platô, recorde | Estado marcado só por cor — precisa de ícone + palavra + cor, os três canais (§3.2 nota E, a mesma regra já vale para o parecer) |
 | 7 | Tabela com cabeçalho de coluna | Hevy | As séries do treino | Séries sem cabeçalho de coluna alinhado — é a peça que fecha o desalinhamento que abriu a sessão do diagnóstico de design |
 | 8 | Ação fantasma dentro da seção | Hevy | "Adicionar série", "adicionar anilha", "criar modelo" | Ação secundária com o mesmo peso visual da ação primária da tela |
 | 9 | Prosa com título em serifa | Oura | O parecer da Análise Semanal, o Coach e a marca do `/login` (§6.6, D10) — a voz do produto | Fraunces usada fora do parecer, do Coach e da marca (mesma proibição que já vale pra Plex Serif em §3.3) — **mas o alcance dela dentro do parecer cresce, ver nota abaixo** |
