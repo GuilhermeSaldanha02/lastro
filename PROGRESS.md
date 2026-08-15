@@ -255,7 +255,19 @@ Quota checada com uma chamada direta à API antes de gastar esforço recriando d
 >
 > ⚠️ **Antes de codar qualquer coisa da Trilha B:** o vocabulário das 10 peças precisa virar seção do `DESIGN.md` (item E5). Hoje ele só existe em artifact, e artifact não é fonte durável de projeto.
 >
-> **Atualização (2026-08-15, sessão seguinte): A1 e A2 estão feitos e mergeados.** A3/A4 e toda a Trilha B não foram começados.
+> **Atualização (2026-08-15, sessão seguinte): A1, A2 e A3 estão feitos e mergeados.** A4 e toda a Trilha B não foram começados.
+
+### ✅ A3 — piscada do `ForcarInicioNoLancamento` corrigida (2026-08-15)
+
+O componente fazia `window.location.replace("/")` dentro de `useEffect`, que só roda **depois** da primeira pintura — no PWA instalado, a tela errada aparecia por um instante antes do salto.
+
+**Duas tentativas, a primeira errada e descartada, registradas porque o erro ensina algo sobre este Next.js.** A primeira foi `<Script strategy="beforeInteractive">` (a API dedicada do Next pra isso) — a doc dela (`node_modules/next/dist/docs/01-app/03-api-reference/02-components/script.md`) diz "injetado no HTML inicial… executado antes de qualquer hidratação", o que parecia resolver. Inspecionar o runtime (`node_modules/next/dist/client/app-bootstrap.js`) mostrou que **"antes da hidratação" não é "antes da pintura"**: o `<Script>` vira uma fila (`self.__next_s.push(...)`) processada por um bundle carregado com `async` — o `<main>` da SSR pode pintar primeiro numa conexão lenta, exatamente o cenário do lançamento frio de um PWA. Achado por inspeção de fonte, não por suposição.
+
+A correção de verdade está em outra doc do mesmo Next (`node_modules/next/dist/docs/01-app/02-guides/preventing-flash-before-hydration.md`, existe pra isso especificamente): `<script>` **cru**, com `dangerouslySetInnerHTML`, direto no `<head>` do `app/layout.tsx` — não o componente `<Script>`. É um script inline de verdade, sem `async`/`defer`/`type=module`; o parser do navegador o executa de forma síncrona ao encontrá-lo e só então segue pro `<body>`.
+
+**Verificação — posição no HTML gerado, checada por script, não por leitura:** confirmado que o `<script>` fica dentro de `<head>`, antes de `<main>`, tanto no dev server (Turbopack) quanto num build de produção real (`npm run build && npm run start`, testado e encerrado nesta sessão). `npx tsc --noEmit && npm run test && npm run lint && npm run build` verdes (133 testes, `/login` continua estático).
+
+**PR:** ver `fix/pisca-forcar-inicio-no-lancamento`.
 
 ### ✅ A2 — telas de entrada fundidas (2026-08-15)
 
