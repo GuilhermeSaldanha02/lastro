@@ -7,6 +7,8 @@
 > **Uma restrição funcional foi revista pelo dono nesta data: D5.** O tema padrão passou a ser **claro** (areia), não escuro. A justificativa original de D5 (academia com luz baixa, tela clara cansa à noite) continua válida como risco conhecido; o dono a aceitou conscientemente em favor do padrão escolhido.
 >
 > **2026-08-11 — revisto de novo.** A pílula da aba inferior deixou de ser vidro areia e passou a ser petróleo (mais claro que a barra de topo), a pedido do dono. **Duas superfícies petróleo agora, não uma** — a barra de topo continua a mais escura das duas; a pílula é uma versão mais clara da mesma tinta, amarrando as duas pontas da tela. Onde este documento disser "a única superfície escura", leia "a barra de topo é a mais escura das duas superfícies petróleo".
+>
+> **2026-08-15 — §6 acrescentado (item E5 do redesenho).** O vocabulário das 10 peças do redesenho, decidido pelo dono e antes só em artifact, virou seção durável deste documento. **Nada em §6 está implementado ainda** — §3 continua sendo a tipografia e os tokens que o código de fato usa até a Trilha B (`docs/BACKLOG-REDESENHO.md`) chegar em cada peça.
 
 ---
 
@@ -491,3 +493,122 @@ Anel de foco: `--lastro-foco-espessura` sólido em `--lastro-foco`, com `--lastr
 - **No coach 24h o balão é correto e completo**, com rabicho, alternância e campo de digitação. É a única tela do app onde se conversa (PRD §4.4).
 
 **Advertência que continua de pé:** a validação final de qualquer peça visual é **olho do dono em navegador real, no celular**. Medição de DOM não substitui — `getComputedStyle` não detecta toda renderização errada. As telas logadas (`/treino`, `/treino/[id]`, `/analise`) **ainda não passaram por isso**: ficam atrás de autenticação e o gate de §4 segue pendente para elas.
+
+---
+
+## 6. Vocabulário do redesenho — Trilha B (decidido, ainda não implementado)
+
+> **Este parágrafo existe porque um documento cuja fonte era artifact não é fonte durável de projeto** (item E5 do backlog, pré-requisito de tudo abaixo dele). As 10 decisões do dono que fundamentam esta seção, com a evidência e a alternativa descartada de cada uma, estão em `DECISIONS.md` 2026-08-15 — este parágrafo não repete essa evidência, só o vocabulário resultante. O que construir com ele, e em que ordem, está em `docs/BACKLOG-REDESENHO.md`.
+>
+> **Travas que continuam valendo em toda a Trilha B:** nenhum pigmento da paleta muda (§3.1) e a pílula de navegação (`.nav`, `aba-inferior.tsx`, tokens `--lastro-nav-*`/`--lastro-vidro-nav*`) fica intacta. Nada em §6 autoriza mexer nas duas.
+>
+> **Estado:** nada abaixo está em produção. `§3.3` (IBM Plex Sans/Mono/Serif) e a escala `--lastro-t-1..8` continuam sendo o que o código executa até cada peça ser implementada.
+>
+> **Sobre os literais que aparecem abaixo (tamanho em px, duração em ms, `cubic-bezier`):** são o **alvo decidido**, não valor executável — viram token quando E1/E2/E4 (`docs/BACKLOG-REDESENHO.md`) forem implementados. Continuam fora da lista de exceções de §3.8 até lá; §3.8 ganha entrada nova no dia em que E1/E2/E4 tirarem esses números daqui e os colocarem em `tokens.css`.
+
+### 6.1 As três famílias (D1) — substituem §3.3 quando implementadas
+
+| Papel | Família | Eixos variáveis |
+|---|---|---|
+| Voz — prosa do parecer, título de conteúdo | **Fraunces** | `opsz, wght, SOFT, WONK` |
+| Dado — carga, reps, volume, e1RM | **Archivo** (condensada) | `wdth, wght` |
+| Corpo — tudo que se lê no dia a dia | **Bricolage Grotesque** | `opsz, wdth, wght` |
+
+Não é meio-termo entre as opções descartadas (tudo Archivo, ou tudo Fraunces+Bricolage) — é divisão de trabalho: a serifa carrega a prosa do parecer (o produto), a condensada carrega o dado (carga/e1RM/volume). Espelha a tese "o log é infraestrutura, o produto é a leitura" (`CLAUDE.md`).
+
+**Archivo substitui a monoespaçada de hoje** — precisa de `font-variant-numeric: tabular-nums` explícito, porque a garantia de avanço tabular que a Mono dava por ser monoespaçada (§3.3) não existe numa condensada proporcional.
+
+**Reprova:** uma quarta família aparecendo fora deste papel; Archivo sem `tabular-nums` em coluna de série.
+
+### 6.2 Os 6 papéis tipográficos (D2)
+
+Substituem `--lastro-t-meta`/`--lastro-t-corpo`/`--lastro-t-1..8` por papéis **nomeados**, não números crus:
+
+| Papel | Tamanho |
+|---|---|
+| Rótulo | 14 |
+| Corpo | 16 |
+| Seção | 20 |
+| Título de tela | 30 |
+| Número herói | 48 |
+| Bancada | 76 |
+
+**Regra que vale como gate: quem implementa escolhe o papel, nunca o pixel.**
+
+**Reprova:** tamanho usado sem papel atribuído.
+
+### 6.3 Os 2 padrões de superfície (D3)
+
+Decididos pelo que a linha **É**, não por preferência de tela em tela:
+
+| Padrão | Quando usar | Tratamento |
+|---|---|---|
+| **Navega** | a linha leva pra outro lugar | recipiente macio + chevron |
+| **Dado** | a linha só mostra um número ou estado | sem recipiente, em grade |
+
+**Medido a 360px** (motivação da decisão): 6 anilhas em grade = 88px, contra 372px nas 6 linhas de hoje — é a diferença entre "dado" tratado como "navega" e tratado pelo que ele é.
+
+**Reprova:** dado (número que só se lê, nunca se toca pra navegar) dentro de um recipiente com borda; item que navega sem recipiente nem chevron.
+
+### 6.4 A regra verbo × substantivo (D4)
+
+Ação usa o **mesmo recipiente da navegação, sem chevron** — a seta ausente é pista fraca sozinha, então um segundo canal por classe gramatical compensa: **rótulo de navegação é substantivo; rótulo de ação é verbo.**
+
+**Reprova:** rótulo de navegação em verbo; rótulo de ação em substantivo; ação com chevron.
+
+### 6.5 As dez peças
+
+Cada peça vem de um app premiado (Apple Design Award ou finalista), recriada na paleta do `lastro` — nenhuma cor nova.
+
+| # | Peça | Origem | Onde entra | Reprova |
+|---|---|---|---|---|
+| 1 | Rótulo micro + valor grande | Gentler Streak · Oura · Hevy | Todo número do app: volume, e1RM, carga, frequência | Número solto sem rótulo acima, ou rótulo no mesmo papel tipográfico do número |
+| 2 | Grade de métricas, sem recipiente | Gentler Streak | Resumo da Análise, cabeçalho do treino, ficha do exercício | Métrica dentro do próprio cartão com borda — volta ao padrão "navega" que §6.3 proíbe para dado |
+| 3 | Linha de navegação e linha de ação | Oura | Toda lista do app — a base de §6.3 e §6.4 | Linha de ação com chevron; linha de navegação com rótulo em verbo |
+| 4 | Controle segmentado | Structured | Trocar o que o gráfico da Análise mostra; filtrar histórico do exercício | `<select>` usado pra essa troca — o próprio seletor que o dono mandou tirar em 2026-08-14 |
+| 5 | Chips de seleção | Strava · Structured | Grupo muscular no catálogo e na criação de modelo | Lista vertical de caixas de seleção pra grupo muscular |
+| 6 | Etiqueta de estado | Gentler Streak · Oura | Progressão, platô, recorde | Estado marcado só por cor — precisa de ícone + palavra + cor, os três canais (§3.2 nota E, a mesma regra já vale para o parecer) |
+| 7 | Tabela com cabeçalho de coluna | Hevy | As séries do treino | Séries sem cabeçalho de coluna alinhado — é a peça que fecha o desalinhamento que abriu a sessão do diagnóstico de design |
+| 8 | Ação fantasma dentro da seção | Hevy | "Adicionar série", "adicionar anilha", "criar modelo" | Ação secundária com o mesmo peso visual da ação primária da tela |
+| 9 | Prosa com título em serifa | Oura | O parecer da Análise Semanal e o Coach — a voz do produto | Fraunces usada fora do parecer e do Coach (mesma proibição que já vale pra Plex Serif em §3.3) — **mas o alcance dela dentro do parecer cresce, ver nota abaixo** |
+| 10 | Folha com alça | Strava · Structured | Adicionar anilha, editar série, criar modelo, editar perfil | Tarefa curta abrindo em rota cheia em vez de folha; folha sem fechar arrastando pra baixo |
+
+**Nota sobre a peça 9 — ela alarga o alcance da terceira família, não só troca a fonte.** §3.3/C4 (aprovado 2026-08-08) restringe a Plex Serif ao **veredito, e só ele**, dentro do parecer — o resto do documento (cabeçalho, prosa, procedência) é Sans. A peça 9 usa a serifa no **título de conteúdo** da prosa inteira do parecer e do Coach, não só no veredito. Isso não é a mesma regra com fonte trocada: é C4 sendo revisto pela Trilha B. Quando a peça 9 for implementada, ela **substitui** o escopo de C4 — a serifa passa a valer para título + veredito, ainda proibida em qualquer outro lugar do app. Até lá, §3.3 continua sendo a regra que vale.
+
+### 6.6 O mapa: qual peça em qual tela
+
+| Tela | Peças | O que ganha |
+|---|---|---|
+| `/` (início) | 1 · 2 · 3 · 6 | o estado do dia vira grade de métricas; a ação de treinar deixa de ser bloco entre blocos |
+| `/treino` | 3 · 6 · 10 | iniciar/continuar como ação clara; escolher modelo vira folha |
+| `/treino/[id]` | 1 · 7 · 8 · 10 | séries em colunas com cabeçalho; registrar e editar viram folha; "adicionar" fantasma |
+| `/analise` | 1 · 2 · 4 · 6 · 9 | a peça-assinatura: serifa na leitura, grade no dado, segmentado no gráfico |
+| `/catalogo` | 5 · 3 | grupos viram chips; fichas perdem moldura e viram linhas de navegação |
+| `/catalogo/[id]` | 1 · 2 · 4 · 7 | histórico com cabeçalho de coluna; segmentado troca a métrica |
+| `/coach` | 9 | a única tela onde balão se justifica; título e prosa na voz do produto |
+| `/ajustes` | 3 | já é a mais correta hoje; só herda a linha de navegação nova |
+| `/ajustes/anilhas` | 1 · 2 · 8 · 10 | anilhas viram grade (88px no lugar de 372px); adicionar vira folha |
+| `/ajustes/modelos` | 3 · 5 · 8 · 10 | modelos como linhas de navegação; criar vira folha com chips |
+| `/perfil` | 1 · 10 | vira folha; o nome ganha papel tipográfico (hoje é texto sem classe nenhuma) |
+| `/login` | 9 | primeira impressão do app (D10) — hoje é a tela mais genérica de todas |
+
+**Este mapa cobre 12 das 13 telas do artifact original.** `/ajustes/modelos/novo` existe no app (ver rota em `src/app/ajustes/modelos/novo/`) e não recebeu peça mapeada na sessão que gerou o vocabulário — ficou de fora por omissão do artifact, não por decisão. Fica registrado aqui pra não ser esquecido: mapear essa tela é trabalho pendente antes de propagar a Trilha B até `/ajustes/modelos`.
+
+**Ordem sugerida de propagação** (`docs/BACKLOG-REDESENHO.md`, item H4): `/ajustes/anilhas` (pequena, exercita quase tudo) → `/analise` (peça-assinatura) → `/treino/[id]` (a mais complexa) → o resto. Uma tela por PR, olhada no celular antes da seguinte.
+
+### 6.7 Padrões de transição (D7)
+
+Conjunto contido do Material 3 — **sem container transform**, que o próprio M3 chama de "o mais expressivo" e o dono recusou por excesso.
+
+| Elemento | Transição | Duração |
+|---|---|---|
+| Pílula (nível de topo) | só esmaece | 200ms |
+| Sub-tela | desliza + esmaece | 300ms |
+| Folha | sobe | 400ms, curva enfatizada |
+| Segmentado | lateral | — |
+
+Curvas: padrão `cubic-bezier(0.2,0,0,1)` · enfatizada decelerando `cubic-bezier(0.05,0.7,0.1,1)`.
+
+**Obrigatório respeitar `prefers-reduced-motion`** em todas.
+
+**Reprova:** container transform em qualquer lugar do app; transição fora deste conjunto contido; movimento que ignora `prefers-reduced-motion`.

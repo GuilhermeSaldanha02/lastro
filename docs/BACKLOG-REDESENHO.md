@@ -4,7 +4,7 @@
 >
 > **Nada aqui foi implementado** quando este documento foi escrito. Tudo é decisão já tomada pelo dono ou achado verificado por medição — não é lista de ideias.
 >
-> **Estado em 2026-08-15 (sessão seguinte):** **toda a Trilha A está fechada** — A1, A2, A3 e A4 (investigação) marcados ✅ abaixo. Só a Trilha B (o redesenho) continua por fazer.
+> **Estado em 2026-08-15 (sessão seguinte):** **toda a Trilha A está fechada** — A1, A2, A3 e A4 (investigação) marcados ✅ abaixo. Na Trilha B, **E5 (o pré-requisito) também está feito** — o vocabulário agora mora em `DESIGN.md` §6. O resto do Nível 1 (E1-E4) e os Níveis 2 e 3 continuam por fazer.
 
 ---
 
@@ -131,7 +131,9 @@ Substituir `--lastro-t-meta/corpo/1..8` por **papéis nomeados**: Rótulo (14) �
 ### E4 · Tokens de movimento · [D7]
 Hoje só existem 120ms e 220ms — falta a faixa média. Acrescentar as durações do M3 (250/300/350/400) e as curvas: padrão `cubic-bezier(0.2,0,0,1)`, enfatizada decelerando `cubic-bezier(0.05,0.7,0.1,1)`.
 
-### E5 · **Escrever o vocabulário no `DESIGN.md`** · [pré-requisito de tudo]
+### E5 · **Escrever o vocabulário no `DESIGN.md`** · [pré-requisito de tudo] · ✅ **FEITO (2026-08-15)**
+
+> Virou `DESIGN.md` §6. Uma lacuna encontrada e registrada, não resolvida por invenção: o mapa do artifact tinha 13 telas, mas `/ajustes/modelos/novo` nunca recebeu peça — está anotado como pendência em §6.6. Detalhe completo: `PROGRESS.md`, bloco "✅ E5". O texto abaixo é o enunciado original, mantido como registro.
 As 10 peças, os 2 padrões de superfície, a regra verbo × substantivo, os papéis tipográficos e os padrões de transição — cada um com cláusula `Reprova:`, no idioma do documento.
 **Este item não é opcional e vem antes do Nível 2.** Sem ele, o vocabulário existe só em artifact, e artifact não é fonte de projeto.
 

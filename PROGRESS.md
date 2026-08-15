@@ -253,9 +253,23 @@ Quota checada com uma chamada direta à API antes de gastar esforço recriando d
 >
 > **Nada do redesenho foi implementado.** Nenhum CSS foi tocado nesta sessão — só documentos. `main` limpa.
 >
-> ⚠️ **Antes de codar qualquer coisa da Trilha B:** o vocabulário das 10 peças precisa virar seção do `DESIGN.md` (item E5). Hoje ele só existe em artifact, e artifact não é fonte durável de projeto.
+> ⚠️ ~~Antes de codar qualquer coisa da Trilha B: o vocabulário das 10 peças precisa virar seção do DESIGN.md (item E5).~~ **Feito — ver bloco abaixo.**
 >
-> **Atualização (2026-08-15, sessão seguinte): A1, A2, A3 e A4 (investigação) estão fechados.** Só a Trilha B não foi começada.
+> **Atualização (2026-08-15, sessão seguinte): A1, A2, A3, A4 (investigação) e E5 estão fechados.** O resto da Trilha B (E1-E4, Nível 2, Nível 3) não foi começado.
+
+### ✅ E5 — vocabulário do redesenho virou seção do DESIGN.md (2026-08-15)
+
+Pré-requisito de toda a Trilha B: o vocabulário das 10 peças, os 2 padrões de superfície, a regra verbo × substantivo, os 6 papéis tipográficos e os padrões de transição existiam só num artifact (`docs/BACKLOG-REDESENHO.md` §1) — artifact não é fonte durável de projeto. Virou `DESIGN.md` §6, com cláusula `Reprova:` em cada peça, seguindo o padrão que o resto do documento já usa.
+
+**Fonte do conteúdo, e um cuidado que valeu a pena.** O artifact é renderizado num iframe entre origens — texto e árvore de acessibilidade da extensão do Chrome não alcançam, e a aba **ativou tradução automática do Google sozinha**, trocando "lastro" por "último" no título antes que eu notasse. Não usei nada do que vi ali. Em vez disso, baixei o HTML bruto do artifact (`WebFetch`, que usa o login do dono em claude.ai) e extraí o texto direto da marcação — sem depender do navegador nem de qualquer tradução.
+
+**Revisão (achados de uma passagem de `advisor` antes do commit, dois bloqueantes):**
+1. O mapa tinha 12 telas; o artifact original fala em 13. Faltava `/ajustes/modelos/novo`, que existe no app e não recebeu peça mapeada na sessão que gerou o vocabulário. Registrado como pendência explícita em §6.6, não preenchido por invenção.
+2. A peça 9 (prosa com título em serifa) usa Fraunces no título de conteúdo do parecer inteiro, não só no veredito — isso **alarga** o escopo aprovado de C4 (`§3.3`, 2026-08-08: serifa só no veredito), não é uma simples troca de fonte. Anotado explicitamente em §6.5: C4 é revisto quando a peça 9 for implementada, e §3.3 continua valendo até lá.
+
+Também anotado em §3.8 e na abertura de §6: os números novos (tamanho, duração, curva de easing) são o **alvo decidido**, não literal executável — só viram exceção legítima de `tokens.css` quando E1/E2/E4 os implementarem.
+
+**Nenhum código mudado.** É documento só; os quatro comandos de verificação não se aplicam.
 
 ### ✅ A4 — investigação concluída: artefato do dev server, não bug de produção (2026-08-15)
 
