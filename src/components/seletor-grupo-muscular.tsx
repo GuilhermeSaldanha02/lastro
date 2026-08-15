@@ -34,9 +34,11 @@ export default function SeletorGrupoMuscular({
         Escolha um ou mais — a lista de exercícios mostra só esses grupos.
       </p>
 
-      <div className="selecao-grupos" role="group" aria-label="Grupos musculares de hoje">
+      {/* Chips (DESIGN.md §6.5, peça 5, M7) — substitui a grade de caixas
+          de seleção. */}
+      <div className="chips" role="group" aria-label="Grupos musculares de hoje">
         {opcoes.map((opcao) => (
-          <label key={opcao.id} className="selecao-grupos__opcao">
+          <label key={opcao.id} className="chip">
             <input
               type="checkbox"
               checked={selecionados.includes(opcao.id)}

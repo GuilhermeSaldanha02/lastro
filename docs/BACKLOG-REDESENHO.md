@@ -194,7 +194,12 @@ Progressão, platô, recorde. Ícone + palavra + cor — nunca só cor.
 
 "Adicionar série", "adicionar anilha", "criar modelo". Resolve o desequilíbrio já registrado entre "Adicionar" e "Salvar configuração".
 
-### M7 · Chips e controle segmentado
+### M7 · Chips e controle segmentado · ✅ **FEITO EM PARTE (2026-08-15)**
+
+> **Chips — implementado.** Classes novas `.chips`/`.chip` (`sistema.css`), token novo `--lastro-raio-chip` (`tokens.css`, mesmo valor de `--lastro-raio-pilula` mas token próprio — aquele é travado só pra aba inferior). Substitui `.selecao-grupos`/`.selecao-grupos__opcao` (grade de 2 colunas, caixa com borda) só em `SeletorGrupoMuscular` — usado em `/treino/[id]` (grupo do dia) e `/ajustes/modelos/novo` (1º passo de criar modelo, e resolve de passagem a lacuna que E5 tinha registrado: essa tela nunca tinha recebido peça mapeada em §6.6). `.selecao-grupos` continua existindo — `modelo-treino-form.tsx` reusa a mesma classe pra escolher EXERCÍCIOS (não grupo muscular), fora do escopo da peça 5, e nomes de exercício variam demais em tamanho pra funcionar bem como chip.
+>
+> **Segmentado — auditado, sem trabalho novo, nenhum dos dois alvos existe hoje.** Os dois lugares nomeados no próprio enunciado do item ("trocar o que o gráfico mostra", "filtrar histórico do exercício") não têm controle nenhum pra substituir: o gráfico (`grafico-progressao.tsx`) já não tem seletor desde a reescrita de §3.7 (pequenos múltiplos, aprovada 2026-08-14, ANTES das 10 decisões da Trilha B — o próprio §3.7 já fez o trabalho que a peça 4 descreveria, por um caminho diferente: eliminar a escolha em vez de trocar o `<select>` por um segmentado); `/catalogo/[id]` lista o histórico inteiro, sem filtro de métrica nenhum pra trocar. Construir um controle segmentado exigiria **inventar uma funcionalidade de filtro que não existe**, não só reestilizar uma que existe — fora do escopo de um item de redesenho visual. Detalhe: `PROGRESS.md`, bloco "✅ M7".
+
 Chips para grupo muscular (catálogo, criar modelo). Segmentado para trocar o que o gráfico mostra — **substitui o seletor que o dono já mandou tirar**.
 
 ### M8 · Tabela com cabeçalho de coluna · ⚠️ herda pendência de M5
