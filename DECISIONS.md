@@ -934,3 +934,42 @@ Confirma **Opção 2** ("Tela Configuração de Treinos", pré-cadastro escrito 
 **Impacto.** `PRD.md` §9 editado nesta mesma entrada de trabalho para registrar a decisão revista (ver diff em `PRD.md`). `ADR.md` e `SDD.md` **não tocados aqui** — ficam com o `arquiteto`, que escreve a spec técnica em paralelo. Nenhum código implementado ainda.
 
 **Como reverter.** Editar `PRD.md` §9 de volta e registrar nova entrada aqui — nunca reescrever esta. Nenhuma migração de dado envolvida ainda, porque nada foi implementado.
+
+---
+
+## 2026-08-15 — Redesenho: as 10 decisões do dono, com evidência
+
+**Contexto.** Depois de reprovar duas propostas de composição ("nada de linhas soltas, nada de blocos soltos, não é um site, é um aplicativo"), o dono pediu estudo em partes sequenciais e decidiu item a item, olhando cada opção renderizada com a paleta real. Estudo em `docs/ESTUDO-REDESENHO.md`; o que construir, em `docs/BACKLOG-REDESENHO.md`.
+
+**Travas dadas por ele, válidas em todas as 10:** paleta inteira e pílula de navegação intocadas; todo o resto aberto — inclusive a tipografia, que o estudo anterior havia cercado como aprovada.
+
+| # | Decisão | Alternativa descartada | Por quê |
+|---|---|---|---|
+| D1 | **Fraunces** (voz) · **Archivo condensada** (dado) · **Bricolage** (corpo) | A (tudo Archivo) e C (tudo Fraunces+Bricolage), que ele gostou separadamente | Não é meio-termo, é divisão de trabalho: a serifa carrega a prosa do parecer (o produto), a condensada carrega carga/e1RM/volume (o dado). Espelha a tese "o log é infraestrutura, o produto é a leitura". **Custo aceito: 3 famílias** — o HIG alerta contra misturar muitas, então a terceira só se sustenta como papel funcional, nunca decoração |
+| D2 | **6 papéis nomeados**, não números | "só encolher para 6 números" (minha proposta original) | **A pesquisa corrigiu minha recomendação.** M3 tem 15 estilos e o HIG ~11 — nenhum defende "menos degraus". O M3 diz: *"No single product will use all the styles… select styles from the scale that are most appropriate"*. O defeito do lastro não era o número 10, era `t-1/t-2/t-3` serem números sem função: sem papel, cada tela escolhe por gosto. Piso de 14px respeitado |
+| D3 | **Dois padrões, decididos pelo que a linha É**: navega → recipiente macio + chevron; dado → sem recipiente, em grade | 9 variações de "como desenhar uma lista" | Eu estava errando a pergunta. Oura e Gentler Streak (Apple Design Award 2024) não escolhem um tratamento para tudo — escolhem dois. **Medido a 360px:** 6 anilhas em grade = 88px, contra 372px em linhas |
+| D4 | Ação usa o **mesmo recipiente, sem chevron** | pílula/chip (minha recomendação) | **Decisão do dono contra a minha recomendação.** Risco que levantei e ele aceitou: seta ausente é pista fraca. Mitigação combinada: segundo canal por classe gramatical — **navegação usa substantivo, ação usa verbo** |
+| D5 | **Sem barra de topo**; o título é conteúdo e rola junto | barra de 1 linha; barra que encolhe ao rolar | Dos 5 apps olhados, **nenhum** usa barra de 2 linhas, e os dois premiados (Structured, finalista ADA 2026; Gentler Streak, ADA 2024) não usam barra nenhuma. Devolve os 88px inteiros de `--lastro-clearance-topo`, não os ~36 da versão compacta |
+| D6 | **Folha** nas tarefas curtas | tudo continuar rota | HIG define folha para "tarefa curta e delimitada sem perder o contexto". Reforça a D5: sem barra fixa, folha dispensa botão de voltar. **Muda rota e histórico — não é CSS** |
+| D7 | **Conjunto contido do M3, sem container transform** | container transform, mesmo em um lugar só | Pedido do dono: "não pode ser algo até demais". O M3 define o padrão por lugar — pílula (top-level) **só esmaece**, sem deslize nem elemento persistente; sub-tela desliza; folha sobe. Container transform é, pelo próprio M3, "o mais expressivo" — descartado. Custo caiu: **Next 16 traz `ViewTransition` do React nativo** (conferido na doc instalada) |
+| D8 | **Modo de edição** | deslizar; menu de excesso; toque longo | Único que serve à grade **e** às listas — deslizar é gesto de linha, não existe em grade. Consequência forçada pela D3: sem recipiente por anilha, não há onde pendurar a lixeira. HIG registra o padrão para iOS. Confirmação em duas etapas permanece |
+| D9 | **Não fazer háptico** | fazer só onde funciona; contorno não oficial | **Verificado, e derrubou minha própria sugestão:** iOS não expõe Vibration API a web/PWA, e continua assim em 2026 (~77% de suporte global, tudo Android/Chrome). O dono usa iPhone — seria trabalho para um efeito que ele nunca sentiria |
+| D10 | **`/login` prova a direção primeiro** | `/ajustes/anilhas`; `/analise` | Escolha do dono, motivada por suspeita dele de "2 caminhos quando abre o link". A suspeita procede — ver entrada seguinte |
+
+**Como reverter:** cada decisão é independente das outras exceto D8, que é consequência forçada da D3. D1 a D4 e D7 são reversíveis por token. D5, D6 e D8 tocam estrutura e exigem reversão por PR.
+
+---
+
+## 2026-08-15 (2) — Três defeitos reais no fluxo de entrada, achados ao investigar suspeita do dono
+
+O dono disse: *"a tela de login, os caminhos dela, até parece que existe 2 caminhos quando abre o link, um antes e um depois"*. Investigado, e **procede** — são três coisas distintas, nenhuma delas conhecida antes:
+
+1. **Duas telas de entrada de verdade.** `/` sem sessão (`src/app/page.tsx:56`) renderiza tela própria (marca + subtítulo + botão "Entrar") que leva a `/login`, o formulário real. Duas telas para uma coisa. Fundir ou manter é **decisão do dono**, porque "home como porta de entrada única" foi decisão dele em 2026-08-06.
+
+2. **Parâmetro de retorno morto nas duas pontas** (verificado por busca em todo `src/`): `src/proxy.ts:49` escreve `?proximo=` e ninguém lê; `src/app/auth/callback/route.ts:18` lê `?next=` e ninguém escreve. Efeito: abrir `/analise` sem sessão → login → cair em `/` depois de entrar, não em `/analise`.
+
+3. **`ForcarInicioNoLancamento` pisca.** `window.location.replace("/")` dentro de `useEffect` roda **depois** da pintura; no PWA instalado a tela errada aparece antes do salto. A regra (pedida pelo dono em 2026-08-07) continua certa; a execução é que pisca.
+
+**Suspeita adicional, NÃO confirmada:** durante os testes, `/login` carregou com o título "lastro — sem conexão" (`public/offline.html`, servido pelo `sw.js` em falha de navegação). Observado em `npm run dev`, pode ser artefato do ambiente. Registrado como A4 no backlog para reproduzir em produção antes de tratar como defeito.
+
+**Impacto:** vira a **Trilha A** do `docs/BACKLOG-REDESENHO.md`, separada do redesenho a pedido do dono — são defeitos, valem por si mesmo que o redesenho não aconteça.
