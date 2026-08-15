@@ -255,7 +255,19 @@ Quota checada com uma chamada direta à API antes de gastar esforço recriando d
 >
 > ⚠️ **Antes de codar qualquer coisa da Trilha B:** o vocabulário das 10 peças precisa virar seção do `DESIGN.md` (item E5). Hoje ele só existe em artifact, e artifact não é fonte durável de projeto.
 >
-> **Atualização (2026-08-15, sessão seguinte): o item A1 está feito e mergeado.** O resto do backlog segue intocado — A2 continua parado na decisão do dono, A3/A4 e toda a Trilha B não foram começados.
+> **Atualização (2026-08-15, sessão seguinte): A1 e A2 estão feitos e mergeados.** A3/A4 e toda a Trilha B não foram começados.
+
+### ✅ A2 — telas de entrada fundidas (2026-08-15)
+
+**Decisão do dono:** fundir numa tela só (perguntado explicitamente nesta sessão — não decidido sozinho, como o backlog exigia).
+
+`/` sem sessão renderizava tela própria (marca + subtítulo + botão "Entrar") que levava ao `/login`, o formulário real — duas telas para uma coisa só, o "um antes e um depois" relatado. `src/app/page.tsx` agora chama `redirect("/login")` (de `next/navigation`) no lugar de renderizar aquele stub. É `redirect()` de Server Component, resolvido **antes** de qualquer HTML sair — não é `useEffect` reagindo depois da pintura, então não introduz o mesmo defeito do A3 (a piscada).
+
+`/login` continua existindo como rota — é o alvo do redirecionamento do `proxy.ts` (`?proximo=`) e do erro do OAuth (`?erro=`) — só deixou de precisar de um clique extra pra ser alcançado a partir da home. CSS intocado (fora de escopo).
+
+**Verificação:** `npx tsc --noEmit && npm run test && npm run lint && npm run build` verdes (133 testes, build gera `/` como rota dinâmica, igual antes). `curl -sD -` sem cookies contra `/` do dev server: `HTTP/1.1 307 Temporary Redirect` com `location: /login` — confirma que o redirecionamento é server-side, sem cookie, sem tela intermediária. Chrome real (sessão autenticada do dono) confirmou que a home autenticada não mudou.
+
+**PR:** ver `fix/fundir-telas-de-entrada`.
 
 ### ✅ A1 — parâmetro de retorno unificado (2026-08-15)
 

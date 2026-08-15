@@ -1,6 +1,13 @@
 // lastro · a home é a porta de entrada única do app (2026-08-06): tudo
 // parte daqui, inclusive o ícone instalado e o retorno do login.
 //
+// Sem sessão, `/` não tem tela própria — ela é o `/login` (Trilha A, item
+// A2, decisão do dono 2026-08-15). Antes existiam duas telas para uma
+// coisa só: uma marca com botão "Entrar" aqui, e o formulário de verdade
+// lá. `redirect()` roda no servidor, antes de qualquer HTML sair — não é
+// `useEffect` reagindo depois da pintura, então não pisca (o mesmo defeito
+// do item A3, evitado aqui de propósito).
+//
 // TODO NÚMERO DESTA TELA É REAL, calculado pelo mesmo agregador da
 // Análise Semanal (`carregarResumoHome`). Nenhum valor de exemplo, nenhum
 // "Novo PR em Agachamento" fixo — E3 e PRD §7: sem treino, os números
@@ -16,6 +23,7 @@
 // isso não é o app sugerindo nada, é reaproveitar o que a pessoa mesma
 // montou. Sem modelo nenhum, o comportamento é idêntico ao original.
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { criarClienteServidor } from "@/lib/supabase/cliente-servidor";
 import { carregarResumoHome } from "@/lib/dados/resumo-home";
 import { criarTreino } from "@/lib/dados/treino";
@@ -52,21 +60,8 @@ export default async function PaginaInicial() {
     data: { user },
   } = await supabase.auth.getUser();
 
-  // Sem sessão: a home é só a marca e a porta de entrada.
   if (!user) {
-    return (
-      <main className="tela tela--entrada">
-        <div className="entrada">
-          <header className="entrada__marca">
-            <h1>lastro</h1>
-            <p>Registro de treino e leitura semanal.</p>
-          </header>
-          <Link href="/login" className="botao-primario">
-            Entrar
-          </Link>
-        </div>
-      </main>
-    );
+    redirect("/login");
   }
 
   const hoje = dataLocalBrasil();
