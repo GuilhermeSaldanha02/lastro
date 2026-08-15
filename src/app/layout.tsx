@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { IBM_Plex_Sans, IBM_Plex_Mono, IBM_Plex_Serif } from "next/font/google";
+import { Bricolage_Grotesque, Archivo, Fraunces } from "next/font/google";
 import RegistrarServiceWorker from "@/components/registrar-service-worker";
 import "./globals.css";
 
@@ -34,31 +34,40 @@ import "./globals.css";
 // JavaScript no navegador, não uma checagem no servidor.
 const ROTAS_ISENTAS_DE_FORCAR_INICIO = ["/", "/login", "/auth/callback"];
 
-// DESIGN.md §3.3 — Sans para tudo que se lê; Mono para número, unidade,
-// metadado e rótulo de sistema. É a troca de família que destaca o dado,
-// não a cor. (Terceira família, Serif, abaixo — uso único: o veredito.)
-const plexSans = IBM_Plex_Sans({
-  variable: "--fonte-plex-sans",
-  weight: ["400", "500", "600", "700"],
+// Trilha B, item E1 (D1, DESIGN.md §6.1) — substitui a família IBM Plex
+// inteira. As três permanecem nos MESMOS papéis de antes: Bricolage é
+// corpo (tudo que se lê no dia a dia), Archivo é dado (número, unidade,
+// rótulo de sistema — a troca de família que destaca o dado, não a cor),
+// Fraunces é a terceira família, uso único: o veredito do parecer
+// (.doc__veredito), C4 aprovado 2026-08-08. Nenhuma marcação muda — só o
+// token de fonte que cada papel resolve (§6.1: "só token"). O ALCANCE de
+// onde a Fraunces pode aparecer não muda aqui; ele cresce quando a peça 9
+// (§6.5) for implementada — ver a nota em DESIGN.md §6.5.
+const bricolage = Bricolage_Grotesque({
+  variable: "--fonte-bricolage",
+  weight: "variable",
+  axes: ["opsz", "wdth"],
   subsets: ["latin"],
   display: "swap",
 });
 
-const plexMono = IBM_Plex_Mono({
-  variable: "--fonte-plex-mono",
-  weight: ["400", "500", "600"],
+// Condensada, substitui a Mono. A garantia de coluna alinhada que a Mono
+// dava por ser monoespaçada não existe numa condensada proporcional —
+// por isso todo seletor de número em sistema.css precisa de
+// `font-variant-numeric: tabular-nums` explícito (§6.1, DESIGN.md §3.3
+// documentava isso como "reforço oportunista"; agora é obrigatório).
+const archivo = Archivo({
+  variable: "--fonte-archivo",
+  weight: "variable",
+  axes: ["wdth"],
   subsets: ["latin"],
   display: "swap",
 });
 
-// DESIGN.md §3.3 — terceira família, uso ÚNICO: o veredito do parecer
-// (.doc__veredito). Mesma superfamília IBM Plex, mesma licença SIL OFL —
-// "documento emitido" ganha voz própria só onde já é a peça-assinatura,
-// sem virar uma 4ª família espalhada pelo resto do app (C4, aprovado
-// 2026-08-08, implementado 2026-08-10 — ficou pendente na tarefa 4).
-const plexSerif = IBM_Plex_Serif({
-  variable: "--fonte-plex-serif",
-  weight: ["600"],
+const fraunces = Fraunces({
+  variable: "--fonte-fraunces",
+  weight: "variable",
+  axes: ["SOFT", "WONK", "opsz"],
   subsets: ["latin"],
   display: "swap",
 });
@@ -91,7 +100,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang="pt-BR"
-      className={`${plexSans.variable} ${plexMono.variable} ${plexSerif.variable}`}
+      className={`${bricolage.variable} ${archivo.variable} ${fraunces.variable}`}
     >
       <head>
         <script

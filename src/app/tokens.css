@@ -71,11 +71,15 @@
   --lastro-alvo-folga: 12px; /* distância mínima entre dois alvos vizinhos */
   --lastro-alvo-acao:  72px; /* altura da ação primária (D3) */
 
-  /* ---- Tipografia ---- */
-  --lastro-fonte-txt: var(--fonte-plex-sans), system-ui, sans-serif;
-  --lastro-fonte-num: var(--fonte-plex-mono), ui-monospace, monospace;
+  /* ---- Tipografia (DESIGN.md §6.1, Trilha B item E1) ----
+     Os três papéis continuam os mesmos de antes; só a família mudou.
+     Fallback de --lastro-fonte-num deixou de ser monoespaçado — Archivo
+     é condensada proporcional, um fallback monoespaçado ficaria bem mais
+     largo que ela e quebraria layout antes da fonte carregar. */
+  --lastro-fonte-txt: var(--fonte-bricolage), system-ui, sans-serif;
+  --lastro-fonte-num: var(--fonte-archivo), system-ui, sans-serif;
   /* Uso único: o veredito do parecer (DESIGN.md §3.3, C4 aprovado 2026-08-08). */
-  --lastro-fonte-serif: var(--fonte-plex-serif), Georgia, serif;
+  --lastro-fonte-serif: var(--fonte-fraunces), Georgia, serif;
 
   /* ---- Escala de tamanho. Piso 14px, e 14 só para metadado não-corpo ---- */
   --lastro-t-meta:  14px;
