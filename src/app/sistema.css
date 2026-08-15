@@ -45,10 +45,16 @@
   margin-top: var(--lastro-e-6);
 }
 
+/* Peça 9 (DESIGN.md §6.5/§6.6, M1) — a marca é a primeira impressão do
+   app (D10) e ganha a voz de documento que a peça 9 dá ao parecer e ao
+   Coach: Fraunces em vez da família de corpo. Peso e entreletra
+   ajustados pra serifa (peso-max/tracking negativo eram calibrados pra
+   Bricolage) — mesmo peso do veredito (§3.6.2), sem tracking negativo,
+   que aperta demais uma serifa. */
 .entrada__marca h1 {
+  font-family: var(--lastro-fonte-serif);
   font-size: var(--lastro-papel-numero-heroi);
-  font-weight: var(--lastro-peso-max);
-  letter-spacing: -0.03em;
+  font-weight: var(--lastro-peso-forte);
   line-height: var(--lastro-el-apertada);
 }
 

@@ -155,7 +155,12 @@ As 10 peças, os 2 padrões de superfície, a regra verbo × substantivo, os pap
 
 *Uma peça por vez, cada uma provada numa tela antes de propagar.*
 
-### M1 · A tela de prova: `/login` · [D10] · [HITL]
+### M1 · A tela de prova: `/login` · [D10] · [HITL] · ✅ **IMPLEMENTADO (2026-08-15), gate do dono PENDENTE**
+
+> A2 (fusão das duas telas de entrada) já estava feita antes desta sessão (Trilha A) — `/login` já herdava E1-E4 por reuso de componentes compartilhados (`.entrada__marca`, `.botao-primario`, `.botao-secundario`). O trabalho novo de M1 foi só a peça 9: a marca "lastro" ganhou `--lastro-fonte-serif` (Fraunces), peso `--lastro-peso-forte` (600, igual ao veredito) — antes herdava Bricolage do corpo do texto. `letter-spacing: -0.03em` (calibrado pra Bricolage) foi removido; a serifa fica só com o `-0.01em` global de `globals.css`. Verificado sem overflow em 544px (extensão não conseguiu forçar 375px nesta sessão — janela do Chrome maximizada) e por medição de `scrollWidth`/`clientWidth`; a 48px fixo, "lastro" cabe com folga também nos 335px de conteúdo do mobile real. Detalhe: `PROGRESS.md`, bloco "✅ M1".
+>
+> **O gate ("o dono olha no iPhone dele") ainda não aconteceu.** Implementação mergeada em `main`, mas **M2 em diante não deve começar antes desse olhar real** — é a condição que o próprio item impõe antes de propagar a direção pras outras telas.
+
 A primeira tela a receber a direção nova. Exercita E1–E4 e estabelece a personalidade. **Fazer junto com A2**, porque as duas mexem na mesma entrada.
 **Gate:** o dono olha no iPhone dele antes de qualquer propagação.
 
