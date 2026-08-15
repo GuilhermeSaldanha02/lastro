@@ -2,7 +2,9 @@
 
 > **Documento de partida, autocontido.** Escrito em 2026-08-15, ao fim da sessão que levantou o redesenho e fechou as 10 decisões com o dono. Quem abrir um chat novo consegue trabalhar a partir daqui sem reler o histórico.
 >
-> **Nada aqui foi implementado.** Tudo é decisão já tomada pelo dono ou achado verificado por medição — não é lista de ideias.
+> **Nada aqui foi implementado** quando este documento foi escrito. Tudo é decisão já tomada pelo dono ou achado verificado por medição — não é lista de ideias.
+>
+> **Estado em 2026-08-15 (sessão seguinte):** só o **A1** saiu — está marcado ✅ abaixo. Todo o resto continua por fazer.
 
 ---
 
@@ -64,7 +66,9 @@ Detalhe e evidência em `DECISIONS.md` (2026-08-15).
 
 > Separada a pedido do dono. **São defeitos, não melhorias** — valem por si, mesmo que o redesenho não aconteça. Achados ao investigar a suspeita dele: *"parece que existe 2 caminhos quando abre o link, um antes e um depois"*. A suspeita procede.
 
-### A1 · Parâmetro de retorno morto nas duas pontas · **FÁCIL**
+### A1 · Parâmetro de retorno morto nas duas pontas · **FÁCIL** · ✅ **FEITO (2026-08-15)**
+
+> Implementado na branch `fix/rota-de-retorno-no-login`. O nome e a sanitização vivem em `src/lib/rota-de-retorno.ts`; as três pontas importam de lá. Verificação, ressalvas e o que ficou não provado em produção: `PROGRESS.md`, bloco "✅ A1". O texto abaixo é o enunciado original, mantido como registro.
 
 `src/proxy.ts:49` escreve `?proximo=<rota>` ao redirecionar pro login. **Ninguém lê `proximo`** — `/login` só lê `erro` e sempre faz `router.push("/")`. Do outro lado, `src/app/auth/callback/route.ts:18` lê `?next=` — **ninguém escreve `next`**. Dois parâmetros mortos, um de cada lado (verificado por busca em todo `src/`).
 

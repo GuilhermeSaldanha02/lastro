@@ -4,21 +4,24 @@
 import { NextResponse } from "next/server";
 import { criarClienteServidor } from "@/lib/supabase/cliente-servidor";
 import { sincronizarAvatarGoogle } from "@/lib/dados/perfil";
+import { PARAM_RETORNO, sanitizarRotaDeRetorno } from "@/lib/rota-de-retorno";
 
 export async function GET(request: Request) {
   const { searchParams, origin } = new URL(request.url);
   const code = searchParams.get("code");
 
-  // `next` vem da URL — só aceita caminho relativo. Sem esta trava, um
-  // link forjado (`?next=//site-malicioso`) transformaria o callback num
-  // redirecionamento aberto, usando o domínio do lastro como fachada.
+  // O parâmetro de retorno vem da URL — a trava contra redirecionamento
+  // aberto mora em `@/lib/rota-de-retorno` e é a mesma nas três pontas.
   //
-  // A home ("/") é a porta de entrada única do app (2026-08-06) — login
-  // com Google também volta pra lá, não direto pro treino.
-  const bruto = searchParams.get("next") ?? "/";
-  const proximo = bruto.startsWith("/") && !bruto.startsWith("//")
-    ? bruto
-    : "/";
+  // Antes lia-se `next`, que ninguém escrevia; o `proxy.ts` escrevia
+  // `proximo`, que ninguém lia (Trilha A, item A1). O nome é um só agora.
+  //
+  // O padrão continua sendo a home ("/"), porta de entrada única do app
+  // (2026-08-06): quem entra com Google sem retorno pedido volta pra lá.
+  // O que mudou é que um retorno explícito — posto pelo `proxy.ts` quando
+  // barrou uma rota privada e carregado pelo `/login` até aqui — vence o
+  // padrão, senão quem tenta abrir /analise sem sessão nunca chega lá.
+  const proximo = sanitizarRotaDeRetorno(searchParams.get(PARAM_RETORNO));
 
   /**
    * Na Vercel o app roda atrás de um balanceador: `new URL(request.url).origin`

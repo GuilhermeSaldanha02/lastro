@@ -254,6 +254,31 @@ Quota checada com uma chamada direta à API antes de gastar esforço recriando d
 > **Nada do redesenho foi implementado.** Nenhum CSS foi tocado nesta sessão — só documentos. `main` limpa.
 >
 > ⚠️ **Antes de codar qualquer coisa da Trilha B:** o vocabulário das 10 peças precisa virar seção do `DESIGN.md` (item E5). Hoje ele só existe em artifact, e artifact não é fonte durável de projeto.
+>
+> **Atualização (2026-08-15, sessão seguinte): o item A1 está feito e mergeado.** O resto do backlog segue intocado — A2 continua parado na decisão do dono, A3/A4 e toda a Trilha B não foram começados.
+
+### ✅ A1 — parâmetro de retorno unificado (2026-08-15)
+
+`src/proxy.ts` escrevia `?proximo=` e ninguém lia; `/auth/callback` lia `?next=` e ninguém escrevia. O nome e a trava contra redirecionamento aberto passam a morar em `src/lib/rota-de-retorno.ts`, importado pelas três pontas (`proxy.ts`, `auth/callback/route.ts`, `login/page.tsx`). O `/login` finalmente lê o parâmetro e redireciona pra ele; no caminho do Google, ele viaja no `redirectTo` do OAuth e volta pelo callback.
+
+**Segurança.** A checagem original (`começa com /` e `não começa com //`) foi preservada e **apertada**: rejeita também barra invertida e caractere de controle, porque o navegador normaliza `/\evil.com` e `/<tab>/evil.com` para `//evil.com` — as duas passariam pela checagem antiga. O aperto é carregado justamente no ponto novo: `router.push("//evil.com")` no `/login` é redirecionamento aberto de verdade, no cliente. 8 casos cobertos em `src/lib/rota-de-retorno.test.ts`.
+
+**Verificação — Chrome real, dev server na 3002, usuário QA efêmero criado pela Admin API (`email_confirm: true`, porque o projeto exige confirmação de e-mail):**
+
+| O que | Resultado |
+|---|---|
+| `npx tsc --noEmit` · `npm run test` · `npm run lint` · `npm run build` | ✅ todos verdes — 133 testes (eram 125), lint 0 erros, `/login` continua estático no build |
+| Sem sessão, abrir `/analise` | ✅ foi pra `/login?proximo=%2Fanalise` |
+| Entrar com e-mail/senha do QA | ✅ **caiu em `/analise`**, não em `/` — é o check do A1 |
+| Caminho do Google, com `?proximo=%2Ftreino` | ✅ **caiu em `/treino`** — o parâmetro sobreviveu ao `redirectTo` do OAuth e ao callback |
+| Remoção do QA | ✅ `DELETE /auth/v1/admin/users/{id}` → 200; busca por e-mail volta 0 |
+
+**Duas ressalvas honestas, para não passarem por prova o que não é:**
+
+1. **A contagem de linhas órfãs não pôde ser medida por consulta.** A `service_role` não tem `SELECT` em `public.usuario`/`treino`/`serie`/`modelo_treino` (os grants da migração 0002 são só pra `authenticated`), então o REST devolve 403. O cascade está garantido por schema — todas essas tabelas são `references auth.users(id) on delete cascade` — e o usuário do auth sumiu. Além disso o QA só logou, nunca registrou nada: a única linha possível era a de `public.usuario` criada pelo trigger. Conceder grant à `service_role` só pra medir seria mudar schema por causa do teste, e não foi feito.
+2. **O login com Google foi feito com a conta do dono, não com o QA.** O clique em "Entrar com Google" no Chrome dele reautenticou sem tela de consentimento (a sessão do Google já estava ativa) e substituiu a sessão do QA. Não era a intenção; o efeito é o dono ficar logado como ele mesmo no navegador dele. Serviu de prova legítima do caminho OAuth, mas **em dev, contra o Supabase hospedado**: a allowlist de Redirect URLs aceitou o callback **com query string** para `localhost:3002`. Em produção o `redirect_to` é o domínio da Vercel — se lá a allowlist tiver entrada exata sem curinga, o Supabase pode cair no Site URL e descartar o `proximo` silenciosamente. **Conferir a allowlist do projeto antes de confiar no caminho Google em produção.**
+
+**PR:** ver `fix/rota-de-retorno-no-login`.
 
 ---
 

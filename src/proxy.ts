@@ -5,6 +5,7 @@
 // App Router.
 import { type NextRequest, NextResponse } from "next/server";
 import { createServerClient } from "@supabase/ssr";
+import { PARAM_RETORNO } from "@/lib/rota-de-retorno";
 
 // Toda tela que lê ou escreve dado do dono entra aqui. Rota nova que
 // esqueça esta lista fica pública por omissão — é o tipo de furo que só
@@ -46,7 +47,9 @@ export async function proxy(request: NextRequest) {
   if (!user && rotaPrivada) {
     const url = request.nextUrl.clone();
     url.pathname = "/login";
-    url.searchParams.set("proximo", request.nextUrl.pathname);
+    // O nome do parâmetro vem de `@/lib/rota-de-retorno` — quem escreve e
+    // quem lê (o `/login` e o `/auth/callback`) importam a mesma constante.
+    url.searchParams.set(PARAM_RETORNO, request.nextUrl.pathname);
     // Carrega os cookies que `setAll` já tenha limpado/atualizado (ex.:
     // refresh token inválido) — sem isso, o navegador manteria um cookie
     // morto e o próximo request repetiria o mesmo erro de refresh

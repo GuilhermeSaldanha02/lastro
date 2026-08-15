@@ -7,6 +7,22 @@ import { Suspense, useState, type FormEvent } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { criarClienteBrowser } from "@/lib/supabase/cliente-browser";
 import { criarContaComEmail, entrarComEmail } from "@/lib/dados/auth";
+import { PARAM_RETORNO, sanitizarRotaDeRetorno } from "@/lib/rota-de-retorno";
+
+/**
+ * Lê o retorno da URL na hora do clique, e não com `useSearchParams`, de
+ * propósito: o hook obrigaria a envolver a página inteira em `Suspense` (ou
+ * derrubaria a pré-renderização). Aqui isto só roda dentro de handler, que
+ * é sempre cliente — `window` existe.
+ *
+ * A sanitização é a mesma do `/auth/callback`. Ela é ainda mais necessária
+ * aqui: `router.push("//evil.com")` sai do domínio de verdade.
+ */
+function rotaDeRetorno(): string {
+  return sanitizarRotaDeRetorno(
+    new URLSearchParams(window.location.search).get(PARAM_RETORNO),
+  );
+}
 
 /**
  * O callback do OAuth redireciona pra cá com `?erro=...` quando algo falha.
@@ -62,16 +78,23 @@ export default function PaginaLogin() {
     }
     // A home (`/`) é a porta de entrada única do app — o dono pediu que
     // tudo parta dela, não só o ícone instalado (ver ESCOPO/DECISIONS
-    // 2026-08-06). Login também volta pra lá, não direto pro treino.
-    router.push("/");
+    // 2026-08-06), e ela segue sendo o padrão. A exceção é quem foi
+    // mandado pra cá pelo `proxy.ts` ao tentar abrir uma rota privada:
+    // esse volta pra rota que pediu, senão o login vira beco (A1).
+    router.push(rotaDeRetorno());
     router.refresh();
   }
 
   async function entrarComGoogle() {
     const supabase = criarClienteBrowser();
+    // O caminho do Google sai do app e volta pelo `/auth/callback`, então o
+    // retorno precisa viajar na própria URL de callback — `URLSearchParams`
+    // codifica o valor (interpolar cru quebraria no primeiro `&`).
+    const callback = new URL("/auth/callback", window.location.origin);
+    callback.searchParams.set(PARAM_RETORNO, rotaDeRetorno());
     await supabase.auth.signInWithOAuth({
       provider: "google",
-      options: { redirectTo: `${window.location.origin}/auth/callback` },
+      options: { redirectTo: callback.toString() },
     });
   }
 
