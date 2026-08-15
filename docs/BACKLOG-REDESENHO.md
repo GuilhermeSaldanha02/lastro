@@ -180,7 +180,12 @@ A peça mais reusada do app: volume, e1RM, carga, frequência.
 
 Recipiente macio + chevron para o que navega; mesmo recipiente sem chevron para o que age. **Rótulo de navegação é substantivo; de ação, verbo** — é o segundo canal que compensa a seta ausente.
 
-### M5 · Etiqueta de estado
+### M5 · Etiqueta de estado · ✅ **FEITO (2026-08-15)**
+
+> Auditoria antes de codar (mesmo hábito de M2/M4): "progressão" e "platô" só existem hoje em dois lugares — o bloco de evidência do parecer (`bloco-evidencia.tsx`, já tinha ícone+palavra+cor desde antes da Trilha B) e o gráfico de progressão (linha tracejada + anotação de texto, um padrão próprio já justificado por §3.7, fora do escopo desta peça). O único gap real era `.marca--recorde` (série no treino, histórico do exercício): tinha palavra + cor, faltava o ícone. Componente novo `EtiquetaRecorde` (★, `aria-hidden`) reusado nos 2 lugares.
+>
+> **Achado no caminho, fora do escopo original mas corrigido: `.serie` mostrava "valendo" E "recorde" ao mesmo tempo** (redundante — recorde só existe em série valendo) e, medido com peso de 3 dígitos, isso já estourava a linha em ~103px a 335px de conteúdo real (o pior caso do gate, §4.1) — **bug pré-existente, não causado por este item nem pelos anteriores**. Mitigado: "valendo" some quando é recorde. Reduz o resíduo pra ~15px (só no caso de peso de 3 dígitos + recorde, o mais raro dos casos) — **não fica 100% resolvido**; a correção definitiva é território do M8 (cabeçalho de coluna com largura alocada, não `span`s competindo). Detalhe: `PROGRESS.md`, bloco "✅ M5".
+
 Progressão, platô, recorde. Ícone + palavra + cor — nunca só cor.
 
 ### M6 · Ação fantasma dentro da seção
@@ -189,8 +194,8 @@ Progressão, platô, recorde. Ícone + palavra + cor — nunca só cor.
 ### M7 · Chips e controle segmentado
 Chips para grupo muscular (catálogo, criar modelo). Segmentado para trocar o que o gráfico mostra — **substitui o seletor que o dono já mandou tirar**.
 
-### M8 · Tabela com cabeçalho de coluna
-As séries do treino. **É a peça que resolve em definitivo o desalinhamento que abriu toda esta conversa.**
+### M8 · Tabela com cabeçalho de coluna · ⚠️ herda pendência de M5
+As séries do treino. **É a peça que resolve em definitivo o desalinhamento que abriu toda esta conversa.** Herda uma pendência real de M5: `.serie` com peso de 3 dígitos + recorde ainda estoura ~15px a 335px de conteúdo — mitigado, não resolvido (ver bloco de M5 acima e `PROGRESS.md`).
 
 ### M9 · Título como conteúdo + voltar flutuante · [D5]
 Remove `--lastro-clearance-topo` (88px) de todas as telas. **Devolve 88px em cada uma** — o maior ganho de espaço do app. Sub-telas ganham voltar flutuante.

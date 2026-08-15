@@ -26,6 +26,7 @@ import {
 import FormularioSerie, { type DadosNovaSerie } from "./formulario-serie";
 import EditarSerie, { type DadosEdicaoSerie } from "./editar-serie";
 import SeletorGrupoMuscular, { type OpcaoGrupo } from "./seletor-grupo-muscular";
+import EtiquetaRecorde from "./etiqueta-recorde";
 
 /**
  * `ehRecordePessoal` é só de tela (C4) — nunca persiste no banco, nunca
@@ -372,21 +373,23 @@ export default function TreinoDetalhe({
                         {serie.peso}
                         <span className="serie__un">kg</span>
                       </span>
-                      {/* Cor nunca é o único canal: a palavra carrega o sentido. */}
-                      <span
-                        className={
-                          serie.tipo === "aquecimento"
-                            ? "marca marca--aquecimento"
-                            : "marca marca--valendo"
-                        }
-                      >
-                        {serie.tipo}
-                      </span>
+                      {/* Cor nunca é o único canal: a palavra carrega o sentido.
+                          "valendo" some quando é recorde — recorde só existe
+                          em série valendo (aquecimento nunca conta pra PR,
+                          ver marcarRecordesHistoricos), então mostrar os dois
+                          juntos é redundante e, medido a 335px de conteúdo
+                          real, também estourava a linha (achado no M5,
+                          2026-08-15). "aquecimento" nunca compete com
+                          recorde, por isso continua sempre visível. */}
+                      {serie.tipo === "aquecimento" && (
+                        <span className="marca marca--aquecimento">aquecimento</span>
+                      )}
+                      {serie.tipo === "valendo" && !serie.ehRecordePessoal && (
+                        <span className="marca marca--valendo">valendo</span>
+                      )}
                       {/* PR na hora (C4) — só existe enquanto a tela está
                           aberta, não persiste no banco (ver SerieUI). */}
-                      {serie.ehRecordePessoal && (
-                        <span className="marca marca--recorde">recorde</span>
-                      )}
+                      {serie.ehRecordePessoal && <EtiquetaRecorde />}
                       <button
                         type="button"
                         className="botao-icone serie__excluir"
