@@ -12,6 +12,7 @@ import { listarModelos } from "@/lib/dados/modelo-treino";
 import { dataLocalBrasil } from "@/lib/tempo";
 import AbaInferior from "@/components/aba-inferior";
 import ExcluirTreino from "@/components/excluir-treino";
+import SetaNavegacao from "@/components/seta-navegacao";
 import Avatar from "@/components/avatar";
 import IniciarTreino from "@/components/iniciar-treino";
 
@@ -65,8 +66,18 @@ export default async function PaginaTreino() {
               <li key={treino.id}>
                 <div className="item">
                   <Link href={`/treino/${treino.id}`} className="item__link">
-                    <span className="item__data">{formatarData(treino.data)}</span>
-                    <span className="item__meta">ver</span>
+                    <span className="item__conteudo">
+                      <span className="item__data">{formatarData(treino.data)}</span>
+                      {/* "ver" era rótulo em verbo numa linha de navegação —
+                          reprova de peça 3 (§6.3/§6.4). A seta (M4) já
+                          carrega esse recado; a meta virou informação de
+                          verdade, mesmo padrão de `/` (Início). */}
+                      <span className="item__meta">
+                        {treino.totalSeries}{" "}
+                        {treino.totalSeries === 1 ? "série" : "séries"}
+                      </span>
+                    </span>
+                    <SetaNavegacao />
                   </Link>
                   <ExcluirTreino
                     id={treino.id}

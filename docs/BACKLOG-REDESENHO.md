@@ -174,7 +174,10 @@ A peça mais reusada do app: volume, e1RM, carga, frequência.
 
 **Medido a 360px:** 6 anilhas em grade = 3 colunas × 2 linhas × **88px**, contra **372px** das 6 linhas de hoje. Devolve 284px no aparelho mais estreito.
 
-### M4 · Linha de navegação e linha de ação · [D3, D4]
+### M4 · Linha de navegação e linha de ação · [D3, D4] · ✅ **FEITO (2026-08-15)**
+
+> Escopo: só a metade "navega" — nenhuma linha de ação dentro de lista existe hoje (auditado; ver `PROGRESS.md`), então a metade "ação" fica definida sem consumidor, como `--lastro-papel-bancada` já ficou em E2. Toda linha que usa `.item__link` (`/ajustes` ×3, `/`, `/treino`, `/catalogo/[id]`) ganhou seta via um componente novo (`SetaNavegacao`) — mudança central e de baixo risco: uma classe compartilhada, sem repetir marcação em cada tela. Achado no caminho: `/treino` tinha "ver" como rótulo — um VERBO numa linha de navegação, a reprova exata da peça 3 — trocado pela metadata real (`{n} séries`, mesmo padrão já usado em `/`). Detalhe: `PROGRESS.md`, bloco "✅ M4".
+
 Recipiente macio + chevron para o que navega; mesmo recipiente sem chevron para o que age. **Rótulo de navegação é substantivo; de ação, verbo** — é o segundo canal que compensa a seta ausente.
 
 ### M5 · Etiqueta de estado

@@ -825,12 +825,18 @@
   box-shadow: var(--lastro-elev-2);
 }
 
+/* Peça 3 (DESIGN.md §6.3/§6.4, M4) — recipiente macio + seta é o que
+   marca "isto navega". `.item__conteudo` carrega a distribuição que
+   `.item__link` fazia sozinho antes (rótulo à esquerda, meta à
+   direita); a seta é o quarto papel, sempre no fim, nunca competindo
+   pelo mesmo espaço — por isso vira um filho a mais do link, não um
+   `justify-content` de três ou quatro itens (que espalharia a seta pro
+   meio da linha em vez do canto). */
 .item__link {
   flex: 1;
   min-width: 0;
   display: flex;
   align-items: center;
-  justify-content: space-between;
   gap: var(--lastro-e-3);
   min-height: var(--lastro-alvo-min);
   padding: var(--lastro-e-3) var(--lastro-e-4);
@@ -844,6 +850,22 @@
 .item__link:active {
   background: var(--lastro-sup-2);
   transform: translateY(1px);
+}
+
+.item__conteudo {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--lastro-e-3);
+}
+
+.item__seta {
+  flex: none;
+  width: var(--lastro-e-5);
+  height: var(--lastro-e-5);
+  color: var(--lastro-txt-3);
 }
 
 /* A confirmação de excluir não cabe ao lado do link em 360px — cai pra
