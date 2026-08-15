@@ -143,8 +143,12 @@ export default function AnilhasForm({ configInicial }: { configInicial: ConfigAn
               onChange={(e) => setNovaAnilha(e.target.value)}
             />
           </div>
-          <button type="button" className="botao-secundario" onClick={adicionarAnilha}>
-            Adicionar
+          {/* Ação fantasma (DESIGN.md §6.5, peça 8, M6) — "Adicionar" não
+              pode competir em peso visual com "Salvar configuração"
+              (`.botao-primario`, abaixo), o desequilíbrio que motivou
+              esta peça (ESTUDO-PADRAO-APLICATIVO.md). */}
+          <button type="button" className="acao-fantasma" onClick={adicionarAnilha}>
+            <span aria-hidden="true">+</span> Adicionar
           </button>
         </div>
 

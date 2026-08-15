@@ -41,8 +41,11 @@ export default async function PaginaModelos() {
           </ul>
         )}
 
-        <Link href="/ajustes/modelos/novo" className="botao-secundario">
-          Criar modelo
+        {/* Ação fantasma (DESIGN.md §6.5, peça 8, M6) — "criar modelo" é uma
+            ação secundária dentro da seção, não deve competir em peso
+            visual com nenhuma ação primária de tela. */}
+        <Link href="/ajustes/modelos/novo" className="acao-fantasma">
+          <span aria-hidden="true">+</span> Criar modelo
         </Link>
       </div>
 

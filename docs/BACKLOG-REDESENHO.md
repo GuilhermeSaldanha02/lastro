@@ -188,7 +188,10 @@ Recipiente macio + chevron para o que navega; mesmo recipiente sem chevron para 
 
 Progressão, platô, recorde. Ícone + palavra + cor — nunca só cor.
 
-### M6 · Ação fantasma dentro da seção
+### M6 · Ação fantasma dentro da seção · ✅ **FEITO EM PARTE (2026-08-15)**
+
+> Classe nova `.acao-fantasma` (sem borda, sem preenchimento, cor de tinta) aplicada aos 2 dos 3 exemplos nomeados: "adicionar anilha" (`/ajustes/anilhas`, resolve o desequilíbrio nomeado contra "Salvar configuração") e "criar modelo" (`/ajustes/modelos`). **"Adicionar série" (`/treino/[id]`) ficou de fora, de propósito** — hoje é o botão do `.acao-area` (a barra de ação fixa embaixo, D2/D3), não uma ação inline dentro de uma seção; §6.6 já marca essa tela como "registrar e editar viram folha" (H1, Nível 3, ainda não implementado). Converter esse botão pra fantasma agora, antes de H1 mudar a arquitetura do fluxo, arriscaria esvaziar visualmente a única forma de registrar série numa tela que D2/D3 exigem ser óbvia. Revisitar quando H1 acontecer. Detalhe: `PROGRESS.md`, bloco "✅ M6".
+
 "Adicionar série", "adicionar anilha", "criar modelo". Resolve o desequilíbrio já registrado entre "Adicionar" e "Salvar configuração".
 
 ### M7 · Chips e controle segmentado
@@ -207,10 +210,11 @@ Remove `--lastro-clearance-topo` (88px) de todas as telas. **Devolve 88px em cad
 
 *Cada um pode quebrar coisa que já funciona. Um por PR, com verificação real.*
 
-### H1 · Folha para tarefa curta · [D6]
+### H1 · Folha para tarefa curta · [D6] · ⚠️ herda pendência de M6
 Criar modelo, editar perfil, adicionar anilha, editar série.
 **Muda rota e histórico — não é CSS.** Precisa: fechar arrastando pra baixo, funcionar com o botão voltar do Android, e não empilhar hierarquia dentro da folha (o HIG proíbe).
 **Risco:** o app é PWA offline-first; conferir que a folha não atrapalha a fila de sincronização ao registrar série.
+**Herdado de M6:** quando "registrar série" virar folha, o gatilho que hoje é `.botao-secundario` no `.acao-area` de `/treino/[id]` deveria virar `.acao-fantasma` — deixado de fora de M6 porque converter antes esvaziaria a única forma de registrar série na tela atual (D2/D3).
 
 ### H2 · Modo de edição · [D8]
 Estado novo em todas as listas e grades. Substitui a lixeira visível por linha.
