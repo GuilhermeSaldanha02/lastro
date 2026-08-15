@@ -260,6 +260,20 @@ Quota checada com uma chamada direta à API antes de gastar esforço recriando d
 > **Atualização (2026-08-15, mesma sessão): o Nível 1 inteiro está fechado — E1, E2, E3, E4.** Blocos abaixo, mais recentes primeiro. `DESIGN.md` §3.3/§3.4/§3.5 foram reescritos para bater com o código (não só §6, que já documentava o alvo). Pendente: Nível 2 (M1-M9) e Nível 3 (H1-H4), nenhum começado.
 >
 > **Atualização (2026-08-15, mesma sessão): M1 implementado.** `/login` ganhou a peça 9 (Fraunces na marca). **O gate do item ("o dono olha no iPhone dele antes de qualquer propagação") ainda não aconteceu** — M2 em diante não deveria começar antes disso, é a condição que o próprio backlog impõe.
+>
+> **Atualização (2026-08-15, mesma sessão): bug real achado pelo dono no gate do M1, corrigido.** Ao olhar `/login` e `/` no iPhone dele (o próprio gate do M1 fazendo o trabalho que deveria fazer), o dono viu `.metrica__valor` ("30,2t" e "142") quebrando de forma feia — número partindo no meio ("30," numa linha, "2" na outra). Era regressão de E2: Número herói (48px) não cabe na coluna de 3 com números reais de 4+ dígitos. Corrigido — ver bloco "✅ fix — `.metrica__valor` estourava a grade de 3 colunas" abaixo.
+
+### ✅ fix — `.metrica__valor` estourava a grade de 3 colunas em Número herói (2026-08-15)
+
+**Achado pelo dono, no gate do M1 — não por mim.** Ele olhou `/` no iPhone real (`lastro-pi.vercel.app`) e mandou print: "30,2" (Volume) e "142" (Séries valendo) quebravam de forma visivelmente errada — "30," numa linha, "2" sozinho na linha de baixo. Regressão de **E2** (não de M1, que não tocou `.metrica__valor`), só ficou visível agora porque foi o primeiro olhar real na tela `/`.
+
+**Causa raiz, medida, não estimada.** `.metrica__valor` estava em Número herói (48px) desde E2. Numa grade de 3 colunas a 390px de viewport, cada coluna tem **83px** de largura útil de texto (medido: `.metricas` 350px de conteúdo, menos 2 `gap` de 12px, menos padding de 12px×2 por card, dividido por 3). "30,2" sem quebra mede **92,5px** nessa fonte — não cabe, e `overflow-wrap: anywhere` (que já existia ali, para a unidade nunca vazar) quebra no meio do número em vez de deixar transbordar.
+
+**Por que a verificação de E2 não pegou isto.** O teste feito na hora (injeção de marcação real no Chrome, medindo `scrollWidth`/`clientWidth`) usou números de exemplo — `142`, `24`, `14,2k`+`kg` — que por coincidência couberam na largura testada. Não testei com um valor de 4 dígitos antes da vírgula tipo `30,2`, que é exatamente o formato real que `formatarVolume` produz para volumes de uma cifra na casa das dezenas. **Lição:** medir overflow com o valor mais largo plausível, não com o primeiro exemplo que vier à cabeça — registrado para não repetir.
+
+**Correção:** `.metrica__valor` volta pra Título de tela (30px) — mesmo papel e mesmo motivo já usados em `.serie__v` (E2): número real que não cabe no papel maior, medido, não escolhido a priori. Testado de novo com o valor real que quebrou (`30,2t`) e um caso mais largo (`142`+`séries`, unidade mais longa que `kg`) — ambos cabem numa linha só agora, com a unidade caindo pra linha de baixo como o desenho sempre previu.
+
+**Verificação:** `npx tsc --noEmit` · `npm run test` (133/133) · `npm run lint` (0 erros) · `npm run build` — todos verdes. Visual: Chrome real via extensão, reproduzindo a marcação e a largura reais (390px, grade de 3 colunas), com screenshot confirmando a correção antes do merge.
 
 ### ✅ M1 — `/login` recebe a peça 9 (Fraunces na marca) — gate do dono PENDENTE (2026-08-15)
 
