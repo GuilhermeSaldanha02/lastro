@@ -4,7 +4,7 @@
 >
 > **Nada aqui foi implementado** quando este documento foi escrito. Tudo é decisão já tomada pelo dono ou achado verificado por medição — não é lista de ideias.
 >
-> **Estado em 2026-08-15 (sessão seguinte):** só o **A1** saiu — está marcado ✅ abaixo. Todo o resto continua por fazer.
+> **Estado em 2026-08-15 (sessão seguinte):** **A1 e A2** saíram — estão marcados ✅ abaixo. Todo o resto continua por fazer.
 
 ---
 
@@ -77,7 +77,9 @@ Detalhe e evidência em `DECISIONS.md` (2026-08-15).
 **Fazer:** unificar o nome do parâmetro; `/login` passa a lê-lo e a redirecionar pra ele depois de entrar; manter a proteção contra redirecionamento aberto que o callback já tem (`startsWith("/") && !startsWith("//")`).
 **Check:** sem sessão, abrir `/analise`, entrar, e cair em `/analise`.
 
-### A2 · Duas telas de entrada · **MÉDIO** · [HITL]
+### A2 · Duas telas de entrada · **MÉDIO** · [HITL] · ✅ **FEITO (2026-08-15)**
+
+> Decisão do dono: fundir. Implementado na branch `fix/fundir-telas-de-entrada` — `/` sem sessão passa a fazer `redirect("/login")` server-side, em vez de renderizar tela própria. Detalhe: `PROGRESS.md`, bloco "✅ A2". O texto abaixo é o enunciado original, mantido como registro.
 
 `/` sem sessão (`src/app/page.tsx:56`) renderiza uma tela própria — marca + subtítulo + botão "Entrar" — que leva a `/login`, o formulário de verdade. **Duas telas para uma coisa só.** É o "um antes e um depois" que o dono descreveu.
 
