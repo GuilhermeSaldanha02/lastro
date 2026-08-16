@@ -96,7 +96,7 @@ export const viewport: Viewport = {
   viewportFit: "cover",
 };
 
-export default function RootLayout({ children }: LayoutProps<"/">) {
+export default function RootLayout({ children, modal }: LayoutProps<"/">) {
   return (
     <html
       lang="pt-BR"
@@ -120,6 +120,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       <body>
         <RegistrarServiceWorker />
         {children}
+        {modal}
       </body>
     </html>
   );

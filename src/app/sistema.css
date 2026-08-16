@@ -1821,3 +1821,89 @@
   white-space: nowrap;
   border: 0;
 }
+
+/* ---------- Folha (H1, D6) — tarefa curta sem sair da tela ----------
+   Sobe do rodapé sobre o conteúdo, em vez de navegar pra rota cheia
+   (backlog Nível 3, H1). Duração e curva são as que E4/H3 já reservaram
+   pra isto especificamente — DESIGN.md §6.7: "folha = sobe (400ms,
+   enfatizada)" — primeiro consumidor real de `--lastro-dur-6` e
+   `--lastro-curva-enfatizada`, que existiam sem uso desde E4. */
+.folha-fundo {
+  position: fixed;
+  inset: 0;
+  z-index: 30;
+  display: flex;
+  align-items: flex-end;
+  background: var(--lastro-folha-fundo);
+  animation: lastro-folha-fundo-entra var(--lastro-dur-6) var(--lastro-curva-padrao);
+}
+
+.folha {
+  position: relative;
+  width: 100%;
+  max-height: 88vh;
+  overflow-y: auto;
+  background: var(--lastro-fundo);
+  border-radius: var(--lastro-raio-3) var(--lastro-raio-3) 0 0;
+  box-shadow: var(--lastro-elev-3);
+  padding: 0 var(--lastro-e-5) calc(var(--lastro-e-6) + env(safe-area-inset-bottom, 0px));
+  animation: lastro-folha-entra var(--lastro-dur-6) var(--lastro-curva-enfatizada);
+}
+
+/* Zona de arraste real (D1: alvo mínimo 48×48px) — a faixa inteira captura
+   o gesto, não só o traço visual de 4px dentro dela (achado testando com
+   arraste real: mirar num alvo de 4px de altura falhou e selecionou texto
+   do formulário por baixo em vez de arrastar). Fica no fluxo normal, antes
+   do cabeçalho — sem `position:absolute`, não compete por clique com o
+   botão ✕ logo abaixo. */
+.folha__pega {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: var(--lastro-alvo-min);
+  touch-action: none;
+}
+
+/* Decorativa — só o traço visual dentro da zona de arraste acima. Quem
+   fecha de fato por gesto sem arrastar usa o botão ✕ (foco/teclado/leitor
+   de tela) ou o próprio botão voltar do navegador/Android (é rota
+   interceptada: fechar = histórico voltar, D6). */
+.folha__alca {
+  width: var(--lastro-e-10);
+  height: 4px;
+  border-radius: var(--lastro-raio-pilula);
+  background: var(--lastro-controle);
+}
+
+.folha__cabecalho {
+  position: sticky;
+  top: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--lastro-e-3);
+  padding-bottom: var(--lastro-e-4);
+  background: var(--lastro-fundo);
+}
+
+.folha__titulo {
+  font-size: var(--lastro-papel-secao);
+  font-weight: var(--lastro-peso-forte);
+}
+
+@keyframes lastro-folha-fundo-entra {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes lastro-folha-entra {
+  from { transform: translateY(100%); }
+  to   { transform: translateY(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .folha-fundo,
+  .folha {
+    animation: none;
+  }
+}

@@ -172,6 +172,12 @@
   --lastro-vidro-nav:       rgba(23, 65, 79, 0.78); /* --lastro-barra-a na base */
   --lastro-vidro-nav-opaco: #476670; /* composto sobre --lastro-fundo em alpha 0.78 */
 
+  /* Fundo atrás da folha (H1) — mesmo petróleo de --lastro-barra-a, alpha
+     bem mais diluído: só precisa separar a folha do conteúdo por trás,
+     não ler como superfície própria (essa é --lastro-vidro-nav). Nenhuma
+     cor nova. */
+  --lastro-folha-fundo: rgba(23, 65, 79, 0.32);
+
   /* Contorno/brilho no ícone — pedido do dono pensando em usuário 50+:
      "os símbolos... se possível até ter um contorno", pra destacar mais.
      2026-08-11: primeira tentativa usava sombra ESCURA — invisível,
