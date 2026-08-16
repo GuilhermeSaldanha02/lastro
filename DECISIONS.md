@@ -973,3 +973,17 @@ O dono disse: *"a tela de login, os caminhos dela, até parece que existe 2 cami
 **Suspeita adicional, NÃO confirmada:** durante os testes, `/login` carregou com o título "lastro — sem conexão" (`public/offline.html`, servido pelo `sw.js` em falha de navegação). Observado em `npm run dev`, pode ser artefato do ambiente. Registrado como A4 no backlog para reproduzir em produção antes de tratar como defeito.
 
 **Impacto:** vira a **Trilha A** do `docs/BACKLOG-REDESENHO.md`, separada do redesenho a pedido do dono — são defeitos, valem por si mesmo que o redesenho não aconteça.
+
+---
+
+## 2026-08-16 — Correção: D7 ("custo caiu") estava errado. `ViewTransition` exige React canary, não a versão instalada
+
+Ao começar H3 (pílula/sub-tela), a nota de D7 ("Custo caiu: Next 16 traz `ViewTransition` do React nativo — conferido na doc instalada") foi verificada por execução, não só por leitura de doc — e a premissa **não procede**.
+
+**O que a verificação anterior confundiu.** O arquivo `node_modules/next/dist/docs/01-app/02-guides/view-transitions.md` existir no pacote do Next **não significa** que a versão de `react`/`react-dom` deste projeto exporta a API. Testado direto: `node -e "console.log(require('react').ViewTransition)"` → `undefined`. `react`/`react-dom` estão em `19.2.8` (`package.json`), o canal **estável**. `ViewTransition` só existe em `react@canary` (`19.3.0-canary-...`, confirmado via `npm view react@canary version`) ou `react@experimental` — canais que mudam sem aviso semver, sem garantia de compatibilidade entre atualizações.
+
+**Decisão do dono, apresentada com 3 caminhos:** não trocar o canal do React por uma peça de transição visual — risco desproporcional pra um app pessoal já em produção. Escolhido **crossfade implementado à mão** (CSS puro, sem `ViewTransition`) em vez de (a) trocar pra `react@canary` ou (b) deixar H3 pendente sem entregar nada.
+
+**Custo real do caminho escolhido, honesto:** sem a API nativa, não há como coordenar a saída (fade-out) do conteúdo antigo — o Next troca a árvore de rota instantaneamente antes de qualquer animação de saída poder rodar sem um mecanismo próprio de "segurar o conteúdo antigo por X ms", que é exatamente a complexidade que o `ViewTransition` existiria pra evitar (ver a doc do Next, seção de motivação). Por isso a implementação cobre só a **entrada** (fade-in) da tela nova — não é um crossfade simétrico. Registrado como escopo reduzido explícito, não escondido — ver `docs/BACKLOG-REDESENHO.md` (H3).
+
+**D7 original não é revertida** (o "conjunto contido do M3, sem container transform" continua valendo) — só a frase "custo caiu" está desatualizada. Esta entrada é o registro append-only da correção, HD (log cronológico, nunca reescrever entrada antiga).

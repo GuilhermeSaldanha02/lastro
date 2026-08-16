@@ -43,7 +43,7 @@ export default async function PaginaCatalogo() {
         </div>
       </header>
 
-      <div className="corpo corpo--com-nav">
+      <div className="corpo corpo--com-nav transicao-pilula">
         {semDica > 0 && (
           // Comunica a ausência UMA vez, no topo — não card a card (A2,
           // 2026-08-13). Antes de rolar qualquer grupo, quem varre a lista

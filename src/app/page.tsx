@@ -88,7 +88,7 @@ export default async function PaginaInicial() {
         </div>
       </header>
 
-      <div className="corpo corpo--com-nav">
+      <div className="corpo corpo--com-nav transicao-pilula">
         {/* Ação principal: continuar o treino de hoje, ou começar um. */}
         <section className="destaque">
           <p className="destaque__rotulo">

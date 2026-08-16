@@ -606,21 +606,23 @@ Cada peça vem de um app premiado (Apple Design Award ou finalista), recriada na
 
 **Ordem sugerida de propagação** (`docs/BACKLOG-REDESENHO.md`, item H4): `/ajustes/anilhas` (pequena, exercita quase tudo) → `/analise` (peça-assinatura) → `/treino/[id]` (a mais complexa) → o resto. Uma tela por PR, olhada no celular antes da seguinte. **Nota (2026-08-15, pós-H1):** a peça 10 dessa entrada já está resolvida (folha, via navegação a partir de `/ajustes`) — o que sobra dessa entrada na fila de H4 é a rota cheia de fallback (`src/app/ajustes/anilhas/page.tsx`, ainda com `barra-topo`, acessada por URL direta/refresh), que continua precisando da peça 1.
 
-### 6.7 Padrões de transição (D7) — tokens em `tokens.css` desde E4 (2026-08-15), aplicação pendente
+### 6.7 Padrões de transição (D7) — tokens em `tokens.css` desde E4 (2026-08-15), aplicação parcial (H3, 2026-08-16)
 
-E4 só criou os tokens de duração e curva abaixo em `tokens.css` (`--lastro-dur-3..6`, `--lastro-curva-padrao`, `--lastro-curva-enfatizada`). **Nenhum componente foi cabeado a eles ainda** — aplicar duração/curva à pílula, sub-tela, folha e segmentado é trabalho do Nível 2 (backlog), não deste item.
+E4 só criou os tokens de duração e curva abaixo em `tokens.css` (`--lastro-dur-3..6`, `--lastro-curva-padrao`, `--lastro-curva-enfatizada`). Aplicar duração/curva à pílula, sub-tela, folha e segmentado é trabalho do Nível 3 (H3).
 
 Conjunto contido do Material 3 — **sem container transform**, que o próprio M3 chama de "o mais expressivo" e o dono recusou por excesso.
 
-| Elemento | Transição | Duração |
-|---|---|---|
-| Pílula (nível de topo) | só esmaece | 200ms |
-| Sub-tela | desliza + esmaece | 300ms |
-| Folha | sobe | 400ms, curva enfatizada |
-| Segmentado | lateral | — |
+| Elemento | Transição | Duração | Estado |
+|---|---|---|---|
+| Pílula (nível de topo) | só esmaece | 200ms (token mais próximo: `--lastro-dur-2`, 220ms) | **implementada em parte (H3, 2026-08-16)** — só a entrada da tela nova, ver nota abaixo |
+| Sub-tela | desliza + esmaece | 300ms | pendente |
+| Folha | sobe | 400ms, curva enfatizada | **implementada (H1, 2026-08-15)** — `Folha`, primeiro consumidor real de `--lastro-dur-6`/`--lastro-curva-enfatizada` |
+| Segmentado | lateral | — | **auditado (M7, 2026-08-15), nenhum alvo existe hoje** |
 
 Curvas: padrão `cubic-bezier(0.2,0,0,1)` · enfatizada decelerando `cubic-bezier(0.05,0.7,0.1,1)`.
 
 **Obrigatório respeitar `prefers-reduced-motion`** em todas.
 
 **Reprova:** container transform em qualquer lugar do app; transição fora deste conjunto contido; movimento que ignora `prefers-reduced-motion`.
+
+**Correção registrada em `DECISIONS.md` 2026-08-16.** A nota original de D7 ("custo caiu: Next 16 traz `ViewTransition` do React nativo") estava errada — a API exige `react@canary`/`react@experimental`; este projeto usa `19.2.8` estável. O dono decidiu não trocar o canal do React por uma peça de transição. A pílula foi implementada à mão (CSS puro, `.transicao-pilula` em `sistema.css`) — só a **entrada** da tela nova esmaece (220ms), não um crossfade simétrico: sem a API nativa não há como coordenar a saída do conteúdo antigo sem um mecanismo próprio de "segurar" esse conteúdo, escopo maior que o item pedia. `AbaInferior`/`.barra-topo` ficam de fora de propósito (cada tela os remonta do zero, incluir causaria a pílula ativa piscando a cada toque). Sub-tela (desliza+esmaece) herda o mesmo bloqueio de API — fica pendente até essa decisão ser revisitada.

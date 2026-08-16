@@ -97,7 +97,7 @@ export default function AnaliseInterativa({
   }
 
   return (
-    <div className="corpo corpo--com-nav">
+    <div className="corpo corpo--com-nav transicao-pilula">
       <GraficoProgressao
         onStatus={(temPainel) => setGraficoTemPainel(temPainel)}
         ocultarQuandoVazio={!dadosSuficientes}
