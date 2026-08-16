@@ -268,6 +268,12 @@ O mapa tela a tela está no artifact do vocabulário e deve ser copiado para o `
 **Ordem sugerida:** `/ajustes/anilhas` (pequena, exercita quase tudo) → `/analise` (peça-assinatura) → `/treino/[id]` (a mais complexa) → o resto.
 **Regra:** uma tela por PR, olhada no celular antes da seguinte.
 
+> **Pendência registrada (2026-08-15) — achado real do dono no iPhone, em `/ajustes`, não corrigido ainda.** Dois problemas visuais, distintos do escopo do H1 (que não tocou `/ajustes`):
+> 1. A linha "Modelos de treino" / "Montar listas de exercícios" (`src/app/ajustes/page.tsx`) quebra em 2 linhas e desalinha em relação às outras linhas da lista (`Coach`, `Anilhas`) — `.item__conteudo` usa `justify-content: space-between` entre `.atalho__titulo` e `.atalho__meta` (herdado de M4), o que só funciona bem com pares curtos; esse par é o mais longo da lista e provavelmente precisa empilhar título/meta em vez de lado a lado.
+> 2. `Excluir conta` (`src/components/excluir-conta.tsx`, renderizado solto depois do botão "Sair" em `src/app/ajustes/page.tsx`) lê como desconectado do resto da tela.
+>
+> Melhor momento provável: quando `/ajustes` for propagada aqui em H4 (ela já está na "ordem sugerida" implícita, junto de `/ajustes/anilhas`) — mas fica como decisão de quem pegar o item, não travado a isso.
+
 ---
 
 ## 4. O que **não** entra neste backlog
