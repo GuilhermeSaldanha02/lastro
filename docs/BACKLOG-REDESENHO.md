@@ -233,7 +233,22 @@ Remove `--lastro-clearance-topo` (88px) de todas as telas. **Devolve 88px em cad
 
 *Cada um pode quebrar coisa que já funciona. Um por PR, com verificação real.*
 
-### H1 · Folha para tarefa curta · [D6] · ⚠️ herda pendência de M6
+### H1 · Folha para tarefa curta · [D6] · ✅ **FEITO EM PARTE (2026-08-15)**
+
+> **Mecanismo construído + 1 dos 4 fluxos convertido** (`editar perfil`, `/ajustes` → `/perfil`) — mesma lógica de propagação de M9: provar o primitivo no caso mais barato, documentar o resto como pendência explícita, não forçar os 4 numa PR só.
+>
+> **Por que "editar perfil" primeiro, dos 4 nomeados no item.** É o único caso de formulário simples, sem passo-a-passo (`criar modelo` tem 2 passos — grupo → exercícios — e empilhar passos dentro de uma folha é o que o próprio item proíbe, "não empilhar hierarquia"; `adicionar anilha` carrega a calculadora; `editar série` é o mais arriscado dos quatro, ver abaixo) e sem nenhuma interação com a fila offline.
+>
+> **Como foi construído.** Rota interceptada do App Router (`src/app/@modal/(.)perfil/page.tsx`, parallel route `@modal` em `src/app/layout.tsx`) — clique em `<Link href="/perfil">` (nav client-side) abre como folha por cima de `/ajustes`, sem perder o contexto; acesso direto por URL/refresh continua caindo na rota cheia de sempre (`src/app/perfil/page.tsx`, intocada). Componente novo `Folha` (`src/components/folha.tsx`) + classes `.folha`/`.folha-fundo`/`.folha__*` (`sistema.css`) — primeiro consumidor real de `--lastro-dur-6`/`--lastro-curva-enfatizada` (E4 tinha deixado prontos, sem uso). Fechar funciona por: toque no fundo, botão ✕, tecla Esc, arrastar pra baixo, e o próprio botão voltar do navegador/Android — este último de graça, é o próprio mecanismo de rota interceptada fazendo o trabalho (D6), não lógica escrita à mão.
+>
+> **Bug real achado e corrigido durante o teste com arraste de verdade (não só clique).** A primeira versão da alça tinha só 4px de altura — abaixo do piso de D1 (48×48px). Testando um arraste de verdade (não só aparência), a primeira tentativa não pegou a alça: selecionou texto do formulário por baixo em vez de arrastar. Corrigido com uma zona de arraste de 48px inteiros (`.folha__pega`) contendo o traço visual de 4px dentro — só depois disso o arraste (com deslocamento real e com soltura abaixo do limiar, testados os dois) funcionou de forma confiável.
+>
+> **Verificado com navegação real, não só aparência injetada.** `/ajustes` e `/perfil` não exigem login (fora de `PREFIXOS_PRIVADOS` em `src/proxy.ts`) — deu pra testar clique real, histórico do navegador, arraste e fallback de URL direta no Chrome de verdade, não só marcação injetada. **Não testado:** botão físico voltar do Android (só o back do navegador desktop) e leitor de tela real (só a estrutura ARIA — `role="dialog"`, `aria-modal`, `aria-label` — sem correr um AT de verdade). Sem trap de foco dentro da folha (Tab pode sair pro conteúdo por trás) — gap conhecido, não corrigido nesta entrega.
+>
+> **Pendente — os outros 3 fluxos**, cada um com razão própria pra não entrar nesta PR: `adicionar anilha` e `criar modelo` (o 2º ainda esbarra na proibição de hierarquia empilhada — precisaria resolver isso primeiro, não é conversão direta); `editar série` **auditado, não convertido de propósito** — hoje já troca a linha `.serie` por `EditarSerie` inline, no lugar, sem navegação nenhuma (o mesmo resultado que a folha existe pra produzir, por um caminho diferente) — e é o único dos quatro que toca `enfileirar`/`sincronizar` (fila offline) e a atualização otimista, exatamente o risco que o item cita ("conferir que a folha não atrapalha a fila de sincronização"). Convertê-lo sem necessidade clara trocaria um padrão que já funciona por um risco novo — decisão explícita de não fazer, não esquecimento (mesmo raciocínio de M2/M6/M7).
+>
+> **Sobre a pendência herdada de M6 — continua aberta, não fechada por este PR.** A nota "⚠️ herda pendência de M6" no cabeçalho original condiciona a mudança de `.botao-secundario` pra `.acao-fantasma` em `/treino/[id]` a **"registrar série" virar folha** — e "registrar série" não é um dos 4 fluxos que o próprio H1 nomeia ("criar modelo, editar perfil, adicionar anilha, editar série"). Converter `editar` não toca esse gatilho. Fica pendência aberta pra quando (e se) "registrar" for endereçado.
+
 Criar modelo, editar perfil, adicionar anilha, editar série.
 **Muda rota e histórico — não é CSS.** Precisa: fechar arrastando pra baixo, funcionar com o botão voltar do Android, e não empilhar hierarquia dentro da folha (o HIG proíbe).
 **Risco:** o app é PWA offline-first; conferir que a folha não atrapalha a fila de sincronização ao registrar série.
