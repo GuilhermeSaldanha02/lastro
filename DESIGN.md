@@ -581,7 +581,7 @@ Cada peça vem de um app premiado (Apple Design Award ou finalista), recriada na
 | 7 | Tabela com cabeçalho de coluna — **implementada (M8, 2026-08-15)** | Hevy | As séries do treino | Séries sem cabeçalho de coluna alinhado — é a peça que fecha o desalinhamento que abriu a sessão do diagnóstico de design |
 | 8 | Ação fantasma dentro da seção — **implementada em parte (M6, 2026-08-15)** | Hevy | "Adicionar série" ⚠️ **pendente até H1** (hoje é o gatilho fixo de `.acao-area`, D2/D3 — converter agora esvaziaria a única forma de registrar série na tela), "adicionar anilha" ✅, "criar modelo" ✅ | Ação secundária com o mesmo peso visual da ação primária da tela |
 | 9 | Prosa com título em serifa | Oura | O parecer da Análise Semanal, o Coach e a marca do `/login` (§6.6, D10) — a voz do produto | Fraunces usada fora do parecer, do Coach e da marca (mesma proibição que já vale pra Plex Serif em §3.3) — **mas o alcance dela dentro do parecer cresce, ver nota abaixo** |
-| 10 | Folha com alça — **implementada em parte (H1, 2026-08-15)** | Strava · Structured | Adicionar anilha, editar série, criar modelo, **editar perfil ✅** | Tarefa curta abrindo em rota cheia em vez de folha; folha sem fechar arrastando pra baixo |
+| 10 | Folha com alça — **implementada em parte (H1, 2026-08-15)** | Strava · Structured | Editar série, criar modelo, **editar perfil ✅**, **adicionar anilha ✅** | Tarefa curta abrindo em rota cheia em vez de folha; folha sem fechar arrastando pra baixo |
 
 **Nota sobre a peça 9 — ela alarga o alcance da terceira família, não só troca a fonte.** §3.3/C4 (aprovado 2026-08-08) restringe a Fraunces ao **veredito, e só ele**, dentro do parecer — o resto do documento (cabeçalho, prosa, procedência) é Bricolage. A peça 9 usa a serifa no **título de conteúdo** da prosa inteira do parecer e do Coach, não só no veredito — isso ainda não foi implementado (é trabalho de propagação do Nível 2/3, não de M1). Quando for, ela **substitui** o escopo de C4 nesses dois lugares — a serifa passa a valer para título + veredito, ainda proibida em qualquer outro lugar do app **exceto a marca do `/login`**, que já usa Fraunces desde M1 (2026-08-15) por decisão própria de D10/§6.6, não por essa revisão de C4. Até a propagação chegar no parecer, §3.3 continua sendo a regra que vale ali.
 
@@ -597,14 +597,14 @@ Cada peça vem de um app premiado (Apple Design Award ou finalista), recriada na
 | `/catalogo/[id]` | 1 · 2 · 4 · 7 | histórico com cabeçalho de coluna; segmentado troca a métrica |
 | `/coach` | 9 | a única tela onde balão se justifica; título e prosa na voz do produto |
 | `/ajustes` | 3 | já é a mais correta hoje; só herda a linha de navegação nova |
-| `/ajustes/anilhas` | 1 · 2 · 8 · 10 | anilhas viram grade (88px no lugar de 372px); adicionar vira folha |
+| `/ajustes/anilhas` | 1 · 2 · 8 · 10 | anilhas viram grade (88px no lugar de 372px); **navegar até aqui vira folha ✅ (H1, 2026-08-15)** — peça 1 (rótulo micro + valor grande) segue pendente, é H4 |
 | `/ajustes/modelos` | 3 · 5 · 8 · 10 | modelos como linhas de navegação; criar vira folha com chips |
 | `/perfil` | 1 · 10 | vira folha; o nome ganha papel tipográfico (hoje é texto sem classe nenhuma) |
 | `/login` | 9 | primeira impressão do app (D10) — hoje é a tela mais genérica de todas |
 
 **Este mapa cobre 12 das 13 telas do artifact original.** `/ajustes/modelos/novo` existe no app (ver rota em `src/app/ajustes/modelos/novo/`) e não recebeu peça mapeada na sessão que gerou o vocabulário — ficou de fora por omissão do artifact, não por decisão. **Parcialmente resolvido em M7 (2026-08-15):** o 1º passo da tela (escolher grupo muscular, via `SeletorGrupoMuscular`) ganhou peça 5 (chips). O 2º passo (escolher exercícios, lista de caixas de seleção em `modelo-treino-form.tsx`) continua sem peça mapeada — fica pendência aberta.
 
-**Ordem sugerida de propagação** (`docs/BACKLOG-REDESENHO.md`, item H4): `/ajustes/anilhas` (pequena, exercita quase tudo) → `/analise` (peça-assinatura) → `/treino/[id]` (a mais complexa) → o resto. Uma tela por PR, olhada no celular antes da seguinte.
+**Ordem sugerida de propagação** (`docs/BACKLOG-REDESENHO.md`, item H4): `/ajustes/anilhas` (pequena, exercita quase tudo) → `/analise` (peça-assinatura) → `/treino/[id]` (a mais complexa) → o resto. Uma tela por PR, olhada no celular antes da seguinte. **Nota (2026-08-15, pós-H1):** a peça 10 dessa entrada já está resolvida (folha, via navegação a partir de `/ajustes`) — o que sobra dessa entrada na fila de H4 é a rota cheia de fallback (`src/app/ajustes/anilhas/page.tsx`, ainda com `barra-topo`, acessada por URL direta/refresh), que continua precisando da peça 1.
 
 ### 6.7 Padrões de transição (D7) — tokens em `tokens.css` desde E4 (2026-08-15), aplicação pendente
 
