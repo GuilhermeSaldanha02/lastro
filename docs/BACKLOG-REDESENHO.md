@@ -260,9 +260,21 @@ Criar modelo, editar perfil, adicionar anilha, editar série.
 **Risco:** o app é PWA offline-first; conferir que a folha não atrapalha a fila de sincronização ao registrar série.
 **Herdado de M6:** quando "registrar série" virar folha, o gatilho que hoje é `.botao-secundario` no `.acao-area` de `/treino/[id]` deveria virar `.acao-fantasma` — deixado de fora de M6 porque converter antes esvaziaria a única forma de registrar série na tela atual (D2/D3).
 
-### H2 · Modo de edição · [D8]
+### H2 · Modo de edição · [D8] · ✅ **FEITO EM PARTE (2026-08-15)**
 Estado novo em todas as listas e grades. Substitui a lixeira visível por linha.
 **Preservar:** a confirmação em duas etapas, e **nunca** `window.confirm`.
+
+> **Mecanismo construído + 1 dos 4 consumidores convertido** (`/ajustes/modelos`) — mesma lógica de propagação de M9/H1: provar o primitivo no caso mais barato, documentar o resto como pendência explícita.
+>
+> **Por que `/ajustes/modelos` primeiro.** Consultei o `advisor` antes de codar (Nível 3): dos 4 lugares com lixeira sempre visível hoje (grade de anilhas, lista de treinos, lista de modelos, grade de séries), `/ajustes/modelos` é o único `.item` sem nenhum alvo de toque concorrente — só nome + lixeira, sem `.item__link`. Nos outros três, ligar/desligar a visibilidade da lixeira interage com outra coisa que já existe na linha (ver pendências abaixo), o que teria misturado dois problemas numa PR só.
+>
+> **Como foi construído.** Componente novo `src/components/lista-modelos.tsx` (client), com estado local `modoEdicao` (boolean) — substitui o JSX que antes vivia direto em `src/app/ajustes/modelos/page.tsx`. Toggle "Editar"/"Concluído" (rótulo muda com o estado, verbo, `.botao-textual`, no cabeçalho da lista via `.grupo__cab`/`.grupo__nome` — reuso do mesmo padrão rótulo+ação já usado em `anilhas-form.tsx` e `FormularioSerie`, nenhuma classe CSS nova). `ExcluirModelo` só é montado quando `modoEdicao` é `true` — a decisão que resolve de graça o risco que o `advisor` apontou (dois estados independentes, modo de edição da tela e "confirmando exclusão" do componente, podendo dessincronizar): desligar o modo de edição desmonta `ExcluirModelo`, e o estado `confirmando` dele deixa de existir junto, sem precisar sincronizar nada à mão. Testado explicitamente: abrir a confirmação de exclusão de um modelo e desligar o modo de edição no meio cancela a confirmação sem apagar nada.
+>
+> **Guard de lista vazia.** O toggle só renderiza quando `modelos.length > 0` — testado nos dois sentidos: carga inicial com lista vazia (sem toggle) e lista esvaziando em runtime depois de excluir o único modelo restante (toggle some de novo).
+>
+> **Pendentes — os outros 3 consumidores**, cada um com razão própria pra não entrar nesta PR: **grade de anilhas** (`.grade-anilhas`/`.anilha`) — esconder a lixeira colapsa a célula de 48px e reflui a grade medida a 84px em M3, relitigar esse layout dentro de uma PR de H2 misturaria dois problemas; **lista de treinos** (`/treino`) — a linha tem `.item__link` (navega pro detalhe) E a lixeira como alvos concorrentes, o modo de edição precisaria decidir o que acontece com o alvo de navegação enquanto ligado; **grade de séries** (`.serie`, `treino-detalhe.tsx`) — a linha inteira é `role="button"` com `onClick` pra abrir edição inline, e a lixeira hoje usa `stopPropagation` pra escapar disso; o modo de edição aqui não é só esconder/mostrar, é decidir o que um toque na linha significa enquanto o modo está ligado — o mais arriscado dos quatro, fica pra último.
+>
+> **Verificação:** `npx tsc --noEmit` (pós `npm run build`) · `npm run test` (133/133) · `npm run lint` (0 erros, 1 aviso pré-existente em arquivo gerado) · `npm run build` — todos verdes. `grep window.confirm` → só comentários, nenhuma chamada real. Visual/funcional em Chrome real: 2 modelos criados de teste — estado padrão sem lixeira em nenhuma linha; toggle liga → lixeira aparece nas duas linhas, alvo 48×48 confirmado (`getBoundingClientRect`); excluir → confirma → Cancelar volta ao modo de edição intacto; excluir → confirma → desligar o modo de edição no meio cancela a confirmação sem apagar; exclusão completa re-renderiza a lista sem linha obsoleta; dado de teste removido ao final. Zero erros no console.
 
 ### H3 · Transições · [D7]
 Pílula = só esmaece (200ms) · sub-tela = deslize + esmaecimento (300ms) · folha = sobe (400ms, enfatizada) · segmentado = lateral. **Sem container transform.**
