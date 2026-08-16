@@ -39,6 +39,36 @@
   padding-top: 0;
 }
 
+/* ---------- Transição "pílula" (H3, D7) ----------
+   Crossfade entre as 5 abas de nível de topo — "só esmaece", sem
+   deslize, sem container transform. Implementado à mão: o `ViewTransition`
+   nativo do React exige canal canary/experimental (verificado em
+   node_modules/react/cjs/react.development.js — 19.2.8 estável não
+   exporta isso), e trocar o canal do React por uma peça de transição é
+   risco desproporcional (decisão do dono, DECISIONS.md 2026-08-16).
+   Por isso só a ENTRADA da tela nova esmaece — a tela antiga já some na
+   troca de rota do Next, não há como animar sua saída sem seu próprio
+   código de coordenação, que é exatamente a complexidade que o
+   `ViewTransition` existiria pra evitar. `AbaInferior` e `.barra-topo`
+   ficam de fora de propósito: cada página os remonta do zero a cada
+   navegação (não vivem no layout), então incluí-los aqui faria a pílula
+   ativa piscar/re-entrar a cada toque — exatamente o elemento que o
+   dedo acabou de tocar. `prefers-reduced-motion` já é coberto pelo
+   bloco global em `globals.css` (`*, ::before, ::after`), sem precisar
+   de regra própria aqui. */
+@keyframes lastro-pilula-entra {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.transicao-pilula {
+  animation: lastro-pilula-entra var(--lastro-dur-2) var(--lastro-curva-padrao);
+}
+
 /* ---------- Entrada ---------- */
 .tela--entrada {
   justify-content: center;

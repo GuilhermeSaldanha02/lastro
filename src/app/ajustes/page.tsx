@@ -23,7 +23,7 @@ export default async function PaginaAjustes() {
         </div>
       </header>
 
-      <div className="corpo corpo--com-nav">
+      <div className="corpo corpo--com-nav transicao-pilula">
         {perfil ? (
           <div className="pilha">
             <Link href="/perfil" className="atalho">

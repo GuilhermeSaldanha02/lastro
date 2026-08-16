@@ -53,7 +53,7 @@ export default async function PaginaTreino() {
         </div>
       </header>
 
-      <div className="corpo corpo--com-nav">
+      <div className="corpo corpo--com-nav transicao-pilula">
         <h2 className="doc__secao">Histórico</h2>
 
         {treinos.length === 0 ? (
