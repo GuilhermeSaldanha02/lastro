@@ -2,7 +2,7 @@
 // /ajustes/modelos/novo; editar é FORA de escopo (§9.0) — só criar e excluir.
 import Link from "next/link";
 import { listarModelos } from "@/lib/dados/modelo-treino";
-import ExcluirModelo from "@/components/excluir-modelo";
+import ListaModelos from "@/components/lista-modelos";
 import AbaInferior from "@/components/aba-inferior";
 
 export default async function PaginaModelos() {
@@ -26,20 +26,7 @@ export default async function PaginaModelos() {
           dia.
         </p>
 
-        {modelos.length === 0 ? (
-          <p className="vazio">Nenhum modelo criado ainda.</p>
-        ) : (
-          <ul className="lista">
-            {modelos.map((modelo) => (
-              <li key={modelo.id}>
-                <div className="item">
-                  <span className="item__data">{modelo.nome}</span>
-                  <ExcluirModelo id={modelo.id} nome={modelo.nome} />
-                </div>
-              </li>
-            ))}
-          </ul>
-        )}
+        <ListaModelos modelos={modelos} />
 
         {/* Ação fantasma (DESIGN.md §6.5, peça 8, M6) — "criar modelo" é uma
             ação secundária dentro da seção, não deve competir em peso
