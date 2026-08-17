@@ -104,6 +104,7 @@ export default function TreinoDetalhe({
   const [formularioAberto, setFormularioAberto] = useState(false);
   const [editandoId, setEditandoId] = useState<string | null>(null);
   const [excluindoId, setExcluindoId] = useState<string | null>(null);
+  const [modoEdicao, setModoEdicao] = useState(false);
   // D7 — reflete a fila de verdade: só vira "sincronizado" quando uma
   // drenagem termina sem falha. Nunca é apresentado como erro.
   const [sincronizado, setSincronizado] = useState(false);
@@ -279,9 +280,35 @@ export default function TreinoDetalhe({
     }
   }
 
+  /**
+   * H2 (D8) — estado é de TELA, não de grupo: `grupos.map` gera um
+   * `.grupo__cab` por exercício, então o toggle não pode viver ali dentro
+   * (N cabeçalhos duplicando um único estado). Fica uma vez só, acima de
+   * todos os grupos. Desligar no meio de uma confirmação cancela ela —
+   * mesmo comportamento já garantido em ListaModelos/ListaTreinos, só que
+   * lá vinha de graça (desmontar o componente); aqui a lixeira nunca
+   * desmonta (só fica `visibility:hidden`), então a limpeza de
+   * `excluindoId` precisa ser explícita.
+   */
+  function alternarModoEdicao() {
+    setModoEdicao((atual) => {
+      if (atual) setExcluindoId(null);
+      return !atual;
+    });
+  }
+
   return (
     <>
       <div className="corpo corpo--com-nav corpo--titulo-conteudo">
+        {series.length > 0 && (
+          <div className="grupo__cab">
+            <h2 className="grupo__nome">Séries</h2>
+            <button type="button" className="botao-textual" onClick={alternarModoEdicao}>
+              {modoEdicao ? "Concluído" : "Editar"}
+            </button>
+          </div>
+        )}
+
         {/* Exercícios do modelo escolhido, ainda sem nenhuma série (SDD
             §9.3) — mesmo cabeçalho visual dos grupos de verdade, só sem
             linhas de série dentro. Sempre ANTES dos grupos de série real. */}
@@ -411,8 +438,14 @@ export default function TreinoDetalhe({
                       </span>
                       <button
                         type="button"
-                        className="botao-icone serie__excluir"
+                        className={
+                          modoEdicao
+                            ? "botao-icone serie__excluir"
+                            : "botao-icone serie__excluir botao-icone--oculto"
+                        }
                         aria-label={`Excluir série ${indice + 1} de ${grupo.nome}`}
+                        aria-hidden={!modoEdicao}
+                        tabIndex={modoEdicao ? undefined : -1}
                         onClick={(e) => {
                           e.stopPropagation();
                           setExcluindoId(serie.id);
