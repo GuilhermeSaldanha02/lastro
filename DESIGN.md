@@ -592,7 +592,7 @@ Cada peça vem de um app premiado (Apple Design Award ou finalista), recriada na
 | `/` (início) | 1 · 2 · 3 · 6 | o estado do dia vira grade de métricas; a ação de treinar deixa de ser bloco entre blocos |
 | `/treino` | 3 · 6 · 10 | iniciar/continuar como ação clara; escolher modelo vira folha |
 | `/treino/[id]` | 1 · 7 · 8 · 10 | séries em colunas com cabeçalho; registrar e editar viram folha; "adicionar" fantasma |
-| `/analise` | 1 · 2 · 4 · 6 · 9 | a peça-assinatura: serifa na leitura, grade no dado, segmentado no gráfico |
+| `/analise` | 1 · 2 · 4 · 6 · 9 | a peça-assinatura: serifa na leitura, grade no dado, segmentado no gráfico. **M9 propagado ✅ (H4, 2026-08-16)** — `TituloTela` sem `VoltarFlutuante` (aba de nível de topo não tem "voltar") |
 | `/catalogo` | 5 · 3 | grupos viram chips; fichas perdem moldura e viram linhas de navegação |
 | `/catalogo/[id]` | 1 · 2 · 4 · 7 | histórico com cabeçalho de coluna; segmentado troca a métrica |
 | `/coach` | 9 | a única tela onde balão se justifica; título e prosa na voz do produto |
