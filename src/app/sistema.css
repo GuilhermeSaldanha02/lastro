@@ -396,6 +396,24 @@
   cursor: pointer;
 }
 
+/* Achado do dono no iPhone (2026-08-15) — "Excluir conta" usava a mesma
+   cor neutra de "Editar"/"Trocar grupo" e lia como solto/desconectado do
+   resto da tela, sem nenhum sinal de que é destrutivo. Cor emprestada de
+   `.botao-destrutivo` (--lastro-erro, já reservada a "falha real e ação
+   destrutiva") — mesmo peso visual discreto de `.botao-textual`, só a cor
+   muda. `.zona-risco` (abaixo) cuida da separação do resto da tela. */
+.botao-textual--destrutivo {
+  color: var(--lastro-erro);
+}
+
+/* Separa "Excluir conta" do resto de `.pilha` (perfil, lista, Sair) com um
+   traço acima — em vez de espaçamento uniforme tratando ação irreversível
+   igual a qualquer outra linha (a causa raiz do "solto"). */
+.zona-risco {
+  border-top: 1px solid var(--lastro-linha);
+  padding-top: var(--lastro-e-4);
+}
+
 /* Ação fantasma — DESIGN.md §6.5, peça 8 (M6). Diferente de
    `.botao-textual`: não é um link utilitário sublinhado, é uma AÇÃO
    ("Adicionar", "Criar modelo") que precisa continuar lendo como ação —
@@ -1101,6 +1119,19 @@
   align-items: center;
   justify-content: space-between;
   gap: var(--lastro-e-3);
+}
+
+/* Achado do dono no iPhone (2026-08-15) — "Modelos de treino" / "Montar
+   listas de exercícios" é o par mais longo entre os consumidores de
+   `.item__conteudo`; lado a lado ele quebra em 2 linhas e desalinha com as
+   outras linhas da lista. Modificador só pra essa linha (não a classe
+   base) — os outros pares (Coach, Anilhas, datas de treino) continuam
+   cabendo lado a lado, sem motivo pra mudar. */
+.item__conteudo--empilhado {
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 2px;
 }
 
 .item__seta {

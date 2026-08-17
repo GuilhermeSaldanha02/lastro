@@ -25,10 +25,10 @@ export default function ExcluirConta() {
 
   if (!confirmando) {
     return (
-      <>
+      <div className="zona-risco">
         <button
           type="button"
-          className="botao-textual"
+          className="botao-textual botao-textual--destrutivo"
           onClick={() => setConfirmando(true)}
         >
           Excluir conta
@@ -38,34 +38,36 @@ export default function ExcluirConta() {
             {erro}
           </p>
         )}
-      </>
+      </div>
     );
   }
 
   return (
-    <div className="confirma" role="group" aria-label="Confirmar exclusão de conta">
-      <p className="confirma__texto">
-        Excluir sua conta apaga o perfil, todos os treinos e séries registradas,
-        os modelos de treino e a configuração de anilhas — tudo, sem exceção.
-        Não dá para desfazer.
-      </p>
-      <div className="confirma__acoes">
-        <button
-          type="button"
-          className="botao-secundario"
-          onClick={() => setConfirmando(false)}
-          disabled={pendente}
-        >
-          Cancelar
-        </button>
-        <button
-          type="button"
-          className="botao-destrutivo"
-          onClick={excluir}
-          disabled={pendente}
-        >
-          {pendente ? "Excluindo…" : "Excluir conta"}
-        </button>
+    <div className="zona-risco">
+      <div className="confirma" role="group" aria-label="Confirmar exclusão de conta">
+        <p className="confirma__texto">
+          Excluir sua conta apaga o perfil, todos os treinos e séries registradas,
+          os modelos de treino e a configuração de anilhas — tudo, sem exceção.
+          Não dá para desfazer.
+        </p>
+        <div className="confirma__acoes">
+          <button
+            type="button"
+            className="botao-secundario"
+            onClick={() => setConfirmando(false)}
+            disabled={pendente}
+          >
+            Cancelar
+          </button>
+          <button
+            type="button"
+            className="botao-destrutivo"
+            onClick={excluir}
+            disabled={pendente}
+          >
+            {pendente ? "Excluindo…" : "Excluir conta"}
+          </button>
+        </div>
       </div>
     </div>
   );
