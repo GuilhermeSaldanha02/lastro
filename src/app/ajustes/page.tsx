@@ -41,7 +41,7 @@ export default async function PaginaAjustes() {
               <li>
                 <div className="item">
                   <Link href="/ajustes/modelos" className="item__link">
-                    <span className="item__conteudo">
+                    <span className="item__conteudo item__conteudo--empilhado">
                       <span className="atalho__titulo">Modelos de treino</span>
                       <span className="atalho__meta">Montar listas de exercícios</span>
                     </span>
