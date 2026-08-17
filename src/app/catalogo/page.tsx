@@ -10,6 +10,7 @@ import { listarCatalogo } from "@/lib/dados/treino";
 import { obterPerfil } from "@/lib/dados/perfil";
 import AbaInferior from "@/components/aba-inferior";
 import Avatar from "@/components/avatar";
+import TituloTela from "@/components/titulo-tela";
 
 export default async function PaginaCatalogo() {
   const [exercicios, perfil] = await Promise.all([listarCatalogo(), obterPerfil()]);
@@ -33,17 +34,14 @@ export default async function PaginaCatalogo() {
 
   return (
     <main className="tela">
-      <header className="barra-topo">
-        <div className="barra-topo__acoes">
-          <div className="barra-topo__info">
-            <p className="barra-topo__contexto">Catálogo</p>
-            <h1 className="barra-topo__titulo">Exercícios</h1>
-          </div>
-          {perfil && <Avatar nome={perfil.nome} avatarUrl={perfil.avatarUrl} />}
-        </div>
-      </header>
+      {/* Aba de nível de topo — sem `VoltarFlutuante`. */}
+      <TituloTela
+        contexto="Catálogo"
+        titulo="Exercícios"
+        acessorio={perfil && <Avatar nome={perfil.nome} avatarUrl={perfil.avatarUrl} />}
+      />
 
-      <div className="corpo corpo--com-nav transicao-pilula">
+      <div className="corpo corpo--com-nav corpo--titulo-conteudo transicao-pilula">
         {semDica > 0 && (
           // Comunica a ausência UMA vez, no topo — não card a card (A2,
           // 2026-08-13). Antes de rolar qualquer grupo, quem varre a lista

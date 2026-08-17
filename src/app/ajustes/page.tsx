@@ -8,22 +8,17 @@ import { sair } from "@/lib/dados/auth";
 import AbaInferior from "@/components/aba-inferior";
 import ExcluirConta from "@/components/excluir-conta";
 import SetaNavegacao from "@/components/seta-navegacao";
+import TituloTela from "@/components/titulo-tela";
 
 export default async function PaginaAjustes() {
   const perfil = await obterPerfil();
 
   return (
     <main className="tela">
-      <header className="barra-topo">
-        <div className="barra-topo__acoes">
-          <div className="barra-topo__info">
-            <p className="barra-topo__contexto">lastro</p>
-            <h1 className="barra-topo__titulo">Ajustes</h1>
-          </div>
-        </div>
-      </header>
+      {/* Aba de nível de topo — sem `VoltarFlutuante`. */}
+      <TituloTela contexto="lastro" titulo="Ajustes" />
 
-      <div className="corpo corpo--com-nav transicao-pilula">
+      <div className="corpo corpo--com-nav corpo--titulo-conteudo transicao-pilula">
         {perfil ? (
           <div className="pilha">
             <Link href="/perfil" className="atalho">

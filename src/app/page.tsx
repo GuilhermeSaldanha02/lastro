@@ -34,6 +34,7 @@ import AbaInferior from "@/components/aba-inferior";
 import Avatar from "@/components/avatar";
 import IniciarTreino from "@/components/iniciar-treino";
 import SetaNavegacao from "@/components/seta-navegacao";
+import TituloTela from "@/components/titulo-tela";
 
 /** "2026-08-06" → "6 ago". Relativo quando é hoje ou ontem. */
 function formatarData(iso: string, hojeISO: string): string {
@@ -74,21 +75,14 @@ export default async function PaginaInicial() {
 
   return (
     <main className="tela">
-      <header className="barra-topo">
-        <div className="barra-topo__acoes">
-          <div className="barra-topo__info">
-            <p className="barra-topo__contexto">lastro</p>
-            <h1 className="barra-topo__titulo">Início</h1>
-          </div>
-          {perfil && (
-            <div className="barra-topo__usuario">
-              <Avatar nome={perfil.nome} avatarUrl={perfil.avatarUrl} />
-            </div>
-          )}
-        </div>
-      </header>
+      {/* Aba de nível de topo — sem `VoltarFlutuante`. */}
+      <TituloTela
+        contexto="lastro"
+        titulo="Início"
+        acessorio={perfil && <Avatar nome={perfil.nome} avatarUrl={perfil.avatarUrl} />}
+      />
 
-      <div className="corpo corpo--com-nav transicao-pilula">
+      <div className="corpo corpo--com-nav corpo--titulo-conteudo transicao-pilula">
         {/* Ação principal: continuar o treino de hoje, ou começar um. */}
         <section className="destaque">
           <p className="destaque__rotulo">
