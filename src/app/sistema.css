@@ -557,6 +557,13 @@
   background: var(--lastro-sup-2);
 }
 
+/* `:hover` sozinho nunca aparece em toque (a maioria dos aparelhos que
+   usam este app) — sem isto, a única pista de "isto reage" era o chip em
+   `.serie__v`, e a linha inteira também é alvo de toque (não só o chip). */
+.serie:active {
+  background: var(--lastro-sup-2);
+}
+
 /* Ação discreta de barra escura (sair, voltar). */
 .botao-barra {
   display: inline-flex;
@@ -699,12 +706,23 @@
    só, ao custo de não crescer como .metrica__valor cresceu — E2
    (2026-08-15), verificado com medição real da linha, não só a favor da
    consistência entre os dois papéis de "número". */
+/* Pista de que a série é editável, sem repetir "Editar" em cada linha
+   (achado do dono, 2026-08-17: repetir a palavra por linha ficaria feio) e
+   sem contradizer D3 (dado não ganha moldura/seta como navegação). Pesquisa
+   de padrão real: apps de treino de peso livre (Strong, Hevy) desenham o
+   PRÓPRIO valor como um campo — um "chip" com fundo diferente do resto da
+   linha — em vez de anexar rótulo ou ícone repetido. `--lastro-sup-2` já é
+   "faixa, cabeçalho de tabela" no token; reaproveitado aqui como o mesmo
+   tipo de destaque sutil, não uma cor nova. */
 .serie__v {
   font-family: var(--lastro-fonte-num);
   font-variant-numeric: tabular-nums;
   font-size: var(--lastro-papel-titulo-tela);
   font-weight: var(--lastro-peso-medio);
   letter-spacing: -0.02em;
+  padding: 0 var(--lastro-e-2);
+  border-radius: var(--lastro-raio-1);
+  background: var(--lastro-sup-2);
 }
 
 .serie__x {
