@@ -1005,3 +1005,13 @@ Ao começar H3 (pílula/sub-tela), a nota de D7 ("Custo caiu: Next 16 traz `View
 **Fixture de auditoria.** Usuário de teste isolado criado no Supabase real via `scripts/qa-treino-helper.sh` (mesmo mecanismo do `qa-treino`), seedado com 15 treinos / 5 semanas via SQL direto (mesma técnica autorizada em `DECISIONS.md` 2026-08-06, porque a UI não permite data retroativa) — nunca dado do dono. Limpo ao final da auditoria.
 
 **Como reverter.** Reverter esta entrada e a edição de `CLAUDE.md` §"Verificação" restaura a regra antiga. Não remove o MCP do Playwright instalado (isso é reversível separadamente, `claude mcp remove playwright`).
+
+---
+
+## 2026-08-17 (2) — Correção: a auditoria usou Claude in Chrome, não o painel Browser interno; achado de "3 vs 4 semanas" fechado como não-bug
+
+**Correção de fato, sobre a entrada anterior.** "A auditoria desta sessão usa o painel Browser interno" **não procede** — testado por execução: o painel interno (`mcp__Claude_Browser__*`) não registra clique/digitação quando quem dirige é um subagente (confirmado no piloto da área 1 — `computer{action:"screenshot"}` retornava "Browser pane is not displayed"). A auditoria inteira (Fase 3, 143 itens) rodou de fato com a **extensão Claude in Chrome** (`mcp__claude-in-chrome__*`), que funcionou de ponta a ponta pra subagente. Mesmo padrão de honestidade de D7/H1: a entrada anterior fica, esta é o registro append-only da correção.
+
+**Achado "divergência 3 vs 4 semanas de platô" (Fase 3, área 6) — investigado e fechado como não-bug.** `/api/progressao` (gráfico) usa `PLATO_GRAFICO_SEMANAS=3`, regra descritiva/visual; `/api/analise` (parecer da IA) usa `SEMANAS_ESTAGNACAO=4`, o limiar clínico. São dois cálculos DIFERENTES de propósito — já documentado no comentário de `src/lib/analise/limiares.ts:19` ("DIFERENTE de SEMANAS_ESTAGNACAO acima") e na decisão original de `DECISIONS.md` 2026-08-07 ("regra de platô do gráfico é descritiva, separada do limiar clínico do PRD §10"). O subagente de QA, sem esse contexto, reportou a divergência numérica como achado — correto reportar, mas não é bug. Dono confirmou não mexer: as duas telas continuam mostrando números diferentes de propósito, cada um respondendo uma pergunta diferente.
+
+**Como reverter.** Não há o que reverter — registro de fato, não mudança de código.
