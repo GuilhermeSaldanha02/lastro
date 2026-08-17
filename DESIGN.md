@@ -597,14 +597,14 @@ Cada peça vem de um app premiado (Apple Design Award ou finalista), recriada na
 | `/catalogo/[id]` | 1 · 2 · 4 · 7 | histórico com cabeçalho de coluna; segmentado troca a métrica |
 | `/coach` | 9 | a única tela onde balão se justifica; título e prosa na voz do produto |
 | `/ajustes` | 3 | já é a mais correta hoje; só herda a linha de navegação nova |
-| `/ajustes/anilhas` | 1 · 2 · 8 · 10 | anilhas viram grade (88px no lugar de 372px); **navegar até aqui vira folha ✅ (H1, 2026-08-15)** — peça 1 (rótulo micro + valor grande) segue pendente, é H4 |
+| `/ajustes/anilhas` | 1 · 2 · 8 · 10 | anilhas viram grade (88px no lugar de 372px); **navegar até aqui vira folha ✅ (H1, 2026-08-15)** — a rota cheia de fallback (URL direta/refresh) **✅ M9 propagada (H4, 2026-08-16)**, `TituloTela`+`VoltarFlutuante` no lugar de `.barra-topo`. Peça 1 (rótulo micro + valor grande) auditada: os valores de anilha já vivem sob o cabeçalho de seção "Anilhas disponíveis", que cumpre o papel de contexto — nenhum trabalho novo considerado necessário |
 | `/ajustes/modelos` | 3 · 5 · 8 · 10 | modelos como linhas de navegação; criar vira folha com chips |
 | `/perfil` | 1 · 10 | vira folha; o nome ganha papel tipográfico (hoje é texto sem classe nenhuma) |
 | `/login` | 9 | primeira impressão do app (D10) — hoje é a tela mais genérica de todas |
 
 **Este mapa cobre 12 das 13 telas do artifact original.** `/ajustes/modelos/novo` existe no app (ver rota em `src/app/ajustes/modelos/novo/`) e não recebeu peça mapeada na sessão que gerou o vocabulário — ficou de fora por omissão do artifact, não por decisão. **Parcialmente resolvido em M7 (2026-08-15):** o 1º passo da tela (escolher grupo muscular, via `SeletorGrupoMuscular`) ganhou peça 5 (chips). O 2º passo (escolher exercícios, lista de caixas de seleção em `modelo-treino-form.tsx`) continua sem peça mapeada — fica pendência aberta.
 
-**Ordem sugerida de propagação** (`docs/BACKLOG-REDESENHO.md`, item H4): `/ajustes/anilhas` (pequena, exercita quase tudo) → `/analise` (peça-assinatura) → `/treino/[id]` (a mais complexa) → o resto. Uma tela por PR, olhada no celular antes da seguinte. **Nota (2026-08-15, pós-H1):** a peça 10 dessa entrada já está resolvida (folha, via navegação a partir de `/ajustes`) — o que sobra dessa entrada na fila de H4 é a rota cheia de fallback (`src/app/ajustes/anilhas/page.tsx`, ainda com `barra-topo`, acessada por URL direta/refresh), que continua precisando da peça 1.
+**Ordem sugerida de propagação** (`docs/BACKLOG-REDESENHO.md`, item H4): `/ajustes/anilhas` (pequena, exercita quase tudo) → `/analise` (peça-assinatura) → `/treino/[id]` (a mais complexa) → o resto. Uma tela por PR, olhada no celular antes da seguinte. **`/ajustes/anilhas` — ✅ fechada (H4, 2026-08-16).** A rota cheia de fallback (`src/app/ajustes/anilhas/page.tsx`) trocou `.barra-topo` por `TituloTela`+`VoltarFlutuante` — mesmo mecanismo do M9, terceiro consumidor real. Próxima da fila: `/analise`.
 
 ### 6.7 Padrões de transição (D7) — tokens em `tokens.css` desde E4 (2026-08-15), aplicação parcial (H3, 2026-08-16)
 
