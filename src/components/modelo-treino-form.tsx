@@ -12,8 +12,16 @@ import SeletorGrupoMuscular, { type OpcaoGrupo } from "./seletor-grupo-muscular"
 
 export default function ModeloTreinoForm({
   exercicios,
+  naFolha = false,
 }: {
   exercicios: ExercicioDoCatalogo[];
+  /** H1 — dentro da folha, fechar é `router.back()` (o próprio mecanismo de
+   * histórico da folha), não `router.push`: empurrar uma rota nova por cima
+   * da entrada da folha deixaria ela presa por baixo — o voltar do
+   * navegador cairia de novo nela, num modelo que já foi criado. Fora da
+   * folha (rota cheia por URL direta), `push` continua certo: não existe
+   * entrada de folha pra fechar. */
+  naFolha?: boolean;
 }) {
   const router = useRouter();
   const [gruposEscolhidos, setGruposEscolhidos] = useState<string[]>([]);
@@ -54,7 +62,11 @@ export default function ModeloTreinoForm({
     setEnviando(true);
     try {
       await criarModelo(nome.trim(), exerciciosEscolhidos);
-      router.push("/ajustes/modelos");
+      if (naFolha) {
+        router.back();
+      } else {
+        router.push("/ajustes/modelos");
+      }
     } catch {
       setErro("Não foi possível salvar. Tente de novo.");
       setEnviando(false);
