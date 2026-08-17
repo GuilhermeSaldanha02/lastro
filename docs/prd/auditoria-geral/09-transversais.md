@@ -1,0 +1,17 @@
+# 09 — Transversais (aplicam a vários fluxos)
+
+Rodar contra pelo menos 2 telas diferentes cada (indicado por item), não só uma — o ponto é confirmar que não é peculiaridade de uma tela só.
+
+- [ ] **TRANS-01** Voltar do navegador depois de fechar uma folha (`/ajustes/anilhas`, `(.)perfil`). Esperado: fecha a folha (não navega pra trás na pilha de páginas cheias) — comportamento de `router.back()`.
+- [ ] **TRANS-02** Voltar do navegador depois de salvar um modelo **dentro** da folha "criar modelo" (`AJU-20`). Esperado — regra específica de `DECISIONS.md` 2026-08-16 H1: não deveria empilhar rota nova, então voltar não deveria cair de novo na folha de criação. Confirmar.
+- [ ] **TRANS-03** Recarregar (F5) no meio do formulário de registrar série, com campos parcialmente preenchidos. Esperado: perde o que não foi salvo (é esperado, formulário não persiste rascunho) — mas nenhuma série "fantasma" incompleta é criada no servidor.
+- [ ] **TRANS-04** Recarregar (F5) durante a confirmação inline de exclusão (série, treino ou modelo — testar pelo menos 2). Esperado: confirmação reseta, nada é excluído por acidente.
+- [ ] **TRANS-05** Duplo clique rápido no botão "Excluir" de uma confirmação (treino, modelo ou conta — os que têm `useTransition`/"Excluindo…"). Esperado: segunda ativação não dispara segunda exclusão (botão `disabled` durante `pendente`) — checar rede, 1 requisição só.
+- [ ] **TRANS-06** Duplo clique rápido em "Registrar série". Esperado: não cria 2 séries idênticas (checar se há alguma proteção — se não houver, é achado real, não suposição).
+- [ ] **TRANS-07** Navegação por teclado só (Tab/Shift+Tab/Enter/Espaço), sem mouse, em pelo menos 2 fluxos: registrar série completo, excluir um item com confirmação. Esperado: todo controle interativo alcançável, ordem de foco lógica, nenhum "buraco" onde o foco desaparece.
+- [ ] **TRANS-08** Foco visível (D9) em pelo menos 3 elementos distintos (botão, link, campo de formulário) — outline/contorno perceptível ao tabular, não removido por CSS.
+- [ ] **TRANS-09** Viewport 360×640 (piso realista) em pelo menos 3 telas densas: `/treino/[id]` com várias séries, `/analise` com parecer + gráfico, `/ajustes/anilhas` com grade de anilhas. Esperado: sem overflow horizontal, sem texto cortado, números não quebram no meio (regressão histórica de `.metrica__valor`/`.serie`, já corrigida — confirmar que continua corrigida).
+- [ ] **TRANS-10** Alvo de toque mínimo 48×48px (D1) — medir pelo menos 3 botões/links de ação primária via inspeção de CSS computado, não só olhar.
+- [ ] **TRANS-11** Erro de rede genérico simulado onde a UI trata explicitamente (ex.: `/analise`, `/coach` — bloquear a requisição via alguma forma disponível na ferramenta, ou provocar timeout). Esperado: mensagens específicas mapeadas em `06-analise-progressao.md`/`08-perfil-coach.md`, nunca uma tela em branco ou erro não tratado do React (checar console — zero erro não capturado).
+- [ ] **TRANS-12** Sessão expirada no meio de uma ação de rede (ex.: deletar cookie de sessão manualmente entre abrir a tela e clicar "Solicitar Análise" ou enviar pergunta no coach). Esperado: mensagem "Sessão expirada. Faça login novamente." nos 2 fluxos que tratam 401 explicitamente.
+- [ ] **TRANS-13** Console do navegador limpo (sem erro/warning novo introduzido) em pelo menos 5 telas visitadas nesta auditoria — colar a saída crua mesmo quando vazia, é parte da prova, não só quando há erro.

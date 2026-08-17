@@ -987,3 +987,21 @@ Ao começar H3 (pílula/sub-tela), a nota de D7 ("Custo caiu: Next 16 traz `View
 **Custo real do caminho escolhido, honesto:** sem a API nativa, não há como coordenar a saída (fade-out) do conteúdo antigo — o Next troca a árvore de rota instantaneamente antes de qualquer animação de saída poder rodar sem um mecanismo próprio de "segurar o conteúdo antigo por X ms", que é exatamente a complexidade que o `ViewTransition` existiria pra evitar (ver a doc do Next, seção de motivação). Por isso a implementação cobre só a **entrada** (fade-in) da tela nova — não é um crossfade simétrico. Registrado como escopo reduzido explícito, não escondido — ver `docs/BACKLOG-REDESENHO.md` (H3).
 
 **D7 original não é revertida** (o "conjunto contido do M3, sem container transform" continua valendo) — só a frase "custo caiu" está desatualizada. Esta entrada é o registro append-only da correção, HD (log cronológico, nunca reescrever entrada antiga).
+
+---
+
+## 2026-08-17 — E2E com Playwright adotado; reversão de `CLAUDE.md:100` sobre verificação visual por subagente
+
+**O que muda.** Duas decisões do dono, ligadas:
+
+1. **E2E com Playwright, registrado como "candidato à Fase 6, não urgência" em `DECISIONS.md` 2026-08-06, agora é adotado.** MCP oficial (`@playwright/mcp`) instalado via `claude mcp add playwright -s user -- npx -y @playwright/mcp@latest` (escopo de usuário, não fica preso a este projeto). `ADR-004` continua não reescrito (append-only) — esta entrada é a atualização do fato, como já foi feito para Serwist/SW.
+
+2. **`CLAUDE.md:100` ("Verificação visual é do controller — subagente não tem essa ferramenta de forma confiável") é revertida por instrução explícita do dono.** O dono pediu um protocolo de QA de 5 fases (test-plan → implementação → execução por subagente isolado com Playwright, sem editar código → correção → PR) em que o subagente **é** quem prova o item, com print + console cru + rede crua colados — não relatório de agente sem prova, que já era proibido e continua proibido. A regra antiga vira a exceção: eu (controller) ainda faço a verificação visual das minhas próprias mudanças de código (regra inalterada para esse caso), mas quando o objetivo é uma auditoria QA independente de quem implementou, o subagente dirige o navegador e anexa a prova crua — é o mecanismo, não uma degradação da régua.
+
+**Por quê registrar agora, antes de rodar qualquer subagente.** Mesmo motivo do padrão D7/H1: se eu não corrigir `CLAUDE.md` agora, a próxima sessão lê a linha 100 e reverte a decisão sem saber que já foi tomada. `CLAUDE.md` §"Verificação" corrigido nesta mesma sessão.
+
+**Limitação técnica encontrada, registrada por transparência.** O MCP do Playwright foi instalado *durante* a sessão em que foi decidido usá-lo — o registro de ferramentas desta conversa já estava montado antes da instalação, então `mcp__playwright__*` não carregou (confirmado por `ToolSearch` com múltiplas queries, nenhuma retornou). A auditoria desta sessão usa o painel Browser interno (`mcp__Claude_Browser__*`) em vez do Playwright — mesmo princípio (navegador real, print + console + rede crua), ferramenta diferente por causa dessa limitação de sessão. Sessões futuras devem ter `mcp__playwright__*` disponível desde o início.
+
+**Fixture de auditoria.** Usuário de teste isolado criado no Supabase real via `scripts/qa-treino-helper.sh` (mesmo mecanismo do `qa-treino`), seedado com 15 treinos / 5 semanas via SQL direto (mesma técnica autorizada em `DECISIONS.md` 2026-08-06, porque a UI não permite data retroativa) — nunca dado do dono. Limpo ao final da auditoria.
+
+**Como reverter.** Reverter esta entrada e a edição de `CLAUDE.md` §"Verificação" restaura a regra antiga. Não remove o MCP do Playwright instalado (isso é reversível separadamente, `claude mcp remove playwright`).

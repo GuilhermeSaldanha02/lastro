@@ -97,7 +97,7 @@ Windows, restaurar binário: `git checkout SHA -- caminho` — nunca `git show >
 
 Relatório de agente **não é prova**. Antes de mover para Concluído: rodar o comando e ler a saída; mudança visual → **abrir no navegador real e olhar**, em viewport mobile, com contraste AA **medido**; anotar a evidência em `PROGRESS.md`.
 
-Verificação visual é do controller — subagente não tem essa ferramenta de forma confiável, e medição de DOM não substitui olho.
+Verificação visual das minhas próprias mudanças de código é do controller — medição de DOM não substitui olho. **Exceção, decidida em `DECISIONS.md` 2026-08-17:** numa auditoria QA independente de quem implementou (protocolo de 5 fases — test-plan → implementação → subagente isolado com Playwright/navegador real, sem editar código → correção → PR), o subagente dirige o navegador e prova cada item com print + console cru + rede crua anexados. Não é relatório sem prova — é prova crua colada, só que coletada por outro agente, de propósito.
 
 <!-- BEGIN:nextjs-agent-rules -->
 
