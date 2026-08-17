@@ -22,6 +22,7 @@ export default function AnilhasForm({ configInicial }: { configInicial: ConfigAn
   const [erro, setErro] = useState<string | null>(null);
   const [salvo, setSalvo] = useState(false);
   const [pesoAlvo, setPesoAlvo] = useState("");
+  const [modoEdicao, setModoEdicao] = useState(false);
 
   function adicionarAnilha() {
     const peso = Number(novaAnilha.replace(",", "."));
@@ -88,6 +89,15 @@ export default function AnilhasForm({ configInicial }: { configInicial: ConfigAn
       <section className="grupo">
         <div className="grupo__cab">
           <h2 className="grupo__nome">Anilhas disponíveis</h2>
+          {anilhas.length > 0 && (
+            <button
+              type="button"
+              className="botao-textual"
+              onClick={() => setModoEdicao((atual) => !atual)}
+            >
+              {modoEdicao ? "Concluído" : "Editar"}
+            </button>
+          )}
         </div>
 
         {anilhas.length === 0 ? (
@@ -98,6 +108,13 @@ export default function AnilhasForm({ configInicial }: { configInicial: ConfigAn
           // borda) ficam reservados às linhas que navegam; aqui a grade sem
           // cartão é o padrão certo, medido a 360px: 6 anilhas em grade = 3
           // colunas × 2 linhas × 88px, contra 372px das 6 linhas de antes.
+          //
+          // H2 (D8): a lixeira fica SEMPRE no DOM; `.botao-icone--oculto`
+          // (visibility:hidden) some com ela fora do modo de edição sem
+          // desmontar — `.anilha` é flex-column, então remover o botão
+          // encolheria a célula e refluiria a grade inteira medida acima.
+          // Sem confirmação em duas etapas aqui: `removerAnilha` só mexe em
+          // estado local, nada persiste até "Salvar configuração".
           <div className="grade-anilhas">
             {anilhas.map((peso) => (
               <div className="anilha" key={peso}>
@@ -107,8 +124,12 @@ export default function AnilhasForm({ configInicial }: { configInicial: ConfigAn
                 </p>
                 <button
                   type="button"
-                  className="botao-icone"
+                  className={
+                    modoEdicao ? "botao-icone" : "botao-icone botao-icone--oculto"
+                  }
                   aria-label={`Remover anilha de ${formatarKg(peso)} kg`}
+                  aria-hidden={!modoEdicao}
+                  tabIndex={modoEdicao ? undefined : -1}
                   onClick={() => removerAnilha(peso)}
                 >
                   <svg
