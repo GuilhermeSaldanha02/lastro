@@ -1688,6 +1688,17 @@
   margin-bottom: var(--lastro-e-4);
 }
 
+/* IniciarTreino ("Como começar?") reusa .grupo/.grupo__nome dentro deste
+   card escuro — essas classes presumem fundo claro (D8 nunca mediu o par
+   contra o petróleo). Sem isto, --lastro-txt herdado fica ilegível aqui. */
+.destaque .grupo__nome {
+  color: var(--lastro-barra-txt);
+}
+
+.destaque .grupo__cab {
+  border-bottom-color: color-mix(in srgb, var(--lastro-barra-txt) 30%, transparent);
+}
+
 .metricas {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
