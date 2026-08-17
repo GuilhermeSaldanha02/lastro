@@ -274,6 +274,16 @@ Quota checada com uma chamada direta à API antes de gastar esforço recriando d
 > **Atualização (2026-08-16, sessão seguinte): H2 mergeado, sessão entra em H3 — e H3 achou um erro real numa decisão anterior.** A nota de D7 ("custo caiu: Next 16 traz `ViewTransition` do React nativo") não procede — verificado por execução, não só por doc: a API exige `react@canary`, este projeto usa `19.2.8` estável. Correção registrada em `DECISIONS.md` 2026-08-16. Dono escolheu não trocar o canal do React; pílula (crossfade de nível de topo) implementada à mão, só a entrada (sem `ViewTransition` não dá pra coordenar a saída do conteúdo antigo). **Verificação visual ao vivo não rolou nesta sessão** — ambiente de captura preso (aba em `document.visibilityState: hidden`, `computer-use` desconectado); confirmado só por DOM/CSS/WAAPI. Merge seguro pedindo o dono olhar no aparelho. Bloco detalhado abaixo.
 >
 > **Atualização (2026-08-16, mesma sessão): H3 mergeado (dono confirmou "pode subir, vejo no celular depois"), sessão entra em H4.** Propagação do mecanismo M9 pra `/ajustes/anilhas` — terceiro consumidor real (depois de `/catalogo/[id]` e `/treino/[id]`), 1 de 12 telas restantes. Bloco detalhado abaixo.
+>
+> **Atualização (2026-08-16, mesma sessão): H4 — `/analise` também convertida.** Quarto consumidor do M9, primeiro numa aba de nível de topo (sem `VoltarFlutuante` — aba de topo não tem "voltar"). Restam `/ajustes/modelos`, `/ajustes/modelos/novo`, `/perfil`, `/`, `/treino`, `/catalogo`, `/coach`, `/ajustes`. Bloco detalhado abaixo.
+
+### ✅ H4 — `/analise` convertida; primeira aba de nível de topo, sem voltar (2026-08-16)
+
+**Diferença desta tela em relação às 3 conversões anteriores.** `/catalogo/[id]`, `/treino/[id]` e `/ajustes/anilhas` são todas sub-telas alcançadas por navegação — todas ganharam `VoltarFlutuante`. `/analise` é uma das 5 abas de nível de topo (chega direto pela aba inferior) — não existe "voltar" daqui, a própria aba inferior já é a navegação. `TituloTela` aplicado sem `comVoltar`/sem `VoltarFlutuante`, primeiro caso desse tipo.
+
+**O que mudou.** `src/app/analise/page.tsx`: `<header className="barra-topo">` (contexto "Análise semanal" + título "Semana fechada" + avatar) virou `<TituloTela contexto="..." titulo="..." acessorio={<Avatar/>} />`. `src/components/analise-interativa.tsx`: `.corpo--titulo-conteudo` somada ao `.corpo` interno (é ali que a div de conteúdo de fato vive — `page.tsx` não tinha `.corpo` próprio, só passava pro componente client).
+
+**Verificação:** `npx tsc --noEmit` · `npm run test` (133/133) · `npm run lint` (0 erros) · `npm run build` — todos verdes. Chrome real: confirmado por `querySelector` que `.barra-topo` e `.voltar-flutuante` não existem mais nessa tela; `getBoundingClientRect` do avatar (461–509px horizontal) contra o bloco de título (20–254px) sem sobreposição, ambos alinhados no topo (y=20); `scrollWidth === clientWidth` (sem overflow); zero erros no console.
 
 ### ✅ H4 — propagação do mecanismo M9 pra `/ajustes/anilhas`; 1 de 12 telas (2026-08-16)
 
