@@ -137,8 +137,13 @@ export default function FormularioSerie({
     formulario.reset();
   }
 
+  // noValidate: os campos abaixo mantêm required/min/max (semântica pra
+  // leitor de tela e teclado numérico do mobile), mas sem isto o browser
+  // intercepta o submit e mostra seu próprio balão antes de `aoEnviar`
+  // rodar — as mensagens deste componente ("Exercício é obrigatório." etc.)
+  // nunca apareciam (achado real da auditoria, REG-06 a REG-11, 2026-08-17).
   return (
-    <form className="formulario" onSubmit={aoEnviar}>
+    <form className="formulario" onSubmit={aoEnviar} noValidate>
       <div className="campo">
         <label className="campo__rotulo" htmlFor="exercicio_id">
           Exercício
