@@ -606,13 +606,13 @@
    primeiro grupo pode ficar atrás da barra depois do foco/scroll
    automático (relato do dono, 2026-08-10). `scroll-margin-top` corrige
    isso na rolagem nativa, sem JS.
-   M9 (2026-08-15): `/treino/[id]` não tem mais `.barra-topo` fixa — aqui
-   esse offset virou reserva sem função (espaço vazio extra acima do campo
-   focado, não incorreto, só desnecessário). Não removido porque `.grupo`
-   ainda é compartilhada com `/ajustes/modelos/novo` (`SeletorGrupoMuscular`),
-   que continua com a barra fixa — lá o offset segue sendo o mesmo bug real
-   de 2026-08-10. Decisão explícita: fica assim até a propagação do M9
-   converter também essa tela. */
+   M9 (2026-08-16): com as 13/13 telas convertidas (H4), nenhuma tela tem
+   mais `.barra-topo` fixa — este offset virou reserva sem função em TODO
+   lugar que usa `.grupo` (espaço vazio extra acima do campo focado, não
+   incorreto, só desnecessário). Não removido: é candidato de limpeza junto
+   de `.barra-topo`/`--lastro-clearance-topo` (código morto, sem consumidor
+   de página), decisão de remoção não tomada ainda — ver nota em
+   `docs/BACKLOG-REDESENHO.md`, seção H4. */
 .grupo {
   scroll-margin-top: var(--lastro-clearance-topo);
 }
