@@ -1,12 +1,61 @@
 # 05 — Catálogo, `/catalogo` e `/catalogo/[id]`
 
-- [ ] **CAT-01** Acessar `/catalogo`. Esperado: exercícios agrupados por grupo muscular, ordem alfabética pt-BR.
-- [ ] **CAT-02** Aviso de dicas faltantes no topo, se `semDica > 0`. Esperado: texto exato "{N} de {total} exercício(s) está(ão) sem dica. Elas são escritas e revisadas por pessoa, nunca geradas — por isso o campo fica vazio até você preencher." — conferir os números N/total batem com a contagem real.
-- [ ] **CAT-03** Clicar num exercício sem dica. Esperado: ficha em `/catalogo/[id]` sem seção de dica (ou seção vazia — documentar o que realmente aparece), sem texto gerado.
+> **NOTA DE INTEGRIDADE DO FIXTURE (lida antes de CAT-05/06):** o texto do
+> plano assume "Supino reto com barra, tem 15 registros da seed". Ao vivo,
+> `/catalogo/339a305e-4c52-4744-86c5-6b830b707032` (Supino reto com barra) e
+> `/catalogo/1db2c316-4c25-4f71-b2f4-6c30ceb75259` (Agachamento livre) mostram
+> **45 séries "valendo"** (15 treinos × 3 séries cada), não 15. Os 15 treinos
+> da seed (`/treino`, datas 13 jul → 14 ago) aparecem todos com status
+> "Treino em andamento" (nenhum finalizado), e **toda** série de todos os 15
+> treinos tem `criado_em` = hoje (17 ago) — ou seja, os dados foram inseridos
+> hoje com a data do treino "back-dated" só no campo próprio do treino, não
+> no `criado_em` de cada série. Isso é a causa raiz do que CAT-05 reprova
+> abaixo. Registrado aqui para quem for revisar não gastar tempo achando
+> "15 registros" que não existem.
+
+- [x] **CAT-01** Acessar `/catalogo`. Esperado: exercícios agrupados por grupo muscular, ordem alfabética pt-BR.
+  PROVA: `get_page_text` em `http://localhost:3002/catalogo` (logado como `qa-audit-geral2`) retorna os grupos na ordem
+  `Abdômen(10), Bíceps(9), Costas(14), Glúteos(9), Ombro(12), Panturrilha(5), Peito(15), Posterior de coxa(7), Quadríceps(12), Tríceps(9)`
+  — alfabética pt-BR correta. Dentro de cada grupo os exercícios também vêm em ordem alfabética (ex. Abdômen: "Abdominal infra, Abdominal máquina, Abdominal na polia, Abdominal oblíquo na bicicleta, Abdominal supra, Elevação de pernas, Prancha, Prancha lateral, Rotação de tronco máquina, Rotação de tronco no cabo"). Total somado dos contadores por grupo = 102, batendo com o aviso do topo (ver CAT-02).
+  Observação lateral (não bloqueia o item): em Ombro, o item está grafado "Elevacao lateral com halteres" (sem cedilha/til), diferente de "Elevação lateral máquina" logo abaixo — typo no dado semeado, não afeta a ordenação porque o collator pt-BR ignora acento na comparação.
+
+- [x] **CAT-02** Aviso de dicas faltantes no topo, se `semDica > 0`. Esperado: texto exato "{N} de {total} exercício(s) está(ão) sem dica. Elas são escritas e revisadas por pessoa, nunca geradas — por isso o campo fica vazio até você preencher." — conferir os números N/total batem com a contagem real.
+  PROVA: screenshot de `/catalogo` (390×844) mostra exatamente:
+  "102 de 102 exercícios estão sem dica. Elas são escritas e revisadas por pessoa, nunca geradas — por isso o campo fica vazio até você preencher."
+  Contagem manual dos 102 exercícios listados na página (soma dos contadores por grupo: 10+9+14+9+12+5+15+7+12+9 = 102) confere com N=102 e total=102 exibidos. Texto bate literalmente com o esperado, incluindo pluralização "exercício(s) está(ão)" → "exercícios estão".
+
+- [x] **CAT-03** Clicar num exercício sem dica. Esperado: ficha em `/catalogo/[id]` sem seção de dica (ou seção vazia — documentar o que realmente aparece), sem texto gerado.
+  PROVA: clique ao vivo em "Abdominal infra" → navegou para `/catalogo/d08f9e23-09cd-40c5-a56c-f2a7cb9ac73b`. `read_page` (filter:all) da ficha mostra apenas: heading "Abdominal infra" + `<p class="vazio">` com o texto de série vazia (ver CAT-07) + nav inferior. Nenhum elemento de dica, nenhuma seção vazia com placeholder, nenhum texto gerado. Screenshot confirma visualmente (só título + card tracejado "Nenhuma série valendo..."). Reforça: como os 102/102 exercícios do catálogo estão sem dica (CAT-02), também confirmei em "Supino reto com barra" e "Agachamento livre" (que têm histórico extenso, CAT-05/06) que nenhum dos dois renderiza bloco de dica — descarta a hipótese de a ausência de dica estar ligada à ausência de histórico.
+
 - [ ] **CAT-04** Clicar num exercício com dica curada. Esperado: dica aparece na ficha.
+  **[NÃO COBERTO]** — motivo: o aviso do topo do catálogo (CAT-02) e a contagem confirmam que **102 de 102** exercícios do catálogo estão sem dica curada. Não existe, no estado atual do banco, nenhum exercício com `dicaExecucao` preenchida para clicar e verificar. Item não pode ser exercitado sem primeiro cadastrar uma dica (fora do escopo desta auditoria, que é leitura).
+
 - [ ] **CAT-05** Ficha de exercício com histórico (Supino reto com barra, tem 15 registros da seed). Esperado: lista mais-recente-primeiro, `reps × peso kg` batendo com o que foi seedado.
+  **REPROVADO.**
+  Repro exato: logado como `qa-audit-geral2`, acessar `/catalogo/339a305e-4c52-4744-86c5-6b830b707032` (Supino reto com barra) ou `/catalogo/1db2c316-4c25-4f71-b2f4-6c30ceb75259` (Agachamento livre, mesma seed, progressão de carga mais fácil de ler: 70kg→85kg).
+  Esperado: primeira linha da lista = série do treino mais recente (14 ago), última linha = treino mais antigo (13 jul), cada linha com a data real daquele treino.
+  Real: a primeira linha é a série do treino **mais antigo** (`c338e4c7`, "SEGUNDA · 13 JUL", peso 70kg em Agachamento) e a última linha é o treino **mais recente** (`ac8113db`, 14 ago, peso 85kg) — ordem invertida. Confirmado cruzando os `treinoId` de cada `<li><a href="/treino/{id}">` da ficha do exercício com as datas reais em `/treino` (lista "Histórico": 14 ago, 12 ago, 10 ago, 7 ago, 5 ago, 3 ago, 31 jul, 29 jul, 27 jul, 24 jul, 22 jul, 20 jul, 17 jul, 15 jul, 13 jul). Além disso, **toda** linha da ficha exibe a data "17 ago" (hoje), independentemente do treino real a que pertence.
+  Causa raiz (lida em código, não modificada): `src/lib/dados/treino.ts:171` faz `order("criado_em", {ascending:false})` e `src/app/catalogo/[id]/page.tsx:54` formata a data a partir do mesmo `criado_em` de cada série — não do campo de data do treino. Nesta seed, `criado_em` de toda série é hoje (ver nota de integridade do fixture no topo do arquivo), então a ordenação "mais recente por criado_em" não corresponde à data nominal do treino, e a UI mostra a data errada em toda linha. Em produção isso divergiria sempre que uma série for lançada/editada num momento diferente da data do treino a que pertence (ex.: completar o registro depois, ou editar um treino passado) — não é só artefato deste fixture, é uma premissa frágil do código (`criado_em` da linha ≠ data do treino).
+  Consequência direta: essa mesma inversão quebra CAT-06 (ver abaixo — mesma causa raiz, não bug independente).
+
 - [ ] **CAT-06** Ficha de exercício com recorde no histórico. Esperado: etiqueta de Recorde no item correto (o de maior peso na série "valendo"), calculado cronologicamente (não é sempre o mais recente).
-- [ ] **CAT-07** Ficha de exercício **sem** nenhuma série valendo registrada ainda (escolher um do catálogo fora da seed). Esperado: `<p className="vazio">` "Nenhuma série valendo registrada ainda para {exercicio.nome}."
-- [ ] **CAT-08** Clicar num item do histórico na ficha do exercício. Esperado: navega para `/treino/{treinoId}` correto (o treino daquele registro específico).
-- [ ] **CAT-09** Rodapé fixo do catálogo. Esperado: texto "As dicas deste catálogo não substituem acompanhamento profissional. Dor, limitação ou lesão são assunto de fisioterapeuta ou médico." sempre visível.
-- [ ] **CAT-10** Acessar `/catalogo/{uuid-inexistente}`. Esperado: `notFound()` → 404.
+  **REPROVADO — mesma causa raiz de CAT-05, não um bug independente.**
+  Repro exato: acessar `/catalogo/1db2c316-4c25-4f71-b2f4-6c30ceb75259` (Agachamento livre) logado como `qa-audit-geral2`. A carga sobe de forma monotônica e clara ao longo de 15 sessões: 70, 71, 72.5, 72.5, 74, 75, 76, 77, 77.5, 79, 80, 81, 82.5, 83.5, 85 kg (reps 5-6, bem abaixo do teto `E1RM_REPS_MAX=12`; 15 `treinoId` distintos, acima do piso `MINIMO_SESSOES_PARA_RECORDE=3`) — condições claramente elegíveis para pelo menos um PR.
+  Esperado: pelo menos uma linha com a etiqueta `★ recorde` (`src/components/etiqueta-recorde.tsx`).
+  Real: `get_page_text` da ficha inteira (45 linhas) não contém a palavra "recorde" em nenhum ponto — nenhuma etiqueta aparece, confirmado por texto bruto e por scroll+screenshot em 4 pontos da lista.
+  Mecanismo (lido em código, não modificado — `recorde-serie.ts` não é o problema, os testes dele continuam válidos): `catalogo/[id]/page.tsx:32` faz `cronologico = [...historico].reverse()` sob a premissa (comentário do próprio arquivo, linha 28) de que `historico` "vem do mais recente pro mais antigo". CAT-05 prova que, nesta seed, `historico` vem do **mais antigo pro mais recente** (efeito do `criado_em` idêntico a "hoje" em toda linha). Logo `cronologico` fica, na prática, mais-recente-primeiro — o inverso do que `marcarRecordesHistoricos` espera. Cada série é comparada contra as sessões **futuras** (mais pesadas), nunca contra as passadas (mais leves): índice 0 = 85kg contra histórico vazio (não elegível), índice 3 (primeiro após o piso de 3 sessões) = 83.5kg contra um histórico de sessões de 85kg → nunca `e1rmNova > e1rmMaximoAnterior`. Resultado: nenhuma das 45 linhas nunca é marcada, mesmo havendo progressão real. Corrigir CAT-05 (ordenar/rotular por data do treino, não por `criado_em` da série) deve destravar este item também — não precisa de correção separada em `recorde-serie.ts`.
+
+- [x] **CAT-07** Ficha de exercício **sem** nenhuma série valendo registrada ainda (escolher um do catálogo fora da seed). Esperado: `<p className="vazio">` "Nenhuma série valendo registrada ainda para {exercicio.nome}."
+  PROVA: exercício escolhido "Abdominal infra" (`d08f9e23-09cd-40c5-a56c-f2a7cb9ac73b`), catálogo geral, nunca usado pelo `qa-audit-geral2` (fora de Supino/Agachamento/Rosca, que têm histórico da seed). `document.querySelector('.vazio')?.textContent` executado ao vivo na página retornou exatamente:
+  `"Nenhuma série valendo registrada ainda para Abdominal infra."`
+  — bate com o texto esperado. Screenshot confirma renderização visual (card tracejado com o texto). `document.querySelector('[class*="dica"]')` retornou `null` na mesma página, confirmando ausência de qualquer bloco de dica residual.
+
+- [x] **CAT-08** Clicar num item do histórico na ficha do exercício. Esperado: navega para `/treino/{treinoId}` correto (o treino daquele registro específico).
+  PROVA: na ficha de "Agachamento livre", clique ao vivo (coordenada real, não navegação direta por URL) na primeira linha da lista (série "6×70kg") → navegou para `http://localhost:3002/treino/c338e4c7-9d35-45c0-889b-126be6c28a5f` (confirmado via `tabs_context_mcp` mostrando a URL da aba após o clique). `get_page_text` da página de destino mostra "SEGUNDA · 13 JUL" com a seção "Agachamento livre" contendo a série `6×70kg VALENDO` — exatamente o registro clicado, treino correto. O `href` de cada item (`/treino/{treinoId}`) já embutia o id certo por linha (`read_page` mostrou ids diferentes por bloco de 3 séries, um por treino).
+
+- [x] **CAT-09** Rodapé fixo do catálogo. Esperado: texto "As dicas deste catálogo não substituem acompanhamento profissional. Dor, limitação ou lesão são assunto de fisioterapeuta ou médico." sempre visível.
+  PROVA (texto): `read_page`/`get_page_text` de `/catalogo` confirmam o texto literal ao final do conteúdo: "As dicas deste catálogo não substituem acompanhamento profissional. Dor, limitação ou lesão são assunto de fisioterapeuta ou médico."
+  **Ressalva registrada, não reprovado:** não é um rodapé com `position: fixed`/`sticky`. Inspeção de CSS (`sistema.css:1540`, classe `.aviso-saude`: `position: static`, só `border-top` + `margin-top`) e verificação ao vivo (`getBoundingClientRect` com `window.scrollTo(0,3000)`) confirmam que o aviso fica no fim do conteúdo rolável, depois dos 102 exercícios (`rectTop` ~4463px de um documento de 7647px de altura total com scroll em 3000px — fora da viewport, não visível). Screenshot no meio da lista (seção Ombro) mostra só o card de exercícios e a barra de navegação inferior fixa (`AbaInferior`, essa sim `position:fixed`), sem o aviso de saúde à vista. Não encontrei em `docs/` (`DESIGN.md`, PRD) uma especificação que exija posição fixa/sticky para este aviso especificamente — "rodapé fixo" no enunciado do item é lido aqui como "nota de fechamento sempre presente na tela" (existe incondicionalmente, não depende de estado), não como elemento fixado na viewport durante o scroll. Sob essa leitura o item passa; sob uma leitura literal de "sempre visível" = visível a qualquer momento do scroll, o item reprovaria. Fica registrado para o dono decidir qual leitura vale.
+
+- [x] **CAT-10** Acessar `/catalogo/{uuid-inexistente}`. Esperado: `notFound()` → 404.
+  PROVA: acesso a `/catalogo/00000000-0000-0000-0000-000000000000` logado como `qa-audit-geral2`. `read_network_requests` confirma `statusCode: 404` para essa URL. `get_page_text` retorna "404 / This page could not be found." Screenshot confirma a tela de 404 padrão do Next.js. (Nota lateral, não bloqueia o item: o overlay de dev do Next.js mostrou "1 Issue" com um console error não relacionado — "Encountered a script tag while rendering React component" — presente já antes de qualquer teste desta sessão; parece um aviso de build-dev genérico, não específico da rota 404.)
