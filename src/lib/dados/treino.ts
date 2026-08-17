@@ -146,6 +146,12 @@ export type SerieHistorica = {
   rir: number | null;
   pesoCorporalIncluso: boolean;
   criadoEm: string;
+  /** Data NOMINAL do treino a que a série pertence (`treino.data`) — é o
+   * que ordena e o que a UI mostra, não `criadoEm` (achado de auditoria,
+   * 2026-08-17: uma série lançada/editada num momento diferente da data
+   * do treino — completar o registro depois, editar um treino passado —
+   * fazia a ordem e a etiqueta de data ficarem erradas). */
+  dataTreino: string;
   /** Pra contar SESSÕES distintas (piso de PR), não só séries — um treino
    * pode ter várias séries do mesmo exercício e ainda ser uma sessão só. */
   treinoId: string;
@@ -158,14 +164,24 @@ export type SerieHistorica = {
  * (não a última série do treino inteiro), e detecção de PR em tempo real.
  * Aquecimento nunca entra (FF4) — não é "o que a pessoa fez de verdade" pra
  * fins de comparação, é preparação.
+ *
+ * Ordenado por `treino.data` (a data NOMINAL do treino), não por
+ * `serie.criado_em` — ver nota em `SerieHistorica.dataTreino`.
  */
 export async function historicoDoExercicio(
   exercicioId: string,
 ): Promise<SerieHistorica[]> {
   const { supabase } = await usuarioAutenticadoOuErro();
+  // Sem `.order()` na tabela relacionada — PostgREST não ordena as linhas
+  // de `serie` por uma coluna da tabela embutida (`treino.data`) de forma
+  // confiável (testado: saiu ascendente mesmo pedindo `ascending: false`).
+  // Busca as 200 mais recentes por `criado_em` (heurística de janela,
+  // igual antes) e reordena no lado do JS pela data real do treino.
   const { data, error } = await supabase
     .from("serie")
-    .select("reps, peso, rir, peso_corporal_incluso, criado_em, treino_id")
+    .select(
+      "reps, peso, rir, peso_corporal_incluso, criado_em, treino_id, treino:treino_id(data)",
+    )
     .eq("exercicio_id", exercicioId)
     .eq("tipo", "valendo")
     .order("criado_em", { ascending: false })
@@ -181,16 +197,28 @@ export async function historicoDoExercicio(
     peso_corporal_incluso: boolean;
     criado_em: string;
     treino_id: string;
+    treino: { data: string } | { data: string }[] | null;
   };
 
-  return ((data ?? []) as Linha[]).map((s) => ({
-    reps: s.reps,
-    peso: Number(s.peso),
-    rir: s.rir,
-    pesoCorporalIncluso: s.peso_corporal_incluso,
-    criadoEm: s.criado_em,
-    treinoId: s.treino_id,
-  }));
+  const historico = ((data ?? []) as Linha[]).map((s) => {
+    const treino = Array.isArray(s.treino) ? s.treino[0] : s.treino;
+    return {
+      reps: s.reps,
+      peso: Number(s.peso),
+      rir: s.rir,
+      pesoCorporalIncluso: s.peso_corporal_incluso,
+      criadoEm: s.criado_em,
+      dataTreino: treino?.data ?? s.criado_em,
+      treinoId: s.treino_id,
+    };
+  });
+
+  historico.sort((a, b) => {
+    const porData = b.dataTreino.localeCompare(a.dataTreino);
+    return porData !== 0 ? porData : b.criadoEm.localeCompare(a.criadoEm);
+  });
+
+  return historico;
 }
 
 /** Catálogo de exercícios disponíveis para o formulário (SDD §5.1). */
