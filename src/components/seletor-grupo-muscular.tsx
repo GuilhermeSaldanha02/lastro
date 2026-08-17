@@ -6,7 +6,7 @@
 // do formulário filtra por isso. Começa sem nada marcado, de propósito —
 // mesma regra do formulário de série (DECISIONS.md 2026-08-07, "sempre
 // iniciar em branco").
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 export type OpcaoGrupo = { id: string; nome: string };
 
@@ -18,6 +18,17 @@ export default function SeletorGrupoMuscular({
   onConfirmar: (grupos: string[]) => void;
 }) {
   const [selecionados, setSelecionados] = useState<string[]>([]);
+  const tituloRef = useRef<HTMLHeadingElement>(null);
+
+  // Esta seção só existe quando `formularioAberto` liga (treino-detalhe.tsx)
+  // — é conteúdo revelado, não uma tela nova. Sem isto, quem navega só por
+  // teclado ativa "Adicionar exercício" e o foco não entra aqui: o Tab
+  // seguinte pula pro resto da página (achado real, auditoria 2026-08-17,
+  // TRANS-07). Padrão WAI-ARIA APG para conteúdo revelado dinamicamente:
+  // mover o foco pro título que descreve o que apareceu.
+  useEffect(() => {
+    tituloRef.current?.focus();
+  }, []);
 
   function alternar(id: string) {
     setSelecionados((atual) =>
@@ -28,7 +39,9 @@ export default function SeletorGrupoMuscular({
   return (
     <section className="grupo">
       <div className="grupo__cab">
-        <h2 className="grupo__nome">Grupo muscular de hoje</h2>
+        <h2 className="grupo__nome" tabIndex={-1} ref={tituloRef}>
+          Grupo muscular de hoje
+        </h2>
       </div>
       <p className="campo__nota">
         Escolha um ou mais — a lista de exercícios mostra só esses grupos.
