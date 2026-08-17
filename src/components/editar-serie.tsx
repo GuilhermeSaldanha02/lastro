@@ -66,8 +66,12 @@ export default function EditarSerie({
     }
   }
 
+  // noValidate: mesma razão de FormularioSerie — required/min/max nativos
+  // interceptavam o submit antes de `aoEnviar` rodar, e as mensagens deste
+  // componente nunca apareciam (achado real da auditoria, TDET-04/05,
+  // 2026-08-17). Atributos mantidos por semântica, só sem bloquear o JS.
   return (
-    <form className="formulario" onSubmit={aoEnviar}>
+    <form className="formulario" onSubmit={aoEnviar} noValidate>
       <div className="campo">
         <label className="campo__rotulo" htmlFor={`tipo-${serie.id}`}>
           {serie.exercicioNome}
