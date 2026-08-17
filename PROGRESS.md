@@ -278,6 +278,18 @@ Quota checada com uma chamada direta à API antes de gastar esforço recriando d
 > **Atualização (2026-08-16, mesma sessão): H4 — `/analise` também convertida.** Quarto consumidor do M9, primeiro numa aba de nível de topo (sem `VoltarFlutuante` — aba de topo não tem "voltar"). Restam `/ajustes/modelos`, `/ajustes/modelos/novo`, `/perfil`, `/`, `/treino`, `/catalogo`, `/coach`, `/ajustes`. Bloco detalhado abaixo.
 >
 > **Atualização (2026-08-16, mesma sessão): combinado com o dono mudar de ritmo — faço, commito, mergeio, sigo pelo resto do backlog sem parar pra pedir "pode subir" a cada PR; o teste geral no aparelho fica pra o fim de tudo.** H4 fechado: as 8 telas restantes (`/`, `/treino`, `/catalogo`, `/ajustes` — abas de topo; `/ajustes/modelos`, `/ajustes/modelos/novo`, `/perfil`, `/coach` — sub-telas) convertidas numa PR só. **13/13 telas com o mecanismo M9 — `.barra-topo` não tem mais nenhum consumidor no app** (`grep` confirma). Sessão segue pro que resta de H1/H2/H3. Bloco detalhado abaixo.
+>
+> **Atualização (2026-08-16, mesma sessão): H2 — lista de treinos também no modo de edição.** Segundo consumidor real (depois de `/ajustes/modelos`), primeiro com alvo de toque concorrente na mesma linha (link de navegação + lixeira) — resolvido sem misturar problemas: o modo de edição só decide a visibilidade da lixeira, nunca o que a linha faz ao tocar. Restam grade de anilhas e grade de séries em H2; H1 (criar modelo) e H3 (sub-tela) seguem pendentes. Bloco detalhado abaixo.
+
+### ✅ H2 — lista de treinos (`/treino`); segundo consumidor, primeiro com alvo concorrente (2026-08-16)
+
+**Diferença em relação a `/ajustes/modelos`.** Aquele era o caso mais barato (nome + lixeira, sem navegação). Aqui a linha tem `.item__link` (navega pro detalhe do treino) além da lixeira — dois alvos de toque reais na mesma linha. Resolvido sem misturar problemas: o modo de edição só decide se a lixeira renderiza; o que a linha faz ao ser tocada (navegar) nunca muda, ligado ou desligado.
+
+**Componente novo `src/components/lista-treinos.tsx`**, mesmo mecanismo de `ListaModelos` — `modoEdicao` local, `ExcluirTreino` só monta quando ligado (resolve o mesmo risco de dessincronia por desenho, não por sincronização manual). Cabeçalho "Histórico" + toggle "Editar"/"Concluído" via `.grupo__cab` — reuso da mesma classe já usada em `ListaModelos`; o `<h2>` manteve `.doc__secao` (a classe original da tela, não `.grupo__nome`, pra não mudar a aparência do título que já existia ali).
+
+**Verificação:** `npx tsc --noEmit` · `npm run test` (133/133) · `npm run lint` (0 erros) · `npm run build` — todos verdes. `grep window.confirm` → só comentários. Chrome real, com os 7 treinos reais da sessão de dev (não dado de teste criado pra isso — dado que já existia): estado padrão sem lixeira em nenhuma linha; toggle liga → 7 lixeiras, alvo 48×48 confirmado; `.item__link` e a lixeira lado a lado sem sobreposição (medido: borda direita do link = borda esquerda da lixeira); excluir → confirma → aparece corretamente; desligar o modo de edição no meio da confirmação → confirmação cancelada, os 7 treinos continuam intactos (nada apagado). Zero erros no console.
+
+**Restam em H2:** grade de anilhas (reflow de layout já medido em M3) e grade de séries (o mais arriscado — linha inteira é `role="button"` de edição inline).
 
 ### ✅ H4 — fechado: as 8 telas restantes convertidas numa PR só (2026-08-16)
 
