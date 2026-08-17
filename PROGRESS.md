@@ -276,6 +276,22 @@ Quota checada com uma chamada direta à API antes de gastar esforço recriando d
 > **Atualização (2026-08-16, mesma sessão): H3 mergeado (dono confirmou "pode subir, vejo no celular depois"), sessão entra em H4.** Propagação do mecanismo M9 pra `/ajustes/anilhas` — terceiro consumidor real (depois de `/catalogo/[id]` e `/treino/[id]`), 1 de 12 telas restantes. Bloco detalhado abaixo.
 >
 > **Atualização (2026-08-16, mesma sessão): H4 — `/analise` também convertida.** Quarto consumidor do M9, primeiro numa aba de nível de topo (sem `VoltarFlutuante` — aba de topo não tem "voltar"). Restam `/ajustes/modelos`, `/ajustes/modelos/novo`, `/perfil`, `/`, `/treino`, `/catalogo`, `/coach`, `/ajustes`. Bloco detalhado abaixo.
+>
+> **Atualização (2026-08-16, mesma sessão): combinado com o dono mudar de ritmo — faço, commito, mergeio, sigo pelo resto do backlog sem parar pra pedir "pode subir" a cada PR; o teste geral no aparelho fica pra o fim de tudo.** H4 fechado: as 8 telas restantes (`/`, `/treino`, `/catalogo`, `/ajustes` — abas de topo; `/ajustes/modelos`, `/ajustes/modelos/novo`, `/perfil`, `/coach` — sub-telas) convertidas numa PR só. **13/13 telas com o mecanismo M9 — `.barra-topo` não tem mais nenhum consumidor no app** (`grep` confirma). Sessão segue pro que resta de H1/H2/H3. Bloco detalhado abaixo.
+
+### ✅ H4 — fechado: as 8 telas restantes convertidas numa PR só (2026-08-16)
+
+**Mudança de ritmo, combinada com o dono.** A partir daqui: implemento, verifico, commito e mergeio sem pausar pra pedir autorização de merge a cada PR — o teste geral de verdade (aparelho físico) fica concentrado pro fim de todo o backlog, não PR a PR. Isso não muda o que é verificado antes de cada commit (os 4 comandos + Chrome real continuam obrigatórios), só quem decide se sobe: passa a ser eu, dentro do que já foi combinado.
+
+**As 8 telas, numa PR.** 4 abas de nível de topo (`/`, `/treino`, `/catalogo`, `/ajustes`) — `TituloTela` sem `VoltarFlutuante`, mesmo raciocínio de `/analise`: não existe "voltar" partindo de uma aba primária. 4 sub-telas (`/ajustes/modelos`, `/ajustes/modelos/novo`, `/perfil`, `/coach`) — `VoltarFlutuante` apontando pro pai real de navegação, não necessariamente o que o texto de "contexto" sugere.
+
+**Regra descoberta e corrigida no meio do trabalho:** `contexto`/`titulo` do `TituloTela` preservam o texto EXATO que o `.barra-topo` antigo usava em cada tela (não são inventados nem seguem a hierarquia de rotas) — já o destino do `VoltarFlutuante` segue a hierarquia de navegação REAL, independente do texto do contexto. Os dois podem divergir (`/treino/[id]`: contexto é uma data, volta pra `/treino`) e isso é esperado, não bug. Errei isso uma vez em `/ajustes/modelos/novo` (pus contexto="Modelos de treino" por analogia malfeita) e corrigi pra "Ajustes" — o valor original — antes de commitar.
+
+**Achado na verificação de `/perfil`, quase virou falso alarme.** Clique automatizado não abria a folha do H1 nem navegava — a aba de teste estava presa em `document.visibilityState: "hidden"` (mesma classe de problema de ambiente já vista antes nesta sessão, não bug de código). Confirmado disparando `link.click()` via JS direto: a folha abriu normalmente, mecanismo do H1 intacto.
+
+**Verificação:** `npx tsc --noEmit` · `npm run test` (133/133) · `npm run lint` (0 erros) · `npm run build` — todos verdes. Chrome real, as 8 telas verificadas uma a uma por medição de DOM: `.barra-topo` ausente e `.titulo-tela` presente em todas; `VoltarFlutuante` com href/rótulo corretos nas 4 sub-telas; zero sobreposição entre círculo de voltar e título (medido) em todas; zero overflow horizontal em todas; texto de contexto/título conferido contra o `.barra-topo` original tela por tela. Zero erros no console.
+
+**H4 fechado — 13/13 telas do app com o mecanismo M9.** `grep` confirma zero consumidores restantes de `.barra-topo` em `src/`. `.barra-topo`/`--lastro-clearance-topo` viram candidatos a remoção de `sistema.css`/`tokens.css` — não removidos aqui, decisão fica pra depois (nenhum item do backlog pediu essa limpeza explicitamente).
 
 ### ✅ H4 — `/analise` convertida; primeira aba de nível de topo, sem voltar (2026-08-16)
 

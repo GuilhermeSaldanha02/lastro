@@ -15,6 +15,7 @@ import ExcluirTreino from "@/components/excluir-treino";
 import SetaNavegacao from "@/components/seta-navegacao";
 import Avatar from "@/components/avatar";
 import IniciarTreino from "@/components/iniciar-treino";
+import TituloTela from "@/components/titulo-tela";
 
 /** "2026-08-06" → "6 ago". A data já vem local; não há fuso a converter. */
 function formatarData(iso: string): string {
@@ -43,17 +44,14 @@ export default async function PaginaTreino() {
 
   return (
     <main className="tela">
-      <header className="barra-topo">
-        <div className="barra-topo__acoes">
-          <div className="barra-topo__info">
-            <p className="barra-topo__contexto">lastro</p>
-            <h1 className="barra-topo__titulo">Treinos</h1>
-          </div>
-          {perfil && <Avatar nome={perfil.nome} avatarUrl={perfil.avatarUrl} />}
-        </div>
-      </header>
+      {/* Aba de nível de topo — sem `VoltarFlutuante`. */}
+      <TituloTela
+        contexto="lastro"
+        titulo="Treinos"
+        acessorio={perfil && <Avatar nome={perfil.nome} avatarUrl={perfil.avatarUrl} />}
+      />
 
-      <div className="corpo corpo--com-nav transicao-pilula">
+      <div className="corpo corpo--com-nav corpo--titulo-conteudo transicao-pilula">
         <h2 className="doc__secao">Histórico</h2>
 
         {treinos.length === 0 ? (

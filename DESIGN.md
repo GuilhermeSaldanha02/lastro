@@ -589,20 +589,20 @@ Cada peça vem de um app premiado (Apple Design Award ou finalista), recriada na
 
 | Tela | Peças | O que ganha |
 |---|---|---|
-| `/` (início) | 1 · 2 · 3 · 6 | o estado do dia vira grade de métricas; a ação de treinar deixa de ser bloco entre blocos |
-| `/treino` | 3 · 6 · 10 | iniciar/continuar como ação clara; escolher modelo vira folha |
-| `/treino/[id]` | 1 · 7 · 8 · 10 | séries em colunas com cabeçalho; registrar e editar viram folha; "adicionar" fantasma |
+| `/` (início) | 1 · 2 · 3 · 6 | o estado do dia vira grade de métricas; a ação de treinar deixa de ser bloco entre blocos. **M9 propagado ✅ (H4, 2026-08-16)** — aba de topo, sem `VoltarFlutuante` |
+| `/treino` | 3 · 6 · 10 | iniciar/continuar como ação clara; escolher modelo vira folha. **M9 propagado ✅ (H4, 2026-08-16)** — aba de topo, sem `VoltarFlutuante` |
+| `/treino/[id]` | 1 · 7 · 8 · 10 | séries em colunas com cabeçalho; registrar e editar viram folha; "adicionar" fantasma. **M9 propagado ✅ (M9, 2026-08-15)** — feita na própria PR que construiu o mecanismo |
 | `/analise` | 1 · 2 · 4 · 6 · 9 | a peça-assinatura: serifa na leitura, grade no dado, segmentado no gráfico. **M9 propagado ✅ (H4, 2026-08-16)** — `TituloTela` sem `VoltarFlutuante` (aba de nível de topo não tem "voltar") |
-| `/catalogo` | 5 · 3 | grupos viram chips; fichas perdem moldura e viram linhas de navegação |
-| `/catalogo/[id]` | 1 · 2 · 4 · 7 | histórico com cabeçalho de coluna; segmentado troca a métrica |
-| `/coach` | 9 | a única tela onde balão se justifica; título e prosa na voz do produto |
-| `/ajustes` | 3 | já é a mais correta hoje; só herda a linha de navegação nova |
+| `/catalogo` | 5 · 3 | grupos viram chips; fichas perdem moldura e viram linhas de navegação. **M9 propagado ✅ (H4, 2026-08-16)** — aba de topo, sem `VoltarFlutuante` |
+| `/catalogo/[id]` | 1 · 2 · 4 · 7 | histórico com cabeçalho de coluna; segmentado troca a métrica. **M9 propagado ✅ (M9, 2026-08-15)** — feita na própria PR que construiu o mecanismo |
+| `/coach` | 9 | a única tela onde balão se justifica; título e prosa na voz do produto. **M9 propagado ✅ (H4, 2026-08-16)** — `VoltarFlutuante` pra `/ajustes` |
+| `/ajustes` | 3 | já é a mais correta hoje; só herda a linha de navegação nova. **M9 propagado ✅ (H4, 2026-08-16)** — aba de topo, sem `VoltarFlutuante` |
 | `/ajustes/anilhas` | 1 · 2 · 8 · 10 | anilhas viram grade (88px no lugar de 372px); **navegar até aqui vira folha ✅ (H1, 2026-08-15)** — a rota cheia de fallback (URL direta/refresh) **✅ M9 propagada (H4, 2026-08-16)**, `TituloTela`+`VoltarFlutuante` no lugar de `.barra-topo`. Peça 1 (rótulo micro + valor grande) auditada: os valores de anilha já vivem sob o cabeçalho de seção "Anilhas disponíveis", que cumpre o papel de contexto — nenhum trabalho novo considerado necessário |
-| `/ajustes/modelos` | 3 · 5 · 8 · 10 | modelos como linhas de navegação; criar vira folha com chips |
-| `/perfil` | 1 · 10 | vira folha; o nome ganha papel tipográfico (hoje é texto sem classe nenhuma) |
+| `/ajustes/modelos` | 3 · 5 · 8 · 10 | modelos como linhas de navegação; criar vira folha com chips. **M9 propagado ✅ (H4, 2026-08-16)** — `VoltarFlutuante` pra `/ajustes` |
+| `/perfil` | 1 · 10 | vira folha ✅ (H1, 2026-08-15); o nome ganha papel tipográfico (hoje é texto sem classe nenhuma) — **pendência aberta, fora de H4**. **M9 propagado ✅ (H4, 2026-08-16)** na rota cheia de fallback (URL direta/refresh) — `VoltarFlutuante` pra `/ajustes` |
 | `/login` | 9 | primeira impressão do app (D10) — hoje é a tela mais genérica de todas |
 
-**Este mapa cobre 12 das 13 telas do artifact original.** `/ajustes/modelos/novo` existe no app (ver rota em `src/app/ajustes/modelos/novo/`) e não recebeu peça mapeada na sessão que gerou o vocabulário — ficou de fora por omissão do artifact, não por decisão. **Parcialmente resolvido em M7 (2026-08-15):** o 1º passo da tela (escolher grupo muscular, via `SeletorGrupoMuscular`) ganhou peça 5 (chips). O 2º passo (escolher exercícios, lista de caixas de seleção em `modelo-treino-form.tsx`) continua sem peça mapeada — fica pendência aberta.
+**Este mapa cobre 12 das 13 telas do artifact original.** `/ajustes/modelos/novo` existe no app (ver rota em `src/app/ajustes/modelos/novo/`) e não recebeu peça mapeada na sessão que gerou o vocabulário — ficou de fora por omissão do artifact, não por decisão. **Parcialmente resolvido em M7 (2026-08-15):** o 1º passo da tela (escolher grupo muscular, via `SeletorGrupoMuscular`) ganhou peça 5 (chips). O 2º passo (escolher exercícios, lista de caixas de seleção em `modelo-treino-form.tsx`) continua sem peça mapeada — fica pendência aberta. **M9 propagado ✅ (H4, 2026-08-16)** — `VoltarFlutuante` pra `/ajustes/modelos` (o pai real, não `/ajustes`).
 
 **Ordem sugerida de propagação** (`docs/BACKLOG-REDESENHO.md`, item H4): `/ajustes/anilhas` (pequena, exercita quase tudo) → `/analise` (peça-assinatura) → `/treino/[id]` (a mais complexa) → o resto. Uma tela por PR, olhada no celular antes da seguinte. **`/ajustes/anilhas` — ✅ fechada (H4, 2026-08-16).** A rota cheia de fallback (`src/app/ajustes/anilhas/page.tsx`) trocou `.barra-topo` por `TituloTela`+`VoltarFlutuante` — mesmo mecanismo do M9, terceiro consumidor real. Próxima da fila: `/analise`.
 
