@@ -5,7 +5,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { buscarExercicio, historicoDoExercicio } from "@/lib/dados/treino";
 import { marcarRecordesHistoricos } from "@/lib/analise/recorde-serie";
-import { dataLocalBrasil, formatarDataCurta } from "@/lib/tempo";
+import { formatarDataCurta } from "@/lib/tempo";
 import AbaInferior from "@/components/aba-inferior";
 import SetaNavegacao from "@/components/seta-navegacao";
 import EtiquetaRecorde from "@/components/etiqueta-recorde";
@@ -51,7 +51,7 @@ export default async function PaginaHistoricoExercicio({
                   <Link href={`/treino/${serie.treinoId}`} className="item__link">
                     <span className="item__conteudo">
                       <span className="item__data">
-                        {formatarDataCurta(dataLocalBrasil(new Date(serie.criadoEm)))}
+                        {formatarDataCurta(serie.dataTreino)}
                       </span>
                       <span className="serie__v">
                         {serie.reps}
