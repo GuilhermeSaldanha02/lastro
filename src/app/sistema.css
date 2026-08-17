@@ -374,6 +374,14 @@
     color var(--lastro-dur-1) ease;
 }
 
+/* H2 (D8) — fora do modo de edição, some visualmente e do tab order, mas
+   continua no DOM ocupando o mesmo espaço: evita reflow em grades sem
+   recipiente por item (ex.: `.grade-anilhas`), onde desmontar o botão
+   encolheria a célula flex-column e reposicionaria a grade inteira. */
+.botao-icone--oculto {
+  visibility: hidden;
+}
+
 /* Ação secundária de texto — alvo de toque cumprido por padding, não por
    virar quadrado como `.botao-icone` (esta tem rótulo visível, não ícone). */
 .botao-textual {
