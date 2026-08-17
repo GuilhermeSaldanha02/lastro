@@ -11,8 +11,7 @@ import { obterPerfil } from "@/lib/dados/perfil";
 import { listarModelos } from "@/lib/dados/modelo-treino";
 import { dataLocalBrasil } from "@/lib/tempo";
 import AbaInferior from "@/components/aba-inferior";
-import ExcluirTreino from "@/components/excluir-treino";
-import SetaNavegacao from "@/components/seta-navegacao";
+import ListaTreinos from "@/components/lista-treinos";
 import Avatar from "@/components/avatar";
 import IniciarTreino from "@/components/iniciar-treino";
 import TituloTela from "@/components/titulo-tela";
@@ -52,41 +51,13 @@ export default async function PaginaTreino() {
       />
 
       <div className="corpo corpo--com-nav corpo--titulo-conteudo transicao-pilula">
-        <h2 className="doc__secao">Histórico</h2>
-
-        {treinos.length === 0 ? (
-          <p className="vazio">
-            Nenhum treino registrado ainda. O primeiro começa aqui embaixo.
-          </p>
-        ) : (
-          <ul className="lista">
-            {treinos.map((treino) => (
-              <li key={treino.id}>
-                <div className="item">
-                  <Link href={`/treino/${treino.id}`} className="item__link">
-                    <span className="item__conteudo">
-                      <span className="item__data">{formatarData(treino.data)}</span>
-                      {/* "ver" era rótulo em verbo numa linha de navegação —
-                          reprova de peça 3 (§6.3/§6.4). A seta (M4) já
-                          carrega esse recado; a meta virou informação de
-                          verdade, mesmo padrão de `/` (Início). */}
-                      <span className="item__meta">
-                        {treino.totalSeries}{" "}
-                        {treino.totalSeries === 1 ? "série" : "séries"}
-                      </span>
-                    </span>
-                    <SetaNavegacao />
-                  </Link>
-                  <ExcluirTreino
-                    id={treino.id}
-                    data={formatarData(treino.data)}
-                    series={treino.totalSeries}
-                  />
-                </div>
-              </li>
-            ))}
-          </ul>
-        )}
+        <ListaTreinos
+          treinos={treinos.map((treino) => ({
+            id: treino.id,
+            dataFormatada: formatarData(treino.data),
+            totalSeries: treino.totalSeries,
+          }))}
+        />
       </div>
 
       <div className="acao-area">
