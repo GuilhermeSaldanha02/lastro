@@ -212,7 +212,7 @@ Chips para grupo muscular (catálogo, criar modelo). Segmentado para trocar o qu
 
 As séries do treino. **É a peça que resolve em definitivo o desalinhamento que abriu toda esta conversa.**
 
-### M9 · Título como conteúdo + voltar flutuante · [D5] · ✅ **FEITO EM PARTE (2026-08-15)**
+### M9 · Título como conteúdo + voltar flutuante · [D5] · ✅ **FEITO (2026-08-16) — 13/13 telas, ver H4**
 
 > **Mecanismo construído + 2 das 13 telas convertidas, exatamente como o próprio item pedia** ("tratar como item de propagação, não de uma tela"). Componentes novos `TituloTela` e `VoltarFlutuante` (`src/components/`), classes novas `.titulo-tela`/`.titulo-tela__*`/`.voltar-flutuante`/`.corpo--titulo-conteudo` (`sistema.css`). `.barra-topo` e `--lastro-clearance-topo` **não foram removidos** — continuam existindo e valendo para as 11 telas ainda não convertidas; só deixam de ser usados nas 2 telas convertidas nesta PR.
 >
@@ -222,7 +222,7 @@ As séries do treino. **É a peça que resolve em definitivo o desalinhamento qu
 >
 > **Decisão explícita, não escondida:** `.grupo` (`sistema.css`) ainda usa `scroll-margin-top: var(--lastro-clearance-topo)` — em `/treino/[id]` isso virou uma reserva sem função (o motivo original, compensar a barra fixa no foco de campo pelo teclado, não existe mais ali), mas a classe é compartilhada com `/ajustes/modelos/novo` (ainda não convertida), onde o offset continua sendo o fix real de 2026-08-10. Fica assim até a propagação chegar nessa tela também.
 >
-> **Pendente — as 11 telas restantes**, na ordem sugerida por H4 (`DESIGN.md` §6.6): `/ajustes/anilhas` → `/analise` → o resto de `/ajustes/*` e `/perfil` → `/`, `/treino`, `/catalogo`, `/coach`. Cada uma remove a superfície petróleo mais escura (a barra) daquela tela — registrado explicitamente em `DESIGN.md` §2, nota da D5, pra não ler como acidente.
+> **As 11 telas restantes foram convertidas em H4 (ver seção H4 abaixo) — 13/13 telas do app com o mecanismo, `.barra-topo` sem nenhum consumidor.** Esta nota ficou desatualizada por uma sessão inteira (dizia "pendente" depois do H4 já ter fechado) — corrigida agora ao revisar o backlog completo com o dono. `.barra-topo`/`--lastro-clearance-topo` continuam existindo em `sistema.css`/`tokens.css` como código morto, não removidos (ver nota de limpeza pendente na seção H4).
 
 Remove `--lastro-clearance-topo` (88px) de todas as telas. **Devolve 88px em cada uma** — o maior ganho de espaço do app. Sub-telas ganham voltar flutuante.
 **Cuidado:** toca as 13 telas. É "médio" por peça e **difícil no agregado** — tratar como item de propagação, não de uma tela.
