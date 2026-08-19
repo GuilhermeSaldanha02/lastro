@@ -1160,6 +1160,21 @@
   font-size: var(--lastro-papel-corpo);
 }
 
+/* Conteúdo de linha que NÃO navega (lista de modelos). O padding da linha
+   mora em `.item__link`; sem ele o texto encosta na moldura e a linha lê
+   como campo de formulário — foi assim que o dono viu no aparelho
+   ("o nome tá encurtado e estranho", 2026-08-17). Mesmo padding e mesma
+   altura mínima do link, sem a seta: a ausência dela é o que, por D3,
+   diz que isto não leva a lugar nenhum. */
+.item__estatico {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  min-height: var(--lastro-alvo-min);
+  padding: var(--lastro-e-3) var(--lastro-e-4);
+}
+
 .item__meta {
   font-family: var(--lastro-fonte-num);
   font-variant-numeric: tabular-nums;

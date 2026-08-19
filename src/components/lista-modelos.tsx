@@ -48,7 +48,7 @@ export default function ListaModelos({
           {modelos.map((modelo) => (
             <li key={modelo.id}>
               <div className="item">
-                <span className="item__data">{modelo.nome}</span>
+                <span className="item__estatico item__data">{modelo.nome}</span>
                 {modoEdicao && <ExcluirModelo id={modelo.id} nome={modelo.nome} />}
               </div>
             </li>
