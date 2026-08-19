@@ -8,6 +8,10 @@ O teste que estava pendente desde o fim do redesenho finalmente aconteceu: o don
 
 ---
 
+**Estado (2026-08-19):** 7 dos 8 corrigidos e mergeados, um PR por item — #88 (coach), #89 (#6 e #7), #90 (#2 e #3), #91 (#5), #92 (#4). Cada um com os 4 comandos verdes e verificação ao vivo em **Playwright** (viewport 390×844, usuário de teste isolado, criado e limpo em cada rodada). O #1 segue guardado, por decisão do dono — ver a seção final.
+
+---
+
 ## ✅ Resolvidos nesta rodada
 
 ### #8 — Coach não funciona
@@ -49,6 +53,8 @@ O teste que estava pendente desde o fim do redesenho finalmente aconteceu: o don
 > *"anilhas está soltas os numeros dos kg, deveria ter algo pra selecionar, kg ou lbs, veja tambem que onde se adiciona o valor da anilhas esta coloda em salvar configurações, essa tela precisa ser remodelada."*
 
 **Escopo decidido pelo dono (2026-08-17): remodelar o layout agora, kg/lbs vira item próprio.** O motivo é concreto, não preguiça: o schema já prevê `unidade in ('kg','lb')` (`0001_schema_inicial.sql:57`), mas **nenhuma tela do app usa** — tudo é kg fixo. Unidade aparece em série, volume, e1RM, gráfico e no prompt da Análise; mexer nisso só na tela de anilhas produziria duas unidades na mesma sessão e número errado no parecer da IA.
+
+**Correção de premissa (PR #92).** "Números soltos" parecia ser a ausência de recipiente — ou seja, a peça M3 do redesenho estando errada. **Não era.** M3 (`DESIGN.md` §6.3, grade sem cartão) está preservada; a causa real era a lixeira ficar sempre no fluxo com `visibility:hidden`, reservando um alvo de toque inteiro embaixo de *cada* número. Essa regra veio do H2, pra evitar reflow ao alternar o modo de edição — revista aqui: reflow em resposta a um toque explícito é aceitável, espaço morto permanente não. `.serie` não mudou (lá a coluna é fixa na grade). Registrado porque é exatamente o tipo de coisa que teria virado uma reversão errada de decisão documentada se eu tivesse aceitado o diagnóstico aparente.
 
 ---
 
