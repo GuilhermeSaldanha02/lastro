@@ -706,23 +706,26 @@
    só, ao custo de não crescer como .metrica__valor cresceu — E2
    (2026-08-15), verificado com medição real da linha, não só a favor da
    consistência entre os dois papéis de "número". */
-/* Pista de que a série é editável, sem repetir "Editar" em cada linha
-   (achado do dono, 2026-08-17: repetir a palavra por linha ficaria feio) e
-   sem contradizer D3 (dado não ganha moldura/seta como navegação). Pesquisa
-   de padrão real: apps de treino de peso livre (Strong, Hevy) desenham o
-   PRÓPRIO valor como um campo — um "chip" com fundo diferente do resto da
-   linha — em vez de anexar rótulo ou ícone repetido. `--lastro-sup-2` já é
-   "faixa, cabeçalho de tabela" no token; reaproveitado aqui como o mesmo
-   tipo de destaque sutil, não uma cor nova. */
+/* O valor NÃO leva pista permanente de "editável" — quem sinaliza é o
+   `.serie:active` (o realce ao pressionar a linha inteira).
+   Registrado aqui porque a tentação de "só marcar de leve" volta sempre:
+   o chip com fundo `--lastro-sup-2` existiu neste seletor (PR #80) e foi
+   reprovado pelo dono no aparelho real. Três razões sustentam a remoção,
+   e nenhuma é gosto:
+   1. `ESCOPO.md` §2 — Modo Bancada exige "poucos, grandes, REDUNDÂNCIA
+      ZERO". Pista repetida por linha vira 20 pistas numa tela de 20
+      séries: é redundância, na única tela que a proíbe por escrito.
+   2. D3 (`DECISIONS.md` 2026-08-15) — "dado → sem recipiente". O chip era
+      recipiente em cima de dado; nasceu em tensão com a própria regra.
+   3. Convenção da plataforma — no iOS (Health, Lembretes) toca-se o dado
+      pra editar sem marca permanente; o realce de toque é a affordance.
+   Ler `docs/BACKLOG-TESTE-APARELHO.md` (#1) antes de reintroduzir. */
 .serie__v {
   font-family: var(--lastro-fonte-num);
   font-variant-numeric: tabular-nums;
   font-size: var(--lastro-papel-titulo-tela);
   font-weight: var(--lastro-peso-medio);
   letter-spacing: -0.02em;
-  padding: 0 var(--lastro-e-2);
-  border-radius: var(--lastro-raio-1);
-  background: var(--lastro-sup-2);
 }
 
 .serie__x {

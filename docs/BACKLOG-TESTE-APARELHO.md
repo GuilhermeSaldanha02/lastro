@@ -8,7 +8,7 @@ O teste que estava pendente desde o fim do redesenho finalmente aconteceu: o don
 
 ---
 
-**Estado (2026-08-19):** 7 dos 8 corrigidos e mergeados, um PR por item — #88 (coach), #89 (#6 e #7), #90 (#2 e #3), #91 (#5), #92 (#4). Cada um com os 4 comandos verdes e verificação ao vivo em **Playwright** (viewport 390×844, usuário de teste isolado, criado e limpo em cada rodada). O #1 segue guardado, por decisão do dono — ver a seção final.
+**Estado (2026-08-19): os 8 fechados.** 7 corrigidos e mergeados, um PR por item — #88 (coach), #89 (#6 e #7), #90 (#2 e #3), #91 (#5), #92 (#4), #94 (#1). Cada um com os 4 comandos verdes e verificação ao vivo em **Playwright** (viewport 390×844, usuário de teste isolado, criado e limpo em cada rodada). O **#1 saiu de "guardado" e foi resolvido** — ver a seção final. Fica aberto só o **kg/lbs**, que é feature própria, não ajuste de tela.
 
 ---
 
@@ -60,7 +60,23 @@ O teste que estava pendente desde o fim do redesenho finalmente aconteceu: o don
 
 ## ⏸ Guardados, com motivo
 
-### #1 — Cor escura na tela "Treino em andamento"
+### ✅ #1 — RESOLVIDO em 2026-08-19 (PR #94): o chip sai, o realce de toque fica
+
+O dono pediu a recomendação ("qual a melhor opção para o mobile?") e a resposta foi **remover o fundo, sem substituir por outra pista permanente**. Três razões, nenhuma de gosto:
+
+1. **`ESCOPO.md` §2** — o Modo Bancada (registro) exige *"poucos, grandes, redundância zero"*. Pista repetida por linha vira 20 pistas numa tela de 20 séries: é redundância, na única tela que a proíbe por escrito.
+2. **D3** (`DECISIONS.md` 2026-08-15) — *"dado → sem recipiente"*. O chip era um recipiente sobre dado; nasceu em tensão com a regra que o próprio redesenho tinha acabado de fixar. Isso explica o "não tem nada a ver com a proposta" melhor que qualquer argumento de cor.
+3. **Convenção da plataforma** — no iOS (Health, Lembretes) toca-se o dado pra editar sem marca permanente; o realce ao pressionar é a affordance. É o que `.serie:active` faz, e foi **verificado por screenshot durante o toque**, não por leitura de estilo computado (que deu falso negativo — `getComputedStyle` via `evaluate` não reflete `:active`).
+
+Também pesou o fato de o app ter **uma persona só** (`ESCOPO.md` §1): pista de descoberta serve a usuário novo, e não há. A função dela era ensinar uma vez — e ensinou.
+
+**Alternativas descartadas, com o motivo:** sublinhado pontilhado (mesmo problema de repetição do chip, e sinal mais fraco segundo a pesquisa de campo de formulário) e pista no cabeçalho da coluna (é texto de instrução, forma que o dono já vetara antes).
+
+### ✅ #1b — era o #7, já resolvido no PR #89
+
+A queixa da "tela azul" tinha duas coisas dentro, e o dono separou: **o card petróleo de iniciar treino deve existir** (é a tese visual §3.0, "Areia & Azul Petróleo"). O problema era só as cápsulas ficarem brancas ao escolher um modelo — corrigido no PR #89, que as fez seguir o verde do "Iniciar treino de hoje".
+
+### Contexto original do #1, preservado
 
 > *"essa cor mas escura não ta agradavel, precisamos ver oque colocar."*
 
