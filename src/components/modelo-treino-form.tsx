@@ -1,11 +1,16 @@
 "use client";
 
-// lastro · SDD.md §9.3 — formulário de criação de modelo: grupo(s)
-// muscular(es) primeiro (reaproveita SeletorGrupoMuscular, mesmo padrão do
-// registro de série), depois os exercícios daqueles grupos, depois o nome.
+// lastro · SDD.md §9.3 — formulário de criação de modelo, em 3 passos:
+// nome, grupo(s) muscular(es) (reaproveita SeletorGrupoMuscular, mesmo
+// padrão do registro de série) e os exercícios daqueles grupos.
 // Só grava lista de exercícios — nunca série, peso ou reps (ADR-009/FF8).
+//
+// O nome era o ÚLTIMO campo, solto embaixo da lista de caixas de seleção,
+// e o dono reprovou no teste de aparelho (2026-08-17): "não vi muito
+// sentido". Virou o primeiro passo — nomear a intenção e depois preencher
+// é a ordem de quem monta um treino.
 import { useRouter } from "next/navigation";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import type { ExercicioDoCatalogo } from "@/lib/dados/treino";
 import { criarModelo } from "@/lib/dados/modelo-treino";
 import SeletorGrupoMuscular, { type OpcaoGrupo } from "./seletor-grupo-muscular";
@@ -27,8 +32,17 @@ export default function ModeloTreinoForm({
   const [gruposEscolhidos, setGruposEscolhidos] = useState<string[]>([]);
   const [exerciciosEscolhidos, setExerciciosEscolhidos] = useState<string[]>([]);
   const [nome, setNome] = useState("");
+  const [nomeConfirmado, setNomeConfirmado] = useState(false);
   const [erro, setErro] = useState<string | null>(null);
   const [enviando, setEnviando] = useState(false);
+  const nomeRef = useRef<HTMLInputElement>(null);
+
+  // Mesmo motivo do foco em SeletorGrupoMuscular (PR #83): a folha revela
+  // conteúdo sem trocar de rota, então o foco não vem sozinho — sem isto
+  // quem usa só teclado abre "Criar modelo" e não alcança o campo.
+  useEffect(() => {
+    if (!nomeConfirmado) nomeRef.current?.focus();
+  }, [nomeConfirmado]);
 
   const opcoesGrupo = useMemo<OpcaoGrupo[]>(() => {
     const porId = new Map<string, string>();
@@ -73,14 +87,66 @@ export default function ModeloTreinoForm({
     }
   }
 
+  // Passo 1 — o nome.
+  if (!nomeConfirmado) {
+    return (
+      <section className="grupo">
+        <div className="grupo__cab">
+          <h2 className="grupo__nome">Que treino é esse?</h2>
+        </div>
+        <p className="campo__nota">
+          Dê um nome — os exercícios vêm no passo seguinte.
+        </p>
+
+        <div className="campo">
+          <label className="campo__rotulo" htmlFor="nome_modelo">
+            Nome do modelo
+          </label>
+          <input
+            ref={nomeRef}
+            id="nome_modelo"
+            type="text"
+            value={nome}
+            onChange={(e) => setNome(e.target.value)}
+            placeholder="Ex.: Peito e tríceps"
+          />
+        </div>
+
+        <button
+          type="button"
+          className="botao-primario"
+          disabled={!nome.trim()}
+          onClick={() => setNomeConfirmado(true)}
+        >
+          Continuar
+        </button>
+      </section>
+    );
+  }
+
+  // Passo 2 — os grupos musculares.
   if (gruposEscolhidos.length === 0) {
     return <SeletorGrupoMuscular opcoes={opcoesGrupo} onConfirmar={setGruposEscolhidos} />;
   }
 
+  // Passo 3 — os exercícios. O nome vira o título, que é o que dá contexto
+  // ao que se está montando; "Renomear" existe pra um erro de digitação não
+  // custar a seleção inteira.
   return (
     <section className="grupo">
       <div className="grupo__cab">
-        <h2 className="grupo__nome">Exercícios do modelo</h2>
+        <h2 className="grupo__nome">{nome.trim()}</h2>
+        <button
+          type="button"
+          className="botao-textual"
+          onClick={() => setNomeConfirmado(false)}
+        >
+          Renomear
+        </button>
+      </div>
+
+      <div className="grupo__cab">
+        <p className="campo__nota">Exercícios do modelo</p>
         <button type="button" className="botao-textual" onClick={() => setGruposEscolhidos([])}>
           Trocar grupo
         </button>
@@ -97,19 +163,6 @@ export default function ModeloTreinoForm({
             {exercicio.nome}
           </label>
         ))}
-      </div>
-
-      <div className="campo">
-        <label className="campo__rotulo" htmlFor="nome_modelo">
-          Nome do modelo
-        </label>
-        <input
-          id="nome_modelo"
-          type="text"
-          value={nome}
-          onChange={(e) => setNome(e.target.value)}
-          placeholder="Ex.: Peito e tríceps"
-        />
       </div>
 
       {erro && (
