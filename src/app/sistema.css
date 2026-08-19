@@ -1045,6 +1045,17 @@
   margin-top: 0;
 }
 
+/* Ação que CONFIRMA a seção inteira, separada das ações que editam o
+   conteúdo dela. Em `/ajustes/anilhas` "Adicionar anilha" mexe na lista e
+   "Salvar configuração" persiste tudo — encostados, os dois liam como um
+   par de botões do mesmo passo ("está colada em salvar configurações",
+   teste no aparelho, 2026-08-17). */
+.grupo__confirmacao {
+  margin-top: var(--lastro-e-6);
+  padding-top: var(--lastro-e-5);
+  border-top: 1px solid var(--lastro-linha);
+}
+
 /* ---------- Avisos ---------- */
 .aviso-erro {
   border: 1px solid var(--lastro-erro);
@@ -1197,6 +1208,18 @@
   flex-direction: column;
   align-items: center;
   gap: var(--lastro-e-1);
+}
+
+/* A lixeira só OCUPA espaço no modo de edição. Mantê-la sempre no fluxo
+   (`visibility:hidden`, como H2 fez) reservava um alvo de toque inteiro
+   embaixo de cada número, e era isso que deixava os valores boiando no
+   vazio — o "números soltos" do teste no aparelho (2026-08-17). A grade
+   crescer ao LIGAR o modo de edição é consequência visível de uma ação
+   explícita, diferente de espaço morto permanente; o reflow que H2
+   queria evitar só acontece nesse toque. Em `.serie` a reserva continua
+   certa e não muda: lá a coluna é fixa na grade, some sem refluir nada. */
+.anilha .botao-icone--oculto {
+  display: none;
 }
 
 .anilha__valor {
