@@ -16,6 +16,7 @@ import {
   perguntaAceitavel,
   LIMITE_PERGUNTA,
 } from "./prompt";
+import { detalheParaLog, respostaDeFalha } from "./falha";
 
 export async function POST(request: Request) {
   const supabase = await criarClienteServidor();
@@ -56,12 +57,14 @@ export async function POST(request: Request) {
       );
     }
     return NextResponse.json({ resposta: texto });
-  } catch {
-    // A mensagem do erro pode conter detalhe da chave ou do provedor —
-    // não vaza para o cliente.
-    return NextResponse.json(
-      { erro: "Falha ao consultar o coach." },
-      { status: 502 },
-    );
+  } catch (erro) {
+    // Logar é obrigatório: sem isto a falha some sem deixar rastro, e a
+    // única pista que o dono tem é uma mensagem genérica na tela (achado
+    // real do teste no aparelho, 2026-08-17 — a causa só foi encontrada
+    // porque /api/analise, que loga, falhou junto).
+    console.error("[coach] falha ao gerar", detalheParaLog(erro));
+
+    const { erro: mensagem, status } = respostaDeFalha(erro);
+    return NextResponse.json({ erro: mensagem }, { status });
   }
 }
