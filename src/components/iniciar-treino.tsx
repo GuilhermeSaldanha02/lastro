@@ -30,10 +30,16 @@ export default function IniciarTreino({ modelos }: { modelos: Modelo[] }) {
       <div className="grupo__cab">
         <h2 className="grupo__nome">Como começar?</h2>
       </div>
+      {/* `.botao-primario`, não `.pergunta`: estes botões vivem dentro do
+          card escuro `.destaque`, e o cartão claro da Análise vira uma
+          cápsula branca que não tem parentesco nenhum com o botão verde
+          que estava ali um toque antes (achado do teste no aparelho,
+          2026-08-17). Escolher como começar é a mesma ação de "Iniciar
+          treino de hoje", só que ramificada — mesmo peso, mesma cor. */}
       <ul className="perguntas">
         <li>
           <form action={criarTreino}>
-            <button type="submit" className="pergunta">
+            <button type="submit" className="botao-primario">
               Treino novo
             </button>
           </form>
@@ -41,7 +47,7 @@ export default function IniciarTreino({ modelos }: { modelos: Modelo[] }) {
         {modelos.map((modelo) => (
           <li key={modelo.id}>
             <form action={criarTreinoComModelo.bind(null, modelo.id)}>
-              <button type="submit" className="pergunta">
+              <button type="submit" className="botao-primario">
                 {modelo.nome}
               </button>
             </form>
