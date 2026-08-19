@@ -109,10 +109,14 @@ export default function AnilhasForm({ configInicial }: { configInicial: ConfigAn
           // cartão é o padrão certo, medido a 360px: 6 anilhas em grade = 3
           // colunas × 2 linhas × 88px, contra 372px das 6 linhas de antes.
           //
-          // H2 (D8): a lixeira fica SEMPRE no DOM; `.botao-icone--oculto`
-          // (visibility:hidden) some com ela fora do modo de edição sem
-          // desmontar — `.anilha` é flex-column, então remover o botão
-          // encolheria a célula e refluiria a grade inteira medida acima.
+          // H2 (D8): a lixeira fica sempre no DOM e `.botao-icone--oculto`
+          // some com ela fora do modo de edição. A regra do H2 era
+          // `visibility:hidden`, pra célula não encolher e não refluir a
+          // grade — REVISTA em 2026-08-17: reservar um alvo de toque
+          // inteiro embaixo de cada número deixava os valores boiando
+          // ("números soltos", teste no aparelho). Agora o CSS de `.anilha`
+          // usa `display:none`; a grade cresce ao ligar o modo de edição,
+          // que é resposta a um toque explícito, não espaço morto fixo.
           // Sem confirmação em duas etapas aqui: `removerAnilha` só mexe em
           // estado local, nada persiste até "Salvar configuração".
           <div className="grade-anilhas">
@@ -179,19 +183,24 @@ export default function AnilhasForm({ configInicial }: { configInicial: ConfigAn
           </p>
         )}
 
-        <button
-          type="button"
-          className="botao-primario"
-          onClick={salvar}
-          disabled={salvando}
-        >
-          {salvando ? "Salvando…" : "Salvar configuração"}
-        </button>
-        {salvo && (
-          <p className="campo__nota" aria-live="polite">
-            Configuração salva.
-          </p>
-        )}
+        {/* "Adicionar anilha" (acima) edita a lista; "Salvar configuração"
+            persiste a seção inteira. Encostados, liam como dois botões do
+            mesmo passo — achado do teste no aparelho, 2026-08-17. */}
+        <div className="grupo__confirmacao">
+          <button
+            type="button"
+            className="botao-primario"
+            onClick={salvar}
+            disabled={salvando}
+          >
+            {salvando ? "Salvando…" : "Salvar configuração"}
+          </button>
+          {salvo && (
+            <p className="campo__nota" aria-live="polite">
+              Configuração salva.
+            </p>
+          )}
+        </div>
       </section>
 
       <section className="grupo">
