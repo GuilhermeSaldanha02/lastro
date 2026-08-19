@@ -1451,6 +1451,22 @@
   margin-bottom: var(--lastro-e-6);
 }
 
+/* Fonte única da altura do desenho: o `ResponsiveContainer` lê 100% daqui
+   em vez de carregar o número em JS, e o esqueleto de carregamento usa a
+   mesma medida — a tela não muda de altura quando o dado chega. */
+.grafico-progressao__area {
+  height: var(--lastro-grafico-altura);
+}
+
+/* Esqueleto com a FORMA do que está vindo (título curto + área do
+   desenho), não um bloco chapado: sem isto o carregamento lê como caixa
+   vazia quebrada, que foi como o dono viu no aparelho (2026-08-17). */
+.grafico-progressao__area--esqueleto {
+  border-radius: var(--lastro-raio-1);
+  background: var(--lastro-sup-2);
+  animation: lastro-pulso 1.6s ease-in-out infinite;
+}
+
 /* A conclusão em palavras vem ANTES do desenho (§3.7 item 2) — quem só lê
    esta linha já sabe o resultado. */
 .grafico-progressao__conclusao {
