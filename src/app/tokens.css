@@ -71,6 +71,13 @@
   --lastro-alvo-folga: 12px; /* distância mínima entre dois alvos vizinhos */
   --lastro-alvo-acao:  72px; /* altura da ação primária (D3) */
 
+  /* Altura da área de desenho do gráfico. Fonte única: o esqueleto de
+     carregamento e o gráfico pronto leem daqui, então a tela não muda de
+     altura quando o dado chega (achado do teste no aparelho, 2026-08-17
+     — o esqueleto lia como caixa vazia porque não tinha a forma do que
+     estava vindo). */
+  --lastro-grafico-altura: 200px;
+
   /* ---- Tipografia (DESIGN.md §6.1, Trilha B item E1) ----
      Os três papéis continuam os mesmos de antes; só a família mudou.
      Fallback de --lastro-fonte-num deixou de ser monoespaçado — Archivo

@@ -80,7 +80,21 @@ function pontoInterativo(cor: string, ativo: boolean, aoAtivar: (indice: number 
 function PainelConteudo({ painel }: { painel: PainelProgressao }) {
   const [indiceAtivo, setIndiceAtivo] = useState<number | null>(null);
 
-  const comDado = painel.pontos.filter((p) => p.e1rm !== undefined);
+  // A janela do servidor tem 12 semanas fixas; exercício começado há pouco
+  // só tem dado nas últimas. Desenhar as 12 espreme a linha inteira no
+  // canto direito, e aí o gráfico deixa de responder "está subindo?" —
+  // a única pergunta que ele existe pra responder (§3.7). Foi assim que o
+  // dono viu no aparelho (2026-08-17). Recorta a janela vazia das PONTAS;
+  // buraco no meio segue desenhado, porque ali a ausência é informação
+  // (semana em que aquele exercício não foi treinado).
+  const iInicio = painel.pontos.findIndex((p) => p.e1rm !== undefined);
+  const iFim =
+    painel.pontos.length -
+    1 -
+    [...painel.pontos].reverse().findIndex((p) => p.e1rm !== undefined);
+  const pontos = painel.pontos.slice(iInicio, iFim + 1);
+
+  const comDado = pontos.filter((p) => p.e1rm !== undefined);
   const primeiro = comDado[0];
   const ultimo = comDado[comDado.length - 1];
   // primeiro.e1rm pode ser 0 (ex.: assistida registrada sem carga externa)
@@ -100,14 +114,14 @@ function PainelConteudo({ painel }: { painel: PainelProgressao }) {
   // subida (o extremo mais alto cai perto do topo do gráfico).
   const melhorMarcaEhExtremo = melhorMarca === primeiro.e1rm || melhorMarca === ultimo.e1rm;
 
-  const indicePrimeiro = painel.pontos.indexOf(primeiro);
-  const indiceUltimo = painel.pontos.indexOf(ultimo);
+  const indicePrimeiro = pontos.indexOf(primeiro);
+  const indiceUltimo = pontos.indexOf(ultimo);
 
   const inicioPlato = painel.plato
-    ? painel.pontos.findIndex((p) => p.semanaInicio === painel.plato!.semanaInicio)
+    ? pontos.findIndex((p) => p.semanaInicio === painel.plato!.semanaInicio)
     : -1;
 
-  const serie: PontoGrafico[] = painel.pontos.map((p, i) => {
+  const serie: PontoGrafico[] = pontos.map((p, i) => {
     const noPlato = inicioPlato >= 0 && i >= inicioPlato;
     const naJuncao = inicioPlato >= 0 && i === inicioPlato;
     return {
@@ -167,8 +181,15 @@ function PainelConteudo({ painel }: { painel: PainelProgressao }) {
         )}
       </p>
 
-      <ResponsiveContainer width="100%" height={200}>
-        <LineChart data={serie} margin={{ top: 24, right: 12, bottom: 4, left: 12 }}>
+      {/* `RotuloExtremos` centraliza o valor em kg na coordenada do ponto,
+          então metade do texto cai FORA nos extremos — com margem de 12 o
+          rótulo do último ponto era cortado no meio ("66.7 k" no print do
+          dono, 2026-08-17). 40 comporta o rótulo mais largo previsto
+          ("999.9 kg") na fonte de rótulo. Altura vem do CSS (100% da
+          `__area`), pra não repetir a medida em JS. */}
+      <div className="grafico-progressao__area">
+        <ResponsiveContainer width="100%" height="100%">
+          <LineChart data={serie} margin={{ top: 24, right: 40, bottom: 4, left: 40 }}>
           <XAxis
             dataKey="semanaInicio"
             tickFormatter={formatarSemana}
@@ -209,13 +230,14 @@ function PainelConteudo({ painel }: { painel: PainelProgressao }) {
             isAnimationActive={false}
             label={RotuloExtremos}
           />
-        </LineChart>
-      </ResponsiveContainer>
+          </LineChart>
+        </ResponsiveContainer>
+      </div>
 
-      {indiceAtivo !== null && painel.pontos[indiceAtivo]?.e1rm !== undefined && (
+      {indiceAtivo !== null && pontos[indiceAtivo]?.e1rm !== undefined && (
         <p aria-live="polite" className="grafico-progressao__leitura-ativa">
-          Semana de {formatarSemana(painel.pontos[indiceAtivo].semanaInicio)}:{" "}
-          {formatarKg(painel.pontos[indiceAtivo].e1rm!)}
+          Semana de {formatarSemana(pontos[indiceAtivo].semanaInicio)}:{" "}
+          {formatarKg(pontos[indiceAtivo].e1rm!)}
         </p>
       )}
 
@@ -271,8 +293,25 @@ export default function GraficoProgressao({
     );
   }
 
+  // Esqueleto com a FORMA do que está vindo — título de seção real, card
+  // real, e a área do desenho na mesma altura do gráfico pronto. O bloco
+  // chapado de antes lia como caixa vazia/quebrada, não como carregando
+  // (achado do teste no aparelho, 2026-08-17: "abre com uma aba em branco
+  // e logo depois entra a tela preenchida").
   if (paineis === undefined) {
-    return <div className="esqueleto" style={{ height: 200 }} />;
+    return (
+      <div>
+        <h2 className="doc__secao">Progressão</h2>
+        <section
+          className="grafico-progressao"
+          aria-busy="true"
+          aria-label="Carregando progressão"
+        >
+          <div className="esqueleto esqueleto--curto" />
+          <div className="grafico-progressao__area grafico-progressao__area--esqueleto" />
+        </section>
+      </div>
+    );
   }
 
   if (paineis.length === 0) {
