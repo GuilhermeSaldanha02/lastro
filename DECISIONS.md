@@ -1015,3 +1015,23 @@ Ao começar H3 (pílula/sub-tela), a nota de D7 ("Custo caiu: Next 16 traz `View
 **Achado "divergência 3 vs 4 semanas de platô" (Fase 3, área 6) — investigado e fechado como não-bug.** `/api/progressao` (gráfico) usa `PLATO_GRAFICO_SEMANAS=3`, regra descritiva/visual; `/api/analise` (parecer da IA) usa `SEMANAS_ESTAGNACAO=4`, o limiar clínico. São dois cálculos DIFERENTES de propósito — já documentado no comentário de `src/lib/analise/limiares.ts:19` ("DIFERENTE de SEMANAS_ESTAGNACAO acima") e na decisão original de `DECISIONS.md` 2026-08-07 ("regra de platô do gráfico é descritiva, separada do limiar clínico do PRD §10"). O subagente de QA, sem esse contexto, reportou a divergência numérica como achado — correto reportar, mas não é bug. Dono confirmou não mexer: as duas telas continuam mostrando números diferentes de propósito, cada um respondendo uma pergunta diferente.
 
 **Como reverter.** Não há o que reverter — registro de fato, não mudança de código.
+
+---
+
+## 2026-08-21 — Contraste de `--lastro-txt-3` corrigido; `DESIGN.md` §3.0–3.2/§4.2 marcado como stale contra o Apex Pro (escopo travado pelo dono)
+
+**O que mudou.** `src/app/tokens.css`: `--lastro-txt-3` foi de `#64748B` para `#7C8DA6`. Remedido ao vivo em `/login` e `/catalogo`: 4,74:1 (`sup-3`, pior caso) · 5,18:1 (`sup-2`) · 5,56:1 (`sup-1`) · 5,90:1 (`fundo`) — todos acima do piso AA 4,5. Antes: 3,36 / 4,19 / 3,95 — reprovava nos três. Zero elemento reprovando no DOM real onde antes 104 reprovavam só no `/catalogo` e 14 na Home (medido antes/depois com o mesmo script, mesma tela, mesma sessão).
+
+**Por quê.** Achado A05 da auditoria `docs/AUDITORIA-APEX-PRO.md` (2026-08-21): `--lastro-txt-3` reprovava contraste AA em toda superfície do Apex Pro, usado em 40 seletores de `sistema.css` (metadados, unidades, "Sem dica registrada", dias da semana). Não era só dívida documental — o `DESIGN.md` §3.2 linha C3 certificava esse mesmo par como **4,85, aprovado**, número calculado para a paleta areia (substituída em `8d30cf0`). O gate de contraste estava aprovando com medida de uma paleta que não existe mais.
+
+**Escopo, decisão explícita do dono (opção 2 de duas apresentadas):** corrigir o contraste **só do tema padrão** (`:root`, "Obsidian Ouro") e reconciliar os documentos **só contra ele**. As outras 6 paletas que o card de Tema (`docs/BACKLOG-PROXIMA-FASE.md` T1) vai expor **não foram tocadas** — ficam para quando esse card existir e cada paleta puder ser remedida contra dado real, não contra suposição de como ficariam.
+
+**O que foi reconciliado em `DESIGN.md`:** banner datado no topo de §3 apontando o pivô Apex Pro; a linha `txt-3` de §3.1 e §3.2 corrigida com os números medidos hoje, mantendo o valor antigo riscado (não apagado — histórico); a linha C3 de §4.2 corrigida do mesmo jeito. **O que NÃO foi reconciliado, e fica marcado como tal:** as outras 16 linhas de §3.2 e as outras 13 linhas de C1–C14 continuam com número da paleta areia — não foram remedidas, e o documento agora diz isso explicitamente em vez de deixar implícito.
+
+**Por que não reescrevi a tabela inteira.** Eu não tenho medição real dos outros 16 pares contra o Apex Pro nesta sessão — inventar número "aproximado" pelos tokens.css sem medir em navegador violaria a própria regra do documento (D8: "contraste AA medido, não estimado") e o E3 do projeto (nunca inventar dado). Marcar como stale e explicar o que falta é mais honesto que preencher com número não verificado.
+
+**Alternativa descartada.** Reescrever `DESIGN.md` §3 inteiro para descrever o Apex Pro do zero — rejeitada porque exigiria inventar a razão de decisão por trás de cada token que outra sessão escolheu (ouro, esmeralda, obsidiana), e eu não estava naquela sessão. Isso seria fabricar histórico, não documentar. A reconciliação completa (remedir os 14 pares × 7 paletas, e escrever a razão de cada cor do Apex Pro com quem decidiu) é tarefa própria, maior, e pertence a quem tem esse contexto — ou a uma sessão dedicada.
+
+**Impacto.** `sistema.css` usa `--lastro-txt-3` em 40 seletores; todos herdam a correção automaticamente, nenhum precisou de edição própria. Nenhuma mudança de layout, espaçamento ou estrutura — só a cor de um token.
+
+**Como reverter.** `git revert` do commit desta entrada restaura `#64748B` em `tokens.css` e desfaz as edições em `DESIGN.md`. Reintroduz os 104+14 elementos reprovando AA.

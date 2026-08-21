@@ -335,20 +335,50 @@ visual do app.
 produção. Quem cai nisso é o dono com a sessão expirada, não um atacante.
 Correção: acrescentar os dois prefixos. Resolve o A02 (avatar "AT") junto.
 
-## T3 — `--lastro-txt-3` reprova contraste AA (A05/A06) · **ALTA**
+## T3 — `--lastro-txt-3` reprova contraste AA (A05/A06) · ✅ **RESOLVIDO em 2026-08-21** (escopo: tema padrão)
 
 Medido: **3,36** sobre `sup-3`, **3,95** sobre `sup-1`, **4,19** sobre o
 fundo — piso 4,5. Confirmado ao vivo: 104 elementos no `/catalogo`, 18 na
-Home. São 40 seletores em `sistema.css`.
+Home. Eram 40 seletores em `sistema.css`.
 
-Verificar antes de tratar todos igual: `.evidencia__de`/`.evidencia__seta`
-(19px sem `font-weight` declarado) e `.marca--aquecimento` — se o peso
-herdado for ≥700 o piso cai para 3,0 e passam.
+**Corrigido:** `#64748B` → `#7C8DA6`. Remedido ao vivo: 4,74 / 5,18 / 5,56
+/ 5,90 — todos acima do piso. Zero elemento reprovando no DOM real, nas
+mesmas duas telas. `DESIGN.md` §3.0–3.2/§4.2 reconciliados **só na linha
+`txt-3`**, com banner datado marcando o resto da tabela como stale contra
+o Apex Pro. Entrada em `DECISIONS.md` 2026-08-21.
 
-**Junto, obrigatoriamente:** reconciliar `DESIGN.md` §3.2 e as entradas
-D1–D10 do `DECISIONS.md`, que ainda descrevem a paleta areia e
-certificam esse mesmo par como "4,85 aprovado". Corrigir o token sem
-corrigir o documento deixa o gate mentindo do mesmo jeito.
+Verificado antes do fix, e a suposição registrada na primeira auditoria
+estava errada: `.evidencia__de`/`.evidencia__seta` (19px) e
+`.marca--aquecimento` **não têm `font-weight` declarado** — herdam 400,
+não bold. A 19px e peso 400, nenhum dos dois cumpre a isenção de "texto
+grande" (exige ≥700 nessa faixa); o piso real sempre foi 4,5, igual ao
+resto. Não precisaram de tratamento especial porque o fix do token os
+cobre do mesmo jeito que cobre as outras 38 ocorrências — não porque já
+passavam antes.
+
+**O que NÃO foi feito, decisão explícita do dono (opção 2, não a 1):**
+só o tema padrão (`:root`) foi corrigido. As outras 16 linhas de §3.2 e
+as 13 restantes de C1–C14 em §4.2 continuam com número da paleta areia —
+o documento agora diz isso explicitamente em vez de deixar implícito.
+Vira o item **T3b** abaixo.
+
+## T3b — Reconciliar `DESIGN.md`/`DECISIONS.md` com o Apex Pro por inteiro
+
+Pendência que o T3 deixou explícita. Duas partes, e a segunda depende do
+T1 (card de Tema):
+
+1. **Remedir os 14 pares de §4.2 (C1–C14) contra o tema padrão Apex
+   Pro** — hoje só C3 (`txt-3`) está remedido; os outros 13 ainda citam
+   número da paleta areia. Ao vivo, em navegador real, como o próprio
+   `DESIGN.md` exige (D8).
+2. **Escrever a razão de cada cor do Apex Pro** (por que ouro, por que
+   esmeralda, por que obsidiana) — quem decidiu isso foi outra sessão, e
+   nenhuma razão foi registrada em `DECISIONS.md` na hora. Sem isso,
+   `DESIGN.md` §3 nunca deixa de citar a paleta antiga como se fosse a
+   atual, porque não há o que pôr no lugar sem inventar.
+3. **Remedir contra as 6 paletas alternativas** do card de Tema (T1),
+   quando existirem — não faz sentido reconciliar 7 vezes; a 2ª a 7ª só
+   ficam corretas quando o T1 tiver algo real para medir.
 
 ## T4 — Meta semanal de treinos configurável
 

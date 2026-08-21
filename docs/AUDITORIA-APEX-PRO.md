@@ -170,7 +170,7 @@ Fórmula WCAG sobre as cores computadas no navegador. Aferição do método conf
 | `/login` | 1 | divisor "OU" (3.95) |
 | `/analise` | 1 | rótulo "ANÁLISE SEMANAL" (4.19) |
 
-`--lastro-txt-3` é `color:` em **40 seletores** de `sistema.css`. Duas ressalvas antes de tratar todos igual: `.evidencia__de` / `.evidencia__seta` (`sistema.css:1449-1450`) são 19px **sem `font-weight` declarado** — se o peso herdado for ≥700 o piso cai para 3.0 e passam. Mesma checagem para `.marca--aquecimento` (`sistema.css:766`). Não medidos: dependem de tela com dado.
+`--lastro-txt-3` é `color:` em **40 seletores** de `sistema.css`. Ressalva registrada aqui, verificada depois: `.evidencia__de` / `.evidencia__seta` (`sistema.css:1449-1450`, 19px) e `.marca--aquecimento` (`sistema.css:766`) **não têm `font-weight` declarado** — herdam 400. A 19px e peso 400, nenhum cumpre a isenção de "texto grande" (que exige ≥700 nessa faixa); o piso sempre foi 4,5, não 3,0. **Corrigido em 2026-08-21 (T3)** junto com os outros 37 seletores — não precisou de tratamento especial.
 
 ## A06 — `DESIGN.md` certifica contraste com número de outra paleta · **ALTA**
 

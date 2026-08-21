@@ -19,7 +19,12 @@
   /* ---- Tipografia e Textos ---- */
   --lastro-txt:          #F8FAFC; /* Branco titânio - leitura principal */
   --lastro-txt-2:        #94A3B8; /* Ardósia secundário - legendas e rótulos */
-  --lastro-txt-3:        #64748B; /* Ardósia atenuado - metadados e unidades */
+  /* Ardósia atenuado - metadados e unidades. Era #64748B: reprovava AA
+     (3,36:1 sobre --lastro-sup-3, piso 4,5 — achado A05/T3, auditoria
+     2026-08-21, confirmado ao vivo em produção). Este valor foi medido
+     em navegador real contra as três superfícies em uso — ver
+     DESIGN.md §3.2, linha C3. */
+  --lastro-txt-3:        #7C8DA6;
 
   /* ---- Barra de Topo e Navegação ---- */
   --lastro-barra-a:      #0B0F15;

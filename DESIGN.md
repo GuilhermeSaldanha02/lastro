@@ -11,6 +11,12 @@
 > **2026-08-15 — §6 acrescentado (item E5 do redesenho).** O vocabulário das 10 peças do redesenho, decidido pelo dono e antes só em artifact, virou seção durável deste documento. **Nada em §6 está implementado ainda** — §3 continua sendo a tipografia e os tokens que o código de fato usa até a Trilha B (`docs/BACKLOG-REDESENHO.md`) chegar em cada peça.
 >
 > **2026-08-15 — Nível 1 da Trilha B implementado (E1, E2, E3, E4).** §3.3, §3.4 e §3.5 foram reescritos para bater com o código: a família passou de IBM Plex Sans/Mono/Serif para Bricolage Grotesque/Archivo/Fraunces (E1); a escala numerada `--lastro-t-meta`/`--lastro-t-corpo`/`--lastro-t-1..8` foi substituída pelos seis papéis nomeados de §6.2 (E2); bevel e gradiente saíram das superfícies areia, com `.nav` como única exceção mantida (E3); tokens de duração/curva M3 entraram em `tokens.css` (E4). Onde §3 e §6 hoje dizem a mesma coisa, §6 fica com o texto histórico da decisão e §3 com o que o código executa.
+>
+> ⚠️ **2026-08-20 — PIVÔ NÃO DOCUMENTADO ATÉ 2026-08-21: §3.0–3.2 e a tabela C1–C14 de §4.2 descrevem uma paleta que não existe mais.** Numa sessão separada, o redesenho **"Apex Pro"** (`8d30cf0`) substituiu "Areia & Azul Petróleo" por um tema **escuro** (obsidiana `#07090D`, ouro `#D4AF37`, esmeralda `#10B981`) sem atualizar este documento. Os nomes de token abaixo (`--lastro-fundo`, `--lastro-sup-1`, `--lastro-txt-3`...) ainda existem em `src/app/tokens.css`, mas com **valores diferentes** dos escritos aqui. **A fonte de verdade visual é `src/app/tokens.css` — confirme contra ele antes de citar qualquer número desta seção.**
+>
+> **O que foi corrigido nesta data (auditoria `docs/AUDITORIA-APEX-PRO.md`, achados A05/A06/T3):** `--lastro-txt-3` reprovava AA contra as superfícies do Apex Pro (3,36:1 sobre `--lastro-sup-3`, piso 4,5) enquanto a linha C3 abaixo — calculada para a paleta areia — dizia "4,85, passa". O token foi corrigido para `#7C8DA6` e **remedido ao vivo**: 4,74 (`sup-3`, pior caso) · 5,18 (`sup-2`) · 5,56 (`sup-1`) · 5,90 (`fundo`). Confirmado por `getComputedStyle` em `/login` e `/catalogo` reais, zero elemento reprovando onde antes 104 reprovavam só no catálogo.
+>
+> **O que NÃO foi corrigido — escopo travado pelo dono (opção 2, não a reconciliação completa):** o resto de §3.1/§3.2 e toda a tabela C1–C14 de §4.2 seguem descrevendo a paleta areia, com números que não representam o Apex Pro. Remedir os 14 pares contra as 7 paletas de tema (incluindo as 6 que o card de Tema em `/ajustes` vai expor — `docs/BACKLOG-PROXIMA-FASE.md` T1) é tarefa própria, ainda não feita. **Não usar nenhum número de §3.1/§3.2/§4.2 além do C3 já corrigido sem remedir primeiro contra `tokens.css`.**
 
 ---
 
@@ -82,7 +88,7 @@ Tema **claro** por padrão (D5 revista). A leitura humana da paleta:
 | Limite de alvo de toque | `--lastro-controle` | `#8A7C68` | 3.40:1 no fundo |
 | Corpo, número, título | `--lastro-txt` | `#12303F` | 11.54:1 |
 | Secundário | `--lastro-txt-2` | `#3A5361` | 6.78:1 |
-| Procedência, metadado | `--lastro-txt-3` | `#476069` | 4.83:1 no `sup-2`, o pior caso |
+| Procedência, metadado | `--lastro-txt-3` | ~~`#476069`~~ **superado — ver §3.1 topo** | 4.83:1 no `sup-2` — número da paleta areia, não confiar. Valor Apex Pro real e remedido: `#7C8DA6`, 4,74:1 no `sup-3` (pior caso) |
 | Barra de topo (gradiente) | `--lastro-barra-a/b` | `#17414F` → `#0E2833` | texto a 9.21:1 contra o topo |
 | **Ação — preenchimento** | `--lastro-acao-a/b` | `#46C27B` → `#35A866` | tinta a 5.12:1 na base, o pior caso |
 | **Ação — tinta sobre ela** | `--lastro-acao-txt` | `#0A2A18` | — |
@@ -125,7 +131,7 @@ Limiares: **4.5:1** texto normal · **3:1** texto grande (≥24px em `--lastro-p
 |---|---|---|---|
 | `--lastro-txt` / fundo · sup-1 · sup-2 | 11.54 · 13.04 · 9.99 | 4.5 | passa |
 | `--lastro-txt-2` / fundo · sup-1 | 6.78 · 7.65 | 4.5 | passa |
-| `--lastro-txt-3` / fundo · sup-1 · sup-2 | 5.58 · 6.30 · **4.83** | 4.5 | passa (margem menor em sup-2) |
+| `--lastro-txt-3` / fundo · sup-1 · sup-2 | ~~5.58 · 6.30 · 4.83~~ — números da paleta areia | 4.5 | **superado, ver nota abaixo** |
 | `--lastro-alta` / sup-1 | 6.17 | 4.5 | passa |
 | `--lastro-plato` / sup-1 | 5.59 | 4.5 | passa |
 | `--lastro-queda` / sup-1 | 6.53 | 4.5 | passa |
@@ -162,7 +168,9 @@ Consequência obrigatória, não recomendação — **em toda ocorrência, no gr
 
 **Cor nunca é o portador da informação — é reforço.** Bloco de evidência ou trecho de gráfico que dependa só da cor para dizer o que é **reprova o gate**. Ver §3.7 e §3.6.6.
 
-**O que não foi medido:** nada. Todo par acima tem razão computada em navegador real, com o método aferido antes. Se um token novo entrar, ele entra com a razão medida ao lado ou não entra.
+**Nota Apex Pro (2026-08-21) — `--lastro-txt-3` remedido, o resto da tabela não.** A linha `txt-3` acima ainda mostra os números da paleta areia (histórico, não apagar — HD append-only vale para a razão de existir do valor antigo). O valor **atual** do token é `#7C8DA6`, remedido ao vivo contra as quatro superfícies do Apex Pro: **4,74** (`sup-3`, pior caso) · **5,18** (`sup-2`) · **5,56** (`sup-1`) · **5,90** (`fundo`) — todos acima do piso 4,5, aferição do método confirmada em `#FFF/#000 = 21,00`. As outras 16 linhas desta tabela (`txt`, `txt-2`, `alta`, `plato`, `queda`, `sync`, `erro`, `acao-*`, `barra-*`, `controle`, `foco`, `linha`) **não foram remedidas contra o Apex Pro** — continuam com número da paleta areia, correto para um tema que não é mais o padrão. Não citar como prova de conformidade atual.
+
+**O que não foi medido:** os 14 pares abaixo da linha `txt-3` corrigida, contra o Apex Pro. Antes do pivô, todo par tinha razão computada em navegador real (nota histórica preservada). Se um token novo entrar — ou um existente for remedido —, ele entra com a razão medida ao lado ou não entra.
 
 ### 3.3 Tipografia
 
@@ -417,11 +425,13 @@ Viewports mínimos: **360×640** (piso realista de celular), **390×844**, **128
 
 Medir com conta-gotas sobre a tela **renderizada** (a tabela de §3.2 é a expectativa; o gate confirma que o CSS entregue bate com ela). Pares obrigatórios, com a razão esperada:
 
+⚠️ **A tabela abaixo (C1–C14) é da paleta areia, pré-Apex Pro (ver §3.0, nota 2026-08-20).** Só a linha **C3** foi remedida contra o tema atual — as outras 13 não. Não usá-las como gate real até remedir.
+
 | # | Par medido, na tela | Esperado | Limiar | Reprova se |
 |---|---|---|---|---|
 | C1 | `--lastro-txt` sobre `--lastro-fundo` (corpo, G1) | 17.27 | 4.5 | < 4.5 ou divergir da expectativa em mais de 0.2 |
 | C2 | `--lastro-txt-2` sobre `--lastro-sup-1` (rótulo, G1) | 9.26 | 4.5 | idem |
-| C3 | `--lastro-txt-3` sobre `--lastro-sup-3` — **o par mais apertado do sistema** | 4.85 | 4.5 | idem |
+| C3 | `--lastro-txt-3` sobre `--lastro-sup-3` — **o par mais apertado do sistema** | ~~4.85~~ (areia) → **4,74 remedido, Apex Pro, 2026-08-21** | 4.5 | < 4.5 |
 | C4 | Número em `--lastro-txt` sobre `--lastro-sup-2` (bloco de evidência, G2) | 14.05 | 4.5 | idem |
 | C5 | Procedência `--lastro-txt-3` sobre `--lastro-sup-2` (G2) | 5.68 | 4.5 | idem |
 | C6 | `--lastro-acao-txt` sobre `--lastro-acao-fundo` (botão D3, G1) | 17.27 | 4.5 | idem |
