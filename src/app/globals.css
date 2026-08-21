@@ -16,9 +16,7 @@
 
 html {
   height: 100%;
-  /* D5 foi revista pelo dono em 2026-08-06: o padrão passou a ser claro.
-     Declarar o esquema evita que o navegador escureça controles nativos. */
-  color-scheme: light;
+  color-scheme: dark;
 }
 
 html,

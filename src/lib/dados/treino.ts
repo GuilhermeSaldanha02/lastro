@@ -38,6 +38,8 @@ export type Treino = {
   data: string;
   /** Quantas séries este treino tem, contando aquecimento. */
   totalSeries: number;
+  gruposMusculares?: string[];
+  volumeKg?: number;
 };
 
 export type TreinoComSeries = Treino & {
@@ -58,29 +60,58 @@ async function usuarioAutenticadoOuErro() {
 
 /**
  * Lista os treinos do usuário logado, mais recente primeiro, com a
- * contagem de séries de cada um. A contagem não é enfeite: a confirmação
- * de exclusão precisa dizer quantas séries somem junto, senão o dono
- * confirma sem saber o tamanho do estrago.
+ * contagem de séries, grupos musculares e volume de cada um.
  */
 export async function listarTreinos(): Promise<Treino[]> {
   const { supabase } = await usuarioAutenticadoOuErro();
   const { data, error } = await supabase
     .from("treino")
-    .select("id, data, serie(count)")
+    .select(
+      "id, data, serie (tipo, reps, peso, peso_corporal_incluso, exercicio:exercicio_id (grupo_muscular_primario, unilateral))",
+    )
     .order("data", { ascending: false });
   if (error) throw new Error(`Falha ao listar treinos: ${error.message}`);
+
+  type LinhaSerie = {
+    tipo: "aquecimento" | "valendo";
+    reps: number;
+    peso: number;
+    peso_corporal_incluso: boolean;
+    exercicio: { grupo_muscular_primario: string; unilateral: boolean } | null;
+  };
 
   type Linha = {
     id: string;
     data: string;
-    serie: { count: number }[] | null;
+    serie: LinhaSerie[] | null;
   };
 
-  return ((data ?? []) as unknown as Linha[]).map((t) => ({
-    id: t.id,
-    data: t.data,
-    totalSeries: t.serie?.[0]?.count ?? 0,
-  }));
+  return ((data ?? []) as unknown as Linha[]).map((t) => {
+    const series = t.serie ?? [];
+    const valendo = series.filter((s) => s.tipo === "valendo");
+    let vol = 0;
+    for (const s of valendo) {
+      const peso = Number(s.peso);
+      const reps = s.reps;
+      const mult = s.exercicio?.unilateral ? 2 : 1;
+      vol += peso * reps * mult;
+    }
+    const grupos = Array.from(
+      new Set(
+        series
+          .map((s) => s.exercicio?.grupo_muscular_primario)
+          .filter((g): g is string => Boolean(g)),
+      ),
+    );
+
+    return {
+      id: t.id,
+      data: t.data,
+      totalSeries: series.length,
+      gruposMusculares: grupos,
+      volumeKg: Math.round(vol),
+    };
+  });
 }
 
 /** Busca um treino do usuário logado com as séries já registradas nele. */
@@ -237,24 +268,6 @@ export async function listarExercicios(): Promise<Exercicio[]> {
   }));
 }
 
-/** Um exercício específico — cabeçalho da tela de histórico (backlog C4 parte 2). */
-export async function buscarExercicio(id: string): Promise<Exercicio | null> {
-  const { supabase } = await usuarioAutenticadoOuErro();
-  const { data, error } = await supabase
-    .from("exercicio")
-    .select("id, nome, grupo_muscular_primario, unilateral")
-    .eq("id", id)
-    .maybeSingle();
-  if (error) throw new Error(`Falha ao buscar exercício: ${error.message}`);
-  if (!data) return null;
-  return {
-    id: data.id,
-    nome: data.nome,
-    grupoMuscularPrimario: data.grupo_muscular_primario,
-    unilateral: data.unilateral,
-  };
-}
-
 export type ExercicioDoCatalogo = Exercicio & {
   grupoMuscularNome: string;
   /**
@@ -264,6 +277,45 @@ export type ExercicioDoCatalogo = Exercicio & {
    */
   dicaExecucao: string | null;
 };
+
+/** Um exercício específico — cabeçalho da tela de histórico (backlog C4 parte 2). */
+export async function buscarExercicio(
+  id: string,
+): Promise<ExercicioDoCatalogo | null> {
+  const { supabase } = await usuarioAutenticadoOuErro();
+  const { data, error } = await supabase
+    .from("exercicio")
+    .select(
+      "id, nome, grupo_muscular_primario, unilateral, dica_execucao, grupo_muscular (nome)",
+    )
+    .eq("id", id)
+    .maybeSingle();
+  if (error) throw new Error(`Falha ao buscar exercício: ${error.message}`);
+  if (!data) return null;
+
+  type Linha = {
+    id: string;
+    nome: string;
+    grupo_muscular_primario: string;
+    unilateral: boolean;
+    dica_execucao: string | null;
+    grupo_muscular: { nome: string } | { nome: string }[] | null;
+  };
+
+  const linha = data as unknown as Linha;
+  const grupo = Array.isArray(linha.grupo_muscular)
+    ? linha.grupo_muscular[0]
+    : linha.grupo_muscular;
+
+  return {
+    id: linha.id,
+    nome: linha.nome,
+    grupoMuscularPrimario: linha.grupo_muscular_primario,
+    grupoMuscularNome: grupo?.nome ?? linha.grupo_muscular_primario,
+    unilateral: linha.unilateral,
+    dicaExecucao: linha.dica_execucao,
+  };
+}
 
 /** Catálogo completo, agrupável por grupo muscular. */
 export async function listarCatalogo(): Promise<ExercicioDoCatalogo[]> {

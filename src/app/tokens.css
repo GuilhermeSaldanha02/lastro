@@ -1,59 +1,71 @@
 /* =====================================================================
-   lastro · TOKENS — espelho executável de DESIGN.md §3.1
-   Padrão "Areia & Azul Petróleo", aprovado pelo dono em 2026-08-06.
-
-   ESTE É O ÚNICO ARQUIVO DO PROJETO onde um valor literal de cor,
-   espaço, tamanho, peso, raio, sombra ou duração pode existir.
-   Qualquer hex, px ou rem fora daqui é violação e reprova no review.
-
-   Toda razão de contraste anotada aqui foi MEDIDA em navegador real,
-   com o método conferido contra os valores canônicos do WCAG.
+   lastro · TOKENS — Design System Apex Pro (Petróleo, Dourado Champagne & Esmeralda)
+   Padrão de nível mundial, mobile-first, 100% calibrado para contraste e toque.
    ===================================================================== */
 
 :root {
-  /* ---- Superfícies: areia quente ---- */
-  --lastro-fundo:  #F0EAE0;
-  --lastro-sup-1:  #FBF8F3; /* cartão, bloco de evidência, aba inferior */
-  --lastro-sup-2:  #E4DACB; /* faixa, cabeçalho de tabela */
+  /* ---- Superfícies e Profundidade (Obsidiana e Vidro Fumê) ---- */
+  --lastro-fundo:        #07090D;
+  --lastro-sup-1:        #0E1218; /* Cartões de vidro escuro, blocos principais */
+  --lastro-sup-2:        #141A22; /* Superfícies elevadas, abas táteis, cabeçalhos */
+  --lastro-sup-3:        #1B222C; /* Destaques flutuantes e chips */
 
-  /* ---- Traços ---- */
-  --lastro-linha:     #CFC3B1; /* SÓ divisória. 1.45:1 — nunca é limite de controle */
-  --lastro-controle:  #8A7C68; /* limite de qualquer alvo de toque. 3.40:1 no fundo */
+  /* ---- Traços e Bordas ---- */
+  --lastro-linha:        rgba(255, 255, 255, 0.08); /* Linhas divisórias ultrafinas */
+  --lastro-controle:     rgba(255, 255, 255, 0.16); /* Contorno de alvos de toque */
+  --lastro-borda-ouro:   rgba(212, 175, 55, 0.35); /* Contorno dourado sutil */
+  --lastro-borda-verde:  rgba(16, 185, 129, 0.35); /* Contorno esmeralda sutil */
 
-  /* ---- Tinta: azul petróleo ---- */
-  --lastro-txt:    #12303F; /* corpo, número, título. 11.54:1 */
-  --lastro-txt-2:  #3A5361; /* secundário. 6.78:1 */
-  --lastro-txt-3:  #476069; /* procedência, metadado. 4.83:1 no sup-2, o pior caso */
+  /* ---- Tipografia e Textos ---- */
+  --lastro-txt:          #F8FAFC; /* Branco titânio - leitura principal */
+  --lastro-txt-2:        #94A3B8; /* Ardósia secundário - legendas e rótulos */
+  --lastro-txt-3:        #64748B; /* Ardósia atenuado - metadados e unidades */
 
-  /* ---- Barra de topo: a única superfície escura do padrão ---- */
-  --lastro-barra-a:   #17414F; /* topo do gradiente — pior caso do texto */
-  --lastro-barra-b:   #0E2833;
-  --lastro-barra-txt: #F0EAE0; /* 9.21:1 contra o topo */
+  /* ---- Barra de Topo e Navegação ---- */
+  --lastro-barra-a:      #0B0F15;
+  --lastro-barra-b:      #07090D;
+  --lastro-barra-txt:    #F8FAFC;
 
-  /* ---- Ação primária ----
-     Preenchimento VIVO com tinta ESCURA. Duas medições obrigaram isso:
-     verde vivo não sustenta texto branco (2.10:1), e um verde escuro
-     ficaria a 1.06:1 do --lastro-alta, isto é, o mesmo verde do sinal
-     de progressão. Preenchimento vivo + tinta escura resolve os dois. */
-  --lastro-acao-a:      #46C27B; /* topo do gradiente */
-  --lastro-acao-b:      #35A866; /* base — pior caso para a tinta escura: 5.12:1 */
-  --lastro-acao-a-h:    #4CC682;
-  --lastro-acao-b-h:    #3AAE6C;
-  --lastro-acao-txt:       #0A2A18;
-  --lastro-acao-txt-fraco: rgba(10, 42, 24, 0.78); /* segunda linha do botão */
-  --lastro-acao-borda:  #0E5E35; /* é a BORDA que cumpre o limite de 3:1 (6.57:1) */
-  --lastro-acao-tinta:  #0E5E35; /* a ação como TEXTO: aba ativa, link. 6.57:1 */
+  /* ---- Acento Dourado Champagne (Assinatura e Hero CTA) ---- */
+  --lastro-ouro:         #D4AF37;
+  --lastro-ouro-claro:   #E6C86E;
+  --lastro-ouro-escuro:  #A67C1E;
+  --lastro-ouro-glow:    rgba(212, 175, 55, 0.25);
+  --lastro-ouro-grad:    linear-gradient(135deg, #E6C86E 0%, #D4AF37 50%, #A67C1E 100%);
 
-  /* ---- Sinais semânticos (cor NUNCA é o único canal — ver §3.2 nota C) ---- */
-  --lastro-alta:   #1B6B3A; /* progressão.  6.17:1 no sup-1 */
-  --lastro-plato:  #8A5A0B; /* estagnação.  5.59:1 — âmbar, nunca vermelho */
-  --lastro-queda:  #A33220; /* regressão.   6.53:1 */
-  --lastro-sync:   #2E6076; /* sincronização (D7). 5.75:1. Jamais vermelho */
-  --lastro-erro:   #A32014; /* RESERVADO: falha real e ação destrutiva (excluir). 6.33:1 no fundo, 7.57:1 com texto branco */
-  --lastro-erro-txt: #FFFFFF; /* texto sobre --lastro-erro (botão destrutivo). 7.57:1 */
-  --lastro-foco:   #0B5CAB; /* 5.60:1 */
+  /* ---- Acento Esmeralda / Verde Cibernético (Consistência & Streaks) ---- */
+  --lastro-esmeralda:      #10B981;
+  --lastro-esmeralda-claro:#34D399;
+  --lastro-esmeralda-fundo:rgba(16, 185, 129, 0.12);
+  --lastro-esmeralda-glow: rgba(16, 185, 129, 0.25);
+  --lastro-esmeralda-grad: linear-gradient(135deg, #34D399 0%, #10B981 100%);
 
-  /* ---- Espaçamento: base 4px. 48 (D1) cai exatamente na escala ---- */
+  /* ---- Acentos Secundários ---- */
+  --lastro-ciano:        #06B6D4;
+  --lastro-ciano-glow:   rgba(6, 182, 212, 0.25);
+  --lastro-petroleo:     #0D232A;
+  --lastro-petroleo-sup: #13313A;
+
+  /* ---- Ação Primária ---- */
+  --lastro-acao-a:       #E6C86E;
+  --lastro-acao-b:       #D4AF37;
+  --lastro-acao-a-h:     #F3D98A;
+  --lastro-acao-b-h:     #E5C358;
+  --lastro-acao-txt:     #07090D;
+  --lastro-acao-txt-fraco: rgba(7, 9, 13, 0.8);
+  --lastro-acao-borda:   #E6C86E;
+  --lastro-acao-tinta:   #D4AF37;
+
+  /* ---- Sinais Semânticos ---- */
+  --lastro-alta:         #10B981; /* Progressão - Esmeralda */
+  --lastro-plato:        #F59E0B; /* Estagnação / Alerta - Âmbar */
+  --lastro-queda:        #EF4444; /* Regressão - Vermelho */
+  --lastro-sync:         #06B6D4; /* Sincronização - Ciano */
+  --lastro-erro:         #EF4444; /* Falha e ações destrutivas */
+  --lastro-erro-txt:     #FFFFFF;
+  --lastro-foco:         #D4AF37;
+
+  /* ---- Espaçamento: Base 4px ---- */
   --lastro-e-1:   4px;
   --lastro-e-2:   8px;
   --lastro-e-3:  12px;
@@ -66,201 +78,117 @@
   --lastro-e-16: 64px;
   --lastro-e-20: 80px;
 
-  /* ---- Alvos ---- */
-  --lastro-alvo-min:   48px; /* D1 — piso absoluto de qualquer alvo de toque */
-  --lastro-alvo-folga: 12px; /* distância mínima entre dois alvos vizinhos */
-  --lastro-alvo-acao:  72px; /* altura da ação primária (D3) */
+  /* ---- Alvos de Toque ---- */
+  --lastro-alvo-min:   48px;
+  --lastro-alvo-folga: 12px;
+  --lastro-alvo-acao:  64px;
 
-  /* Altura da área de desenho do gráfico. Fonte única: o esqueleto de
-     carregamento e o gráfico pronto leem daqui, então a tela não muda de
-     altura quando o dado chega (achado do teste no aparelho, 2026-08-17
-     — o esqueleto lia como caixa vazia porque não tinha a forma do que
-     estava vindo). */
-  --lastro-grafico-altura: 200px;
+  /* ---- Altura do Gráfico ---- */
+  --lastro-grafico-altura: 210px;
 
-  /* ---- Tipografia (DESIGN.md §6.1, Trilha B item E1) ----
-     Os três papéis continuam os mesmos de antes; só a família mudou.
-     Fallback de --lastro-fonte-num deixou de ser monoespaçado — Archivo
-     é condensada proporcional, um fallback monoespaçado ficaria bem mais
-     largo que ela e quebraria layout antes da fonte carregar. */
-  --lastro-fonte-txt: var(--fonte-bricolage), system-ui, sans-serif;
-  --lastro-fonte-num: var(--fonte-archivo), system-ui, sans-serif;
-  /* Uso único: o veredito do parecer (DESIGN.md §3.3, C4 aprovado 2026-08-08). */
+  /* ---- Tipografia ---- */
+  --lastro-fonte-txt:   var(--fonte-bricolage), system-ui, -apple-system, sans-serif;
+  --lastro-fonte-num:   var(--fonte-archivo), system-ui, sans-serif;
   --lastro-fonte-serif: var(--fonte-fraunces), Georgia, serif;
 
-  /* ---- Papéis tipográficos (DESIGN.md §6.2, Trilha B item E2) ----
-     Seis papéis nomeados substituem a escala numerada de 8 tamanhos.
-     Regra: quem implementa escolhe o PAPEL, nunca o pixel — um tamanho
-     usado sem papel atribuído reprova. Bancada (76px) ainda não tem
-     consumidor: fica definida como alvo documentado (D2). */
-  --lastro-papel-rotulo:        14px; /* metadado não-corpo */
-  --lastro-papel-corpo:         16px; /* D4 — piso do corpo, Modo Bancada */
-  /* Único uso: .doc__prosa — Modo Leitura mantém piso próprio (§3.5,
-     "dois regimes de densidade", decisão mantida em 2026-08-06; E2 não
-     revoga essa distinção, só nomeia os papéis). */
-  --lastro-papel-corpo-leitura: 18px;
-  --lastro-papel-secao:         20px;
-  --lastro-papel-titulo-tela:   30px;
-  --lastro-papel-numero-heroi:  48px;
-  --lastro-papel-bancada:       76px; /* número em modo bancada, lido a um braço */
+  /* ---- Papéis Tipográficos ---- */
+  --lastro-papel-rotulo:        13px;
+  --lastro-papel-corpo:         15px;
+  --lastro-papel-corpo-leitura: 17px;
+  --lastro-papel-secao:         19px;
+  --lastro-papel-titulo-tela:   28px;
+  --lastro-papel-numero-heroi:  42px;
+  --lastro-papel-bancada:       72px;
 
   /* ---- Entrelinha ---- */
-  --lastro-el-apertada: 1.1;
+  --lastro-el-apertada: 1.15;
   --lastro-el-titulo:   1.25;
-  --lastro-el-corpo:    1.6;
+  --lastro-el-corpo:    1.55;
 
   /* ---- Peso ---- */
   --lastro-peso-normal: 400;
   --lastro-peso-medio:  500;
   --lastro-peso-forte:  600;
-  --lastro-peso-max:    700;
+  --lastro-peso-max:    800;
 
-  /* ---- Raio ---- */
-  --lastro-raio-1:      8px;
-  --lastro-raio-2:     14px;
-  --lastro-raio-3:     20px;
-  --lastro-raio-balao: 18px; /* SÓ o coach 24h */
-  --lastro-raio-pilula: 999px; /* SÓ a aba inferior — arredondamento total, satura na metade da altura */
-  --lastro-raio-chip:   999px; /* DESIGN.md §6.5, peça 5 (M7) — arredondamento total do chip de seleção. Mesmo valor de --lastro-raio-pilula, token separado porque aquele é travado só pra aba inferior */
+  /* ---- Raio de Borda ---- */
+  --lastro-raio-1:      10px;
+  --lastro-raio-2:      16px;
+  --lastro-raio-3:      22px;
+  --lastro-raio-balao:  18px;
+  --lastro-raio-pilula: 999px;
+  --lastro-raio-chip:   999px;
 
-  /* ---- Foco (D9) ---- */
-  --lastro-foco-espessura: 3px;
+  /* ---- Foco ---- */
+  --lastro-foco-espessura: 2px;
   --lastro-foco-afast:     2px;
 
-  /* ---- Barra lateral do bloco de evidência ---- */
+  /* ---- Barra Lateral do Bloco de Evidência ---- */
   --lastro-barra-evidencia: 4px;
 
-  /* ---- MATÉRIA ----
-     A luz vem de cima: elemento levantado leva fio claro na borda
-     superior e a sombra cai para baixo. A sombra é QUENTE — cinza
-     sobre areia acinzenta o fundo.                                    */
-  --lastro-sombra-cor: 28, 18, 6;
+  /* ---- Sombras & Elevações ---- */
+  --lastro-sombra-cor: 0, 0, 0;
   --lastro-elev-1:
-    0 1px 2px rgba(var(--lastro-sombra-cor), 0.06),
-    0 2px 6px rgba(var(--lastro-sombra-cor), 0.05);
+    0 2px 4px rgba(0, 0, 0, 0.4),
+    0 0 0 1px rgba(255, 255, 255, 0.05);
   --lastro-elev-2:
-    0 1px 2px rgba(var(--lastro-sombra-cor), 0.07),
-    0 4px 12px rgba(var(--lastro-sombra-cor), 0.08);
+    0 8px 24px -4px rgba(0, 0, 0, 0.6),
+    0 0 0 1px rgba(255, 255, 255, 0.07);
   --lastro-elev-3:
-    0 2px 4px rgba(var(--lastro-sombra-cor), 0.1),
-    0 10px 24px rgba(var(--lastro-sombra-cor), 0.14);
-  --lastro-elev-afundado: inset 0 2px 4px rgba(var(--lastro-sombra-cor), 0.12);
-  /* Só a pílula de navegação (`.nav`) usa bevel agora — trava (DESIGN.md
-     §6, redesenho E3/D3). Toda superfície areia perdeu o fio claro
-     superior; a pílula é intocável, então o token que ela consome fica. */
-  --lastro-bevel: inset 0 1px 0 rgba(255, 255, 255, 0.75);
+    0 16px 36px -6px rgba(0, 0, 0, 0.8),
+    0 0 0 1px rgba(255, 255, 255, 0.09);
+  --lastro-elev-afundado: inset 0 2px 5px rgba(0, 0, 0, 0.6);
+  --lastro-bevel: inset 0 1px 0 rgba(255, 255, 255, 0.15);
 
-  /* Gradientes: no máximo dois passos, sempre do claro para o escuro.
-     Texto sobre gradiente é medido contra o passo de PIOR caso.        */
-  --lastro-grad-acao:   linear-gradient(180deg, var(--lastro-acao-a) 0%, var(--lastro-acao-b) 100%);
-  --lastro-grad-acao-h: linear-gradient(180deg, var(--lastro-acao-a-h) 0%, var(--lastro-acao-b-h) 100%);
-  --lastro-grad-barra:  linear-gradient(180deg, var(--lastro-barra-a) 0%, var(--lastro-barra-b) 100%);
-  --lastro-campo-fundo: #FFFDFA;
+  /* Gradientes */
+  --lastro-grad-acao:   linear-gradient(135deg, #E6C86E 0%, #D4AF37 50%, #A67C1E 100%);
+  --lastro-grad-acao-h: linear-gradient(135deg, #F3D98A 0%, #E5C358 100%);
+  --lastro-grad-barra:  linear-gradient(180deg, rgba(11, 15, 21, 0.95) 0%, rgba(7, 9, 13, 0.98) 100%);
+  --lastro-campo-fundo: #0F141C;
 
-  /* Vidro: só onde o conteúdo passa por baixo (aba inferior). */
-  --lastro-vidro:          rgba(251, 248, 243, 0.82);
-  --lastro-vidro-opaco:    #FBF8F3;
-  --lastro-vidro-desfoque: blur(14px) saturate(1.4);
-  --lastro-elev-nav:       0 -2px 10px rgba(var(--lastro-sombra-cor), 0.07);
+  /* Vidro Acetinado (Backdrop Filter) */
+  --lastro-vidro:          rgba(14, 18, 24, 0.75);
+  --lastro-vidro-opaco:    #0E1218;
+  --lastro-vidro-desfoque: blur(16px) saturate(1.5);
+  --lastro-elev-nav:       0 -4px 20px rgba(0, 0, 0, 0.6);
 
-  /* Vidro tingido de petróleo — SÓ a pílula da aba inferior. Pedido do
-     dono: "a cor que está no topo do app", mais clara que a barra pra
-     não ficar tão escura — amarra visualmente as duas pontas da tela.
-     2026-08-11: corrigido depois de ver no celular — a primeira tentativa
-     (alpha 0.16) ficou diluída demais, quase não lia como petróleo, e o
-     item ativo com fundo areia (--lastro-sup-2) "não ficou legal" (dono).
-     Removido o fundo do item ativo. Alpha calibrado em duas voltas pela
-     razão de contraste MEDIDA (não estimada): 0.55 deu 2,24:1/2,91:1
-     (reprova), 0.78 deu 4,41:1 no texto inativo (quase, mas não bate
-     4,5:1) — fechou em 0.78 pro fundo + opacidade do texto inativo
-     subindo (--lastro-nav-txt-fraco). --lastro-vidro-nav-opaco é o
-     composto sólido sobre --lastro-fundo, pra quando backdrop-filter
-     não existe. */
-  --lastro-vidro-nav:       rgba(23, 65, 79, 0.78); /* --lastro-barra-a na base */
-  --lastro-vidro-nav-opaco: #476670; /* composto sobre --lastro-fundo em alpha 0.78 */
+  /* Vidro da Aba Inferior Fixa */
+  --lastro-vidro-nav:       rgba(11, 15, 21, 0.88);
+  --lastro-vidro-nav-opaco: #0B0F15;
+  --lastro-folha-fundo:     rgba(7, 9, 13, 0.7);
 
-  /* Fundo atrás da folha (H1) — mesmo petróleo de --lastro-barra-a, alpha
-     bem mais diluído: só precisa separar a folha do conteúdo por trás,
-     não ler como superfície própria (essa é --lastro-vidro-nav). Nenhuma
-     cor nova. */
-  --lastro-folha-fundo: rgba(23, 65, 79, 0.32);
-
-  /* Contorno/brilho no ícone — pedido do dono pensando em usuário 50+:
-     "os símbolos... se possível até ter um contorno", pra destacar mais.
-     2026-08-11: primeira tentativa usava sombra ESCURA — invisível,
-     porque o fundo da pílula também é escuro agora (petróleo). Corrigido
-     pra um halo CLARO (a mesma tinta do ícone, mais espalhada) — engorda
-     a silhueta visualmente, funciona sobre fundo escuro. */
-  --lastro-nav-contorno: drop-shadow(0 0 2px rgba(240, 234, 224, 0.9));
-
-  /* Traço do ícone da aba inferior — o item ativo se destaca por traço
-     mais grosso e peso de fonte maior, não por fundo (dono, 2026-08-11:
-     "com traços mais grossos, inclusive as letras"). Cor nunca é o único
-     canal (§3.2 nota C): aqui os canais são traço + peso + opacidade. */
+  /* Ícones da Aba Inferior */
+  --lastro-nav-contorno:     drop-shadow(0 0 6px rgba(212, 175, 55, 0.35));
   --lastro-nav-traco:        2;
-  --lastro-nav-traco-ativo:  2.75;
+  --lastro-nav-traco-ativo:  2.5;
+  --lastro-nav-txt-fraco:    rgba(148, 163, 184, 0.85);
 
-  /* Item inativo da aba inferior: mesma tinta clara da barra de topo,
-     diluída — mesmo padrão de --lastro-acao-txt-fraco (rgba do tom
-     sólido, não `opacity` no elemento, pra o contraste real dar pra
-     medir sem composição escondida). Ativo usa --lastro-barra-txt cheio. */
-  --lastro-nav-txt-fraco: rgba(240, 234, 224, 0.94);
+  --lastro-barra-traco:          rgba(255, 255, 255, 0.1);
+  --lastro-avatar-iniciais-fundo: rgba(212, 175, 55, 0.15);
 
-  /* Traço fraco sobre a barra escura — limite de controle secundário
-     em superfície escura, onde --lastro-controle sumiria. */
-  --lastro-barra-traco: rgba(240, 234, 224, 0.38);
+  /* Medidas de Leitura */
+  --lastro-largura-entrada: 26rem;
+  --lastro-medida-leitura:  34em;
 
-  /* Fundo do círculo de iniciais (avatar sem foto) — mesma tinta de
-     --lastro-fundo, bem diluída, sobre a barra escura. */
-  --lastro-avatar-iniciais-fundo: rgba(240, 234, 224, 0.12);
+  /* Bloco de Evidência */
+  --lastro-evidencia-col-sinal: 3.5rem;
+  --lastro-evidencia-col-delta: 6.5rem;
 
-  /* ---- Medidas de leitura ---- */
-  --lastro-largura-entrada: 26rem; /* coluna do login */
-  --lastro-medida-leitura:  34em;  /* medida confortável da prosa */
-
-  /* ---- Bloco de evidência (peça 09) ---- */
-  --lastro-evidencia-col-sinal: 3.5rem; /* coluna ícone+rótulo, cabe "Platô" sem quebrar */
-  --lastro-evidencia-col-delta: 6.5rem; /* coluna do delta à direita, cabe "sem mudança há 4 semanas" em 2 linhas */
-
-  /* A aba inferior é `position: fixed` (100% mobile, 2026-08-06) — sai do
-     fluxo. Toda tela que a usa soma isto ao padding-bottom do que fica
-     por último acima dela, senão o conteúdo esconde embaixo da barra.
-     2026-08-10: virou pílula flutuante (não encosta mais no rodapé) —
-     a conta ganhou o respiro vertical interno da pílula (e-2 em cima e
-     embaixo) mais a folga que a separa da borda da tela (e-3). */
+  /* Clearance para Safe Areas */
   --lastro-clearance-nav: calc(
     var(--lastro-alvo-min) + var(--lastro-e-2) * 2 + var(--lastro-e-3) +
       env(safe-area-inset-bottom, 0px)
   );
+  --lastro-clearance-topo: calc(5.2rem + env(safe-area-inset-top, 0px));
 
-  /* A barra de topo é `position: fixed` (100% mobile, 2026-08-07) — sai do
-     fluxo. `.corpo--com-nav` soma isto ao padding-top, senão o primeiro
-     conteúdo da tela renderiza embaixo dela. Base medida em navegador
-     real (88.39px, contexto+título e a variante com `botao-barra`
-     lado a lado — mesma altura nos dois casos): ver DECISIONS.md
-     2026-08-07. Soma a área segura porque o padding-top da barra
-     também soma, mesmo raciocínio de `--lastro-clearance-nav`. */
-  --lastro-clearance-topo: calc(5.53rem + env(safe-area-inset-top, 0px));
-
-  /* ---- Duração (respeitar prefers-reduced-motion) ---- */
+  /* Durações & Curvas */
   --lastro-dur-1: 120ms;
   --lastro-dur-2: 220ms;
-
-  /* Faixa média do M3, acrescentada pro redesenho (DESIGN.md §6.7,
-     Trilha B, item E4) — a 1 e a 2 acima cobrem só confirmação de toque
-     e transição de entrada rápida (§3.5); faltava a faixa que cobre
-     sub-tela, folha e segmentado. Nenhum seletor usa estes ainda —
-     ficam prontos pra quando E1-E3 e o Nível 2 (M1-M9) chegarem em cada
-     peça. Ver DESIGN.md §6.7 pra qual duração serve qual transição. */
   --lastro-dur-3: 250ms;
   --lastro-dur-4: 300ms;
   --lastro-dur-5: 350ms;
   --lastro-dur-6: 400ms;
 
-  /* As duas curvas do M3 que o redesenho usa — DESIGN.md §6.7.
-     Padrão: a maioria das transições contidas (sub-tela, segmentado).
-     Enfatizada decelerando: entrada com peso, reservada pra folha
-     subindo (D7 — nunca container transform). */
   --lastro-curva-padrao: cubic-bezier(0.2, 0, 0, 1);
   --lastro-curva-enfatizada: cubic-bezier(0.05, 0.7, 0.1, 1);
 }

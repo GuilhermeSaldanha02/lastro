@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Galeria dos 5 Novos Conceitos — Lastro</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      background: #0B0E11;
+      color: #FFF;
+      font-family: system-ui, -apple-system, sans-serif;
+      padding: 40px 20px;
+      margin: 0;
+    }
+    h1 { text-align: center; font-size: 32px; color: #46C27B; margin-bottom: 8px; }
+    p { text-align: center; color: #8899A6; font-size: 16px; margin-bottom: 40px; }
+    .gallery {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 30px;
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+    .card {
+      background: #161C22;
+      border-radius: 24px;
+      padding: 16px;
+      width: 320px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+      border: 1px solid rgba(255,255,255,0.08);
+      text-align: center;
+    }
+    .card h2 { font-size: 18px; margin: 12px 0 6px; color: #46C27B; }
+    .card p.desc { font-size: 13px; color: #A0B0BA; margin-bottom: 16px; text-align: center; }
+    .card img {
+      width: 100%;
+      height: auto;
+      border-radius: 16px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+      display: block;
+      background: #222;
+    }
+  </style>
+</head>
+<body>
+  <h1>📱 5 Conceitos de Redesign para o Lastro</h1>
+  <p>Compare os 5 modelos visuais para a tela de Início do aplicativo:</p>
+
+  <div class="gallery">
+    <div class="card">
+      <h2>1. Cyber-Athletic</h2>
+      <p class="desc">Dark Neon, anel radial de telemetria e alto impacto.</p>
+      <img src="/modelo_1_cyber_athletic.png" alt="Modelo 1">
+    </div>
+
+    <div class="card">
+      <h2>2. Bento Kinetic</h2>
+      <p class="desc">Grade modular dinâmica em blocos 2x1 e 1x1.</p>
+      <img src="/modelo_2_bento_kinetic.png" alt="Modelo 2">
+    </div>
+
+    <div class="card">
+      <h2>3. Modern Brutalism</h2>
+      <p class="desc">Tipografia pesada, números gigantes e máxima velocidade.</p>
+      <img src="/modelo_3_modern_brutalism.png" alt="Modelo 3">
+    </div>
+
+    <div class="card">
+      <h2>4. Fluid Luxury</h2>
+      <p class="desc">Areia Cashmere aveludado, minimalismo e sofisticação.</p>
+      <img src="/modelo_4_fluid_luxury.png" alt="Modelo 4">
+    </div>
+
+    <div class="card">
+      <h2>5. Action-First Hub</h2>
+      <p class="desc">Central gigante de toque rápido na zona do polegar.</p>
+      <img src="/modelo_5_action_first.png" alt="Modelo 5">
+    </div>
+  </div>
+</body>
+</html>

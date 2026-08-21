@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Preview dos 5 Conceitos de Design — Lastro</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Archivo:wdth,wght@75..125,400..900&family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: #111417;
+      color: #F0EAE0;
+      font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    h1 { font-size: 24px; margin-bottom: 8px; text-align: center; color: #46C27B; }
+    p.sub { font-size: 14px; color: #8C9BA5; margin-bottom: 24px; text-align: center; max-width: 600px; }
+    
+    .tabs-selector {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      justify-content: center;
+      margin-bottom: 32px;
+      background: #1A2127;
+      padding: 6px;
+      border-radius: 999px;
+    }
+    .tab-btn {
+      background: transparent;
+      border: none;
+      color: #A0B0BA;
+      padding: 10px 18px;
+      font-size: 13px;
+      font-weight: 700;
+      border-radius: 999px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .tab-btn.active {
+      background: #46C27B;
+      color: #0A2416;
+      box-shadow: 0 2px 10px rgba(70, 194, 123, 0.3);
+    }
+
+    .device-stage {
+      width: 100%;
+      max-width: 390px;
+      min-height: 844px;
+      border-radius: 48px;
+      padding: 14px;
+      background: #000;
+      box-shadow: 0 25px 60px -15px rgba(0,0,0,0.8), 0 0 0 1px #333;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .screen-content {
+      width: 100%;
+      height: 816px;
+      border-radius: 36px;
+      overflow-y: auto;
+      position: relative;
+      padding: 20px 16px 100px 16px;
+    }
+    .screen-content::-webkit-scrollbar { display: none; }
+
+    /* =========================================================================
+       MODELO 1: CYBER ATHLETIC (DARK NEON)
+       ========================================================================= */
+    .theme-cyber {
+      background: #090E11;
+      color: #F2F5F8;
+    }
+    .theme-cyber .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+    }
+    .theme-cyber .logo { font-size: 18px; font-weight: 800; letter-spacing: 1px; color: #00E676; }
+    .theme-cyber .ring-card {
+      background: radial-gradient(circle at 50% 30%, rgba(0, 230, 118, 0.12), transparent 70%), #12191F;
+      border: 1px solid rgba(0, 230, 118, 0.2);
+      border-radius: 28px;
+      padding: 24px;
+      text-align: center;
+      margin-bottom: 16px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    }
+    .theme-cyber .ring-stat {
+      font-family: 'Archivo', sans-serif;
+      font-size: 48px;
+      font-weight: 900;
+      color: #FFF;
+      line-height: 1;
+      margin: 12px 0 4px;
+    }
+    .theme-cyber .ring-stat span { font-size: 20px; color: #00E676; }
+    .theme-cyber .btn-cyber {
+      width: 100%;
+      background: linear-gradient(135deg, #00E676, #00B050);
+      color: #03200F;
+      font-weight: 800;
+      font-size: 16px;
+      border: none;
+      padding: 18px;
+      border-radius: 20px;
+      box-shadow: 0 0 25px rgba(0, 230, 118, 0.45);
+      cursor: pointer;
+      margin-bottom: 16px;
+      letter-spacing: 0.5px;
+    }
+    .theme-cyber .grid-cyber {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+    .theme-cyber .card-cyber {
+      background: #12191F;
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 20px;
+      padding: 16px;
+    }
+    .theme-cyber .card-cyber .lbl { font-size: 11px; text-transform: uppercase; color: #7B8F9D; font-weight: 700; }
+    .theme-cyber .card-cyber .val { font-family: 'Archivo', sans-serif; font-size: 28px; font-weight: 800; color: #FFF; margin-top: 6px; }
+
+    /* =========================================================================
+       MODELO 2: BENTO KINETIC
+       ========================================================================= */
+    .theme-bento {
+      background: #F0EAE0;
+      color: #12303F;
+    }
+    .theme-bento .header { display: flex; justify-content: space-between; margin-bottom: 20px; }
+    .theme-bento .header h2 { font-size: 28px; font-weight: 800; font-family: 'Bricolage Grotesque', sans-serif; }
+    .theme-bento .bento-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+    .theme-bento .bento-hero {
+      grid-column: span 2;
+      background: linear-gradient(135deg, #17414F, #0E2833);
+      color: #FFF;
+      padding: 22px;
+      border-radius: 26px;
+      box-shadow: 0 10px 25px rgba(18, 48, 63, 0.18);
+    }
+    .theme-bento .bento-hero h3 { font-size: 18px; margin-bottom: 16px; }
+    .theme-bento .bento-hero .btn-bento {
+      background: #46C27B;
+      color: #0A2416;
+      border: none;
+      width: 100%;
+      padding: 14px;
+      font-weight: 800;
+      font-size: 15px;
+      border-radius: 16px;
+      cursor: pointer;
+    }
+    .theme-bento .bento-card {
+      background: #FAF7F2;
+      padding: 16px;
+      border-radius: 22px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+      border: 1px solid rgba(0,0,0,0.03);
+    }
+    .theme-bento .bento-card .val {
+      font-family: 'Archivo', sans-serif;
+      font-size: 32px;
+      font-weight: 800;
+      color: #12303F;
+      margin-top: 4px;
+    }
+
+    /* =========================================================================
+       MODELO 3: BRUTALISM GYM
+       ========================================================================= */
+    .theme-brutal {
+      background: #EFECE6;
+      color: #000;
+    }
+    .theme-brutal .hero-brutal {
+      background: #46C27B;
+      color: #000;
+      padding: 24px 20px;
+      border-radius: 14px;
+      margin-bottom: 16px;
+      border: 2px solid #000;
+      box-shadow: 4px 4px 0px #000;
+    }
+    .theme-brutal .hero-brutal h2 { font-size: 24px; font-weight: 900; letter-spacing: -0.5px; }
+    .theme-brutal .table-brutal {
+      background: #FFF;
+      border: 2px solid #000;
+      border-radius: 14px;
+      box-shadow: 4px 4px 0px #000;
+      margin-bottom: 16px;
+      overflow: hidden;
+    }
+    .theme-brutal .table-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      padding: 16px 12px;
+      text-align: center;
+    }
+    .theme-brutal .table-val {
+      font-family: 'Archivo', sans-serif;
+      font-size: 26px;
+      font-weight: 900;
+    }
+
+    /* =========================================================================
+       MODELO 4: FLUID LUXURY (CASHMERE)
+       ========================================================================= */
+    .theme-luxury {
+      background: #FAF6EE;
+      color: #12303F;
+    }
+    .theme-luxury .lux-card {
+      background: #FFF;
+      border-radius: 28px;
+      padding: 26px 20px;
+      box-shadow: 0 8px 30px rgba(18, 48, 63, 0.05);
+      border: 1px solid rgba(18, 48, 63, 0.04);
+      margin-bottom: 16px;
+    }
+    .theme-luxury .lux-btn {
+      background: #17414F;
+      color: #FFF;
+      border: none;
+      width: 100%;
+      padding: 18px;
+      font-size: 16px;
+      font-weight: 700;
+      border-radius: 22px;
+      box-shadow: 0 8px 20px rgba(23, 65, 79, 0.25);
+    }
+
+    /* =========================================================================
+       MODELO 5: ACTION-FIRST SPLIT HUB
+       ========================================================================= */
+    .theme-action {
+      background: #F2EBE0;
+      color: #12303F;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      height: 100%;
+    }
+    .theme-action .btn-gigante {
+      background: #46C27B;
+      color: #0A2416;
+      border: none;
+      width: 100%;
+      padding: 24px 20px;
+      font-size: 20px;
+      font-weight: 900;
+      border-radius: 24px;
+      box-shadow: 0 12px 28px rgba(70, 194, 123, 0.35);
+      margin-bottom: 12px;
+    }
+
+    /* PÍLULA FLUTUANTE COMUM */
+    .floating-pill {
+      position: absolute;
+      bottom: 24px;
+      left: 20px;
+      right: 20px;
+      background: #0E2833;
+      border-radius: 999px;
+      padding: 10px 14px;
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.4);
+      z-index: 100;
+    }
+    .pill-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      font-size: 10px;
+      color: #7D97A3;
+      font-weight: 700;
+      gap: 3px;
+    }
+    .pill-item.active {
+      color: #46C27B;
+    }
+    .pill-item svg { width: 20px; height: 20px; stroke-width: 2.2; }
+  </style>
+</head>
+<body>
+
+  <h1>🎨 Escolha o Novo Design do Lastro</h1>
+  <p class="sub">Clique nas abas abaixo para alternar em tempo real entre os 5 modelos na tela interativa.</p>
+
+  <div class="tabs-selector">
+    <button class="tab-btn active" onclick="switchTheme('cyber', this)">1. Cyber-Athletic (Dark Neon)</button>
+    <button class="tab-btn" onclick="switchTheme('bento', this)">2. Bento Kinetic (Modular)</button>
+    <button class="tab-btn" onclick="switchTheme('brutal', this)">3. Modern Brutalism (Bold)</button>
+    <button class="tab-btn" onclick="switchTheme('luxury', this)">4. Fluid Luxury (Cashmere)</button>
+    <button class="tab-btn" onclick="switchTheme('action', this)">5. Action-First (Hub Rápido)</button>
+  </div>
+
+  <div class="device-stage">
+    
+    <!-- TELA MODELO 1 (CYBER ATHLETIC) -->
+    <div id="screen-cyber" class="screen-content theme-cyber">
+      <div class="header">
+        <div>
+          <div class="logo">⚡ LASTRO</div>
+          <div style="font-size: 20px; font-weight: 800; margin-top: 4px;">Início</div>
+        </div>
+        <div style="width: 36px; height: 36px; border-radius: 50%; background: #00E676; border: 2px solid #FFF;"></div>
+      </div>
+
+      <div class="ring-card">
+        <div style="font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: #00E676; font-weight: 800;">Volume da Semana</div>
+        <div class="ring-stat">5,2<span>t</span></div>
+        <div style="font-size: 12px; color: #7B8F9D;">Meta: 8,0t • 65% concluído</div>
+      </div>
+
+      <button class="btn-cyber">⚡ INICIAR TREINO DE HOJE</button>
+
+      <div class="grid-cyber">
+        <div class="card-cyber">
+          <div class="lbl">Treinos</div>
+          <div class="val">1 <span style="font-size: 14px; color: #00E676;">/ 4</span></div>
+        </div>
+        <div class="card-cyber">
+          <div class="lbl">Séries Válidas</div>
+          <div class="val">12</div>
+        </div>
+      </div>
+
+      <div class="card-cyber" style="margin-bottom: 12px;">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <div class="lbl" style="color: #00E676;">Análise Semanal (IA)</div>
+          <span style="font-size: 11px; background: rgba(0,230,118,0.15); color: #00E676; padding: 2px 8px; border-radius: 999px;">Pronto</span>
+        </div>
+        <div style="font-size: 13px; font-weight: 600; margin-top: 8px; color: #E0E8EE;">2 semanas fechadas com treino disponíveis para leitura.</div>
+      </div>
+
+      <!-- PÍLULA FLUTUANTE -->
+      <div class="floating-pill">
+        <div class="pill-item active">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+          Início
+        </div>
+        <div class="pill-item">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
+          Treinos
+        </div>
+        <div class="pill-item">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+          Análise
+        </div>
+        <div class="pill-item">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+          Catálogo
+        </div>
+        <div class="pill-item">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+          Ajustes
+        </div>
+      </div>
+    </div>
+
+    <!-- TELA MODELO 2 (BENTO KINETIC) -->
+    <div id="screen-bento" class="screen-content theme-bento" style="display:none;">
+      <div class="header">
+        <div>
+          <div style="font-size: 11px; font-weight: 700; text-transform: uppercase; color: #6D828E;">LASTRO</div>
+          <h2>Início</h2>
+        </div>
+        <div style="width: 36px; height: 36px; border-radius: 50%; background: #17414F; color: #FFF; display: flex; align-items: center; justify-content: center; font-weight: 800;">G</div>
+      </div>
+
+      <div class="bento-grid">
+        <div class="bento-hero">
+          <div style="font-size: 11px; font-weight: 800; text-transform: uppercase; color: #46C27B; letter-spacing: 0.5px;">PRONTO PARA TREINAR</div>
+          <h3>Supino + Costas (A)</h3>
+          <button class="btn-bento">Iniciar Treino de Hoje →</button>
+        </div>
+
+        <div class="bento-card">
+          <div style="font-size: 11px; font-weight: 700; color: #5B727F;">TREINOS</div>
+          <div class="val">1</div>
+          <div style="font-size: 11px; color: #46C27B; font-weight: 700; margin-top: 4px;">▲ Em dia</div>
+        </div>
+
+        <div class="bento-card">
+          <div style="font-size: 11px; font-weight: 700; color: #5B727F;">VOLUME</div>
+          <div class="val">5,2<span style="font-size: 16px;">t</span></div>
+          <div style="font-size: 11px; color: #5B727F; margin-top: 4px;">12 séries</div>
+        </div>
+
+        <div class="bento-card" style="grid-column: span 2;">
+          <div style="display: flex; justify-content: space-between;">
+            <span style="font-size: 12px; font-weight: 800; color: #17414F;">ANÁLISE DA SEMANA</span>
+            <span style="font-size: 11px; color: #46C27B; font-weight: 700;">Ler parecer</span>
+          </div>
+          <div style="font-size: 14px; font-weight: 600; margin-top: 8px; line-height: 1.4;">
+            "Seu peitoral progrediu +8% enquanto o bíceps manteve estabilidade."
+          </div>
+        </div>
+      </div>
+
+      <!-- PÍLULA FLUTUANTE -->
+      <div class="floating-pill">
+        <div class="pill-item active"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>Início</div>
+        <div class="pill-item"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>Treinos</div>
+        <div class="pill-item"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>Análise</div>
+        <div class="pill-item"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>Catálogo</div>
+        <div class="pill-item"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>Ajustes</div>
+      </div>
+    </div>
+
+    <!-- TELA MODELO 3 (BRUTALISM) -->
+    <div id="screen-brutal" class="screen-content theme-brutal" style="display:none;">
+      <div style="font-size: 24px; font-weight: 900; margin-bottom: 16px;">LASTRO // INÍCIO</div>
+      
+      <div class="hero-brutal">
+        <h2>INICIAR TREINO DE HOJE</h2>
+        <div style="font-size: 13px; font-weight: 700; margin-top: 6px;">TOQUE PARA COMEÇAR ➔</div>
+      </div>
+
+      <div class="table-brutal">
+        <div class="table-row" style="border-bottom: 2px solid #000; font-size: 11px; font-weight: 800; background: #F5F5F5;">
+          <div>TREINOS</div>
+          <div>VOLUME</div>
+          <div>SÉRIES</div>
+        </div>
+        <div class="table-row">
+          <div class="table-val">01</div>
+          <div class="table-val">5,2t</div>
+          <div class="table-val">12</div>
+        </div>
+      </div>
+
+      <!-- PÍLULA FLUTUANTE -->
+      <div class="floating-pill" style="border: 2px solid #000; box-shadow: 4px 4px 0px #000;">
+        <div class="pill-item active"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>Início</div>
+        <div class="pill-item"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>Treinos</div>
+        <div class="pill-item"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>Análise</div>
+        <div class="pill-item"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>Catálogo</div>
+        <div class="pill-item"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>Ajustes</div>
+      </div>
+    </div>
+
+    <!-- TELA MODELO 4 (LUXURY) -->
+    <div id="screen-luxury" class="screen-content theme-luxury" style="display:none;">
+      <div style="font-size: 26px; font-weight: 800; margin-bottom: 20px;">Início</div>
+      
+      <div class="lux-card">
+        <div style="font-size: 12px; color: #5B727F; text-transform: uppercase; font-weight: 700; margin-bottom: 6px;">Sessão de Hoje</div>
+        <div style="font-size: 20px; font-weight: 800; margin-bottom: 16px;">Pronto para treinar?</div>
+        <button class="lux-btn">Iniciar treino de hoje</button>
+      </div>
+
+      <div class="lux-card">
+        <div style="display: flex; justify-content: space-between; text-align: center;">
+          <div><div style="font-size: 11px; color: #7B909C;">TREINOS</div><div style="font-size: 26px; font-weight: 800; font-family: 'Archivo';">1</div></div>
+          <div style="width: 1px; background: #EAE3D6;"></div>
+          <div><div style="font-size: 11px; color: #7B909C;">VOLUME</div><div style="font-size: 26px; font-weight: 800; font-family: 'Archivo';">5,2t</div></div>
+          <div style="width: 1px; background: #EAE3D6;"></div>
+          <div><div style="font-size: 11px; color: #7B909C;">SÉRIES</div><div style="font-size: 26px; font-weight: 800; font-family: 'Archivo';">12</div></div>
+        </div>
+      </div>
+
+      <!-- PÍLULA FLUTUANTE -->
+      <div class="floating-pill">
+        <div class="pill-item active"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>Início</div>
+        <div class="pill-item"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>Treinos</div>
+        <div class="pill-item"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>Análise</div>
+        <div class="pill-item"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>Catálogo</div>
+        <div class="pill-item"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>Ajustes</div>
+      </div>
+    </div>
+
+    <!-- TELA MODELO 5 (ACTION FIRST) -->
+    <div id="screen-action" class="screen-content theme-action" style="display:none;">
+      <div>
+        <div style="font-size: 24px; font-weight: 800; margin-bottom: 12px;">Início</div>
+        
+        <div style="background: #FFF; border-radius: 20px; padding: 18px; margin-bottom: 12px;">
+          <div style="font-size: 11px; font-weight: 700; color: #7B8F9D;">RESUMO DA SEMANA</div>
+          <div style="display: flex; justify-content: space-between; align-items: baseline; margin-top: 6px;">
+            <div style="font-size: 32px; font-weight: 900; font-family: 'Archivo';">5,2t</div>
+            <div style="font-size: 13px; font-weight: 700; color: #46C27B;">1 treino • 12 séries</div>
+          </div>
+        </div>
+      </div>
+
+      <div style="margin-bottom: 20px;">
+        <button class="btn-gigante">🔥 COMEÇAR TREINO</button>
+        <button style="background: #17414F; color: #FFF; border: none; width: 100%; padding: 16px; font-weight: 700; border-radius: 20px; font-size: 15px;">Modelos Salvos →</button>
+      </div>
+
+      <!-- PÍLULA FLUTUANTE -->
+      <div class="floating-pill">
+        <div class="pill-item active"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>Início</div>
+        <div class="pill-item"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>Treinos</div>
+        <div class="pill-item"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>Análise</div>
+        <div class="pill-item"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>Catálogo</div>
+        <div class="pill-item"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>Ajustes</div>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    function switchTheme(theme, btn) {
+      document.querySelectorAll('.screen-content').forEach(el => el.style.display = 'none');
+      document.getElementById('screen-' + theme).style.display = 'block';
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+    }
+  </script>
+</body>
+</html>

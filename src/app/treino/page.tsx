@@ -56,6 +56,8 @@ export default async function PaginaTreino() {
             id: treino.id,
             dataFormatada: formatarData(treino.data),
             totalSeries: treino.totalSeries,
+            gruposMusculares: treino.gruposMusculares,
+            volumeKg: treino.volumeKg,
           }))}
         />
       </div>

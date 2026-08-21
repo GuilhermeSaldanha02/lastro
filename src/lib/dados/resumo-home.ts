@@ -18,6 +18,7 @@ export type TreinoRecente = {
   data: string;
   totalSeries: number;
   volume: number;
+  gruposMusculares: string[];
 };
 
 export type ResumoHome = {
@@ -27,7 +28,9 @@ export type ResumoHome = {
   volumeNaSemana: number;
   /** Séries valendo na semana em andamento. Aquecimento não conta (A2). */
   seriesValendoNaSemana: number;
-  /** Os 3 treinos mais recentes, para a lista de atividade. */
+  /** Datas ISO dos treinos realizados nesta semana. */
+  diasComTreinoNaSemana: string[];
+  /** Os 3 treinos mais recentes, para a lista de atividade com grupos musculares. */
   recentes: TreinoRecente[];
   /** Quantas semanas ISO fechadas já têm treino — a Análise precisa disso. */
   semanasFechadasComTreino: number;
@@ -89,12 +92,6 @@ export async function carregarResumoHome(hojeISO: string): Promise<ResumoHome> {
       })) as SerieValendo[];
   }
 
-  // Treino sem NENHUMA série (aquecimento ou valendo) não é um treino
-  // feito — é uma linha criada por um clique em "Iniciar treino de hoje"
-  // que ainda não virou nada. Não conta em nenhuma estatística nem
-  // aparece em "recentes" (achado do dono, 2026-08-07): só o treino de
-  // hoje (`treinoDeHojeId`, abaixo) permanece visível vazio, porque é o
-  // link de "continuar" pra ele.
   const comSerie = treinos.filter((t) => (t.serie?.length ?? 0) > 0);
 
   const daSemana = comSerie.filter(
@@ -112,12 +109,23 @@ export async function carregarResumoHome(hojeISO: string): Promise<ResumoHome> {
     treinosNaSemana: daSemana.length,
     volumeNaSemana: calcularVolume(valendoDaSemana),
     seriesValendoNaSemana: valendoDaSemana.length,
-    recentes: comSerie.slice(0, 3).map((t) => ({
-      id: t.id,
-      data: t.data,
-      totalSeries: (t.serie ?? []).length,
-      volume: calcularVolume(valendoDoTreino(t)),
-    })),
+    diasComTreinoNaSemana: Array.from(new Set(daSemana.map((t) => t.data))),
+    recentes: comSerie.slice(0, 3).map((t) => {
+      const grupos = Array.from(
+        new Set(
+          (t.serie ?? [])
+            .map((s) => s.exercicio?.grupo_muscular_primario)
+            .filter((g): g is string => Boolean(g)),
+        ),
+      );
+      return {
+        id: t.id,
+        data: t.data,
+        totalSeries: (t.serie ?? []).length,
+        volume: calcularVolume(valendoDoTreino(t)),
+        gruposMusculares: grupos,
+      };
+    }),
     semanasFechadasComTreino: semanasComTreino.size,
     treinoDeHojeId: treinos.find((t) => t.data === hojeISO)?.id ?? null,
   };

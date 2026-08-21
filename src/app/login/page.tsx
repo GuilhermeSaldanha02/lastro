@@ -9,27 +9,12 @@ import { criarClienteBrowser } from "@/lib/supabase/cliente-browser";
 import { criarContaComEmail, entrarComEmail } from "@/lib/dados/auth";
 import { PARAM_RETORNO, sanitizarRotaDeRetorno } from "@/lib/rota-de-retorno";
 
-/**
- * Lê o retorno da URL na hora do clique, e não com `useSearchParams`, de
- * propósito: o hook obrigaria a envolver a página inteira em `Suspense` (ou
- * derrubaria a pré-renderização). Aqui isto só roda dentro de handler, que
- * é sempre cliente — `window` existe.
- *
- * A sanitização é a mesma do `/auth/callback`. Ela é ainda mais necessária
- * aqui: `router.push("//evil.com")` sai do domínio de verdade.
- */
 function rotaDeRetorno(): string {
   return sanitizarRotaDeRetorno(
     new URLSearchParams(window.location.search).get(PARAM_RETORNO),
   );
 }
 
-/**
- * O callback do OAuth redireciona pra cá com `?erro=...` quando algo falha.
- * Sem exibir isso, o login com Google que dá errado devolve o dono pra tela
- * de login sem explicação nenhuma — foi exatamente o que aconteceu no teste
- * em celular (2026-08-06) e o que tornou o diagnóstico difícil.
- */
 const MENSAGENS_DE_ERRO: Record<string, string> = {
   troca: "Não foi possível concluir o login com o Google. Tente de novo.",
   "sem-codigo": "O Google não retornou a autorização. Tente de novo.",
@@ -76,20 +61,12 @@ export default function PaginaLogin() {
       setMensagem("Conta criada — confirme seu e-mail antes de entrar.");
       return;
     }
-    // A home (`/`) é a porta de entrada única do app — o dono pediu que
-    // tudo parta dela, não só o ícone instalado (ver ESCOPO/DECISIONS
-    // 2026-08-06), e ela segue sendo o padrão. A exceção é quem foi
-    // mandado pra cá pelo `proxy.ts` ao tentar abrir uma rota privada:
-    // esse volta pra rota que pediu, senão o login vira beco (A1).
     router.push(rotaDeRetorno());
     router.refresh();
   }
 
   async function entrarComGoogle() {
     const supabase = criarClienteBrowser();
-    // O caminho do Google sai do app e volta pelo `/auth/callback`, então o
-    // retorno precisa viajar na própria URL de callback — `URLSearchParams`
-    // codifica o valor (interpolar cru quebraria no primeiro `&`).
     const callback = new URL("/auth/callback", window.location.origin);
     callback.searchParams.set(PARAM_RETORNO, rotaDeRetorno());
     await supabase.auth.signInWithOAuth({
@@ -99,102 +76,133 @@ export default function PaginaLogin() {
   }
 
   return (
-    // Primeira e única tela antes de existir qualquer dado — é aqui que a
-    // personalidade se estabelece. Ferramenta pessoal e séria: sem tour,
-    // sem depoimento, sem promessa de marketing (ESCOPO.md §5.1).
     <main className="tela tela--entrada">
       <div className="entrada">
         <header className="entrada__marca">
-          <h1>lastro</h1>
-          <p>Registro de treino e leitura semanal.</p>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/logo-lastro.png"
+            alt="LASTRO"
+            className="entrada__logo-img"
+            width={120}
+            height={120}
+          />
+          <p className="entrada__subtitulo">Registro de treino e leitura semanal com IA</p>
         </header>
 
         <Suspense fallback={null}>
           <AvisoDeErroNaUrl />
         </Suspense>
 
-        <form className="formulario" onSubmit={aoEnviar}>
-          {modo === "criar-conta" && (
+        <div className="cartao cartao--vidro">
+          <form className="formulario" onSubmit={aoEnviar}>
+            {modo === "criar-conta" && (
+              <div className="campo">
+                <label className="campo__rotulo" htmlFor="nome">
+                  Nome
+                </label>
+                <input
+                  id="nome"
+                  type="text"
+                  autoComplete="name"
+                  placeholder="Seu nome"
+                  value={nome}
+                  onChange={(e) => setNome(e.target.value)}
+                  required
+                />
+              </div>
+            )}
+
             <div className="campo">
-              <label className="campo__rotulo" htmlFor="nome">
-                Nome
+              <label className="campo__rotulo" htmlFor="email">
+                E-mail
               </label>
               <input
-                id="nome"
-                type="text"
-                autoComplete="name"
-                value={nome}
-                onChange={(e) => setNome(e.target.value)}
+                id="email"
+                type="email"
+                autoComplete="email"
+                placeholder="seu@email.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
                 required
               />
             </div>
-          )}
 
-          <div className="campo">
-            <label className="campo__rotulo" htmlFor="email">
-              E-mail
-            </label>
-            <input
-              id="email"
-              type="email"
-              autoComplete="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-            />
+            <div className="campo">
+              <label className="campo__rotulo" htmlFor="senha">
+                Senha
+              </label>
+              <input
+                id="senha"
+                type="password"
+                placeholder="••••••••"
+                autoComplete={
+                  modo === "entrar" ? "current-password" : "new-password"
+                }
+                value={senha}
+                onChange={(e) => setSenha(e.target.value)}
+                required
+                minLength={6}
+              />
+            </div>
+
+            {mensagem && (
+              <p className="aviso-erro" role="alert">
+                {mensagem}
+              </p>
+            )}
+
+            <button type="submit" className="botao-primario botao-primario--heroi" disabled={carregando}>
+              {carregando
+                ? "Entrando…"
+                : modo === "entrar"
+                  ? "Entrar no Lastro"
+                  : "Criar minha conta"}
+            </button>
+          </form>
+
+          <div className="divisor-ou">
+            <span>ou</span>
           </div>
 
-          <div className="campo">
-            <label className="campo__rotulo" htmlFor="senha">
-              Senha
-            </label>
-            <input
-              id="senha"
-              type="password"
-              autoComplete={
-                modo === "entrar" ? "current-password" : "new-password"
-              }
-              value={senha}
-              onChange={(e) => setSenha(e.target.value)}
-              required
-              minLength={6}
-            />
+          <div className="pilha">
+            <button
+              type="button"
+              className="botao-secundario botao-google"
+              onClick={entrarComGoogle}
+            >
+              <svg className="icone-google" viewBox="0 0 24 24" width="18" height="18">
+                <path
+                  fill="#4285F4"
+                  d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
+                />
+                <path
+                  fill="#34A853"
+                  d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
+                />
+                <path
+                  fill="#FBBC05"
+                  d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"
+                />
+                <path
+                  fill="#EA4335"
+                  d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"
+                />
+              </svg>
+              Entrar com Google
+            </button>
+
+            <button
+              type="button"
+              className="botao-texto"
+              onClick={() => {
+                setModo(modo === "entrar" ? "criar-conta" : "entrar");
+                setMensagem(null);
+              }}
+            >
+              {modo === "entrar" ? "Não tem uma conta? Cadastre-se" : "Já tem conta? Fazer login"}
+            </button>
           </div>
-
-          {mensagem && (
-            <p className="aviso-erro" role="alert">
-              {mensagem}
-            </p>
-          )}
-
-          <button type="submit" className="botao-primario" disabled={carregando}>
-            {carregando
-              ? "Entrando…"
-              : modo === "entrar"
-                ? "Entrar"
-                : "Criar conta"}
-          </button>
-        </form>
-
-        <div className="pilha">
-          <button
-            type="button"
-            className="botao-secundario"
-            onClick={entrarComGoogle}
-          >
-            Entrar com Google
-          </button>
-
-          <button
-            type="button"
-            className="botao-secundario"
-            onClick={() => {
-              setModo(modo === "entrar" ? "criar-conta" : "entrar");
-              setMensagem(null);
-            }}
-          >
-            {modo === "entrar" ? "Criar uma conta" : "Já tenho conta"}
-          </button>
         </div>
       </div>
     </main>

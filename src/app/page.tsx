@@ -1,27 +1,5 @@
 // lastro · a home é a porta de entrada única do app (2026-08-06): tudo
 // parte daqui, inclusive o ícone instalado e o retorno do login.
-//
-// Sem sessão, `/` não tem tela própria — ela é o `/login` (Trilha A, item
-// A2, decisão do dono 2026-08-15). Antes existiam duas telas para uma
-// coisa só: uma marca com botão "Entrar" aqui, e o formulário de verdade
-// lá. `redirect()` roda no servidor, antes de qualquer HTML sair — não é
-// `useEffect` reagindo depois da pintura, então não pisca (o mesmo defeito
-// do item A3, evitado aqui de propósito).
-//
-// TODO NÚMERO DESTA TELA É REAL, calculado pelo mesmo agregador da
-// Análise Semanal (`carregarResumoHome`). Nenhum valor de exemplo, nenhum
-// "Novo PR em Agachamento" fixo — E3 e PRD §7: sem treino, os números
-// vêm zerados e a tela diz isso, em vez de parecer cheia mentindo.
-//
-// O que NÃO existe aqui: cartão passivo de "próximo treino planejado" com
-// nome e lista de exercícios sugeridos pelo app. O app não prescreve
-// programa (PRD §5, escopo negativo) — ele analisa o que foi feito. A ação
-// real é "iniciar treino de hoje". SDD §9 (2026-08-13, Scope Change
-// aprovado em PRD §9) acrescenta uma exceção estreita e opcional: se o
-// PRÓPRIO dono já salvou um modelo (só lista de exercícios, nunca
-// série/peso/reps), o botão oferece escolher entre ele e "treino novo" —
-// isso não é o app sugerindo nada, é reaproveitar o que a pessoa mesma
-// montou. Sem modelo nenhum, o comportamento é idêntico ao original.
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { criarClienteServidor } from "@/lib/supabase/cliente-servidor";
@@ -34,9 +12,9 @@ import AbaInferior from "@/components/aba-inferior";
 import Avatar from "@/components/avatar";
 import IniciarTreino from "@/components/iniciar-treino";
 import SetaNavegacao from "@/components/seta-navegacao";
-import TituloTela from "@/components/titulo-tela";
+import RastreadorDisciplina from "@/components/rastreador-disciplina";
+import SeletorMetricasHome from "@/components/seletor-metricas-home";
 
-/** "2026-08-06" → "6 ago". Relativo quando é hoje ou ontem. */
 function formatarData(iso: string, hojeISO: string): string {
   if (iso === hojeISO) return "hoje";
   const ontem = new Date(`${hojeISO}T00:00:00Z`);
@@ -45,15 +23,34 @@ function formatarData(iso: string, hojeISO: string): string {
   return formatarDataCurta(iso);
 }
 
-/**
- * 14250 → { valor: "14,2", unidade: "t" }. Abaixo de 1000 kg, kg cheio.
- * Antes disso o valor saía como "14,2k" + "kg" fixo no template = "14,2k kg",
- * dois indicadores de magnitude na mesma expressão (DECISIONS 2026-08-08).
- */
 function formatarVolume(kg: number): { valor: string; unidade: string } {
   if (kg === 0) return { valor: "0", unidade: "kg" };
   if (kg < 1000) return { valor: String(Math.round(kg)), unidade: "kg" };
   return { valor: (kg / 1000).toFixed(1).replace(".", ","), unidade: "t" };
+}
+
+function formatarCabecalhoData(hojeISO: string): { dataTexto: string; semanaTexto: string } {
+  const d = new Date(`${hojeISO}T00:00:00Z`);
+  const dias = ["Domingo", "Segunda-feira", "Terça-feira", "Quarta-feira", "Quinta-feira", "Sexta-feira", "Sábado"];
+  const meses = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"];
+  const diaSemana = dias[d.getUTCDay()];
+  const diaMes = d.getUTCDate();
+  const mes = meses[d.getUTCMonth()];
+
+  const target = new Date(d.valueOf());
+  const dayNr = (d.getUTCDay() + 6) % 7;
+  target.setUTCDate(target.getUTCDate() - dayNr + 3);
+  const firstThursday = target.valueOf();
+  target.setUTCMonth(0, 1);
+  if (target.getUTCDay() !== 4) {
+    target.setUTCMonth(0, 1 + ((4 - target.getUTCDay()) + 7) % 7);
+  }
+  const semanaNum = 1 + Math.ceil((firstThursday - target.valueOf()) / 604800000);
+
+  return {
+    dataTexto: `${diaSemana}, ${diaMes} ${mes}`,
+    semanaTexto: `Semana ${semanaNum}`,
+  };
 }
 
 export default async function PaginaInicial() {
@@ -73,110 +70,143 @@ export default async function PaginaInicial() {
     listarModelos(),
   ]);
 
+  const { dataTexto, semanaTexto } = formatarCabecalhoData(hoje);
+  const volumeFormatado = formatarVolume(resumo.volumeNaSemana);
+
+  // Meta estimada de treinos por semana (ex: 4)
+  const metaTreinos = 4;
+  const porcentagemMeta = Math.min(100, Math.round((resumo.treinosNaSemana / metaTreinos) * 100));
+
   return (
     <main className="tela">
-      {/* Aba de nível de topo — sem `VoltarFlutuante`. */}
-      <TituloTela
-        contexto="lastro"
-        titulo="Início"
-        acessorio={perfil && <Avatar nome={perfil.nome} avatarUrl={perfil.avatarUrl} />}
-      />
+      {/* Topo com Logo Spartan, Data Flutuante e Avatar */}
+      <header className="topo-pro">
+        <div className="topo-pro__esquerda">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/logo-lastro.png" alt="LASTRO" className="topo-pro__logo" width={38} height={38} />
+          <div className="topo-pro__data-pill">
+            {dataTexto} · <span>{semanaTexto}</span>
+          </div>
+        </div>
+        <Link href="/perfil" className="topo-pro__avatar-link" aria-label="Perfil do usuário">
+          {perfil && <Avatar nome={perfil.nome} avatarUrl={perfil.avatarUrl} />}
+        </Link>
+      </header>
 
-      <div className="corpo corpo--com-nav corpo--titulo-conteudo transicao-pilula">
-        {/* Ação principal: continuar o treino de hoje, ou começar um. */}
-        <section className="destaque">
-          <p className="destaque__rotulo">
-            {resumo.treinoDeHojeId ? "Treino de hoje em andamento" : "Pronto para treinar"}
-          </p>
+      <div className="corpo corpo--com-nav transicao-pilula">
+        {/* Ação Hero Principal */}
+        <section className="destaque-pro">
           {resumo.treinoDeHojeId ? (
             <Link
               href={`/treino/${resumo.treinoDeHojeId}`}
-              className="botao-primario"
+              className="botao-primario botao-primario--heroi"
             >
-              Continuar treino de hoje
+              <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <polygon points="5 3 19 12 5 21 5 3"></polygon>
+              </svg>
+              Continuar Treino de Hoje
             </Link>
           ) : modelos.length > 0 ? (
             <IniciarTreino modelos={modelos} />
           ) : (
-            <form action={criarTreino}>
-              <button type="submit" className="botao-primario">
-                Iniciar treino de hoje
+            <form action={criarTreino} style={{ width: "100%" }}>
+              <button type="submit" className="botao-primario botao-primario--heroi">
+                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                </svg>
+                Iniciar Treino de Hoje
               </button>
             </form>
           )}
         </section>
 
-        {/* Resumo da semana em andamento — número real ou zero honesto. */}
-        <h2 className="doc__secao">Esta semana</h2>
-        <div className="metricas">
-          <div className="metrica">
-            <p className="metrica__rotulo">Treinos</p>
-            <p className="metrica__valor">{resumo.treinosNaSemana}</p>
+        {/* Rastreador de Disciplina Semanal (7 dias) */}
+        <RastreadorDisciplina
+          hojeISO={hoje}
+          diasComTreino={resumo.diasComTreinoNaSemana}
+          streakDias={resumo.treinosNaSemana}
+        />
+
+        {/* Seletor de Métricas com Gráfico de Onda (Volume / Cargas / Séries) */}
+        <SeletorMetricasHome
+          volumeFormatado={volumeFormatado}
+          seriesValendo={resumo.seriesValendoNaSemana}
+          treinosNaSemana={resumo.treinosNaSemana}
+        />
+
+        {/* Card Análise Semanal (AI Coach) */}
+        <section className="ai-coach-card">
+          <div className="ai-coach-card__header">
+            <div className="ai-coach-card__badge">
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="var(--lastro-ouro)">
+                <path d="M12 2L14.5 9.5L22 12L14.5 14.5L12 22L9.5 14.5L2 12L9.5 9.5L12 2Z" />
+              </svg>
+              <span>Análise Semanal (AI Coach)</span>
+            </div>
+            <span className="ai-coach-card__meta">
+              {resumo.treinosNaSemana}/{metaTreinos} Treinos ({porcentagemMeta}%)
+            </span>
           </div>
-          <div className="metrica">
-            <p className="metrica__rotulo">Volume</p>
-            <p className="metrica__valor">
-              {formatarVolume(resumo.volumeNaSemana).valor}
-              <span className="metrica__un">
-                {formatarVolume(resumo.volumeNaSemana).unidade}
-              </span>
+
+          <div className="ai-coach-card__barra">
+            <div
+              className="ai-coach-card__progresso"
+              style={{ width: `${Math.max(8, porcentagemMeta)}%` }}
+            ></div>
+          </div>
+
+          <Link href="/analise" className="ai-coach-card__citacao">
+            <p>
+              {resumo.treinosNaSemana > 0
+                ? "Sua progressão semanal está ativa. Toque para ver a leitura detalhada do seu ciclo."
+                : "Ainda sem treinos nesta semana. Inicie uma sessão para gerar o parecer inteligente."}
             </p>
-          </div>
-          <div className="metrica">
-            <p className="metrica__rotulo">Séries valendo</p>
-            <p className="metrica__valor">{resumo.seriesValendoNaSemana}</p>
-          </div>
+          </Link>
+        </section>
+
+        {/* Feed de Treinos Recentes */}
+        <div className="secao-header">
+          <h2 className="secao-header__titulo">Treinos Recentes</h2>
+          <Link href="/treino" className="secao-header__link">Ver Todos</Link>
         </div>
-        <p className="metricas__nota">
-          Semana em andamento. Aquecimento não entra em volume nem na
-          contagem de séries.
-        </p>
 
-        {/* Atalho pra Análise — com o estado REAL de quanto dado existe,
-            em vez de um insight de IA fixo (que seria invenção). */}
-        <Link href="/analise" className="atalho">
-          <span className="atalho__titulo">Análise Semanal</span>
-          <span className="atalho__meta">
-            {resumo.semanasFechadasComTreino === 0
-              ? "Ainda sem semana fechada com treino"
-              : `${resumo.semanasFechadasComTreino} ${
-                  resumo.semanasFechadasComTreino === 1
-                    ? "semana fechada"
-                    : "semanas fechadas"
-                } com treino`}
-          </span>
-        </Link>
-
-        <h2 className="doc__secao">Treinos recentes</h2>
         {resumo.recentes.length === 0 ? (
-          <p className="vazio">
-            Nenhum treino ainda. O primeiro começa aqui em cima.
-          </p>
+          <div className="cartao-vazio">
+            <p className="vazio">Nenhum treino registrado ainda. O primeiro começa no botão acima.</p>
+          </div>
         ) : (
-          <ul className="lista">
+          <div className="feed-treinos">
             {resumo.recentes.map((treino) => (
-              <li key={treino.id}>
-                <div className="item">
-                  <Link href={`/treino/${treino.id}`} className="item__link">
-                    <span className="item__conteudo">
-                      <span className="item__data">
-                        {formatarData(treino.data, hoje)}
-                      </span>
-                      <span className="item__meta">
-                        {treino.totalSeries}{" "}
-                        {treino.totalSeries === 1 ? "série" : "séries"}
-                        {treino.volume > 0 &&
-                          ` · ${formatarVolume(treino.volume).valor} ${
-                            formatarVolume(treino.volume).unidade
-                          }`}
-                      </span>
-                    </span>
-                    <SetaNavegacao />
-                  </Link>
+              <Link key={treino.id} href={`/treino/${treino.id}`} className="cartao-treino-item">
+                <div className="cartao-treino-item__esquerda">
+                  <div className="cartao-treino-item__grupos">
+                    {treino.gruposMusculares.length > 0 ? (
+                      treino.gruposMusculares.map((grupo, idx) => (
+                        <span key={idx} className="tag-grupo">
+                          {grupo.toUpperCase()}
+                        </span>
+                      ))
+                    ) : (
+                      <span className="tag-grupo">SESSÃO</span>
+                    )}
+                  </div>
+                  <span className="cartao-treino-item__data">{formatarData(treino.data, hoje)}</span>
                 </div>
-              </li>
+
+                <div className="cartao-treino-item__direita">
+                  <div className="cartao-treino-item__metricas">
+                    <span className="cartao-treino-item__vol">
+                      {formatarVolume(treino.volume).valor} {formatarVolume(treino.volume).unidade}
+                    </span>
+                    <span className="cartao-treino-item__series">
+                      {treino.totalSeries} {treino.totalSeries === 1 ? "série" : "séries"}
+                    </span>
+                  </div>
+                  <SetaNavegacao />
+                </div>
+              </Link>
             ))}
-          </ul>
+          </div>
         )}
       </div>
 
