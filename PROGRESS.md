@@ -243,7 +243,31 @@ Quota checada com uma chamada direta à API antes de gastar esforço recriando d
 
 ---
 
-## ▶ PONTO DE RETOMADA — ler primeiro (2026-08-15, sessão do redesenho)
+## ▶ PONTO DE RETOMADA — ler primeiro (2026-08-21, auditoria pós-Apex Pro)
+
+> **➡️ Comece por `docs/BACKLOG-PROXIMA-FASE.md`, seção "Itens acrescentados em 2026-08-21"** — T1 (card de Tema, pedido do dono) até T7. É autocontido.
+>
+> ⚠️ **`DESIGN.md` e as entradas D1–D10 do `DECISIONS.md` estão DESATUALIZADOS.** Descrevem a paleta clara *"Areia & Azul Petróleo"*, substituída em `8d30cf0` pelo **Apex Pro** (obsidiana `#07090D`, ouro `#D4AF37`, esmeralda `#10B981`). **A fonte de verdade visual é `src/app/tokens.css`** — confirme contra ele antes de citar qualquer número daqueles documentos.
+>
+> Não é dívida cosmética: a §3.2 do `DESIGN.md` certifica `--lastro-txt-3` sobre `--lastro-sup-3` como **4,85 aprovado**; o valor real hoje é **3,36** (piso 4,5). O gate de contraste aprova com medida de uma paleta que não existe mais. Ver T3.
+>
+> **Auditoria em `docs/AUDITORIA-APEX-PRO.md`** — 14 achados, validados duas vezes: local com Playwright (360×640) e em produção (`lastro-pi.vercel.app`) contra os dados reais do dono. Três falsos positivos meus ficaram registrados lá, para não voltarem como "achado" na próxima rodada.
+>
+> **Fechado nesta sessão** — branch `fix/home-sem-dado-inventado`:
+> - `ebcf5d0` — os três gráficos da Home tinham o `path` do SVG escrito à mão: perfil com zero treino via a mesma curva subindo que perfil com 11 t na semana. Saíram junto os selos fixos ("Progressão", "Faixa Ideal"), o "Alta" 1RM sem cálculo e a meta `const metaTreinos = 4`, que ninguém escolheu. Cada barra agora é um treino real, do mesmo `select` que a Home já fazia.
+> - `ebcf5d0` — "sessões seguidas" mostrava `treinosNaSemana`: terça + quinta, com quarta vazia, lia "2 sessões seguidas". `calcularSequenciaAtual` passa a contar dias de calendário consecutivos; o rótulo virou "dias seguidos". 10 testes, com o caso real do dono como fixture.
+> - `678ebc5` — aba "Cargas" deu lugar a **"Grupos"** (séries por grupo muscular na semana), decisão do dono. Carga não é somável entre grupos musculares; série é. Progressão de carga por exercício continua na `/analise`.
+> - `bc97aae` — auditoria e backlog registrados.
+>
+> **Decisão do dono que enquadra tudo:** corrigir o dado inventado **mantendo o Apex Pro**. Paleta, cartões de vidro, abas e tipografia não se tocam — a mudança é de honestidade de dado, não de estética.
+>
+> **Pendências:** PR ainda não aberta em `fix/home-sem-dado-inventado`; a branch `chore/ignorar-artefatos-sessao` (1 commit, `.gitignore` dos mockups da sessão do redesenho) está órfã, sem PR. Telas **com dado** ainda não foram varridas — a auditoria rodou em estado vazio, então o bug histórico de M5/M8 (peso de 4 dígitos, nome longo) não foi exercitado.
+>
+> **Fixture viva:** `qa-audit-2608@teste.lastro.invalid` (uuid `ab52bd53-…`), com 6 treinos e 5 grupos semeados, mantida de propósito para essa varredura. Limpar com `limpar-usuario` ao fechar. Os outros dois usuários de teste da sessão já foram removidos, cascade = 0 confirmado nos dois.
+
+---
+
+## ▶ Ponto de retomada anterior (2026-08-15, sessão do redesenho) — histórico
 
 > **➡️ O trabalho seguinte é o redesenho, e ele já está decidido e destrinchado. Comece por `docs/BACKLOG-REDESENHO.md`** — é autocontido e diz o que fazer, em que ordem e com que esforço.
 >
