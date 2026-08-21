@@ -1047,3 +1047,40 @@ Ao começar H3 (pílula/sub-tela), a nota de D7 ("Custo caiu: Next 16 traz `View
 **Impacto.** `sistema.css` usa `--lastro-txt-3` em 40 seletores; todos herdam a correção do `:root` automaticamente. `petroleo` e `moka` ganharam override próprio (antes não tinham); `branco-ouro` teve o próprio token corrigido. Nenhuma mudança de layout, espaçamento ou estrutura — só cor.
 
 **Como reverter.** `git revert` do commit desta entrada restaura `#64748B` no `:root`, remove os overrides de `petroleo`/`moka`, restaura `#64748B` em `branco-ouro`, e desfaz as edições em `DESIGN.md`. Reintroduz os 104+14 elementos reprovando AA no tema padrão, e os bugs equivalentes em `petroleo`/`moka`/`branco-ouro`.
+
+---
+
+## 2026-08-21 (2) — T3b (acentos de cor): 8 tokens corrigidos no branco-ouro; achado de metodologia registrado
+
+**O que mudou.** `src/app/tokens.css`, bloco `[data-tema="branco-ouro"]`: 8 tokens de acento receberam override próprio (nenhum era redefinido por tema nenhum antes, todos herdavam o valor calibrado para fundo escuro do `:root`):
+
+| Token | Uso real medido | Antes → depois | Fundo composto |
+|---|---|---|---|
+| `--lastro-ouro` | `.chip-filtro--ativo` ("Todos") | 3,25 (contra branco) → **4,94** | pílula tingida, não branco puro |
+| `--lastro-esmeralda-claro` | `.tag-grupo` ("X exercícios") | 1,79 → **4,99** | pílula tingida |
+| `--lastro-esmeralda` | `.disciplina-card__streak`, `.metrica-switcher__delta`, `.disciplina-dia--feito` | não medido antes → **4,91** | pílula tingida |
+| `--lastro-ciano` | `.tag-unilateral` | 2,43 → **4,94** | pílula tingida |
+| `--lastro-erro` | `.botao-textual--destrutivo` ("Excluir conta") | 3,51 → **4,93** | fundo liso |
+| `--lastro-acao-tinta` | `.acao-fantasma`/`.botao-confirmar` ("+ Adicionar") | 2,10 → **4,92** | fundo liso |
+| `--lastro-sync` | `.sync` ("salvo no aparelho", D7) | 2,26 → **4,94** | fundo liso |
+| `--lastro-aquecimento` (**token novo**) | `.chip-serie--aquecimento` | 1,21 → **4,93** | pílula tingida — pior número da rodada |
+
+Mais dois hex cravados corrigidos (P7, não específicos de tema): `.pergunta--primaria` e `.topo-avatar` tinham `color: #FFF` literal — funcionavam por acidente nos temas escuros (onde `--lastro-txt` também é branco) e reprovavam 1,11:1 e 1,10:1 no branco-ouro. Trocados por `var(--lastro-txt)`, o token correto que já existe por tema.
+
+**Por quê.** Pedido do dono: começar o T3b pelos acentos de cor, com explicação prévia e aprovação explícita antes de executar. Medição inicial (3 tokens: ouro, esmeralda-claro, ciano) encontrou só o `branco-ouro` reprovando entre os 6 temas — os 5 escuros passam com folga (7,17 a 11,12) por terem sido calibrados originalmente para fundo escuro. Ao corrigir e reverificar a tela inteira (não só os 3 pontos originais), apareceram mais 5 tokens quebrados pelo mesmo motivo — nenhum tinha sido medido antes porque não estavam no escopo inicial de 3 itens.
+
+**Achado de metodologia, registrado por transparência — quase me levou a números errados duas vezes:**
+
+1. **Trocar tema via `setAttribute('data-tema', ...)` sem recarregar a página mede a cor EM TRANSIÇÃO, não a final**, em qualquer elemento cujo ancestral tenha `transition: all` (ex.: `.cartao-exercicio-pro`). A primeira leitura do `.tag-unilateral` deu ratio 7,73 idêntico nos 6 temas — parecia que ciano nunca mudava. Era artefato: o fundo lido era sempre o valor por padrão do `:root`, porque `getComputedStyle` foi chamado antes da transição resolver. Refeito com `localStorage.setItem('lastro_tema', ...)` + navegação real, os números mudaram de verdade por tema.
+
+2. **Medir contraste contra o fundo do elemento-pai, e não do próprio elemento, subestima o problema quando o elemento tem fundo translúcido próprio** (ex.: `.tag-grupo { background: var(--lastro-esmeralda-fundo); color: var(--lastro-esmeralda-claro); }` — a pílula tem AS DUAS propriedades no mesmo seletor). Minha primeira leitura de precisão (`corEfetiva(el.parentElement)`) pulava essa camada e dava 4,92/5,02 "passando"; a leitura correta (`corEfetiva(el)`, incluindo o próprio fundo do elemento) deu 4,42/4,50 — abaixo ou na borda do piso. Os valores finais desta entrada vêm todos da versão correta.
+
+**Alternativa descartada.** Corrigir só o `--lastro-txt-3` e parar (escopo original da conversa) — descartada porque o dono pediu explicitamente para seguir pelos acentos depois de ver a explicação, e cada achado novo era o mesmo padrão raiz (acento calibrado só para escuro), não um problema disperso — parar no meio deixaria o tema claro parcialmente quebrado.
+
+**O que NÃO foi corrigido, registrado para não virar suposição depois:**
+- `--lastro-ouro-claro` (usado em `.chip-serie--pr`, badge de recorde pessoal) não foi medido — apareceu na varredura de `/treino/[id]` como zero reprovações, mas esse card específico só aparece quando o exercício tem PR; pode não ter sido exercitado na sessão de teste.
+- A reconciliação completa do `DESIGN.md` (os 14 pares C1–C14 contra as 6 paletas, e a razão de cada cor do Apex Pro) continua não feita — este item corrigiu bug real, não documentou a tese de design.
+
+**Verificado:** varredura completa (mesmo script, incluindo o próprio fundo do elemento na composição) em 10 telas do `branco-ouro` — `/login`, `/`, `/treino`, `/treino/[id]`, `/analise`, `/catalogo`, `/catalogo/[id]`, `/ajustes`, `/ajustes/anilhas`, `/ajustes/modelos` — zero reprovações reais em todas. Um falso positivo descartado ("Solicitar Análise", ratio 1 — botão `aria-disabled` com `opacity: 0.55`, decisão já documentada em B1, artefato do meu script não ler `opacity`). Confirmado que os 5 temas escuros e o padrão não regrediram (os overrides só existem dentro do bloco `branco-ouro`; as duas trocas de `#FFF` usam `var(--lastro-txt)`, que já é branco em todo tema escuro). `tsc`/test (173)/lint/build verdes a cada passo.
+
+**Como reverter.** `git revert` do commit desta entrada remove os 8 overrides do bloco `branco-ouro`, remove o token `--lastro-aquecimento` de `:root`, e restaura `color: #FFF` nos dois seletores. Reintroduz os 8 padrões de contraste quebrados no tema claro.

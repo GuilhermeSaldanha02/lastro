@@ -69,6 +69,10 @@
   --lastro-erro:         #EF4444; /* Falha e ações destrutivas */
   --lastro-erro-txt:     #FFFFFF;
   --lastro-foco:         #D4AF37;
+  /* Era #FCD34D cravado direto em `.chip-serie--aquecimento` (P7) —
+     virou token porque reprovava no branco-ouro (T3b, 2026-08-21) e
+     precisava de override por tema, que hex solto não permite. */
+  --lastro-aquecimento:  #FCD34D;
 
   /* ---- Espaçamento: Base 4px ---- */
   --lastro-e-1:   4px;
@@ -219,7 +223,12 @@
   --lastro-linha:        rgba(0, 0, 0, 0.08);
   --lastro-controle:     rgba(0, 0, 0, 0.16);
   --lastro-borda-ouro:   rgba(184, 134, 11, 0.35);
-  --lastro-ouro:         #B8860B;
+  /* Era #B8860B: reprovava como texto (T3b, 2026-08-21). Pior caso é
+     `.chip-filtro--ativo` — o próprio texto ouro sobre o preenchimento
+     `--lastro-ouro-glow` (tingido, não branco puro): fundo composto
+     real (231,219,190), razão original 3,25:1 contra branco chegava a
+     cair pra ~3,0 ali. Escurecido até passar no pior caso: 4,94:1. */
+  --lastro-ouro:         #755607;
   --lastro-ouro-claro:   #D4AF37;
   --lastro-ouro-escuro:  #8F6904;
   --lastro-ouro-glow:    rgba(184, 134, 11, 0.25);
@@ -237,6 +246,42 @@
   --lastro-elev-1:       0 2px 8px rgba(0, 0, 0, 0.05);
   --lastro-elev-2:       0 8px 20px -4px rgba(0, 0, 0, 0.08);
   --lastro-elev-3:       0 16px 32px -6px rgba(0, 0, 0, 0.12);
+  /* `--lastro-esmeralda-claro` e `--lastro-ciano` não são redefinidos
+     em nenhum outro tema — todos os 5 escuros compartilham o valor do
+     :root, calibrado pra fundo escuro, e passam AA nele. `branco-ouro`
+     é o único tema claro do sistema e herdava os mesmos valores:
+     esmeralda-claro reprovava a 1,79:1 como texto (tag de grupo do
+     catálogo), ciano a 2,43:1 (tag "UNILATERAL") — piso 3,0, os dois
+     piores números já medidos no projeto (T3b, 2026-08-21).
+     Remedido contra o fundo COMPOSTO real — a própria pílula carrega
+     `--lastro-esmeralda-fundo`/tinta ciano translúcida sobre o branco,
+     não o branco puro; a 1ª medição ignorou essa camada e superestimou
+     a razão (4,92 “passando” que na verdade era 4,42/4,50 reais).
+     Corrigido pra 4,99:1 e 4,94:1 contra o fundo tingido de verdade. */
+  --lastro-esmeralda-claro: #1C7153;
+  --lastro-ciano:           #047385;
+  /* `--lastro-esmeralda` (base, distinta de `-claro` acima) também
+     reprovava — "1 dia seguido" e "2 sessões" na Home, mesmo padrão
+     de pílula tingida. Fundo composto real 226,247,240; remedido pra
+     4,91:1. */
+  --lastro-esmeralda:       #0A7854;
+  /* `--lastro-erro` (destrutivo, "Excluir conta") também não é
+     redefinido em nenhum outro tema. Reprovava 3,51:1 sobre o fundo
+     claro (piso 4,5) — achado ao varrer /ajustes na mesma passada.
+     Remedido: 4,93:1. */
+  --lastro-erro:            #C43838;
+  /* `--lastro-acao-tinta` (link "+ Adicionar", "Confirmar") reprovava
+     2,10:1 sobre branco (piso 4,5). Não redefinido em nenhum outro
+     tema. Remedido: 4,92:1. */
+  --lastro-acao-tinta:      #866E23;
+  /* `--lastro-sync` reprovava 2,26:1 (indicador "salvo no aparelho",
+     D7 — jamais vira --lastro-erro, precisa continuar sendo ciano/
+     teal, não vermelho). Remedido: 4,94:1. */
+  --lastro-sync:            #04768A;
+  /* `--lastro-aquecimento` reprovava 1,21:1, o pior número desta
+     rodada — chip com o próprio fundo tingido (rgba(245,158,11,.12)).
+     Remedido: 4,93:1. */
+  --lastro-aquecimento:     #766324;
 }
 
 /* 2. DUNA AREIA & ÂMBAR (SANDSTONE WARMTH) */
