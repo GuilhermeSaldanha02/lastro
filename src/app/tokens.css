@@ -19,7 +19,12 @@
   /* ---- Tipografia e Textos ---- */
   --lastro-txt:          #F8FAFC; /* Branco titânio - leitura principal */
   --lastro-txt-2:        #94A3B8; /* Ardósia secundário - legendas e rótulos */
-  --lastro-txt-3:        #64748B; /* Ardósia atenuado - metadados e unidades */
+  /* Ardósia atenuado - metadados e unidades. Era #64748B: reprovava AA
+     (3,36:1 sobre --lastro-sup-3, piso 4,5 — achado A05/T3, auditoria
+     2026-08-21, confirmado ao vivo em produção). Este valor foi medido
+     em navegador real contra as três superfícies em uso — ver
+     DESIGN.md §3.2, linha C3. */
+  --lastro-txt-3:        #7C8DA6;
 
   /* ---- Barra de Topo e Navegação ---- */
   --lastro-barra-a:      #0B0F15;
@@ -205,7 +210,12 @@
   --lastro-sup-3:        #E2E8F0;
   --lastro-txt:          #0F172A;
   --lastro-txt-2:        #475569;
-  --lastro-txt-3:        #64748B;
+  /* Era #64748B: reprovava AA neste tema (3,86:1 sobre --lastro-sup-3,
+     piso 4,5 — achado do dono ao revisar os 6 temas, 2026-08-21, mesmo
+     dia do fix do padrão). Tema claro: fica MAIS ESCURO que o :root
+     equivalente, não mais claro — a direção que aumenta contraste se
+     inverte com fundo claro. Remedido: 4,89:1 no pior caso (sup-3). */
+  --lastro-txt-3:        #556478;
   --lastro-linha:        rgba(0, 0, 0, 0.08);
   --lastro-controle:     rgba(0, 0, 0, 0.16);
   --lastro-borda-ouro:   rgba(184, 134, 11, 0.35);
@@ -279,6 +289,11 @@
   --lastro-sup-1:        #0E161F;
   --lastro-sup-2:        #141F2B;
   --lastro-sup-3:        #1D2C3D;
+  /* :root herda #7C8DA6, mas este tema tem sup-3 mais claro que o
+     padrão — o herdado reprovava (4,20:1, piso 4,5). Override próprio,
+     remedido: 4,71:1 no pior caso. Achado do dono ao revisar os 6
+     temas, 2026-08-21. */
+  --lastro-txt-3:        #8596AD;
   --lastro-linha:        rgba(197, 168, 128, 0.15);
   --lastro-controle:     rgba(197, 168, 128, 0.22);
   --lastro-borda-ouro:   rgba(197, 168, 128, 0.35);
@@ -301,6 +316,10 @@
   --lastro-sup-1:        #171311;
   --lastro-sup-2:        #221C18;
   --lastro-sup-3:        #2E2621;
+  /* Mesmo caso de "petroleo": sup-3 mais claro que o padrão faz o
+     valor herdado do :root reprovar (4,39:1, piso 4,5). Override
+     próprio, remedido: 4,74:1 no pior caso. */
+  --lastro-txt-3:        #8293AB;
   --lastro-linha:        rgba(229, 169, 60, 0.15);
   --lastro-controle:     rgba(229, 169, 60, 0.22);
   --lastro-borda-ouro:   rgba(229, 169, 60, 0.35);
