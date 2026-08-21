@@ -10,7 +10,22 @@ import { PARAM_RETORNO } from "@/lib/rota-de-retorno";
 // Toda tela que lê ou escreve dado do dono entra aqui. Rota nova que
 // esqueça esta lista fica pública por omissão — é o tipo de furo que só
 // aparece em produção.
-const PREFIXOS_PRIVADOS = ["/treino", "/analise", "/catalogo", "/coach"];
+//
+// `/perfil` e `/ajustes` faltavam aqui (achado A04/T2, auditoria de
+// 2026-08-21): sem sessão, `/perfil` e `/ajustes` renderizavam o shell
+// vazio (200) e `/ajustes/modelos` chegava a devolver 500, porque a
+// camada de dados lança quando `getUser()` volta nulo em vez de o
+// middleware já ter redirecionado antes. Confirmado em produção com o
+// mesmo comportamento. Quem cai nisso é o dono com o token expirado no
+// meio da semana, não um atacante.
+const PREFIXOS_PRIVADOS = [
+  "/treino",
+  "/analise",
+  "/catalogo",
+  "/coach",
+  "/perfil",
+  "/ajustes",
+];
 
 export async function proxy(request: NextRequest) {
   let response = NextResponse.next({ request });
