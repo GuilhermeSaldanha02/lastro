@@ -1099,6 +1099,14 @@
   text-align: center;
 }
 
+/* Ícone opcional dentro de `.vazio` (ex.: lista de treinos vazia) — uma
+   única moldura tracejada, não duas empilhadas. Ver I6, docs/IMPECCABLE-AUDIT.md. */
+.cartao-vazio__icone {
+  display: flex;
+  justify-content: center;
+  margin-bottom: var(--lastro-e-3);
+}
+
 /* ---------- Lista de treinos ---------- */
 .lista {
   list-style: none;
@@ -2164,7 +2172,6 @@
   display: flex;
   flex-direction: column;
   gap: var(--lastro-e-3);
-  backdrop-filter: blur(12px);
   margin-bottom: var(--lastro-e-4);
 }
 
@@ -2258,7 +2265,6 @@
   flex-direction: column;
   gap: var(--lastro-e-4);
   margin-bottom: var(--lastro-e-4);
-  backdrop-filter: blur(12px);
 }
 
 .metrica-switcher__tabs {
@@ -2609,14 +2615,6 @@
   color: var(--lastro-txt-3);
 }
 
-.cartao-vazio {
-  background: var(--lastro-sup-1);
-  border: 1px dashed var(--lastro-linha);
-  border-radius: var(--lastro-raio-2);
-  padding: var(--lastro-e-6);
-  text-align: center;
-}
-
 /* Login Apex Pro */
 .entrada__marca {
   display: flex;
@@ -2635,18 +2633,6 @@
   display: block;
   margin: 0 auto var(--lastro-e-3);
   filter: drop-shadow(0 6px 20px rgba(212, 175, 55, 0.45));
-}
-
-.entrada__titulo {
-  font-family: var(--lastro-fonte-num);
-  font-size: var(--lastro-papel-numero-heroi);
-  font-weight: var(--lastro-peso-max);
-  letter-spacing: 3px;
-  text-align: center;
-  background: var(--lastro-ouro-grad);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  margin: 0 auto;
 }
 
 .entrada__subtitulo {
