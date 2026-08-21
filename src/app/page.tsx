@@ -83,7 +83,7 @@ export default async function PaginaInicial() {
       <header className="topo-pro">
         <div className="topo-pro__esquerda">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/logo-lastro.png" alt="LASTRO" className="topo-pro__logo" width={48} height={48} />
+          <img src="/logo-lastro.png" alt="LASTRO" className="topo-pro__logo" width={38} height={38} />
           <div className="topo-pro__data-pill">
             {dataTexto} · <span>{semanaTexto}</span>
           </div>
