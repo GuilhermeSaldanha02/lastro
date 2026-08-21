@@ -298,3 +298,83 @@ Depois da leva 1, rodar o gate visual da seção G inteiro. Ele foi escrito exat
 5. **C5** (excluir conta) — o cascade já funciona; falta só a porta na UI.
 6. **C3** (calculadora de anilhas) — cuidado com escopo: a versão mínima é lista de pesos + peso da barra, nada além.
 7. **C4(2)** (PR no histórico do exercício) — depende de existir uma tela de histórico por exercício, que hoje não existe. É o item mais distante da lista.
+
+---
+
+# Itens acrescentados em 2026-08-21 (sessão da auditoria pós-Apex Pro)
+
+Origem: `docs/AUDITORIA-APEX-PRO.md`. Os itens A00/A01/A13 já foram
+resolvidos nas PRs `ebcf5d0` e `678ebc5`; o que sobra está aqui.
+
+## T1 — Card "Tema" em `/ajustes` · pedido direto do dono
+
+Criar um card **Tema** dentro de `/ajustes`, onde a pessoa escolhe o tema
+visual do app.
+
+- **Agora:** a lista mostra só o tema atual (Apex Pro), já selecionado.
+  Nenhuma opção nova entra nesta etapa — o dono acrescenta depois.
+- **Escopo travado pelo dono:** *"tema só irá trocar cores"*. Nada de
+  trocar tipografia, espaçamento, raio, elevação ou layout. Só a camada
+  de cor de `src/app/tokens.css`.
+- **Consequência de projeto:** os tokens de cor precisam sair do `:root`
+  fixo e virar um conjunto trocável (`[data-tema="..."]`), sem que
+  nenhum outro token se mova junto. Hoje cor, espaçamento, tipografia e
+  elevação convivem no mesmo `:root` — a separação é o trabalho real
+  deste item, não a tela de seleção.
+- **Onde a preferência mora:** decidir entre perfil no banco (segue o
+  usuário entre aparelhos) e armazenamento local (não precisa de
+  migração). Perguntar ao dono antes de implementar.
+- **Gate:** o dono olha no aparelho dele; trocar o tema não pode mexer em
+  nenhuma medida, só em cor.
+
+## T2 — `/perfil` e `/ajustes/**` fora das rotas privadas (A04) · **ALTA**
+
+`src/proxy.ts:13` não lista `/perfil` nem `/ajustes`. Sem sessão,
+`/ajustes/modelos` e `/ajustes/modelos/novo` devolvem **500**; `/perfil`,
+`/ajustes` e `/ajustes/anilhas` renderizam shell vazio. Confirmado em
+produção. Quem cai nisso é o dono com a sessão expirada, não um atacante.
+Correção: acrescentar os dois prefixos. Resolve o A02 (avatar "AT") junto.
+
+## T3 — `--lastro-txt-3` reprova contraste AA (A05/A06) · **ALTA**
+
+Medido: **3,36** sobre `sup-3`, **3,95** sobre `sup-1`, **4,19** sobre o
+fundo — piso 4,5. Confirmado ao vivo: 104 elementos no `/catalogo`, 18 na
+Home. São 40 seletores em `sistema.css`.
+
+Verificar antes de tratar todos igual: `.evidencia__de`/`.evidencia__seta`
+(19px sem `font-weight` declarado) e `.marca--aquecimento` — se o peso
+herdado for ≥700 o piso cai para 3,0 e passam.
+
+**Junto, obrigatoriamente:** reconciliar `DESIGN.md` §3.2 e as entradas
+D1–D10 do `DECISIONS.md`, que ainda descrevem a paleta areia e
+certificam esse mesmo par como "4,85 aprovado". Corrigir o token sem
+corrigir o documento deixa o gate mentindo do mesmo jeito.
+
+## T4 — Meta semanal de treinos configurável
+
+Continuação do A13. A fração "2/4 Treinos (50%)" e a barra de progresso
+foram removidas da Home porque o denominador era `const metaTreinos = 4`.
+Voltam quando a meta for escolha do dono (campo em `/ajustes`, mesmo
+lugar do T1). O CSS `.ai-coach-card__barra` / `__progresso` foi deletado
+e precisa ser reescrito.
+
+## T5 — Campo do coach sob a aba inferior (A03) · **ALTA**
+
+Em `/coach`, o campo "Pergunte ao coach…" e o botão de enviar ficam
+**9px** por baixo da aba inferior fixa. Medido em 360×640 e confirmado em
+produção com o mesmo número. É o único controle da tela.
+
+## T6 — Alvos de toque abaixo de 48px (A07)
+
+`--lastro-alvo-min` vale 48px. Medido: "Ver Todos" **20px**, chips do
+catálogo 34px, "Voltar" e avatar do topo 36×36, "Cadastre-se" 36px.
+
+## T7 — Achados menores (A08–A12)
+
+- Erro de cadastro volta cru em inglês, do Supabase.
+- "Conta criada — confirme seu e-mail" usa o estilo de **erro**.
+- `/treino` diz "Inicie sua primeira sessão **abaixo**"; o botão está acima.
+- `/ajustes/modelos`: descrição renderiza 60px **acima** do `<h2>`.
+- Estado vazio da `/analise` mistura "2 semanas" e "3 semanas" na mesma frase.
+- Chips de grupo muscular na lista de treinos ainda imprimem a chave crua
+  do banco; `formatarGrupoMuscular` já existe e resolve.

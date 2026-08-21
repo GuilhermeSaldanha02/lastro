@@ -10,8 +10,17 @@
 
 import { criarClienteServidor } from "@/lib/supabase/cliente-servidor";
 import { calcularVolume } from "@/lib/analise/volume";
+import { calcularSequenciaAtual } from "@/lib/analise/sequencia";
+import { calcularSeriesPorGrupo } from "@/lib/analise/equilibrio";
 import { semanaInicioDoTreino, semanaAnaliseAtual, paraISO, segundaFeiraDaSemana } from "@/lib/analise/semanas";
 import type { SerieValendo } from "@/lib/analise/tipos";
+
+/**
+ * Quantos treinos entram no gráfico de barras da Home. Oito cabe na
+ * largura de 360px sem barra virar risco, e cobre ~2 semanas de treino
+ * regular. Não confundir com os 3 da lista de "Treinos Recentes".
+ */
+const MAX_BARRAS_HOME = 8;
 
 export type TreinoRecente = {
   id: string;
@@ -30,6 +39,25 @@ export type ResumoHome = {
   seriesValendoNaSemana: number;
   /** Datas ISO dos treinos realizados nesta semana. */
   diasComTreinoNaSemana: string[];
+  /**
+   * Dias de calendário consecutivos treinados, terminando hoje ou ontem.
+   * NÃO é `treinosNaSemana` — ver `analise/sequencia.ts` e o achado de
+   * 2026-08-21 que separou as duas coisas.
+   */
+  sequenciaAtual: number;
+  /**
+   * Últimos treinos em ordem cronológica (antigo → recente), para o
+   * gráfico de barras da Home. Vem do mesmo `select` já feito: nenhuma
+   * requisição extra. Lista vazia quando não há treino — a Home não
+   * desenha barra nenhuma nesse caso, porque ausência de dado tem que
+   * parecer ausência.
+   */
+  historicoBarras: { data: string; volume: number; series: number }[];
+  /**
+   * Séries valendo por grupo muscular na semana em andamento, do mais
+   * treinado para o menos. Alimenta a aba "Grupos" da Home.
+   */
+  seriesPorGrupo: { grupo: string; series: number }[];
   /** Os 3 treinos mais recentes, para a lista de atividade com grupos musculares. */
   recentes: TreinoRecente[];
   /** Quantas semanas ISO fechadas já têm treino — a Análise precisa disso. */
@@ -110,6 +138,24 @@ export async function carregarResumoHome(hojeISO: string): Promise<ResumoHome> {
     volumeNaSemana: calcularVolume(valendoDaSemana),
     seriesValendoNaSemana: valendoDaSemana.length,
     diasComTreinoNaSemana: Array.from(new Set(daSemana.map((t) => t.data))),
+    sequenciaAtual: calcularSequenciaAtual(
+      comSerie.map((t) => t.data),
+      hojeISO,
+    ),
+    // `comSerie` vem ordenado por data DESC — as barras leem da esquerda
+    // (mais antigo) para a direita (mais recente), então inverte.
+    historicoBarras: comSerie
+      .slice(0, MAX_BARRAS_HOME)
+      .map((t) => {
+        const valendo = valendoDoTreino(t);
+        return {
+          data: t.data,
+          volume: calcularVolume(valendo),
+          series: valendo.length,
+        };
+      })
+      .reverse(),
+    seriesPorGrupo: calcularSeriesPorGrupo(valendoDaSemana),
     recentes: comSerie.slice(0, 3).map((t) => {
       const grupos = Array.from(
         new Set(

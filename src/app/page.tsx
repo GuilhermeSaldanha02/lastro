@@ -73,10 +73,6 @@ export default async function PaginaInicial() {
   const { dataTexto, semanaTexto } = formatarCabecalhoData(hoje);
   const volumeFormatado = formatarVolume(resumo.volumeNaSemana);
 
-  // Meta estimada de treinos por semana (ex: 4)
-  const metaTreinos = 4;
-  const porcentagemMeta = Math.min(100, Math.round((resumo.treinosNaSemana / metaTreinos) * 100));
-
   return (
     <main className="tela">
       {/* Topo com Logo Spartan, Data Flutuante e Avatar */}
@@ -124,7 +120,7 @@ export default async function PaginaInicial() {
         <RastreadorDisciplina
           hojeISO={hoje}
           diasComTreino={resumo.diasComTreinoNaSemana}
-          streakDias={resumo.treinosNaSemana}
+          streakDias={resumo.sequenciaAtual}
         />
 
         {/* Seletor de Métricas com Gráfico de Onda (Volume / Cargas / Séries) */}
@@ -132,6 +128,8 @@ export default async function PaginaInicial() {
           volumeFormatado={volumeFormatado}
           seriesValendo={resumo.seriesValendoNaSemana}
           treinosNaSemana={resumo.treinosNaSemana}
+          historicoBarras={resumo.historicoBarras}
+          seriesPorGrupo={resumo.seriesPorGrupo}
         />
 
         {/* Card Análise Semanal (AI Coach) */}
@@ -143,22 +141,24 @@ export default async function PaginaInicial() {
               </svg>
               <span>Análise Semanal (AI Coach)</span>
             </div>
+            {/* A fração "2/4 Treinos (50%)" e a barra saíram: o
+                denominador era `const metaTreinos = 4`, um número que o
+                dono nunca escolheu — não há tela, campo ou preferência
+                que o produza. Volta na PR da meta configurável, aí como
+                verdade. Até lá, a contagem sozinha já é informação real. */}
+            {/* Curto de propósito: o cartão já se chama "Análise Semanal",
+                então "nesta semana" no rótulo era redundante — e a 360px
+                a frase longa quebrava o cabeçalho em duas linhas. */}
             <span className="ai-coach-card__meta">
-              {resumo.treinosNaSemana}/{metaTreinos} Treinos ({porcentagemMeta}%)
+              {resumo.treinosNaSemana}{" "}
+              {resumo.treinosNaSemana === 1 ? "treino" : "treinos"}
             </span>
-          </div>
-
-          <div className="ai-coach-card__barra">
-            <div
-              className="ai-coach-card__progresso"
-              style={{ width: `${Math.max(8, porcentagemMeta)}%` }}
-            ></div>
           </div>
 
           <Link href="/analise" className="ai-coach-card__citacao">
             <p>
               {resumo.treinosNaSemana > 0
-                ? "Sua progressão semanal está ativa. Toque para ver a leitura detalhada do seu ciclo."
+                ? "Toque para ver a leitura da sua semana."
                 : "Ainda sem treinos nesta semana. Inicie uma sessão para gerar o parecer inteligente."}
             </p>
           </Link>

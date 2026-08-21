@@ -50,8 +50,13 @@ export default function RastreadorDisciplina({
       <div className="disciplina-card__header">
         <span className="disciplina-card__titulo">Disciplina Semanal</span>
         {streak > 0 && (
+          // "dias seguidos", não "sessões seguidas": o que se conta é dia
+          // de calendário consecutivo (`analise/sequencia.ts`). O rótulo
+          // antigo prometia continuidade sobre uma contagem que não era
+          // sequência — e o texto longo ainda quebrava em duas linhas a
+          // 360px, empurrando o título do cartão junto.
           <span className="disciplina-card__streak">
-            {streak} {streak === 1 ? "sessão seguida" : "sessões seguidas"}
+            {streak} {streak === 1 ? "dia seguido" : "dias seguidos"}
           </span>
         )}
       </div>
