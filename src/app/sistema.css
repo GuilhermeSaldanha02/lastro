@@ -2181,6 +2181,9 @@
   text-transform: uppercase;
   letter-spacing: 0.5px;
   color: var(--lastro-txt-2);
+  /* Título e pílula dividem a linha a 360px: sem isto, a pílula quebrava
+     e empurrava "DISCIPLINA SEMANAL" para duas linhas. */
+  white-space: nowrap;
 }
 
 .disciplina-card__streak {
@@ -2194,6 +2197,8 @@
   font-size: var(--lastro-papel-rotulo);
   font-weight: var(--lastro-peso-forte);
   color: var(--lastro-esmeralda);
+  white-space: nowrap;
+  flex: 0 0 auto;
 }
 
 .disciplina-grid {
@@ -2326,18 +2331,69 @@
   border: 1px solid var(--lastro-borda-verde);
   padding: 4px 10px;
   border-radius: var(--lastro-raio-pilula);
+  /* Pílula é rótulo curto: "Sem treinos" quebrava em duas linhas a 360px
+     e a cápsula virava um bloco alto ao lado do número. */
+  white-space: nowrap;
+  flex: 0 0 auto;
 }
 
-.metrica-wave-wrapper {
-  height: 70px;
+/* Barras do histórico — uma por treino real (`resumo.historicoBarras`).
+   Substituíram três SVGs de `path` fixo que desenhavam a mesma curva
+   para qualquer usuário, inclusive com zero treino (auditoria
+   2026-08-21). Sem treino, o componente não renderiza barra nenhuma:
+   ausência de dado tem que parecer ausência. */
+.metrica-barras {
+  display: flex;
+  align-items: flex-end;
+  gap: var(--lastro-e-2);
+  height: 84px;
   width: 100%;
-  margin-top: 4px;
+  margin-top: var(--lastro-e-2);
 }
 
-.metrica-wave-svg {
-  width: 100%;
+.metrica-barra {
+  flex: 1 1 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
   height: 100%;
-  overflow: visible;
+  min-width: 0;
+}
+
+.metrica-barra__haste {
+  width: 100%;
+  border-radius: var(--lastro-raio-1) var(--lastro-raio-1) 2px 2px;
+  background: linear-gradient(
+    180deg,
+    var(--lastro-esmeralda-claro) 0%,
+    var(--lastro-esmeralda) 100%
+  );
+  box-shadow: var(--lastro-bevel);
+}
+
+/* O treino mais recente é o dourado — mesma função de destaque que o
+   ponto dourado tinha no desenho antigo, agora apontando para um dado
+   que existe. */
+.metrica-barra:last-child .metrica-barra__haste {
+  background: var(--lastro-ouro-grad);
+  box-shadow:
+    var(--lastro-bevel),
+    0 0 12px var(--lastro-ouro-glow);
+}
+
+.metrica-barra__dia {
+  font-family: var(--lastro-fonte-num);
+  font-variant-numeric: tabular-nums;
+  font-size: var(--lastro-papel-rotulo);
+  color: var(--lastro-txt-2);
+  margin-top: var(--lastro-e-1);
+}
+
+.metrica-switcher__vazio {
+  font-size: var(--lastro-papel-corpo);
+  color: var(--lastro-txt-2);
+  margin-top: var(--lastro-e-3);
 }
 
 /* AI Coach Card (Análise Semanal) */
@@ -2372,23 +2428,13 @@
   font-size: var(--lastro-papel-rotulo);
   font-weight: var(--lastro-peso-medio);
   color: var(--lastro-txt-2);
+  white-space: nowrap;
+  flex: 0 0 auto;
 }
 
-.ai-coach-card__barra {
-  height: 6px;
-  width: 100%;
-  background: rgba(255, 255, 255, 0.08);
-  border-radius: var(--lastro-raio-pilula);
-  overflow: hidden;
-}
-
-.ai-coach-card__progresso {
-  height: 100%;
-  background: linear-gradient(90deg, var(--lastro-esmeralda), var(--lastro-ouro));
-  border-radius: var(--lastro-raio-pilula);
-  box-shadow: 0 0 10px var(--lastro-esmeralda-glow);
-  transition: width var(--lastro-dur-4) var(--lastro-curva-enfatizada);
-}
+/* `.ai-coach-card__barra` e `__progresso` foram removidos junto com a
+   meta cravada de 4 treinos que os alimentava (E11: rejeitado é
+   deletado, não comentado). Voltam na PR da meta configurável. */
 
 .ai-coach-card__citacao {
   text-decoration: none;

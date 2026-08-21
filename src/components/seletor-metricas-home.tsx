@@ -2,18 +2,89 @@
 
 import { useState } from "react";
 
+/**
+ * Card de métricas da Home.
+ *
+ * A versão anterior desenhava três SVGs com o `d` do path escrito à mão,
+ * idênticos para todo usuário: um perfil com ZERO treino via a mesma
+ * curva subindo que um perfil com 11 toneladas na semana. Junto vinham
+ * selos fixos ("Progressão", "Faixa Ideal") e um veredito de carga sem
+ * cálculo nenhum ("Alta"). Auditoria de 2026-08-21, confirmada em
+ * produção contra os dados reais do dono.
+ *
+ * Aqui cada barra é um treino de verdade, vindo de `resumo.historicoBarras`.
+ * Sem treino, não há barra — ausência de dado precisa parecer ausência,
+ * nunca uma linha de base que se lê como "zero progresso".
+ *
+ * A aba "Cargas" saiu de propósito: e1RM entre treinos de grupos
+ * musculares diferentes não é série comparável (o melhor e1RM de um dia
+ * de perna não conversa com o de um dia de bíceps), e o cálculo de PR
+ * honesto mora na camada de agregação da Análise. Aba nova só volta com
+ * métrica que se sustente.
+ */
+
+type Barra = { data: string; volume: number; series: number };
+
 type MetricasHomeProps = {
   volumeFormatado: { valor: string; unidade: string };
   seriesValendo: number;
   treinosNaSemana: number;
+  historicoBarras: Barra[];
 };
+
+type Aba = "volume" | "series";
+
+function rotuloDia(iso: string): string {
+  const d = new Date(`${iso}T00:00:00Z`);
+  return String(d.getUTCDate());
+}
+
+function GraficoBarras({
+  barras,
+  valorDe,
+  formatar,
+  rotuloSerie,
+}: {
+  barras: Barra[];
+  valorDe: (b: Barra) => number;
+  formatar: (n: number) => string;
+  rotuloSerie: string;
+}) {
+  if (barras.length === 0) return null;
+
+  const maximo = Math.max(...barras.map(valorDe));
+
+  return (
+    <div className="metrica-barras" role="img" aria-label={rotuloSerie}>
+      {barras.map((b) => {
+        const valor = valorDe(b);
+        // Altura mínima de 4% para um treino leve não sumir da grade —
+        // ele existiu, e a barra precisa dizer isso.
+        const altura = maximo > 0 ? Math.max(4, (valor / maximo) * 100) : 4;
+        return (
+          <div className="metrica-barra" key={b.data + valor}>
+            <div
+              className="metrica-barra__haste"
+              style={{ height: `${altura}%` }}
+              title={`${rotuloDia(b.data)}: ${formatar(valor)}`}
+            />
+            <span className="metrica-barra__dia">{rotuloDia(b.data)}</span>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
 
 export default function SeletorMetricasHome({
   volumeFormatado,
   seriesValendo,
   treinosNaSemana,
+  historicoBarras,
 }: MetricasHomeProps) {
-  const [abaAtiva, setAbaAtiva] = useState<"volume" | "cargas" | "series">("volume");
+  const [abaAtiva, setAbaAtiva] = useState<Aba>("volume");
+
+  const temBarras = historicoBarras.length > 0;
 
   return (
     <section className="metrica-switcher-card" aria-label="Métricas da Semana">
@@ -26,15 +97,6 @@ export default function SeletorMetricasHome({
           onClick={() => setAbaAtiva("volume")}
         >
           Volume
-        </button>
-        <button
-          type="button"
-          role="tab"
-          aria-selected={abaAtiva === "cargas"}
-          className={`metrica-tab${abaAtiva === "cargas" ? " metrica-tab--ativa" : ""}`}
-          onClick={() => setAbaAtiva("cargas")}
-        >
-          Cargas
         </button>
         <button
           type="button"
@@ -59,58 +121,18 @@ export default function SeletorMetricasHome({
                 <p className="metrica-switcher__subtitulo">Volume acumulado na semana</p>
               </div>
               <span className="metrica-switcher__delta">
-                {treinosNaSemana > 0 ? `${treinosNaSemana} sessões` : "Sem treinos"}
+                {treinosNaSemana > 0
+                  ? `${treinosNaSemana} ${treinosNaSemana === 1 ? "sessão" : "sessões"}`
+                  : "Sem treinos"}
               </span>
             </div>
 
-            {/* Onda SVG com gradiente dinâmico */}
-            <div className="metrica-wave-wrapper">
-              <svg className="metrica-wave-svg" viewBox="0 0 350 75" preserveAspectRatio="none">
-                <defs>
-                  <linearGradient id="waveGradTeal" x1="0%" y1="0%" x2="0%" y2="100%">
-                    <stop offset="0%" stopColor="#10B981" stopOpacity="0.35" />
-                    <stop offset="100%" stopColor="#10B981" stopOpacity="0.0" />
-                  </linearGradient>
-                  <linearGradient id="strokeGradTeal" x1="0%" y1="0%" x2="100%" y2="0%">
-                    <stop offset="0%" stopColor="#06B6D4" />
-                    <stop offset="60%" stopColor="#10B981" />
-                    <stop offset="100%" stopColor="#D4AF37" />
-                  </linearGradient>
-                </defs>
-                <path d="M 0,55 Q 50,60 100,45 T 200,50 T 290,15 T 350,8 L 350,75 L 0,75 Z" fill="url(#waveGradTeal)" />
-                <path d="M 0,55 Q 50,60 100,45 T 200,50 T 290,15 T 350,8" fill="none" stroke="url(#strokeGradTeal)" strokeWidth="3" strokeLinecap="round" />
-                <circle cx="290" cy="15" r="4.5" fill="#D4AF37" stroke="#0E1218" strokeWidth="2" />
-              </svg>
-            </div>
-          </div>
-        )}
-
-        {abaAtiva === "cargas" && (
-          <div className="metrica-switcher__bloco">
-            <div className="metrica-switcher__topo">
-              <div>
-                <div className="metrica-switcher__grande">
-                  {treinosNaSemana > 0 ? "Alta" : "—"}
-                  <span className="metrica-switcher__unidade">1RM</span>
-                </div>
-                <p className="metrica-switcher__subtitulo">Evolução de cargas nos principais exercícios</p>
-              </div>
-              <span className="metrica-switcher__delta">Progressão</span>
-            </div>
-
-            <div className="metrica-wave-wrapper">
-              <svg className="metrica-wave-svg" viewBox="0 0 350 75" preserveAspectRatio="none">
-                <defs>
-                  <linearGradient id="waveGradGold" x1="0%" y1="0%" x2="0%" y2="100%">
-                    <stop offset="0%" stopColor="#D4AF37" stopOpacity="0.3" />
-                    <stop offset="100%" stopColor="#D4AF37" stopOpacity="0.0" />
-                  </linearGradient>
-                </defs>
-                <path d="M 0,60 Q 60,50 120,40 T 240,25 T 350,10 L 350,75 L 0,75 Z" fill="url(#waveGradGold)" />
-                <path d="M 0,60 Q 60,50 120,40 T 240,25 T 350,10" fill="none" stroke="#D4AF37" strokeWidth="3" strokeLinecap="round" />
-                <circle cx="350" cy="10" r="4.5" fill="#10B981" stroke="#0E1218" strokeWidth="2" />
-              </svg>
-            </div>
+            <GraficoBarras
+              barras={historicoBarras}
+              valorDe={(b) => b.volume}
+              formatar={(n) => `${Math.round(n).toLocaleString("pt-BR")} kg`}
+              rotuloSerie={`Volume dos últimos ${historicoBarras.length} treinos`}
+            />
           </div>
         )}
 
@@ -122,25 +144,30 @@ export default function SeletorMetricasHome({
                   {seriesValendo}
                   <span className="metrica-switcher__unidade">séries</span>
                 </div>
-                <p className="metrica-switcher__subtitulo">Séries valendo concluídas (aquecimento excluído)</p>
+                <p className="metrica-switcher__subtitulo">
+                  Séries valendo concluídas (aquecimento excluído)
+                </p>
               </div>
-              <span className="metrica-switcher__delta">Faixa Ideal</span>
+              <span className="metrica-switcher__delta">
+                {treinosNaSemana > 0
+                  ? `${treinosNaSemana} ${treinosNaSemana === 1 ? "sessão" : "sessões"}`
+                  : "Sem treinos"}
+              </span>
             </div>
 
-            <div className="metrica-wave-wrapper">
-              <svg className="metrica-wave-svg" viewBox="0 0 350 75" preserveAspectRatio="none">
-                <defs>
-                  <linearGradient id="waveGradCyan" x1="0%" y1="0%" x2="0%" y2="100%">
-                    <stop offset="0%" stopColor="#06B6D4" stopOpacity="0.3" />
-                    <stop offset="100%" stopColor="#06B6D4" stopOpacity="0.0" />
-                  </linearGradient>
-                </defs>
-                <path d="M 0,50 Q 70,30 140,45 T 280,20 T 350,15 L 350,75 L 0,75 Z" fill="url(#waveGradCyan)" />
-                <path d="M 0,50 Q 70,30 140,45 T 280,20 T 350,15" fill="none" stroke="#06B6D4" strokeWidth="3" strokeLinecap="round" />
-                <circle cx="280" cy="20" r="4.5" fill="#D4AF37" stroke="#0E1218" strokeWidth="2" />
-              </svg>
-            </div>
+            <GraficoBarras
+              barras={historicoBarras}
+              valorDe={(b) => b.series}
+              formatar={(n) => `${n} ${n === 1 ? "série" : "séries"}`}
+              rotuloSerie={`Séries dos últimos ${historicoBarras.length} treinos`}
+            />
           </div>
+        )}
+
+        {!temBarras && (
+          <p className="metrica-switcher__vazio">
+            Os treinos que você registrar aparecem aqui como histórico.
+          </p>
         )}
       </div>
     </section>
