@@ -192,3 +192,150 @@
   --lastro-curva-padrao: cubic-bezier(0.2, 0, 0, 1);
   --lastro-curva-enfatizada: cubic-bezier(0.05, 0.7, 0.1, 1);
 }
+
+/* =========================================================================
+   PALETAS DE CORES PERSONALIZADAS (data-tema)
+   ========================================================================= */
+
+/* 1. MARFIM & OURO IMPERIAL (LIGHT LUXURY) */
+[data-tema="branco-ouro"] {
+  --lastro-fundo:        #F6F7F9;
+  --lastro-sup-1:        #FFFFFF;
+  --lastro-sup-2:        #F1F5F9;
+  --lastro-sup-3:        #E2E8F0;
+  --lastro-txt:          #0F172A;
+  --lastro-txt-2:        #475569;
+  --lastro-txt-3:        #64748B;
+  --lastro-linha:        rgba(0, 0, 0, 0.08);
+  --lastro-controle:     rgba(0, 0, 0, 0.16);
+  --lastro-borda-ouro:   rgba(184, 134, 11, 0.35);
+  --lastro-ouro:         #B8860B;
+  --lastro-ouro-claro:   #D4AF37;
+  --lastro-ouro-escuro:  #8F6904;
+  --lastro-ouro-glow:    rgba(184, 134, 11, 0.25);
+  --lastro-ouro-grad:    linear-gradient(135deg, #E6C86E 0%, #D4AF37 50%, #B8860B 100%);
+  --lastro-grad-acao:    linear-gradient(135deg, #E6C86E 0%, #D4AF37 50%, #B8860B 100%);
+  --lastro-grad-acao-h:  linear-gradient(135deg, #F3D98A 0%, #E5C358 100%);
+  --lastro-acao-txt:     #0F172A;
+  --lastro-campo-fundo:  #F8FAFC;
+  --lastro-barra-a:      #FFFFFF;
+  --lastro-barra-b:      #F6F7F9;
+  --lastro-barra-txt:    #0F172A;
+  --lastro-vidro-nav:    rgba(255, 255, 255, 0.96);
+  --lastro-vidro-nav-opaco: #FFFFFF;
+  --lastro-nav-txt-fraco: rgba(100, 116, 139, 0.85);
+  --lastro-elev-1:       0 2px 8px rgba(0, 0, 0, 0.05);
+  --lastro-elev-2:       0 8px 20px -4px rgba(0, 0, 0, 0.08);
+  --lastro-elev-3:       0 16px 32px -6px rgba(0, 0, 0, 0.12);
+}
+
+/* 2. DUNA AREIA & ÂMBAR (SANDSTONE WARMTH) */
+[data-tema="areia"] {
+  --lastro-fundo:        #090807;
+  --lastro-sup-1:        #12100D;
+  --lastro-sup-2:        #1A1713;
+  --lastro-sup-3:        #24201A;
+  --lastro-linha:        rgba(217, 195, 165, 0.12);
+  --lastro-controle:     rgba(217, 195, 165, 0.22);
+  --lastro-borda-ouro:   rgba(217, 195, 165, 0.35);
+  --lastro-ouro:         #D9C3A5;
+  --lastro-ouro-claro:   #E8D3B8;
+  --lastro-ouro-escuro:  #B3956E;
+  --lastro-ouro-glow:    rgba(217, 195, 165, 0.25);
+  --lastro-ouro-grad:    linear-gradient(135deg, #E8D3B8 0%, #D4BA95 50%, #B3956E 100%);
+  --lastro-grad-acao:    linear-gradient(135deg, #E8D3B8 0%, #D4BA95 50%, #B3956E 100%);
+  --lastro-grad-acao-h:  linear-gradient(135deg, #F3E2CE 0%, #E8D3B8 100%);
+  --lastro-acao-txt:     #1A150E;
+  --lastro-campo-fundo:  #14110E;
+  --lastro-barra-a:      #12100D;
+  --lastro-barra-b:      #090807;
+}
+
+/* 3. CLEAN MONOLITH (PLATINA & TITÂNIO) */
+[data-tema="clean"] {
+  --lastro-fundo:        #08090A;
+  --lastro-sup-1:        #101214;
+  --lastro-sup-2:        #171A1D;
+  --lastro-sup-3:        #22262B;
+  --lastro-linha:        rgba(255, 255, 255, 0.12);
+  --lastro-controle:     rgba(255, 255, 255, 0.22);
+  --lastro-borda-ouro:   rgba(255, 255, 255, 0.35);
+  --lastro-ouro:         #FFFFFF;
+  --lastro-ouro-claro:   #F8FAFC;
+  --lastro-ouro-escuro:  #CBD5E1;
+  --lastro-ouro-glow:    rgba(255, 255, 255, 0.2);
+  --lastro-ouro-grad:    linear-gradient(135deg, #FFFFFF 0%, #E2E8F0 60%, #CBD5E1 100%);
+  --lastro-grad-acao:    linear-gradient(135deg, #FFFFFF 0%, #E2E8F0 60%, #CBD5E1 100%);
+  --lastro-grad-acao-h:  linear-gradient(135deg, #FFFFFF 0%, #F1F5F9 100%);
+  --lastro-acao-txt:     #08090A;
+  --lastro-campo-fundo:  #121417;
+  --lastro-barra-a:      #101214;
+  --lastro-barra-b:      #08090A;
+}
+
+/* 4. SLATE PETRÓLEO & OURO ANTIGO (EQUINOX LUXURY) */
+[data-tema="petroleo"] {
+  --lastro-fundo:        #080D12;
+  --lastro-sup-1:        #0E161F;
+  --lastro-sup-2:        #141F2B;
+  --lastro-sup-3:        #1D2C3D;
+  --lastro-linha:        rgba(197, 168, 128, 0.15);
+  --lastro-controle:     rgba(197, 168, 128, 0.22);
+  --lastro-borda-ouro:   rgba(197, 168, 128, 0.35);
+  --lastro-ouro:         #DFC19B;
+  --lastro-ouro-claro:   #EBD5B9;
+  --lastro-ouro-escuro:  #9C7E54;
+  --lastro-ouro-glow:    rgba(197, 168, 128, 0.25);
+  --lastro-ouro-grad:    linear-gradient(135deg, #EBD5B9 0%, #C5A880 50%, #9C7E54 100%);
+  --lastro-grad-acao:    linear-gradient(135deg, #EBD5B9 0%, #C5A880 50%, #9C7E54 100%);
+  --lastro-grad-acao-h:  linear-gradient(135deg, #F5E5D0 0%, #DFC19B 100%);
+  --lastro-acao-txt:     #080D12;
+  --lastro-campo-fundo:  #101923;
+  --lastro-barra-a:      #0E161F;
+  --lastro-barra-b:      #080D12;
+}
+
+/* 5. CAFÉ MOKA & CARAMELO TOSTADO (LEICA CRAFT) */
+[data-tema="moka"] {
+  --lastro-fundo:        #0D0B0A;
+  --lastro-sup-1:        #171311;
+  --lastro-sup-2:        #221C18;
+  --lastro-sup-3:        #2E2621;
+  --lastro-linha:        rgba(229, 169, 60, 0.15);
+  --lastro-controle:     rgba(229, 169, 60, 0.22);
+  --lastro-borda-ouro:   rgba(229, 169, 60, 0.35);
+  --lastro-ouro:         #E5A93C;
+  --lastro-ouro-claro:   #FBD38D;
+  --lastro-ouro-escuro:  #B7791F;
+  --lastro-ouro-glow:    rgba(229, 169, 60, 0.25);
+  --lastro-ouro-grad:    linear-gradient(135deg, #FBD38D 0%, #E5A93C 50%, #B7791F 100%);
+  --lastro-grad-acao:    linear-gradient(135deg, #FBD38D 0%, #E5A93C 50%, #B7791F 100%);
+  --lastro-grad-acao-h:  linear-gradient(135deg, #FEEBC8 0%, #F6AD55 100%);
+  --lastro-acao-txt:     #0D0B0A;
+  --lastro-campo-fundo:  #1A1513;
+  --lastro-barra-a:      #171311;
+  --lastro-barra-b:      #0D0B0A;
+}
+
+/* 6. OLIVA TÁTICO (FOREST STEALTH / SÁLVIA) */
+[data-tema="oliva"] {
+  --lastro-fundo:        #070908;
+  --lastro-sup-1:        #0F1310;
+  --lastro-sup-2:        #161C18;
+  --lastro-sup-3:        #1E2620;
+  --lastro-linha:        rgba(132, 169, 140, 0.15);
+  --lastro-controle:     rgba(132, 169, 140, 0.22);
+  --lastro-borda-ouro:   rgba(132, 169, 140, 0.35);
+  --lastro-ouro:         #84A98C;
+  --lastro-ouro-claro:   #A3B18A;
+  --lastro-ouro-escuro:  #588157;
+  --lastro-ouro-glow:    rgba(132, 169, 140, 0.25);
+  --lastro-ouro-grad:    linear-gradient(135deg, #A3B18A 0%, #84A98C 50%, #588157 100%);
+  --lastro-grad-acao:    linear-gradient(135deg, #A3B18A 0%, #84A98C 50%, #588157 100%);
+  --lastro-grad-acao-h:  linear-gradient(135deg, #B5C99A 0%, #84A98C 100%);
+  --lastro-acao-txt:     #070908;
+  --lastro-campo-fundo:  #111713;
+  --lastro-barra-a:      #0F1310;
+  --lastro-barra-b:      #070908;
+}
+

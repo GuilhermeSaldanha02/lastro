@@ -98,6 +98,10 @@ export default function RootLayout({ children, modal }: LayoutProps<"/">) {
           dangerouslySetInnerHTML={{
             __html: `(function () {
               try {
+                var tema = localStorage.getItem("lastro_tema");
+                if (tema) {
+                  document.documentElement.setAttribute("data-tema", tema);
+                }
                 var ROTAS_ISENTAS = ${JSON.stringify(ROTAS_ISENTAS_DE_FORCAR_INICIO)};
                 var emPwaInstalado = window.matchMedia("(display-mode: standalone)").matches;
                 if (emPwaInstalado && ROTAS_ISENTAS.indexOf(window.location.pathname) === -1) {
