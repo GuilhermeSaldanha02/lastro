@@ -29,7 +29,7 @@ export default async function PaginaAjustes() {
                 <Avatar nome={perfil.nome} avatarUrl={perfil.avatarUrl} />
                 <div>
                   <h2 className="card-perfil-bento__nome">{perfil.nome}</h2>
-                  <span className="card-perfil-bento__status">Atleta Lastro · Ver Perfil</span>
+                  <span className="card-perfil-bento__status">Ver Perfil</span>
                 </div>
               </div>
               <SetaNavegacao />

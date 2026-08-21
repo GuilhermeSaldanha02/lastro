@@ -37,21 +37,21 @@ export default function SeletorGrupoMuscular({
   }
 
   return (
-    <section className="grupo">
-      <div className="grupo__cab">
-        <h2 className="grupo__nome" tabIndex={-1} ref={tituloRef}>
-          Grupo muscular de hoje
-        </h2>
+    <section className="card-obsidian" style={{ marginBottom: "var(--lastro-e-4)" }}>
+      <div className="card-obsidian__header">
+        <div>
+          <span className="card-obsidian__titulo" tabIndex={-1} ref={tituloRef}>
+            Grupo Muscular de Hoje
+          </span>
+          <p style={{ fontSize: "var(--lastro-papel-rotulo)", color: "var(--lastro-txt-3)", margin: "2px 0 0" }}>
+            Escolha um ou mais para filtrar a lista de exercícios
+          </p>
+        </div>
       </div>
-      <p className="campo__nota">
-        Escolha um ou mais — a lista de exercícios mostra só esses grupos.
-      </p>
 
-      {/* Chips (DESIGN.md §6.5, peça 5, M7) — substitui a grade de caixas
-          de seleção. */}
-      <div className="chips" role="group" aria-label="Grupos musculares de hoje">
+      <div className="chips" role="group" aria-label="Grupos musculares de hoje" style={{ margin: "var(--lastro-e-3) 0 var(--lastro-e-4)" }}>
         {opcoes.map((opcao) => (
-          <label key={opcao.id} className="chip">
+          <label key={opcao.id} className={`chip${selecionados.includes(opcao.id) ? " chip--ativo" : ""}`}>
             <input
               type="checkbox"
               checked={selecionados.includes(opcao.id)}

@@ -457,9 +457,14 @@ export default function TreinoDetalhe({
         )}
 
         {formularioAberto && gruposEscolhidos.length > 0 && (
-          <section className="grupo">
-            <div className="grupo__cab">
-              <h2 className="grupo__nome">Registrar série</h2>
+          <section className="card-obsidian" style={{ marginBottom: "var(--lastro-e-4)" }}>
+            <div className="card-obsidian__header">
+              <div>
+                <span className="card-obsidian__titulo">Registrar Série</span>
+                <p style={{ fontSize: "var(--lastro-papel-rotulo)", color: "var(--lastro-txt-3)", margin: 0 }}>
+                  Preencha a carga e repetições executadas
+                </p>
+              </div>
               <button
                 type="button"
                 className="botao-textual"

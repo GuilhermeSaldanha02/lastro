@@ -143,7 +143,7 @@ export default function FormularioSerie({
   // rodar — as mensagens deste componente ("Exercício é obrigatório." etc.)
   // nunca apareciam (achado real da auditoria, REG-06 a REG-11, 2026-08-17).
   return (
-    <form className="formulario" onSubmit={aoEnviar} noValidate>
+    <form className="formulario" onSubmit={aoEnviar} noValidate style={{ display: "flex", flexDirection: "column", gap: "var(--lastro-e-3)" }}>
       <div className="campo">
         <label className="campo__rotulo" htmlFor="exercicio_id">
           Exercício
@@ -167,28 +167,25 @@ export default function FormularioSerie({
       </div>
 
       {exercicioSelecionado?.unilateral && (
-        <p className="campo__nota">
-          Exercício unilateral — reps contam por lado
-        </p>
+        <span className="tag-unilateral" style={{ alignSelf: "flex-start" }}>
+          Unilateral · reps contam por lado
+        </span>
       )}
 
-      {/* "Última vez" (C1) — só séries VALENDO entram no histórico (FF4),
-          então isto nunca mostra um aquecimento como referência. Some em
-          silêncio sem rede ou sem histórico — nunca vira erro (D6). */}
       {ultimaDoHistorico && (
-        <div className="campo__historico">
-          <p className="campo__nota">
-            Última vez: {ultimaDoHistorico.reps} × {ultimaDoHistorico.peso} kg
+        <div style={{ background: "var(--lastro-sup-2)", border: "1px solid var(--lastro-linha)", borderRadius: "var(--lastro-raio-2)", padding: "10px 14px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+          <p style={{ fontSize: "var(--lastro-papel-rotulo)", color: "var(--lastro-txt-2)", margin: 0 }}>
+            Última vez: <strong style={{ color: "var(--lastro-ouro)", fontFamily: "var(--lastro-fonte-num)" }}>{ultimaDoHistorico.reps} × {ultimaDoHistorico.peso} kg</strong>
           </p>
-          <button type="button" className="botao-textual" onClick={usarUltimosValores}>
-            Usar esses valores
+          <button type="button" className="botao-textual" onClick={usarUltimosValores} style={{ color: "var(--lastro-ouro)", fontWeight: "bold" }}>
+            Usar valores
           </button>
         </div>
       )}
 
       <div className="campo">
         <label className="campo__rotulo" htmlFor="tipo">
-          Tipo
+          Tipo de Série
         </label>
         <select
           id="tipo"
@@ -216,6 +213,7 @@ export default function FormularioSerie({
             name="reps"
             type="number"
             inputMode="numeric"
+            placeholder="0"
             min={1}
             max={200}
             required
@@ -232,6 +230,7 @@ export default function FormularioSerie({
             name="peso"
             type="number"
             inputMode="decimal"
+            placeholder="0.0"
             min={0}
             max={1000}
             step="0.01"
@@ -243,13 +242,13 @@ export default function FormularioSerie({
       {tipo === "valendo" && (
         <div className="campo">
           <label className="campo__rotulo" htmlFor="rir">
-            RIR (opcional)
+            RIR (Repetições na Reserva — Opcional)
           </label>
-          <input id="rir" name="rir" type="number" inputMode="numeric" min={0} max={10} />
+          <input id="rir" name="rir" type="number" inputMode="numeric" placeholder="Ex: 2" min={0} max={10} />
         </div>
       )}
 
-      <label className="campo-caixa" htmlFor="peso_corporal_incluso">
+      <label className="campo-caixa" htmlFor="peso_corporal_incluso" style={{ padding: "8px 0" }}>
         <input
           id="peso_corporal_incluso"
           name="peso_corporal_incluso"
@@ -264,7 +263,7 @@ export default function FormularioSerie({
         </p>
       )}
 
-      <button type="submit" className="botao-secundario">
+      <button type="submit" className="botao-primario" style={{ marginTop: "var(--lastro-e-2)" }}>
         Registrar série
       </button>
     </form>
