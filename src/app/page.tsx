@@ -141,19 +141,31 @@ export default async function PaginaInicial() {
               </svg>
               <span>Análise Semanal (AI Coach)</span>
             </div>
-            {/* A fração "2/4 Treinos (50%)" e a barra saíram: o
-                denominador era `const metaTreinos = 4`, um número que o
-                dono nunca escolheu — não há tela, campo ou preferência
-                que o produza. Volta na PR da meta configurável, aí como
-                verdade. Até lá, a contagem sozinha já é informação real. */}
             {/* Curto de propósito: o cartão já se chama "Análise Semanal",
                 então "nesta semana" no rótulo era redundante — e a 360px
                 a frase longa quebrava o cabeçalho em duas linhas. */}
             <span className="ai-coach-card__meta">
               {resumo.treinosNaSemana}{" "}
               {resumo.treinosNaSemana === 1 ? "treino" : "treinos"}
+              {/* T4: a fração só aparece depois que o dono define a meta
+                  em /ajustes — nunca um denominador inventado (achado
+                  A13). Sem meta definida, a contagem sozinha já basta. */}
+              {perfil?.metaTreinosSemana != null && (
+                <> / {perfil.metaTreinosSemana}</>
+              )}
             </span>
           </div>
+
+          {perfil?.metaTreinosSemana != null && (
+            <div className="ai-coach-card__barra">
+              <div
+                className="ai-coach-card__progresso"
+                style={{
+                  width: `${Math.min(100, Math.round((resumo.treinosNaSemana / perfil.metaTreinosSemana) * 100))}%`,
+                }}
+              />
+            </div>
+          )}
 
           <Link href="/analise" className="ai-coach-card__citacao">
             <p>

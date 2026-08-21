@@ -8,6 +8,8 @@ import type { SupabaseClient, User } from "@supabase/supabase-js";
 export type Perfil = {
   nome: string;
   avatarUrl: string | null;
+  /** null = dono nunca definiu (T4) — Home não mostra fração nem barra. */
+  metaTreinosSemana: number | null;
 };
 
 export async function obterPerfil(): Promise<Perfil | null> {
@@ -19,14 +21,18 @@ export async function obterPerfil(): Promise<Perfil | null> {
 
   const { data } = await supabase
     .from("usuario")
-    .select("nome, avatar_url")
+    .select("nome, avatar_url, meta_treinos_semana")
     .eq("id", user.id)
     .maybeSingle();
 
   // O trigger da 0004 garante que a linha existe pra toda conta nova;
   // null aqui só acontece se o backfill ainda não rodou nesta base.
   if (!data) return null;
-  return { nome: data.nome, avatarUrl: data.avatar_url };
+  return {
+    nome: data.nome,
+    avatarUrl: data.avatar_url,
+    metaTreinosSemana: data.meta_treinos_semana,
+  };
 }
 
 const CAMINHO_BUCKET = "avatares";

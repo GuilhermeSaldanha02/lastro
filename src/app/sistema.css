@@ -2491,6 +2491,16 @@
   font-size: var(--lastro-papel-rotulo);
   font-weight: var(--lastro-peso-max);
   color: var(--lastro-ouro);
+  /* T4: "/ N" no meta empurrou este título pra quebrar no meio de
+     "(AI Coach)" — feio. Trunca com reticências em vez de quebrar. */
+  min-width: 0;
+  overflow: hidden;
+}
+
+.ai-coach-card__badge span {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .ai-coach-card__meta {
@@ -2501,9 +2511,24 @@
   flex: 0 0 auto;
 }
 
-/* `.ai-coach-card__barra` e `__progresso` foram removidos junto com a
-   meta cravada de 4 treinos que os alimentava (E11: rejeitado é
-   deletado, não comentado). Voltam na PR da meta configurável. */
+/* Restauradas na PR da meta configurável (T4) — só renderizam quando
+   `perfil.metaTreinosSemana` existe de verdade (usuario.usuario,
+   coluna nullable, migração 0009), nunca com denominador inventado. */
+.ai-coach-card__barra {
+  height: 6px;
+  width: 100%;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: var(--lastro-raio-pilula);
+  overflow: hidden;
+}
+
+.ai-coach-card__progresso {
+  height: 100%;
+  background: linear-gradient(90deg, var(--lastro-esmeralda), var(--lastro-ouro));
+  border-radius: var(--lastro-raio-pilula);
+  box-shadow: 0 0 10px var(--lastro-esmeralda-glow);
+  transition: width var(--lastro-dur-4) var(--lastro-curva-enfatizada);
+}
 
 .ai-coach-card__citacao {
   text-decoration: none;

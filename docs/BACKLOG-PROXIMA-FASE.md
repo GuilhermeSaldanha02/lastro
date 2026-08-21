@@ -431,13 +431,40 @@ que gere PR.
 - Remedir C1–C14 contra as 6 paletas (agora todas com contraste real
   para medir, depois da parte 2 acima).
 
-## T4 — Meta semanal de treinos configurável
+## T4 — Meta semanal de treinos configurável · ✅ **RESOLVIDO em 2026-08-21**
 
 Continuação do A13. A fração "2/4 Treinos (50%)" e a barra de progresso
-foram removidas da Home porque o denominador era `const metaTreinos = 4`.
-Voltam quando a meta for escolha do dono (campo em `/ajustes`, mesmo
-lugar do T1). O CSS `.ai-coach-card__barra` / `__progresso` foi deletado
-e precisa ser reescrito.
+tinham saído da Home porque o denominador era `const metaTreinos = 4`,
+um número que o dono nunca escolheu.
+
+**Decisão do dono, perguntada antes de implementar:** sem meta definida,
+a Home mostra só a contagem ("2 treinos"), nunca fração com denominador
+inventado — nem "padrão de 4" como sugestão. A fração só aparece depois
+que o dono define a meta em `/ajustes`.
+
+**Implementado:**
+- Migração `0009_meta_semanal.sql` — `usuario.meta_treinos_semana`,
+  `smallint` **nullable** (não um default numérico — NULL é o estado
+  honesto de "ainda não escolhido"), `check` 1–7.
+- `src/lib/dados/meta-semanal.ts` — server action `definirMetaTreinosSemana`,
+  arquivo próprio (não em `perfil.ts`, mesma razão documentada em
+  `atualizar-avatar.ts`: `"use server"` é diretiva de arquivo inteiro).
+- `src/components/meta-semanal-form.tsx` — campo em `/ajustes`, logo
+  abaixo do card de perfil. Vazio = sem meta; `Number.isInteger` 1–7
+  validado no cliente e de novo no servidor.
+- `.ai-coach-card__barra`/`__progresso` reescritos em `sistema.css`
+  (tinham sido apagados, não só comentados — E11).
+
+**Achado durante a verificação visual, corrigido na mesma leva:** o "/ N"
+empurrou "Análise Semanal (AI Coach)" pra quebrar no meio de "(AI
+Coach)" a 360px. `.ai-coach-card__badge` ganhou `min-width: 0` +
+`text-overflow: ellipsis` — trunca em vez de quebrar feio.
+
+**Verificado ao vivo:** ciclo completo (definir 4 → fração+barra
+aparecem, 50% de largura → limpar → volta pra "2 treinos" sem fração),
+validação de intervalo (9 reprovado, mensagem certa), usuário QA
+devolvido ao estado `null` original ao final. `tsc`/test (173)/lint/
+build verdes.
 
 ## T5 — Campo do coach sob a aba inferior (A03) · **ALTA**
 
