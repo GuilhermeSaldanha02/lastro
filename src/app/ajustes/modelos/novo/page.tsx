@@ -2,16 +2,18 @@
 import { listarCatalogo } from "@/lib/dados/treino";
 import ModeloTreinoForm from "@/components/modelo-treino-form";
 import AbaInferior from "@/components/aba-inferior";
-import TituloTela from "@/components/titulo-tela";
-import VoltarFlutuante from "@/components/voltar-flutuante";
+import CabecalhoPro from "@/components/cabecalho-pro";
 
 export default async function PaginaNovoModelo() {
   const exercicios = await listarCatalogo();
 
   return (
     <main className="tela">
-      <VoltarFlutuante href="/ajustes/modelos" rotulo="Modelos de treino" />
-      <TituloTela contexto="Ajustes" titulo="Novo modelo" comVoltar />
+      <CabecalhoPro
+        titulo="Modelos"
+        destaque="Novo"
+        voltarHref="/ajustes/modelos"
+      />
 
       <div className="corpo corpo--com-nav corpo--titulo-conteudo">
         <ModeloTreinoForm exercicios={exercicios} />

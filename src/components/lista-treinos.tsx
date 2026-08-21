@@ -91,7 +91,11 @@ export default function ListaTreinos({
 
       {treinos.length === 0 ? (
         <div className="cartao-vazio">
-          <div className="cartao-vazio__icone">⚔️</div>
+          <div className="cartao-vazio__icone" aria-hidden="true">
+            <svg viewBox="0 0 24 24" width="32" height="32" fill="none" stroke="var(--lastro-ouro)" strokeWidth="1.5">
+              <path d="M4 8v8M20 8v8M8 6v12M16 6v12M8 12h8" />
+            </svg>
+          </div>
           <p className="vazio">Nenhum treino registrado ainda. Inicie sua primeira sessão abaixo.</p>
         </div>
       ) : treinosFiltrados.length === 0 ? (

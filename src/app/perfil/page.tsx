@@ -4,16 +4,18 @@
 import { obterPerfil } from "@/lib/dados/perfil";
 import AbaInferior from "@/components/aba-inferior";
 import EditarPerfil from "@/components/editar-perfil";
-import TituloTela from "@/components/titulo-tela";
-import VoltarFlutuante from "@/components/voltar-flutuante";
+import CabecalhoPro from "@/components/cabecalho-pro";
 
 export default async function PaginaPerfil() {
   const perfil = await obterPerfil();
 
   return (
     <main className="tela">
-      <VoltarFlutuante href="/ajustes" rotulo="Ajustes" />
-      <TituloTela contexto="Ajustes" titulo="Perfil" comVoltar />
+      <CabecalhoPro
+        titulo="Ajustes"
+        destaque="Perfil"
+        voltarHref="/ajustes"
+      />
 
       <div className="corpo corpo--com-nav corpo--titulo-conteudo">
         {perfil ? (

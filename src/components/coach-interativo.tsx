@@ -89,7 +89,7 @@ export default function CoachInterativo() {
                   onClick={() => enviarPergunta(sugestao)}
                   disabled={carregando}
                 >
-                  💬 {sugestao}
+                  {sugestao}
                 </button>
               ))}
             </div>

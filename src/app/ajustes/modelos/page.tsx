@@ -4,16 +4,18 @@ import Link from "next/link";
 import { listarModelos } from "@/lib/dados/modelo-treino";
 import ListaModelos from "@/components/lista-modelos";
 import AbaInferior from "@/components/aba-inferior";
-import TituloTela from "@/components/titulo-tela";
-import VoltarFlutuante from "@/components/voltar-flutuante";
+import CabecalhoPro from "@/components/cabecalho-pro";
 
 export default async function PaginaModelos() {
   const modelos = await listarModelos();
 
   return (
     <main className="tela">
-      <VoltarFlutuante href="/ajustes" rotulo="Ajustes" />
-      <TituloTela contexto="Ajustes" titulo="Modelos de treino" comVoltar />
+      <CabecalhoPro
+        titulo="Ajustes"
+        destaque="Modelos"
+        voltarHref="/ajustes"
+      />
 
       <div className="corpo corpo--com-nav corpo--titulo-conteudo">
         <p className="campo__nota">

@@ -6,17 +6,18 @@ import AbaInferior from "@/components/aba-inferior";
 import Avatar from "@/components/avatar";
 import ExcluirConta from "@/components/excluir-conta";
 import SetaNavegacao from "@/components/seta-navegacao";
-import TituloTela from "@/components/titulo-tela";
+import CabecalhoPro from "@/components/cabecalho-pro";
 
 export default async function PaginaAjustes() {
   const perfil = await obterPerfil();
 
   return (
     <main className="tela">
-      <TituloTela
-        contexto="lastro"
+      <CabecalhoPro
         titulo="Ajustes"
-        acessorio={perfil && <Avatar nome={perfil.nome} avatarUrl={perfil.avatarUrl} />}
+        destaque="Preferências"
+        mostrarLogo={true}
+        perfil={perfil}
       />
 
       <div className="corpo corpo--com-nav corpo--titulo-conteudo transicao-pilula">

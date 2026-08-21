@@ -7,8 +7,7 @@ import { formatarDataCurta } from "@/lib/tempo";
 import AbaInferior from "@/components/aba-inferior";
 import SetaNavegacao from "@/components/seta-navegacao";
 import EtiquetaRecorde from "@/components/etiqueta-recorde";
-import TituloTela from "@/components/titulo-tela";
-import VoltarFlutuante from "@/components/voltar-flutuante";
+import CabecalhoPro from "@/components/cabecalho-pro";
 
 export default async function PaginaHistoricoExercicio({
   params,
@@ -34,8 +33,11 @@ export default async function PaginaHistoricoExercicio({
 
   return (
     <main className="tela">
-      <VoltarFlutuante href="/catalogo" rotulo="Catálogo" />
-      <TituloTela contexto={exercicio.grupoMuscularNome.toUpperCase()} titulo={exercicio.nome} comVoltar />
+      <CabecalhoPro
+        titulo={exercicio.nome}
+        destaque={exercicio.grupoMuscularNome}
+        voltarHref="/catalogo"
+      />
 
       <div className="corpo corpo--com-nav corpo--titulo-conteudo transicao-pilula">
         {/* Banner do Exercício & Tags */}
@@ -45,7 +47,7 @@ export default async function PaginaHistoricoExercicio({
             {exercicio.unilateral && <span className="tag-unilateral">Unilateral</span>}
             {cargaMaxima > 0 && (
               <span className="disciplina-card__streak">
-                🏆 PR: {cargaMaxima} kg
+                PR: {cargaMaxima} kg
               </span>
             )}
           </div>
