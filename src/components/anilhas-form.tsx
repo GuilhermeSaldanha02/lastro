@@ -70,9 +70,9 @@ export default function AnilhasForm({ configInicial }: { configInicial: ConfigAn
       : null;
 
   return (
-    <>
-      <section className="grupo">
-        <h2 className="grupo__nome">Peso da barra</h2>
+    <div style={{ display: "flex", flexDirection: "column", gap: "var(--lastro-e-4)" }}>
+      <section className="card-obsidian">
+        <span className="card-obsidian__titulo">Peso da barra (kg)</span>
         <div className="campo">
           <input
             type="number"
@@ -86,9 +86,9 @@ export default function AnilhasForm({ configInicial }: { configInicial: ConfigAn
         </div>
       </section>
 
-      <section className="grupo">
-        <div className="grupo__cab">
-          <h2 className="grupo__nome">Anilhas disponíveis</h2>
+      <section className="card-obsidian">
+        <div className="card-obsidian__header">
+          <span className="card-obsidian__titulo">Anilhas disponíveis</span>
           {anilhas.length > 0 && (
             <button
               type="button"
@@ -103,22 +103,6 @@ export default function AnilhasForm({ configInicial }: { configInicial: ConfigAn
         {anilhas.length === 0 ? (
           <p className="vazio">Nenhuma anilha configurada ainda.</p>
         ) : (
-          // Anilha é DADO, não navegação — nunca leva a lugar nenhum, só se
-          // lê e se remove (§6.3, peça 2). `.item`/`.lista` (recipiente com
-          // borda) ficam reservados às linhas que navegam; aqui a grade sem
-          // cartão é o padrão certo, medido a 360px: 6 anilhas em grade = 3
-          // colunas × 2 linhas × 88px, contra 372px das 6 linhas de antes.
-          //
-          // H2 (D8): a lixeira fica sempre no DOM e `.botao-icone--oculto`
-          // some com ela fora do modo de edição. A regra do H2 era
-          // `visibility:hidden`, pra célula não encolher e não refluir a
-          // grade — REVISTA em 2026-08-17: reservar um alvo de toque
-          // inteiro embaixo de cada número deixava os valores boiando
-          // ("números soltos", teste no aparelho). Agora o CSS de `.anilha`
-          // usa `display:none`; a grade cresce ao ligar o modo de edição,
-          // que é resposta a um toque explícito, não espaço morto fixo.
-          // Sem confirmação em duas etapas aqui: `removerAnilha` só mexe em
-          // estado local, nada persiste até "Salvar configuração".
           <div className="grade-anilhas">
             {anilhas.map((peso) => (
               <div className="anilha" key={peso}>
@@ -168,10 +152,6 @@ export default function AnilhasForm({ configInicial }: { configInicial: ConfigAn
               onChange={(e) => setNovaAnilha(e.target.value)}
             />
           </div>
-          {/* Ação fantasma (DESIGN.md §6.5, peça 8, M6) — "Adicionar" não
-              pode competir em peso visual com "Salvar configuração"
-              (`.botao-primario`, abaixo), o desequilíbrio que motivou
-              esta peça (ESTUDO-PADRAO-APLICATIVO.md). */}
           <button type="button" className="acao-fantasma" onClick={adicionarAnilha}>
             <span aria-hidden="true">+</span> Adicionar
           </button>
@@ -183,9 +163,6 @@ export default function AnilhasForm({ configInicial }: { configInicial: ConfigAn
           </p>
         )}
 
-        {/* "Adicionar anilha" (acima) edita a lista; "Salvar configuração"
-            persiste a seção inteira. Encostados, liam como dois botões do
-            mesmo passo — achado do teste no aparelho, 2026-08-17. */}
         <div className="grupo__confirmacao">
           <button
             type="button"
@@ -203,8 +180,8 @@ export default function AnilhasForm({ configInicial }: { configInicial: ConfigAn
         </div>
       </section>
 
-      <section className="grupo">
-        <h2 className="grupo__nome">Calculadora</h2>
+      <section className="card-obsidian">
+        <span className="card-obsidian__titulo">Calculadora de Carga</span>
         <div className="campo">
           <label className="campo__rotulo" htmlFor="peso_alvo">
             Peso alvo (kg)
@@ -221,23 +198,21 @@ export default function AnilhasForm({ configInicial }: { configInicial: ConfigAn
         </div>
 
         {resultado && (
-          <p className="campo__nota" aria-live="polite">
-            {resultado.porLado.length === 0 ? (
-              "Só a barra, sem anilha de cada lado."
-            ) : (
-              <>
-                De cada lado:{" "}
-                {resultado.porLado
-                  .map((a) => `${a.quantidade}× ${formatarKg(a.peso)} kg`)
-                  .join(" + ")}
-                .
-              </>
-            )}{" "}
-            Total: {formatarKg(resultado.pesoTotalAlcancado)} kg
-            {!resultado.exato && ` (mais próximo do alvo com as anilhas que você tem)`}.
-          </p>
+          <div style={{ background: "var(--lastro-sup-2)", borderLeft: "3px solid var(--lastro-ouro)", borderRadius: "var(--lastro-raio-2)", padding: "12px 14px", marginTop: "4px" }}>
+            <span style={{ fontSize: "11px", color: "var(--lastro-txt-3)", textTransform: "uppercase", fontWeight: "var(--lastro-peso-max)" }}>
+              De cada lado da barra:
+            </span>
+            <p style={{ fontFamily: "var(--lastro-fonte-num)", fontSize: "var(--lastro-papel-secao)", fontWeight: "var(--lastro-peso-max)", color: "var(--lastro-ouro-claro)", margin: "2px 0" }}>
+              {resultado.porLado.length === 0 ? "0 kg / lado" : `${resultado.porLado.reduce((acc, a) => acc + a.peso * a.quantidade, 0)} kg / lado`}
+            </p>
+            <p style={{ fontSize: "var(--lastro-papel-rotulo)", color: "var(--lastro-txt-2)" }}>
+              {resultado.porLado.length === 0
+                ? "Só a barra, sem anilha de cada lado."
+                : `${resultado.porLado.map((a) => `${a.quantidade}× ${formatarKg(a.peso)} kg`).join(" + ")}. Total: ${formatarKg(resultado.pesoTotalAlcancado)} kg${!resultado.exato ? " (mais próximo do alvo)" : " (exato)"}.`}
+            </p>
+          </div>
         )}
       </section>
-    </>
+    </div>
   );
 }

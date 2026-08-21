@@ -49,7 +49,26 @@ export default async function PaginaTreino() {
         perfil={perfil}
       />
 
-      <div className="corpo corpo--com-nav corpo--titulo-conteudo transicao-pilula">
+      <div className="corpo corpo--com-nav transicao-pilula">
+        {/* Ação Hero Principal */}
+        <section className="destaque-pro">
+          {treinoDeHojeId ? (
+            <Link href={`/treino/${treinoDeHojeId}`} className="botao-primario botao-primario--heroi">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+              Continuar treino de hoje
+            </Link>
+          ) : modelos.length > 0 ? (
+            <IniciarTreino modelos={modelos} />
+          ) : (
+            <form action={criarTreino}>
+              <button type="submit" className="botao-primario botao-primario--heroi">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                Iniciar treino de hoje
+              </button>
+            </form>
+          )}
+        </section>
+
         <ListaTreinos
           treinos={treinos.map((treino) => ({
             id: treino.id,
@@ -59,22 +78,6 @@ export default async function PaginaTreino() {
             volumeKg: treino.volumeKg,
           }))}
         />
-      </div>
-
-      <div className="acao-area">
-        {treinoDeHojeId ? (
-          <Link href={`/treino/${treinoDeHojeId}`} className="botao-primario">
-            Continuar treino de hoje
-          </Link>
-        ) : modelos.length > 0 ? (
-          <IniciarTreino modelos={modelos} />
-        ) : (
-          <form action={criarTreino}>
-            <button type="submit" className="botao-primario">
-              Iniciar treino de hoje
-            </button>
-          </form>
-        )}
       </div>
 
       <AbaInferior ativa="bancada" />

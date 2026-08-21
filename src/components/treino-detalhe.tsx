@@ -322,150 +322,131 @@ export default function TreinoDetalhe({
         ))}
 
         {series.length === 0 && pendentesDoModelo.length === 0 ? (
-          <p className="vazio">
-            Nenhuma série registrada ainda. Comece pela primeira aqui embaixo.
-          </p>
+          <div className="cartao-vazio">
+            <p className="vazio">
+              Nenhuma série registrada ainda. Comece pela primeira aqui embaixo.
+            </p>
+          </div>
         ) : (
           grupos.map((grupo) => {
             const valendo = grupo.series.filter((s) => s.tipo === "valendo").length;
             return (
-              <section className="grupo" key={grupo.exercicioId}>
-                <div className="grupo__cab">
-                  <h2 className="grupo__nome">{grupo.nome}</h2>
-                  <span className="grupo__cont">{valendo} valendo</span>
+              <section className="card-obsidian" key={grupo.exercicioId} style={{ marginBottom: "var(--lastro-e-3)" }}>
+                <div className="card-obsidian__header">
+                  <div>
+                    <h2 style={{ fontSize: "var(--lastro-papel-corpo)", fontWeight: "var(--lastro-peso-max)", color: "var(--lastro-txt)" }}>
+                      {grupo.nome}
+                    </h2>
+                    <span style={{ fontSize: "var(--lastro-papel-rotulo)", color: "var(--lastro-txt-3)" }}>
+                      {valendo} {valendo === 1 ? "série valendo" : "séries valendo"}
+                    </span>
+                  </div>
+                  {grupo.series.length > 0 && grupo.series[0].exercicioNome && (
+                    <span className="tag-grupo">EXERCÍCIO</span>
+                  )}
                 </div>
 
-                {/* Cabeçalho de coluna (DESIGN.md §6.5, peça 7, M8) — só
-                    quando existe ao menos 1 série; ver nota em
-                    `.grupo__colunas` no sistema.css. */}
-                {grupo.series.length > 0 && (
-                  <div className="grupo__colunas">
-                    <span />
-                    <span>carga × reps</span>
-                    <span />
-                    <span />
-                  </div>
-                )}
+                <div className="tabela-series-pro">
+                  {grupo.series.map((serie, indice) => {
+                    if (editandoId === serie.id) {
+                      return (
+                        <EditarSerie
+                          key={serie.id}
+                          serie={serie}
+                          onSalvar={(dados) => editarSerie(serie.id, dados)}
+                          onCancelar={() => setEditandoId(null)}
+                        />
+                      );
+                    }
 
-                {grupo.series.map((serie, indice) => {
-                  if (editandoId === serie.id) {
+                    if (excluindoId === serie.id) {
+                      return (
+                        <div className="confirma" key={serie.id}>
+                          <p className="confirma__texto">
+                            Excluir a série {indice + 1} de {grupo.nome} —{" "}
+                            {serie.reps} × {serie.peso} kg? Não dá para desfazer.
+                          </p>
+                          <div className="confirma__acoes">
+                            <button
+                              type="button"
+                              className="botao-secundario"
+                              onClick={() => setExcluindoId(null)}
+                            >
+                              Cancelar
+                            </button>
+                            <button
+                              type="button"
+                              className="botao-destrutivo"
+                              onClick={() => void excluirSerie(serie.id)}
+                            >
+                              Excluir
+                            </button>
+                          </div>
+                        </div>
+                      );
+                    }
+
                     return (
-                      <EditarSerie
+                      <div
+                        className={`linha-serie-pro${serie.ehRecordePessoal ? " linha-serie-pro--pr" : ""}`}
                         key={serie.id}
-                        serie={serie}
-                        onSalvar={(dados) => editarSerie(serie.id, dados)}
-                        onCancelar={() => setEditandoId(null)}
-                      />
-                    );
-                  }
-
-                  if (excluindoId === serie.id) {
-                    return (
-                      <div className="confirma" key={serie.id}>
-                        <p className="confirma__texto">
-                          Excluir a série {indice + 1} de {grupo.nome} —{" "}
-                          {serie.reps} × {serie.peso} kg? Não dá para desfazer.
-                        </p>
-                        <div className="confirma__acoes">
-                          <button
-                            type="button"
-                            className="botao-secundario"
-                            onClick={() => setExcluindoId(null)}
-                          >
-                            Cancelar
-                          </button>
-                          <button
-                            type="button"
-                            className="botao-destrutivo"
-                            onClick={() => void excluirSerie(serie.id)}
-                          >
-                            Excluir
-                          </button>
+                        role="button"
+                        tabIndex={0}
+                        onClick={() => setEditandoId(serie.id)}
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter" || e.key === " ") {
+                            e.preventDefault();
+                            setEditandoId(serie.id);
+                          }
+                        }}
+                      >
+                        <span className="serie-col-i">{indice + 1}</span>
+                        <div className="serie-col-val">
+                          {serie.reps}
+                          <span>×</span>
+                          {serie.peso}
+                          <span>kg</span>
+                        </div>
+                        <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                          {serie.tipo === "aquecimento" && (
+                            <span className="chip-serie chip-serie--aquecimento">aquecimento</span>
+                          )}
+                          {serie.tipo === "valendo" && !serie.ehRecordePessoal && (
+                            <span className="chip-serie chip-serie--valendo">valendo</span>
+                          )}
+                          {serie.ehRecordePessoal && (
+                            <span className="chip-serie chip-serie--pr">recorde pessoal</span>
+                          )}
+                          {modoEdicao && (
+                            <button
+                              type="button"
+                              className="botao-icone"
+                              aria-label={`Excluir série ${indice + 1} de ${grupo.nome}`}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setExcluindoId(serie.id);
+                              }}
+                            >
+                              <svg
+                                viewBox="0 0 24 24"
+                                width="18"
+                                height="18"
+                                fill="none"
+                                stroke="currentColor"
+                                strokeWidth="2"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                aria-hidden="true"
+                              >
+                                <path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3" />
+                              </svg>
+                            </button>
+                          )}
                         </div>
                       </div>
                     );
-                  }
-
-                  return (
-                    // A linha inteira é o alvo de correção — tocar nela
-                    // abre a edição, um alcance maior que um lápis
-                    // minúsculo (D1: dedo suado, sem precisão fina). Só
-                    // excluir pede confirmação; abrir a edição não muda
-                    // nada até o dono apertar Salvar.
-                    <div
-                      className="serie"
-                      key={serie.id}
-                      role="button"
-                      tabIndex={0}
-                      onClick={() => setEditandoId(serie.id)}
-                      onKeyDown={(e) => {
-                        if (e.key === "Enter" || e.key === " ") {
-                          e.preventDefault();
-                          setEditandoId(serie.id);
-                        }
-                      }}
-                    >
-                      <span className="serie__i">{indice + 1}</span>
-                      <span className="serie__v">
-                        {serie.reps}
-                        <span className="serie__x">×</span>
-                        {serie.peso}
-                        <span className="serie__un">kg</span>
-                      </span>
-                      {/* Envelope fixo da 3ª coluna da grade (M8) — mantém a
-                          marca (quando existe) alinhada com o cabeçalho,
-                          mesmo quando nenhuma das três condições abaixo
-                          renderiza nada. */}
-                      <span className="serie__marca">
-                        {/* Cor nunca é o único canal: a palavra carrega o
-                            sentido. "valendo" some quando é recorde —
-                            recorde só existe em série valendo (aquecimento
-                            nunca conta pra PR, ver marcarRecordesHistoricos),
-                            então mostrar os dois juntos é redundante e,
-                            medido a 335px de conteúdo real, também estourava
-                            a linha (achado no M5, 2026-08-15). "aquecimento"
-                            nunca compete com recorde, por isso continua
-                            sempre visível. */}
-                        {serie.tipo === "aquecimento" && (
-                          <span className="marca marca--aquecimento">aquecimento</span>
-                        )}
-                        {serie.tipo === "valendo" && !serie.ehRecordePessoal && (
-                          <span className="marca marca--valendo">valendo</span>
-                        )}
-                        {/* PR na hora (C4) — só existe enquanto a tela está
-                            aberta, não persiste no banco (ver SerieUI). */}
-                        {serie.ehRecordePessoal && <EtiquetaRecorde />}
-                      </span>
-                      <button
-                        type="button"
-                        className={
-                          modoEdicao
-                            ? "botao-icone serie__excluir"
-                            : "botao-icone serie__excluir botao-icone--oculto"
-                        }
-                        aria-label={`Excluir série ${indice + 1} de ${grupo.nome}`}
-                        aria-hidden={!modoEdicao}
-                        tabIndex={modoEdicao ? undefined : -1}
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setExcluindoId(serie.id);
-                        }}
-                      >
-                        <svg
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeWidth="2"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          aria-hidden="true"
-                        >
-                          <path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3" />
-                        </svg>
-                      </button>
-                    </div>
-                  );
-                })}
+                  })}
+                </div>
               </section>
             );
           })

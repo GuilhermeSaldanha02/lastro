@@ -150,7 +150,8 @@ export default function AnaliseInterativa({
             aria-disabled={inativo}
             onClick={() => perguntarSeAtivo(PERGUNTA_PRIMARIA)}
           >
-            {PERGUNTAS[PERGUNTA_PRIMARIA]}
+            <span>{PERGUNTAS[PERGUNTA_PRIMARIA]}</span>
+            <span style={{ color: "var(--lastro-ouro)", fontWeight: "bold" }}>•</span>
           </button>
         </li>
         {secundarias.map((numero) => (
@@ -161,7 +162,8 @@ export default function AnaliseInterativa({
               aria-disabled={inativo}
               onClick={() => perguntarSeAtivo(numero)}
             >
-              {PERGUNTAS[numero]}
+              <span>{PERGUNTAS[numero]}</span>
+              <span style={{ color: "var(--lastro-txt-3)" }}>›</span>
             </button>
           </li>
         ))}
