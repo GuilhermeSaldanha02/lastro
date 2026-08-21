@@ -379,11 +379,47 @@ na mesma leva.**
 com número da paleta areia — o documento diz isso explicitamente.
 Vira o item **T3b** abaixo, junto com um achado novo e maior.
 
-## T3b — Reconciliar `DESIGN.md`/`DECISIONS.md` com o Apex Pro por inteiro; corrigir acentos de cor no tema claro
+## T3b — parte 2 (acentos de cor) · ✅ **RESOLVIDO em 2026-08-21**
 
-Duas pendências, tamanhos bem diferentes:
+**8 tokens corrigidos no `branco-ouro`**, não só os 3 originalmente
+suspeitados. Explicado ao dono antes de executar, aprovado, ampliado
+durante a execução conforme a varredura completa achava mais casos do
+mesmo padrão raiz — acento calibrado só para fundo escuro, nunca
+ajustado para o único tema claro do sistema:
 
-**1. Reconciliação de documento** (pendência que o T3 deixou explícita):
+| Token | Antes | Depois |
+|---|---|---|
+| `--lastro-ouro` | 3,25 | **4,94** |
+| `--lastro-esmeralda-claro` | 1,79 | **4,99** |
+| `--lastro-esmeralda` | não medido | **4,91** |
+| `--lastro-ciano` | 2,43 | **4,94** |
+| `--lastro-erro` | 3,51 | **4,93** |
+| `--lastro-acao-tinta` | 2,10 | **4,92** |
+| `--lastro-sync` | 2,26 | **4,94** |
+| `--lastro-aquecimento` (token novo) | 1,21 | **4,93** |
+
+Mais 2 hex cravados (`.pergunta--primaria`, `.topo-avatar`, ambos
+`color: #FFF`) trocados por `var(--lastro-txt)` — P7, funcionavam por
+acidente nos temas escuros.
+
+**Achado de metodologia que quase deu número errado duas vezes** (ver
+`DECISIONS.md` 2026-08-21 (2) para o detalhe): trocar tema via
+`setAttribute` sem recarregar mede cor em transição, não a final,
+quando há `transition: all` no ancestral; medir contraste contra o
+fundo do elemento-**pai** em vez do próprio elemento subestima quando o
+elemento carrega fundo translúcido próprio (pílula tingida). Os dois
+corrigidos antes de aplicar qualquer valor final.
+
+**Varrido por completo:** 10 telas do `branco-ouro`, zero reprovações
+reais. Os 5 temas escuros e o padrão confirmados intactos (overrides só
+dentro do bloco `branco-ouro`).
+
+**Não medido:** `--lastro-ouro-claro` (`.chip-serie--pr`, badge de
+recorde pessoal) — card só aparece com PR real, pode não ter sido
+exercitado na sessão de teste. Conferir na próxima varredura com dado
+que gere PR.
+
+## T3b — parte 1, ainda pendente: reconciliar `DESIGN.md`/`DECISIONS.md` com o Apex Pro por inteiro
 
 - Remedir os 14 pares de §4.2 (C1–C14) contra o tema padrão Apex Pro —
   hoje só C3 (`txt-3`) está remedido. Ao vivo, em navegador real (D8).
@@ -392,31 +428,8 @@ Duas pendências, tamanhos bem diferentes:
   registro em `DECISIONS.md` na hora. Sem isso, `DESIGN.md` §3 nunca
   deixa de citar a paleta antiga, porque não há o que pôr no lugar sem
   inventar.
-- Remedir C1–C14 contra as 5 paletas restantes (`areia`, `clean`,
-  `petroleo`, `moka`, `oliva` — `branco-ouro` seu próprio caso, ver
-  item 2).
-
-**2. Bug real, achado ao medir o item acima — ALTA, maior que o T3.**
-Medindo `branco-ouro` por inteiro (não só `txt-3`), apareceram **33
-elementos reprovando** por três tokens diferentes, nenhum relacionado a
-`txt-3`:
-
-| Token | Cor | Pior caso medido | Piso |
-|---|---|---|---|
-| `--lastro-ouro` | `#B8860B` | 3,04 | 4,5 |
-| `--lastro-esmeralda-claro` | `#34D399` | **1,79** | 3,0 (texto grande) |
-| `--lastro-ciano` | `#06B6D4` | **2,43** | 3,0 |
-
-Esses acentos foram calibrados para fundo escuro (Apex Pro) e nunca
-ajustados para o único tema claro do sistema — `branco-ouro` não os
-sobrescreve, herda os valores escuros direto. É mais grave que o T3
-porque mexe em cor de marca (ouro, esmeralda, ciano têm significado —
-ação, progresso, sincronização), não em cinza neutro, e **1,79:1** é o
-pior número já medido nesta auditoria inteira. Provavelmente atinge
-outros pontos do `branco-ouro` além do `/catalogo` — não varrido por
-completo. Precisa da mesma técnica do T3 (achar valor por bissecção,
-remedir ao vivo), mas por cor de marca, não por cinza — exige decisão
-de quanto dessaturar/escurecer sem descaracterizar o acento.
+- Remedir C1–C14 contra as 6 paletas (agora todas com contraste real
+  para medir, depois da parte 2 acima).
 
 ## T4 — Meta semanal de treinos configurável
 

@@ -1938,7 +1938,11 @@
   border-color: var(--lastro-borda-ouro);
   font-size: var(--lastro-papel-corpo);
   font-weight: var(--lastro-peso-forte);
-  color: #FFF;
+  /* Era #FFF cravado (P7) — funcionava por acidente nos temas escuros
+     (onde --lastro-txt também é branco) e reprovava 1,11:1 no
+     branco-ouro, o único tema claro. --lastro-txt já é o token
+     correto por tema; nunca deveria ter sido hex direto. */
+  color: var(--lastro-txt);
 }
 
 .pergunta--primaria:hover:not([aria-disabled="true"]) {
@@ -3201,7 +3205,9 @@
   background: var(--lastro-sup-2);
   border: 2px solid var(--lastro-ouro);
   box-shadow: 0 0 10px var(--lastro-ouro-glow);
-  color: #FFF;
+  /* Era #FFF cravado (P7) — mesmo defeito de .pergunta--primaria,
+     reprovava 1,10:1 no branco-ouro. */
+  color: var(--lastro-txt);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -3302,7 +3308,7 @@
 
 .chip-serie--aquecimento {
   background: rgba(245, 158, 11, 0.12);
-  color: #FCD34D;
+  color: var(--lastro-aquecimento);
   border: 1px solid rgba(245, 158, 11, 0.3);
 }
 
