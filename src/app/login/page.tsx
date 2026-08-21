@@ -84,10 +84,9 @@ export default function PaginaLogin() {
             src="/logo-lastro.png"
             alt="LASTRO"
             className="entrada__logo-img"
-            width={120}
-            height={120}
+            width={150}
+            height={150}
           />
-          <p className="entrada__subtitulo">Registro de treino e leitura semanal com IA</p>
         </header>
 
         <Suspense fallback={null}>
