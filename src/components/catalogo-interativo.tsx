@@ -114,9 +114,7 @@ export default function CatalogoInterativo({
       )}
 
       {exerciciosFiltrados.length === 0 ? (
-        <div className="cartao-vazio">
-          <p className="vazio">Nenhum exercício encontrado para &ldquo;{busca}&rdquo;.</p>
-        </div>
+        <p className="vazio">Nenhum exercício encontrado para &ldquo;{busca}&rdquo;.</p>
       ) : (
         <div className="catalogo-lista">
           {gruposExibicao.map((grupo) => (

@@ -322,11 +322,9 @@ export default function TreinoDetalhe({
         ))}
 
         {series.length === 0 && pendentesDoModelo.length === 0 ? (
-          <div className="cartao-vazio">
-            <p className="vazio">
-              Nenhuma série registrada ainda. Comece pela primeira aqui embaixo.
-            </p>
-          </div>
+          <p className="vazio">
+            Nenhuma série registrada ainda. Comece pela primeira aqui embaixo.
+          </p>
         ) : (
           grupos.map((grupo) => {
             const valendo = grupo.series.filter((s) => s.tipo === "valendo").length;

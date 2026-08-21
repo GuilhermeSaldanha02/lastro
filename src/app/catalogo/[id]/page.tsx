@@ -78,11 +78,9 @@ export default async function PaginaHistoricoExercicio({
         </div>
 
         {historico.length === 0 ? (
-          <div className="cartao-vazio">
-            <p className="vazio">
-              Nenhuma série valendo registrada ainda para {exercicio.nome}.
-            </p>
-          </div>
+          <p className="vazio">
+            Nenhuma série valendo registrada ainda para {exercicio.nome}.
+          </p>
         ) : (
           <div className="feed-treinos">
             {historico.map((serie, indice) => (

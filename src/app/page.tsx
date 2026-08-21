@@ -171,9 +171,7 @@ export default async function PaginaInicial() {
         </div>
 
         {resumo.recentes.length === 0 ? (
-          <div className="cartao-vazio">
-            <p className="vazio">Nenhum treino registrado ainda. O primeiro começa no botão acima.</p>
-          </div>
+          <p className="vazio">Nenhum treino registrado ainda. O primeiro começa no botão acima.</p>
         ) : (
           <div className="feed-treinos">
             {resumo.recentes.map((treino) => (
