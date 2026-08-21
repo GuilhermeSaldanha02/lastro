@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { formatarGrupoMuscular } from "@/lib/texto/grupo-muscular";
 
 /**
  * Card de métricas da Home.
@@ -16,23 +17,25 @@ import { useState } from "react";
  * Sem treino, não há barra — ausência de dado precisa parecer ausência,
  * nunca uma linha de base que se lê como "zero progresso".
  *
- * A aba "Cargas" saiu de propósito: e1RM entre treinos de grupos
- * musculares diferentes não é série comparável (o melhor e1RM de um dia
- * de perna não conversa com o de um dia de bíceps), e o cálculo de PR
- * honesto mora na camada de agregação da Análise. Aba nova só volta com
- * métrica que se sustente.
+ * A aba "Cargas" deu lugar a "Grupos": e1RM entre treinos de grupos
+ * musculares diferentes não é série comparável (110 kg de agachamento e
+ * 20 kg de rosca não conversam), enquanto série é somável em qualquer
+ * grupo. Progressão de carga por exercício continua na `/analise`, que
+ * compara o mesmo exercício ao longo das semanas.
  */
 
 type Barra = { data: string; volume: number; series: number };
+type GrupoComSeries = { grupo: string; series: number };
 
 type MetricasHomeProps = {
   volumeFormatado: { valor: string; unidade: string };
   seriesValendo: number;
   treinosNaSemana: number;
   historicoBarras: Barra[];
+  seriesPorGrupo: GrupoComSeries[];
 };
 
-type Aba = "volume" | "series";
+type Aba = "volume" | "series" | "grupos";
 
 function rotuloDia(iso: string): string {
   const d = new Date(`${iso}T00:00:00Z`);
@@ -76,11 +79,38 @@ function GraficoBarras({
   );
 }
 
+/**
+ * Distribuição de séries por grupo muscular na semana. Barras
+ * horizontais, não verticais: o rótulo é uma palavra ("Posterior de
+ * coxa"), e palavra não cabe embaixo de uma coluna de 40px.
+ */
+function BarrasGrupos({ grupos }: { grupos: GrupoComSeries[] }) {
+  const maximo = Math.max(...grupos.map((g) => g.series));
+
+  return (
+    <ul className="grupo-barras">
+      {grupos.map((g) => (
+        <li className="grupo-barra" key={g.grupo}>
+          <span className="grupo-barra__nome">{formatarGrupoMuscular(g.grupo)}</span>
+          <span className="grupo-barra__trilho">
+            <span
+              className="grupo-barra__preenchimento"
+              style={{ width: `${Math.max(6, (g.series / maximo) * 100)}%` }}
+            />
+          </span>
+          <span className="grupo-barra__valor">{g.series}</span>
+        </li>
+      ))}
+    </ul>
+  );
+}
+
 export default function SeletorMetricasHome({
   volumeFormatado,
   seriesValendo,
   treinosNaSemana,
   historicoBarras,
+  seriesPorGrupo,
 }: MetricasHomeProps) {
   const [abaAtiva, setAbaAtiva] = useState<Aba>("volume");
 
@@ -106,6 +136,15 @@ export default function SeletorMetricasHome({
           onClick={() => setAbaAtiva("series")}
         >
           Séries
+        </button>
+        <button
+          type="button"
+          role="tab"
+          aria-selected={abaAtiva === "grupos"}
+          className={`metrica-tab${abaAtiva === "grupos" ? " metrica-tab--ativa" : ""}`}
+          onClick={() => setAbaAtiva("grupos")}
+        >
+          Grupos
         </button>
       </div>
 
@@ -164,7 +203,33 @@ export default function SeletorMetricasHome({
           </div>
         )}
 
-        {!temBarras && (
+        {abaAtiva === "grupos" && (
+          <div className="metrica-switcher__bloco">
+            <div className="metrica-switcher__topo">
+              <div>
+                <div className="metrica-switcher__grande">
+                  {seriesPorGrupo.length}
+                  <span className="metrica-switcher__unidade">
+                    {seriesPorGrupo.length === 1 ? "grupo" : "grupos"}
+                  </span>
+                </div>
+                <p className="metrica-switcher__subtitulo">
+                  Séries por grupo muscular nesta semana
+                </p>
+              </div>
+            </div>
+
+            {seriesPorGrupo.length > 0 ? (
+              <BarrasGrupos grupos={seriesPorGrupo} />
+            ) : (
+              <p className="metrica-switcher__vazio">
+                Nenhuma série registrada nesta semana ainda.
+              </p>
+            )}
+          </div>
+        )}
+
+        {abaAtiva !== "grupos" && !temBarras && (
           <p className="metrica-switcher__vazio">
             Os treinos que você registrar aparecem aqui como histórico.
           </p>

@@ -2390,6 +2390,66 @@
   margin-top: var(--lastro-e-1);
 }
 
+/* Aba "Grupos" — barras horizontais porque o rótulo é uma palavra
+   ("Posterior de coxa"), e palavra não cabe sob coluna de 40px. */
+.grupo-barras {
+  display: flex;
+  flex-direction: column;
+  gap: var(--lastro-e-2);
+  margin-top: var(--lastro-e-3);
+  list-style: none;
+  padding: 0;
+}
+
+.grupo-barra {
+  display: grid;
+  grid-template-columns: 8.5rem 1fr 2rem;
+  align-items: center;
+  gap: var(--lastro-e-2);
+}
+
+.grupo-barra__nome {
+  font-size: var(--lastro-papel-rotulo);
+  color: var(--lastro-txt-2);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.grupo-barra__trilho {
+  height: 10px;
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: var(--lastro-raio-pilula);
+  overflow: hidden;
+}
+
+.grupo-barra__preenchimento {
+  display: block;
+  height: 100%;
+  border-radius: var(--lastro-raio-pilula);
+  background: linear-gradient(
+    90deg,
+    var(--lastro-esmeralda) 0%,
+    var(--lastro-esmeralda-claro) 100%
+  );
+}
+
+/* O grupo mais treinado da semana leva o dourado — mesma gramática de
+   destaque da barra mais recente no histórico. */
+.grupo-barra:first-child .grupo-barra__preenchimento {
+  background: var(--lastro-ouro-grad);
+  box-shadow: 0 0 10px var(--lastro-ouro-glow);
+}
+
+.grupo-barra__valor {
+  font-family: var(--lastro-fonte-num);
+  font-variant-numeric: tabular-nums;
+  font-size: var(--lastro-papel-rotulo);
+  font-weight: var(--lastro-peso-forte);
+  color: var(--lastro-txt);
+  text-align: right;
+}
+
 .metrica-switcher__vazio {
   font-size: var(--lastro-papel-corpo);
   color: var(--lastro-txt-2);

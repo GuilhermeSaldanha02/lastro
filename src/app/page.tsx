@@ -129,6 +129,7 @@ export default async function PaginaInicial() {
           seriesValendo={resumo.seriesValendoNaSemana}
           treinosNaSemana={resumo.treinosNaSemana}
           historicoBarras={resumo.historicoBarras}
+          seriesPorGrupo={resumo.seriesPorGrupo}
         />
 
         {/* Card Análise Semanal (AI Coach) */}
