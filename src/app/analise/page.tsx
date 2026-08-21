@@ -7,9 +7,8 @@ import { obterPerfil } from "@/lib/dados/perfil";
 import { carregarResumoHome } from "@/lib/dados/resumo-home";
 import { dataLocalBrasil } from "@/lib/tempo";
 import AbaInferior from "@/components/aba-inferior";
-import Avatar from "@/components/avatar";
 import AnaliseInterativa from "@/components/analise-interativa";
-import TituloTela from "@/components/titulo-tela";
+import CabecalhoPro from "@/components/cabecalho-pro";
 
 export default async function PaginaAnalise() {
   const [perfil, resumo] = await Promise.all([
@@ -19,12 +18,11 @@ export default async function PaginaAnalise() {
 
   return (
     <main className="tela">
-      {/* Aba de nível de topo — sem `VoltarFlutuante`: a aba inferior já É
-          a navegação daqui, não existe "voltar" pra uma aba de topo. */}
-      <TituloTela
-        contexto="Análise semanal"
-        titulo="Semana fechada"
-        acessorio={perfil && <Avatar nome={perfil.nome} avatarUrl={perfil.avatarUrl} />}
+      <CabecalhoPro
+        titulo="Análise Semanal"
+        destaque="Ciclo"
+        mostrarLogo={true}
+        perfil={perfil}
       />
 
       <AnaliseInterativa semanasFechadasComTreino={resumo.semanasFechadasComTreino} />

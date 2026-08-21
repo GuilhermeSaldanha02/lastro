@@ -51,7 +51,7 @@ export default function RastreadorDisciplina({
         <span className="disciplina-card__titulo">Disciplina Semanal</span>
         {streak > 0 && (
           <span className="disciplina-card__streak">
-            🔥 {streak} {streak === 1 ? "Dia Seguido" : "Dias Seguidos"}
+            {streak} {streak === 1 ? "sessão seguida" : "sessões seguidas"}
           </span>
         )}
       </div>

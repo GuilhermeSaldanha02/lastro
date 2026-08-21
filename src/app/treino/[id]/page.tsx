@@ -8,9 +8,7 @@ import { obterPerfil } from "@/lib/dados/perfil";
 import { buscarModelo } from "@/lib/dados/modelo-treino";
 import TreinoDetalhe from "@/components/treino-detalhe";
 import AbaInferior from "@/components/aba-inferior";
-import Avatar from "@/components/avatar";
-import TituloTela from "@/components/titulo-tela";
-import VoltarFlutuante from "@/components/voltar-flutuante";
+import CabecalhoPro from "@/components/cabecalho-pro";
 
 const DIAS = [
   "domingo", "segunda", "terça", "quarta", "quinta", "sexta", "sábado",
@@ -55,12 +53,11 @@ export default async function PaginaTreinoDetalhe({
 
   return (
     <main className="tela">
-      <VoltarFlutuante href="/treino" rotulo="Treinos" />
-      <TituloTela
-        contexto={formatarContexto(treino.data)}
-        titulo="Treino em andamento"
-        acessorio={perfil && <Avatar nome={perfil.nome} avatarUrl={perfil.avatarUrl} />}
-        comVoltar
+      <CabecalhoPro
+        titulo={formatarContexto(treino.data)}
+        destaque="Bancada"
+        voltarHref="/treino"
+        perfil={perfil}
       />
 
       <TreinoDetalhe

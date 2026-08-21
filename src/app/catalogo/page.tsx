@@ -2,8 +2,7 @@
 import { listarCatalogo } from "@/lib/dados/treino";
 import { obterPerfil } from "@/lib/dados/perfil";
 import AbaInferior from "@/components/aba-inferior";
-import Avatar from "@/components/avatar";
-import TituloTela from "@/components/titulo-tela";
+import CabecalhoPro from "@/components/cabecalho-pro";
 import CatalogoInterativo from "@/components/catalogo-interativo";
 
 export default async function PaginaCatalogo() {
@@ -12,10 +11,11 @@ export default async function PaginaCatalogo() {
 
   return (
     <main className="tela">
-      <TituloTela
-        contexto="Catálogo"
-        titulo="Exercícios"
-        acessorio={perfil && <Avatar nome={perfil.nome} avatarUrl={perfil.avatarUrl} />}
+      <CabecalhoPro
+        titulo="Catálogo"
+        destaque={`${exercicios.length} Exercícios`}
+        mostrarLogo={true}
+        perfil={perfil}
       />
 
       <div className="corpo corpo--com-nav corpo--titulo-conteudo transicao-pilula">

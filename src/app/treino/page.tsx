@@ -12,9 +12,8 @@ import { listarModelos } from "@/lib/dados/modelo-treino";
 import { dataLocalBrasil } from "@/lib/tempo";
 import AbaInferior from "@/components/aba-inferior";
 import ListaTreinos from "@/components/lista-treinos";
-import Avatar from "@/components/avatar";
 import IniciarTreino from "@/components/iniciar-treino";
-import TituloTela from "@/components/titulo-tela";
+import CabecalhoPro from "@/components/cabecalho-pro";
 
 /** "2026-08-06" → "6 ago". A data já vem local; não há fuso a converter. */
 function formatarData(iso: string): string {
@@ -43,11 +42,11 @@ export default async function PaginaTreino() {
 
   return (
     <main className="tela">
-      {/* Aba de nível de topo — sem `VoltarFlutuante`. */}
-      <TituloTela
-        contexto="lastro"
+      <CabecalhoPro
         titulo="Treinos"
-        acessorio={perfil && <Avatar nome={perfil.nome} avatarUrl={perfil.avatarUrl} />}
+        destaque="Histórico"
+        mostrarLogo={true}
+        perfil={perfil}
       />
 
       <div className="corpo corpo--com-nav corpo--titulo-conteudo transicao-pilula">

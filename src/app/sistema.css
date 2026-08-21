@@ -3046,4 +3046,150 @@
   margin-top: var(--lastro-e-4);
 }
 
+/* Topo Pro Voltar e Logo Wrap */
+.topo-pro__voltar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--lastro-sup-2);
+  border: 1px solid var(--lastro-linha);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--lastro-txt-2);
+  text-decoration: none;
+  transition: all var(--lastro-dur-1) ease;
+}
+
+.topo-pro__voltar:hover {
+  background: var(--lastro-sup-3);
+  border-color: rgba(255, 255, 255, 0.2);
+  color: var(--lastro-txt);
+}
+
+.topo-pro__logo-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.topo-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--lastro-sup-2);
+  border: 2px solid var(--lastro-ouro);
+  box-shadow: 0 0 10px var(--lastro-ouro-glow);
+  color: #FFF;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--lastro-fonte-num);
+  font-weight: var(--lastro-peso-max);
+  font-size: var(--lastro-papel-rotulo);
+}
+
+/* Cartões Obsidian Universais */
+.card-obsidian {
+  background: var(--lastro-sup-1);
+  border: 1px solid var(--lastro-linha);
+  border-radius: var(--lastro-raio-3);
+  padding: var(--lastro-e-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--lastro-e-3);
+  backdrop-filter: blur(12px);
+}
+
+.card-obsidian__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.card-obsidian__titulo {
+  font-size: var(--lastro-papel-rotulo);
+  font-weight: var(--lastro-peso-max);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--lastro-txt-2);
+}
+
+/* Tabelas e Séries Pro */
+.tabela-series-pro {
+  display: flex;
+  flex-direction: column;
+  gap: var(--lastro-e-2);
+}
+
+.linha-serie-pro {
+  display: grid;
+  grid-template-columns: 24px 1fr auto;
+  align-items: center;
+  gap: var(--lastro-e-3);
+  padding: 10px 14px;
+  background: var(--lastro-sup-2);
+  border: 1px solid var(--lastro-linha);
+  border-radius: var(--lastro-raio-2);
+  transition: border-color var(--lastro-dur-1) ease;
+}
+
+.linha-serie-pro--pr {
+  border-color: var(--lastro-borda-ouro);
+  background: rgba(212, 175, 55, 0.06);
+}
+
+.serie-col-i {
+  font-family: var(--lastro-fonte-num);
+  font-size: var(--lastro-papel-rotulo);
+  color: var(--lastro-txt-3);
+  font-weight: var(--lastro-peso-forte);
+  text-align: center;
+}
+
+.serie-col-val {
+  font-family: var(--lastro-fonte-num);
+  font-variant-numeric: tabular-nums;
+  font-size: var(--lastro-papel-secao);
+  font-weight: var(--lastro-peso-max);
+  color: var(--lastro-txt);
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+}
+
+.serie-col-val span {
+  font-size: var(--lastro-papel-rotulo);
+  color: var(--lastro-txt-3);
+  font-weight: var(--lastro-peso-medio);
+}
+
+.chip-serie {
+  font-size: 11px;
+  font-weight: var(--lastro-peso-max);
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  padding: 3px 8px;
+  border-radius: 6px;
+}
+
+.chip-serie--valendo {
+  background: var(--lastro-esmeralda-fundo);
+  color: var(--lastro-esmeralda-claro);
+  border: 1px solid var(--lastro-borda-verde);
+}
+
+.chip-serie--aquecimento {
+  background: rgba(245, 158, 11, 0.12);
+  color: #FCD34D;
+  border: 1px solid rgba(245, 158, 11, 0.3);
+}
+
+.chip-serie--pr {
+  background: var(--lastro-ouro-glow);
+  color: var(--lastro-ouro-claro);
+  border: 1px solid var(--lastro-ouro);
+}
+
+
 

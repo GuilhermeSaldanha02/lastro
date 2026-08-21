@@ -2,16 +2,18 @@
 import { obterConfigAnilhas } from "@/lib/dados/config-anilhas";
 import AnilhasForm from "@/components/anilhas-form";
 import AbaInferior from "@/components/aba-inferior";
-import TituloTela from "@/components/titulo-tela";
-import VoltarFlutuante from "@/components/voltar-flutuante";
+import CabecalhoPro from "@/components/cabecalho-pro";
 
 export default async function PaginaAnilhas() {
   const config = await obterConfigAnilhas();
 
   return (
     <main className="tela">
-      <VoltarFlutuante href="/ajustes" rotulo="Ajustes" />
-      <TituloTela contexto="Ajustes" titulo="Anilhas" comVoltar />
+      <CabecalhoPro
+        titulo="Ajustes"
+        destaque="Anilhas"
+        voltarHref="/ajustes"
+      />
 
       <div className="corpo corpo--com-nav corpo--titulo-conteudo">
         {config ? (

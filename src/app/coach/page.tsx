@@ -4,22 +4,19 @@
 // `components/coach-interativo.tsx`.
 import { obterPerfil } from "@/lib/dados/perfil";
 import AbaInferior from "@/components/aba-inferior";
-import Avatar from "@/components/avatar";
+import CabecalhoPro from "@/components/cabecalho-pro";
 import CoachInterativo from "@/components/coach-interativo";
-import TituloTela from "@/components/titulo-tela";
-import VoltarFlutuante from "@/components/voltar-flutuante";
 
 export default async function PaginaCoach() {
   const perfil = await obterPerfil();
 
   return (
     <main className="tela">
-      <VoltarFlutuante href="/ajustes" rotulo="Ajustes" />
-      <TituloTela
-        contexto="Coach"
-        titulo="Tirar uma dúvida"
-        acessorio={perfil && <Avatar nome={perfil.nome} avatarUrl={perfil.avatarUrl} />}
-        comVoltar
+      <CabecalhoPro
+        titulo="Coach"
+        destaque="Consultoria"
+        voltarHref="/ajustes"
+        perfil={perfil}
       />
 
       <CoachInterativo />
