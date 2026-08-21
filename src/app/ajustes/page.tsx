@@ -7,6 +7,7 @@ import Avatar from "@/components/avatar";
 import ExcluirConta from "@/components/excluir-conta";
 import SetaNavegacao from "@/components/seta-navegacao";
 import CabecalhoPro from "@/components/cabecalho-pro";
+import MetaSemanalForm from "@/components/meta-semanal-form";
 
 export default async function PaginaAjustes() {
   const perfil = await obterPerfil();
@@ -34,6 +35,8 @@ export default async function PaginaAjustes() {
               </div>
               <SetaNavegacao />
             </Link>
+
+            <MetaSemanalForm metaInicial={perfil.metaTreinosSemana} />
 
             {/* Menu de Funcionalidades */}
             <div className="bento-menu-grid">
