@@ -1,24 +1,15 @@
 "use client";
 
-// lastro · PRD §4.4 — o coach 24h.
-//
-// ESTA É A ÚNICA TELA DO APP ONDE SE CONVERSA, e por isso é a única onde
-// balão, rabicho, alternância de lado e caixa de digitação são CORRETOS
-// (DESIGN.md §5). O oposto vale no parecer: lá, qualquer um desses
-// elementos reprova o gate. A separação entre as duas telas é proposital —
-// é o que impede o produto de virar "chatbot com gráfico colado".
-//
-// O histórico vive só nesta sessão: não há persistência de conversa no
-// escopo (PRD §5). Recarregar limpa, e isso é intencional.
-//
-// Extraído de `app/coach/page.tsx` (PROGRESS.md pendência 4) pelo mesmo
-// motivo do `analise-interativa.tsx`: a barra de topo precisa do perfil
-// buscado no servidor, e Client Component não importa Server Component
-// diretamente.
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import { LIMITE_PERGUNTA } from "@/app/api/coach/prompt";
 
 type Fala = { de: "dono" | "coach"; texto: string };
+
+const SUGESTOES = [
+  "Como foi meu volume de treino nesta semana?",
+  "Qual grupo muscular estou treinando com menor frequência?",
+  "Devo aumentar a carga ou as repetições no meu próximo treino?",
+];
 
 export default function CoachInterativo() {
   const [falas, setFalas] = useState<Fala[]>([]);
@@ -31,12 +22,11 @@ export default function CoachInterativo() {
     fimDaConversa.current?.scrollIntoView({ behavior: "smooth", block: "end" });
   }, [falas, carregando]);
 
-  async function perguntar(evento: FormEvent<HTMLFormElement>) {
-    evento.preventDefault();
-    const texto = pergunta.trim();
-    if (!texto || carregando) return;
+  async function enviarPergunta(texto: string) {
+    const textoLimpo = texto.trim();
+    if (!textoLimpo || carregando) return;
 
-    setFalas((atual) => [...atual, { de: "dono", texto }]);
+    setFalas((atual) => [...atual, { de: "dono", texto: textoLimpo }]);
     setPergunta("");
     setErro(null);
     setCarregando(true);
@@ -45,7 +35,7 @@ export default function CoachInterativo() {
       const resposta = await fetch("/api/coach", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ pergunta: texto }),
+        body: JSON.stringify({ pergunta: textoLimpo }),
       });
 
       if (!resposta.ok) {
@@ -69,14 +59,41 @@ export default function CoachInterativo() {
     }
   }
 
+  function aoEnviar(evento: FormEvent<HTMLFormElement>) {
+    evento.preventDefault();
+    enviarPergunta(pergunta);
+  }
+
   return (
     <>
       <div className="corpo corpo--com-nav conversa" aria-live="polite">
         {falas.length === 0 && (
-          <p className="vazio">
-            Pergunte o que quiser sobre treino. Execução de exercício fica no
-            catálogo — é escrita por pessoa, não por IA.
-          </p>
+          <div className="coach-boas-vindas">
+            <div className="coach-avatar-badge">
+              <svg viewBox="0 0 24 24" width="28" height="28" fill="var(--lastro-ouro)">
+                <path d="M12 2L14.5 9.5L22 12L14.5 14.5L12 22L9.5 14.5L2 12L9.5 9.5L12 2Z" />
+              </svg>
+            </div>
+            <h3 className="coach-boas-vindas__titulo">Assistente de Treino 24h</h3>
+            <p className="coach-boas-vindas__desc">
+              Tire dúvidas sobre periodização, fadiga e progressão com base nas suas métricas reais.
+            </p>
+
+            <div className="coach-sugestoes">
+              <span className="coach-sugestoes__rotulo">Sugestões de perguntas:</span>
+              {SUGESTOES.map((sugestao, idx) => (
+                <button
+                  key={idx}
+                  type="button"
+                  className="chip-sugestao"
+                  onClick={() => enviarPergunta(sugestao)}
+                  disabled={carregando}
+                >
+                  💬 {sugestao}
+                </button>
+              ))}
+            </div>
+          </div>
         )}
 
         {falas.map((fala, indice) => (
@@ -84,14 +101,23 @@ export default function CoachInterativo() {
             className={fala.de === "dono" ? "balao balao--minha" : "balao balao--dele"}
             key={indice}
           >
-            {fala.de === "coach" && <span className="balao__quem">Coach</span>}
-            {fala.texto}
+            {fala.de === "coach" && (
+              <span className="balao__quem">
+                <svg viewBox="0 0 24 24" width="12" height="12" fill="var(--lastro-ouro)" style={{ marginRight: 4 }}>
+                  <path d="M12 2L14.5 9.5L22 12L14.5 14.5L12 22L9.5 14.5L2 12L9.5 9.5L12 2Z" />
+                </svg>
+                Coach IA
+              </span>
+            )}
+            <p className="balao__texto">{fala.texto}</p>
           </div>
         ))}
 
-        {/* Sem reticências pulsantes: um rótulo em estado, como no resto do app. */}
         {carregando && (
-          <p className="balao balao--dele balao--pensando">escrevendo…</p>
+          <div className="balao balao--dele balao--pensando">
+            <span className="balao__quem">Coach IA</span>
+            <p>Analisando seus dados…</p>
+          </div>
         )}
 
         {erro && (
@@ -103,26 +129,25 @@ export default function CoachInterativo() {
         <div ref={fimDaConversa} />
       </div>
 
-      <form className="campo-conversa" onSubmit={perguntar}>
-        <label className="so-leitor-de-tela" htmlFor="pergunta">
-          Perguntar ao coach
-        </label>
+      <form className="barra-conversa" onSubmit={aoEnviar}>
         <input
-          id="pergunta"
+          type="text"
+          placeholder="Pergunte ao coach…"
           value={pergunta}
           onChange={(e) => setPergunta(e.target.value)}
-          placeholder="Perguntar…"
           maxLength={LIMITE_PERGUNTA}
-          autoComplete="off"
+          disabled={carregando}
+          className="barra-conversa__input"
         />
         <button
           type="submit"
-          className="enviar"
-          disabled={carregando || pergunta.trim().length === 0}
-          aria-label="Enviar"
+          disabled={carregando || !pergunta.trim()}
+          className="barra-conversa__botao"
+          aria-label="Enviar pergunta"
         >
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
-            <path d="M4 12h15M13 6l6 6-6 6" />
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2.5">
+            <line x1="22" y1="2" x2="11" y2="13"></line>
+            <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
           </svg>
         </button>
       </form>

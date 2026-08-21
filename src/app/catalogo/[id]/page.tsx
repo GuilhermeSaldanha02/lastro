@@ -1,6 +1,4 @@
-// lastro · backlog C4 parte 2 — histórico do exercício, com recorde
-// pessoal marcado onde aconteceu (não só o maior de todos os tempos —
-// cada série marcada foi recorde NO MOMENTO em que aconteceu).
+// lastro · Detalhes do Exercício com Histórico de Séries e Recordes Pessoais
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { buscarExercicio, historicoDoExercicio } from "@/lib/dados/treino";
@@ -25,48 +23,90 @@ export default async function PaginaHistoricoExercicio({
 
   if (!exercicio) notFound();
 
-  // historicoDoExercicio vem do mais recente pro mais antigo;
-  // marcarRecordesHistoricos precisa do sentido cronológico (mais antigo
-  // primeiro) pra saber o que "veio antes" de cada série. Reverte pra
-  // marcar, reverte de novo pra alinhar com a ordem de exibição.
   const cronologico = [...historico].reverse();
   const marcasCronologicas = marcarRecordesHistoricos(cronologico);
   const marcas = [...marcasCronologicas].reverse();
 
+  // Calcula o PR de carga máxima de todos os tempos
+  const cargaMaxima = historico.length > 0
+    ? Math.max(...historico.map((s) => s.peso))
+    : 0;
+
   return (
     <main className="tela">
       <VoltarFlutuante href="/catalogo" rotulo="Catálogo" />
-      <TituloTela contexto="Catálogo" titulo={exercicio.nome} comVoltar />
+      <TituloTela contexto={exercicio.grupoMuscularNome.toUpperCase()} titulo={exercicio.nome} comVoltar />
 
-      <div className="corpo corpo--com-nav corpo--titulo-conteudo">
+      <div className="corpo corpo--com-nav corpo--titulo-conteudo transicao-pilula">
+        {/* Banner do Exercício & Tags */}
+        <div className="exercicio-hero-card">
+          <div className="exercicio-hero-card__tags">
+            <span className="tag-grupo">{exercicio.grupoMuscularNome.toUpperCase()}</span>
+            {exercicio.unilateral && <span className="tag-unilateral">Unilateral</span>}
+            {cargaMaxima > 0 && (
+              <span className="disciplina-card__streak">
+                🏆 PR: {cargaMaxima} kg
+              </span>
+            )}
+          </div>
+
+          {exercicio.dicaExecucao ? (
+            <div className="exercicio-hero-card__dica">
+              <div className="dica-header">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="var(--lastro-ouro)">
+                  <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z" />
+                </svg>
+                <span>Instruções Técnicas</span>
+              </div>
+              <p>{exercicio.dicaExecucao}</p>
+            </div>
+          ) : (
+            <p className="exercicio-hero-card__sem-dica">
+              Dica técnica de execução ainda não cadastrada.
+            </p>
+          )}
+        </div>
+
+        {/* Histórico de Séries Executadas */}
+        <div className="secao-header">
+          <h2 className="secao-header__titulo">Histórico de Séries</h2>
+          <span className="secao-header__subtitulo">
+            {historico.length} {historico.length === 1 ? "registro" : "registros"}
+          </span>
+        </div>
+
         {historico.length === 0 ? (
-          <p className="vazio">
-            Nenhuma série valendo registrada ainda para {exercicio.nome}.
-          </p>
+          <div className="cartao-vazio">
+            <p className="vazio">
+              Nenhuma série valendo registrada ainda para {exercicio.nome}.
+            </p>
+          </div>
         ) : (
-          <ul className="lista">
+          <div className="feed-treinos">
             {historico.map((serie, indice) => (
-              <li key={`${serie.treinoId}-${serie.criadoEm}-${indice}`}>
-                <div className="item">
-                  <Link href={`/treino/${serie.treinoId}`} className="item__link">
-                    <span className="item__conteudo">
-                      <span className="item__data">
-                        {formatarDataCurta(serie.dataTreino)}
-                      </span>
-                      <span className="serie__v">
-                        {serie.reps}
-                        <span className="serie__x">×</span>
-                        {serie.peso}
-                        <span className="serie__un">kg</span>
-                      </span>
-                      {marcas[indice] && <EtiquetaRecorde />}
-                    </span>
-                    <SetaNavegacao />
-                  </Link>
+              <Link
+                key={`${serie.treinoId}-${serie.criadoEm}-${indice}`}
+                href={`/treino/${serie.treinoId}`}
+                className="cartao-treino-item"
+              >
+                <div className="cartao-treino-item__esquerda">
+                  <span className="cartao-treino-item__data">
+                    {formatarDataCurta(serie.dataTreino)}
+                  </span>
+                  {marcas[indice] && <EtiquetaRecorde />}
                 </div>
-              </li>
+
+                <div className="cartao-treino-item__direita">
+                  <div className="cartao-treino-item__metricas">
+                    <span className="cartao-treino-item__vol">
+                      {serie.reps} × {serie.peso} kg
+                    </span>
+                  </div>
+                  <SetaNavegacao />
+                </div>
+              </Link>
             ))}
-          </ul>
+          </div>
         )}
       </div>
 

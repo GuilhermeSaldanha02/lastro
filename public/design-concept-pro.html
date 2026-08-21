@@ -1,0 +1,785 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>LASTRO · Design System Pro (NTC / Strava / Hevy Grade)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-main: #07090D;
+      --bg-surface: #0E1218;
+      --bg-surface-elevated: #141A22;
+      --border-glass: rgba(255, 255, 255, 0.08);
+      --border-active: rgba(212, 175, 55, 0.4);
+      --gold-primary: #D4AF37;
+      --gold-gradient: linear-gradient(135deg, #E6C86E 0%, #D4AF37 50%, #A67C1E 100%);
+      --gold-glow: rgba(212, 175, 55, 0.25);
+      --emerald-accent: #10B981;
+      --emerald-glow: rgba(16, 185, 129, 0.2);
+      --cyan-accent: #06B6D4;
+      --text-primary: #F8FAFC;
+      --text-secondary: #94A3B8;
+      --text-muted: #64748B;
+      --font-main: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      --font-mono: 'Space Grotesk', monospace;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      background-color: #030406;
+      color: var(--text-primary);
+      font-family: var(--font-main);
+      display: flex;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 20px 0;
+    }
+
+    /* Container Mobile 100% fiel */
+    .mobile-frame {
+      width: 100%;
+      max-width: 414px;
+      background-color: var(--bg-main);
+      border-radius: 40px;
+      box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(255, 255, 255, 0.1);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      min-height: 860px;
+    }
+
+    /* Ambient Glows */
+    .ambient-glow-top {
+      position: absolute;
+      top: -100px;
+      right: -60px;
+      width: 250px;
+      height: 250px;
+      background: radial-gradient(circle, rgba(16, 185, 129, 0.15) 0%, rgba(0,0,0,0) 70%);
+      pointer-events: none;
+      z-index: 0;
+    }
+    .ambient-glow-mid {
+      position: absolute;
+      top: 280px;
+      left: -80px;
+      width: 280px;
+      height: 280px;
+      background: radial-gradient(circle, rgba(212, 175, 55, 0.12) 0%, rgba(0,0,0,0) 70%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* Header */
+    .header {
+      padding: 48px 20px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: relative;
+      z-index: 10;
+    }
+
+    .brand-group {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .brand-logo {
+      width: 38px;
+      height: 38px;
+      filter: drop-shadow(0 2px 8px rgba(212, 175, 55, 0.3));
+    }
+
+    .date-pill {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border-glass);
+      padding: 6px 14px;
+      border-radius: 999px;
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+      letter-spacing: 0.2px;
+      backdrop-filter: blur(10px);
+    }
+    .date-pill span {
+      color: var(--emerald-accent);
+      font-weight: 700;
+    }
+
+    .avatar-wrapper {
+      position: relative;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      padding: 2px;
+      background: linear-gradient(135deg, var(--emerald-accent), var(--gold-primary));
+    }
+    .avatar-img {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      object-fit: cover;
+      background: #1e293b;
+      display: block;
+    }
+
+    /* Scrollable Content */
+    .content {
+      flex: 1;
+      overflow-y: auto;
+      padding: 8px 18px 110px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      position: relative;
+      z-index: 5;
+    }
+
+    /* Hero CTA */
+    .btn-hero {
+      width: 100%;
+      padding: 18px 24px;
+      background: var(--gold-gradient);
+      border: none;
+      border-radius: 20px;
+      color: #0A0D12;
+      font-family: var(--font-main);
+      font-size: 1.05rem;
+      font-weight: 800;
+      letter-spacing: 0.6px;
+      text-transform: uppercase;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      box-shadow: 0 10px 25px -5px var(--gold-glow), inset 0 1px 1px rgba(255, 255, 255, 0.6);
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .btn-hero:active {
+      transform: scale(0.98);
+      box-shadow: 0 4px 12px -2px var(--gold-glow);
+    }
+    .btn-hero svg {
+      width: 22px;
+      height: 22px;
+    }
+
+    /* Weekly 7-Day Discipline Tracker */
+    .tracker-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-glass);
+      border-radius: 24px;
+      padding: 16px 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      backdrop-filter: blur(12px);
+    }
+
+    .tracker-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .tracker-title {
+      font-size: 0.85rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--text-secondary);
+    }
+    .streak-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      background: rgba(16, 185, 129, 0.12);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+      padding: 3px 10px;
+      border-radius: 999px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--emerald-accent);
+    }
+
+    .days-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 6px;
+    }
+    .day-col {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+    }
+    .day-name {
+      font-size: 0.72rem;
+      font-weight: 600;
+      color: var(--text-muted);
+    }
+    .day-circle {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.8rem;
+      font-weight: 700;
+      border: 1.5px solid var(--border-glass);
+      color: var(--text-muted);
+      transition: all 0.25s ease;
+    }
+    .day-col.done .day-circle {
+      background: rgba(16, 185, 129, 0.15);
+      border-color: var(--emerald-accent);
+      color: var(--emerald-accent);
+      box-shadow: 0 0 14px var(--emerald-glow);
+    }
+    .day-col.today .day-circle {
+      border-color: var(--gold-primary);
+      color: var(--gold-primary);
+      box-shadow: 0 0 14px var(--gold-glow);
+      background: rgba(212, 175, 55, 0.12);
+    }
+
+    /* Metric Switcher & Chart */
+    .metric-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-glass);
+      border-radius: 24px;
+      padding: 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .metric-tabs {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      background: var(--bg-main);
+      padding: 4px;
+      border-radius: 14px;
+      border: 1px solid var(--border-glass);
+    }
+    .tab-btn {
+      padding: 8px 12px;
+      border: none;
+      background: transparent;
+      color: var(--text-secondary);
+      font-family: var(--font-main);
+      font-size: 0.8rem;
+      font-weight: 700;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .tab-btn.active {
+      background: var(--bg-surface-elevated);
+      color: var(--text-primary);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+      border: 1px solid var(--border-glass);
+    }
+
+    .metric-value-row {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+    }
+    .metric-huge {
+      font-family: var(--font-mono);
+      font-size: 2.2rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      letter-spacing: -0.5px;
+    }
+    .metric-huge span {
+      font-size: 1.1rem;
+      color: var(--gold-primary);
+      margin-left: 4px;
+    }
+    .delta-pill {
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: var(--emerald-accent);
+      background: rgba(16, 185, 129, 0.1);
+      padding: 4px 10px;
+      border-radius: 999px;
+    }
+
+    /* Waveform SVG */
+    .wave-wrapper {
+      height: 75px;
+      width: 100%;
+      margin-top: 4px;
+    }
+    .wave-svg {
+      width: 100%;
+      height: 100%;
+      overflow: visible;
+    }
+
+    /* AI Coach Card (Análise Semanal) */
+    .ai-card {
+      background: linear-gradient(145deg, rgba(20, 26, 34, 0.9) 0%, rgba(14, 18, 24, 0.95) 100%);
+      border: 1px solid rgba(212, 175, 55, 0.25);
+      border-radius: 24px;
+      padding: 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      box-shadow: 0 8px 24px -6px rgba(0, 0, 0, 0.5);
+    }
+
+    .ai-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .ai-badge {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.85rem;
+      font-weight: 800;
+      color: var(--gold-primary);
+      letter-spacing: 0.3px;
+    }
+    .ai-spark {
+      width: 18px;
+      height: 18px;
+      fill: var(--gold-primary);
+    }
+    .ai-progress-text {
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+    }
+
+    .ai-progress-bar {
+      height: 6px;
+      width: 100%;
+      background: rgba(255, 255, 255, 0.08);
+      border-radius: 999px;
+      overflow: hidden;
+    }
+    .ai-progress-fill {
+      height: 100%;
+      width: 75%;
+      background: linear-gradient(90deg, var(--emerald-accent), var(--gold-primary));
+      border-radius: 999px;
+      box-shadow: 0 0 10px rgba(16, 185, 129, 0.4);
+    }
+
+    .ai-quote {
+      font-size: 0.9rem;
+      line-height: 1.45;
+      color: #E2E8F0;
+      font-style: italic;
+      padding: 8px 12px;
+      background: rgba(0, 0, 0, 0.25);
+      border-radius: 12px;
+      border-left: 3px solid var(--gold-primary);
+    }
+
+    /* Treinos Recentes */
+    .section-title {
+      font-size: 0.95rem;
+      font-weight: 800;
+      letter-spacing: 0.3px;
+      color: var(--text-primary);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .section-title a {
+      font-size: 0.78rem;
+      color: var(--gold-primary);
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    .workout-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .workout-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-glass);
+      border-radius: 18px;
+      padding: 14px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      transition: all 0.2s ease;
+      cursor: pointer;
+    }
+    .workout-card:hover {
+      border-color: rgba(255, 255, 255, 0.15);
+      background: var(--bg-surface-elevated);
+    }
+
+    .workout-left {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .muscle-tags {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+    }
+    .tag-pill {
+      background: rgba(16, 185, 129, 0.12);
+      color: #34D399;
+      border: 1px solid rgba(16, 185, 129, 0.25);
+      padding: 3px 8px;
+      border-radius: 8px;
+      font-size: 0.72rem;
+      font-weight: 800;
+      letter-spacing: 0.3px;
+    }
+    .tag-pill.gold {
+      background: rgba(212, 175, 55, 0.12);
+      color: #FCD34D;
+      border-color: rgba(212, 175, 55, 0.25);
+    }
+    .pr-badge {
+      background: rgba(245, 158, 11, 0.18);
+      color: #FBBF24;
+      border: 1px solid rgba(245, 158, 11, 0.35);
+      padding: 2px 6px;
+      border-radius: 6px;
+      font-size: 0.68rem;
+      font-weight: 800;
+    }
+
+    .workout-meta {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+
+    .workout-right {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .workout-vol {
+      text-align: right;
+    }
+    .vol-num {
+      font-family: var(--font-mono);
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+    .vol-sets {
+      font-size: 0.7rem;
+      color: var(--text-muted);
+    }
+
+    /* Bottom Navigation Dock */
+    .bottom-nav {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 84px;
+      background: rgba(11, 15, 21, 0.85);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-top: 1px solid var(--border-glass);
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      align-items: center;
+      padding: 0 8px 12px;
+      z-index: 100;
+    }
+
+    .nav-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 5px;
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 0.72rem;
+      font-weight: 600;
+      transition: all 0.2s ease;
+    }
+    .nav-item svg {
+      width: 22px;
+      height: 22px;
+      stroke: currentColor;
+    }
+    .nav-item.active {
+      color: var(--gold-primary);
+    }
+    .nav-item.active svg {
+      filter: drop-shadow(0 0 8px rgba(212, 175, 55, 0.4));
+    }
+    .nav-indicator {
+      width: 4px;
+      height: 4px;
+      background: var(--gold-primary);
+      border-radius: 50%;
+      margin-top: -2px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="mobile-frame">
+    <div class="ambient-glow-top"></div>
+    <div class="ambient-glow-mid"></div>
+
+    <!-- Header -->
+    <header class="header">
+      <div class="brand-group">
+        <img src="/logo-lastro.png" alt="LASTRO" class="brand-logo">
+        <div class="date-pill">Quinta-feira, 20 Ago · <span>Semana 34</span></div>
+      </div>
+      <div class="avatar-wrapper">
+        <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80" alt="Avatar" class="avatar-img">
+      </div>
+    </header>
+
+    <!-- Scrollable Content -->
+    <main class="content">
+
+      <!-- Hero CTA -->
+      <button class="btn-hero" onclick="alert('Iniciando treino de hoje!')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <polygon points="5 3 19 12 5 21 5 3"></polygon>
+        </svg>
+        Iniciar Treino de Hoje
+      </button>
+
+      <!-- 7-Day Discipline Tracker -->
+      <section class="tracker-card">
+        <div class="tracker-header">
+          <span class="tracker-title">Disciplina Semanal</span>
+          <span class="streak-badge">🔥 4 Dias Seguidos</span>
+        </div>
+        <div class="days-grid">
+          <div class="day-col done">
+            <span class="day-name">Seg</span>
+            <div class="day-circle">✓</div>
+          </div>
+          <div class="day-col done">
+            <span class="day-name">Ter</span>
+            <div class="day-circle">✓</div>
+          </div>
+          <div class="day-col done">
+            <span class="day-name">Qua</span>
+            <div class="day-circle">✓</div>
+          </div>
+          <div class="day-col today">
+            <span class="day-name">Qui</span>
+            <div class="day-circle">20</div>
+          </div>
+          <div class="day-col">
+            <span class="day-name">Sex</span>
+            <div class="day-circle">21</div>
+          </div>
+          <div class="day-col">
+            <span class="day-name">Sáb</span>
+            <div class="day-circle">22</div>
+          </div>
+          <div class="day-col">
+            <span class="day-name">Dom</span>
+            <div class="day-circle">23</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Metric Switcher Bar & Dynamic Curve -->
+      <section class="metric-card">
+        <div class="metric-tabs">
+          <button class="tab-btn active" onclick="setMetricTab(this, '14,2 t', '+1.4t (+11%)')">Volume</button>
+          <button class="tab-btn" onclick="setMetricTab(this, '92,5 kg', '+2.5kg no Supino')">Cargas</button>
+          <button class="tab-btn" onclick="setMetricTab(this, '38', '38 séries valendo')">Séries</button>
+        </div>
+
+        <div class="metric-value-row">
+          <div>
+            <div class="metric-huge" id="metric-val">14,2<span>t</span></div>
+            <div style="font-size: 0.78rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase;">Volume Acumulado na Semana</div>
+          </div>
+          <div class="delta-pill" id="metric-delta">+1.4t (+11%)</div>
+        </div>
+
+        <!-- Waveform Chart -->
+        <div class="wave-wrapper">
+          <svg class="wave-svg" viewBox="0 0 350 75" preserveAspectRatio="none">
+            <defs>
+              <linearGradient id="waveGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+                <stop offset="0%" stop-color="#10B981" stop-opacity="0.35"/>
+                <stop offset="100%" stop-color="#10B981" stop-opacity="0.0"/>
+              </linearGradient>
+              <linearGradient id="strokeGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" stop-color="#06B6D4"/>
+                <stop offset="60%" stop-color="#10B981"/>
+                <stop offset="100%" stop-color="#D4AF37"/>
+              </linearGradient>
+            </defs>
+            <path d="M 0,55 Q 50,60 100,45 T 200,50 T 290,15 T 350,8 L 350,75 L 0,75 Z" fill="url(#waveGrad)"/>
+            <path d="M 0,55 Q 50,60 100,45 T 200,50 T 290,15 T 350,8" fill="none" stroke="url(#strokeGrad)" stroke-width="3" stroke-linecap="round"/>
+            <circle cx="290" cy="15" r="4.5" fill="#D4AF37" stroke="#0E1218" stroke-width="2"/>
+          </svg>
+        </div>
+      </section>
+
+      <!-- AI Coach Card (Análise Semanal) -->
+      <section class="ai-card">
+        <div class="ai-header">
+          <div class="ai-badge">
+            <svg class="ai-spark" viewBox="0 0 24 24">
+              <path d="M12 2L14.5 9.5L22 12L14.5 14.5L12 22L9.5 14.5L2 12L9.5 9.5L12 2Z"/>
+            </svg>
+            Análise Semanal (AI Coach)
+          </div>
+          <span class="ai-progress-text">3/4 Treinos · 75%</span>
+        </div>
+        <div class="ai-progress-bar">
+          <div class="ai-progress-fill"></div>
+        </div>
+        <p class="ai-quote">
+          "Seu supino progrediu +5% nesta semana. O volume de peitoral atingiu a faixa ótima de hipertrofia."
+        </p>
+      </section>
+
+      <!-- Recent Workouts -->
+      <div class="section-title">
+        <span>Treinos Recentes</span>
+        <a href="#todos">Ver Todos</a>
+      </div>
+
+      <div class="workout-list">
+        <div class="workout-card">
+          <div class="workout-left">
+            <div class="muscle-tags">
+              <span class="tag-pill">PEITO & TRÍCEPS</span>
+              <span class="pr-badge">⚡ PR 90kg</span>
+            </div>
+            <span class="workout-meta">Ontem · 4 exercícios</span>
+          </div>
+          <div class="workout-right">
+            <div class="workout-vol">
+              <div class="vol-num">5,4 t</div>
+              <div class="vol-sets">14 séries</div>
+            </div>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#64748B" stroke-width="2">
+              <polyline points="9 18 15 12 9 6"></polyline>
+            </svg>
+          </div>
+        </div>
+
+        <div class="workout-card">
+          <div class="workout-left">
+            <div class="muscle-tags">
+              <span class="tag-pill gold">COSTAS & BÍCEPS</span>
+            </div>
+            <span class="workout-meta">Terça-feira · 5 exercícios</span>
+          </div>
+          <div class="workout-right">
+            <div class="workout-vol">
+              <div class="vol-num">6,1 t</div>
+              <div class="vol-sets">16 séries</div>
+            </div>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#64748B" stroke-width="2">
+              <polyline points="9 18 15 12 9 6"></polyline>
+            </svg>
+          </div>
+        </div>
+
+        <div class="workout-card">
+          <div class="workout-left">
+            <div class="muscle-tags">
+              <span class="tag-pill">PERNAS & OMBROS</span>
+            </div>
+            <span class="workout-meta">Segunda-feira · 4 exercícios</span>
+          </div>
+          <div class="workout-right">
+            <div class="workout-vol">
+              <div class="vol-num">4,8 t</div>
+              <div class="vol-sets">12 séries</div>
+            </div>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#64748B" stroke-width="2">
+              <polyline points="9 18 15 12 9 6"></polyline>
+            </svg>
+          </div>
+        </div>
+      </div>
+
+    </main>
+
+    <!-- Bottom Navigation Dock -->
+    <nav class="bottom-nav">
+      <a href="#" class="nav-item active">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+          <polyline points="9 22 9 12 15 12 15 22"></polyline>
+        </svg>
+        <span>Início</span>
+        <div class="nav-indicator"></div>
+      </a>
+      <a href="#" class="nav-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M4 8v8M20 8v8M8 6v12M16 6v12M8 12h8"></path>
+        </svg>
+        <span>Treinos</span>
+      </a>
+      <a href="#" class="nav-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="18" y1="20" x2="18" y2="10"></line>
+          <line x1="12" y1="20" x2="12" y2="4"></line>
+          <line x1="6" y1="20" x2="6" y2="14"></line>
+        </svg>
+        <span>Análise</span>
+      </a>
+      <a href="#" class="nav-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+          <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+        </svg>
+        <span>Catálogo</span>
+      </a>
+      <a href="#" class="nav-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="3"></circle>
+          <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+        </svg>
+        <span>Ajustes</span>
+      </a>
+    </nav>
+  </div>
+
+  <script>
+    function setMetricTab(btn, val, delta) {
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      document.getElementById('metric-val').innerHTML = val.includes('t') ? val.replace('t', '<span>t</span>') : val;
+      document.getElementById('metric-delta').innerText = delta;
+    }
+  </script>
+</body>
+</html>

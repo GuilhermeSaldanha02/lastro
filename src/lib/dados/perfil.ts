@@ -21,7 +21,7 @@ export async function obterPerfil(): Promise<Perfil | null> {
     .from("usuario")
     .select("nome, avatar_url")
     .eq("id", user.id)
-    .single();
+    .maybeSingle();
 
   // O trigger da 0004 garante que a linha existe pra toda conta nova;
   // null aqui só acontece se o backfill ainda não rodou nesta base.
