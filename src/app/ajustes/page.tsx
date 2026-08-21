@@ -76,6 +76,23 @@ export default async function PaginaAjustes() {
                 </div>
                 <SetaNavegacao />
               </Link>
+
+              <Link href="/ajustes/temas" className="bento-menu-item">
+                <div className="bento-menu-item__icone bento-menu-item__icone--ouro">
+                  <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="var(--lastro-ouro)" strokeWidth="2">
+                    <circle cx="13.5" cy="6.5" r="1.5" fill="var(--lastro-ouro)" />
+                    <circle cx="17.5" cy="10.5" r="1.5" fill="var(--lastro-ouro)" />
+                    <circle cx="8.5" cy="7.5" r="1.5" fill="var(--lastro-ouro)" />
+                    <circle cx="6.5" cy="12.5" r="1.5" fill="var(--lastro-ouro)" />
+                    <path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.563-2.512 5.563-5.563C22 6.5 17.5 2 12 2Z" />
+                  </svg>
+                </div>
+                <div className="bento-menu-item__info">
+                  <h3 className="bento-menu-item__titulo">Temas & Cores</h3>
+                  <p className="bento-menu-item__desc">Personalizar paleta do aplicativo</p>
+                </div>
+                <SetaNavegacao />
+              </Link>
             </div>
 
             {/* Ações de Conta */}
