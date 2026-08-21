@@ -28,3 +28,13 @@ supabase/.branches/
 .DS_Store
 Thumbs.db
 *.log
+
+# Artefatos de sessão — mockups renderizados, previews e scripts de captura.
+# Não são entregáveis: tudo em public/ é servido na raiz do site pelo Next,
+# então commitar mockup aqui é publicá-lo.
+public/0*_*.png
+public/preview-*.html
+public/preview_*.png
+scripts/crop-logo.mjs
+scripts/render-redesign-mockups.mjs
+docs/PROMPT-PROXIMO-CHAT.md
