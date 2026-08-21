@@ -2082,7 +2082,7 @@
   align-items: center;
   justify-content: space-between;
   padding: calc(var(--lastro-e-2) + env(safe-area-inset-top, 0px)) var(--lastro-e-4) var(--lastro-e-2);
-  background: #07090D;
+  background: var(--lastro-barra-b);
   border-bottom: 1px solid var(--lastro-linha);
   height: 60px;
 }
@@ -2108,7 +2108,7 @@
 }
 
 .topo-pro__data-pill {
-  background: rgba(255, 255, 255, 0.05);
+  background: var(--lastro-sup-1);
   border: 1px solid var(--lastro-linha);
   padding: 6px 14px;
   border-radius: var(--lastro-raio-pilula);
@@ -2116,11 +2116,10 @@
   font-weight: var(--lastro-peso-medio);
   color: var(--lastro-txt-2);
   letter-spacing: 0.2px;
-  backdrop-filter: blur(10px);
 }
 
 .topo-pro__data-pill span {
-  color: var(--lastro-esmeralda);
+  color: var(--lastro-ouro);
   font-weight: var(--lastro-peso-max);
 }
 
@@ -2245,7 +2244,7 @@
 .disciplina-dia--hoje .disciplina-dia__circulo {
   border-color: var(--lastro-ouro);
   color: var(--lastro-ouro);
-  background: rgba(212, 175, 55, 0.12);
+  background: var(--lastro-ouro-glow);
   box-shadow: 0 0 12px var(--lastro-ouro-glow);
 }
 
@@ -2458,14 +2457,14 @@
 
 /* AI Coach Card (Análise Semanal) */
 .ai-coach-card {
-  background: linear-gradient(145deg, rgba(20, 26, 34, 0.95) 0%, rgba(14, 18, 24, 0.98) 100%);
+  background: var(--lastro-sup-1);
   border: 1px solid var(--lastro-borda-ouro);
   border-radius: var(--lastro-raio-3);
   padding: var(--lastro-e-4);
   display: flex;
   flex-direction: column;
   gap: var(--lastro-e-3);
-  box-shadow: 0 8px 24px -6px rgba(0, 0, 0, 0.6);
+  box-shadow: var(--lastro-elev-2);
   margin-bottom: var(--lastro-e-4);
 }
 
@@ -2500,10 +2499,10 @@
   text-decoration: none;
   font-size: var(--lastro-papel-corpo);
   line-height: 1.45;
-  color: #E2E8F0;
+  color: var(--lastro-txt);
   font-style: italic;
   padding: var(--lastro-e-3);
-  background: rgba(0, 0, 0, 0.35);
+  background: var(--lastro-sup-2);
   border-radius: var(--lastro-raio-2);
   border-left: 3px solid var(--lastro-ouro);
   display: block;
