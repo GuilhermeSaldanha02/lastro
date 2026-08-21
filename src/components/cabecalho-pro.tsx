@@ -38,7 +38,7 @@ export default function CabecalhoPro({
         ) : mostrarLogo ? (
           <div className="topo-pro__logo-wrap">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/logo-lastro.png" alt="LASTRO" className="topo-pro__logo" width={48} height={48} />
+            <img src="/logo-lastro.png" alt="LASTRO" className="topo-pro__logo" width={38} height={38} />
           </div>
         ) : null}
 
