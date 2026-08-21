@@ -356,29 +356,67 @@ resto. Não precisaram de tratamento especial porque o fix do token os
 cobre do mesmo jeito que cobre as outras 38 ocorrências — não porque já
 passavam antes.
 
-**O que NÃO foi feito, decisão explícita do dono (opção 2, não a 1):**
-só o tema padrão (`:root`) foi corrigido. As outras 16 linhas de §3.2 e
-as 13 restantes de C1–C14 em §4.2 continuam com número da paleta areia —
-o documento agora diz isso explicitamente em vez de deixar implícito.
-Vira o item **T3b** abaixo.
+**Escopo original travado pelo dono (opção 2, não a 1) — depois ampliado
+com números reais na mão.** A decisão inicial era corrigir só o tema
+padrão. Antes de fechar, medi as outras 6 paletas do card de Tema
+(`docs/BACKLOG-PROXIMA-FASE.md` T1 — **já mergeado, já no ar**, não é
+"trabalho futuro"): 3 delas reprovavam o mesmo bug, ao vivo, hoje —
+`petroleo` (4,20), `moka` (4,39), `branco-ouro` (3,86, nem herdava a
+correção, tem token próprio). Apresentado ao dono, **corrigido também
+na mesma leva.**
 
-## T3b — Reconciliar `DESIGN.md`/`DECISIONS.md` com o Apex Pro por inteiro
+| Tema | Antes | Depois | Valor |
+|---|---|---|---|
+| padrão (`:root`) | 3,36 | **4,74** | `#7C8DA6` |
+| `areia` | 4,80 (já passava) | — | herdado, sem mudança |
+| `clean` | 4,51 (já passava) | — | herdado, sem mudança |
+| `oliva` | 4,59 (já passava) | — | herdado, sem mudança |
+| `petroleo` | 4,20 | **4,71** | `#8596AD` (override novo) |
+| `moka` | 4,39 | **4,74** | `#8293AB` (override novo) |
+| `branco-ouro` | 3,86 | **4,89** | `#556478` (token próprio) |
 
-Pendência que o T3 deixou explícita. Duas partes, e a segunda depende do
-T1 (card de Tema):
+**As 16 linhas restantes de §3.2 e as 13 de C1–C14 em §4.2** continuam
+com número da paleta areia — o documento diz isso explicitamente.
+Vira o item **T3b** abaixo, junto com um achado novo e maior.
 
-1. **Remedir os 14 pares de §4.2 (C1–C14) contra o tema padrão Apex
-   Pro** — hoje só C3 (`txt-3`) está remedido; os outros 13 ainda citam
-   número da paleta areia. Ao vivo, em navegador real, como o próprio
-   `DESIGN.md` exige (D8).
-2. **Escrever a razão de cada cor do Apex Pro** (por que ouro, por que
-   esmeralda, por que obsidiana) — quem decidiu isso foi outra sessão, e
-   nenhuma razão foi registrada em `DECISIONS.md` na hora. Sem isso,
-   `DESIGN.md` §3 nunca deixa de citar a paleta antiga como se fosse a
-   atual, porque não há o que pôr no lugar sem inventar.
-3. **Remedir contra as 6 paletas alternativas** do card de Tema (T1),
-   quando existirem — não faz sentido reconciliar 7 vezes; a 2ª a 7ª só
-   ficam corretas quando o T1 tiver algo real para medir.
+## T3b — Reconciliar `DESIGN.md`/`DECISIONS.md` com o Apex Pro por inteiro; corrigir acentos de cor no tema claro
+
+Duas pendências, tamanhos bem diferentes:
+
+**1. Reconciliação de documento** (pendência que o T3 deixou explícita):
+
+- Remedir os 14 pares de §4.2 (C1–C14) contra o tema padrão Apex Pro —
+  hoje só C3 (`txt-3`) está remedido. Ao vivo, em navegador real (D8).
+- Escrever a razão de cada cor do Apex Pro (por que ouro, por que
+  esmeralda, por que obsidiana) — quem decidiu foi outra sessão, sem
+  registro em `DECISIONS.md` na hora. Sem isso, `DESIGN.md` §3 nunca
+  deixa de citar a paleta antiga, porque não há o que pôr no lugar sem
+  inventar.
+- Remedir C1–C14 contra as 5 paletas restantes (`areia`, `clean`,
+  `petroleo`, `moka`, `oliva` — `branco-ouro` seu próprio caso, ver
+  item 2).
+
+**2. Bug real, achado ao medir o item acima — ALTA, maior que o T3.**
+Medindo `branco-ouro` por inteiro (não só `txt-3`), apareceram **33
+elementos reprovando** por três tokens diferentes, nenhum relacionado a
+`txt-3`:
+
+| Token | Cor | Pior caso medido | Piso |
+|---|---|---|---|
+| `--lastro-ouro` | `#B8860B` | 3,04 | 4,5 |
+| `--lastro-esmeralda-claro` | `#34D399` | **1,79** | 3,0 (texto grande) |
+| `--lastro-ciano` | `#06B6D4` | **2,43** | 3,0 |
+
+Esses acentos foram calibrados para fundo escuro (Apex Pro) e nunca
+ajustados para o único tema claro do sistema — `branco-ouro` não os
+sobrescreve, herda os valores escuros direto. É mais grave que o T3
+porque mexe em cor de marca (ouro, esmeralda, ciano têm significado —
+ação, progresso, sincronização), não em cinza neutro, e **1,79:1** é o
+pior número já medido nesta auditoria inteira. Provavelmente atinge
+outros pontos do `branco-ouro` além do `/catalogo` — não varrido por
+completo. Precisa da mesma técnica do T3 (achar valor por bissecção,
+remedir ao vivo), mas por cor de marca, não por cinza — exige decisão
+de quanto dessaturar/escurecer sem descaracterizar o acento.
 
 ## T4 — Meta semanal de treinos configurável
 

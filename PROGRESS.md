@@ -273,6 +273,10 @@ Quota checada com uma chamada direta à API antes de gastar esforço recriando d
 > - **Correção de processo, registrada por transparência:** o backlog (`T3`) tinha uma ressalva não verificada — "`.evidencia__de`/`.evidencia__seta` e `.marca--aquecimento`, se o peso herdado for ≥700, já passam no piso de 3,0". Antes de escrever essa ressalva como resolvida, medi de verdade: nenhum dos dois tem `font-weight` declarado, herdam 400. Não são "texto grande" isento — o piso sempre foi 4,5, igual ao resto. A ressalva original (em `AUDITORIA-APEX-PRO.md`) estava certa em registrar como "não medido"; o erro seria tê-la promovido a fato sem medir. Corrigido nos dois documentos antes do commit.
 >
 > **4 gates verdes em cada passo** (`tsc`/`test`/`lint`/`build`), medido no navegador real via Playwright a cada mudança visual — não só matemática de token.
+>
+> **Atualização (2026-08-21, mesma sessão): antes de fechar a PR do T3, medi as 6 paletas do card de Tema — 3 tinham o mesmo bug, ao vivo, hoje.** Não era escopo travado que sobrava pra "quando o card existir" (frase que eu mesmo tinha escrito errada — o card já existe, já está no ar desde o T1). `petroleo` (4,20), `moka` (4,39) e `branco-ouro` (3,86, com token próprio, nem herdava o fix do `:root`) reprovavam AA. Apresentei os números ao dono, ele escolheu corrigir os 3 na mesma PR. Remedido ao vivo por tema: `petroleo` → 4,71, `moka` → 4,74, `branco-ouro` → 4,89. `areia`/`clean`/`oliva` já passavam. DECISIONS.md e DESIGN.md corrigidos junto — a frase errada sobre "quando o card existir" não sobrevive em nenhum documento.
+>
+> **Achado colateral, maior, não corrigido:** medindo `branco-ouro` por inteiro (não só `txt-3`), apareceram 33 elementos reprovando por `--lastro-ouro`/`--lastro-esmeralda-claro`/`--lastro-ciano` — pior caso **1,79:1**, o número mais baixo de toda a auditoria. Acentos calibrados pro Apex Pro escuro, nunca ajustados pro único tema claro do sistema. Vira T3b no backlog, registrado como ALTA — mexe em cor de marca, não em cinza neutro.
 
 ---
 
