@@ -7,6 +7,22 @@
 
 ---
 
+## ESTADO ATUAL
+
+> Bloco de handoff entre agentes (Antigravity ⇄ Claude). **Sobrescrever a cada sessão**, nunca acumular. Formato e regras: `AGENTS.md` §3.
+
+- **Última sessão:** 2026-08-23 · agente: claude · branch: `main`
+- **Em andamento:** *a preencher na próxima sessão — este bloco foi semeado a partir do `git log`, não de contexto de trabalho real*
+- **Último commit:** `8bb3fc8` feat: Meta semanal de treinos configuravel (T4)
+- **Não commitado:** `public/comparacao_4_temas.png` e `scripts/render-temas.mjs` — decidir se entram no repositório ou viram ignorados
+- **Bloqueado / a decidir:** nada registrado
+- **Próximo passo:** resolver os dois arquivos acima; criar o `QA.md` (não existe neste projeto) antes da próxima auditoria
+- **Para o outro agente saber:**
+  - O trabalho está saindo **direto na `main`** — a convenção é branch `feat/`/`fix/` + PR. Corrigir a partir da próxima tarefa.
+  - Este arquivo passou de **1.100 linhas** e a regra logo acima manda arquivar acima de ~300. Arquivar os concluídos em `PROGRESS-archive.md` antes de acumular mais: arquivo gordo deixa de ser lido por inteiro, e aí ele para de cumprir a função.
+
+---
+
 ## Ordem das fases — e por que esta ordem
 
 A **Fase 1 é a peça-assinatura**, como fatia vertical feia mas completa. Antes de qualquer polimento, antes do offline, antes do catálogo, antes do coach. Se a Análise não convencer o dono com dados reais dele, o projeto muda de rumo — e é infinitamente mais barato descobrir isso agora do que depois de três semanas de UI bonita.
