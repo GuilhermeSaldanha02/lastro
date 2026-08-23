@@ -27,15 +27,18 @@ jobs:
       - name: Instalar dependências
         run: npm ci
 
-      - name: Type-check
-        run: npx tsc --noEmit
-
       - name: Lint
         run: npm run lint
 
       - name: Testes
         run: npm run test
 
+      # O `tsc --noEmit` roda DEPOIS do build, e a ordem é obrigatória: o Next
+      # gera tipos globais (`LayoutProps`, tipos de rota, CSS) em `.next/types`
+      # durante o build. Em máquina de desenvolvimento isso passa despercebido
+      # porque sobra `.next` de builds anteriores — em runner limpo, `tsc` antes
+      # do build falha com TS2304. Verificado neste repositório em 2026-08-23.
+      #
       # Os valores abaixo caem para um placeholder quando o secret não existe,
       # para o build não quebrar por variável ausente. Para o build refletir a
       # realidade, cadastre os secrets em Settings → Secrets and variables →
@@ -47,3 +50,6 @@ jobs:
           NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'placeholder' }}
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY || 'placeholder' }}
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY || 'placeholder' }}
+
+      - name: Type-check
+        run: npx tsc --noEmit
