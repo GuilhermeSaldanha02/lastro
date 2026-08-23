@@ -6,6 +6,8 @@ App pessoal de treino. Registra cada série executada e, semanalmente, entrega u
 
 Responda sempre em **pt-BR** e instrua todo subagente a responder em pt-BR — a preferência não é herdada.
 
+**Protocolo de trabalho — leia `AGENTS.md` na abertura de toda sessão.** Ele é a camada compartilhada com os outros agentes deste repositório (Antigravity, Cursor): como saber o que foi feito desde a sua última vez, git, portões e o bloco de handoff. Este arquivo aqui cobre só o que é do produto e da stack.
+
 ---
 
 ## Onde está cada coisa
