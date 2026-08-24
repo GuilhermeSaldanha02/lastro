@@ -139,12 +139,31 @@ function mudadosDesde(sha) {
   return r;
 }
 
-let head = 'HEAD';
-try {
-  head = execFileSync('git', ['rev-parse', '--short', 'HEAD'], { encoding: 'utf8' }).trim();
-} catch {
-  console.error('Nao parece um repositorio git — o calculo depende do historico.');
+const gitSilencioso = (args) => {
+  try {
+    return execFileSync('git', args, { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] }).trim();
+  } catch {
+    return null;
+  }
+};
+
+if (gitSilencioso(['rev-parse', '--git-dir']) === null) {
+  console.error('Nao e um repositorio git — o calculo de obsolescencia depende do historico.');
   process.exit(1);
+}
+
+const head = gitSilencioso(['rev-parse', '--short', 'HEAD']);
+if (head === null) {
+  console.log('Repositorio git ainda sem nenhum commit.');
+  console.log('Nao ha historico para comparar: o calculo comeca a valer no primeiro commit.');
+  process.exit(0);
+}
+
+if (!tabItens.linhas.length) {
+  console.log(`QA em ${head} — registro ainda vazio.`);
+  console.log('Nenhum item para calcular. A tabela se preenche na primeira auditoria de verdade');
+  console.log('(skill qa-registro) — nao invente itens para popular o arquivo.');
+  process.exit(0);
 }
 
 /* ---------- classificacao ---------- */
