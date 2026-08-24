@@ -11,15 +11,20 @@
 
 > Bloco de handoff entre agentes (Antigravity ⇄ Claude). **Sobrescrever a cada sessão**, nunca acumular. Formato e regras: `AGENTS.md` §3.
 
-- **Última sessão:** 2026-08-23 · agente: claude · branch: `main`
-- **Em andamento:** *a preencher na próxima sessão — este bloco foi semeado a partir do `git log`, não de contexto de trabalho real*
-- **Último commit:** `8bb3fc8` feat: Meta semanal de treinos configuravel (T4)
-- **Não commitado:** `public/comparacao_4_temas.png` e `scripts/render-temas.mjs` — decidir se entram no repositório ou viram ignorados
-- **Bloqueado / a decidir:** nada registrado
-- **Próximo passo:** resolver os dois arquivos acima; preencher o `QA.md` na primeira auditoria de verdade
-- **Correção registrada:** uma versão anterior deste bloco afirmava que o trabalho saía direto na `main`. Não procede — o histórico mostra integração por PR de forma consistente. A afirmação errada sobreviveu na mensagem de um commit já mergeado; esta linha é o registro da correção.
+- **Última sessão:** 2026-08-21 · agente: claude · branch: `main`
+- **Em andamento:** nada — a fila da auditoria pós-Apex Pro (`docs/AUDITORIA-APEX-PRO.md`) está fechada, exceto o item abaixo.
+- **Último commit:** `d916078` (de outra sessão, instalou `AGENTS.md`/`QA.md`/CI). Meus commits de conteúdo terminam em `8bb3fc8` (T4).
+- **Fechado nesta sessão** (branches `fix/contraste-txt3-obsidian-ouro`, `fix/acentos-cor-tema-claro`, `feat/meta-semanal-configuravel`, todas já mergeadas em `main`):
+  - **T3** — contraste de `--lastro-txt-3` corrigido no tema padrão + `petroleo`/`moka`/`branco-ouro` (os 3 únicos temas escuros que reprovavam, medidos ao vivo).
+  - **T3b (parte 2 — acentos de cor)** — 8 tokens corrigidos só no `branco-ouro` (`ouro`, `esmeralda-claro`, `esmeralda`, `ciano`, `erro`, `acao-tinta`, `sync`, `aquecimento` — este último token novo). 2 hex cravados (`color: #FFF`) trocados por `var(--lastro-txt)`. Ver `DECISIONS.md` 2026-08-21 (2) pros dois erros de metodologia de medição encontrados e corrigidos no caminho (transição CSS mascarando leitura; medir contra o pai em vez do próprio elemento).
+  - **T4** — meta semanal de treinos configurável. Migração `0009_meta_semanal.sql` (`smallint` nullable, sem default — decisão explícita do dono: sem meta definida, a Home mostra só a contagem, nunca fração inventada). Campo em `/ajustes`.
+  - `.gitignore` — dois artefatos de sessão de outro trabalho (`comparacao_4_temas.png`, `render-temas.mjs`) adicionados aos padrões já existentes.
+- **Bloqueado / a decidir:** nada.
+- **Próximo passo:** **T3b parte 1**, ainda aberta — reconciliar `DESIGN.md` por inteiro com o Apex Pro (os 14 pares de contraste de §4.2 contra as 6 paletas, e escrever a razão de cada cor escolhida). É documentação, não bug — nada quebrado esperando por isso. Registrado em `docs/BACKLOG-PROXIMA-FASE.md` T3b.
+- **Fixture QA:** `qa-audit-2608@teste.lastro.invalid` (uuid `ab52bd53-…`) segue viva, com treinos e grupos semeados — mantida de propósito pra próxima varredura visual. Sempre devolvida a `meta_treinos_semana = null` ao final de cada teste desta sessão.
 - **Para o outro agente saber:**
   - Este arquivo passou de **1.100 linhas** e a regra logo acima manda arquivar acima de ~300. Arquivar os concluídos em `PROGRESS-archive.md` antes de acumular mais: arquivo gordo deixa de ser lido por inteiro, e aí ele para de cumprir a função.
+  - `DESIGN.md` tem um banner datado (2026-08-20/21) avisando que §3.0–3.2 e a tabela C1–C14 de §4.2 descrevem a paleta areia antiga, não o Apex Pro. Só a linha `txt-3`/C3 foi remedida. Não citar número de lá sem conferir contra `tokens.css` primeiro.
 
 ---
 
