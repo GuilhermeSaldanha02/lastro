@@ -245,16 +245,16 @@ export type ResumoCompacto = {
 
 ### D3.5 — Como `volume.ts` trata unilateral e peso por lado
 
-Dois atributos do **exercício** (nunca da série — §3.2) dobram volume, por razões distintas, e NUNCA compõem entre si (`DECISIONS.md` 2026-08-04 e 2026-08-24):
+Dois atributos dobram volume, por razões distintas, e NUNCA compõem entre si (`DECISIONS.md` 2026-08-04, 2026-08-24 e 2026-08-24 (2)):
 
-- **Unilateral:** `exercicio.unilateral = true` — as reps são contadas por lado. O dono anota "10 de cada lado"; o agregador sabe que isso são 20 execuções.
-- **Peso por lado:** `exercicio.peso_por_lado = true` — o peso registrado é de **um** implemento (ex.: um halter em cada mão), não do par. Sem a correção, halter bilateral (ex.: "Supino reto com halteres", `unilateral=false` corretamente) tem o volume subestimado pela metade.
+- **Unilateral:** `exercicio.unilateral = true` (atributo do EXERCÍCIO, nunca da série — §3.2) — as reps são contadas por lado. O dono anota "10 de cada lado"; o agregador sabe que isso são 20 execuções.
+- **Peso por lado:** `serie.peso_por_lado = true` (atributo da SÉRIE, decidido por um interruptor no formulário — reversão de 2026-08-24 (2)) — o peso registrado é de **um** implemento (ex.: um halter em cada mão), não do par. `exercicio.peso_por_lado` continua existindo só como VALOR-PADRÃO que pré-marca o interruptor para exercícios de halter conhecidos; quem decide o volume é sempre a série, nunca o catálogo diretamente — uma lista fixa de exercícios não cobre todo uso real de halter.
 
-`volume_da_serie = reps × peso × (exercicio.unilateral || exercicio.peso_por_lado ? 2 : 1)`.
+`volume_da_serie = reps × peso × (exercicio.unilateral || serie.peso_por_lado ? 2 : 1)`.
 
 **"Peso corporal incluso" existiu e foi removido (2026-08-24).** Nunca foi usado (0 de 461 séries no banco real) — ver `DECISIONS.md` 2026-08-24. Não há mais exceção de volume para exercício de peso corporal; toda série valendo entra em `volume` e `volume_por_grupo_muscular` normalmente.
 
-Casos de teste: T-V4, T-V6, T-V7 (`src/lib/analise/volume.test.ts`).
+Casos de teste: T-V4, T-V6, T-V7 (`src/lib/analise/volume.test.ts`, nível do `volume.ts` puro) e T-V8 (`src/lib/analise/agregar.test.ts`, prova que a série decide, não o catálogo).
 
 ---
 
@@ -303,10 +303,12 @@ create table public.exercicio (
   -- Rosca alternada é sempre unilateral; não é o dono quem decide isso toda
   -- série. O agregador dobra o volume quando este flag é true (§4.5, T-V4).
   unilateral               boolean not null default false,
-  -- ATRIBUTO DO EXERCÍCIO, mesma forma de `unilateral` (DECISIONS.md
-  -- 2026-08-24, migração 0010). true quando o peso registrado é de UM
-  -- implemento (ex.: um halter em cada mão), não do par — dobra o volume
-  -- pela mesma razão de unilateral, mas nunca composto com ele (D3.5).
+  -- VALOR-PADRÃO apenas (DECISIONS.md 2026-08-24 (2), migração 0011) — não
+  -- decide mais o volume sozinho. Pré-marca o interruptor do formulário
+  -- quando a pessoa escolhe um exercício de halter conhecido; quem de fato
+  -- decide é `serie.peso_por_lado` (ver tabela `serie` abaixo). Antes desta
+  -- migração era a fonte de verdade (migração 0010) — uma lista fixa de
+  -- exercícios não cobre todo uso real de halter.
   peso_por_lado            boolean not null default false,
   dica_execucao            text,          -- CURADA, nunca gerada (FF7). Fase 4.
   criado_em                timestamptz not null default now()
@@ -334,10 +336,15 @@ create table public.serie (
   peso                  numeric(6,2) not null,
   unidade               text    not null default 'kg',
   rir                   smallint,
-  -- `unilateral` e `peso_por_lado` NÃO moram aqui — são atributo do
-  -- exercício (ver tabela acima). Marcado assim porque cada série já
-  -- poderia divergir do catálogo, e a decisão registrada é que não
-  -- diverge: a série herda do exercício.
+  -- `unilateral` NÃO mora aqui — é atributo do exercício (ver tabela
+  -- acima), decisão que se mantém: a série herda do exercício, sem
+  -- exceção por série.
+  --
+  -- `peso_por_lado` MORA AQUI (migração 0011, DECISIONS.md 2026-08-24
+  -- (2)) — ao contrário de unilateral, é decidido POR SÉRIE, por um
+  -- interruptor no formulário. `exercicio.peso_por_lado` (tabela acima)
+  -- só fornece o valor-padrão que pré-marca o interruptor.
+  peso_por_lado         boolean not null default false,
   --
   -- `peso_corporal_incluso` existiu aqui e foi removido em 2026-08-24
   -- (migração 0010) — nunca foi usado (0 de 461 séries no banco real).
@@ -681,9 +688,11 @@ src/components/formulario-serie.tsx
 src/lib/dados/treino.ts           ← leitura/escrita via Supabase (fora de analise/)
 ```
 
-Campos do formulário, um por um: exercício (select do seed), `tipo` (aquecimento | valendo — **default valendo**), `reps`, `peso`, `rir` (visível **só** quando `tipo = valendo`, e **opcional**).
+Campos do formulário, um por um: exercício (select do seed), `tipo` (aquecimento | valendo — **default valendo**), `reps`, `peso`, `rir` (visível **só** quando `tipo = valendo`, e **opcional**), `peso_por_lado` (interruptor — ver abaixo).
 
-**`unilateral` e `peso_por_lado` não são campos do formulário.** São atributos do exercício escolhido, lidos do catálogo — a tela mostra um indicador de texto para cada um ("rosca alternada — reps contam por lado" / "halteres — peso é de cada lado"), nunca um checkbox. O dono não re-declara isso a cada série.
+**`unilateral` não é campo do formulário.** É atributo do exercício escolhido, lido do catálogo — a tela mostra só um indicador de texto ("rosca alternada — reps contam por lado"), nunca um controle. O dono não re-declara isso a cada série.
+
+**`peso_por_lado` É campo do formulário — interruptor, não texto (D3.5, revisado 2026-08-24 (2)).** Pré-marcado com o valor-padrão do catálogo (`exercicio.peso_por_lado`) quando a pessoa escolhe um exercício de halter conhecido, mas ligável/desligável por série — uma lista fixa de exercícios no catálogo não cobre todo uso real de halter. Mesmo lugar visual onde "peso corporal incluso" existia antes de ser removido.
 
 ### 5.2 FORA
 
@@ -694,7 +703,7 @@ Offline, Dexie, outbox, service worker (Fase 2) · "repetir última série" (Fas
 Registrar **5 séries reais** — incluindo pelo menos um aquecimento, um `rir = 0`, uma série sem `rir`, e uma série de exercício unilateral do catálogo — e ver as 5 no Postgres:
 
 ```sql
-select s.tipo, s.reps, s.peso, s.rir, e.unilateral, e.peso_por_lado
+select s.tipo, s.reps, s.peso, s.rir, s.peso_por_lado, e.unilateral
 from serie s join exercicio e on e.id = s.exercicio_id
 order by s.criado_em desc limit 5;
 ```
@@ -888,7 +897,7 @@ Isso entrega a tarefa **1.6** ao dono: ele lê os 3 pareceres e diz se convence.
 
 ## 8. TODOs e perguntas ao dono
 
-**Unilateral e peso por lado — já decididos, não reabrir.** `DECISIONS.md` (2026-08-04, revisado 2026-08-24) fechou os dois: unilateral e peso por lado dobram o volume via atributo do exercício, nunca compostos entre si (D3.5, §3.2, §4.5 T-V4/T-V6/T-V7). "Peso corporal incluso" — a decisão original de 2026-08-04 sobre exercício de peso corporal fora do volume — foi revertida em 2026-08-24: nunca foi usado (0 de 461 séries) e saiu do produto. Esta versão da spec já incorpora o estado atual.
+**Unilateral e peso por lado — já decididos, não reabrir.** `DECISIONS.md` (2026-08-04, revisado 2026-08-24 e 2026-08-24 (2)) fechou os dois: unilateral dobra o volume via atributo do EXERCÍCIO; peso por lado dobra via atributo da SÉRIE (interruptor no formulário, catálogo só fornece o valor-padrão) — nunca compostos entre si (D3.5, §3.2, §4.5 T-V4/T-V6/T-V7/T-V8). "Peso corporal incluso" — a decisão original de 2026-08-04 sobre exercício de peso corporal fora do volume — foi revertida em 2026-08-24: nunca foi usado (0 de 461 séries) e saiu do produto. Esta versão da spec já incorpora o estado atual.
 
 **Pergunta que permanece aberta:**
 

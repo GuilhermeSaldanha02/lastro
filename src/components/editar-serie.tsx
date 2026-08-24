@@ -13,6 +13,7 @@ export type DadosEdicaoSerie = {
   reps: number;
   peso: number;
   rir: number | null;
+  pesoPorLado: boolean;
 };
 
 export default function EditarSerie({
@@ -25,6 +26,7 @@ export default function EditarSerie({
   onCancelar: () => void;
 }) {
   const [tipo, setTipo] = useState<"aquecimento" | "valendo">(serie.tipo);
+  const [pesoPorLado, setPesoPorLado] = useState(serie.pesoPorLado);
   const [salvando, setSalvando] = useState(false);
   const [erro, setErro] = useState<string | null>(null);
 
@@ -58,7 +60,7 @@ export default function EditarSerie({
 
     setSalvando(true);
     try {
-      await onSalvar({ tipo, reps, peso, rir });
+      await onSalvar({ tipo, reps, peso, rir, pesoPorLado });
     } finally {
       setSalvando(false);
     }
@@ -136,6 +138,16 @@ export default function EditarSerie({
           />
         </div>
       )}
+
+      <label className="campo-caixa" htmlFor={`ppl-${serie.id}`}>
+        <input
+          id={`ppl-${serie.id}`}
+          type="checkbox"
+          checked={pesoPorLado}
+          onChange={(e) => setPesoPorLado(e.target.checked)}
+        />
+        Peso é de cada lado (ex.: um halter em cada mão)
+      </label>
 
       {erro && (
         <p className="aviso-erro" role="alert">

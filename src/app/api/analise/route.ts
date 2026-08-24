@@ -32,6 +32,7 @@ type LinhaSerie = {
   reps: number;
   peso: number;
   rir: number | null;
+  peso_por_lado: boolean;
 };
 
 type LinhaTreino = {
@@ -55,7 +56,7 @@ async function carregarTreinosDoUsuario(
   const { data, error } = await supabase
     .from("treino")
     .select(
-      "id, data, serie (id, exercicio_id, tipo, reps, peso, rir)",
+      "id, data, serie (id, exercicio_id, tipo, reps, peso, rir, peso_por_lado)",
     );
   if (error) throw new Error(`Falha ao carregar treinos: ${error.message}`);
 
@@ -69,6 +70,7 @@ async function carregarTreinosDoUsuario(
       reps: s.reps,
       peso: Number(s.peso),
       rir: s.rir ?? undefined,
+      pesoPorLado: s.peso_por_lado,
     })),
   }));
 }
