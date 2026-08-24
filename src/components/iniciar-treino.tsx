@@ -9,8 +9,10 @@
 import { useState } from "react";
 import { criarTreino, criarTreinoComModelo } from "@/lib/dados/treino";
 import type { Modelo } from "@/lib/dados/modelo-treino";
+import { t } from "@/lib/texto/i18n";
+import type { Idioma } from "@/lib/dados/idioma";
 
-export default function IniciarTreino({ modelos }: { modelos: Modelo[] }) {
+export default function IniciarTreino({ modelos, idioma }: { modelos: Modelo[]; idioma: Idioma }) {
   const [escolhendo, setEscolhendo] = useState(false);
 
   if (!escolhendo) {
@@ -20,7 +22,7 @@ export default function IniciarTreino({ modelos }: { modelos: Modelo[] }) {
         className="botao-primario"
         onClick={() => setEscolhendo(true)}
       >
-        Iniciar treino de hoje
+        {t("Iniciar treino de hoje", idioma)}
       </button>
     );
   }
@@ -28,7 +30,7 @@ export default function IniciarTreino({ modelos }: { modelos: Modelo[] }) {
   return (
     <section className="grupo">
       <div className="grupo__cab">
-        <h2 className="grupo__nome">Como começar?</h2>
+        <h2 className="grupo__nome">{t("Como começar?", idioma)}</h2>
       </div>
       {/* `.botao-primario`, não `.pergunta`: estes botões vivem dentro do
           card escuro `.destaque`, e o cartão claro da Análise vira uma
@@ -40,7 +42,7 @@ export default function IniciarTreino({ modelos }: { modelos: Modelo[] }) {
         <li>
           <form action={criarTreino}>
             <button type="submit" className="botao-primario">
-              Treino novo
+              {t("Treino novo", idioma)}
             </button>
           </form>
         </li>

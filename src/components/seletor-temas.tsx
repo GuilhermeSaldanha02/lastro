@@ -1,6 +1,8 @@
 "use client";
 
 import { useSyncExternalStore } from "react";
+import { t } from "@/lib/texto/i18n";
+import type { Idioma } from "@/lib/dados/idioma";
 
 interface TemaOpcao {
   id: string;
@@ -123,7 +125,7 @@ function getServerSnapshot(): string {
   return "ouro";
 }
 
-export default function SeletorTemas() {
+export default function SeletorTemas({ idioma }: { idioma: Idioma }) {
   const temaAtivo = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
 
   function selecionarTema(id: string) {
@@ -143,29 +145,29 @@ export default function SeletorTemas() {
   return (
     <div className="seletor-temas-container">
       <div className="seletor-temas-grid">
-        {TEMAS.map((t) => {
-          const estaAtivo = temaAtivo === t.id;
+        {TEMAS.map((tema) => {
+          const estaAtivo = temaAtivo === tema.id;
 
           return (
             <button
-              key={t.id}
+              key={tema.id}
               type="button"
-              onClick={() => selecionarTema(t.id)}
+              onClick={() => selecionarTema(tema.id)}
               className={`seletor-tema-card ${estaAtivo ? "seletor-tema-card--ativo" : ""}`}
             >
               {/* Amostra Visual do Tema */}
               <div
                 className="seletor-tema-card__preview"
-                style={{ background: t.fundoPreview, color: t.corTextoPreview }}
+                style={{ background: tema.fundoPreview, color: tema.corTextoPreview }}
               >
                 <div className="seletor-tema-card__preview-topo">
-                  <span className="seletor-tema-card__tag">{t.tag}</span>
+                  <span className="seletor-tema-card__tag">{t(tema.tag, idioma)}</span>
                   {estaAtivo && (
                     <span className="seletor-tema-card__badge-ativo">
                       <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="3">
                         <polyline points="20 6 9 17 4 12" />
                       </svg>
-                      Ativo
+                      {t("Ativo", idioma)}
                     </span>
                   )}
                 </div>
@@ -174,29 +176,29 @@ export default function SeletorTemas() {
                 <div
                   className="seletor-tema-card__mini-btn"
                   style={{
-                    background: t.gradienteHero,
-                    color: t.id === "branco-ouro" || t.id === "clean" ? "#0F172A" : "#07090D",
+                    background: tema.gradienteHero,
+                    color: tema.id === "branco-ouro" || tema.id === "clean" ? "#0F172A" : "#07090D",
                   }}
                 >
-                  <span className="seletor-tema-card__mini-btn-dot" style={{ background: t.acentoPreview }} />
-                  Exemplo de Botão
+                  <span className="seletor-tema-card__mini-btn-dot" style={{ background: tema.acentoPreview }} />
+                  {t("Exemplo de Botão", idioma)}
                 </div>
 
                 {/* Swatches de Cores */}
                 <div className="seletor-tema-card__swatches">
-                  <span className="seletor-tema-card__swatch" style={{ background: t.fundoPreview }} title="Fundo" />
-                  <span className="seletor-tema-card__swatch" style={{ background: t.cardPreview }} title="Superfície" />
-                  <span className="seletor-tema-card__swatch" style={{ background: t.acentoPreview }} title="Acento" />
+                  <span className="seletor-tema-card__swatch" style={{ background: tema.fundoPreview }} title={t("Fundo", idioma)} />
+                  <span className="seletor-tema-card__swatch" style={{ background: tema.cardPreview }} title={t("Superfície", idioma)} />
+                  <span className="seletor-tema-card__swatch" style={{ background: tema.acentoPreview }} title={t("Acento", idioma)} />
                 </div>
               </div>
 
               {/* Informações do Tema */}
               <div className="seletor-tema-card__info">
                 <div className="seletor-tema-card__header-info">
-                  <h3 className="seletor-tema-card__nome">{t.nome}</h3>
-                  <span className="seletor-tema-card__subtitulo">{t.subtitulo}</span>
+                  <h3 className="seletor-tema-card__nome">{t(tema.nome, idioma)}</h3>
+                  <span className="seletor-tema-card__subtitulo">{t(tema.subtitulo, idioma)}</span>
                 </div>
-                <p className="seletor-tema-card__descricao">{t.descricao}</p>
+                <p className="seletor-tema-card__descricao">{t(tema.descricao, idioma)}</p>
               </div>
             </button>
           );

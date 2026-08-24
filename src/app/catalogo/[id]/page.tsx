@@ -2,12 +2,14 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { buscarExercicio, historicoDoExercicio } from "@/lib/dados/treino";
+import { obterPerfil } from "@/lib/dados/perfil";
 import { marcarRecordesHistoricos } from "@/lib/analise/recorde-serie";
 import { formatarDataCurta } from "@/lib/tempo";
 import AbaInferior from "@/components/aba-inferior";
 import SetaNavegacao from "@/components/seta-navegacao";
 import EtiquetaRecorde from "@/components/etiqueta-recorde";
 import CabecalhoPro from "@/components/cabecalho-pro";
+import { t } from "@/lib/texto/i18n";
 
 export default async function PaginaHistoricoExercicio({
   params,
@@ -15,10 +17,12 @@ export default async function PaginaHistoricoExercicio({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const [exercicio, historico] = await Promise.all([
+  const [exercicio, historico, perfil] = await Promise.all([
     buscarExercicio(id),
     historicoDoExercicio(id),
+    obterPerfil(),
   ]);
+  const idioma = perfil?.idioma ?? "pt-BR";
 
   if (!exercicio) notFound();
 
@@ -37,6 +41,7 @@ export default async function PaginaHistoricoExercicio({
         titulo={exercicio.nome}
         destaque={exercicio.grupoMuscularNome}
         voltarHref="/catalogo"
+        idioma={idioma}
       />
 
       <div className="corpo corpo--com-nav corpo--titulo-conteudo transicao-pilula">
@@ -44,8 +49,8 @@ export default async function PaginaHistoricoExercicio({
         <div className="exercicio-hero-card">
           <div className="exercicio-hero-card__tags">
             <span className="tag-grupo">{exercicio.grupoMuscularNome.toUpperCase()}</span>
-            {exercicio.unilateral && <span className="tag-unilateral">Unilateral</span>}
-            {exercicio.pesoPorLado && <span className="tag-unilateral">Peso por lado</span>}
+            {exercicio.unilateral && <span className="tag-unilateral">{t("Unilateral", idioma)}</span>}
+            {exercicio.pesoPorLado && <span className="tag-unilateral">{t("Peso por lado", idioma)}</span>}
             {cargaMaxima > 0 && (
               <span className="disciplina-card__streak">
                 PR: {cargaMaxima} kg
@@ -59,28 +64,28 @@ export default async function PaginaHistoricoExercicio({
                 <svg viewBox="0 0 24 24" width="16" height="16" fill="var(--lastro-ouro)">
                   <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z" />
                 </svg>
-                <span>Instruções Técnicas</span>
+                <span>{t("Instruções Técnicas", idioma)}</span>
               </div>
               <p>{exercicio.dicaExecucao}</p>
             </div>
           ) : (
             <p className="exercicio-hero-card__sem-dica">
-              Dica técnica de execução ainda não cadastrada.
+              {t("Dica técnica de execução ainda não cadastrada.", idioma)}
             </p>
           )}
         </div>
 
         {/* Histórico de Séries Executadas */}
         <div className="secao-header">
-          <h2 className="secao-header__titulo">Histórico de Séries</h2>
+          <h2 className="secao-header__titulo">{t("Histórico de Séries", idioma)}</h2>
           <span className="secao-header__subtitulo">
-            {historico.length} {historico.length === 1 ? "registro" : "registros"}
+            {historico.length} {t(historico.length === 1 ? "registro" : "registros", idioma)}
           </span>
         </div>
 
         {historico.length === 0 ? (
           <p className="vazio">
-            Nenhuma série valendo registrada ainda para {exercicio.nome}.
+            {t("Nenhuma série valendo registrada ainda para", idioma)} {exercicio.nome}.
           </p>
         ) : (
           <div className="feed-treinos">
@@ -94,7 +99,7 @@ export default async function PaginaHistoricoExercicio({
                   <span className="cartao-treino-item__data">
                     {formatarDataCurta(serie.dataTreino)}
                   </span>
-                  {marcas[indice] && <EtiquetaRecorde />}
+                  {marcas[indice] && <EtiquetaRecorde idioma={idioma} />}
                 </div>
 
                 <div className="cartao-treino-item__direita">
@@ -111,7 +116,7 @@ export default async function PaginaHistoricoExercicio({
         )}
       </div>
 
-      <AbaInferior ativa="catalogo" />
+      <AbaInferior ativa="catalogo" idioma={idioma} />
     </main>
   );
 }

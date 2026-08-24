@@ -4,17 +4,20 @@
 // mesmo arquivo quebraria o teste) e importada tanto pelo componente
 // cliente (feedback imediato) quanto pela ação de servidor (defesa contra
 // cliente adulterado).
+import { t } from "@/lib/texto/i18n";
+import type { Idioma } from "@/lib/dados/idioma";
+
 const TIPOS_ACEITOS = new Set(["image/jpeg", "image/png"]);
 const TAMANHO_MAXIMO_BYTES = 5 * 1024 * 1024; // 5 MB
 
 export type ValidacaoAvatar = { ok: true } | { ok: false; erro: string };
 
-export function validarArquivoAvatar(arquivo: File): ValidacaoAvatar {
+export function validarArquivoAvatar(arquivo: File, idioma: Idioma = "pt-BR"): ValidacaoAvatar {
   if (!TIPOS_ACEITOS.has(arquivo.type)) {
-    return { ok: false, erro: "Envie uma foto em JPEG ou PNG." };
+    return { ok: false, erro: t("Envie uma foto em JPEG ou PNG.", idioma) };
   }
   if (arquivo.size > TAMANHO_MAXIMO_BYTES) {
-    return { ok: false, erro: "A foto precisa ter até 5 MB." };
+    return { ok: false, erro: t("A foto precisa ter até 5 MB.", idioma) };
   }
   return { ok: true };
 }

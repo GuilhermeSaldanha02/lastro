@@ -27,6 +27,8 @@ import FormularioSerie, { type DadosNovaSerie } from "./formulario-serie";
 import EditarSerie, { type DadosEdicaoSerie } from "./editar-serie";
 import SeletorGrupoMuscular, { type OpcaoGrupo } from "./seletor-grupo-muscular";
 import EtiquetaRecorde from "./etiqueta-recorde";
+import { t } from "@/lib/texto/i18n";
+import type { Idioma } from "@/lib/dados/idioma";
 
 /**
  * `ehRecordePessoal` é só de tela (C4) — nunca persiste no banco, nunca
@@ -90,6 +92,7 @@ export default function TreinoDetalhe({
   seriesIniciais,
   exercicios,
   exerciciosPreSelecionados,
+  idioma,
 }: {
   treinoId: string;
   seriesIniciais: Serie[];
@@ -99,6 +102,7 @@ export default function TreinoDetalhe({
    * isso (só cria grupo a partir de série existente), por isso é uma prop
    * separada, renderizada ao lado, nunca dentro dela. */
   exerciciosPreSelecionados?: { exercicioId: string; nome: string }[];
+  idioma: Idioma;
 }) {
   const [series, setSeries] = useState<SerieUI[]>(seriesIniciais);
   const [formularioAberto, setFormularioAberto] = useState(false);
@@ -129,8 +133,8 @@ export default function TreinoDetalhe({
     for (const e of exercicios) porId.set(e.grupoMuscularPrimario, e.grupoMuscularNome);
     return Array.from(porId.entries())
       .map(([id, nome]) => ({ id, nome }))
-      .sort((a, b) => a.nome.localeCompare(b.nome, "pt-BR"));
-  }, [exercicios]);
+      .sort((a, b) => a.nome.localeCompare(b.nome, idioma));
+  }, [exercicios, idioma]);
 
   const exerciciosFiltrados = useMemo(
     () => exercicios.filter((e) => gruposEscolhidos.includes(e.grupoMuscularPrimario)),
@@ -303,9 +307,9 @@ export default function TreinoDetalhe({
       <div className="corpo corpo--com-nav corpo--titulo-conteudo">
         {series.length > 0 && (
           <div className="grupo__cab">
-            <h2 className="grupo__nome">Séries</h2>
+            <h2 className="grupo__nome">{t("Séries", idioma)}</h2>
             <button type="button" className="botao-textual" onClick={alternarModoEdicao}>
-              {modoEdicao ? "Concluído" : "Editar"}
+              {t(modoEdicao ? "Concluído" : "Editar", idioma)}
             </button>
           </div>
         )}
@@ -317,14 +321,14 @@ export default function TreinoDetalhe({
           <section className="grupo" key={exercicio.exercicioId}>
             <div className="grupo__cab">
               <h2 className="grupo__nome">{exercicio.nome}</h2>
-              <span className="grupo__cont">0 valendo</span>
+              <span className="grupo__cont">0 {t("valendo", idioma)}</span>
             </div>
           </section>
         ))}
 
         {series.length === 0 && pendentesDoModelo.length === 0 ? (
           <p className="vazio">
-            Nenhuma série registrada ainda. Comece pela primeira aqui embaixo.
+            {t("Nenhuma série registrada ainda. Comece pela primeira aqui embaixo.", idioma)}
           </p>
         ) : (
           grupos.map((grupo) => {
@@ -337,11 +341,11 @@ export default function TreinoDetalhe({
                       {grupo.nome}
                     </h2>
                     <span style={{ fontSize: "var(--lastro-papel-rotulo)", color: "var(--lastro-txt-3)" }}>
-                      {valendo} {valendo === 1 ? "série valendo" : "séries valendo"}
+                      {valendo} {t(valendo === 1 ? "série valendo" : "séries valendo", idioma)}
                     </span>
                   </div>
                   {grupo.series.length > 0 && grupo.series[0].exercicioNome && (
-                    <span className="tag-grupo">EXERCÍCIO</span>
+                    <span className="tag-grupo">{t("EXERCÍCIO", idioma)}</span>
                   )}
                 </div>
 
@@ -354,6 +358,7 @@ export default function TreinoDetalhe({
                           serie={serie}
                           onSalvar={(dados) => editarSerie(serie.id, dados)}
                           onCancelar={() => setEditandoId(null)}
+                          idioma={idioma}
                         />
                       );
                     }
@@ -362,8 +367,8 @@ export default function TreinoDetalhe({
                       return (
                         <div className="confirma" key={serie.id}>
                           <p className="confirma__texto">
-                            Excluir a série {indice + 1} de {grupo.nome} —{" "}
-                            {serie.reps} × {serie.peso} kg? Não dá para desfazer.
+                            {t("Excluir a série", idioma)} {indice + 1} {t("de", idioma)} {grupo.nome} —{" "}
+                            {serie.reps} × {serie.peso} kg? {t("Não dá para desfazer.", idioma)}
                           </p>
                           <div className="confirma__acoes">
                             <button
@@ -371,14 +376,14 @@ export default function TreinoDetalhe({
                               className="botao-secundario"
                               onClick={() => setExcluindoId(null)}
                             >
-                              Cancelar
+                              {t("Cancelar", idioma)}
                             </button>
                             <button
                               type="button"
                               className="botao-destrutivo"
                               onClick={() => void excluirSerie(serie.id)}
                             >
-                              Excluir
+                              {t("Excluir", idioma)}
                             </button>
                           </div>
                         </div>
@@ -408,19 +413,19 @@ export default function TreinoDetalhe({
                         </div>
                         <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
                           {serie.tipo === "aquecimento" && (
-                            <span className="chip-serie chip-serie--aquecimento">aquecimento</span>
+                            <span className="chip-serie chip-serie--aquecimento">{t("aquecimento", idioma)}</span>
                           )}
                           {serie.tipo === "valendo" && !serie.ehRecordePessoal && (
-                            <span className="chip-serie chip-serie--valendo">valendo</span>
+                            <span className="chip-serie chip-serie--valendo">{t("valendo", idioma)}</span>
                           )}
                           {serie.ehRecordePessoal && (
-                            <span className="chip-serie chip-serie--pr">recorde pessoal</span>
+                            <span className="chip-serie chip-serie--pr">{t("recorde pessoal", idioma)}</span>
                           )}
                           {modoEdicao && (
                             <button
                               type="button"
                               className="botao-icone"
-                              aria-label={`Excluir série ${indice + 1} de ${grupo.nome}`}
+                              aria-label={`${t("Excluir série", idioma)} ${indice + 1} ${t("de", idioma)} ${grupo.nome}`}
                               onClick={(e) => {
                                 e.stopPropagation();
                                 setExcluindoId(serie.id);
@@ -452,16 +457,16 @@ export default function TreinoDetalhe({
         )}
 
         {formularioAberto && gruposEscolhidos.length === 0 && (
-          <SeletorGrupoMuscular opcoes={opcoesGrupo} onConfirmar={setGruposEscolhidos} />
+          <SeletorGrupoMuscular opcoes={opcoesGrupo} onConfirmar={setGruposEscolhidos} idioma={idioma} />
         )}
 
         {formularioAberto && gruposEscolhidos.length > 0 && (
           <section className="card-obsidian" style={{ marginBottom: "var(--lastro-e-4)" }}>
             <div className="card-obsidian__header">
               <div>
-                <span className="card-obsidian__titulo">Registrar Série</span>
+                <span className="card-obsidian__titulo">{t("Registrar Série", idioma)}</span>
                 <p style={{ fontSize: "var(--lastro-papel-rotulo)", color: "var(--lastro-txt-3)", margin: 0 }}>
-                  Preencha a carga e repetições executadas
+                  {t("Preencha a carga e repetições executadas", idioma)}
                 </p>
               </div>
               <button
@@ -469,12 +474,13 @@ export default function TreinoDetalhe({
                 className="botao-textual"
                 onClick={() => setGruposEscolhidos([])}
               >
-                Trocar grupo
+                {t("Trocar grupo", idioma)}
               </button>
             </div>
             <FormularioSerie
               exercicios={exerciciosFiltrados}
               onRegistrar={registrarPeloFormulario}
+              idioma={idioma}
             />
           </section>
         )}
@@ -488,9 +494,9 @@ export default function TreinoDetalhe({
             className="botao-primario"
             onClick={repetirUltimaSerie}
           >
-            Repetir última série
+            {t("Repetir última série", idioma)}
             <span className="botao-primario__estado">
-              {ultima.reps} × {ultima.peso} kg · {ultima.tipo}
+              {ultima.reps} × {ultima.peso} kg · {t(ultima.tipo, idioma)}
             </span>
           </button>
         )}
@@ -503,7 +509,7 @@ export default function TreinoDetalhe({
           aria-expanded={formularioAberto}
           onClick={() => setFormularioAberto((aberto) => !aberto)}
         >
-          {formularioAberto ? "Fechar" : series.length === 0 ? "Adicionar exercício" : "Outra série"}
+          {t(formularioAberto ? "Fechar" : series.length === 0 ? "Adicionar exercício" : "Outra série", idioma)}
         </button>
 
         {/* D7 — estado de sincronização sempre visível, nunca alarmante.
@@ -512,7 +518,7 @@ export default function TreinoDetalhe({
         <div className="sync--area">
           <p className="sync">
             <span className="sync__ponto" />
-            {sincronizado ? "sincronizado" : "salvo no aparelho"}
+            {t(sincronizado ? "sincronizado" : "salvo no aparelho", idioma)}
           </p>
         </div>
       </div>

@@ -25,6 +25,7 @@ import { MINIMO_SEMANAS_PARECER } from "@/lib/analise/limiares";
 import type { Idioma } from "@/lib/dados/idioma";
 import Parecer from "@/components/parecer";
 import GraficoProgressao from "@/components/grafico-progressao";
+import { t } from "@/lib/texto/i18n";
 
 type Resultado = {
   parecer: string;
@@ -64,9 +65,9 @@ export default function AnaliseInterativa({
 
       if (!resposta.ok) {
         if (resposta.status === 401) {
-          setErro("Sessão expirada. Faça login novamente.");
+          setErro(t("Sessão expirada. Faça login novamente.", idioma));
         } else {
-          setErro(`Falha ao gerar o parecer (erro ${resposta.status}).`);
+          setErro(`${t("Falha ao gerar o parecer (erro", idioma)} ${resposta.status}).`);
         }
         return;
       }
@@ -74,7 +75,7 @@ export default function AnaliseInterativa({
       const dados = (await resposta.json()) as Resultado;
       setResultado(dados);
     } catch {
-      setErro("Falha de rede ao gerar o parecer. Tente novamente.");
+      setErro(t("Falha de rede ao gerar o parecer. Tente novamente.", idioma));
     } finally {
       setCarregando(null);
     }
@@ -105,9 +106,10 @@ export default function AnaliseInterativa({
       <GraficoProgressao
         onStatus={(temPainel) => setGraficoTemPainel(temPainel)}
         ocultarQuandoVazio={!dadosSuficientes}
+        idioma={idioma}
       />
 
-      <h2 className="doc__secao">Análise semanal</h2>
+      <h2 className="doc__secao">{t("Análise semanal", idioma)}</h2>
 
       {!dadosSuficientes && (
         // Estado "sem dados suficientes" (DESIGN.md §3.6.5): diz o que
@@ -121,14 +123,12 @@ export default function AnaliseInterativa({
         <p className="vazio" aria-live="polite">
           {graficoTemPainel === false && (
             <>
-              Ainda não há pelo menos 2 semanas do mesmo exercício pra desenhar
-              progressão.{" "}
+              {t("Ainda não há pelo menos 2 semanas do mesmo exercício pra desenhar progressão.", idioma)}{" "}
             </>
           )}
-          Você tem {semanasFechadasComTreino}{" "}
-          {semanasFechadasComTreino === 1 ? "semana fechada" : "semanas fechadas"}.
-          São necessárias {MINIMO_SEMANAS_PARECER} para calcular a análise
-          semanal.
+          {t("Você tem", idioma)} {semanasFechadasComTreino}{" "}
+          {t(semanasFechadasComTreino === 1 ? "semana fechada" : "semanas fechadas", idioma)}.{" "}
+          {t("São necessárias", idioma)} {MINIMO_SEMANAS_PARECER} {t("para calcular a análise semanal.", idioma)}
         </p>
       )}
 
@@ -143,7 +143,7 @@ export default function AnaliseInterativa({
         aria-disabled={inativo}
         onClick={() => perguntarSeAtivo(PERGUNTA_PRIMARIA)}
       >
-        Solicitar Análise
+        {t("Solicitar Análise", idioma)}
       </button>
 
       <ul className="perguntas">
@@ -179,10 +179,10 @@ export default function AnaliseInterativa({
       {carregando !== null && (
         <section className="doc" aria-live="polite">
           <header className="doc__emissao">
-            <p className="doc__selo">Parecer em emissão</p>
+            <p className="doc__selo">{t("Parecer em emissão", idioma)}</p>
             <h2 className="doc__pergunta">{PERGUNTAS[carregando]}</h2>
           </header>
-          <p className="doc__secao">escrevendo a leitura</p>
+          <p className="doc__secao">{t("escrevendo a leitura", idioma)}</p>
           <div className="esqueleto" />
           <div className="esqueleto" />
           <div className="esqueleto esqueleto--curto" />
@@ -203,6 +203,7 @@ export default function AnaliseInterativa({
           texto={resultado.parecer}
           avisoFalhaInterpretativa={resultado.avisoFalhaInterpretativa}
           evidencia={resultado.evidencia}
+          idioma={idioma}
         />
       )}
     </div>

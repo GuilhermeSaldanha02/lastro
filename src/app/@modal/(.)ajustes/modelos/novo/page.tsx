@@ -11,15 +11,18 @@
 // "Trocar grupo" que já existia antes desta conversão. O HIG proíbe
 // apresentar OUTRA rota/nível de navegação dentro da folha, não isso.
 import { listarCatalogo } from "@/lib/dados/treino";
+import { obterPerfil } from "@/lib/dados/perfil";
 import ModeloTreinoForm from "@/components/modelo-treino-form";
 import Folha from "@/components/folha";
+import { t } from "@/lib/texto/i18n";
 
 export default async function NovoModeloInterceptado() {
-  const exercicios = await listarCatalogo();
+  const [exercicios, perfil] = await Promise.all([listarCatalogo(), obterPerfil()]);
+  const idioma = perfil?.idioma ?? "pt-BR";
 
   return (
-    <Folha titulo="Novo modelo">
-      <ModeloTreinoForm exercicios={exercicios} naFolha />
+    <Folha titulo={t("Novo modelo", idioma)} idioma={idioma}>
+      <ModeloTreinoForm exercicios={exercicios} naFolha idioma={idioma} />
     </Folha>
   );
 }

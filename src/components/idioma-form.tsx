@@ -8,6 +8,7 @@
 // aqui (não há estado "sem idioma" pra representar no formulário).
 import { useState } from "react";
 import { definirIdioma, type Idioma } from "@/lib/dados/idioma";
+import { t } from "@/lib/texto/i18n";
 
 const OPCOES: { valor: Idioma; rotulo: string }[] = [
   { valor: "pt-BR", rotulo: "Português" },
@@ -34,12 +35,12 @@ export default function IdiomaForm({ idiomaInicial }: { idiomaInicial: Idioma })
 
   return (
     <section className="card-obsidian">
-      <span className="card-obsidian__titulo">Idioma</span>
+      <span className="card-obsidian__titulo">{t("Idioma", idioma)}</span>
       <p className="campo__nota">
-        Catálogo de exercícios e textos do app neste idioma.
+        {t("Catálogo de exercícios e textos do app neste idioma.", idioma)}
       </p>
 
-      <div className="segmentado" role="radiogroup" aria-label="Idioma">
+      <div className="segmentado" role="radiogroup" aria-label={t("Idioma", idioma)}>
         {OPCOES.map((opcao) => (
           <button
             key={opcao.valor}
@@ -63,7 +64,7 @@ export default function IdiomaForm({ idiomaInicial }: { idiomaInicial: Idioma })
 
       {salvo && !erro && (
         <p className="campo__nota" aria-live="polite">
-          Idioma salvo.
+          {t("Idioma salvo.", idioma)}
         </p>
       )}
     </section>

@@ -7,10 +7,20 @@
 // sem lógica própria — é o próprio mecanismo de rota fazendo o trabalho.
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState, type ReactNode } from "react";
+import { t } from "@/lib/texto/i18n";
+import type { Idioma } from "@/lib/dados/idioma";
 
 const LIMIAR_ARRASTE_PX = 96;
 
-export default function Folha({ titulo, children }: { titulo: string; children: ReactNode }) {
+export default function Folha({
+  titulo,
+  children,
+  idioma = "pt-BR",
+}: {
+  titulo: string;
+  children: ReactNode;
+  idioma?: Idioma;
+}) {
   const router = useRouter();
   const arraste = useRef<{ inicioY: number; atual: number } | null>(null);
   const [deslocamento, setDeslocamento] = useState(0);
@@ -82,7 +92,7 @@ export default function Folha({ titulo, children }: { titulo: string; children: 
           <button
             type="button"
             className="botao-icone"
-            aria-label={`Fechar ${titulo}`}
+            aria-label={`${t("Fechar", idioma)} ${titulo}`}
             onClick={fechar}
           >
             <svg

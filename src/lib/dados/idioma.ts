@@ -7,6 +7,7 @@
 
 import { revalidatePath } from "next/cache";
 import { criarClienteServidor } from "@/lib/supabase/cliente-servidor";
+import { t } from "@/lib/texto/i18n";
 
 export type Idioma = "pt-BR" | "en" | "es";
 
@@ -50,14 +51,16 @@ export async function definirIdioma(idioma: Idioma): Promise<ResultadoDefinirIdi
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) return { ok: false, erro: "Sessão ausente — entre de novo." };
+  // Erro traduzido no idioma que a pessoa ACABOU DE ESCOLHER na tela
+  // (não o idioma antigo salvo) — é a língua que ela está lendo agora.
+  if (!user) return { ok: false, erro: t("Sessão ausente — entre de novo.", idioma) };
 
   const { error } = await supabase
     .from("usuario")
     .update({ idioma })
     .eq("id", user.id);
 
-  if (error) return { ok: false, erro: "Não foi possível salvar. Tente de novo." };
+  if (error) return { ok: false, erro: t("Não foi possível salvar. Tente de novo.", idioma) };
 
   // "layout" porque o idioma afeta praticamente toda tela — catálogo,
   // formulário de série, histórico, home — não só /ajustes.

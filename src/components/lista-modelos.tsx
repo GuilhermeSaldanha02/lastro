@@ -18,38 +18,42 @@
 // à mão.
 import { useState } from "react";
 import ExcluirModelo from "@/components/excluir-modelo";
+import { t } from "@/lib/texto/i18n";
+import type { Idioma } from "@/lib/dados/idioma";
 
 export default function ListaModelos({
   modelos,
+  idioma,
 }: {
   modelos: { id: string; nome: string }[];
+  idioma: Idioma;
 }) {
   const [modoEdicao, setModoEdicao] = useState(false);
 
   return (
     <>
       <div className="grupo__cab">
-        <h2 className="grupo__nome">Modelos</h2>
+        <h2 className="grupo__nome">{t("Modelos", idioma)}</h2>
         {modelos.length > 0 && (
           <button
             type="button"
             className="botao-textual"
             onClick={() => setModoEdicao((atual) => !atual)}
           >
-            {modoEdicao ? "Concluído" : "Editar"}
+            {t(modoEdicao ? "Concluído" : "Editar", idioma)}
           </button>
         )}
       </div>
 
       {modelos.length === 0 ? (
-        <p className="vazio">Nenhum modelo criado ainda.</p>
+        <p className="vazio">{t("Nenhum modelo criado ainda.", idioma)}</p>
       ) : (
         <ul className="lista">
           {modelos.map((modelo) => (
             <li key={modelo.id}>
               <div className="item">
                 <span className="item__estatico item__data">{modelo.nome}</span>
-                {modoEdicao && <ExcluirModelo id={modelo.id} nome={modelo.nome} />}
+                {modoEdicao && <ExcluirModelo id={modelo.id} nome={modelo.nome} idioma={idioma} />}
               </div>
             </li>
           ))}

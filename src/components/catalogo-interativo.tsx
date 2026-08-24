@@ -4,13 +4,17 @@ import { useState, useMemo } from "react";
 import Link from "next/link";
 import type { ExercicioDoCatalogo } from "@/lib/dados/treino";
 import SetaNavegacao from "@/components/seta-navegacao";
+import { t } from "@/lib/texto/i18n";
+import type { Idioma } from "@/lib/dados/idioma";
 
 export default function CatalogoInterativo({
   exercicios,
   semDicaCount,
+  idioma,
 }: {
   exercicios: ExercicioDoCatalogo[];
   semDicaCount: number;
+  idioma: Idioma;
 }) {
   const [busca, setBusca] = useState("");
   const [grupoSelecionado, setGrupoSelecionado] = useState<string>("todos");
@@ -22,9 +26,9 @@ export default function CatalogoInterativo({
       map.set(ex.grupoMuscularPrimario, ex.grupoMuscularNome);
     }
     return Array.from(map.entries()).map(([id, nome]) => ({ id, nome })).sort((a, b) =>
-      a.nome.localeCompare(b.nome, "pt-BR"),
+      a.nome.localeCompare(b.nome, idioma),
     );
-  }, [exercicios]);
+  }, [exercicios, idioma]);
 
   // Filtragem combinada por busca e grupo
   const exerciciosFiltrados = useMemo(() => {
@@ -53,8 +57,8 @@ export default function CatalogoInterativo({
       }
       mapa.get(ex.grupoMuscularPrimario)!.itens.push(ex);
     }
-    return Array.from(mapa.values()).sort((a, b) => a.nome.localeCompare(b.nome, "pt-BR"));
-  }, [exerciciosFiltrados]);
+    return Array.from(mapa.values()).sort((a, b) => a.nome.localeCompare(b.nome, idioma));
+  }, [exerciciosFiltrados, idioma]);
 
   return (
     <div className="catalogo-wrapper">
@@ -66,7 +70,7 @@ export default function CatalogoInterativo({
         </svg>
         <input
           type="text"
-          placeholder="Buscar exercício ou músculo…"
+          placeholder={t("Buscar exercício ou músculo…", idioma)}
           value={busca}
           onChange={(e) => setBusca(e.target.value)}
           className="busca-box__input"
@@ -76,7 +80,7 @@ export default function CatalogoInterativo({
             type="button"
             className="busca-box__limpar"
             onClick={() => setBusca("")}
-            aria-label="Limpar busca"
+            aria-label={t("Limpar busca", idioma)}
           >
             ✕
           </button>
@@ -84,13 +88,13 @@ export default function CatalogoInterativo({
       </div>
 
       {/* Carrossel de Filtro por Grupo Muscular */}
-      <div className="chips-carrossel" role="tablist" aria-label="Grupos musculares">
+      <div className="chips-carrossel" role="tablist" aria-label={t("Grupos musculares", idioma)}>
         <button
           type="button"
           className={`chip-filtro${grupoSelecionado === "todos" ? " chip-filtro--ativo" : ""}`}
           onClick={() => setGrupoSelecionado("todos")}
         >
-          Todos ({exercicios.length})
+          {t("Todos", idioma)} ({exercicios.length})
         </button>
         {grupos.map((g) => (
           <button
@@ -106,22 +110,22 @@ export default function CatalogoInterativo({
 
       {semDicaCount > 0 && !busca && (
         <div className="nota-metodo">
-          <span className="nota-metodo__badge">Curadoria</span>
+          <span className="nota-metodo__badge">{t("Curadoria", idioma)}</span>
           <p>
-            {semDicaCount} exercícios estão aguardando curadoria de execução. Dicas técnicas são revisadas por humanos (ADR-007).
+            {semDicaCount} {t("exercícios estão aguardando curadoria de execução. Dicas técnicas são revisadas por humanos (ADR-007).", idioma)}
           </p>
         </div>
       )}
 
       {exerciciosFiltrados.length === 0 ? (
-        <p className="vazio">Nenhum exercício encontrado para &ldquo;{busca}&rdquo;.</p>
+        <p className="vazio">{t("Nenhum exercício encontrado para", idioma)} &ldquo;{busca}&rdquo;.</p>
       ) : (
         <div className="catalogo-lista">
           {gruposExibicao.map((grupo) => (
             <section className="grupo-catalogo" key={grupo.id}>
               <div className="grupo__cab">
                 <h2 className="grupo__nome">{grupo.nome}</h2>
-                <span className="tag-grupo">{grupo.itens.length} {grupo.itens.length === 1 ? "exercício" : "exercícios"}</span>
+                <span className="tag-grupo">{grupo.itens.length} {t(grupo.itens.length === 1 ? "exercício" : "exercícios", idioma)}</span>
               </div>
 
               <div className="grupo-catalogo__itens">
@@ -135,17 +139,17 @@ export default function CatalogoInterativo({
                       <div className="cartao-exercicio-pro__topo">
                         <h3 className="cartao-exercicio-pro__nome">{exercicio.nome}</h3>
                         {exercicio.unilateral && (
-                          <span className="tag-unilateral">Unilateral</span>
+                          <span className="tag-unilateral">{t("Unilateral", idioma)}</span>
                         )}
                         {exercicio.pesoPorLado && (
-                          <span className="tag-unilateral">Peso por lado</span>
+                          <span className="tag-unilateral">{t("Peso por lado", idioma)}</span>
                         )}
                       </div>
 
                       {exercicio.dicaExecucao ? (
                         <p className="cartao-exercicio-pro__dica">{exercicio.dicaExecucao}</p>
                       ) : (
-                        <p className="cartao-exercicio-pro__sem-dica">Sem dica registrada</p>
+                        <p className="cartao-exercicio-pro__sem-dica">{t("Sem dica registrada", idioma)}</p>
                       )}
                     </div>
                     <SetaNavegacao />
@@ -158,7 +162,7 @@ export default function CatalogoInterativo({
       )}
 
       <p className="aviso-saude">
-        As instruções deste catálogo não substituem orientação médica ou fisioterapêutica.
+        {t("As instruções deste catálogo não substituem orientação médica ou fisioterapêutica.", idioma)}
       </p>
     </div>
   );

@@ -19,6 +19,8 @@ import { useEffect, useRef, useState, type FormEvent } from "react";
 import type { Exercicio, SerieHistorica } from "@/lib/dados/treino";
 import { historicoDoExercicio } from "@/lib/dados/treino";
 import { ehRecorde } from "@/lib/analise/recorde-serie";
+import { t } from "@/lib/texto/i18n";
+import type { Idioma } from "@/lib/dados/idioma";
 
 export type DadosNovaSerie = {
   exercicioId: string;
@@ -36,9 +38,11 @@ export type DadosNovaSerie = {
 export default function FormularioSerie({
   exercicios,
   onRegistrar,
+  idioma,
 }: {
   exercicios: Exercicio[];
   onRegistrar: (dados: DadosNovaSerie) => void | Promise<void>;
+  idioma: Idioma;
 }) {
   // Começa em branco de propósito — a pessoa escolhe o exercício e o tipo,
   // nenhum dos dois vem pré-marcado. Com o catálogo crescendo, pré-marcar
@@ -109,19 +113,19 @@ export default function FormularioSerie({
     const rirBruto = formData.get("rir");
 
     if (!exercicioId) {
-      setErro("Exercício é obrigatório.");
+      setErro(t("Exercício é obrigatório.", idioma));
       return;
     }
     if (tipo === "") {
-      setErro("Escolha o tipo: aquecimento ou valendo.");
+      setErro(t("Escolha o tipo: aquecimento ou valendo.", idioma));
       return;
     }
     if (!Number.isFinite(reps) || reps <= 0) {
-      setErro("Reps precisa ser um número positivo.");
+      setErro(t("Reps precisa ser um número positivo.", idioma));
       return;
     }
     if (!Number.isFinite(peso) || peso < 0) {
-      setErro("Peso precisa ser um número válido.");
+      setErro(t("Peso precisa ser um número válido.", idioma));
       return;
     }
 
@@ -132,7 +136,7 @@ export default function FormularioSerie({
     if (tipo === "valendo" && rirBruto !== null && rirBruto !== "") {
       const rirNumero = Number(rirBruto);
       if (!Number.isFinite(rirNumero)) {
-        setErro("RIR precisa ser um número válido.");
+        setErro(t("RIR precisa ser um número válido.", idioma));
         return;
       }
       rir = rirNumero;
@@ -165,7 +169,7 @@ export default function FormularioSerie({
     <form className="formulario" onSubmit={aoEnviar} noValidate style={{ display: "flex", flexDirection: "column", gap: "var(--lastro-e-3)" }}>
       <div className="campo">
         <label className="campo__rotulo" htmlFor="exercicio_id">
-          Exercício
+          {t("Exercício", idioma)}
         </label>
         <select
           id="exercicio_id"
@@ -175,7 +179,7 @@ export default function FormularioSerie({
           required
         >
           <option value="" disabled>
-            Selecione o exercício
+            {t("Selecione o exercício", idioma)}
           </option>
           {exercicios.map((exercicio) => (
             <option key={exercicio.id} value={exercicio.id}>
@@ -187,24 +191,24 @@ export default function FormularioSerie({
 
       {exercicioSelecionado?.unilateral && (
         <span className="tag-unilateral" style={{ alignSelf: "flex-start" }}>
-          Unilateral · reps contam por lado
+          {t("Unilateral · reps contam por lado", idioma)}
         </span>
       )}
 
       {ultimaDoHistorico && (
         <div style={{ background: "var(--lastro-sup-2)", border: "1px solid var(--lastro-linha)", borderRadius: "var(--lastro-raio-2)", padding: "10px 14px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
           <p style={{ fontSize: "var(--lastro-papel-rotulo)", color: "var(--lastro-txt-2)", margin: 0 }}>
-            Última vez: <strong style={{ color: "var(--lastro-ouro)", fontFamily: "var(--lastro-fonte-num)" }}>{ultimaDoHistorico.reps} × {ultimaDoHistorico.peso} kg</strong>
+            {t("Última vez:", idioma)} <strong style={{ color: "var(--lastro-ouro)", fontFamily: "var(--lastro-fonte-num)" }}>{ultimaDoHistorico.reps} × {ultimaDoHistorico.peso} kg</strong>
           </p>
           <button type="button" className="botao-textual" onClick={usarUltimosValores} style={{ color: "var(--lastro-ouro)", fontWeight: "bold" }}>
-            Usar valores
+            {t("Usar valores", idioma)}
           </button>
         </div>
       )}
 
       <div className="campo">
         <label className="campo__rotulo" htmlFor="tipo">
-          Tipo de Série
+          {t("Tipo de Série", idioma)}
         </label>
         <select
           id="tipo"
@@ -214,17 +218,17 @@ export default function FormularioSerie({
           required
         >
           <option value="" disabled>
-            Selecione o tipo
+            {t("Selecione o tipo", idioma)}
           </option>
-          <option value="valendo">Valendo</option>
-          <option value="aquecimento">Aquecimento</option>
+          <option value="valendo">{t("Valendo", idioma)}</option>
+          <option value="aquecimento">{t("Aquecimento", idioma)}</option>
         </select>
       </div>
 
       <div className="dupla">
         <div className="campo">
           <label className="campo__rotulo" htmlFor="reps">
-            Reps
+            {t("Reps", idioma)}
           </label>
           <input
             ref={repsRef}
@@ -241,7 +245,7 @@ export default function FormularioSerie({
 
         <div className="campo">
           <label className="campo__rotulo" htmlFor="peso">
-            Peso (kg)
+            {t("Peso (kg)", idioma)}
           </label>
           <input
             ref={pesoRef}
@@ -261,9 +265,9 @@ export default function FormularioSerie({
       {tipo === "valendo" && (
         <div className="campo">
           <label className="campo__rotulo" htmlFor="rir">
-            RIR (Repetições na Reserva — Opcional)
+            {t("RIR (Repetições na Reserva — Opcional)", idioma)}
           </label>
-          <input id="rir" name="rir" type="number" inputMode="numeric" placeholder="Ex: 2" min={0} max={10} />
+          <input id="rir" name="rir" type="number" inputMode="numeric" placeholder={t("Ex: 2", idioma)} min={0} max={10} />
         </div>
       )}
 
@@ -278,7 +282,7 @@ export default function FormularioSerie({
         <span className="interruptor__trilho">
           <span className="interruptor__bolinha" />
         </span>
-        Peso é de cada lado (ex.: um halter em cada mão)
+        {t("Peso é de cada lado (ex.: um halter em cada mão)", idioma)}
       </label>
 
       {erro && (
@@ -288,7 +292,7 @@ export default function FormularioSerie({
       )}
 
       <button type="submit" className="botao-primario" style={{ marginTop: "var(--lastro-e-2)" }}>
-        Registrar série
+        {t("Registrar série", idioma)}
       </button>
     </form>
   );

@@ -5,16 +5,18 @@
 import { obterPerfil } from "@/lib/dados/perfil";
 import EditarPerfil from "@/components/editar-perfil";
 import Folha from "@/components/folha";
+import { t } from "@/lib/texto/i18n";
 
 export default async function PerfilInterceptado() {
   const perfil = await obterPerfil();
+  const idioma = perfil?.idioma ?? "pt-BR";
 
   return (
-    <Folha titulo="Perfil">
+    <Folha titulo={t("Perfil", idioma)} idioma={idioma}>
       {perfil ? (
-        <EditarPerfil nome={perfil.nome} avatarUrlInicial={perfil.avatarUrl} />
+        <EditarPerfil nome={perfil.nome} avatarUrlInicial={perfil.avatarUrl} idioma={idioma} />
       ) : (
-        <p className="vazio">Entre para editar seu perfil.</p>
+        <p className="vazio">{t("Entre para editar seu perfil.", idioma)}</p>
       )}
     </Folha>
   );

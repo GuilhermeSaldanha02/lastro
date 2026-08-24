@@ -16,6 +16,8 @@ import {
   XAxis,
 } from "recharts";
 import type { PainelProgressao } from "@/lib/dados/progressao";
+import { t } from "@/lib/texto/i18n";
+import type { Idioma } from "@/lib/dados/idioma";
 
 type PontoGrafico = {
   semanaInicio: string;
@@ -28,12 +30,24 @@ function formatarSemana(semanaInicioISO: string): string {
   return `${dia}/${mes}`;
 }
 
-function formatarKg(valor: number): string {
-  return `${valor.toFixed(1)} kg`;
+/** Ponto decimal em inglês, vírgula em pt-BR/es — mesma convenção do validador da Gemini. */
+function formatarKg(valor: number, idioma: Idioma): string {
+  const texto = idioma === "en" ? valor.toFixed(1) : valor.toFixed(1).replace(".", ",");
+  return `${texto} kg`;
+}
+
+function formatarPct(valor: number, idioma: Idioma): string {
+  const texto = idioma === "en" ? valor.toFixed(1) : valor.toFixed(1).replace(".", ",");
+  return `${texto}%`;
 }
 
 /** Ponto interativo: alvo de toque/foco de --lastro-alvo-min mesmo com marcador pequeno (§3.7.4 item 5). */
-function pontoInterativo(cor: string, ativo: boolean, aoAtivar: (indice: number | null) => void) {
+function pontoInterativo(
+  cor: string,
+  ativo: boolean,
+  aoAtivar: (indice: number | null) => void,
+  idioma: Idioma,
+) {
   return function PontoInterativo(props: {
     cx?: number;
     cy?: number;
@@ -45,7 +59,7 @@ function pontoInterativo(cor: string, ativo: boolean, aoAtivar: (indice: number 
     if (cx === undefined || cy === undefined || value === undefined || index === undefined || !payload) {
       return null;
     }
-    const rotulo = `Semana de ${formatarSemana(payload.semanaInicio)}: ${formatarKg(value)}`;
+    const rotulo = `${t("Semana de", idioma)} ${formatarSemana(payload.semanaInicio)}: ${formatarKg(value, idioma)}`;
     return (
       <g>
         <circle cx={cx} cy={cy} r={4} fill={cor} />
@@ -77,7 +91,7 @@ function pontoInterativo(cor: string, ativo: boolean, aoAtivar: (indice: number 
  * 2 semanas elegíveis para e1RM (T-E6), então este componente não repete
  * essa checagem: se chegou até aqui, tem dado suficiente pra desenhar.
  */
-function PainelConteudo({ painel }: { painel: PainelProgressao }) {
+function PainelConteudo({ painel, idioma }: { painel: PainelProgressao; idioma: Idioma }) {
   const [indiceAtivo, setIndiceAtivo] = useState<number | null>(null);
 
   // A janela do servidor tem 12 semanas fixas; exercício começado há pouco
@@ -158,7 +172,7 @@ function PainelConteudo({ painel }: { painel: PainelProgressao }) {
         textAnchor="middle"
         className="grafico-progressao__rotulo"
       >
-        {formatarKg(props.value)}
+        {formatarKg(props.value, idioma)}
       </text>
     );
   }
@@ -166,17 +180,17 @@ function PainelConteudo({ painel }: { painel: PainelProgressao }) {
   return (
     <>
       <p className="grafico-progressao__conclusao">
-        e1RM {subindo ? "subiu" : caindo ? "caiu" : "ficou estável"}{" "}
+        e1RM {t(subindo ? "subiu" : caindo ? "caiu" : "ficou estável", idioma)}{" "}
         <strong>
           {baseValida
-            ? `${Math.abs(deltaPct).toFixed(1)}%`
-            : `${Math.abs(deltaKg).toFixed(1)} kg`}
+            ? formatarPct(Math.abs(deltaPct), idioma)
+            : formatarKg(Math.abs(deltaKg), idioma)}
         </strong>{" "}
-        entre {formatarSemana(primeiro.semanaInicio)} e {formatarSemana(ultimo.semanaInicio)}.
+        {t("entre", idioma)} {formatarSemana(primeiro.semanaInicio)} {t("e", idioma)} {formatarSemana(ultimo.semanaInicio)}.
         {painel.plato && (
           <span className="grafico-progressao__plato-nota">
             {" "}
-            Platô há {painel.plato.semanas} semanas.
+            {t("Platô há", idioma)} {painel.plato.semanas} {t("semanas.", idioma)}
           </span>
         )}
       </p>
@@ -204,7 +218,7 @@ function PainelConteudo({ painel }: { painel: PainelProgressao }) {
               stroke="var(--lastro-linha)"
               strokeDasharray="2 3"
               label={{
-                value: `melhor marca: ${formatarKg(melhorMarca)}`,
+                value: `${t("melhor marca:", idioma)} ${formatarKg(melhorMarca, idioma)}`,
                 position: "insideTopRight",
                 fill: "var(--lastro-txt-3)",
                 fontSize: "var(--lastro-papel-rotulo)",
@@ -216,7 +230,7 @@ function PainelConteudo({ painel }: { painel: PainelProgressao }) {
             stroke="var(--lastro-alta)"
             strokeWidth={2}
             connectNulls={false}
-            dot={pontoInterativo("var(--lastro-alta)", false, setIndiceAtivo)}
+            dot={pontoInterativo("var(--lastro-alta)", false, setIndiceAtivo, idioma)}
             isAnimationActive={false}
             label={RotuloExtremos}
           />
@@ -226,7 +240,7 @@ function PainelConteudo({ painel }: { painel: PainelProgressao }) {
             strokeWidth={2}
             strokeDasharray="6 5"
             connectNulls={false}
-            dot={pontoInterativo("var(--lastro-plato)", false, setIndiceAtivo)}
+            dot={pontoInterativo("var(--lastro-plato)", false, setIndiceAtivo, idioma)}
             isAnimationActive={false}
             label={RotuloExtremos}
           />
@@ -236,16 +250,16 @@ function PainelConteudo({ painel }: { painel: PainelProgressao }) {
 
       {indiceAtivo !== null && pontos[indiceAtivo]?.e1rm !== undefined && (
         <p aria-live="polite" className="grafico-progressao__leitura-ativa">
-          Semana de {formatarSemana(pontos[indiceAtivo].semanaInicio)}:{" "}
-          {formatarKg(pontos[indiceAtivo].e1rm!)}
+          {t("Semana de", idioma)} {formatarSemana(pontos[indiceAtivo].semanaInicio)}:{" "}
+          {formatarKg(pontos[indiceAtivo].e1rm!, idioma)}
         </p>
       )}
 
       <ul className="so-leitor-de-tela">
         {comDado.map((p) => (
           <li key={p.semanaInicio}>
-            {painel.exercicio.nome} — semana de {formatarSemana(p.semanaInicio)}: e1RM{" "}
-            {formatarKg(p.e1rm!)}
+            {painel.exercicio.nome} — {t("semana de", idioma)} {formatarSemana(p.semanaInicio)}: e1RM{" "}
+            {formatarKg(p.e1rm!, idioma)}
           </li>
         ))}
       </ul>
@@ -256,6 +270,7 @@ function PainelConteudo({ painel }: { painel: PainelProgressao }) {
 export default function GraficoProgressao({
   onStatus,
   ocultarQuandoVazio,
+  idioma,
 }: {
   /** Avisa o pai se há painel pra mostrar, assim que a busca resolve —
    * usado pra combinar o aviso "sem dado" com o da Análise Semanal
@@ -265,6 +280,7 @@ export default function GraficoProgressao({
   /** Quando true e não há painel, não renderiza o próprio texto de vazio
    * — o pai já está mostrando um aviso combinado. */
   ocultarQuandoVazio?: boolean;
+  idioma: Idioma;
 }) {
   const [paineis, setPaineis] = useState<PainelProgressao[] | undefined>(undefined);
   const [erro, setErro] = useState(false);
@@ -288,7 +304,7 @@ export default function GraficoProgressao({
   if (erro) {
     return (
       <p className="grafico-progressao__vazio">
-        Não foi possível carregar o gráfico de progressão agora.
+        {t("Não foi possível carregar o gráfico de progressão agora.", idioma)}
       </p>
     );
   }
@@ -301,11 +317,11 @@ export default function GraficoProgressao({
   if (paineis === undefined) {
     return (
       <div>
-        <h2 className="doc__secao">Progressão</h2>
+        <h2 className="doc__secao">{t("Progressão", idioma)}</h2>
         <section
           className="grafico-progressao"
           aria-busy="true"
-          aria-label="Carregando progressão"
+          aria-label={t("Carregando progressão", idioma)}
         >
           <div className="esqueleto esqueleto--curto" />
           <div className="grafico-progressao__area grafico-progressao__area--esqueleto" />
@@ -318,23 +334,25 @@ export default function GraficoProgressao({
     if (ocultarQuandoVazio) return null;
     return (
       <p className="grafico-progressao__vazio">
-        Ainda não há sessões suficientes de nenhum exercício pra desenhar progressão —
-        registre pelo menos 2 treinos com o mesmo exercício.
+        {t(
+          "Ainda não há sessões suficientes de nenhum exercício pra desenhar progressão — registre pelo menos 2 treinos com o mesmo exercício.",
+          idioma,
+        )}
       </p>
     );
   }
 
   return (
     <div>
-      <h2 className="doc__secao">Progressão</h2>
+      <h2 className="doc__secao">{t("Progressão", idioma)}</h2>
       {paineis.map((painel) => (
         <section
           className="grafico-progressao"
           key={painel.exercicio.id}
-          aria-label={`Progressão de ${painel.exercicio.nome}`}
+          aria-label={`${t("Progressão de", idioma)} ${painel.exercicio.nome}`}
         >
           <h3 className="grupo__nome">{painel.exercicio.nome}</h3>
-          <PainelConteudo painel={painel} />
+          <PainelConteudo painel={painel} idioma={idioma} />
         </section>
       ))}
     </div>

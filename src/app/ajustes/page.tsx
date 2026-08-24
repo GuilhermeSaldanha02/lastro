@@ -9,17 +9,20 @@ import SetaNavegacao from "@/components/seta-navegacao";
 import CabecalhoPro from "@/components/cabecalho-pro";
 import MetaSemanalForm from "@/components/meta-semanal-form";
 import IdiomaForm from "@/components/idioma-form";
+import { t } from "@/lib/texto/i18n";
 
 export default async function PaginaAjustes() {
   const perfil = await obterPerfil();
+  const idioma = perfil?.idioma ?? "pt-BR";
 
   return (
     <main className="tela">
       <CabecalhoPro
-        titulo="Ajustes"
-        destaque="Preferências"
+        titulo={t("Ajustes", idioma)}
+        destaque={t("Preferências", idioma)}
         mostrarLogo={true}
         perfil={perfil}
+        idioma={idioma}
       />
 
       <div className="corpo corpo--com-nav corpo--titulo-conteudo transicao-pilula">
@@ -31,15 +34,15 @@ export default async function PaginaAjustes() {
                 <Avatar nome={perfil.nome} avatarUrl={perfil.avatarUrl} />
                 <div>
                   <h2 className="card-perfil-bento__nome">{perfil.nome}</h2>
-                  <span className="card-perfil-bento__status">Ver Perfil</span>
+                  <span className="card-perfil-bento__status">{t("Ver Perfil", idioma)}</span>
                 </div>
               </div>
               <SetaNavegacao />
             </Link>
 
-            <MetaSemanalForm metaInicial={perfil.metaTreinosSemana} />
+            <MetaSemanalForm metaInicial={perfil.metaTreinosSemana} idioma={idioma} />
 
-            <IdiomaForm idiomaInicial={perfil.idioma ?? "pt-BR"} />
+            <IdiomaForm idiomaInicial={idioma} />
 
             {/* Menu de Funcionalidades */}
             <div className="bento-menu-grid">
@@ -50,8 +53,8 @@ export default async function PaginaAjustes() {
                   </svg>
                 </div>
                 <div className="bento-menu-item__info">
-                  <h3 className="bento-menu-item__titulo">Coach IA</h3>
-                  <p className="bento-menu-item__desc">Consultoria 24h e leitura de ciclo</p>
+                  <h3 className="bento-menu-item__titulo">{t("Coach IA", idioma)}</h3>
+                  <p className="bento-menu-item__desc">{t("Consultoria 24h e leitura de ciclo", idioma)}</p>
                 </div>
                 <SetaNavegacao />
               </Link>
@@ -63,8 +66,8 @@ export default async function PaginaAjustes() {
                   </svg>
                 </div>
                 <div className="bento-menu-item__info">
-                  <h3 className="bento-menu-item__titulo">Modelos de Treino</h3>
-                  <p className="bento-menu-item__desc">Criar e organizar rotinas</p>
+                  <h3 className="bento-menu-item__titulo">{t("Modelos de Treino", idioma)}</h3>
+                  <p className="bento-menu-item__desc">{t("Criar e organizar rotinas", idioma)}</p>
                 </div>
                 <SetaNavegacao />
               </Link>
@@ -77,8 +80,8 @@ export default async function PaginaAjustes() {
                   </svg>
                 </div>
                 <div className="bento-menu-item__info">
-                  <h3 className="bento-menu-item__titulo">Calculadora de Anilhas</h3>
-                  <p className="bento-menu-item__desc">Configurar estoque e barra</p>
+                  <h3 className="bento-menu-item__titulo">{t("Calculadora de Anilhas", idioma)}</h3>
+                  <p className="bento-menu-item__desc">{t("Configurar estoque e barra", idioma)}</p>
                 </div>
                 <SetaNavegacao />
               </Link>
@@ -94,8 +97,8 @@ export default async function PaginaAjustes() {
                   </svg>
                 </div>
                 <div className="bento-menu-item__info">
-                  <h3 className="bento-menu-item__titulo">Temas & Cores</h3>
-                  <p className="bento-menu-item__desc">Personalizar paleta do aplicativo</p>
+                  <h3 className="bento-menu-item__titulo">{t("Temas & Cores", idioma)}</h3>
+                  <p className="bento-menu-item__desc">{t("Personalizar paleta do aplicativo", idioma)}</p>
                 </div>
                 <SetaNavegacao />
               </Link>
@@ -105,19 +108,19 @@ export default async function PaginaAjustes() {
             <div className="ajustes-acoes">
               <form action={sair} style={{ width: "100%" }}>
                 <button type="submit" className="botao-secundario">
-                  Encerrar Sessão (Sair)
+                  {t("Encerrar Sessão (Sair)", idioma)}
                 </button>
               </form>
 
-              <ExcluirConta />
+              <ExcluirConta idioma={idioma} />
             </div>
           </div>
         ) : (
-          <p className="vazio">Entre para ver seus ajustes.</p>
+          <p className="vazio">{t("Entre para ver seus ajustes.", idioma)}</p>
         )}
       </div>
 
-      <AbaInferior ativa="ajustes" />
+      <AbaInferior ativa="ajustes" idioma={idioma} />
     </main>
   );
 }

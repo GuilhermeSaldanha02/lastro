@@ -1,0 +1,524 @@
+// lastro · módulo de idiomas, etapa 4/4 (2026-08-24) — dicionário de
+// strings fixas da UI. Chave é o texto PT-BR ORIGINAL (não um id
+// inventado): mantém o diff mecânico (`"Salvar"` vira `t("Salvar",
+// idioma)`, sem renomear nada) e torna óbvio, olhando o dicionário, se
+// uma tradução ficou desatualizada quando o texto PT-BR muda.
+//
+// Função pura, sem "use server"/"use client" — importável tanto em
+// Server quanto Client Components, mesmo padrão de
+// `src/lib/texto/grupo-muscular.ts`.
+//
+// Fallback honesto: chave sem entrada devolve o próprio PT-BR (nunca
+// quebra a tela, só não traduz aquele texto específico) — mesmo
+// raciocínio do fallback de `mapaTraducaoExercicios` (etapa 1/4).
+import type { Idioma } from "@/lib/dados/idioma";
+
+const DICIONARIO: Record<string, { en: string; es: string }> = {
+  // --- seletor-temas.tsx / ajustes/temas/page.tsx ---
+  "Ajustes": { en: "Settings", es: "Ajustes" },
+  "Temas": { en: "Themes", es: "Temas" },
+  "Ativo": { en: "Active", es: "Activo" },
+  "Exemplo de Botão": { en: "Button Example", es: "Ejemplo de Botón" },
+  "Fundo": { en: "Background", es: "Fondo" },
+  "Superfície": { en: "Surface", es: "Superficie" },
+  "Acento": { en: "Accent", es: "Acento" },
+  "Padrão": { en: "Default", es: "Predeterminado" },
+  "Claro": { en: "Light", es: "Claro" },
+  "Orgânico": { en: "Organic", es: "Orgánico" },
+  "Minimalista": { en: "Minimalist", es: "Minimalista" },
+  "Exclusivo": { en: "Exclusive", es: "Exclusivo" },
+  "Quente": { en: "Warm", es: "Cálido" },
+  "Stealth": { en: "Stealth", es: "Sigiloso" },
+  "Obsidian Ouro": { en: "Obsidian Gold", es: "Obsidiana Oro" },
+  "Spartan Gold": { en: "Spartan Gold", es: "Oro Espartano" },
+  "Luxo espartano e assinatura clássica do LASTRO.": {
+    en: "Spartan luxury and LASTRO's classic signature.",
+    es: "Lujo espartano y firma clásica de LASTRO.",
+  },
+  "Marfim & Ouro Imperial": { en: "Ivory & Imperial Gold", es: "Marfil y Oro Imperial" },
+  "Light Luxury": { en: "Light Luxury", es: "Lujo Claro" },
+  "Modo claro refinado com superfícies de mármore e acento em ouro nobre.": {
+    en: "Refined light mode with marble surfaces and noble gold accents.",
+    es: "Modo claro refinado con superficies de mármol y acento en oro noble.",
+  },
+  "Duna Areia & Âmbar": { en: "Dune Sand & Amber", es: "Duna Arena y Ámbar" },
+  "Sandstone Warmth": { en: "Sandstone Warmth", es: "Calidez Arenisca" },
+  "Tons minerais de linho e areia do deserto em fundo carvão quente.": {
+    en: "Mineral tones of linen and desert sand on a warm charcoal background.",
+    es: "Tonos minerales de lino y arena del desierto sobre fondo carbón cálido.",
+  },
+  "Clean Monolith": { en: "Clean Monolith", es: "Monolito Limpio" },
+  "Pure Platinum": { en: "Pure Platinum", es: "Platino Puro" },
+  "Minimalismo brutalista de alto contraste com platina pura e ônix fosco.": {
+    en: "High-contrast brutalist minimalism with pure platinum and matte onyx.",
+    es: "Minimalismo brutalista de alto contraste con platino puro y ónix mate.",
+  },
+  "Slate Petróleo & Ouro Antigo": { en: "Petrol Slate & Antique Gold", es: "Pizarra Petróleo y Oro Antiguo" },
+  "Equinox Luxury": { en: "Equinox Luxury", es: "Lujo Equinox" },
+  "Grafite petróleo profundo com detalhes em ouro antigo escovado.": {
+    en: "Deep petrol graphite with brushed antique gold details.",
+    es: "Grafito petróleo profundo con detalles en oro antiguo cepillado.",
+  },
+  "Café Moka & Caramelo": { en: "Mocha Coffee & Caramel", es: "Café Moka y Caramelo" },
+  "Leica Craft": { en: "Leica Craft", es: "Artesanía Leica" },
+  "Tons terrosos de espresso escuro e caramelo tostado.": {
+    en: "Earthy tones of dark espresso and toasted caramel.",
+    es: "Tonos terrosos de espresso oscuro y caramelo tostado.",
+  },
+  "Oliva Tático": { en: "Tactical Olive", es: "Oliva Táctico" },
+  "Forest Stealth": { en: "Forest Stealth", es: "Sigilo Forestal" },
+  "Verde sálvia militar sóbrio em grafite floresta.": {
+    en: "Sober military sage green on forest graphite.",
+    es: "Verde salvia militar sobrio sobre grafito bosque.",
+  },
+
+  // --- app/page.tsx (Home) ---
+  "hoje": { en: "today", es: "hoy" },
+  "ontem": { en: "yesterday", es: "ayer" },
+  "Semana": { en: "Week", es: "Semana" },
+  "Perfil do usuário": { en: "User profile", es: "Perfil del usuario" },
+  "Continuar Treino de Hoje": { en: "Continue Today's Workout", es: "Continuar Entrenamiento de Hoy" },
+  "Iniciar Treino de Hoje": { en: "Start Today's Workout", es: "Iniciar Entrenamiento de Hoy" },
+  "Análise Semanal (AI Coach)": { en: "Weekly Analysis (AI Coach)", es: "Análisis Semanal (AI Coach)" },
+  "treino": { en: "workout", es: "entrenamiento" },
+  "treinos": { en: "workouts", es: "entrenamientos" },
+  "Toque para ver a leitura da sua semana.": {
+    en: "Tap to see your week's readout.",
+    es: "Toca para ver la lectura de tu semana.",
+  },
+  "Ainda sem treinos nesta semana. Inicie uma sessão para gerar o parecer inteligente.": {
+    en: "No workouts yet this week. Start a session to generate the AI report.",
+    es: "Aún sin entrenamientos esta semana. Inicia una sesión para generar el informe inteligente.",
+  },
+  "Treinos Recentes": { en: "Recent Workouts", es: "Entrenamientos Recientes" },
+  "Ver Todos": { en: "View All", es: "Ver Todos" },
+  "Nenhum treino registrado ainda. O primeiro começa no botão acima.": {
+    en: "No workouts logged yet. The first one starts with the button above.",
+    es: "Aún no hay entrenamientos registrados. El primero comienza con el botón de arriba.",
+  },
+  "SESSÃO": { en: "SESSION", es: "SESIÓN" },
+  "série": { en: "set", es: "serie" },
+  "séries": { en: "sets", es: "series" },
+
+  // --- components/treino-detalhe.tsx ---
+  "Séries": { en: "Sets", es: "Series" },
+  "Concluído": { en: "Done", es: "Listo" },
+  "Editar": { en: "Edit", es: "Editar" },
+  "valendo": { en: "working", es: "válida" },
+  "Nenhuma série registrada ainda. Comece pela primeira aqui embaixo.": {
+    en: "No sets logged yet. Start with the first one below.",
+    es: "Aún no hay series registradas. Comienza con la primera aquí abajo.",
+  },
+  "série valendo": { en: "working set", es: "serie válida" },
+  "séries valendo": { en: "working sets", es: "series válidas" },
+  "EXERCÍCIO": { en: "EXERCISE", es: "EJERCICIO" },
+  "Excluir a série": { en: "Delete set", es: "Eliminar la serie" },
+  "de": { en: "of", es: "de" },
+  "Não dá para desfazer.": { en: "This can't be undone.", es: "Esto no se puede deshacer." },
+  "Cancelar": { en: "Cancel", es: "Cancelar" },
+  "Excluir": { en: "Delete", es: "Eliminar" },
+  "Excluir série": { en: "Delete set", es: "Eliminar serie" },
+  "aquecimento": { en: "warm-up", es: "calentamiento" },
+  "recorde pessoal": { en: "personal record", es: "récord personal" },
+  "Registrar Série": { en: "Log Set", es: "Registrar Serie" },
+  "Preencha a carga e repetições executadas": {
+    en: "Fill in the weight and reps performed",
+    es: "Completa la carga y las repeticiones realizadas",
+  },
+  "Trocar grupo": { en: "Change group", es: "Cambiar grupo" },
+  "Repetir última série": { en: "Repeat last set", es: "Repetir última serie" },
+  "Fechar": { en: "Close", es: "Cerrar" },
+  "Adicionar exercício": { en: "Add exercise", es: "Agregar ejercicio" },
+  "Outra série": { en: "Another set", es: "Otra serie" },
+  "sincronizado": { en: "synced", es: "sincronizado" },
+  "salvo no aparelho": { en: "saved on device", es: "guardado en el dispositivo" },
+
+  // --- app/treino/[id]/page.tsx ---
+  "Bancada": { en: "Workbench", es: "Banco" },
+
+  // --- app/ajustes/page.tsx ---
+  "Preferências": { en: "Preferences", es: "Preferencias" },
+  "Ver Perfil": { en: "View Profile", es: "Ver Perfil" },
+  "Coach IA": { en: "AI Coach", es: "Coach IA" },
+  "Consultoria 24h e leitura de ciclo": { en: "24h coaching and cycle readout", es: "Asesoría 24h y lectura de ciclo" },
+  "Modelos de Treino": { en: "Workout Templates", es: "Modelos de Entrenamiento" },
+  "Criar e organizar rotinas": { en: "Create and organize routines", es: "Crear y organizar rutinas" },
+  "Calculadora de Anilhas": { en: "Plate Calculator", es: "Calculadora de Discos" },
+  "Configurar estoque e barra": { en: "Configure stock and bar", es: "Configurar stock y barra" },
+  "Temas & Cores": { en: "Themes & Colors", es: "Temas y Colores" },
+  "Personalizar paleta do aplicativo": { en: "Customize the app's color palette", es: "Personalizar la paleta de la app" },
+  "Encerrar Sessão (Sair)": { en: "End Session (Sign Out)", es: "Cerrar Sesión" },
+  "Entre para ver seus ajustes.": { en: "Sign in to see your settings.", es: "Inicia sesión para ver tus ajustes." },
+
+  // --- components/meta-semanal-form.tsx ---
+  "Meta Semanal de Treinos": { en: "Weekly Workout Goal", es: "Meta Semanal de Entrenamientos" },
+  "Quantos treinos por semana é a sua meta. Deixe em branco para não mostrar meta nenhuma na Home.": {
+    en: "How many workouts per week is your goal. Leave blank to show no goal on the Home screen.",
+    es: "Cuántos entrenamientos por semana es tu meta. Deja en blanco para no mostrar ninguna meta en el Inicio.",
+  },
+  "Treinos por semana (1 a 7)": { en: "Workouts per week (1 to 7)", es: "Entrenamientos por semana (1 a 7)" },
+  "Sem meta": { en: "No goal", es: "Sin meta" },
+  "A meta precisa ser um número inteiro entre 1 e 7.": {
+    en: "The goal must be a whole number between 1 and 7.",
+    es: "La meta debe ser un número entero entre 1 y 7.",
+  },
+  "Salvando…": { en: "Saving…", es: "Guardando…" },
+  "Salvar meta": { en: "Save goal", es: "Guardar meta" },
+  "Meta removida.": { en: "Goal removed.", es: "Meta eliminada." },
+  "Meta salva.": { en: "Goal saved.", es: "Meta guardada." },
+  "Sessão ausente — entre de novo.": { en: "Session expired — sign in again.", es: "Sesión ausente — inicia sesión de nuevo." },
+  "Não foi possível salvar. Tente de novo.": { en: "Couldn't save. Try again.", es: "No se pudo guardar. Intenta de nuevo." },
+
+  // --- components/idioma-form.tsx ---
+  "Idioma": { en: "Language", es: "Idioma" },
+  "Catálogo de exercícios e textos do app neste idioma.": {
+    en: "Exercise catalog and app text in this language.",
+    es: "Catálogo de ejercicios y textos de la app en este idioma.",
+  },
+  "Idioma salvo.": { en: "Language saved.", es: "Idioma guardado." },
+
+  // --- components/excluir-conta.tsx ---
+  "Não foi possível excluir a conta. Tente de novo.": {
+    en: "Couldn't delete the account. Try again.",
+    es: "No se pudo eliminar la cuenta. Intenta de nuevo.",
+  },
+  "Excluir conta": { en: "Delete account", es: "Eliminar cuenta" },
+  "Confirmar exclusão de conta": { en: "Confirm account deletion", es: "Confirmar eliminación de cuenta" },
+  "Excluir sua conta apaga o perfil, todos os treinos e séries registradas, os modelos de treino e a configuração de anilhas — tudo, sem exceção. Não dá para desfazer.": {
+    en: "Deleting your account erases your profile, all logged workouts and sets, workout templates, and plate configuration — everything, no exceptions. This can't be undone.",
+    es: "Eliminar tu cuenta borra el perfil, todos los entrenamientos y series registradas, los modelos de entrenamiento y la configuración de discos — todo, sin excepción. Esto no se puede deshacer.",
+  },
+  "Excluindo…": { en: "Deleting…", es: "Eliminando…" },
+
+  // --- components/iniciar-treino.tsx ---
+  "Iniciar treino de hoje": { en: "Start today's workout", es: "Iniciar entrenamiento de hoy" },
+  "Como começar?": { en: "How do you want to start?", es: "¿Cómo empezar?" },
+  "Treino novo": { en: "New workout", es: "Entrenamiento nuevo" },
+
+  // --- components/formulario-serie.tsx ---
+  "Exercício é obrigatório.": { en: "Exercise is required.", es: "El ejercicio es obligatorio." },
+  "Escolha o tipo: aquecimento ou valendo.": {
+    en: "Choose the type: warm-up or working set.",
+    es: "Elige el tipo: calentamiento o serie válida.",
+  },
+  "Reps precisa ser um número positivo.": { en: "Reps must be a positive number.", es: "Las repeticiones deben ser un número positivo." },
+  "Peso precisa ser um número válido.": { en: "Weight must be a valid number.", es: "El peso debe ser un número válido." },
+  "RIR precisa ser um número válido.": { en: "RIR must be a valid number.", es: "El RIR debe ser un número válido." },
+  "Exercício": { en: "Exercise", es: "Ejercicio" },
+  "Selecione o exercício": { en: "Select the exercise", es: "Selecciona el ejercicio" },
+  "Unilateral · reps contam por lado": { en: "Unilateral · reps count per side", es: "Unilateral · las repeticiones cuentan por lado" },
+  "Última vez:": { en: "Last time:", es: "Última vez:" },
+  "Usar valores": { en: "Use values", es: "Usar valores" },
+  "Tipo de Série": { en: "Set Type", es: "Tipo de Serie" },
+  "Selecione o tipo": { en: "Select the type", es: "Selecciona el tipo" },
+  "Valendo": { en: "Working", es: "Válida" },
+  "Aquecimento": { en: "Warm-up", es: "Calentamiento" },
+  "Reps": { en: "Reps", es: "Reps" },
+  "Peso (kg)": { en: "Weight (kg)", es: "Peso (kg)" },
+  "RIR (Repetições na Reserva — Opcional)": { en: "RIR (Reps in Reserve — Optional)", es: "RIR (Repeticiones en Reserva — Opcional)" },
+  "Ex: 2": { en: "E.g.: 2", es: "Ej.: 2" },
+  "Peso é de cada lado (ex.: um halter em cada mão)": {
+    en: "Weight is per side (e.g., one dumbbell in each hand)",
+    es: "El peso es de cada lado (ej.: una mancuerna en cada mano)",
+  },
+  "Registrar série": { en: "Log set", es: "Registrar serie" },
+
+  // --- app/treino/page.tsx ---
+  "Treinos": { en: "Workouts", es: "Entrenamientos" },
+  "Histórico": { en: "History", es: "Historial" },
+  "Continuar treino de hoje": { en: "Continue today's workout", es: "Continuar entrenamiento de hoy" },
+
+  // --- components/lista-treinos.tsx ---
+  "Histórico de Treinos": { en: "Workout History", es: "Historial de Entrenamientos" },
+  "sessão registrada": { en: "session logged", es: "sesión registrada" },
+  "sessões registradas": { en: "sessions logged", es: "sesiones registradas" },
+  "Filtro de grupos": { en: "Group filter", es: "Filtro de grupos" },
+  "Todos": { en: "All", es: "Todos" },
+  "Nenhum treino registrado ainda. Inicie sua primeira sessão abaixo.": {
+    en: "No workouts logged yet. Start your first session below.",
+    es: "Aún no hay entrenamientos registrados. Inicia tu primera sesión abajo.",
+  },
+  "Nenhum treino com o grupo": { en: "No workout with the group", es: "Ningún entrenamiento con el grupo" },
+
+  // --- components/excluir-treino.tsx ---
+  "Não foi possível excluir. Tente de novo.": { en: "Couldn't delete. Try again.", es: "No se pudo eliminar. Intenta de nuevo." },
+  "Excluir o treino de": { en: "Delete the workout from", es: "Eliminar el entrenamiento del" },
+  "Confirmar exclusão": { en: "Confirm deletion", es: "Confirmar eliminación" },
+  "e": { en: "and", es: "y" },
+  "a série dele": { en: "its set", es: "su serie" },
+  "as": { en: "its", es: "sus" },
+  "séries dele": { en: "sets", es: "series" },
+
+  // --- components/seletor-metricas-home.tsx ---
+  "Métricas da Semana": { en: "Weekly Metrics", es: "Métricas de la Semana" },
+  "Volume": { en: "Volume", es: "Volumen" },
+  "Grupos": { en: "Groups", es: "Grupos" },
+  "Volume acumulado na semana": { en: "Volume accumulated this week", es: "Volumen acumulado en la semana" },
+  "sessão": { en: "session", es: "sesión" },
+  "sessões": { en: "sessions", es: "sesiones" },
+  "Sem treinos": { en: "No workouts", es: "Sin entrenamientos" },
+  "Volume dos últimos": { en: "Volume of the last", es: "Volumen de los últimos" },
+  "Séries valendo concluídas (aquecimento excluído)": {
+    en: "Working sets completed (warm-up excluded)",
+    es: "Series válidas completadas (calentamiento excluido)",
+  },
+  "Séries dos últimos": { en: "Sets of the last", es: "Series de los últimos" },
+  "grupo": { en: "group", es: "grupo" },
+  "grupos": { en: "groups", es: "grupos" },
+  "Séries por grupo muscular nesta semana": { en: "Sets by muscle group this week", es: "Series por grupo muscular esta semana" },
+  "Nenhuma série registrada nesta semana ainda.": {
+    en: "No sets logged this week yet.",
+    es: "Aún no hay series registradas esta semana.",
+  },
+  "Os treinos que você registrar aparecem aqui como histórico.": {
+    en: "The workouts you log will appear here as history.",
+    es: "Los entrenamientos que registres aparecerán aquí como historial.",
+  },
+
+  // --- components/aba-inferior.tsx ---
+  "Seções do app": { en: "App sections", es: "Secciones de la app" },
+  "Início": { en: "Home", es: "Inicio" },
+  "Análise": { en: "Analysis", es: "Análisis" },
+  "Catálogo": { en: "Catalog", es: "Catálogo" },
+
+  // --- components/editar-serie.tsx ---
+  "RIR (opcional)": { en: "RIR (optional)", es: "RIR (opcional)" },
+  "Salvar": { en: "Save", es: "Guardar" },
+
+  // --- components/seletor-grupo-muscular.tsx ---
+  "Grupo Muscular de Hoje": { en: "Today's Muscle Group", es: "Grupo Muscular de Hoy" },
+  "Escolha um ou mais para filtrar a lista de exercícios": {
+    en: "Choose one or more to filter the exercise list",
+    es: "Elige uno o más para filtrar la lista de ejercicios",
+  },
+  "Grupos musculares de hoje": { en: "Today's muscle groups", es: "Grupos musculares de hoy" },
+  "Continuar": { en: "Continue", es: "Continuar" },
+
+  // --- components/modelo-treino-form.tsx ---
+  "Dê um nome ao modelo.": { en: "Give the template a name.", es: "Dale un nombre al modelo." },
+  "Escolha pelo menos um exercício.": { en: "Choose at least one exercise.", es: "Elige al menos un ejercicio." },
+  "Que treino é esse?": { en: "What workout is this?", es: "¿Qué entrenamiento es este?" },
+  "Dê um nome — os exercícios vêm no passo seguinte.": {
+    en: "Give it a name — the exercises come in the next step.",
+    es: "Dale un nombre — los ejercicios vienen en el siguiente paso.",
+  },
+  "Nome do modelo": { en: "Template name", es: "Nombre del modelo" },
+  "Ex.: Peito e tríceps": { en: "E.g.: Chest and triceps", es: "Ej.: Pecho y tríceps" },
+  "Renomear": { en: "Rename", es: "Renombrar" },
+  "Exercícios do modelo": { en: "Template exercises", es: "Ejercicios del modelo" },
+  "Salvar modelo": { en: "Save template", es: "Guardar modelo" },
+
+  // --- components/folha.tsx / ajustes/modelos/novo ---
+  "Novo modelo": { en: "New template", es: "Nuevo modelo" },
+  "Modelos": { en: "Templates", es: "Modelos" },
+  "Novo": { en: "New", es: "Nuevo" },
+
+  // --- components/catalogo-interativo.tsx ---
+  "Buscar exercício ou músculo…": { en: "Search exercise or muscle…", es: "Buscar ejercicio o músculo…" },
+  "Limpar busca": { en: "Clear search", es: "Limpiar búsqueda" },
+  "Grupos musculares": { en: "Muscle groups", es: "Grupos musculares" },
+  "Curadoria": { en: "Curation", es: "Curaduría" },
+  "exercícios estão aguardando curadoria de execução. Dicas técnicas são revisadas por humanos (ADR-007).": {
+    en: "exercises are awaiting execution curation. Technical tips are reviewed by humans (ADR-007).",
+    es: "ejercicios están esperando curaduría de ejecución. Los consejos técnicos son revisados por humanos (ADR-007).",
+  },
+  "Nenhum exercício encontrado para": { en: "No exercise found for", es: "Ningún ejercicio encontrado para" },
+  "exercício": { en: "exercise", es: "ejercicio" },
+  "exercícios": { en: "exercises", es: "ejercicios" },
+  "Unilateral": { en: "Unilateral", es: "Unilateral" },
+  "Peso por lado": { en: "Weight per side", es: "Peso por lado" },
+  "Sem dica registrada": { en: "No tip recorded", es: "Sin consejo registrado" },
+  "As instruções deste catálogo não substituem orientação médica ou fisioterapêutica.": {
+    en: "The instructions in this catalog do not replace medical or physical therapy guidance.",
+    es: "Las instrucciones de este catálogo no reemplazan la orientación médica o fisioterapéutica.",
+  },
+
+  // --- app/catalogo/[id]/page.tsx ---
+  "Exercícios": { en: "Exercises", es: "Ejercicios" },
+  "Instruções Técnicas": { en: "Technical Instructions", es: "Instrucciones Técnicas" },
+  "Dica técnica de execução ainda não cadastrada.": {
+    en: "Technical execution tip not registered yet.",
+    es: "Consejo técnico de ejecución aún no registrado.",
+  },
+  "registro": { en: "record", es: "registro" },
+  "registros": { en: "records", es: "registros" },
+  "Nenhuma série valendo registrada ainda para": {
+    en: "No working set logged yet for",
+    es: "Aún no hay serie válida registrada para",
+  },
+
+  // --- components/etiqueta-recorde.tsx ---
+  "recorde": { en: "record", es: "récord" },
+
+  // --- components/anilhas-form.tsx ---
+  "Peso da anilha precisa ser um número positivo.": {
+    en: "Plate weight must be a positive number.",
+    es: "El peso del disco debe ser un número positivo.",
+  },
+  "Peso da barra precisa ser um número positivo.": {
+    en: "Bar weight must be a positive number.",
+    es: "El peso de la barra debe ser un número positivo.",
+  },
+  "Peso da barra (kg)": { en: "Bar weight (kg)", es: "Peso de la barra (kg)" },
+  "Peso da barra em kg": { en: "Bar weight in kg", es: "Peso de la barra en kg" },
+  "Anilhas disponíveis": { en: "Available plates", es: "Discos disponibles" },
+  "Nenhuma anilha configurada ainda.": { en: "No plates configured yet.", es: "Aún no hay discos configurados." },
+  "Remover anilha de": { en: "Remove plate of", es: "Quitar disco de" },
+  "Adicionar anilha (kg)": { en: "Add plate (kg)", es: "Agregar disco (kg)" },
+  "Adicionar": { en: "Add", es: "Agregar" },
+  "Salvar configuração": { en: "Save configuration", es: "Guardar configuración" },
+  "Configuração salva.": { en: "Configuration saved.", es: "Configuración guardada." },
+  "Calculadora de Carga": { en: "Load Calculator", es: "Calculadora de Carga" },
+  "Peso alvo (kg)": { en: "Target weight (kg)", es: "Peso objetivo (kg)" },
+  "De cada lado da barra:": { en: "On each side of the bar:", es: "De cada lado de la barra:" },
+  "kg / lado": { en: "kg / side", es: "kg / lado" },
+  "Só a barra, sem anilha de cada lado.": {
+    en: "Just the bar, no plates on each side.",
+    es: "Solo la barra, sin discos de cada lado.",
+  },
+  "Total:": { en: "Total:", es: "Total:" },
+  "mais próximo do alvo": { en: "closest to target", es: "más cercano al objetivo" },
+  "exato": { en: "exact", es: "exacto" },
+
+  // --- app/ajustes/anilhas/page.tsx ---
+  "Anilhas": { en: "Plates", es: "Discos" },
+  "Entre para configurar suas anilhas.": { en: "Sign in to configure your plates.", es: "Inicia sesión para configurar tus discos." },
+
+  // --- components/lista-modelos.tsx / excluir-modelo.tsx ---
+  "Nenhum modelo criado ainda.": { en: "No templates created yet.", es: "Aún no hay modelos creados." },
+  "Excluir modelo": { en: "Delete template", es: "Eliminar modelo" },
+  "Excluir o modelo": { en: "Delete the template", es: "Eliminar el modelo" },
+  "A lista de exercícios some — os treinos já registrados a partir dela não são afetados. Não dá para desfazer.": {
+    en: "The exercise list disappears — workouts already logged from it are not affected. This can't be undone.",
+    es: "La lista de ejercicios desaparece — los entrenamientos ya registrados a partir de ella no se ven afectados. Esto no se puede deshacer.",
+  },
+
+  // --- app/ajustes/modelos/page.tsx ---
+  "Listas de exercícios pra reaproveitar ao iniciar um treino — sem série, peso ou reps. Isso continua sendo preenchido normalmente no dia.": {
+    en: "Exercise lists to reuse when starting a workout — no sets, weight, or reps. Those are still filled in normally on the day.",
+    es: "Listas de ejercicios para reutilizar al iniciar un entrenamiento — sin series, peso ni repeticiones. Eso se sigue completando normalmente en el día.",
+  },
+  "Criar modelo": { en: "Create template", es: "Crear modelo" },
+
+  // --- components/coach-interativo.tsx ---
+  "Sessão expirada. Faça login novamente.": { en: "Session expired. Sign in again.", es: "Sesión expirada. Inicia sesión de nuevo." },
+  "Falha ao consultar o coach.": { en: "Failed to reach the coach.", es: "Fallo al consultar al coach." },
+  "Falha de rede. Tente de novo.": { en: "Network failure. Try again.", es: "Fallo de red. Intenta de nuevo." },
+  "Assistente de Treino 24h": { en: "24h Training Assistant", es: "Asistente de Entrenamiento 24h" },
+  "Tire dúvidas sobre periodização, fadiga e progressão com base nas suas métricas reais.": {
+    en: "Ask about periodization, fatigue, and progression based on your real metrics.",
+    es: "Resuelve dudas sobre periodización, fatiga y progresión basadas en tus métricas reales.",
+  },
+  "Sugestões de perguntas:": { en: "Suggested questions:", es: "Preguntas sugeridas:" },
+  "Analisando seus dados…": { en: "Analyzing your data…", es: "Analizando tus datos…" },
+  "Pergunte ao coach…": { en: "Ask the coach…", es: "Pregúntale al coach…" },
+  "Enviar pergunta": { en: "Send question", es: "Enviar pregunta" },
+
+  // --- app/coach/page.tsx ---
+  "Coach": { en: "Coach", es: "Coach" },
+  "Consultoria": { en: "Coaching", es: "Asesoría" },
+
+  // --- components/analise-interativa.tsx ---
+  "Falha ao gerar o parecer (erro": { en: "Failed to generate the report (error", es: "Fallo al generar el informe (error" },
+  "Falha de rede ao gerar o parecer. Tente novamente.": {
+    en: "Network failure generating the report. Try again.",
+    es: "Fallo de red al generar el informe. Intenta de nuevo.",
+  },
+  "Análise semanal": { en: "Weekly analysis", es: "Análisis semanal" },
+  "Ainda não há pelo menos 2 semanas do mesmo exercício pra desenhar progressão.": {
+    en: "There still aren't at least 2 weeks of the same exercise to chart progress.",
+    es: "Aún no hay al menos 2 semanas del mismo ejercicio para trazar progresión.",
+  },
+  "Você tem": { en: "You have", es: "Tienes" },
+  "semana fechada": { en: "closed week", es: "semana cerrada" },
+  "semanas fechadas": { en: "closed weeks", es: "semanas cerradas" },
+  "São necessárias": { en: "You need", es: "Se necesitan" },
+  "para calcular a análise semanal.": { en: "to calculate the weekly analysis.", es: "para calcular el análisis semanal." },
+  "Solicitar Análise": { en: "Request Analysis", es: "Solicitar Análisis" },
+  "Parecer em emissão": { en: "Report in progress", es: "Informe en emisión" },
+  "escrevendo a leitura": { en: "writing the readout", es: "escribiendo la lectura" },
+
+  // --- components/bloco-evidencia.tsx ---
+  "Alta": { en: "Up", es: "Alza" },
+  "Platô": { en: "Plateau", es: "Meseta" },
+  "Queda": { en: "Down", es: "Baja" },
+  "semanas": { en: "weeks", es: "semanas" },
+  "calculado no dispositivo": { en: "calculated on device", es: "calculado en el dispositivo" },
+
+  // --- components/parecer.tsx ---
+  "Semana de": { en: "Week of", es: "Semana del" },
+  "Emitido em": { en: "Issued on", es: "Emitido el" },
+  "A interpretação por IA falhou desta vez (duas tentativas rejeitadas). O texto abaixo é um resumo determinístico dos seus dados, sem prosa gerada — não é o parecer normal.": {
+    en: "AI interpretation failed this time (two attempts rejected). The text below is a deterministic summary of your data, no generated prose — this is not the normal report.",
+    es: "La interpretación por IA falló esta vez (dos intentos rechazados). El texto de abajo es un resumen determinístico de tus datos, sin prosa generada — no es el informe normal.",
+  },
+  "Ressalvas do método": { en: "Method caveats", es: "Advertencias del método" },
+  "A faixa de referência de volume é uma convenção prática, baseada majoritariamente em homens jovens treinados — não tem teto validado.": {
+    en: "The volume reference range is a practical convention, based mostly on trained young men — it has no validated ceiling.",
+    es: "El rango de referencia de volumen es una convención práctica, basada mayoritariamente en hombres jóvenes entrenados — no tiene techo validado.",
+  },
+  '"Estagnação" de N semanas é uma convenção de mercado, não um critério clínico.': {
+    en: '"Stagnation" of N weeks is a market convention, not a clinical criterion.',
+    es: '"Estancamiento" de N semanas es una convención de mercado, no un criterio clínico.',
+  },
+  "e1RM calculado acima do teto de reps não é reportado — a fórmula perde precisão nessa faixa.": {
+    en: "e1RM calculated above the rep ceiling is not reported — the formula loses precision in that range.",
+    es: "El e1RM calculado por encima del techo de repeticiones no se reporta — la fórmula pierde precisión en ese rango.",
+  },
+
+  // --- components/grafico-progressao.tsx ---
+  "subiu": { en: "went up", es: "subió" },
+  "caiu": { en: "went down", es: "bajó" },
+  "ficou estável": { en: "stayed stable", es: "se mantuvo estable" },
+  "entre": { en: "between", es: "entre" },
+  "Platô há": { en: "Plateaued for", es: "Meseta hace" },
+  "semanas.": { en: "weeks.", es: "semanas." },
+  "melhor marca:": { en: "best mark:", es: "mejor marca:" },
+  "semana de": { en: "week of", es: "semana del" },
+  "Não foi possível carregar o gráfico de progressão agora.": {
+    en: "Couldn't load the progression chart right now.",
+    es: "No se pudo cargar el gráfico de progresión ahora.",
+  },
+  "Progressão": { en: "Progression", es: "Progresión" },
+  "Carregando progressão": { en: "Loading progression", es: "Cargando progresión" },
+  "Ainda não há sessões suficientes de nenhum exercício pra desenhar progressão — registre pelo menos 2 treinos com o mesmo exercício.": {
+    en: "There aren't enough sessions of any exercise yet to chart progression — log at least 2 workouts with the same exercise.",
+    es: "Aún no hay suficientes sesiones de ningún ejercicio para trazar progresión — registra al menos 2 entrenamientos con el mismo ejercicio.",
+  },
+  "Progressão de": { en: "Progression of", es: "Progresión de" },
+
+  // --- components/cabecalho-pro.tsx ---
+  "Voltar": { en: "Back", es: "Volver" },
+  "Perfil do atleta": { en: "Athlete profile", es: "Perfil del atleta" },
+
+  // --- app/analise/page.tsx ---
+  "Análise Semanal": { en: "Weekly Analysis", es: "Análisis Semanal" },
+  "Ciclo": { en: "Cycle", es: "Ciclo" },
+
+  // --- components/editar-perfil.tsx / validar-avatar.ts / atualizar-avatar.ts / app/perfil ---
+  "Envie uma foto em JPEG ou PNG.": { en: "Upload a JPEG or PNG photo.", es: "Sube una foto en JPEG o PNG." },
+  "A foto precisa ter até 5 MB.": { en: "The photo must be up to 5 MB.", es: "La foto debe tener hasta 5 MB." },
+  "Não foi possível enviar a foto. Tente de novo.": { en: "Couldn't upload the photo. Try again.", es: "No se pudo subir la foto. Intenta de nuevo." },
+  "Foto enviada, mas não deu para salvar o perfil. Tente de novo.": {
+    en: "Photo uploaded, but couldn't save the profile. Try again.",
+    es: "Foto subida, pero no se pudo guardar el perfil. Intenta de nuevo.",
+  },
+  "Escolher foto de perfil": { en: "Choose profile photo", es: "Elegir foto de perfil" },
+  "Enviando…": { en: "Uploading…", es: "Subiendo…" },
+  "Trocar foto": { en: "Change photo", es: "Cambiar foto" },
+  "Perfil": { en: "Profile", es: "Perfil" },
+  "Entre para editar seu perfil.": { en: "Sign in to edit your profile.", es: "Inicia sesión para editar tu perfil." },
+
+  // --- components/rastreador-disciplina.tsx ---
+  "Rastreador de disciplina semanal": { en: "Weekly discipline tracker", es: "Rastreador de disciplina semanal" },
+  "Disciplina Semanal": { en: "Weekly Discipline", es: "Disciplina Semanal" },
+  "dia seguido": { en: "day streak", es: "día seguido" },
+  "dias seguidos": { en: "day streak", es: "días seguidos" },
+};
+
+export function t(chavePtBr: string, idioma: Idioma): string {
+  if (idioma === "pt-BR") return chavePtBr;
+  const entrada = DICIONARIO[chavePtBr];
+  if (!entrada) return chavePtBr;
+  return entrada[idioma];
+}

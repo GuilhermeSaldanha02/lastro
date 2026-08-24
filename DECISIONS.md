@@ -1206,3 +1206,45 @@ Cinco caminhos de leitura em `dados/treino.ts` e `dados/resumo-home.ts` passaram
 **Como reverter.** `git revert` dos commits desta entrada. Sem impacto de banco (só leitura das tabelas já existentes da migração 0012).
 
 ---
+
+## 2026-08-24 (6) — Módulo de idiomas, etapa 4/4 (final): as ~200 strings fixas de UI
+
+**O que mudou.** Todo texto fixo da interface — botões, rótulos, mensagens de erro, `aria-label`, placeholders, cabeçalhos, rodapés — passou a resolver pelo idioma escolhido. `src/lib/texto/i18n.ts` (novo) é o dicionário: chave é o texto PT-BR ORIGINAL (não um id inventado), valor é `{ en, es }`. `t(chave, idioma)` devolve a própria chave em pt-BR e faz fallback honesto pra chave PT-BR se faltar entrada — nunca quebra a tela, só não traduz aquele texto específico.
+
+Por que chave = texto PT-BR e não um id: mantém o diff mecânico (`"Salvar"` vira `t("Salvar", idioma)`, sem renomear nada) e deixa óbvio, olhando o dicionário, quando uma tradução ficou desatualizada em relação ao texto PT-BR que a originou.
+
+**Escopo tocado:** 46 arquivos (todas as páginas em `src/app/`, todos os componentes com texto em `src/components/`), incluindo:
+- `<html lang>` no layout raiz (`app/layout.tsx`) — vira `async`, lê `obterIdioma()`. Achado do `advisor` antes da etapa 3/4: leitor de tela depende deste atributo, não do texto visível.
+- Nomes de dia da semana e mês, em três lugares que os tinham como array PT-BR fixo (`app/page.tsx`, `app/treino/[id]/page.tsx`).
+- Convenção decimal (vírgula pt-BR/es, ponto en) também no gráfico de progressão e nos blocos de evidência da Análise (`formatar-delta.ts`, `grafico-progressao.tsx`) — mesmo raciocínio da etapa 3/4 no validador da Gemini, agora estendido aos números que a TELA formata (fora do parecer do LLM).
+- As 7 temas de `/ajustes/temas` (nome, subtítulo, descrição) traduzidos com nome real por idioma, não tradução literal — "Café Moka & Caramelo" vira "Mocha Coffee & Caramel", não "Coffee Mocha & Caramel".
+- Mensagens de erro de Server Actions (`meta-semanal.ts`, `idioma.ts`, `atualizar-avatar.ts`, `validar-avatar.ts`) resolvidas no idioma da pessoa via `obterIdioma()` — essas telas de erro nunca tinham idioma antes desta etapa.
+
+**Decisões de escopo, deliberadas:**
+- `/login` continua só em PT-BR. Antes da autenticação não existe `usuario.idioma` pra ler — o idioma é, por definição, uma preferência de conta. Detectar `navigator.language` do browser era uma feature nova não pedida, com risco de adivinhar errado; ficou de fora.
+- As 3 sugestões de pergunta do Coach IA (`coach-interativo.tsx`) ficam em PT-BR de propósito — o texto do botão É a pergunta enviada ao backend (`/api/coach`, que continua respondendo só em PT-BR, fora do escopo desta etapa). Traduzir só o rótulo criaria um chat onde a pessoa lê a pergunta em inglês no botão e vê ela mesma em português no balão da conversa.
+- `modelo.nome` (nome que a própria pessoa deu ao modelo de treino) nunca passa por `t()` — é conteúdo do usuário, não string de app.
+- Mensagens de erro internas que nunca deveriam aparecer pra pessoa (ex.: `throw new Error("Exercício não encontrado no catálogo.")`, invariante que só quebra se o dropdown estiver dessincronizado do catálogo) ficaram em PT-BR — não são UI, são defesa de programador.
+
+**Achado ao vivo, corrigido no caminho:** duas colisões de nome de variável `t` (loop `TEMAS.map((t) => ...)` em `seletor-temas.tsx`, `for (const t of treinos)` em `lista-treinos.tsx`) com a nova função `t()` do dicionário — renomeadas pra `tema`/`treino` antes de importar. Também dois `useMemo` com `.localeCompare(..., idioma)` sem `idioma` no array de dependências (`treino-detalhe.tsx`, `modelo-treino-form.tsx`), pego pelo `react-hooks/exhaustive-deps` — corrigido.
+
+**Verificado ao vivo** com usuário QA descartável (cascade confirmado em 0 linhas): `<html lang="en">` confirmado via DOM; `/ajustes` inteira em inglês incluindo os 7 temas com nomes reais; Home com data/semana/dias formatados em inglês; fluxo completo de registro de série (seletor de grupo → catálogo filtrado → formulário → interruptor "peso por lado" → botão) em inglês, do início ao fim.
+
+**Impacto.** `tsc`/`test` (180)/`lint` (mesmos 4 avisos pré-existentes, nenhum novo)/`build` verdes. `npm run build` deixou de pré-renderizar `/login`, `/ajustes/temas` e `/_not-found` como estático — consequência esperada de `<html lang>` agora depender de uma leitura de sessão por requisição no layout raiz; sem efeito prático, o app já era majoritariamente autenticado/dinâmico.
+
+**Como reverter.** `git revert` do commit desta entrada. Sem impacto de banco — etapa é só leitura/apresentação.
+
+---
+
+## Módulo de idiomas — resumo das 4 etapas (2026-08-24)
+
+Pedido do dono: "adicionar o módulo de idiomas" (inglês e espanhol, além do PT-BR existente), "quero tudo, não precisa de curadoria humana". Executado em 4 etapas, uma por vez com aprovação do dono entre elas (preferência dele, ver entrada "etapa 3/4"):
+
+1. Migração 0012 — catálogo de exercícios e grupos musculares traduzidos (tabela de tradução, não colunas).
+2. Leitura por idioma nos dados + seletor em `/ajustes`.
+3. Parecer da Gemini responde no idioma escolhido (prompt, validador, fallback determinístico) — nomes já traduzidos alimentam o resumo, convenção decimal corrigida por idioma.
+4. As ~200 strings fixas de UI, incluindo `<html lang>`.
+
+Reverte explicitamente a posição da ADR anterior contra tradução automática do catálogo (registrado na entrada da etapa 1) — por decisão do dono, não por esquecimento. Fora do escopo em todas as 4 etapas: o Coach IA (`api/coach/*`, feature separada da Análise Semanal) e a tela de `/login` (pré-autenticação, sem `usuario.idioma` pra ler).
+
+---

@@ -4,6 +4,8 @@ import { useState, useMemo } from "react";
 import Link from "next/link";
 import ExcluirTreino from "@/components/excluir-treino";
 import SetaNavegacao from "@/components/seta-navegacao";
+import { t } from "@/lib/texto/i18n";
+import type { Idioma } from "@/lib/dados/idioma";
 
 export type ItemTreinoLista = {
   id: string;
@@ -21,8 +23,10 @@ function formatarVolume(kg?: number): string {
 
 export default function ListaTreinos({
   treinos,
+  idioma,
 }: {
   treinos: ItemTreinoLista[];
+  idioma: Idioma;
 }) {
   const [modoEdicao, setModoEdicao] = useState(false);
   const [filtroGrupo, setFiltroGrupo] = useState<string>("todos");
@@ -30,8 +34,8 @@ export default function ListaTreinos({
   // Extrai todos os grupos musculares únicos
   const todosGrupos = useMemo(() => {
     const set = new Set<string>();
-    for (const t of treinos) {
-      for (const g of t.gruposMusculares ?? []) {
+    for (const treino of treinos) {
+      for (const g of treino.gruposMusculares ?? []) {
         if (g) set.add(g);
       }
     }
@@ -40,8 +44,8 @@ export default function ListaTreinos({
 
   const treinosFiltrados = useMemo(() => {
     if (filtroGrupo === "todos") return treinos;
-    return treinos.filter((t) =>
-      t.gruposMusculares?.some(
+    return treinos.filter((treino) =>
+      treino.gruposMusculares?.some(
         (g) => g.toLowerCase() === filtroGrupo.toLowerCase(),
       ),
     );
@@ -51,9 +55,9 @@ export default function ListaTreinos({
     <div className="secao-treinos">
       <div className="grupo__cab">
         <div>
-          <h2 className="secao-header__titulo">Histórico de Treinos</h2>
+          <h2 className="secao-header__titulo">{t("Histórico de Treinos", idioma)}</h2>
           <p className="secao-header__subtitulo">
-            {treinos.length} {treinos.length === 1 ? "sessão registrada" : "sessões registradas"}
+            {treinos.length} {t(treinos.length === 1 ? "sessão registrada" : "sessões registradas", idioma)}
           </p>
         </div>
         {treinos.length > 0 && (
@@ -62,19 +66,19 @@ export default function ListaTreinos({
             className="botao-textual"
             onClick={() => setModoEdicao((atual) => !atual)}
           >
-            {modoEdicao ? "Concluído" : "Editar"}
+            {t(modoEdicao ? "Concluído" : "Editar", idioma)}
           </button>
         )}
       </div>
 
       {todosGrupos.length > 1 && (
-        <div className="chips-carrossel" role="tablist" aria-label="Filtro de grupos">
+        <div className="chips-carrossel" role="tablist" aria-label={t("Filtro de grupos", idioma)}>
           <button
             type="button"
             className={`chip-filtro${filtroGrupo === "todos" ? " chip-filtro--ativo" : ""}`}
             onClick={() => setFiltroGrupo("todos")}
           >
-            Todos
+            {t("Todos", idioma)}
           </button>
           {todosGrupos.map((grupo) => (
             <button
@@ -96,10 +100,10 @@ export default function ListaTreinos({
               <path d="M4 8v8M20 8v8M8 6v12M16 6v12M8 12h8" />
             </svg>
           </div>
-          <p>Nenhum treino registrado ainda. Inicie sua primeira sessão abaixo.</p>
+          <p>{t("Nenhum treino registrado ainda. Inicie sua primeira sessão abaixo.", idioma)}</p>
         </div>
       ) : treinosFiltrados.length === 0 ? (
-        <p className="vazio">Nenhum treino com o grupo &ldquo;{filtroGrupo}&rdquo;.</p>
+        <p className="vazio">{t("Nenhum treino com o grupo", idioma)} &ldquo;{filtroGrupo}&rdquo;.</p>
       ) : (
         <div className="feed-treinos">
           {treinosFiltrados.map((treino) => (
@@ -114,7 +118,7 @@ export default function ListaTreinos({
                         </span>
                       ))
                     ) : (
-                      <span className="tag-grupo">SESSÃO</span>
+                      <span className="tag-grupo">{t("SESSÃO", idioma)}</span>
                     )}
                   </div>
                   <span className="cartao-treino-item__data">{treino.dataFormatada}</span>
@@ -126,7 +130,7 @@ export default function ListaTreinos({
                       {formatarVolume(treino.volumeKg)}
                     </span>
                     <span className="cartao-treino-item__series">
-                      {treino.totalSeries} {treino.totalSeries === 1 ? "série" : "séries"}
+                      {treino.totalSeries} {t(treino.totalSeries === 1 ? "série" : "séries", idioma)}
                     </span>
                   </div>
                   <SetaNavegacao />
@@ -138,6 +142,7 @@ export default function ListaTreinos({
                     id={treino.id}
                     data={treino.dataFormatada}
                     series={treino.totalSeries}
+                    idioma={idioma}
                   />
                 </div>
               )}

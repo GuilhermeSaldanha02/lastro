@@ -7,18 +7,21 @@
 // continua caindo em `src/app/ajustes/anilhas/page.tsx`, a rota completa de
 // sempre — intocada.
 import { obterConfigAnilhas } from "@/lib/dados/config-anilhas";
+import { obterPerfil } from "@/lib/dados/perfil";
 import AnilhasForm from "@/components/anilhas-form";
 import Folha from "@/components/folha";
+import { t } from "@/lib/texto/i18n";
 
 export default async function AnilhasInterceptado() {
-  const config = await obterConfigAnilhas();
+  const [config, perfil] = await Promise.all([obterConfigAnilhas(), obterPerfil()]);
+  const idioma = perfil?.idioma ?? "pt-BR";
 
   return (
-    <Folha titulo="Anilhas">
+    <Folha titulo={t("Anilhas", idioma)} idioma={idioma}>
       {config ? (
-        <AnilhasForm configInicial={config} />
+        <AnilhasForm configInicial={config} idioma={idioma} />
       ) : (
-        <p className="vazio">Entre para configurar suas anilhas.</p>
+        <p className="vazio">{t("Entre para configurar suas anilhas.", idioma)}</p>
       )}
     </Folha>
   );
