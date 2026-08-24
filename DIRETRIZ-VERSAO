@@ -1,0 +1,5 @@
+v9
+
+# Versao da diretriz que gerou a estrutura deste projeto.
+# Para atualizar: puxe a diretriz de novo e rode install.mjs — ele so
+# cria o que falta, nunca sobrescreve o que voce ja escreveu.
