@@ -11,26 +11,25 @@
 
 > Bloco de handoff entre agentes (Antigravity ⇄ Claude). **Sobrescrever a cada sessão**, nunca acumular. Formato e regras: `AGENTS.md` §3.
 
-- **Última sessão:** 2026-08-24 · agente: claude · branch: `main` (branch de trabalho `feat/peso-por-lado`, mergeada e ainda existente localmente)
-- **Em andamento:** nada — fechado e no remoto.
-- **Último commit:** `e8d816d` (merge de `feat/peso-por-lado` em `main`, pushado para `origin/main`). Nota: `main` avançou por um PR de outra sessão (`#115`, commit `a38d808`) enquanto eu trabalhava — mesmo conteúdo do `84427c8` que eu já tinha visto, sem conflito real no merge.
-- **Fechado nesta sessão:**
-  - **Achado do dono** — halter bilateral (ex.: "Supino reto com halteres") tinha volume subestimado pela metade: `unilateral=false` está correto nesses exercícios (reps não dobram), mas o peso digitado é de UM halter, não do par.
-  - **`exercicio.peso_por_lado`** (migração `0010_peso_por_lado.sql`, **aplicada no Supabase real**) — mesma forma de `unilateral` (atributo do exercício, não da série): dobra volume por razão distinta, nunca composto com `unilateral` no mesmo cálculo. Marca os 9 exercícios de halter bilateral do catálogo (plural "halteres"; pull-over e agachamento sumô ficam de fora — halter singular, peso já total). Confirmado no banco: 9 de 102 exercícios marcados.
-  - **`peso_corporal_incluso` removido de vez** — decisão do dono após eu consultar o banco real: 0 de 461 séries usavam o campo. Saiu do schema (mesma migração 0010), do agregador, dos formulários (`formulario-serie.tsx`, `editar-serie.tsx`) e do rodapé do parecer.
-  - Threading completo em `src/lib/analise/{tipos,volume,agregar}.ts`, `src/lib/dados/{treino,progressao,resumo-home}.ts`, `src/app/api/analise/route.ts`, componentes de catálogo (tag "Peso por lado" ao lado da tag "Unilateral" já existente) e formulários.
-  - Docs atualizados: `KNOWLEDGE.md` §1 (novo termo), `DECISIONS.md` (entrada 2026-08-24), `SDD.md` (§D3.5, schema §3.2, T-V4/T-V6/T-V7 em §4.5, §5.1, §7.1, §8), `ARCHITECTURE.md` (linha da entidade `exercicio`, e a contagem de exercícios que estava desatualizada — são 102, não 3).
-  - Testes: `volume.test.ts` reescrito (T-V6 peso por lado, T-V7 não-composição); `agregar.test.ts` e os 4 outros arquivos de teste em `src/lib/analise/` (`equilibrio`, `frequencia`, `progressao`, `series-dificeis`) tiveram os fixtures atualizados — 173 testes passando.
-  - `tsc`/`test` (173)/`lint`/`build` — verdes na branch, e **reverificados de novo na `main` pós-merge**.
-  - Commit → merge `--no-ff` em `main` → push para `origin/main`, todos pedidos explicitamente pelo dono nesta sessão.
-- **Bloqueado / a decidir:** nada.
-- **Próximo passo:** verificação visual ao vivo (Playwright, 360×640) do formulário de registro de série (indicador "Halteres · peso é de cada lado") e das tags no catálogo — não foi feita nesta sessão, só os gates automatizados.
-- **Fixture QA:** `qa-audit-2608@teste.lastro.invalid` segue viva — não usada nesta sessão.
+- **Última sessão:** 2026-08-24 (2) · agente: claude · branch de trabalho `feat/peso-por-lado-switch` (a mergear em `main`)
+- **Em andamento:** nada — implementação completa, verificada ao vivo em duas ferramentas de automação, pronta pra commit/merge/push.
+- **Fechado nesta sessão (continuação da mesma data):** o dono testou a sessão anterior (`peso_por_lado` só no catálogo, 9 exercícios fixos de halter) e apontou o problema real: a lista fixa não cobre uso real, e a tag era só texto, sem controle nenhum. Pediu um interruptor de verdade, no mesmo lugar onde "peso corporal incluso" existia antes.
+  - **`serie.peso_por_lado`** (migração `0011_peso_por_lado_na_serie.sql`, **aplicada no Supabase real**) — vira a fonte de verdade do volume, decidida POR SÉRIE (interruptor no formulário), não pelo catálogo. `exercicio.peso_por_lado` continua existindo, mas só como valor-padrão que pré-marca o interruptor. Backfill conferido: 26 séries dos 9 exercícios de halter já marcados ganharam `peso_por_lado=true` (26 antes de aplicar, 26 depois — sem isso a migração reverteria a correção de ontem em silêncio).
+  - **Interruptor real** em `formulario-serie.tsx` (checkbox controlado, resetado para o padrão do catálogo quando o exercício muda — via ajuste de estado durante a renderização, não `useEffect`, pra evitar o lint novo `react-hooks/set-state-in-effect`) e em `editar-serie.tsx` (inicializado com o valor real já gravado da série).
+  - **Achado paralelo corrigido:** `treino.ts:listarTreinos` tinha uma segunda cópia do multiplicador de volume que ainda lia do exercício — corrigida para ler da série, senão a lista de treinos mostraria volume diferente da Análise pro mesmo treino.
+  - Threading em 5 caminhos de leitura: `dados/treino.ts` (`listarTreinos` e `buscarTreino`), `dados/resumo-home.ts`, `dados/progressao.ts`, `api/analise/route.ts`. `SerieBruta`/`SerieValendo` (`analise/tipos.ts`) ganham `pesoPorLado` como campo obrigatório da SÉRIE.
+  - Dois testes novos em `agregar.test.ts` (T-V8) provam que é a série que decide, não o catálogo — inclusive quando o catálogo diz `false` e a série diz `true`. 175 testes passando.
+  - `tsc`/`test`/`lint`/`build` verdes.
+  - **Verificação visual ao vivo, dupla:** usuário QA descartável (`qa-peso-lado-2608@teste.lastro.invalid`, criado e removido nesta sessão via `qa-treino-helper.sh`) — registrei uma série de "Crossover no cabo" (exercício **fora** da lista fixa de 9 halteres, catálogo diz `pesoPorLado=false`) com o interruptor ligado manualmente, primeiro pela extensão do Chrome, depois pelo Playwright MCP. As duas ferramentas concordam: checkbox real (não texto), marcado; `serie.peso_por_lado=true` no banco mesmo com `exercicio.peso_por_lado=false`; card do treino mostra **400 kg** (10×20×2, multiplicador aplicado corretamente); formulário de edição reabre com o checkbox já marcado, refletindo o valor real da série.
+- **Bloqueado / a decidir:** nada tecnicamente — falta só commit → merge `--no-ff` em `main` → push, mesmo processo da sessão anterior (dono já autorizou esse fluxo antes; confirmar se vale para esta rodada também).
+- **Próximo passo:** commit/merge/push (ver acima), depois nada pendente conhecido nesta frente.
+- **Fixture QA:** `qa-audit-2608@teste.lastro.invalid` segue viva, não usada nesta sessão (usei uma descartável separada, já removida).
 - **Para o outro agente saber:**
-  - Este arquivo passou de **1.100 linhas** e a regra logo acima manda arquivar acima de ~300 — ainda não arquivado, dívida que se acumula. Arquivar os concluídos em `PROGRESS-archive.md` antes de acumular mais.
-  - `DESIGN.md` tem um banner datado (2026-08-20/21) avisando que §3.0–3.2 e a tabela C1–C14 de §4.2 descrevem a paleta areia antiga, não o Apex Pro. Só a linha `txt-3`/C3 foi remedida. Não citar número de lá sem conferir contra `tokens.css` primeiro. (T3b parte 1, ainda aberta — não tocada nesta sessão.)
-  - Se `unilateral` ganhar um terceiro tratamento parecido no futuro, o padrão está em `src/lib/analise/volume.ts`: multiplicador é sempre `condA || condB || condC ? 2 : 1`, nunca produto — ×2×2 quadruplica silenciosamente.
-  - **Achado desta sessão sobre a ferramenta:** o wrapper `rtk` que intercepta comandos Bash deu leitura *desatualizada/incorreta* de `git log`/`git rev-parse` em pelo menos um momento (mostrou um hash de commit diferente do real, cross-checado e corrigido via PowerShell direto). Se um `git log`/`git status` via Bash parecer inconsistente com o que acabou de acontecer, cross-checar via PowerShell antes de agir — não confiar cegamente no primeiro output.
+  - Este arquivo passou de **1.100 linhas** e a regra logo acima manda arquivar acima de ~300 — ainda não arquivado, dívida que só cresce sessão a sessão.
+  - `DESIGN.md` tem um banner datado (2026-08-20/21) avisando que §3.0–3.2 e a tabela C1–C14 de §4.2 descrevem a paleta areia antiga, não o Apex Pro. T3b parte 1, ainda aberta — não tocada.
+  - **Lição da sessão anterior, reforçada nesta:** decisão de "onde mora o dado" (catálogo vs. série) pode precisar de teste ao vivo pra se provar certa — a primeira resposta (só catálogo) parecia razoável e foi aprovada, mas só quebrou visivelmente quando testada com um exercício fora da lista fixa. Preferir testar cedo com um caso fora do "caminho feliz" antes de fechar a decisão como definitiva.
+  - Multiplicador de volume: sempre `condA || condB ? 2 : 1`, nunca produto — ×2×2 quadruplica silenciosamente. Agora são duas condições (`unilateral`, `peso_por_lado`) em dois lugares no código (`volume.ts` e `treino.ts:listarTreinos`) — se um terceiro multiplicador aparecer, checar os dois lugares.
+  - O wrapper `rtk` que intercepta comandos Bash pode dar leitura desatualizada de `git log`/`git rev-parse` — se parecer inconsistente, cross-checar via PowerShell antes de agir.
 
 ---
 

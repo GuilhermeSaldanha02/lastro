@@ -13,6 +13,14 @@ export type SerieBruta = {
   peso: number;
   /** RIR ausente = informação desconhecida. NUNCA usar 0 para "sem RIR" (D3). */
   rir?: number;
+  /**
+   * Peso desta série é de UM lado/implemento (ex.: um halter em cada mão)
+   * — dobra volume, mesma razão de `exercicio.unilateral` (D3.5), mas
+   * decidido POR SÉRIE (interruptor no formulário), não pelo catálogo.
+   * `exercicio.pesoPorLado` (`ExercicioBruto`) é só o valor-padrão que
+   * pré-marca o interruptor — quem decide o volume é este campo.
+   */
+  pesoPorLado: boolean;
 };
 
 /** Uma ida à academia, com as séries registradas nela. */
@@ -24,10 +32,11 @@ export type TreinoBruto = {
 };
 
 /**
- * Um exercício do catálogo (SDD §3.2) — inclui os dois atributos que
- * dobram o volume da série (D3.5), por razões distintas e nunca compostas:
- * `unilateral` (reps contadas por lado) e `pesoPorLado` (peso registrado é
- * de UM implemento — ex.: um halter — não do par).
+ * Um exercício do catálogo (SDD §3.2). `unilateral` (reps contadas por
+ * lado) dobra volume diretamente. `pesoPorLado` aqui é só o VALOR-PADRÃO
+ * que pré-marca o interruptor do formulário para exercícios de halter
+ * conhecidos — quem de fato decide o volume é `SerieBruta.pesoPorLado`
+ * (D3.5, migração 0011), não este campo.
  */
 export type ExercicioBruto = {
   id: string;

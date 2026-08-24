@@ -7,10 +7,14 @@
 // o estado da lista de séries. Este componente só valida a entrada e
 // entrega um objeto pronto — não sabe nada sobre rede nem sobre a fila.
 //
-// `unilateral` e `pesoPorLado` NÃO são campos deste formulário: são
-// atributos do exercício escolhido, lidos do catálogo. A tela só mostra um
-// indicador de texto quando o exercício selecionado tiver um dos dois — o
-// dono não re-declara isso a cada série (SDD §5.1, D3.5).
+// `unilateral` é atributo do exercício, lido do catálogo — a tela só
+// mostra um indicador de texto, sem controle (o dono não re-declara isso
+// a cada série). Já `pesoPorLado` é um interruptor de verdade, por
+// SÉRIE (D3.5, migração 0011): o catálogo só fornece o valor-padrão que
+// pré-marca o interruptor quando o exercício escolhido é um halter
+// conhecido — a lista de exercícios de halter é fixa demais para cobrir
+// todo uso real (achado do dono, 2026-08-24), então quem decide de fato é
+// a pessoa, série a série, igual "peso corporal incluso" decidia antes.
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import type { Exercicio, SerieHistorica } from "@/lib/dados/treino";
 import { historicoDoExercicio } from "@/lib/dados/treino";
@@ -22,6 +26,8 @@ export type DadosNovaSerie = {
   reps: number;
   peso: number;
   rir: number | null;
+  /** Peso desta série é de UM lado/implemento (D3.5) — interruptor do formulário. */
+  pesoPorLado: boolean;
   /** Calculado aqui (não no pai) porque é aqui que o histórico já foi
    * buscado — evita uma segunda consulta pra mesma informação (C4). */
   ehRecordePessoal: boolean;
@@ -46,10 +52,24 @@ export default function FormularioSerie({
   // buscado ou a busca falhou; a UI degrada em silêncio nos dois casos —
   // sem rede (D6, elevador sem sinal) isto não pode virar erro visível.
   const [historico, setHistorico] = useState<SerieHistorica[] | null>(null);
+  // Interruptor "peso é de cada lado" (D3.5) — controlado, não lido do
+  // FormData: pré-marcado pelo valor-padrão do catálogo quando o exercício
+  // muda, mas a pessoa pode ligar/desligar por série.
+  const [pesoPorLado, setPesoPorLado] = useState(false);
   const repsRef = useRef<HTMLInputElement>(null);
   const pesoRef = useRef<HTMLInputElement>(null);
 
   const exercicioSelecionado = exercicios.find((e) => e.id === exercicioId);
+
+  // Ajuste de estado durante a renderização (padrão recomendado pelo React
+  // para "resetar estado quando uma prop muda"), não num efeito — troca de
+  // exercício reseta o interruptor para o padrão do catálogo deste
+  // exercício, nunca herda o valor do exercício anterior.
+  const [exercicioIdAnterior, setExercicioIdAnterior] = useState(exercicioId);
+  if (exercicioId !== exercicioIdAnterior) {
+    setExercicioIdAnterior(exercicioId);
+    setPesoPorLado(exercicioSelecionado?.pesoPorLado ?? false);
+  }
 
   useEffect(() => {
     let cancelado = false;
@@ -75,6 +95,7 @@ export default function FormularioSerie({
     setTipo("valendo");
     if (repsRef.current) repsRef.current.value = String(ultimaDoHistorico.reps);
     if (pesoRef.current) pesoRef.current.value = String(ultimaDoHistorico.peso);
+    setPesoPorLado(ultimaDoHistorico.pesoPorLado);
   }
 
   async function aoEnviar(evento: FormEvent<HTMLFormElement>) {
@@ -129,6 +150,7 @@ export default function FormularioSerie({
       reps,
       peso,
       rir,
+      pesoPorLado,
       ehRecordePessoal,
     });
     formulario.reset();
@@ -163,15 +185,10 @@ export default function FormularioSerie({
         </select>
       </div>
 
-      {(exercicioSelecionado?.unilateral || exercicioSelecionado?.pesoPorLado) && (
-        <div style={{ display: "flex", gap: "var(--lastro-e-2)", flexWrap: "wrap" }}>
-          {exercicioSelecionado?.unilateral && (
-            <span className="tag-unilateral">Unilateral · reps contam por lado</span>
-          )}
-          {exercicioSelecionado?.pesoPorLado && (
-            <span className="tag-unilateral">Halteres · peso é de cada lado</span>
-          )}
-        </div>
+      {exercicioSelecionado?.unilateral && (
+        <span className="tag-unilateral" style={{ alignSelf: "flex-start" }}>
+          Unilateral · reps contam por lado
+        </span>
       )}
 
       {ultimaDoHistorico && (
@@ -249,6 +266,16 @@ export default function FormularioSerie({
           <input id="rir" name="rir" type="number" inputMode="numeric" placeholder="Ex: 2" min={0} max={10} />
         </div>
       )}
+
+      <label className="campo-caixa" htmlFor="peso_por_lado" style={{ padding: "8px 0" }}>
+        <input
+          id="peso_por_lado"
+          type="checkbox"
+          checked={pesoPorLado}
+          onChange={(e) => setPesoPorLado(e.target.checked)}
+        />
+        Peso é de cada lado (ex.: um halter em cada mão)
+      </label>
 
       {erro && (
         <p className="aviso-erro" role="alert">

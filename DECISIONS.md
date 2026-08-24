@@ -1120,3 +1120,23 @@ Mais dois hex cravados corrigidos (P7, não específicos de tema): `.pergunta--p
 **Impacto.** Volume histórico dos 9 exercícios de halter bilateral (Supino reto/inclinado/declinado com halteres, Crucifixo reto/inclinado com halteres, Levantamento terra romeno com halteres, Desenvolvimento/Elevação frontal/Encolhimento com halteres) **muda retroativamente** — dobra a partir de agora, sem reprocessar séries já gravadas (o volume é calculado em tempo de leitura, não persistido). PRs, tendência de e1RM e volume por exercício desses 9 exercícios NÃO mudam — e1RM/PR usam peso e reps crus, nunca o multiplicador de volume (D3.5). `tsc`/`test` (173)/`lint`/`build` verdes.
 
 **Como reverter.** Código: `git revert` do commit desta entrada. Banco: `alter table public.exercicio drop column peso_por_lado; alter table public.serie add column peso_corporal_incluso boolean not null default false;` — reintroduzir a coluna não recupera os valores antigos (todos eram `false`, então não há perda real).
+
+---
+
+## 2026-08-24 (2) — `peso_por_lado` vira campo da SÉRIE, não só do catálogo (reversão parcial da entrada acima)
+
+**O que mudou.** A entrada anterior (mesma data) tinha decidido que "peso por lado" morava só no catálogo (`exercicio.peso_por_lado`), com uma lista fixa de 9 exercícios de halter marcada na migração. O dono testou ao vivo e apontou o problema: a lista fixa não cobre uso real — qualquer exercício fora dela, ou halter usado de um jeito que a lista não previu, ficava sem forma de corrigir o volume, e a tag na tela era só texto, sem controle algum. Pediu um interruptor de verdade, no mesmo lugar onde "peso corporal incluso" existia antes.
+
+Migração `0011_peso_por_lado_na_serie.sql` adiciona `serie.peso_por_lado` (boolean, default `false`). `exercicio.peso_por_lado` **continua existindo** — não foi removido — mas muda de papel: era a fonte do cálculo de volume, agora é só o **valor-padrão que pré-marca o interruptor** quando a pessoa escolhe um exercício de halter conhecido. Quem decide o volume, série a série, é `serie.peso_por_lado`.
+
+**Backfill, para não reverter a correção de ontem em silêncio.** As 26 séries já gravadas dos 9 exercícios de halter bilateral (marcados na migração 0010) ganharam `peso_por_lado = true` nesta migração — conferido antes (26 séries encontradas) e depois (26 marcadas) de aplicar. Sem isso, o deploy desta migração devolveria essas 26 séries ao volume subestimado que a correção de ontem tinha acabado de resolver.
+
+**Por que não substituir o catálogo por completo.** O valor-padrão do catálogo continua valendo a pena: sem ele, a pessoa teria que lembrar de ligar o interruptor toda vez que registra "Supino reto com halteres" — exatamente a fricção que `unilateral` já evita para reps por lado. O catálogo pré-marca; o interruptor decide.
+
+**Formulário e edição.** `formulario-serie.tsx` ganhou um checkbox controlado (`campo-caixa`, mesmo componente visual do antigo "peso corporal incluso") que reseta para o padrão do catálogo quando o exercício muda (ajuste de estado durante a renderização, não em `useEffect` — evita o novo lint `react-hooks/set-state-in-effect`) e que a pessoa liga/desliga por série. `editar-serie.tsx` ganhou o mesmo controle, inicializado com o valor real já gravado da série (não o padrão do catálogo). "Usar valores" (repetir última série no formulário) e "repetir última série" (no treino) carregam o `pesoPorLado` real da série anterior, não o padrão do catálogo.
+
+**Achado paralelo, corrigido no caminho:** `treino.ts:listarTreinos` tinha uma SEGUNDA cópia do cálculo de multiplicador (inline, fora de `src/lib/analise/`) que ainda lia `exercicio.peso_por_lado` — se não fosse trocada para `serie.peso_por_lado`, a lista de treinos mostraria um volume diferente do que a Análise mostra para o mesmo treino. Corrigida junto.
+
+**Impacto.** `SerieBruta`/`SerieValendo` (`src/lib/analise/tipos.ts`) ganham `pesoPorLado` como campo obrigatório da série (era do exercício). Cinco caminhos de leitura trocaram a fonte: `dados/treino.ts` (`listarTreinos` e `buscarTreino`), `dados/resumo-home.ts`, `dados/progressao.ts`, `api/analise/route.ts`. Dois testes novos em `agregar.test.ts` (T-V8) provam que é a série que decide, não o catálogo — inclusive o caso em que o catálogo diz `false` mas a série diz `true`. `tsc`/`test` (175)/`lint`/`build` verdes.
+
+**Como reverter.** Código: `git revert` do commit desta entrada. Banco: `alter table public.serie drop column peso_por_lado;` — volta ao estado da entrada anterior (catálogo decide sozinho). Perda real: as 26 séries que tinham `peso_por_lado=true` diferente do padrão do catálogo (se a pessoa tiver usado o interruptor para divergir do padrão) voltariam a depender só do catálogo.

@@ -47,7 +47,7 @@ function achatarSeriesValendo(
         exercicio: exercicio.nome,
         grupoMuscular: exercicio.grupoMuscularPrimario,
         unilateral: exercicio.unilateral,
-        pesoPorLado: exercicio.pesoPorLado,
+        pesoPorLado: serie.pesoPorLado,
         reps: serie.reps,
         peso: serie.peso,
         rir: serie.rir,
