@@ -16,9 +16,9 @@
 - **Último commit:** `8bb3fc8` feat: Meta semanal de treinos configuravel (T4)
 - **Não commitado:** `public/comparacao_4_temas.png` e `scripts/render-temas.mjs` — decidir se entram no repositório ou viram ignorados
 - **Bloqueado / a decidir:** nada registrado
-- **Próximo passo:** resolver os dois arquivos acima; criar o `QA.md` (não existe neste projeto) antes da próxima auditoria
+- **Próximo passo:** resolver os dois arquivos acima; preencher o `QA.md` na primeira auditoria de verdade
+- **Correção registrada:** uma versão anterior deste bloco afirmava que o trabalho saía direto na `main`. Não procede — o histórico mostra integração por PR de forma consistente. A afirmação errada sobreviveu na mensagem de um commit já mergeado; esta linha é o registro da correção.
 - **Para o outro agente saber:**
-  - O trabalho está saindo **direto na `main`** — a convenção é branch `feat/`/`fix/` + PR. Corrigir a partir da próxima tarefa.
   - Este arquivo passou de **1.100 linhas** e a regra logo acima manda arquivar acima de ~300. Arquivar os concluídos em `PROGRESS-archive.md` antes de acumular mais: arquivo gordo deixa de ser lido por inteiro, e aí ele para de cumprir a função.
 
 ---
