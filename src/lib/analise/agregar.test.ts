@@ -19,24 +19,28 @@ const supino: ExercicioBruto = {
   nome: "Supino reto com barra",
   grupoMuscularPrimario: "peito",
   unilateral: false,
+  pesoPorLado: false,
 };
 const rosca: ExercicioBruto = {
   id: "rosca",
   nome: "Rosca direta",
   grupoMuscularPrimario: "biceps",
   unilateral: false,
+  pesoPorLado: false,
 };
 const cadeiraExtensora: ExercicioBruto = {
   id: "cadeira-extensora",
   nome: "Cadeira extensora",
   grupoMuscularPrimario: "quadriceps",
   unilateral: false,
+  pesoPorLado: false,
 };
 const puxadaAlta: ExercicioBruto = {
   id: "puxada-alta",
   nome: "Puxada alta",
   grupoMuscularPrimario: "costas",
   unilateral: false,
+  pesoPorLado: false,
 };
 
 const exercicios: ExercicioBruto[] = [supino, rosca, cadeiraExtensora, puxadaAlta];
@@ -47,39 +51,39 @@ const treinosF1: TreinoBruto[] = [
     id: "t0",
     data: "2026-07-21", // semana anterior (2026-07-20)
     series: [
-      { id: "s-ant-1", exercicioId: "supino", tipo: "valendo", reps: 10, peso: 50, pesoCorporalIncluso: false },
-      { id: "s-ant-2", exercicioId: "supino", tipo: "valendo", reps: 10, peso: 50, pesoCorporalIncluso: false },
+      { id: "s-ant-1", exercicioId: "supino", tipo: "valendo", reps: 10, peso: 50 },
+      { id: "s-ant-2", exercicioId: "supino", tipo: "valendo", reps: 10, peso: 50 },
     ],
   },
   {
     id: "t1",
     data: "2026-07-30", // semana atual (2026-07-27)
     series: [
-      { id: "s0", exercicioId: "supino", tipo: "aquecimento", reps: 10, peso: 20, pesoCorporalIncluso: false },
-      { id: "s1", exercicioId: "supino", tipo: "valendo", reps: 10, peso: 50, rir: 2, pesoCorporalIncluso: false },
-      { id: "s2", exercicioId: "supino", tipo: "valendo", reps: 8, peso: 50, rir: 0, pesoCorporalIncluso: false },
-      { id: "s3", exercicioId: "supino", tipo: "valendo", reps: 6, peso: 50, pesoCorporalIncluso: false },
+      { id: "s0", exercicioId: "supino", tipo: "aquecimento", reps: 10, peso: 20 },
+      { id: "s1", exercicioId: "supino", tipo: "valendo", reps: 10, peso: 50, rir: 2 },
+      { id: "s2", exercicioId: "supino", tipo: "valendo", reps: 8, peso: 50, rir: 0 },
+      { id: "s3", exercicioId: "supino", tipo: "valendo", reps: 6, peso: 50 },
     ],
   },
   {
     id: "t2",
     data: "2026-07-28", // semana atual
     series: [
-      { id: "s4", exercicioId: "rosca", tipo: "valendo", reps: 10, peso: 14, rir: 2, pesoCorporalIncluso: false },
+      { id: "s4", exercicioId: "rosca", tipo: "valendo", reps: 10, peso: 14, rir: 2 },
     ],
   },
   {
     id: "t3",
     data: "2026-07-29", // semana atual
     series: [
-      { id: "s5", exercicioId: "cadeira-extensora", tipo: "valendo", reps: 10, peso: 40, rir: 1, pesoCorporalIncluso: false },
+      { id: "s5", exercicioId: "cadeira-extensora", tipo: "valendo", reps: 10, peso: 40, rir: 1 },
     ],
   },
   {
     id: "t4",
     data: "2026-07-31", // semana atual — SÓ aquecimento (T-F1)
     series: [
-      { id: "s6", exercicioId: "supino", tipo: "aquecimento", reps: 10, peso: 20, pesoCorporalIncluso: false },
+      { id: "s6", exercicioId: "supino", tipo: "aquecimento", reps: 10, peso: 20 },
     ],
   },
 ];
@@ -204,15 +208,15 @@ describe("montarResumoCompacto — teto de reps (T-E5)", () => {
         id: "t1",
         data: "2026-07-28", // semana atual
         series: [
-          { id: "s1", exercicioId: "supino", tipo: "valendo", reps: 25, peso: 60, pesoCorporalIncluso: false },
-          { id: "s2", exercicioId: "supino", tipo: "valendo", reps: 10, peso: 30, pesoCorporalIncluso: false },
+          { id: "s1", exercicioId: "supino", tipo: "valendo", reps: 25, peso: 60 },
+          { id: "s2", exercicioId: "supino", tipo: "valendo", reps: 10, peso: 30 },
         ],
       },
       {
         id: "t2",
         data: "2026-07-21", // semana anterior — 2ª sessão, para aparecer em tendencia_e1rm
         series: [
-          { id: "s3", exercicioId: "supino", tipo: "valendo", reps: 10, peso: 30, pesoCorporalIncluso: false },
+          { id: "s3", exercicioId: "supino", tipo: "valendo", reps: 10, peso: 30 },
         ],
       },
     ];
@@ -225,38 +229,10 @@ describe("montarResumoCompacto — teto de reps (T-E5)", () => {
   });
 });
 
-// T-V5 (segunda metade, D3.5) — a série com peso corporal não entra no
-// volume, mas CONTA em frequencia e em series_dificeis (o esforço é real).
-describe("montarResumoCompacto — peso corporal fora do volume, dentro de frequência/série difícil (T-V5)", () => {
-  it("treinos_semana_atual e series_dificeis contam a série; volume do grupo fica ausente", () => {
-    const treinos: TreinoBruto[] = [
-      {
-        id: "t1",
-        data: "2026-07-28",
-        series: [
-          {
-            id: "s1",
-            exercicioId: "supino",
-            tipo: "valendo",
-            reps: 8,
-            peso: 10,
-            rir: 1,
-            pesoCorporalIncluso: true,
-          },
-        ],
-      },
-    ];
-    const resumo = montarResumoCompacto({ treinos, exercicios, agora });
-    expect(resumo.frequencia.treinos_semana_atual).toBe(1);
-    expect(resumo.series_dificeis?.total).toBe(1);
-    // a série CONTA em series_valendo (é uma série valendo real), mas o
-    // volume dela é 0 — peso corporal não entra em volume, nem a carga
-    // externa de 8x10 (D3.5).
-    const peito = resumo.volume_por_grupo_muscular.find((g) => g.grupo_muscular === "peito");
-    expect(peito?.series_valendo).toBe(1);
-    expect(peito?.volume).toBe(0);
-  });
-});
+// T-V5 removido (D3.5, 2026-08-24): "peso corporal incluso" nunca foi
+// usado (0 de 461 séries no banco real) e saiu do produto — ver
+// migração 0010 e DECISIONS.md. Volume normal (reps × peso) agora se
+// aplica a toda série valendo, sem exceção de peso corporal.
 
 // T-R3 — determinismo (C4)
 describe("montarResumoCompacto — determinismo (T-R3)", () => {
@@ -292,7 +268,7 @@ describe("montarResumoCompacto — semana anterior sem dados (T-R5)", () => {
         id: "t1",
         data: "2026-07-28",
         series: [
-          { id: "s1", exercicioId: "supino", tipo: "valendo", reps: 10, peso: 50, pesoCorporalIncluso: false },
+          { id: "s1", exercicioId: "supino", tipo: "valendo", reps: 10, peso: 50 },
         ],
       },
     ];
@@ -316,7 +292,7 @@ describe("montarResumoCompacto — volume_semanal (T-R6)", () => {
         id: "t1",
         data: "2026-07-28",
         series: [
-          { id: "s1", exercicioId: "supino", tipo: "valendo", reps: 10, peso: 50, pesoCorporalIncluso: false },
+          { id: "s1", exercicioId: "supino", tipo: "valendo", reps: 10, peso: 50 },
         ],
       },
     ];
@@ -342,6 +318,7 @@ describe("montarResumoCompacto — orçamento de tamanho (T-R1)", () => {
         nome: `Exercicio de volume grupo ${g}`,
         grupoMuscularPrimario: `grupo-muscular-${g}`,
         unilateral: false,
+        pesoPorLado: false,
       });
     }
 
@@ -354,6 +331,7 @@ describe("montarResumoCompacto — orçamento de tamanho (T-R1)", () => {
         nome: `Exercicio de tendencia numero ${e}`,
         grupoMuscularPrimario: `grupo-muscular-${e % MAX_GRUPOS}`,
         unilateral: false,
+        pesoPorLado: false,
       });
     }
 
@@ -365,6 +343,7 @@ describe("montarResumoCompacto — orçamento de tamanho (T-R1)", () => {
         nome: `Exercicio estagnado numero ${s}`,
         grupoMuscularPrimario: `grupo-muscular-${s}`,
         unilateral: false,
+        pesoPorLado: false,
       });
     }
 
@@ -376,6 +355,7 @@ describe("montarResumoCompacto — orçamento de tamanho (T-R1)", () => {
         nome: `Exercicio recordista numero ${p}`,
         grupoMuscularPrimario: `grupo-muscular-${p}`,
         unilateral: false,
+        pesoPorLado: false,
       });
     }
 
@@ -409,7 +389,6 @@ describe("montarResumoCompacto — orçamento de tamanho (T-R1)", () => {
               reps: 10,
               peso,
               rir: 2,
-              pesoCorporalIncluso: false,
             },
             {
               id: `serie-${contadorTreino}-b`,
@@ -418,7 +397,6 @@ describe("montarResumoCompacto — orçamento de tamanho (T-R1)", () => {
               reps: 8,
               peso,
               rir: 1,
-              pesoCorporalIncluso: false,
             },
           ],
         });
@@ -462,6 +440,7 @@ describe("montarResumoCompacto — teto de tendencia_e1rm (T-R2)", () => {
         nome: `Exercicio ${i}`,
         grupoMuscularPrimario: "grupo-x",
         unilateral: false,
+        pesoPorLado: false,
       });
       // peso cresce com i -> volume cresce com i -> ordenação verificável
       let contador = 0;
@@ -477,7 +456,6 @@ describe("montarResumoCompacto — teto de tendencia_e1rm (T-R2)", () => {
               tipo: "valendo",
               reps: 10,
               peso: 20 + i,
-              pesoCorporalIncluso: false,
             },
           ],
         });

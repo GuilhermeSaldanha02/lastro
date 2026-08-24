@@ -1104,3 +1104,19 @@ Mais dois hex cravados corrigidos (P7, não específicos de tema): `.pergunta--p
 **Impacto.** `tsc`/`test` (173)/`lint`/`build` verdes em cada passo. Nenhuma migração de dado além da coluna nova (todo usuário existente nasce com `meta_treinos_semana = null`, comportamento idêntico ao estado atual da Home).
 
 **Como reverter.** `git revert` do commit desta entrada remove o componente, a server action, e as edições de `page.tsx`/`sistema.css`. A coluna `meta_treinos_semana` fica no banco (reverter migração de banco é ação separada, deliberadamente — não se reverte schema junto com código sem decisão explícita); se precisar remover de fato, `alter table public.usuario drop column meta_treinos_semana;`.
+
+---
+
+## 2026-08-24 — `pesoPorLado` substitui `peso_corporal_incluso`; volume de halter bilateral corrigido
+
+**O que mudou.** Achado do dono: o card de registro de série (exercício, tipo, série valendo/aquecimento, peso, reps) só sabia dobrar volume por `exercicio.unilateral` (reps contadas por lado). Halter bilateral (ex.: "Supino reto com halteres") tem `unilateral=false` **corretamente** — as reps não dobram — mas o peso digitado é de **um** halter, não do par: o volume estava subestimado pela metade nesses exercícios. Migração `0010_peso_por_lado.sql` adiciona `exercicio.peso_por_lado` (mesma forma de `unilateral`: atributo do exercício, não da série) e marca os 9 exercícios de halter bilateral do catálogo (`unilateral=false` + "halteres" no plural — pull-over e agachamento sumô ficam de fora, são halter singular segurado com as duas mãos, peso já total). `src/lib/analise/volume.ts` passa a dobrar por `unilateral || pesoPorLado`, nunca os dois compostos.
+
+**Peso corporal incluso removido de vez, na mesma migração.** Antes de decidir, consultei o banco real: **0 de 461 séries** tinham o campo marcado. Nunca foi usado — remover não muda nenhum dado histórico (volume, PR, estagnação ou parecer passado já calculado). Apresentei os dois números ao dono (0/461, e as duas opções — manter os dois campos vs. remover) antes de agir; decisão dele: remover. `serie.peso_corporal_incluso` sai do schema, do agregador, dos formulários e do rodapé do parecer.
+
+**Onde a marcação mora — pergunta que travava a implementação.** Duas opções: campo no formulário (marca-se a cada série) ou atributo do catálogo (marca-se uma vez por exercício, como `unilateral`). Escolhida a segunda — consistente com a decisão já registrada de que `unilateral` é atributo do exercício, não da série (`SDD.md` §D3.5), e evita o dono re-declarar "é halter" a cada série do mesmo exercício.
+
+**Alternativa descartada.** Detectar "peso por lado" automaticamente pelo nome do exercício em tempo de leitura (regex sobre `nome`) — descartada por ser frágil (nome livre, sem contrato) e por esconder a decisão dentro de uma função em vez de deixá-la visível como dado no catálogo, auditável e editável.
+
+**Impacto.** Volume histórico dos 9 exercícios de halter bilateral (Supino reto/inclinado/declinado com halteres, Crucifixo reto/inclinado com halteres, Levantamento terra romeno com halteres, Desenvolvimento/Elevação frontal/Encolhimento com halteres) **muda retroativamente** — dobra a partir de agora, sem reprocessar séries já gravadas (o volume é calculado em tempo de leitura, não persistido). PRs, tendência de e1RM e volume por exercício desses 9 exercícios NÃO mudam — e1RM/PR usam peso e reps crus, nunca o multiplicador de volume (D3.5). `tsc`/`test` (173)/`lint`/`build` verdes.
+
+**Como reverter.** Código: `git revert` do commit desta entrada. Banco: `alter table public.exercicio drop column peso_por_lado; alter table public.serie add column peso_corporal_incluso boolean not null default false;` — reintroduzir a coluna não recupera os valores antigos (todos eram `false`, então não há perda real).

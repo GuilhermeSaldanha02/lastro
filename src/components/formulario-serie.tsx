@@ -7,10 +7,10 @@
 // o estado da lista de séries. Este componente só valida a entrada e
 // entrega um objeto pronto — não sabe nada sobre rede nem sobre a fila.
 //
-// `unilateral` NÃO é campo deste formulário: é atributo do exercício
-// escolhido, lido do catálogo (`exercicio.unilateral`). A tela só mostra um
-// indicador de texto quando o exercício selecionado for unilateral — o dono
-// não re-declara isso a cada série (SDD §5.1).
+// `unilateral` e `pesoPorLado` NÃO são campos deste formulário: são
+// atributos do exercício escolhido, lidos do catálogo. A tela só mostra um
+// indicador de texto quando o exercício selecionado tiver um dos dois — o
+// dono não re-declara isso a cada série (SDD §5.1, D3.5).
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import type { Exercicio, SerieHistorica } from "@/lib/dados/treino";
 import { historicoDoExercicio } from "@/lib/dados/treino";
@@ -22,7 +22,6 @@ export type DadosNovaSerie = {
   reps: number;
   peso: number;
   rir: number | null;
-  pesoCorporalIncluso: boolean;
   /** Calculado aqui (não no pai) porque é aqui que o histórico já foi
    * buscado — evita uma segunda consulta pra mesma informação (C4). */
   ehRecordePessoal: boolean;
@@ -87,7 +86,6 @@ export default function FormularioSerie({
     const reps = Number(formData.get("reps"));
     const peso = Number(formData.get("peso"));
     const rirBruto = formData.get("rir");
-    const pesoCorporalIncluso = formData.get("peso_corporal_incluso") === "on";
 
     if (!exercicioId) {
       setErro("Exercício é obrigatório.");
@@ -131,7 +129,6 @@ export default function FormularioSerie({
       reps,
       peso,
       rir,
-      pesoCorporalIncluso,
       ehRecordePessoal,
     });
     formulario.reset();
@@ -166,10 +163,15 @@ export default function FormularioSerie({
         </select>
       </div>
 
-      {exercicioSelecionado?.unilateral && (
-        <span className="tag-unilateral" style={{ alignSelf: "flex-start" }}>
-          Unilateral · reps contam por lado
-        </span>
+      {(exercicioSelecionado?.unilateral || exercicioSelecionado?.pesoPorLado) && (
+        <div style={{ display: "flex", gap: "var(--lastro-e-2)", flexWrap: "wrap" }}>
+          {exercicioSelecionado?.unilateral && (
+            <span className="tag-unilateral">Unilateral · reps contam por lado</span>
+          )}
+          {exercicioSelecionado?.pesoPorLado && (
+            <span className="tag-unilateral">Halteres · peso é de cada lado</span>
+          )}
+        </div>
       )}
 
       {ultimaDoHistorico && (
@@ -247,15 +249,6 @@ export default function FormularioSerie({
           <input id="rir" name="rir" type="number" inputMode="numeric" placeholder="Ex: 2" min={0} max={10} />
         </div>
       )}
-
-      <label className="campo-caixa" htmlFor="peso_corporal_incluso" style={{ padding: "8px 0" }}>
-        <input
-          id="peso_corporal_incluso"
-          name="peso_corporal_incluso"
-          type="checkbox"
-        />
-        Peso corporal incluso
-      </label>
 
       {erro && (
         <p className="aviso-erro" role="alert">

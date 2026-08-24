@@ -32,7 +32,6 @@ type LinhaSerie = {
   reps: number;
   peso: number;
   rir: number | null;
-  peso_corporal_incluso: boolean;
 };
 
 type LinhaTreino = {
@@ -46,6 +45,7 @@ type LinhaExercicio = {
   nome: string;
   grupo_muscular_primario: string;
   unilateral: boolean;
+  peso_por_lado: boolean;
 };
 
 /** Todos os treinos do usuário logado (RLS filtra), já com as séries. */
@@ -55,7 +55,7 @@ async function carregarTreinosDoUsuario(
   const { data, error } = await supabase
     .from("treino")
     .select(
-      "id, data, serie (id, exercicio_id, tipo, reps, peso, rir, peso_corporal_incluso)",
+      "id, data, serie (id, exercicio_id, tipo, reps, peso, rir)",
     );
   if (error) throw new Error(`Falha ao carregar treinos: ${error.message}`);
 
@@ -69,7 +69,6 @@ async function carregarTreinosDoUsuario(
       reps: s.reps,
       peso: Number(s.peso),
       rir: s.rir ?? undefined,
-      pesoCorporalIncluso: s.peso_corporal_incluso,
     })),
   }));
 }
@@ -80,7 +79,7 @@ async function carregarExercicios(
 ): Promise<ExercicioBruto[]> {
   const { data, error } = await supabase
     .from("exercicio")
-    .select("id, nome, grupo_muscular_primario, unilateral");
+    .select("id, nome, grupo_muscular_primario, unilateral, peso_por_lado");
   if (error) throw new Error(`Falha ao carregar exercícios: ${error.message}`);
 
   return ((data ?? []) as LinhaExercicio[]).map((e) => ({
@@ -88,6 +87,7 @@ async function carregarExercicios(
     nome: e.nome,
     grupoMuscularPrimario: e.grupo_muscular_primario,
     unilateral: e.unilateral,
+    pesoPorLado: e.peso_por_lado,
   }));
 }
 

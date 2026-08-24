@@ -181,7 +181,6 @@ export default function TreinoDetalhe({
       reps: ultima.reps,
       peso: ultima.peso,
       rir: ultima.rir,
-      pesoCorporalIncluso: ultima.pesoCorporalIncluso,
       // Repetir a série exata que já foi feita não pode superá-la — nunca é PR.
       ehRecordePessoal: false,
     });
@@ -196,11 +195,11 @@ export default function TreinoDetalhe({
       exercicioId: dados.exercicioId,
       exercicioNome: exercicio.nome,
       exercicioUnilateral: exercicio.unilateral,
+      exercicioPesoPorLado: exercicio.pesoPorLado,
       tipo: dados.tipo,
       reps: dados.reps,
       peso: dados.peso,
       rir: dados.rir,
-      pesoCorporalIncluso: dados.pesoCorporalIncluso,
       ehRecordePessoal: dados.ehRecordePessoal,
     };
     const ordem = series.length + 1;
@@ -217,7 +216,6 @@ export default function TreinoDetalhe({
       reps: novaSerie.reps,
       peso: novaSerie.peso,
       rir: novaSerie.rir,
-      pesoCorporalIncluso: novaSerie.pesoCorporalIncluso,
     });
 
     // Melhor esforço — se não houver rede, a série já está na fila.
@@ -251,7 +249,6 @@ export default function TreinoDetalhe({
       reps: dados.reps,
       peso: dados.peso,
       rir: dados.rir,
-      pesoCorporalIncluso: dados.pesoCorporalIncluso,
     });
 
     const resultado = await drenar();

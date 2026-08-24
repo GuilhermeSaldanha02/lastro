@@ -137,6 +137,9 @@ export default function CatalogoInterativo({
                         {exercicio.unilateral && (
                           <span className="tag-unilateral">Unilateral</span>
                         )}
+                        {exercicio.pesoPorLado && (
+                          <span className="tag-unilateral">Peso por lado</span>
+                        )}
                       </div>
 
                       {exercicio.dicaExecucao ? (

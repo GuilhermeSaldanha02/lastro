@@ -243,14 +243,18 @@ export type ResumoCompacto = {
 
 ---
 
-### D3.5 — Como `volume.ts` trata unilateral e peso corporal
+### D3.5 — Como `volume.ts` trata unilateral e peso por lado
 
-Duas decisões do dono (`DECISIONS.md` 2026-08-04), incorporadas ao cálculo:
+Dois atributos do **exercício** (nunca da série — §3.2) dobram volume, por razões distintas, e NUNCA compõem entre si (`DECISIONS.md` 2026-08-04 e 2026-08-24):
 
-- **Unilateral** (atributo de `exercicio`, não de `serie` — §3.2): `volume_da_serie = reps × peso × (exercicio.unilateral ? 2 : 1)`. O dono anota "10 de cada lado"; o agregador sabe que isso são 20 execuções.
-- **Peso corporal:** série com `peso_corporal_incluso = true` **não entra** em `volume` nem em `volume_por_grupo_muscular`, em nenhuma hipótese — nem só a carga adicional. Calcular volume parcial (só a carga externa) seria um número tecnicamente correto mas enganoso, porque comparado lado a lado com séries de volume completo ele pareceria "treino leve" quando pode ser o oposto. A série **continua contando** em `frequencia.treinos_semana_atual` e em `series_dificeis` (o esforço é real, mesmo que o volume não seja mensurável). A tela (§7.1) declara a limitação onde o número de volume aparece.
+- **Unilateral:** `exercicio.unilateral = true` — as reps são contadas por lado. O dono anota "10 de cada lado"; o agregador sabe que isso são 20 execuções.
+- **Peso por lado:** `exercicio.peso_por_lado = true` — o peso registrado é de **um** implemento (ex.: um halter em cada mão), não do par. Sem a correção, halter bilateral (ex.: "Supino reto com halteres", `unilateral=false` corretamente) tem o volume subestimado pela metade.
 
-Casos de teste: T-V4 e T-V5 (§4.5).
+`volume_da_serie = reps × peso × (exercicio.unilateral || exercicio.peso_por_lado ? 2 : 1)`.
+
+**"Peso corporal incluso" existiu e foi removido (2026-08-24).** Nunca foi usado (0 de 461 séries no banco real) — ver `DECISIONS.md` 2026-08-24. Não há mais exceção de volume para exercício de peso corporal; toda série valendo entra em `volume` e `volume_por_grupo_muscular` normalmente.
+
+Casos de teste: T-V4, T-V6, T-V7 (`src/lib/analise/volume.test.ts`).
 
 ---
 
@@ -299,6 +303,11 @@ create table public.exercicio (
   -- Rosca alternada é sempre unilateral; não é o dono quem decide isso toda
   -- série. O agregador dobra o volume quando este flag é true (§4.5, T-V4).
   unilateral               boolean not null default false,
+  -- ATRIBUTO DO EXERCÍCIO, mesma forma de `unilateral` (DECISIONS.md
+  -- 2026-08-24, migração 0010). true quando o peso registrado é de UM
+  -- implemento (ex.: um halter em cada mão), não do par — dobra o volume
+  -- pela mesma razão de unilateral, mas nunca composto com ele (D3.5).
+  peso_por_lado            boolean not null default false,
   dica_execucao            text,          -- CURADA, nunca gerada (FF7). Fase 4.
   criado_em                timestamptz not null default now()
 );
@@ -325,10 +334,13 @@ create table public.serie (
   peso                  numeric(6,2) not null,
   unidade               text    not null default 'kg',
   rir                   smallint,
-  -- `unilateral` NÃO mora aqui — é atributo do exercício (ver tabela acima).
-  -- Marcado assim porque cada série já poderia divergir do catálogo, e a
-  -- decisão registrada é que ele não diverge: a série herda do exercício.
-  peso_corporal_incluso boolean not null default false,
+  -- `unilateral` e `peso_por_lado` NÃO moram aqui — são atributo do
+  -- exercício (ver tabela acima). Marcado assim porque cada série já
+  -- poderia divergir do catálogo, e a decisão registrada é que não
+  -- diverge: a série herda do exercício.
+  --
+  -- `peso_corporal_incluso` existiu aqui e foi removido em 2026-08-24
+  -- (migração 0010) — nunca foi usado (0 de 461 séries no banco real).
   criado_em             timestamptz not null default now(),
 
   constraint serie_tipo_valido  check (tipo in ('aquecimento', 'valendo')),
@@ -583,7 +595,7 @@ export function montarResumoCompacto(entrada: {
    * Volume de dado de um usuário é pequeno; ler tudo é barato.
    */
   treinos: TreinoBruto[];
-  exercicios: ExercicioBruto[];  // catálogo — inclui exercicio.unilateral (D3.5)
+  exercicios: ExercicioBruto[];  // catálogo — inclui exercicio.unilateral e exercicio.pesoPorLado (D3.5)
   /** C4: data de referência INJETADA. Nunca new Date() aqui dentro. */
   agora: Date;
   janelaSemanas?: number;        // default JANELA_SEMANAS
@@ -617,7 +629,8 @@ Semana anterior (início 2026-07-20), mesmo exercício: duas séries valendo de 
 | **T-V2** | **FF4** — remover `s0` do fixture | Volume, e1RM, frequência e contagem de séries **idênticos** a T-V1. O aquecimento `10×20 = 200` **não** aparece em lugar nenhum |
 | **T-V3** | Delta de volume vs. semana anterior (`2×(10×50) = 1000`) | `(1200−1000)/1000 =` **+20,0 %**, campo `delta_volume_pct` pré-calculado |
 | **T-V4** | **Unilateral (D3.5)** — exercício com `exercicio.unilateral = true`, série `10 × 14` (rosca alternada) | Volume da série = `10 × 14 × 2 =` **280**, não 140. O `2×` vem do catálogo, não de campo na série |
-| **T-V5** | **Peso corporal (D3.5)** — série `tipo='valendo'`, `peso_corporal_incluso=true`, `8 × 10` (barra fixa com 10 kg extra) | **Não** entra em `volume` nem em `volume_por_grupo_muscular` — nem a parte de 80 kg da carga externa. A série **conta** em `frequencia.treinos_semana_atual` e, se tiver RIR, em `series_dificeis` |
+| **T-V6** | **Peso por lado (D3.5)** — exercício com `exercicio.peso_por_lado = true`, série `10 × 14` (halter bilateral) | Volume da série = `10 × 14 × 2 =` **280**, não 140. Mesma correção de T-V4, motivo distinto |
+| **T-V7** | **Sem composição (D3.5)** — exercício com `unilateral = true` **e** `peso_por_lado = true`, série `10 × 14` | Volume da série = **280**, nunca 560 — os dois multiplicadores nunca compõem |
 | **T-E1** | e1RM de `s1` (10×50) | `50 × (1 + 10/30) = 50 × 1,3333 =` **66,7 kg** |
 | **T-E2** | e1RM de `s2` (8×50) | `50 × (1 + 8/30) = 50 × 1,26667 =` **63,3 kg** |
 | **T-E3** | **Identidade** — série `1 × 100` | **100,0 kg** exatos. Epley cru daria 103,3 — falha |
@@ -668,9 +681,9 @@ src/components/formulario-serie.tsx
 src/lib/dados/treino.ts           ← leitura/escrita via Supabase (fora de analise/)
 ```
 
-Campos do formulário, um por um: exercício (select do seed), `tipo` (aquecimento | valendo — **default valendo**), `reps`, `peso`, `rir` (visível **só** quando `tipo = valendo`, e **opcional**), `peso_corporal_incluso` (checkbox).
+Campos do formulário, um por um: exercício (select do seed), `tipo` (aquecimento | valendo — **default valendo**), `reps`, `peso`, `rir` (visível **só** quando `tipo = valendo`, e **opcional**).
 
-**`unilateral` não é campo do formulário.** É atributo do exercício escolhido, lido do catálogo — a tela mostra um indicador ("rosca alternada — reps contam por lado"), não um checkbox. O dono não re-declara isso a cada série.
+**`unilateral` e `peso_por_lado` não são campos do formulário.** São atributos do exercício escolhido, lidos do catálogo — a tela mostra um indicador de texto para cada um ("rosca alternada — reps contam por lado" / "halteres — peso é de cada lado"), nunca um checkbox. O dono não re-declara isso a cada série.
 
 ### 5.2 FORA
 
@@ -681,7 +694,7 @@ Offline, Dexie, outbox, service worker (Fase 2) · "repetir última série" (Fas
 Registrar **5 séries reais** — incluindo pelo menos um aquecimento, um `rir = 0`, uma série sem `rir`, e uma série de exercício unilateral do catálogo — e ver as 5 no Postgres:
 
 ```sql
-select s.tipo, s.reps, s.peso, s.rir, e.unilateral, s.peso_corporal_incluso
+select s.tipo, s.reps, s.peso, s.rir, e.unilateral, e.peso_por_lado
 from serie s join exercicio e on e.id = s.exercicio_id
 order by s.criado_em desc limit 5;
 ```
@@ -846,8 +859,7 @@ src/components/parecer.tsx        ← renderiza texto + ressalvas obrigatórias
 **Ressalvas que a tela carrega, não esconde** (não são rodapé decorativo — são o que separa este app de conselho inventado):
 - faixa de referência de volume = convenção prática, base majoritariamente de homens jovens treinados, sem teto validado (`KNOWLEDGE.md` §3.6);
 - estagnação de N semanas = convenção de mercado, não critério clínico (§3.7);
-- e1RM acima do teto de reps não é reportado, e por quê (§D1);
-- **exercício de peso corporal não entra no volume mostrado** — a série conta, o volume dela não é somado (D3.5). Declarar isso onde o número de volume aparece, não em rodapé genérico.
+- e1RM acima do teto de reps não é reportado, e por quê (§D1).
 
 ### 7.2 FORA
 
@@ -876,7 +888,7 @@ Isso entrega a tarefa **1.6** ao dono: ele lê os 3 pareceres e diz se convence.
 
 ## 8. TODOs e perguntas ao dono
 
-**Unilateral e peso corporal — já decididos, não reabrir.** `DECISIONS.md` (2026-08-04) fechou os dois: unilateral dobra o volume via atributo do exercício (D3.5, §3.2, §4.5 T-V4); peso corporal fica fora do volume, contando só em frequência e série difícil (D3.5, §4.5 T-V5). Esta versão da spec já incorpora as duas.
+**Unilateral e peso por lado — já decididos, não reabrir.** `DECISIONS.md` (2026-08-04, revisado 2026-08-24) fechou os dois: unilateral e peso por lado dobram o volume via atributo do exercício, nunca compostos entre si (D3.5, §3.2, §4.5 T-V4/T-V6/T-V7). "Peso corporal incluso" — a decisão original de 2026-08-04 sobre exercício de peso corporal fora do volume — foi revertida em 2026-08-24: nunca foi usado (0 de 461 séries) e saiu do produto. Esta versão da spec já incorpora o estado atual.
 
 **Pergunta que permanece aberta:**
 

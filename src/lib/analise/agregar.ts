@@ -47,10 +47,10 @@ function achatarSeriesValendo(
         exercicio: exercicio.nome,
         grupoMuscular: exercicio.grupoMuscularPrimario,
         unilateral: exercicio.unilateral,
+        pesoPorLado: exercicio.pesoPorLado,
         reps: serie.reps,
         peso: serie.peso,
         rir: serie.rir,
-        pesoCorporalIncluso: serie.pesoCorporalIncluso,
         data: treino.data,
         semanaInicio,
       });

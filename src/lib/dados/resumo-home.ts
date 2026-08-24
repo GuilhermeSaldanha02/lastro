@@ -70,8 +70,7 @@ type LinhaSerie = {
   tipo: "aquecimento" | "valendo";
   reps: number;
   peso: number;
-  peso_corporal_incluso: boolean;
-  exercicio: { grupo_muscular_primario: string; unilateral: boolean } | null;
+  exercicio: { grupo_muscular_primario: string; unilateral: boolean; peso_por_lado: boolean } | null;
 };
 
 type LinhaTreino = {
@@ -93,7 +92,7 @@ export async function carregarResumoHome(hojeISO: string): Promise<ResumoHome> {
   const { data, error } = await supabase
     .from("treino")
     .select(
-      "id, data, serie (tipo, reps, peso, peso_corporal_incluso, exercicio:exercicio_id (grupo_muscular_primario, unilateral))",
+      "id, data, serie (tipo, reps, peso, exercicio:exercicio_id (grupo_muscular_primario, unilateral, peso_por_lado))",
     )
     .order("data", { ascending: false });
   if (error) throw new Error(`Falha ao carregar o resumo: ${error.message}`);
@@ -112,9 +111,9 @@ export async function carregarResumoHome(hojeISO: string): Promise<ResumoHome> {
         exercicio: "",
         grupoMuscular: s.exercicio?.grupo_muscular_primario ?? "",
         unilateral: s.exercicio?.unilateral ?? false,
+        pesoPorLado: s.exercicio?.peso_por_lado ?? false,
         reps: s.reps,
         peso: Number(s.peso),
-        pesoCorporalIncluso: s.peso_corporal_incluso,
         data: treino.data,
         semanaInicio: semanaInicioDoTreino(treino.data),
       })) as SerieValendo[];
