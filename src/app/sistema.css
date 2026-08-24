@@ -948,6 +948,68 @@
   accent-color: var(--lastro-acao-borda);
 }
 
+/* ---------- Interruptor (switch deslizante) ---------- */
+/* Visual de controle deslizante, não caixa de marcar — usado onde a opção é
+   um estado ligado/desligado, não um item de lista (D3.5, "peso é de cada
+   lado"). O input real fica visualmente oculto mas continua no fluxo do
+   teclado/leitor de tela; o trilho e a bolinha são decoração via CSS. */
+.interruptor {
+  display: flex;
+  align-items: center;
+  gap: var(--lastro-e-3);
+  min-height: var(--lastro-alvo-min);
+  font-size: var(--lastro-papel-corpo);
+  color: var(--lastro-txt-2);
+  cursor: pointer;
+}
+
+.interruptor__entrada {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+}
+
+.interruptor__trilho {
+  position: relative;
+  flex: none;
+  width: 46px;
+  height: 26px;
+  border-radius: var(--lastro-raio-pilula);
+  background: var(--lastro-sup-3);
+  border: 1px solid var(--lastro-controle);
+  transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+
+.interruptor__bolinha {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--lastro-txt);
+  transition: transform 0.15s ease, background-color 0.15s ease;
+}
+
+.interruptor__entrada:checked + .interruptor__trilho {
+  background: var(--lastro-ouro);
+  border-color: var(--lastro-ouro);
+}
+
+.interruptor__entrada:checked + .interruptor__trilho .interruptor__bolinha {
+  transform: translateX(20px);
+  background: var(--lastro-acao-txt);
+}
+
+.interruptor__entrada:focus-visible + .interruptor__trilho {
+  outline: var(--lastro-foco-espessura) solid var(--lastro-foco);
+  outline-offset: var(--lastro-foco-afast);
+}
+
 /* ---------- Seleção de grupo(s) muscular(es) antes do exercício ------- */
 /* Grade de 2 colunas, não `flex-wrap` — largura de conteúdo variável
    ("Abdômen" vs "Posterior de coxa") deixava a fileira torta, chip curto

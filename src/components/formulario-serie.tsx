@@ -267,13 +267,17 @@ export default function FormularioSerie({
         </div>
       )}
 
-      <label className="campo-caixa" htmlFor="peso_por_lado" style={{ padding: "8px 0" }}>
+      <label className="interruptor" htmlFor="peso_por_lado">
         <input
           id="peso_por_lado"
+          className="interruptor__entrada"
           type="checkbox"
           checked={pesoPorLado}
           onChange={(e) => setPesoPorLado(e.target.checked)}
         />
+        <span className="interruptor__trilho">
+          <span className="interruptor__bolinha" />
+        </span>
         Peso é de cada lado (ex.: um halter em cada mão)
       </label>
 
