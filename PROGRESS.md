@@ -11,25 +11,26 @@
 
 > Bloco de handoff entre agentes (Antigravity ⇄ Claude). **Sobrescrever a cada sessão**, nunca acumular. Formato e regras: `AGENTS.md` §3.
 
-- **Última sessão:** 2026-08-24 · agente: claude · branch: `feat/peso-por-lado`
-- **Em andamento:** achado do dono — halter bilateral (ex.: "Supino reto com halteres") tinha volume subestimado pela metade, porque `unilateral=false` está correto (reps não dobram) mas o peso digitado é de UM halter, não do par. Implementação de código **completa e com os 4 gates verdes**; falta aplicar a migração no banco real e decidir merge (ver "Bloqueado" abaixo).
-- **Último commit antes desta sessão:** `84427c8` (main).
-- **Fechado nesta sessão** (branch `feat/peso-por-lado`, ainda **não commitada nem mergeada**):
-  - **`exercicio.peso_por_lado`** (migração `0010_peso_por_lado.sql`, escrita mas **não aplicada no Supabase ainda**) — mesma forma de `unilateral` (atributo do exercício, não da série): dobra volume por razão distinta (peso é de um implemento, não reps por lado), nunca composto com `unilateral` no mesmo cálculo. Migração marca os 9 exercícios de halter bilateral do catálogo (plural "halteres"; pull-over e agachamento sumô ficam de fora — halter singular, peso já total).
+- **Última sessão:** 2026-08-24 · agente: claude · branch: `main` (branch de trabalho `feat/peso-por-lado`, mergeada e ainda existente localmente)
+- **Em andamento:** nada — fechado e no remoto.
+- **Último commit:** `e8d816d` (merge de `feat/peso-por-lado` em `main`, pushado para `origin/main`). Nota: `main` avançou por um PR de outra sessão (`#115`, commit `a38d808`) enquanto eu trabalhava — mesmo conteúdo do `84427c8` que eu já tinha visto, sem conflito real no merge.
+- **Fechado nesta sessão:**
+  - **Achado do dono** — halter bilateral (ex.: "Supino reto com halteres") tinha volume subestimado pela metade: `unilateral=false` está correto nesses exercícios (reps não dobram), mas o peso digitado é de UM halter, não do par.
+  - **`exercicio.peso_por_lado`** (migração `0010_peso_por_lado.sql`, **aplicada no Supabase real**) — mesma forma de `unilateral` (atributo do exercício, não da série): dobra volume por razão distinta, nunca composto com `unilateral` no mesmo cálculo. Marca os 9 exercícios de halter bilateral do catálogo (plural "halteres"; pull-over e agachamento sumô ficam de fora — halter singular, peso já total). Confirmado no banco: 9 de 102 exercícios marcados.
   - **`peso_corporal_incluso` removido de vez** — decisão do dono após eu consultar o banco real: 0 de 461 séries usavam o campo. Saiu do schema (mesma migração 0010), do agregador, dos formulários (`formulario-serie.tsx`, `editar-serie.tsx`) e do rodapé do parecer.
   - Threading completo em `src/lib/analise/{tipos,volume,agregar}.ts`, `src/lib/dados/{treino,progressao,resumo-home}.ts`, `src/app/api/analise/route.ts`, componentes de catálogo (tag "Peso por lado" ao lado da tag "Unilateral" já existente) e formulários.
-  - Docs atualizados: `KNOWLEDGE.md` §1 (novo termo), `DECISIONS.md` (entrada 2026-08-24), `SDD.md` (§D3.5, schema §3.2, T-V4/T-V6/T-V7 em §4.5, §5.1, §7.1, §8), `ARCHITECTURE.md` (linha da entidade `exercicio`, corrigido de quebra também a contagem de exercícios que estava desatualizada — são 102, não 3).
+  - Docs atualizados: `KNOWLEDGE.md` §1 (novo termo), `DECISIONS.md` (entrada 2026-08-24), `SDD.md` (§D3.5, schema §3.2, T-V4/T-V6/T-V7 em §4.5, §5.1, §7.1, §8), `ARCHITECTURE.md` (linha da entidade `exercicio`, e a contagem de exercícios que estava desatualizada — são 102, não 3).
   - Testes: `volume.test.ts` reescrito (T-V6 peso por lado, T-V7 não-composição); `agregar.test.ts` e os 4 outros arquivos de teste em `src/lib/analise/` (`equilibrio`, `frequencia`, `progressao`, `series-dificeis`) tiveram os fixtures atualizados — 173 testes passando.
-  - `tsc`/`test` (173)/`lint`/`build` — todos verdes, do zero.
-- **Bloqueado / a decidir:**
-  - **Aplicar a migração `0010` no Supabase real** — bloqueado pelo classificador do modo automático (DDL irreversível: `drop column`). Precisa de confirmação explícita do dono antes de rodar (`apply_migration`, projeto `tbkzcqfvafznxallyfqk`).
-  - **Commit e merge** — não commitei nem abri PR: instrução do dono é só commitar quando pedido explicitamente. Branch `feat/peso-por-lado` tem o working tree com as mudanças, pronta para revisão.
-- **Próximo passo:** dono decide — aplicar a migração, revisar o diff, e então commit + PR (ou pedir ajuste primeiro). Depois disso, verificação visual ao vivo (Playwright, 360×640) do formulário de registro de série e das duas tags no catálogo, antes de fechar de vez.
-- **Fixture QA:** `qa-audit-2608@teste.lastro.invalid` segue viva — não usada nesta sessão (mudança não foi verificada ao vivo ainda, ver "Próximo passo").
+  - `tsc`/`test` (173)/`lint`/`build` — verdes na branch, e **reverificados de novo na `main` pós-merge**.
+  - Commit → merge `--no-ff` em `main` → push para `origin/main`, todos pedidos explicitamente pelo dono nesta sessão.
+- **Bloqueado / a decidir:** nada.
+- **Próximo passo:** verificação visual ao vivo (Playwright, 360×640) do formulário de registro de série (indicador "Halteres · peso é de cada lado") e das tags no catálogo — não foi feita nesta sessão, só os gates automatizados.
+- **Fixture QA:** `qa-audit-2608@teste.lastro.invalid` segue viva — não usada nesta sessão.
 - **Para o outro agente saber:**
   - Este arquivo passou de **1.100 linhas** e a regra logo acima manda arquivar acima de ~300 — ainda não arquivado, dívida que se acumula. Arquivar os concluídos em `PROGRESS-archive.md` antes de acumular mais.
   - `DESIGN.md` tem um banner datado (2026-08-20/21) avisando que §3.0–3.2 e a tabela C1–C14 de §4.2 descrevem a paleta areia antiga, não o Apex Pro. Só a linha `txt-3`/C3 foi remedida. Não citar número de lá sem conferir contra `tokens.css` primeiro. (T3b parte 1, ainda aberta — não tocada nesta sessão.)
   - Se `unilateral` ganhar um terceiro tratamento parecido no futuro, o padrão está em `src/lib/analise/volume.ts`: multiplicador é sempre `condA || condB || condC ? 2 : 1`, nunca produto — ×2×2 quadruplica silenciosamente.
+  - **Achado desta sessão sobre a ferramenta:** o wrapper `rtk` que intercepta comandos Bash deu leitura *desatualizada/incorreta* de `git log`/`git rev-parse` em pelo menos um momento (mostrou um hash de commit diferente do real, cross-checado e corrigido via PowerShell direto). Se um `git log`/`git status` via Bash parecer inconsistente com o que acabou de acontecer, cross-checar via PowerShell antes de agir — não confiar cegamente no primeiro output.
 
 ---
 
