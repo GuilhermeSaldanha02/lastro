@@ -95,10 +95,6 @@ export default function Parecer({
             e1RM calculado acima do teto de reps não é reportado — a fórmula
             perde precisão nessa faixa.
           </li>
-          <li>
-            Séries de peso corporal contam para frequência e série difícil,
-            mas não entram no volume mostrado acima.
-          </li>
         </ul>
       </footer>
     </article>

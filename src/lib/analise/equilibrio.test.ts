@@ -9,9 +9,9 @@ function serie(grupoMuscular: string): SerieValendo {
     exercicio: "x",
     grupoMuscular,
     unilateral: false,
+    pesoPorLado: false,
     reps: 10,
     peso: 50,
-    pesoCorporalIncluso: false,
     data: "2026-08-20",
     semanaInicio: "2026-08-17",
   } as SerieValendo;

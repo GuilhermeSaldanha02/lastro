@@ -102,9 +102,9 @@ Regra que decide o produto: **registrar (e corrigir) série nunca depende de red
 
 Nomes seguem o glossário de `KNOWLEDGE.md` §1 — linguagem ubíqua, sem sinônimo.
 
-- **exercicio** — catálogo curado. Nome PT-BR, grupo muscular primário, dicas de execução (curadas, nunca geradas — FF7). **Hoje só 3 exercícios placeholder de teste existem no banco** — o catálogo real de ~100 é trabalho de redação pendente (ver `PROGRESS.md`, Fase 4).
+- **exercicio** — catálogo curado. Nome PT-BR, grupo muscular primário, dicas de execução (curadas, nunca geradas — FF7), `unilateral` e `peso_por_lado` (D3.5 — ambos dobram volume, nunca compostos). 102 exercícios no banco em 2026-08-24.
 - **treino** — uma ida à academia. Data, usuário. CRUD completo: criar, listar, buscar com séries, excluir (cascade).
-- **serie** — pertence a treino + exercicio. Campos: `tipo` (aquecimento | valendo), `reps`, `peso`, `unidade`, `rir` (opcional), `unilateral`, `peso_corporal_incluso`. CRUD completo: criar, editar (não o exercício — trocar de exercício é operação diferente), excluir.
+- **serie** — pertence a treino + exercicio. Campos: `tipo` (aquecimento | valendo), `reps`, `peso`, `unidade`, `rir` (opcional). CRUD completo: criar, editar (não o exercício — trocar de exercício é operação diferente), excluir.
 
 ---
 

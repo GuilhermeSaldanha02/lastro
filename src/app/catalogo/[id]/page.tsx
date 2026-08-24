@@ -45,6 +45,7 @@ export default async function PaginaHistoricoExercicio({
           <div className="exercicio-hero-card__tags">
             <span className="tag-grupo">{exercicio.grupoMuscularNome.toUpperCase()}</span>
             {exercicio.unilateral && <span className="tag-unilateral">Unilateral</span>}
+            {exercicio.pesoPorLado && <span className="tag-unilateral">Peso por lado</span>}
             {cargaMaxima > 0 && (
               <span className="disciplina-card__streak">
                 PR: {cargaMaxima} kg

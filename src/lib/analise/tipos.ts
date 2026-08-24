@@ -13,7 +13,6 @@ export type SerieBruta = {
   peso: number;
   /** RIR ausente = informação desconhecida. NUNCA usar 0 para "sem RIR" (D3). */
   rir?: number;
-  pesoCorporalIncluso: boolean;
 };
 
 /** Uma ida à academia, com as séries registradas nela. */
@@ -24,12 +23,18 @@ export type TreinoBruto = {
   series: SerieBruta[];
 };
 
-/** Um exercício do catálogo (SDD §3.2) — inclui o atributo `unilateral`. */
+/**
+ * Um exercício do catálogo (SDD §3.2) — inclui os dois atributos que
+ * dobram o volume da série (D3.5), por razões distintas e nunca compostas:
+ * `unilateral` (reps contadas por lado) e `pesoPorLado` (peso registrado é
+ * de UM implemento — ex.: um halter — não do par).
+ */
 export type ExercicioBruto = {
   id: string;
   nome: string;
   grupoMuscularPrimario: string;
   unilateral: boolean;
+  pesoPorLado: boolean;
 };
 
 /**
@@ -43,10 +48,10 @@ export type SerieValendo = {
   exercicio: string;
   grupoMuscular: string;
   unilateral: boolean;
+  pesoPorLado: boolean;
   reps: number;
   peso: number;
   rir?: number;
-  pesoCorporalIncluso: boolean;
   /** ISO date do treino. */
   data: string;
   /** ISO date (segunda-feira) da semana ISO-8601 do treino. */

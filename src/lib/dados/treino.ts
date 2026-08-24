@@ -18,6 +18,8 @@ export type Exercicio = {
   nome: string;
   grupoMuscularPrimario: string;
   unilateral: boolean;
+  /** Peso registrado é de UM implemento (ex.: um halter) — dobra volume, igual unilateral (D3.5). */
+  pesoPorLado: boolean;
 };
 
 export type Serie = {
@@ -25,12 +27,12 @@ export type Serie = {
   exercicioId: string;
   exercicioNome: string;
   exercicioUnilateral: boolean;
+  exercicioPesoPorLado: boolean;
   tipo: "aquecimento" | "valendo";
   reps: number;
   peso: number;
   /** RIR ausente = informação desconhecida (KNOWLEDGE.md §1). NUNCA 0 por default. */
   rir: number | null;
-  pesoCorporalIncluso: boolean;
 };
 
 export type Treino = {
@@ -67,7 +69,7 @@ export async function listarTreinos(): Promise<Treino[]> {
   const { data, error } = await supabase
     .from("treino")
     .select(
-      "id, data, serie (tipo, reps, peso, peso_corporal_incluso, exercicio:exercicio_id (grupo_muscular_primario, unilateral))",
+      "id, data, serie (tipo, reps, peso, exercicio:exercicio_id (grupo_muscular_primario, unilateral, peso_por_lado))",
     )
     .order("data", { ascending: false });
   if (error) throw new Error(`Falha ao listar treinos: ${error.message}`);
@@ -76,8 +78,7 @@ export async function listarTreinos(): Promise<Treino[]> {
     tipo: "aquecimento" | "valendo";
     reps: number;
     peso: number;
-    peso_corporal_incluso: boolean;
-    exercicio: { grupo_muscular_primario: string; unilateral: boolean } | null;
+    exercicio: { grupo_muscular_primario: string; unilateral: boolean; peso_por_lado: boolean } | null;
   };
 
   type Linha = {
@@ -93,7 +94,7 @@ export async function listarTreinos(): Promise<Treino[]> {
     for (const s of valendo) {
       const peso = Number(s.peso);
       const reps = s.reps;
-      const mult = s.exercicio?.unilateral ? 2 : 1;
+      const mult = s.exercicio?.unilateral || s.exercicio?.peso_por_lado ? 2 : 1;
       vol += peso * reps * mult;
     }
     const grupos = Array.from(
@@ -133,7 +134,7 @@ export async function buscarTreino(
   const { data: series, error: erroSeries } = await supabase
     .from("serie")
     .select(
-      "id, exercicio_id, tipo, reps, peso, rir, peso_corporal_incluso, exercicio:exercicio_id (nome, unilateral)",
+      "id, exercicio_id, tipo, reps, peso, rir, exercicio:exercicio_id (nome, unilateral, peso_por_lado)",
     )
     .eq("treino_id", treinoId)
     .order("ordem", { ascending: true });
@@ -148,8 +149,7 @@ export async function buscarTreino(
     reps: number;
     peso: number;
     rir: number | null;
-    peso_corporal_incluso: boolean;
-    exercicio: { nome: string; unilateral: boolean } | null;
+    exercicio: { nome: string; unilateral: boolean; peso_por_lado: boolean } | null;
   };
   const linhasSeries = (series ?? []) as unknown as LinhaSerie[];
 
@@ -162,11 +162,11 @@ export async function buscarTreino(
       exercicioId: s.exercicio_id,
       exercicioNome: s.exercicio?.nome ?? "",
       exercicioUnilateral: s.exercicio?.unilateral ?? false,
+      exercicioPesoPorLado: s.exercicio?.peso_por_lado ?? false,
       tipo: s.tipo,
       reps: s.reps,
       peso: Number(s.peso),
       rir: s.rir,
-      pesoCorporalIncluso: s.peso_corporal_incluso,
     })),
   };
 }
@@ -175,7 +175,6 @@ export type SerieHistorica = {
   reps: number;
   peso: number;
   rir: number | null;
-  pesoCorporalIncluso: boolean;
   criadoEm: string;
   /** Data NOMINAL do treino a que a série pertence (`treino.data`) — é o
    * que ordena e o que a UI mostra, não `criadoEm` (achado de auditoria,
@@ -211,7 +210,7 @@ export async function historicoDoExercicio(
   const { data, error } = await supabase
     .from("serie")
     .select(
-      "reps, peso, rir, peso_corporal_incluso, criado_em, treino_id, treino:treino_id(data)",
+      "reps, peso, rir, criado_em, treino_id, treino:treino_id(data)",
     )
     .eq("exercicio_id", exercicioId)
     .eq("tipo", "valendo")
@@ -225,7 +224,6 @@ export async function historicoDoExercicio(
     reps: number;
     peso: number;
     rir: number | null;
-    peso_corporal_incluso: boolean;
     criado_em: string;
     treino_id: string;
     treino: { data: string } | { data: string }[] | null;
@@ -237,7 +235,6 @@ export async function historicoDoExercicio(
       reps: s.reps,
       peso: Number(s.peso),
       rir: s.rir,
-      pesoCorporalIncluso: s.peso_corporal_incluso,
       criadoEm: s.criado_em,
       dataTreino: treino?.data ?? s.criado_em,
       treinoId: s.treino_id,
@@ -257,7 +254,7 @@ export async function listarExercicios(): Promise<Exercicio[]> {
   const { supabase } = await usuarioAutenticadoOuErro();
   const { data, error } = await supabase
     .from("exercicio")
-    .select("id, nome, grupo_muscular_primario, unilateral")
+    .select("id, nome, grupo_muscular_primario, unilateral, peso_por_lado")
     .order("nome", { ascending: true });
   if (error) throw new Error(`Falha ao listar exercícios: ${error.message}`);
   return (data ?? []).map((e) => ({
@@ -265,6 +262,7 @@ export async function listarExercicios(): Promise<Exercicio[]> {
     nome: e.nome,
     grupoMuscularPrimario: e.grupo_muscular_primario,
     unilateral: e.unilateral,
+    pesoPorLado: e.peso_por_lado,
   }));
 }
 
@@ -286,7 +284,7 @@ export async function buscarExercicio(
   const { data, error } = await supabase
     .from("exercicio")
     .select(
-      "id, nome, grupo_muscular_primario, unilateral, dica_execucao, grupo_muscular (nome)",
+      "id, nome, grupo_muscular_primario, unilateral, peso_por_lado, dica_execucao, grupo_muscular (nome)",
     )
     .eq("id", id)
     .maybeSingle();
@@ -298,6 +296,7 @@ export async function buscarExercicio(
     nome: string;
     grupo_muscular_primario: string;
     unilateral: boolean;
+    peso_por_lado: boolean;
     dica_execucao: string | null;
     grupo_muscular: { nome: string } | { nome: string }[] | null;
   };
@@ -313,6 +312,7 @@ export async function buscarExercicio(
     grupoMuscularPrimario: linha.grupo_muscular_primario,
     grupoMuscularNome: grupo?.nome ?? linha.grupo_muscular_primario,
     unilateral: linha.unilateral,
+    pesoPorLado: linha.peso_por_lado,
     dicaExecucao: linha.dica_execucao,
   };
 }
@@ -323,7 +323,7 @@ export async function listarCatalogo(): Promise<ExercicioDoCatalogo[]> {
   const { data, error } = await supabase
     .from("exercicio")
     .select(
-      "id, nome, grupo_muscular_primario, unilateral, dica_execucao, grupo_muscular (nome)",
+      "id, nome, grupo_muscular_primario, unilateral, peso_por_lado, dica_execucao, grupo_muscular (nome)",
     )
     .order("nome", { ascending: true });
   if (error) throw new Error(`Falha ao listar o catálogo: ${error.message}`);
@@ -333,6 +333,7 @@ export async function listarCatalogo(): Promise<ExercicioDoCatalogo[]> {
     nome: string;
     grupo_muscular_primario: string;
     unilateral: boolean;
+    peso_por_lado: boolean;
     dica_execucao: string | null;
     grupo_muscular: { nome: string } | { nome: string }[] | null;
   };
@@ -347,6 +348,7 @@ export async function listarCatalogo(): Promise<ExercicioDoCatalogo[]> {
       grupoMuscularPrimario: e.grupo_muscular_primario,
       grupoMuscularNome: grupo?.nome ?? e.grupo_muscular_primario,
       unilateral: e.unilateral,
+      pesoPorLado: e.peso_por_lado,
       dicaExecucao: e.dica_execucao,
     };
   });
@@ -436,7 +438,6 @@ export type NovaSerieInput = {
   reps: number;
   peso: number;
   rir: number | null;
-  pesoCorporalIncluso: boolean;
 };
 
 /**
@@ -461,7 +462,6 @@ export async function criarSerieRemoto(input: NovaSerieInput): Promise<void> {
     reps: input.reps,
     peso: input.peso,
     rir: input.rir,
-    peso_corporal_incluso: input.pesoCorporalIncluso,
   });
   if (error) throw new Error(`Falha ao registrar série: ${error.message}`);
 }
@@ -485,7 +485,6 @@ export type AtualizacaoSerieInput = {
   reps: number;
   peso: number;
   rir: number | null;
-  pesoCorporalIncluso: boolean;
 };
 
 /**
@@ -510,7 +509,6 @@ export async function atualizarSerieRemoto(
       reps: input.reps,
       peso: input.peso,
       rir: input.rir,
-      peso_corporal_incluso: input.pesoCorporalIncluso,
     })
     .eq("id", input.id);
   if (error) throw new Error(`Falha ao atualizar série: ${error.message}`);

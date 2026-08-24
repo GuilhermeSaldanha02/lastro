@@ -32,12 +32,12 @@ type LinhaSerie = {
   tipo: "aquecimento" | "valendo";
   reps: number;
   peso: number;
-  peso_corporal_incluso: boolean;
   exercicio_id: string;
   exercicio: {
     nome: string;
     grupo_muscular_primario: string;
     unilateral: boolean;
+    peso_por_lado: boolean;
   } | null;
 };
 
@@ -70,7 +70,7 @@ export async function carregarProgressao(): Promise<PainelProgressao[]> {
   const { data, error } = await supabase
     .from("treino")
     .select(
-      "id, data, serie (tipo, reps, peso, peso_corporal_incluso, exercicio_id, exercicio:exercicio_id (nome, grupo_muscular_primario, unilateral))",
+      "id, data, serie (tipo, reps, peso, exercicio_id, exercicio:exercicio_id (nome, grupo_muscular_primario, unilateral, peso_por_lado))",
     );
   if (error) throw new Error(`Falha ao carregar a progressão: ${error.message}`);
 
@@ -85,9 +85,9 @@ export async function carregarProgressao(): Promise<PainelProgressao[]> {
         exercicio: s.exercicio!.nome,
         grupoMuscular: s.exercicio!.grupo_muscular_primario,
         unilateral: s.exercicio!.unilateral,
+        pesoPorLado: s.exercicio!.peso_por_lado,
         reps: s.reps,
         peso: Number(s.peso),
-        pesoCorporalIncluso: s.peso_corporal_incluso,
         data: treino.data,
         semanaInicio: semanaInicioDoTreino(treino.data),
       })),

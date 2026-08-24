@@ -13,7 +13,6 @@ export type DadosEdicaoSerie = {
   reps: number;
   peso: number;
   rir: number | null;
-  pesoCorporalIncluso: boolean;
 };
 
 export default function EditarSerie({
@@ -37,7 +36,6 @@ export default function EditarSerie({
     const reps = Number(formData.get("reps"));
     const peso = Number(formData.get("peso"));
     const rirBruto = formData.get("rir");
-    const pesoCorporalIncluso = formData.get("peso_corporal_incluso") === "on";
 
     if (!Number.isFinite(reps) || reps <= 0) {
       setErro("Reps precisa ser um número positivo.");
@@ -60,7 +58,7 @@ export default function EditarSerie({
 
     setSalvando(true);
     try {
-      await onSalvar({ tipo, reps, peso, rir, pesoCorporalIncluso });
+      await onSalvar({ tipo, reps, peso, rir });
     } finally {
       setSalvando(false);
     }
@@ -138,16 +136,6 @@ export default function EditarSerie({
           />
         </div>
       )}
-
-      <label className="campo-caixa" htmlFor={`pc-${serie.id}`}>
-        <input
-          id={`pc-${serie.id}`}
-          name="peso_corporal_incluso"
-          type="checkbox"
-          defaultChecked={serie.pesoCorporalIncluso}
-        />
-        Peso corporal incluso
-      </label>
 
       {erro && (
         <p className="aviso-erro" role="alert">

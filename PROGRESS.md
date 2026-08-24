@@ -11,20 +11,25 @@
 
 > Bloco de handoff entre agentes (Antigravity ⇄ Claude). **Sobrescrever a cada sessão**, nunca acumular. Formato e regras: `AGENTS.md` §3.
 
-- **Última sessão:** 2026-08-21 · agente: claude · branch: `main`
-- **Em andamento:** nada — a fila da auditoria pós-Apex Pro (`docs/AUDITORIA-APEX-PRO.md`) está fechada, exceto o item abaixo.
-- **Último commit:** `d916078` (de outra sessão, instalou `AGENTS.md`/`QA.md`/CI). Meus commits de conteúdo terminam em `8bb3fc8` (T4).
-- **Fechado nesta sessão** (branches `fix/contraste-txt3-obsidian-ouro`, `fix/acentos-cor-tema-claro`, `feat/meta-semanal-configuravel`, todas já mergeadas em `main`):
-  - **T3** — contraste de `--lastro-txt-3` corrigido no tema padrão + `petroleo`/`moka`/`branco-ouro` (os 3 únicos temas escuros que reprovavam, medidos ao vivo).
-  - **T3b (parte 2 — acentos de cor)** — 8 tokens corrigidos só no `branco-ouro` (`ouro`, `esmeralda-claro`, `esmeralda`, `ciano`, `erro`, `acao-tinta`, `sync`, `aquecimento` — este último token novo). 2 hex cravados (`color: #FFF`) trocados por `var(--lastro-txt)`. Ver `DECISIONS.md` 2026-08-21 (2) pros dois erros de metodologia de medição encontrados e corrigidos no caminho (transição CSS mascarando leitura; medir contra o pai em vez do próprio elemento).
-  - **T4** — meta semanal de treinos configurável. Migração `0009_meta_semanal.sql` (`smallint` nullable, sem default — decisão explícita do dono: sem meta definida, a Home mostra só a contagem, nunca fração inventada). Campo em `/ajustes`.
-  - `.gitignore` — dois artefatos de sessão de outro trabalho (`comparacao_4_temas.png`, `render-temas.mjs`) adicionados aos padrões já existentes.
-- **Bloqueado / a decidir:** nada.
-- **Próximo passo:** **T3b parte 1**, ainda aberta — reconciliar `DESIGN.md` por inteiro com o Apex Pro (os 14 pares de contraste de §4.2 contra as 6 paletas, e escrever a razão de cada cor escolhida). É documentação, não bug — nada quebrado esperando por isso. Registrado em `docs/BACKLOG-PROXIMA-FASE.md` T3b.
-- **Fixture QA:** `qa-audit-2608@teste.lastro.invalid` (uuid `ab52bd53-…`) segue viva, com treinos e grupos semeados — mantida de propósito pra próxima varredura visual. Sempre devolvida a `meta_treinos_semana = null` ao final de cada teste desta sessão.
+- **Última sessão:** 2026-08-24 · agente: claude · branch: `feat/peso-por-lado`
+- **Em andamento:** achado do dono — halter bilateral (ex.: "Supino reto com halteres") tinha volume subestimado pela metade, porque `unilateral=false` está correto (reps não dobram) mas o peso digitado é de UM halter, não do par. Implementação de código **completa e com os 4 gates verdes**; falta aplicar a migração no banco real e decidir merge (ver "Bloqueado" abaixo).
+- **Último commit antes desta sessão:** `84427c8` (main).
+- **Fechado nesta sessão** (branch `feat/peso-por-lado`, ainda **não commitada nem mergeada**):
+  - **`exercicio.peso_por_lado`** (migração `0010_peso_por_lado.sql`, escrita mas **não aplicada no Supabase ainda**) — mesma forma de `unilateral` (atributo do exercício, não da série): dobra volume por razão distinta (peso é de um implemento, não reps por lado), nunca composto com `unilateral` no mesmo cálculo. Migração marca os 9 exercícios de halter bilateral do catálogo (plural "halteres"; pull-over e agachamento sumô ficam de fora — halter singular, peso já total).
+  - **`peso_corporal_incluso` removido de vez** — decisão do dono após eu consultar o banco real: 0 de 461 séries usavam o campo. Saiu do schema (mesma migração 0010), do agregador, dos formulários (`formulario-serie.tsx`, `editar-serie.tsx`) e do rodapé do parecer.
+  - Threading completo em `src/lib/analise/{tipos,volume,agregar}.ts`, `src/lib/dados/{treino,progressao,resumo-home}.ts`, `src/app/api/analise/route.ts`, componentes de catálogo (tag "Peso por lado" ao lado da tag "Unilateral" já existente) e formulários.
+  - Docs atualizados: `KNOWLEDGE.md` §1 (novo termo), `DECISIONS.md` (entrada 2026-08-24), `SDD.md` (§D3.5, schema §3.2, T-V4/T-V6/T-V7 em §4.5, §5.1, §7.1, §8), `ARCHITECTURE.md` (linha da entidade `exercicio`, corrigido de quebra também a contagem de exercícios que estava desatualizada — são 102, não 3).
+  - Testes: `volume.test.ts` reescrito (T-V6 peso por lado, T-V7 não-composição); `agregar.test.ts` e os 4 outros arquivos de teste em `src/lib/analise/` (`equilibrio`, `frequencia`, `progressao`, `series-dificeis`) tiveram os fixtures atualizados — 173 testes passando.
+  - `tsc`/`test` (173)/`lint`/`build` — todos verdes, do zero.
+- **Bloqueado / a decidir:**
+  - **Aplicar a migração `0010` no Supabase real** — bloqueado pelo classificador do modo automático (DDL irreversível: `drop column`). Precisa de confirmação explícita do dono antes de rodar (`apply_migration`, projeto `tbkzcqfvafznxallyfqk`).
+  - **Commit e merge** — não commitei nem abri PR: instrução do dono é só commitar quando pedido explicitamente. Branch `feat/peso-por-lado` tem o working tree com as mudanças, pronta para revisão.
+- **Próximo passo:** dono decide — aplicar a migração, revisar o diff, e então commit + PR (ou pedir ajuste primeiro). Depois disso, verificação visual ao vivo (Playwright, 360×640) do formulário de registro de série e das duas tags no catálogo, antes de fechar de vez.
+- **Fixture QA:** `qa-audit-2608@teste.lastro.invalid` segue viva — não usada nesta sessão (mudança não foi verificada ao vivo ainda, ver "Próximo passo").
 - **Para o outro agente saber:**
-  - Este arquivo passou de **1.100 linhas** e a regra logo acima manda arquivar acima de ~300. Arquivar os concluídos em `PROGRESS-archive.md` antes de acumular mais: arquivo gordo deixa de ser lido por inteiro, e aí ele para de cumprir a função.
-  - `DESIGN.md` tem um banner datado (2026-08-20/21) avisando que §3.0–3.2 e a tabela C1–C14 de §4.2 descrevem a paleta areia antiga, não o Apex Pro. Só a linha `txt-3`/C3 foi remedida. Não citar número de lá sem conferir contra `tokens.css` primeiro.
+  - Este arquivo passou de **1.100 linhas** e a regra logo acima manda arquivar acima de ~300 — ainda não arquivado, dívida que se acumula. Arquivar os concluídos em `PROGRESS-archive.md` antes de acumular mais.
+  - `DESIGN.md` tem um banner datado (2026-08-20/21) avisando que §3.0–3.2 e a tabela C1–C14 de §4.2 descrevem a paleta areia antiga, não o Apex Pro. Só a linha `txt-3`/C3 foi remedida. Não citar número de lá sem conferir contra `tokens.css` primeiro. (T3b parte 1, ainda aberta — não tocada nesta sessão.)
+  - Se `unilateral` ganhar um terceiro tratamento parecido no futuro, o padrão está em `src/lib/analise/volume.ts`: multiplicador é sempre `condA || condB || condC ? 2 : 1`, nunca produto — ×2×2 quadruplica silenciosamente.
 
 ---
 

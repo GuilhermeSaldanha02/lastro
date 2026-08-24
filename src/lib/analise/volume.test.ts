@@ -9,9 +9,9 @@ function serie(sobrescritas: Partial<SerieValendo>): SerieValendo {
     exercicio: "Supino reto com barra",
     grupoMuscular: "peito",
     unilateral: false,
+    pesoPorLado: false,
     reps: 10,
     peso: 50,
-    pesoCorporalIncluso: false,
     data: "2026-07-27",
     semanaInicio: "2026-07-27",
     ...sobrescritas,
@@ -35,18 +35,21 @@ describe("calcularVolume", () => {
     expect(calcularVolume(series)).toBe(280);
   });
 
-  // T-V5 — peso corporal não entra em volume, nem a carga externa
-  it("série com peso_corporal_incluso não entra no volume, nem a carga externa", () => {
-    const series = [
-      serie({ reps: 8, peso: 10, pesoCorporalIncluso: true }),
-      serie({ reps: 10, peso: 50 }),
-    ];
-    expect(calcularVolume(series)).toBe(500);
+  // T-V6 — pesoPorLado (halter bilateral) dobra o volume, mesma razão de unilateral
+  it("exercício com peso por lado dobra o volume da série (10x14 -> 280, não 140)", () => {
+    const series = [serie({ reps: 10, peso: 14, pesoPorLado: true })];
+    expect(calcularVolume(series)).toBe(280);
+  });
+
+  // T-V7 — os dois multiplicadores nunca compõem (nunca ×2 × ×2)
+  it("unilateral e pesoPorLado juntos não compõem — dobra só uma vez", () => {
+    const series = [serie({ reps: 10, peso: 14, unilateral: true, pesoPorLado: true })];
+    expect(calcularVolume(series)).toBe(280);
   });
 });
 
 describe("volumePorGrupoMuscular", () => {
-  it("agrupa por grupo muscular, respeitando unilateral e peso corporal", () => {
+  it("agrupa por grupo muscular, respeitando unilateral e peso por lado", () => {
     const series = [
       serie({ grupoMuscular: "peito", reps: 10, peso: 50 }),
       serie({ grupoMuscular: "costas", reps: 10, peso: 14, unilateral: true }),
@@ -54,11 +57,11 @@ describe("volumePorGrupoMuscular", () => {
         grupoMuscular: "costas",
         reps: 8,
         peso: 10,
-        pesoCorporalIncluso: true,
+        pesoPorLado: true,
       }),
     ];
     const resultado = volumePorGrupoMuscular(series);
     expect(resultado.get("peito")).toBe(500);
-    expect(resultado.get("costas")).toBe(280);
+    expect(resultado.get("costas")).toBe(280 + 160);
   });
 });
