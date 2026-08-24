@@ -1140,3 +1140,27 @@ Migração `0011_peso_por_lado_na_serie.sql` adiciona `serie.peso_por_lado` (boo
 **Impacto.** `SerieBruta`/`SerieValendo` (`src/lib/analise/tipos.ts`) ganham `pesoPorLado` como campo obrigatório da série (era do exercício). Cinco caminhos de leitura trocaram a fonte: `dados/treino.ts` (`listarTreinos` e `buscarTreino`), `dados/resumo-home.ts`, `dados/progressao.ts`, `api/analise/route.ts`. Dois testes novos em `agregar.test.ts` (T-V8) provam que é a série que decide, não o catálogo — inclusive o caso em que o catálogo diz `false` mas a série diz `true`. `tsc`/`test` (175)/`lint`/`build` verdes.
 
 **Como reverter.** Código: `git revert` do commit desta entrada. Banco: `alter table public.serie drop column peso_por_lado;` — volta ao estado da entrada anterior (catálogo decide sozinho). Perda real: as 26 séries que tinham `peso_por_lado=true` diferente do padrão do catálogo (se a pessoa tiver usado o interruptor para divergir do padrão) voltariam a depender só do catálogo.
+
+---
+
+## 2026-08-24 (3) — Módulo de idiomas: reverte a posição da ADR contra tradução automática do catálogo
+
+**O que mudou.** Dono pediu módulo de idiomas (inglês e espanhol, além do PT-BR) exposto em `/ajustes`, cobrindo "tudo — não precisa de curadoria humana, é só olhar no meaning". `ADR.md`/`KNOWLEDGE.md` §3.3 tinham rejeitado tradução automática do catálogo de exercícios, citando risco de tradução ruim ("Bent Over Row" → "Fileira Curvada" como exemplo de tradução reversa capenga). Esta entrada registra a reversão explícita dessa posição, por decisão do dono — não é um esquecimento da ADR anterior.
+
+Isto também é Scope Change contra `PRD.md` A9 ("nome em PT-BR de academia") — registrado aqui, não bloqueando o trabalho, porque o dono já decidiu.
+
+**Migração 0012.** Duas tabelas de tradução — `exercicio_traducao` e `grupo_muscular_traducao` (`exercicio_id`/`grupo_muscular_id`, `idioma` em `('en','es')`, `nome`) — em vez de colunas `nome_en`/`nome_es`: um terceiro idioma no futuro é uma linha, não uma migração. `exercicio.nome`/`grupo_muscular.nome` continuam o PT-BR, fonte única, sem nenhum lookup para quem usa o app em português. `usuario.idioma` (nullable, mesmo raciocínio honesto do `meta_treinos_semana` da migração 0009 — sem default `'pt-BR'` que ninguém escolheu).
+
+Os 102 exercícios e 10 grupos musculares foram traduzidos (eu mesmo, terminologia padrão de academia por idioma — ex.: "Rosca direta" → "Barbell Curl"/"Curl con barra", não tradução literal palavra-por-palavra) e inseridos na mesma migração. Conferido: 204 linhas em `exercicio_traducao` (102 × 2 idiomas, cobrindo os 102 exercícios existentes), 20 em `grupo_muscular_traducao`.
+
+**Por que catálogo primeiro, antes de qualquer string de UI.** O parecer semanal (Gemini, `api/analise/route.ts`) recebe o resumo compacto com nome de exercício. Decisão tomada com o dono: o nome já traduzido entra no resumo (não uma instrução solta tipo "responda em inglês" deixando o modelo inventar nome de exercício a cada chamada) — assim o parecer sai consistente entre execuções. Por isso o catálogo é a fundação; UI, prompt e validador dependem dele, não o contrário.
+
+**Sequência combinada com o dono, uma etapa por vez com aprovação entre elas:** (1) esta migração; (2) leitura por idioma + seletor em `/ajustes`; (3) parecer da Gemini (prompt + validador + fallback determinístico) por idioma; (4) ~200 strings fixas de UI, `aria-label`s e `<html lang>`.
+
+**Alternativas descartadas.** Colunas `nome_en`/`nome_es` no lugar de tabela de tradução — mais simples agora, mas um terceiro idioma vira migração em vez de `insert`. Rota com prefixo de idioma (`/en/treino`) — descartada: toda rota é autenticada, nada é indexado por buscador, e mexeria em `src/proxy.ts` e todo `redirect()`/`<Link>` do app. Idioma em `localStorage` (padrão do `tema`) — descartado porque o catálogo e o parecer são resolvidos no servidor antes de qualquer render; precisa estar no banco, lido server-side.
+
+**Impacto.** Nenhuma leitura em PT-BR muda de comportamento (tabelas novas, RLS `select` para `authenticated`, mesmo padrão de `exercicio`/`grupo_muscular`). Nenhum código de leitura/escrita existente foi alterado nesta etapa — só schema. `tsc`/`test`/`lint`/`build` ainda não reexecutados após esta migração pura de banco.
+
+**Como reverter.** Banco: `drop table public.exercicio_traducao; drop table public.grupo_muscular_traducao; alter table public.usuario drop column idioma;`. Sem perda real — nenhum dado de usuário depende ainda destas tabelas.
+
+---
