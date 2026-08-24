@@ -139,13 +139,17 @@ export default function EditarSerie({
         </div>
       )}
 
-      <label className="campo-caixa" htmlFor={`ppl-${serie.id}`}>
+      <label className="interruptor" htmlFor={`ppl-${serie.id}`}>
         <input
           id={`ppl-${serie.id}`}
+          className="interruptor__entrada"
           type="checkbox"
           checked={pesoPorLado}
           onChange={(e) => setPesoPorLado(e.target.checked)}
         />
+        <span className="interruptor__trilho">
+          <span className="interruptor__bolinha" />
+        </span>
         Peso é de cada lado (ex.: um halter em cada mão)
       </label>
 
