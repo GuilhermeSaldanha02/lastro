@@ -25,7 +25,10 @@ export default async function PaginaAnalise() {
         perfil={perfil}
       />
 
-      <AnaliseInterativa semanasFechadasComTreino={resumo.semanasFechadasComTreino} />
+      <AnaliseInterativa
+        semanasFechadasComTreino={resumo.semanasFechadasComTreino}
+        idioma={perfil?.idioma ?? "pt-BR"}
+      />
 
       <AbaInferior ativa="analise" />
     </main>

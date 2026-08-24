@@ -16,12 +16,13 @@
 // botão — o botão fica sempre disponível, sem bloqueio de calendário.
 import { useState } from "react";
 import {
-  PERGUNTAS,
+  perguntasDoIdioma,
   PERGUNTA_PRIMARIA,
   type NumeroPergunta,
 } from "@/app/api/analise/perguntas";
 import type { EvidenciaParaTela } from "@/app/api/analise/evidencia";
 import { MINIMO_SEMANAS_PARECER } from "@/lib/analise/limiares";
+import type { Idioma } from "@/lib/dados/idioma";
 import Parecer from "@/components/parecer";
 import GraficoProgressao from "@/components/grafico-progressao";
 
@@ -33,9 +34,12 @@ type Resultado = {
 
 export default function AnaliseInterativa({
   semanasFechadasComTreino,
+  idioma,
 }: {
   semanasFechadasComTreino: number;
+  idioma: Idioma;
 }) {
+  const PERGUNTAS = perguntasDoIdioma(idioma);
   const [carregando, setCarregando] = useState<NumeroPergunta | null>(null);
   const [resultado, setResultado] = useState<Resultado | null>(null);
   const [erro, setErro] = useState<string | null>(null);

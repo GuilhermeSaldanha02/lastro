@@ -2,6 +2,7 @@
 // Função PURA, sem rede: a alavanca FORTE contra número inventado (a
 // instrução de prompt é a alavanca fraca).
 import type { ResumoCompacto } from "@/lib/analise/tipos";
+import type { Idioma } from "@/lib/dados/idioma";
 
 export type ResultadoValidacao =
   | { ok: true; citados: number[] }
@@ -18,9 +19,29 @@ function dentroDaTolerancia(x: number, y: number): boolean {
   );
 }
 
-/** Normaliza vírgula decimal ("66,7" → 66.7) e converte para número. */
-function normalizarToken(token: string): number {
-  return Number(token.replace(",", "."));
+/**
+ * Convenção numérica por idioma (módulo de idiomas, etapa 3/4, achado
+ * do dono ao decidir a etapa 2026-08-24): PT-BR e ES escrevem decimal
+ * com VÍRGULA e milhar com ponto ("11,5%", "12.480"); EN é o OPOSTO —
+ * decimal com PONTO e milhar com vírgula ("11.5%", "12,480"). Não é
+ * escolha estética: se o validador não souber qual convenção o prompt
+ * pediu pro idioma corrente, ele lê "11.5" em inglês como o inteiro
+ * 115 (ou rejeita como intruso) mesmo quando o número está certo — a
+ * MESMA classe de bug que a nota de milhar/decimal abaixo já documentou
+ * para PT-BR, só que na direção contrária.
+ */
+function decimalComVirgula(idioma: Idioma): boolean {
+  return idioma !== "en";
+}
+
+/** Normaliza o separador decimal do idioma e converte para número. */
+function normalizarToken(token: string, idioma: Idioma): number {
+  if (decimalComVirgula(idioma)) {
+    return Number(token.replace(",", "."));
+  }
+  // Inglês: token já veio sem vírgula de milhar (removida em
+  // `extrairTokens` antes de chegar aqui) — ponto já é decimal, nada a trocar.
+  return Number(token);
 }
 
 /**
@@ -41,22 +62,34 @@ function normalizarToken(token: string): number {
  *    um dígito colado a uma letra IMEDIATAMENTE ANTES não conta como
  *    início de número (mas "80kg", com letra DEPOIS, continua válido —
  *    só a letra antes é o sinal de "isto é parte de uma palavra").
- * 3. Separador de milhar PT-BR ("12.480") era lido como decimal — o "."
+ * 3. Separador de milhar PT-BR/ES ("12.480") era lido como decimal — o "."
  *    vira separador de milhar aqui, não de casas decimais (que é a
  *    vírgula). Sem isso, "12.480" virava 12.48 e nunca batia com o dado
- *    real (achado real, revisão estática qa-treino, 2026-08-05).
+ *    real (achado real, revisão estática qa-treino, 2026-08-05). Em
+ *    inglês a mesma armadilha existe invertida: "12,480" é o milhar, "," é
+ *    o separador a remover, "." já é decimal.
  */
-function extrairTokens(parecer: string): number[] {
+function extrairTokens(parecer: string, idioma: Idioma): number[] {
   const semDatasIso = parecer.replace(
     /\b(\d{4})-(\d{2})-(\d{2})\b/g,
     "$1 $2 $3",
   );
+
+  if (!decimalComVirgula(idioma)) {
+    const semMilharEn = semDatasIso.replace(
+      /\b\d{1,3}(?:,\d{3})+(?:\.\d+)?\b/g,
+      (bruto) => bruto.replace(/,/g, ""),
+    );
+    const brutosEn = semMilharEn.match(/(?<![a-zA-Z])-?\d+(?:\.\d+)?/g) ?? [];
+    return brutosEn.map((t) => normalizarToken(t, idioma)).filter((n) => Number.isFinite(n));
+  }
+
   const semMilhar = semDatasIso.replace(
     /\b\d{1,3}(?:\.\d{3})+(?:,\d+)?\b/g,
     (bruto) => bruto.replace(/\./g, ""),
   );
   const brutos = semMilhar.match(/(?<![a-zA-Z])-?\d+(?:[.,]\d+)?/g) ?? [];
-  return brutos.map(normalizarToken).filter((n) => Number.isFinite(n));
+  return brutos.map((t) => normalizarToken(t, idioma)).filter((n) => Number.isFinite(n));
 }
 
 /** Componentes numéricos de uma data ISO (YYYY-MM-DD): ano, mês, dia, ano curto. */
@@ -186,6 +219,9 @@ export function validarNumeros(
   parecer: string,
   resumo: ResumoCompacto,
   contexto: number[],
+  // Default pt-BR: mantém todo teste/chamada existente sem precisar
+  // passar idioma — só o parecer em inglês precisa da convenção oposta.
+  idioma: Idioma = "pt-BR",
 ): ResultadoValidacao {
   const dados = coletarDados(resumo);
   const contextoCompleto = [...contexto, ...coletarContextoEstrutural(resumo)];
@@ -196,7 +232,7 @@ export function validarNumeros(
     ...contextoCompleto,
   ]);
 
-  const tokens = extrairTokens(parecer);
+  const tokens = extrairTokens(parecer, idioma);
 
   const intrusos: number[] = [];
   const citados: number[] = [];

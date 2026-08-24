@@ -1186,3 +1186,23 @@ Cinco caminhos de leitura em `dados/treino.ts` e `dados/resumo-home.ts` passaram
 **Como reverter.** Código: `git revert` dos commits desta entrada. Banco: a migração de GRANT pode ficar (é inofensiva e necessária caso a 0012 permaneça); reverter a 0012 já cobre as tabelas.
 
 ---
+
+## 2026-08-24 (5) — Módulo de idiomas, etapa 3/4: parecer da Gemini por idioma
+
+**O que mudou.** O parecer semanal (prompt, validador, fallback determinístico) passa a responder no idioma escolhido pela pessoa, com nome de exercício/grupo já traduzido (fundação da migração 0012 + etapa 1/4).
+
+- `carregarExercicios` (`api/analise/route.ts`) agora traduz `nome`/`grupoMuscularPrimario` via `mapaTraducaoExercicios`/`mapaTraducaoGrupos` ANTES de entrar no agregador — o `ResumoCompacto` que vai pro prompt já nasce no idioma certo, o modelo nunca precisa inventar nome de exercício traduzindo na hora (decisão tomada com o dono na etapa 1/4).
+- `prompt.ts`: `SYSTEM_INSTRUCTION`, critério de qualidade e preâmbulo viram `Record<Idioma, string>`. Duas travas mudam de CONTEÚDO, não só de texto: (1) convenção numérica — PT-BR/ES usam vírgula decimal, EN usa ponto decimal, são convenções OPOSTAS; (2) uma trava nova explícita dizendo que as CHAVES do JSON (`"posicao_na_faixa": "abaixo"`) são códigos internos em português e o modelo deve traduzir o SENTIDO pra prosa, nunca citar a chave literal — nomes de campo continuam PT-BR em qualquer idioma (KNOWLEDGE.md §1, termos de contrato não traduzem).
+- `validador.ts`: **achado real, exatamente o que o `advisor` tinha avisado antes de começar esta etapa** — `extrairTokens`/`normalizarToken` assumiam vírgula decimal incondicionalmente. Em inglês, "11.5%" é o número correto e "12,480" é separador de milhar (o OPOSTO de PT-BR/ES); sem a correção, todo parecer em inglês citando decimal seria rejeitado como intruso por engano, ou pior, aceito com o valor errado. `validarNumeros` ganhou parâmetro `idioma` (default `"pt-BR"`, não quebra os 9 testes/chamadas existentes) que troca a convenção de extração. 5 testes novos em `validador.test.ts` provam a convenção inglesa — incluindo um teste que passa o MESMO texto pela convenção errada de propósito, pra provar que a checagem realmente importa (não é teste decorativo).
+- `perguntas.ts`: as 5 perguntas padrão viraram `perguntasDoIdioma(idioma)` — o texto entra literalmente no prompt (não é só rótulo de botão), então tradução mora aqui, não em string de UI solta (evita duas fontes divergindo). `analise-interativa.tsx`/`analise/page.tsx` passam a receber `idioma` de `obterPerfil()`, mesmo padrão da Home.
+- `route.ts`: `fallbackDeterministico` (2ª falha, sem LLM) também ficou idioma-aware — inclusive o enum `posicao_na_faixa` (`abaixo/dentro/acima`), que aparece só nesse template determinístico, nunca na prosa do LLM. Instruções de retry (1ª falha) também traduzidas, porque voltam pro modelo no próximo prompt.
+
+**Verificado ao vivo contra a API real da Gemini** (usuário QA descartável, cascade confirmado em 0 linhas ao final): parecer em inglês citando os 10 grupos musculares traduzidos ("Chest, Biceps, Quadriceps, Back, Shoulders, Glutes, Hamstrings, Calves, Triceps, Abs"), prosa e pontuação decimal corretas; parecer em espanhol citando os mesmos 10 grupos em espanhol ("Pecho, Bíceps, Cuádriceps, Espalda, Hombro, Glúteos, Isquiotibiales, Pantorrilla, Tríceps, Abdomen"), vírgula decimal correta. Ambos passaram o validador (não caíram no fallback).
+
+**Fora do escopo desta etapa.** O "Coach IA" (`api/coach/*`) é uma feature Gemini separada (chat interativo, não a Análise Semanal) — não fazia parte do plano de 4 etapas combinado com o dono e não foi tocado. Fica como possível próximo passo, a confirmar com o dono antes de mexer. As ~200 strings fixas de UI continuam pra etapa 4/4.
+
+**Impacto.** `tsc`/`test` (180, +5 desta etapa)/`lint`/`build` verdes. `validarNumeros` com 4º parâmetro opcional — chamada sem idioma continua pt-BR, sem quebrar nada existente.
+
+**Como reverter.** `git revert` dos commits desta entrada. Sem impacto de banco (só leitura das tabelas já existentes da migração 0012).
+
+---

@@ -206,3 +206,77 @@ describe("validarNumeros", () => {
     }
   });
 });
+
+// lastro · módulo de idiomas (etapa 3/4, 2026-08-24) — inglês inverte a
+// convenção decimal/milhar de PT-BR/ES ("11.5%" decimal, "12,480" milhar).
+// Sem passar idioma="en", estes mesmos pareceres seriam lidos errado —
+// replica os mesmos achados reais acima (data ISO, milhar, arredondamento),
+// agora na convenção oposta.
+describe("validarNumeros — convenção numérica em inglês (idioma = \"en\")", () => {
+  it('"66.7" (ponto decimal) contra resumo 66.666... → ok true', () => {
+    const resumo = resumoBase();
+    const parecer = "Your barbell curl estimated load is 66.7 kg.";
+
+    const resultado = validarNumeros(parecer, resumo, [], "en");
+
+    expect(resultado.ok).toBe(true);
+  });
+
+  it('volume com separador de milhar em inglês ("12,480") → ok true, vírgula não vira decimal', () => {
+    const resumo = resumoBase();
+    resumo.volume_semanal.push({
+      semana_inicio: "2026-08-03",
+      volume_total: 12480,
+    });
+    const parecer = "Your total volume this week was 12,480.";
+
+    const resultado = validarNumeros(parecer, resumo, [], "en");
+
+    expect(resultado.ok).toBe(true);
+    if (resultado.ok) {
+      expect(resultado.citados).toContain(12480);
+    }
+  });
+
+  it('mesmo parecer com vírgula de milhar, validado como pt-BR (idioma default) → NÃO bate ("12,480" vira decimal 12.48, intruso)', () => {
+    const resumo = resumoBase();
+    resumo.volume_semanal.push({
+      semana_inicio: "2026-08-03",
+      volume_total: 12480,
+    });
+    const parecer = "Your total volume this week was 12,480.";
+
+    // Prova que a convenção realmente importa: o MESMO texto, lido com a
+    // convenção errada, deixa de bater — não é um teste redundante do de
+    // cima, é a demonstração do bug que a etapa 3/4 corrigiu.
+    const resultado = validarNumeros(parecer, resumo, []);
+
+    expect(resultado.ok).toBe(false);
+  });
+
+  it("data ISO em parecer inglês → ok true, hífen da data não vira sinal de menos", () => {
+    const resumo = resumoBase();
+    const parecer = "For the week starting 2026-07-27, your total volume was 1300.";
+
+    const resultado = validarNumeros(parecer, resumo, [], "en");
+
+    expect(resultado.ok).toBe(true);
+    if (resultado.ok) {
+      expect(resultado.citados).toContain(1300);
+    }
+  });
+
+  it('parecer citando "15" quando o resumo diz 20 → intrusos: [15], mesmo em inglês', () => {
+    const resumo = resumoBase();
+    const parecer = "Your bench press went up 15% in the period.";
+
+    const resultado = validarNumeros(parecer, resumo, [], "en");
+
+    expect(resultado.ok).toBe(false);
+    if (!resultado.ok && resultado.motivo === "intrusos") {
+      expect(resultado.intrusos).toEqual([15]);
+    } else {
+      throw new Error("esperava motivo 'intrusos'");
+    }
+  });
+});
