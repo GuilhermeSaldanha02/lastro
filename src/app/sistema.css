@@ -2852,6 +2852,42 @@
   box-shadow: 0 0 10px var(--lastro-ouro-glow);
 }
 
+/* Controle segmentado (ex.: seletor de idioma em /ajustes) — mesma
+   linguagem visual do chip-filtro, mas em grupo de largura igual, sem
+   scroll horizontal. */
+.segmentado {
+  display: flex;
+  background: var(--lastro-sup-1);
+  border: 1px solid var(--lastro-linha);
+  border-radius: var(--lastro-raio-pilula);
+  padding: 3px;
+  gap: 2px;
+}
+
+.segmentado__opcao {
+  flex: 1;
+  background: transparent;
+  border: none;
+  border-radius: var(--lastro-raio-pilula);
+  padding: 8px 10px;
+  font-size: var(--lastro-papel-rotulo);
+  font-weight: var(--lastro-peso-forte);
+  color: var(--lastro-txt-2);
+  cursor: pointer;
+  transition: all var(--lastro-dur-1) ease;
+}
+
+.segmentado__opcao:disabled {
+  cursor: default;
+  opacity: 0.7;
+}
+
+.segmentado__opcao--ativa {
+  background: var(--lastro-ouro-glow);
+  color: var(--lastro-ouro);
+  box-shadow: 0 0 10px var(--lastro-ouro-glow);
+}
+
 /* Busca Box */
 .busca-box {
   position: relative;

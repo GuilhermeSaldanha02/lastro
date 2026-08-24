@@ -72,6 +72,7 @@ export default async function PaginaInicial() {
 
   const { dataTexto, semanaTexto } = formatarCabecalhoData(hoje);
   const volumeFormatado = formatarVolume(resumo.volumeNaSemana);
+  const idioma = perfil?.idioma ?? "pt-BR";
 
   return (
     <main className="tela">
@@ -130,6 +131,7 @@ export default async function PaginaInicial() {
           treinosNaSemana={resumo.treinosNaSemana}
           historicoBarras={resumo.historicoBarras}
           seriesPorGrupo={resumo.seriesPorGrupo}
+          idioma={idioma}
         />
 
         {/* Card Análise Semanal (AI Coach) */}

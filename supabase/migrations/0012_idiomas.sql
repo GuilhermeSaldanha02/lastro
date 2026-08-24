@@ -56,6 +56,14 @@ create policy grupo_muscular_traducao_leitura
   to authenticated
   using (true);
 
+-- RLS sozinha não basta — sem GRANT explícito o Postgres nega antes de
+-- chegar na policy (achado ao vivo, 2026-08-24: catálogo quebrou com
+-- "permission denied for table exercicio_traducao" até isto rodar).
+-- `exercicio`/`grupo_muscular` já tinham este grant desde a 0001/0002;
+-- tabela nova não herda.
+grant select on public.exercicio_traducao to authenticated;
+grant select on public.grupo_muscular_traducao to authenticated;
+
 -- Preferência de idioma da pessoa, mesmo raciocínio da 0009
 -- (meta_treinos_semana): NULL é o estado honesto de "ainda não
 -- escolheu" — sem default 'pt-BR' cravado que ninguém decidiu. Vive em

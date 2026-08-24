@@ -4,12 +4,22 @@
 // perfil já existente e, no caso do Google, baixa o avatar pra Storage.
 import { criarClienteServidor } from "@/lib/supabase/cliente-servidor";
 import type { SupabaseClient, User } from "@supabase/supabase-js";
+import type { Idioma } from "@/lib/dados/idioma";
 
 export type Perfil = {
   nome: string;
   avatarUrl: string | null;
   /** null = dono nunca definiu (T4) — Home não mostra fração nem barra. */
   metaTreinosSemana: number | null;
+  /**
+   * `usuario.idioma` cru (migração 0012) — pode ser `null` até a pessoa
+   * escolher em /ajustes. Quem consome isto pra decidir o que EXIBIR
+   * (não pra decidir o que gravar) resolve o `null` para `"pt-BR"` no
+   * ponto de uso, igual `obterIdioma()` faz — não aqui, porque este tipo
+   * também alimenta a tela de ajustes, que precisa saber a diferença
+   * entre "nunca escolheu" e "escolheu pt-BR".
+   */
+  idioma: Idioma | null;
 };
 
 export async function obterPerfil(): Promise<Perfil | null> {
@@ -21,7 +31,7 @@ export async function obterPerfil(): Promise<Perfil | null> {
 
   const { data } = await supabase
     .from("usuario")
-    .select("nome, avatar_url, meta_treinos_semana")
+    .select("nome, avatar_url, meta_treinos_semana, idioma")
     .eq("id", user.id)
     .maybeSingle();
 
@@ -32,6 +42,7 @@ export async function obterPerfil(): Promise<Perfil | null> {
     nome: data.nome,
     avatarUrl: data.avatar_url,
     metaTreinosSemana: data.meta_treinos_semana,
+    idioma: data.idioma as Idioma | null,
   };
 }
 

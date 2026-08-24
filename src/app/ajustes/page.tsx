@@ -8,6 +8,7 @@ import ExcluirConta from "@/components/excluir-conta";
 import SetaNavegacao from "@/components/seta-navegacao";
 import CabecalhoPro from "@/components/cabecalho-pro";
 import MetaSemanalForm from "@/components/meta-semanal-form";
+import IdiomaForm from "@/components/idioma-form";
 
 export default async function PaginaAjustes() {
   const perfil = await obterPerfil();
@@ -37,6 +38,8 @@ export default async function PaginaAjustes() {
             </Link>
 
             <MetaSemanalForm metaInicial={perfil.metaTreinosSemana} />
+
+            <IdiomaForm idiomaInicial={perfil.idioma ?? "pt-BR"} />
 
             {/* Menu de Funcionalidades */}
             <div className="bento-menu-grid">

@@ -1164,3 +1164,25 @@ Os 102 exercícios e 10 grupos musculares foram traduzidos (eu mesmo, terminolog
 **Como reverter.** Banco: `drop table public.exercicio_traducao; drop table public.grupo_muscular_traducao; alter table public.usuario drop column idioma;`. Sem perda real — nenhum dado de usuário depende ainda destas tabelas.
 
 ---
+
+## 2026-08-24 (4) — Módulo de idiomas, etapa 2/4: leitura por idioma + seletor em /ajustes
+
+**O que mudou.** `src/lib/dados/idioma.ts` (novo): `obterIdioma()` lê `usuario.idioma`, resolve `null` para `"pt-BR"` (mesmo raciocínio do restante do app — a leitura decide o padrão de EXIBIÇÃO, a gravação continua honesta sobre "nunca escolheu"); `definirIdioma()` é a Server Action que grava a escolha. `src/lib/dados/traducao.ts` (novo): `mapaTraducaoExercicios`/`mapaTraducaoGrupos` leem as tabelas da migração 0012 e devolvem `Map<id, nome>` — vazio para pt-BR (sem round-trip ao banco pra idioma que não precisa de tradução).
+
+Cinco caminhos de leitura em `dados/treino.ts` e `dados/resumo-home.ts` passaram a resolver nome de exercício/grupo pelo idioma da pessoa, com fallback pro nome PT-BR quando falta linha de tradução: `listarExercicios` (seletor do formulário), `buscarExercicio`/`listarCatalogo` (catálogo), `buscarTreino` (nome de exercício na tela de treino), `listarTreinos`/`carregarResumoHome` (tags de grupo muscular na lista de treinos e na Home). Exercícios/catálogo reordenam por nome traduzido fora do pt-BR — a ordem alfabética do banco é em português, misturar alfabetos ficaria estranho.
+
+`formatarGrupoMuscular` (`src/lib/texto/grupo-muscular.ts`, usado só no cliente pela aba "Grupos" da Home) ganhou parâmetro `idioma` com mapas EN/ES estáticos — roda 100% client-side, não pode fazer round-trip ao banco só pra formatar rótulo. `Perfil` (`dados/perfil.ts`) ganhou o campo `idioma`, seguindo o padrão de já trazer `metaTreinosSemana` — evita fetch duplicado nas páginas que já chamam `obterPerfil()`.
+
+`/ajustes` ganhou `IdiomaForm` (`src/components/idioma-form.tsx`), mesmo padrão de `MetaSemanalForm`: card `card-obsidian`, salva ao clicar. Controle é um segmentado de 3 opções (novo `.segmentado`/`.segmentado__opcao` em `sistema.css`, mesmos tokens do `.chip-filtro`), não um `<select>` — só 3 opções fixas, sem "em branco" possível na tela (a leitura já resolveu `null` antes de chegar aqui).
+
+**Achado ao vivo, corrigido no caminho: RLS sem GRANT não basta.** Depois de aplicar a migração 0012, `/catalogo` quebrou com "permission denied for table exercicio_traducao" — a policy de leitura existia, mas o Postgres nega antes de avaliar RLS se o role não tem `GRANT SELECT` na tabela. `exercicio`/`grupo_muscular` já tinham esse grant desde a bootstrap (0001/0002); tabela nova não herda. Corrigido com uma migração adicional (`grant select on ... to authenticated`) já dobrada de volta pro arquivo `0012_idiomas.sql` local, pra manter o repo igual ao banco real.
+
+**Verificado ao vivo** com usuário QA descartável (`qa-idiomas-2608@teste.lastro.invalid`, criado e removido via `scripts/qa-treino-helper.sh`, cascade confirmado em 0 linhas): login, troca pra inglês em `/ajustes` ("Idioma salvo."), `/catalogo` com 102 exercícios e 10 grupos em inglês, seletor do formulário de série filtrado por grupo ("Chest" → 15 exercícios em inglês, ordem alfabética), série registrada e exibida como "Barbell Bench Press" na tela do treino, tag "CHEST" na Home (Treinos Recentes) e na aba Grupos.
+
+**Fora do escopo desta etapa (fica pra 3/4 e 4/4).** O parecer da Gemini ainda responde só em PT-BR — `api/analise/route.ts` (prompt, validador, fallback determinístico) não foi tocado nesta etapa, e continua lendo `exercicio.nome` direto do banco (PT-BR), não pelos novos caminhos traduzidos de `dados/treino.ts`. As ~200 strings fixas de UI (botões, rótulos, `aria-label`, `<html lang>`) continuam só em PT-BR.
+
+**Impacto.** `tsc`/`test` (175)/`lint`/`build` verdes. Nenhuma leitura em pt-BR muda de resultado (idioma resolvido para `"pt-BR"` continua usando `exercicio.nome`/`grupo_muscular.nome` direto, sem tabela de tradução).
+
+**Como reverter.** Código: `git revert` dos commits desta entrada. Banco: a migração de GRANT pode ficar (é inofensiva e necessária caso a 0012 permaneça); reverter a 0012 já cobre as tabelas.
+
+---

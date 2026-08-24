@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { formatarGrupoMuscular } from "@/lib/texto/grupo-muscular";
+import type { Idioma } from "@/lib/dados/idioma";
 
 /**
  * Card de métricas da Home.
@@ -33,6 +34,7 @@ type MetricasHomeProps = {
   treinosNaSemana: number;
   historicoBarras: Barra[];
   seriesPorGrupo: GrupoComSeries[];
+  idioma: Idioma;
 };
 
 type Aba = "volume" | "series" | "grupos";
@@ -84,14 +86,14 @@ function GraficoBarras({
  * horizontais, não verticais: o rótulo é uma palavra ("Posterior de
  * coxa"), e palavra não cabe embaixo de uma coluna de 40px.
  */
-function BarrasGrupos({ grupos }: { grupos: GrupoComSeries[] }) {
+function BarrasGrupos({ grupos, idioma }: { grupos: GrupoComSeries[]; idioma: Idioma }) {
   const maximo = Math.max(...grupos.map((g) => g.series));
 
   return (
     <ul className="grupo-barras">
       {grupos.map((g) => (
         <li className="grupo-barra" key={g.grupo}>
-          <span className="grupo-barra__nome">{formatarGrupoMuscular(g.grupo)}</span>
+          <span className="grupo-barra__nome">{formatarGrupoMuscular(g.grupo, idioma)}</span>
           <span className="grupo-barra__trilho">
             <span
               className="grupo-barra__preenchimento"
@@ -111,6 +113,7 @@ export default function SeletorMetricasHome({
   treinosNaSemana,
   historicoBarras,
   seriesPorGrupo,
+  idioma,
 }: MetricasHomeProps) {
   const [abaAtiva, setAbaAtiva] = useState<Aba>("volume");
 
@@ -220,7 +223,7 @@ export default function SeletorMetricasHome({
             </div>
 
             {seriesPorGrupo.length > 0 ? (
-              <BarrasGrupos grupos={seriesPorGrupo} />
+              <BarrasGrupos grupos={seriesPorGrupo} idioma={idioma} />
             ) : (
               <p className="metrica-switcher__vazio">
                 Nenhuma série registrada nesta semana ainda.

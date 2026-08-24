@@ -14,6 +14,8 @@ import { calcularSequenciaAtual } from "@/lib/analise/sequencia";
 import { calcularSeriesPorGrupo } from "@/lib/analise/equilibrio";
 import { semanaInicioDoTreino, semanaAnaliseAtual, paraISO, segundaFeiraDaSemana } from "@/lib/analise/semanas";
 import type { SerieValendo } from "@/lib/analise/tipos";
+import { obterIdioma } from "@/lib/dados/idioma";
+import { mapaTraducaoGrupos } from "@/lib/dados/traducao";
 
 /**
  * Quantos treinos entram no gráfico de barras da Home. Oito cabe na
@@ -90,13 +92,17 @@ export async function carregarResumoHome(hojeISO: string): Promise<ResumoHome> {
     throw new Error("Sessão ausente — usuário não autenticado.");
   }
 
-  const { data, error } = await supabase
-    .from("treino")
-    .select(
-      "id, data, serie (tipo, reps, peso, peso_por_lado, exercicio:exercicio_id (grupo_muscular_primario, unilateral))",
-    )
-    .order("data", { ascending: false });
+  const [{ data, error }, idioma] = await Promise.all([
+    supabase
+      .from("treino")
+      .select(
+        "id, data, serie (tipo, reps, peso, peso_por_lado, exercicio:exercicio_id (grupo_muscular_primario, unilateral))",
+      )
+      .order("data", { ascending: false }),
+    obterIdioma(),
+  ]);
   if (error) throw new Error(`Falha ao carregar o resumo: ${error.message}`);
+  const traducaoGrupos = await mapaTraducaoGrupos(idioma);
 
   const treinos = (data ?? []) as unknown as LinhaTreino[];
   const semanaCorrente = paraISO(segundaFeiraDaSemana(new Date(`${hojeISO}T00:00:00Z`)));
@@ -163,7 +169,7 @@ export async function carregarResumoHome(hojeISO: string): Promise<ResumoHome> {
             .map((s) => s.exercicio?.grupo_muscular_primario)
             .filter((g): g is string => Boolean(g)),
         ),
-      );
+      ).map((id) => traducaoGrupos.get(id) ?? id);
       return {
         id: t.id,
         data: t.data,
