@@ -7,6 +7,8 @@
 // nem mostra o seletor de exercício: só o que pode mudar.
 import { useState, type FormEvent } from "react";
 import type { Serie } from "@/lib/dados/treino";
+import { t } from "@/lib/texto/i18n";
+import type { Idioma } from "@/lib/dados/idioma";
 
 export type DadosEdicaoSerie = {
   tipo: "aquecimento" | "valendo";
@@ -20,10 +22,12 @@ export default function EditarSerie({
   serie,
   onSalvar,
   onCancelar,
+  idioma,
 }: {
   serie: Serie;
   onSalvar: (dados: DadosEdicaoSerie) => void | Promise<void>;
   onCancelar: () => void;
+  idioma: Idioma;
 }) {
   const [tipo, setTipo] = useState<"aquecimento" | "valendo">(serie.tipo);
   const [pesoPorLado, setPesoPorLado] = useState(serie.pesoPorLado);
@@ -40,11 +44,11 @@ export default function EditarSerie({
     const rirBruto = formData.get("rir");
 
     if (!Number.isFinite(reps) || reps <= 0) {
-      setErro("Reps precisa ser um número positivo.");
+      setErro(t("Reps precisa ser um número positivo.", idioma));
       return;
     }
     if (!Number.isFinite(peso) || peso < 0) {
-      setErro("Peso precisa ser um número válido.");
+      setErro(t("Peso precisa ser um número válido.", idioma));
       return;
     }
 
@@ -52,7 +56,7 @@ export default function EditarSerie({
     if (tipo === "valendo" && rirBruto !== null && rirBruto !== "") {
       const rirNumero = Number(rirBruto);
       if (!Number.isFinite(rirNumero)) {
-        setErro("RIR precisa ser um número válido.");
+        setErro(t("RIR precisa ser um número válido.", idioma));
         return;
       }
       rir = rirNumero;
@@ -82,15 +86,15 @@ export default function EditarSerie({
           value={tipo}
           onChange={(e) => setTipo(e.target.value as "aquecimento" | "valendo")}
         >
-          <option value="valendo">Valendo</option>
-          <option value="aquecimento">Aquecimento</option>
+          <option value="valendo">{t("Valendo", idioma)}</option>
+          <option value="aquecimento">{t("Aquecimento", idioma)}</option>
         </select>
       </div>
 
       <div className="dupla">
         <div className="campo">
           <label className="campo__rotulo" htmlFor={`reps-${serie.id}`}>
-            Reps
+            {t("Reps", idioma)}
           </label>
           <input
             id={`reps-${serie.id}`}
@@ -106,7 +110,7 @@ export default function EditarSerie({
 
         <div className="campo">
           <label className="campo__rotulo" htmlFor={`peso-${serie.id}`}>
-            Peso (kg)
+            {t("Peso (kg)", idioma)}
           </label>
           <input
             id={`peso-${serie.id}`}
@@ -125,7 +129,7 @@ export default function EditarSerie({
       {tipo === "valendo" && (
         <div className="campo">
           <label className="campo__rotulo" htmlFor={`rir-${serie.id}`}>
-            RIR (opcional)
+            {t("RIR (opcional)", idioma)}
           </label>
           <input
             id={`rir-${serie.id}`}
@@ -150,7 +154,7 @@ export default function EditarSerie({
         <span className="interruptor__trilho">
           <span className="interruptor__bolinha" />
         </span>
-        Peso é de cada lado (ex.: um halter em cada mão)
+        {t("Peso é de cada lado (ex.: um halter em cada mão)", idioma)}
       </label>
 
       {erro && (
@@ -166,10 +170,10 @@ export default function EditarSerie({
           onClick={onCancelar}
           disabled={salvando}
         >
-          Cancelar
+          {t("Cancelar", idioma)}
         </button>
         <button type="submit" className="botao-confirmar" disabled={salvando}>
-          {salvando ? "Salvando…" : "Salvar"}
+          {salvando ? t("Salvando…", idioma) : t("Salvar", idioma)}
         </button>
       </div>
     </form>

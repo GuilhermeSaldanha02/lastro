@@ -7,15 +7,19 @@
 // mesma regra do formulário de série (DECISIONS.md 2026-08-07, "sempre
 // iniciar em branco").
 import { useEffect, useRef, useState } from "react";
+import { t } from "@/lib/texto/i18n";
+import type { Idioma } from "@/lib/dados/idioma";
 
 export type OpcaoGrupo = { id: string; nome: string };
 
 export default function SeletorGrupoMuscular({
   opcoes,
   onConfirmar,
+  idioma,
 }: {
   opcoes: OpcaoGrupo[];
   onConfirmar: (grupos: string[]) => void;
+  idioma: Idioma;
 }) {
   const [selecionados, setSelecionados] = useState<string[]>([]);
   const tituloRef = useRef<HTMLHeadingElement>(null);
@@ -41,15 +45,15 @@ export default function SeletorGrupoMuscular({
       <div className="card-obsidian__header">
         <div>
           <span className="card-obsidian__titulo" tabIndex={-1} ref={tituloRef}>
-            Grupo Muscular de Hoje
+            {t("Grupo Muscular de Hoje", idioma)}
           </span>
           <p style={{ fontSize: "var(--lastro-papel-rotulo)", color: "var(--lastro-txt-3)", margin: "2px 0 0" }}>
-            Escolha um ou mais para filtrar a lista de exercícios
+            {t("Escolha um ou mais para filtrar a lista de exercícios", idioma)}
           </p>
         </div>
       </div>
 
-      <div className="chips" role="group" aria-label="Grupos musculares de hoje" style={{ margin: "var(--lastro-e-3) 0 var(--lastro-e-4)" }}>
+      <div className="chips" role="group" aria-label={t("Grupos musculares de hoje", idioma)} style={{ margin: "var(--lastro-e-3) 0 var(--lastro-e-4)" }}>
         {opcoes.map((opcao) => (
           <label key={opcao.id} className={`chip${selecionados.includes(opcao.id) ? " chip--ativo" : ""}`}>
             <input
@@ -68,7 +72,7 @@ export default function SeletorGrupoMuscular({
         disabled={selecionados.length === 0}
         onClick={() => onConfirmar(selecionados)}
       >
-        Continuar
+        {t("Continuar", idioma)}
       </button>
     </section>
   );

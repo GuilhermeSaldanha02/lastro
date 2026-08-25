@@ -2,16 +2,27 @@
 
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import { LIMITE_PERGUNTA } from "@/app/api/coach/prompt";
+import { t } from "@/lib/texto/i18n";
+import type { Idioma } from "@/lib/dados/idioma";
 
 type Fala = { de: "dono" | "coach"; texto: string };
 
+/**
+ * Sugestões da tela — o TEXTO em si é enviado como pergunta ao clicar
+ * (`enviarPergunta(sugestao)`), não é só rótulo. O Coach (`/api/coach`)
+ * continua respondendo em PT-BR (fora do escopo desta etapa — feature
+ * separada da Análise Semanal, ver DECISIONS.md 2026-08-24 (5)), então
+ * fica em PT-BR de propósito aqui: traduzir só o botão criaria um chat
+ * onde a pessoa lê a pergunta em inglês no botão e vê ela mesma aparecer
+ * em português no balão depois de clicar.
+ */
 const SUGESTOES = [
   "Como foi meu volume de treino nesta semana?",
   "Qual grupo muscular estou treinando com menor frequência?",
   "Devo aumentar a carga ou as repetições no meu próximo treino?",
 ];
 
-export default function CoachInterativo() {
+export default function CoachInterativo({ idioma }: { idioma: Idioma }) {
   const [falas, setFalas] = useState<Fala[]>([]);
   const [pergunta, setPergunta] = useState("");
   const [carregando, setCarregando] = useState(false);
@@ -44,8 +55,8 @@ export default function CoachInterativo() {
           | null;
         setErro(
           resposta.status === 401
-            ? "Sessão expirada. Faça login novamente."
-            : (dados?.erro ?? "Falha ao consultar o coach."),
+            ? t("Sessão expirada. Faça login novamente.", idioma)
+            : (dados?.erro ?? t("Falha ao consultar o coach.", idioma)),
         );
         return;
       }
@@ -53,7 +64,7 @@ export default function CoachInterativo() {
       const dados = (await resposta.json()) as { resposta: string };
       setFalas((atual) => [...atual, { de: "coach", texto: dados.resposta }]);
     } catch {
-      setErro("Falha de rede. Tente de novo.");
+      setErro(t("Falha de rede. Tente de novo.", idioma));
     } finally {
       setCarregando(false);
     }
@@ -74,13 +85,13 @@ export default function CoachInterativo() {
                 <path d="M12 2L14.5 9.5L22 12L14.5 14.5L12 22L9.5 14.5L2 12L9.5 9.5L12 2Z" />
               </svg>
             </div>
-            <h3 className="coach-boas-vindas__titulo">Assistente de Treino 24h</h3>
+            <h3 className="coach-boas-vindas__titulo">{t("Assistente de Treino 24h", idioma)}</h3>
             <p className="coach-boas-vindas__desc">
-              Tire dúvidas sobre periodização, fadiga e progressão com base nas suas métricas reais.
+              {t("Tire dúvidas sobre periodização, fadiga e progressão com base nas suas métricas reais.", idioma)}
             </p>
 
             <div className="coach-sugestoes">
-              <span className="coach-sugestoes__rotulo">Sugestões de perguntas:</span>
+              <span className="coach-sugestoes__rotulo">{t("Sugestões de perguntas:", idioma)}</span>
               {SUGESTOES.map((sugestao, idx) => (
                 <button
                   key={idx}
@@ -106,7 +117,7 @@ export default function CoachInterativo() {
                 <svg viewBox="0 0 24 24" width="12" height="12" fill="var(--lastro-ouro)" style={{ marginRight: 4 }}>
                   <path d="M12 2L14.5 9.5L22 12L14.5 14.5L12 22L9.5 14.5L2 12L9.5 9.5L12 2Z" />
                 </svg>
-                Coach IA
+                {t("Coach IA", idioma)}
               </span>
             )}
             <p className="balao__texto">{fala.texto}</p>
@@ -115,8 +126,8 @@ export default function CoachInterativo() {
 
         {carregando && (
           <div className="balao balao--dele balao--pensando">
-            <span className="balao__quem">Coach IA</span>
-            <p>Analisando seus dados…</p>
+            <span className="balao__quem">{t("Coach IA", idioma)}</span>
+            <p>{t("Analisando seus dados…", idioma)}</p>
           </div>
         )}
 
@@ -132,7 +143,7 @@ export default function CoachInterativo() {
       <form className="barra-conversa" onSubmit={aoEnviar}>
         <input
           type="text"
-          placeholder="Pergunte ao coach…"
+          placeholder={t("Pergunte ao coach…", idioma)}
           value={pergunta}
           onChange={(e) => setPergunta(e.target.value)}
           maxLength={LIMITE_PERGUNTA}
@@ -143,7 +154,7 @@ export default function CoachInterativo() {
           type="submit"
           disabled={carregando || !pergunta.trim()}
           className="barra-conversa__botao"
-          aria-label="Enviar pergunta"
+          aria-label={t("Enviar pergunta", idioma)}
         >
           <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2.5">
             <line x1="22" y1="2" x2="11" y2="13"></line>

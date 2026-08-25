@@ -5,11 +5,15 @@
 // converte só no salvar, feedback de erro/sucesso inline.
 import { useState } from "react";
 import { definirMetaTreinosSemana } from "@/lib/dados/meta-semanal";
+import { t } from "@/lib/texto/i18n";
+import type { Idioma } from "@/lib/dados/idioma";
 
 export default function MetaSemanalForm({
   metaInicial,
+  idioma,
 }: {
   metaInicial: number | null;
+  idioma: Idioma;
 }) {
   const [valor, setValor] = useState(metaInicial === null ? "" : String(metaInicial));
   const [salvando, setSalvando] = useState(false);
@@ -30,7 +34,7 @@ export default function MetaSemanalForm({
 
     const meta = Number(valor);
     if (!Number.isInteger(meta) || meta < 1 || meta > 7) {
-      setErro("A meta precisa ser um número inteiro entre 1 e 7.");
+      setErro(t("A meta precisa ser um número inteiro entre 1 e 7.", idioma));
       return;
     }
 
@@ -43,15 +47,14 @@ export default function MetaSemanalForm({
 
   return (
     <section className="card-obsidian">
-      <span className="card-obsidian__titulo">Meta Semanal de Treinos</span>
+      <span className="card-obsidian__titulo">{t("Meta Semanal de Treinos", idioma)}</span>
       <p className="campo__nota">
-        Quantos treinos por semana é a sua meta. Deixe em branco para não
-        mostrar meta nenhuma na Home.
+        {t("Quantos treinos por semana é a sua meta. Deixe em branco para não mostrar meta nenhuma na Home.", idioma)}
       </p>
 
       <div className="campo">
         <label className="campo__rotulo" htmlFor="meta_treinos">
-          Treinos por semana (1 a 7)
+          {t("Treinos por semana (1 a 7)", idioma)}
         </label>
         <input
           id="meta_treinos"
@@ -60,7 +63,7 @@ export default function MetaSemanalForm({
           min={1}
           max={7}
           step={1}
-          placeholder="Sem meta"
+          placeholder={t("Sem meta", idioma)}
           value={valor}
           onChange={(e) => {
             setValor(e.target.value);
@@ -82,11 +85,11 @@ export default function MetaSemanalForm({
           onClick={salvar}
           disabled={salvando}
         >
-          {salvando ? "Salvando…" : "Salvar meta"}
+          {salvando ? t("Salvando…", idioma) : t("Salvar meta", idioma)}
         </button>
         {salvo && (
           <p className="campo__nota" aria-live="polite">
-            {valor.trim() === "" ? "Meta removida." : "Meta salva."}
+            {t(valor.trim() === "" ? "Meta removida." : "Meta salva.", idioma)}
           </p>
         )}
       </div>

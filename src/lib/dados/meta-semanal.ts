@@ -8,6 +8,8 @@
 
 import { revalidatePath } from "next/cache";
 import { criarClienteServidor } from "@/lib/supabase/cliente-servidor";
+import { obterIdioma } from "@/lib/dados/idioma";
+import { t } from "@/lib/texto/i18n";
 
 export type ResultadoDefinirMeta = { ok: true } | { ok: false; erro: string };
 
@@ -20,22 +22,24 @@ export type ResultadoDefinirMeta = { ok: true } | { ok: false; erro: string };
 export async function definirMetaTreinosSemana(
   meta: number | null,
 ): Promise<ResultadoDefinirMeta> {
+  const idioma = await obterIdioma();
+
   if (meta !== null && (!Number.isInteger(meta) || meta < 1 || meta > 7)) {
-    return { ok: false, erro: "A meta precisa ser um número inteiro entre 1 e 7." };
+    return { ok: false, erro: t("A meta precisa ser um número inteiro entre 1 e 7.", idioma) };
   }
 
   const supabase = await criarClienteServidor();
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) return { ok: false, erro: "Sessão ausente — entre de novo." };
+  if (!user) return { ok: false, erro: t("Sessão ausente — entre de novo.", idioma) };
 
   const { error } = await supabase
     .from("usuario")
     .update({ meta_treinos_semana: meta })
     .eq("id", user.id);
 
-  if (error) return { ok: false, erro: "Não foi possível salvar. Tente de novo." };
+  if (error) return { ok: false, erro: t("Não foi possível salvar. Tente de novo.", idioma) };
 
   revalidatePath("/", "layout");
 

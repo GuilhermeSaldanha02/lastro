@@ -6,6 +6,8 @@
 import { revalidatePath } from "next/cache";
 import { criarClienteServidor } from "@/lib/supabase/cliente-servidor";
 import { validarArquivoAvatar } from "./validar-avatar";
+import { obterIdioma } from "@/lib/dados/idioma";
+import { t } from "@/lib/texto/i18n";
 
 const CAMINHO_BUCKET = "avatares";
 
@@ -30,14 +32,15 @@ export type ResultadoAtualizarAvatar =
 export async function atualizarAvatarManual(
   arquivo: File,
 ): Promise<ResultadoAtualizarAvatar> {
-  const validacao = validarArquivoAvatar(arquivo);
+  const idioma = await obterIdioma();
+  const validacao = validarArquivoAvatar(arquivo, idioma);
   if (!validacao.ok) return validacao;
 
   const supabase = await criarClienteServidor();
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) return { ok: false, erro: "Sessão ausente — entre de novo." };
+  if (!user) return { ok: false, erro: t("Sessão ausente — entre de novo.", idioma) };
 
   const extensao = arquivo.type.includes("png") ? "png" : "jpg";
   const caminho = `${user.id}/avatar.${extensao}`;
@@ -46,7 +49,7 @@ export async function atualizarAvatarManual(
     .from(CAMINHO_BUCKET)
     .upload(caminho, arquivo, { contentType: arquivo.type, upsert: true });
   if (erroUpload) {
-    return { ok: false, erro: "Não foi possível enviar a foto. Tente de novo." };
+    return { ok: false, erro: t("Não foi possível enviar a foto. Tente de novo.", idioma) };
   }
 
   const {
@@ -66,7 +69,7 @@ export async function atualizarAvatarManual(
   if (erroAtualizar) {
     return {
       ok: false,
-      erro: "Foto enviada, mas não deu para salvar o perfil. Tente de novo.",
+      erro: t("Foto enviada, mas não deu para salvar o perfil. Tente de novo.", idioma),
     };
   }
 

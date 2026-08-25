@@ -9,21 +9,28 @@ import { buscarModelo } from "@/lib/dados/modelo-treino";
 import TreinoDetalhe from "@/components/treino-detalhe";
 import AbaInferior from "@/components/aba-inferior";
 import CabecalhoPro from "@/components/cabecalho-pro";
+import { t } from "@/lib/texto/i18n";
+import type { Idioma } from "@/lib/dados/idioma";
 
-const DIAS = [
-  "domingo", "segunda", "terça", "quarta", "quinta", "sexta", "sábado",
-];
-const MESES = [
-  "jan", "fev", "mar", "abr", "mai", "jun",
-  "jul", "ago", "set", "out", "nov", "dez",
-];
+const DIAS_POR_IDIOMA: Record<Idioma, string[]> = {
+  "pt-BR": ["domingo", "segunda", "terça", "quarta", "quinta", "sexta", "sábado"],
+  en: ["sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"],
+  es: ["domingo", "lunes", "martes", "miércoles", "jueves", "viernes", "sábado"],
+};
+const MESES_POR_IDIOMA: Record<Idioma, string[]> = {
+  "pt-BR": ["jan", "fev", "mar", "abr", "mai", "jun", "jul", "ago", "set", "out", "nov", "dez"],
+  en: ["jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec"],
+  es: ["ene", "feb", "mar", "abr", "may", "jun", "jul", "ago", "sep", "oct", "nov", "dic"],
+};
 
 /** "2026-08-06" → "quinta · 6 ago". Montado em UTC para não deslizar de dia. */
-function formatarContexto(iso: string): string {
+function formatarContexto(iso: string, idioma: Idioma): string {
   const [ano, mes, dia] = iso.split("-").map(Number);
   if (!ano || !mes || !dia) return iso;
   const data = new Date(Date.UTC(ano, mes - 1, dia));
-  return `${DIAS[data.getUTCDay()]} · ${dia} ${MESES[mes - 1]}`;
+  const dias = DIAS_POR_IDIOMA[idioma];
+  const meses = MESES_POR_IDIOMA[idioma];
+  return `${dias[data.getUTCDay()]} · ${dia} ${meses[mes - 1]}`;
 }
 
 export default async function PaginaTreinoDetalhe({
@@ -43,6 +50,8 @@ export default async function PaginaTreinoDetalhe({
 
   if (!treino) notFound();
 
+  const idioma = perfil?.idioma ?? "pt-BR";
+
   // Pré-seleção só faz sentido no primeiro carregamento de um treino vazio
   // (SDD §9.3) — um treino que já tem série não tem mais "exercício ainda
   // não começado" pra oferecer.
@@ -54,10 +63,11 @@ export default async function PaginaTreinoDetalhe({
   return (
     <main className="tela">
       <CabecalhoPro
-        titulo={formatarContexto(treino.data)}
-        destaque="Bancada"
+        titulo={formatarContexto(treino.data, idioma)}
+        destaque={t("Bancada", idioma)}
         voltarHref="/treino"
         perfil={perfil}
+        idioma={idioma}
       />
 
       <TreinoDetalhe
@@ -65,9 +75,10 @@ export default async function PaginaTreinoDetalhe({
         seriesIniciais={treino.series}
         exercicios={exercicios}
         exerciciosPreSelecionados={exerciciosPreSelecionados}
+        idioma={idioma}
       />
 
-      <AbaInferior ativa="bancada" />
+      <AbaInferior ativa="bancada" idioma={idioma} />
     </main>
   );
 }

@@ -9,25 +9,31 @@ import { dataLocalBrasil } from "@/lib/tempo";
 import AbaInferior from "@/components/aba-inferior";
 import AnaliseInterativa from "@/components/analise-interativa";
 import CabecalhoPro from "@/components/cabecalho-pro";
+import { t } from "@/lib/texto/i18n";
 
 export default async function PaginaAnalise() {
   const [perfil, resumo] = await Promise.all([
     obterPerfil(),
     carregarResumoHome(dataLocalBrasil()),
   ]);
+  const idioma = perfil?.idioma ?? "pt-BR";
 
   return (
     <main className="tela">
       <CabecalhoPro
-        titulo="Análise Semanal"
-        destaque="Ciclo"
+        titulo={t("Análise Semanal", idioma)}
+        destaque={t("Ciclo", idioma)}
         mostrarLogo={true}
         perfil={perfil}
+        idioma={idioma}
       />
 
-      <AnaliseInterativa semanasFechadasComTreino={resumo.semanasFechadasComTreino} />
+      <AnaliseInterativa
+        semanasFechadasComTreino={resumo.semanasFechadasComTreino}
+        idioma={idioma}
+      />
 
-      <AbaInferior ativa="analise" />
+      <AbaInferior ativa="analise" idioma={idioma} />
     </main>
   );
 }

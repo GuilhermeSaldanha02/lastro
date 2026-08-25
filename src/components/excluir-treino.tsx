@@ -7,16 +7,20 @@
 // tocar sem ler, e que não diz o que exatamente vai sumir.
 import { useState, useTransition } from "react";
 import { excluirTreino } from "@/lib/dados/treino";
+import { t } from "@/lib/texto/i18n";
+import type { Idioma } from "@/lib/dados/idioma";
 
 export default function ExcluirTreino({
   id,
   data,
   series,
+  idioma,
 }: {
   id: string;
   /** Já formatada pela página — este componente não repete regra de data. */
   data: string;
   series: number;
+  idioma: Idioma;
 }) {
   const [confirmando, setConfirmando] = useState(false);
   const [erro, setErro] = useState<string | null>(null);
@@ -28,7 +32,7 @@ export default function ExcluirTreino({
       try {
         await excluirTreino(id);
       } catch {
-        setErro("Não foi possível excluir. Tente de novo.");
+        setErro(t("Não foi possível excluir. Tente de novo.", idioma));
         setConfirmando(false);
       }
     });
@@ -41,7 +45,7 @@ export default function ExcluirTreino({
           type="button"
           className="botao-icone"
           onClick={() => setConfirmando(true)}
-          aria-label={`Excluir o treino de ${data}`}
+          aria-label={`${t("Excluir o treino de", idioma)} ${data}`}
         >
           <svg
             viewBox="0 0 24 24"
@@ -65,16 +69,19 @@ export default function ExcluirTreino({
   }
 
   return (
-    <div className="confirma" role="group" aria-label="Confirmar exclusão">
+    <div className="confirma" role="group" aria-label={t("Confirmar exclusão", idioma)}>
       <p className="confirma__texto">
-        Excluir o treino de {data}
+        {t("Excluir o treino de", idioma)} {data}
         {series > 0 && (
           <>
             {" "}
-            e {series === 1 ? "a série dele" : `as ${series} séries dele`}
+            {t("e", idioma)}{" "}
+            {series === 1
+              ? t("a série dele", idioma)
+              : `${t("as", idioma)} ${series} ${t("séries dele", idioma)}`}
           </>
         )}
-        ? Não dá para desfazer.
+        ? {t("Não dá para desfazer.", idioma)}
       </p>
       <div className="confirma__acoes">
         <button
@@ -83,7 +90,7 @@ export default function ExcluirTreino({
           onClick={() => setConfirmando(false)}
           disabled={pendente}
         >
-          Cancelar
+          {t("Cancelar", idioma)}
         </button>
         <button
           type="button"
@@ -91,7 +98,7 @@ export default function ExcluirTreino({
           onClick={excluir}
           disabled={pendente}
         >
-          {pendente ? "Excluindo…" : "Excluir"}
+          {pendente ? t("Excluindo…", idioma) : t("Excluir", idioma)}
         </button>
       </div>
     </div>

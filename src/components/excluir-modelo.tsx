@@ -6,8 +6,10 @@
 // `excluir-treino.tsx` — nada de `window.confirm`.
 import { useState, useTransition } from "react";
 import { excluirModelo } from "@/lib/dados/modelo-treino";
+import { t } from "@/lib/texto/i18n";
+import type { Idioma } from "@/lib/dados/idioma";
 
-export default function ExcluirModelo({ id, nome }: { id: string; nome: string }) {
+export default function ExcluirModelo({ id, nome, idioma }: { id: string; nome: string; idioma: Idioma }) {
   const [confirmando, setConfirmando] = useState(false);
   const [erro, setErro] = useState<string | null>(null);
   const [pendente, iniciar] = useTransition();
@@ -18,7 +20,7 @@ export default function ExcluirModelo({ id, nome }: { id: string; nome: string }
       try {
         await excluirModelo(id);
       } catch {
-        setErro("Não foi possível excluir. Tente de novo.");
+        setErro(t("Não foi possível excluir. Tente de novo.", idioma));
         setConfirmando(false);
       }
     });
@@ -31,7 +33,7 @@ export default function ExcluirModelo({ id, nome }: { id: string; nome: string }
           type="button"
           className="botao-icone"
           onClick={() => setConfirmando(true)}
-          aria-label={`Excluir modelo ${nome}`}
+          aria-label={`${t("Excluir modelo", idioma)} ${nome}`}
         >
           <svg
             viewBox="0 0 24 24"
@@ -55,11 +57,13 @@ export default function ExcluirModelo({ id, nome }: { id: string; nome: string }
   }
 
   return (
-    <div className="confirma" role="group" aria-label="Confirmar exclusão">
+    <div className="confirma" role="group" aria-label={t("Confirmar exclusão", idioma)}>
       <p className="confirma__texto">
-        Excluir o modelo &ldquo;{nome}&rdquo;? A lista de exercícios some — os
-        treinos já registrados a partir dela não são afetados. Não dá para
-        desfazer.
+        {t("Excluir o modelo", idioma)} &ldquo;{nome}&rdquo;?{" "}
+        {t(
+          "A lista de exercícios some — os treinos já registrados a partir dela não são afetados. Não dá para desfazer.",
+          idioma,
+        )}
       </p>
       <div className="confirma__acoes">
         <button
@@ -68,7 +72,7 @@ export default function ExcluirModelo({ id, nome }: { id: string; nome: string }
           onClick={() => setConfirmando(false)}
           disabled={pendente}
         >
-          Cancelar
+          {t("Cancelar", idioma)}
         </button>
         <button
           type="button"
@@ -76,7 +80,7 @@ export default function ExcluirModelo({ id, nome }: { id: string; nome: string }
           onClick={excluir}
           disabled={pendente}
         >
-          {pendente ? "Excluindo…" : "Excluir"}
+          {pendente ? t("Excluindo…", idioma) : t("Excluir", idioma)}
         </button>
       </div>
     </div>

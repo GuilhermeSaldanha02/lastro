@@ -14,12 +14,26 @@ import IniciarTreino from "@/components/iniciar-treino";
 import SetaNavegacao from "@/components/seta-navegacao";
 import RastreadorDisciplina from "@/components/rastreador-disciplina";
 import SeletorMetricasHome from "@/components/seletor-metricas-home";
+import { t } from "@/lib/texto/i18n";
+import type { Idioma } from "@/lib/dados/idioma";
 
-function formatarData(iso: string, hojeISO: string): string {
-  if (iso === hojeISO) return "hoje";
+const DIAS_POR_IDIOMA: Record<Idioma, string[]> = {
+  "pt-BR": ["Domingo", "Segunda-feira", "Terça-feira", "Quarta-feira", "Quinta-feira", "Sexta-feira", "Sábado"],
+  en: ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
+  es: ["Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"],
+};
+
+const MESES_POR_IDIOMA: Record<Idioma, string[]> = {
+  "pt-BR": ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"],
+  en: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
+  es: ["Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"],
+};
+
+function formatarData(iso: string, hojeISO: string, idioma: Idioma): string {
+  if (iso === hojeISO) return t("hoje", idioma);
   const ontem = new Date(`${hojeISO}T00:00:00Z`);
   ontem.setUTCDate(ontem.getUTCDate() - 1);
-  if (iso === ontem.toISOString().slice(0, 10)) return "ontem";
+  if (iso === ontem.toISOString().slice(0, 10)) return t("ontem", idioma);
   return formatarDataCurta(iso);
 }
 
@@ -29,10 +43,10 @@ function formatarVolume(kg: number): { valor: string; unidade: string } {
   return { valor: (kg / 1000).toFixed(1).replace(".", ","), unidade: "t" };
 }
 
-function formatarCabecalhoData(hojeISO: string): { dataTexto: string; semanaTexto: string } {
+function formatarCabecalhoData(hojeISO: string, idioma: Idioma): { dataTexto: string; semanaTexto: string } {
   const d = new Date(`${hojeISO}T00:00:00Z`);
-  const dias = ["Domingo", "Segunda-feira", "Terça-feira", "Quarta-feira", "Quinta-feira", "Sexta-feira", "Sábado"];
-  const meses = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"];
+  const dias = DIAS_POR_IDIOMA[idioma];
+  const meses = MESES_POR_IDIOMA[idioma];
   const diaSemana = dias[d.getUTCDay()];
   const diaMes = d.getUTCDate();
   const mes = meses[d.getUTCMonth()];
@@ -49,7 +63,7 @@ function formatarCabecalhoData(hojeISO: string): { dataTexto: string; semanaText
 
   return {
     dataTexto: `${diaSemana}, ${diaMes} ${mes}`,
-    semanaTexto: `Semana ${semanaNum}`,
+    semanaTexto: `${t("Semana", idioma)} ${semanaNum}`,
   };
 }
 
@@ -70,7 +84,8 @@ export default async function PaginaInicial() {
     listarModelos(),
   ]);
 
-  const { dataTexto, semanaTexto } = formatarCabecalhoData(hoje);
+  const idioma = perfil?.idioma ?? "pt-BR";
+  const { dataTexto, semanaTexto } = formatarCabecalhoData(hoje, idioma);
   const volumeFormatado = formatarVolume(resumo.volumeNaSemana);
 
   return (
@@ -84,7 +99,7 @@ export default async function PaginaInicial() {
             {dataTexto} · <span>{semanaTexto}</span>
           </div>
         </div>
-        <Link href="/perfil" className="topo-pro__avatar-link" aria-label="Perfil do usuário">
+        <Link href="/perfil" className="topo-pro__avatar-link" aria-label={t("Perfil do usuário", idioma)}>
           {perfil && <Avatar nome={perfil.nome} avatarUrl={perfil.avatarUrl} />}
         </Link>
       </header>
@@ -100,17 +115,17 @@ export default async function PaginaInicial() {
               <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                 <polygon points="5 3 19 12 5 21 5 3"></polygon>
               </svg>
-              Continuar Treino de Hoje
+              {t("Continuar Treino de Hoje", idioma)}
             </Link>
           ) : modelos.length > 0 ? (
-            <IniciarTreino modelos={modelos} />
+            <IniciarTreino modelos={modelos} idioma={idioma} />
           ) : (
             <form action={criarTreino} style={{ width: "100%" }}>
               <button type="submit" className="botao-primario botao-primario--heroi">
                 <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                   <polygon points="5 3 19 12 5 21 5 3"></polygon>
                 </svg>
-                Iniciar Treino de Hoje
+                {t("Iniciar Treino de Hoje", idioma)}
               </button>
             </form>
           )}
@@ -121,6 +136,7 @@ export default async function PaginaInicial() {
           hojeISO={hoje}
           diasComTreino={resumo.diasComTreinoNaSemana}
           streakDias={resumo.sequenciaAtual}
+          idioma={idioma}
         />
 
         {/* Seletor de Métricas com Gráfico de Onda (Volume / Cargas / Séries) */}
@@ -130,6 +146,7 @@ export default async function PaginaInicial() {
           treinosNaSemana={resumo.treinosNaSemana}
           historicoBarras={resumo.historicoBarras}
           seriesPorGrupo={resumo.seriesPorGrupo}
+          idioma={idioma}
         />
 
         {/* Card Análise Semanal (AI Coach) */}
@@ -139,14 +156,14 @@ export default async function PaginaInicial() {
               <svg viewBox="0 0 24 24" width="18" height="18" fill="var(--lastro-ouro)">
                 <path d="M12 2L14.5 9.5L22 12L14.5 14.5L12 22L9.5 14.5L2 12L9.5 9.5L12 2Z" />
               </svg>
-              <span>Análise Semanal (AI Coach)</span>
+              <span>{t("Análise Semanal (AI Coach)", idioma)}</span>
             </div>
             {/* Curto de propósito: o cartão já se chama "Análise Semanal",
                 então "nesta semana" no rótulo era redundante — e a 360px
                 a frase longa quebrava o cabeçalho em duas linhas. */}
             <span className="ai-coach-card__meta">
               {resumo.treinosNaSemana}{" "}
-              {resumo.treinosNaSemana === 1 ? "treino" : "treinos"}
+              {t(resumo.treinosNaSemana === 1 ? "treino" : "treinos", idioma)}
               {/* T4: a fração só aparece depois que o dono define a meta
                   em /ajustes — nunca um denominador inventado (achado
                   A13). Sem meta definida, a contagem sozinha já basta. */}
@@ -169,21 +186,24 @@ export default async function PaginaInicial() {
 
           <Link href="/analise" className="ai-coach-card__citacao">
             <p>
-              {resumo.treinosNaSemana > 0
-                ? "Toque para ver a leitura da sua semana."
-                : "Ainda sem treinos nesta semana. Inicie uma sessão para gerar o parecer inteligente."}
+              {t(
+                resumo.treinosNaSemana > 0
+                  ? "Toque para ver a leitura da sua semana."
+                  : "Ainda sem treinos nesta semana. Inicie uma sessão para gerar o parecer inteligente.",
+                idioma,
+              )}
             </p>
           </Link>
         </section>
 
         {/* Feed de Treinos Recentes */}
         <div className="secao-header">
-          <h2 className="secao-header__titulo">Treinos Recentes</h2>
-          <Link href="/treino" className="secao-header__link">Ver Todos</Link>
+          <h2 className="secao-header__titulo">{t("Treinos Recentes", idioma)}</h2>
+          <Link href="/treino" className="secao-header__link">{t("Ver Todos", idioma)}</Link>
         </div>
 
         {resumo.recentes.length === 0 ? (
-          <p className="vazio">Nenhum treino registrado ainda. O primeiro começa no botão acima.</p>
+          <p className="vazio">{t("Nenhum treino registrado ainda. O primeiro começa no botão acima.", idioma)}</p>
         ) : (
           <div className="feed-treinos">
             {resumo.recentes.map((treino) => (
@@ -197,10 +217,10 @@ export default async function PaginaInicial() {
                         </span>
                       ))
                     ) : (
-                      <span className="tag-grupo">SESSÃO</span>
+                      <span className="tag-grupo">{t("SESSÃO", idioma)}</span>
                     )}
                   </div>
-                  <span className="cartao-treino-item__data">{formatarData(treino.data, hoje)}</span>
+                  <span className="cartao-treino-item__data">{formatarData(treino.data, hoje, idioma)}</span>
                 </div>
 
                 <div className="cartao-treino-item__direita">
@@ -209,7 +229,7 @@ export default async function PaginaInicial() {
                       {formatarVolume(treino.volume).valor} {formatarVolume(treino.volume).unidade}
                     </span>
                     <span className="cartao-treino-item__series">
-                      {treino.totalSeries} {treino.totalSeries === 1 ? "série" : "séries"}
+                      {treino.totalSeries} {t(treino.totalSeries === 1 ? "série" : "séries", idioma)}
                     </span>
                   </div>
                   <SetaNavegacao />
@@ -220,7 +240,7 @@ export default async function PaginaInicial() {
         )}
       </div>
 
-      <AbaInferior ativa="inicio" />
+      <AbaInferior ativa="inicio" idioma={idioma} />
     </main>
   );
 }

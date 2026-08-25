@@ -14,10 +14,13 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import type { ExercicioDoCatalogo } from "@/lib/dados/treino";
 import { criarModelo } from "@/lib/dados/modelo-treino";
 import SeletorGrupoMuscular, { type OpcaoGrupo } from "./seletor-grupo-muscular";
+import { t } from "@/lib/texto/i18n";
+import type { Idioma } from "@/lib/dados/idioma";
 
 export default function ModeloTreinoForm({
   exercicios,
   naFolha = false,
+  idioma,
 }: {
   exercicios: ExercicioDoCatalogo[];
   /** H1 — dentro da folha, fechar é `router.back()` (o próprio mecanismo de
@@ -27,6 +30,7 @@ export default function ModeloTreinoForm({
    * folha (rota cheia por URL direta), `push` continua certo: não existe
    * entrada de folha pra fechar. */
   naFolha?: boolean;
+  idioma: Idioma;
 }) {
   const router = useRouter();
   const [gruposEscolhidos, setGruposEscolhidos] = useState<string[]>([]);
@@ -49,8 +53,8 @@ export default function ModeloTreinoForm({
     for (const e of exercicios) porId.set(e.grupoMuscularPrimario, e.grupoMuscularNome);
     return Array.from(porId.entries())
       .map(([id, nomeGrupo]) => ({ id, nome: nomeGrupo }))
-      .sort((a, b) => a.nome.localeCompare(b.nome, "pt-BR"));
-  }, [exercicios]);
+      .sort((a, b) => a.nome.localeCompare(b.nome, idioma));
+  }, [exercicios, idioma]);
 
   const exerciciosFiltrados = useMemo(
     () => exercicios.filter((e) => gruposEscolhidos.includes(e.grupoMuscularPrimario)),
@@ -66,11 +70,11 @@ export default function ModeloTreinoForm({
   async function salvar() {
     setErro(null);
     if (!nome.trim()) {
-      setErro("Dê um nome ao modelo.");
+      setErro(t("Dê um nome ao modelo.", idioma));
       return;
     }
     if (exerciciosEscolhidos.length === 0) {
-      setErro("Escolha pelo menos um exercício.");
+      setErro(t("Escolha pelo menos um exercício.", idioma));
       return;
     }
     setEnviando(true);
@@ -82,7 +86,7 @@ export default function ModeloTreinoForm({
         router.push("/ajustes/modelos");
       }
     } catch {
-      setErro("Não foi possível salvar. Tente de novo.");
+      setErro(t("Não foi possível salvar. Tente de novo.", idioma));
       setEnviando(false);
     }
   }
@@ -92,15 +96,15 @@ export default function ModeloTreinoForm({
     return (
       <section className="grupo">
         <div className="grupo__cab">
-          <h2 className="grupo__nome">Que treino é esse?</h2>
+          <h2 className="grupo__nome">{t("Que treino é esse?", idioma)}</h2>
         </div>
         <p className="campo__nota">
-          Dê um nome — os exercícios vêm no passo seguinte.
+          {t("Dê um nome — os exercícios vêm no passo seguinte.", idioma)}
         </p>
 
         <div className="campo">
           <label className="campo__rotulo" htmlFor="nome_modelo">
-            Nome do modelo
+            {t("Nome do modelo", idioma)}
           </label>
           <input
             ref={nomeRef}
@@ -108,7 +112,7 @@ export default function ModeloTreinoForm({
             type="text"
             value={nome}
             onChange={(e) => setNome(e.target.value)}
-            placeholder="Ex.: Peito e tríceps"
+            placeholder={t("Ex.: Peito e tríceps", idioma)}
           />
         </div>
 
@@ -118,7 +122,7 @@ export default function ModeloTreinoForm({
           disabled={!nome.trim()}
           onClick={() => setNomeConfirmado(true)}
         >
-          Continuar
+          {t("Continuar", idioma)}
         </button>
       </section>
     );
@@ -126,7 +130,7 @@ export default function ModeloTreinoForm({
 
   // Passo 2 — os grupos musculares.
   if (gruposEscolhidos.length === 0) {
-    return <SeletorGrupoMuscular opcoes={opcoesGrupo} onConfirmar={setGruposEscolhidos} />;
+    return <SeletorGrupoMuscular opcoes={opcoesGrupo} onConfirmar={setGruposEscolhidos} idioma={idioma} />;
   }
 
   // Passo 3 — os exercícios. O nome vira o título, que é o que dá contexto
@@ -141,18 +145,18 @@ export default function ModeloTreinoForm({
           className="botao-textual"
           onClick={() => setNomeConfirmado(false)}
         >
-          Renomear
+          {t("Renomear", idioma)}
         </button>
       </div>
 
       <div className="grupo__cab">
-        <p className="campo__nota">Exercícios do modelo</p>
+        <p className="campo__nota">{t("Exercícios do modelo", idioma)}</p>
         <button type="button" className="botao-textual" onClick={() => setGruposEscolhidos([])}>
-          Trocar grupo
+          {t("Trocar grupo", idioma)}
         </button>
       </div>
 
-      <div className="selecao-grupos" role="group" aria-label="Exercícios do modelo">
+      <div className="selecao-grupos" role="group" aria-label={t("Exercícios do modelo", idioma)}>
         {exerciciosFiltrados.map((exercicio) => (
           <label key={exercicio.id} className="selecao-grupos__opcao">
             <input
@@ -177,7 +181,7 @@ export default function ModeloTreinoForm({
         onClick={salvar}
         disabled={enviando}
       >
-        {enviando ? "Salvando…" : "Salvar modelo"}
+        {enviando ? t("Salvando…", idioma) : t("Salvar modelo", idioma)}
       </button>
     </section>
   );

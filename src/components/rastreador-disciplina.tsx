@@ -1,30 +1,38 @@
 "use client";
 
 import { useMemo } from "react";
+import { t } from "@/lib/texto/i18n";
+import type { Idioma } from "@/lib/dados/idioma";
 
 type RastreadorDisciplinaProps = {
   hojeISO: string;
   diasComTreino: string[]; // ISO format "YYYY-MM-DD"
   streakDias?: number;
+  idioma: Idioma;
 };
 
-const NOMES_DIAS = ["Seg", "Ter", "Qua", "Qui", "Sex", "Sáb", "Dom"];
+const NOMES_DIAS_POR_IDIOMA: Record<Idioma, string[]> = {
+  "pt-BR": ["Seg", "Ter", "Qua", "Qui", "Sex", "Sáb", "Dom"],
+  en: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
+  es: ["Lun", "Mar", "Mié", "Jue", "Vie", "Sáb", "Dom"],
+};
 
 export default function RastreadorDisciplina({
   hojeISO,
   diasComTreino,
   streakDias,
+  idioma,
 }: RastreadorDisciplinaProps) {
   const diasDaSemana = useMemo(() => {
     const hoje = new Date(`${hojeISO}T00:00:00Z`);
     // Encontra a segunda-feira da semana ISO
     const diaSemana = hoje.getUTCDay(); // 0 = Dom, 1 = Seg, ...
     const offsetParaSegunda = diaSemana === 0 ? -6 : 1 - diaSemana;
-    
+
     const segunda = new Date(hoje);
     segunda.setUTCDate(hoje.getUTCDate() + offsetParaSegunda);
 
-    return NOMES_DIAS.map((nome, index) => {
+    return NOMES_DIAS_POR_IDIOMA[idioma].map((nome, index) => {
       const dataDia = new Date(segunda);
       dataDia.setUTCDate(segunda.getUTCDate() + index);
       const iso = dataDia.toISOString().slice(0, 10);
@@ -40,15 +48,15 @@ export default function RastreadorDisciplina({
         ehHoje,
       };
     });
-  }, [hojeISO, diasComTreino]);
+  }, [hojeISO, diasComTreino, idioma]);
 
   const totalTreinos = diasComTreino.length;
   const streak = streakDias ?? (totalTreinos > 0 ? totalTreinos : 0);
 
   return (
-    <section className="disciplina-card" aria-label="Rastreador de disciplina semanal">
+    <section className="disciplina-card" aria-label={t("Rastreador de disciplina semanal", idioma)}>
       <div className="disciplina-card__header">
-        <span className="disciplina-card__titulo">Disciplina Semanal</span>
+        <span className="disciplina-card__titulo">{t("Disciplina Semanal", idioma)}</span>
         {streak > 0 && (
           // "dias seguidos", não "sessões seguidas": o que se conta é dia
           // de calendário consecutivo (`analise/sequencia.ts`). O rótulo
@@ -56,7 +64,7 @@ export default function RastreadorDisciplina({
           // sequência — e o texto longo ainda quebrava em duas linhas a
           // 360px, empurrando o título do cartão junto.
           <span className="disciplina-card__streak">
-            {streak} {streak === 1 ? "dia seguido" : "dias seguidos"}
+            {streak} {t(streak === 1 ? "dia seguido" : "dias seguidos", idioma)}
           </span>
         )}
       </div>

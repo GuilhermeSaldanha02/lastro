@@ -7,12 +7,14 @@
 import { useState } from "react";
 import { salvarConfigAnilhas, type ConfigAnilhas } from "@/lib/dados/config-anilhas";
 import { calcularAnilhas } from "@/lib/anilhas";
+import { t } from "@/lib/texto/i18n";
+import type { Idioma } from "@/lib/dados/idioma";
 
 function formatarKg(valor: number): string {
   return valor % 1 === 0 ? String(valor) : valor.toFixed(2).replace(/0+$/, "").replace(/\.$/, "");
 }
 
-export default function AnilhasForm({ configInicial }: { configInicial: ConfigAnilhas }) {
+export default function AnilhasForm({ configInicial, idioma }: { configInicial: ConfigAnilhas; idioma: Idioma }) {
   const [pesoBarra, setPesoBarra] = useState(String(configInicial.pesoBarra));
   const [anilhas, setAnilhas] = useState(
     [...configInicial.anilhasDisponiveis].sort((a, b) => b - a),
@@ -27,7 +29,7 @@ export default function AnilhasForm({ configInicial }: { configInicial: ConfigAn
   function adicionarAnilha() {
     const peso = Number(novaAnilha.replace(",", "."));
     if (!Number.isFinite(peso) || peso <= 0) {
-      setErro("Peso da anilha precisa ser um número positivo.");
+      setErro(t("Peso da anilha precisa ser um número positivo.", idioma));
       return;
     }
     if (anilhas.includes(peso)) {
@@ -48,7 +50,7 @@ export default function AnilhasForm({ configInicial }: { configInicial: ConfigAn
     setSalvo(false);
     const barra = Number(pesoBarra.replace(",", "."));
     if (!Number.isFinite(barra) || barra <= 0) {
-      setErro("Peso da barra precisa ser um número positivo.");
+      setErro(t("Peso da barra precisa ser um número positivo.", idioma));
       return;
     }
     setSalvando(true);
@@ -56,7 +58,7 @@ export default function AnilhasForm({ configInicial }: { configInicial: ConfigAn
       await salvarConfigAnilhas(barra, anilhas);
       setSalvo(true);
     } catch {
-      setErro("Não foi possível salvar. Tente de novo.");
+      setErro(t("Não foi possível salvar. Tente de novo.", idioma));
     } finally {
       setSalvando(false);
     }
@@ -72,7 +74,7 @@ export default function AnilhasForm({ configInicial }: { configInicial: ConfigAn
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "var(--lastro-e-4)" }}>
       <section className="card-obsidian">
-        <span className="card-obsidian__titulo">Peso da barra (kg)</span>
+        <span className="card-obsidian__titulo">{t("Peso da barra (kg)", idioma)}</span>
         <div className="campo">
           <input
             type="number"
@@ -81,27 +83,27 @@ export default function AnilhasForm({ configInicial }: { configInicial: ConfigAn
             step="0.5"
             value={pesoBarra}
             onChange={(e) => setPesoBarra(e.target.value)}
-            aria-label="Peso da barra em kg"
+            aria-label={t("Peso da barra em kg", idioma)}
           />
         </div>
       </section>
 
       <section className="card-obsidian">
         <div className="card-obsidian__header">
-          <span className="card-obsidian__titulo">Anilhas disponíveis</span>
+          <span className="card-obsidian__titulo">{t("Anilhas disponíveis", idioma)}</span>
           {anilhas.length > 0 && (
             <button
               type="button"
               className="botao-textual"
               onClick={() => setModoEdicao((atual) => !atual)}
             >
-              {modoEdicao ? "Concluído" : "Editar"}
+              {t(modoEdicao ? "Concluído" : "Editar", idioma)}
             </button>
           )}
         </div>
 
         {anilhas.length === 0 ? (
-          <p className="vazio">Nenhuma anilha configurada ainda.</p>
+          <p className="vazio">{t("Nenhuma anilha configurada ainda.", idioma)}</p>
         ) : (
           <div className="grade-anilhas">
             {anilhas.map((peso) => (
@@ -115,7 +117,7 @@ export default function AnilhasForm({ configInicial }: { configInicial: ConfigAn
                   className={
                     modoEdicao ? "botao-icone" : "botao-icone botao-icone--oculto"
                   }
-                  aria-label={`Remover anilha de ${formatarKg(peso)} kg`}
+                  aria-label={`${t("Remover anilha de", idioma)} ${formatarKg(peso)} kg`}
                   aria-hidden={!modoEdicao}
                   tabIndex={modoEdicao ? undefined : -1}
                   onClick={() => removerAnilha(peso)}
@@ -140,7 +142,7 @@ export default function AnilhasForm({ configInicial }: { configInicial: ConfigAn
         <div className="dupla">
           <div className="campo">
             <label className="campo__rotulo" htmlFor="nova_anilha">
-              Adicionar anilha (kg)
+              {t("Adicionar anilha (kg)", idioma)}
             </label>
             <input
               id="nova_anilha"
@@ -153,7 +155,7 @@ export default function AnilhasForm({ configInicial }: { configInicial: ConfigAn
             />
           </div>
           <button type="button" className="acao-fantasma" onClick={adicionarAnilha}>
-            <span aria-hidden="true">+</span> Adicionar
+            <span aria-hidden="true">+</span> {t("Adicionar", idioma)}
           </button>
         </div>
 
@@ -170,21 +172,21 @@ export default function AnilhasForm({ configInicial }: { configInicial: ConfigAn
             onClick={salvar}
             disabled={salvando}
           >
-            {salvando ? "Salvando…" : "Salvar configuração"}
+            {salvando ? t("Salvando…", idioma) : t("Salvar configuração", idioma)}
           </button>
           {salvo && (
             <p className="campo__nota" aria-live="polite">
-              Configuração salva.
+              {t("Configuração salva.", idioma)}
             </p>
           )}
         </div>
       </section>
 
       <section className="card-obsidian">
-        <span className="card-obsidian__titulo">Calculadora de Carga</span>
+        <span className="card-obsidian__titulo">{t("Calculadora de Carga", idioma)}</span>
         <div className="campo">
           <label className="campo__rotulo" htmlFor="peso_alvo">
-            Peso alvo (kg)
+            {t("Peso alvo (kg)", idioma)}
           </label>
           <input
             id="peso_alvo"
@@ -200,15 +202,15 @@ export default function AnilhasForm({ configInicial }: { configInicial: ConfigAn
         {resultado && (
           <div style={{ background: "var(--lastro-sup-2)", borderLeft: "3px solid var(--lastro-ouro)", borderRadius: "var(--lastro-raio-2)", padding: "12px 14px", marginTop: "4px" }}>
             <span style={{ fontSize: "11px", color: "var(--lastro-txt-3)", textTransform: "uppercase", fontWeight: "var(--lastro-peso-max)" }}>
-              De cada lado da barra:
+              {t("De cada lado da barra:", idioma)}
             </span>
             <p style={{ fontFamily: "var(--lastro-fonte-num)", fontSize: "var(--lastro-papel-secao)", fontWeight: "var(--lastro-peso-max)", color: "var(--lastro-ouro-claro)", margin: "2px 0" }}>
-              {resultado.porLado.length === 0 ? "0 kg / lado" : `${resultado.porLado.reduce((acc, a) => acc + a.peso * a.quantidade, 0)} kg / lado`}
+              {resultado.porLado.length === 0 ? `0 ${t("kg / lado", idioma)}` : `${resultado.porLado.reduce((acc, a) => acc + a.peso * a.quantidade, 0)} ${t("kg / lado", idioma)}`}
             </p>
             <p style={{ fontSize: "var(--lastro-papel-rotulo)", color: "var(--lastro-txt-2)" }}>
               {resultado.porLado.length === 0
-                ? "Só a barra, sem anilha de cada lado."
-                : `${resultado.porLado.map((a) => `${a.quantidade}× ${formatarKg(a.peso)} kg`).join(" + ")}. Total: ${formatarKg(resultado.pesoTotalAlcancado)} kg${!resultado.exato ? " (mais próximo do alvo)" : " (exato)"}.`}
+                ? t("Só a barra, sem anilha de cada lado.", idioma)
+                : `${resultado.porLado.map((a) => `${a.quantidade}× ${formatarKg(a.peso)} kg`).join(" + ")}. ${t("Total:", idioma)} ${formatarKg(resultado.pesoTotalAlcancado)} kg${!resultado.exato ? ` (${t("mais próximo do alvo", idioma)})` : ` (${t("exato", idioma)})`}.`}
             </p>
           </div>
         )}

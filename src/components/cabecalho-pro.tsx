@@ -1,5 +1,7 @@
 import Link from "next/link";
 import Avatar from "@/components/avatar";
+import { t } from "@/lib/texto/i18n";
+import type { Idioma } from "@/lib/dados/idioma";
 
 type CabecalhoProProps = {
   titulo: string;
@@ -7,6 +9,7 @@ type CabecalhoProProps = {
   voltarHref?: string;
   mostrarLogo?: boolean;
   perfil?: { nome: string; avatarUrl: string | null } | null;
+  idioma?: Idioma;
 };
 
 export default function CabecalhoPro({
@@ -15,12 +18,13 @@ export default function CabecalhoPro({
   voltarHref,
   mostrarLogo = !voltarHref,
   perfil,
+  idioma = "pt-BR",
 }: CabecalhoProProps) {
   return (
     <header className="topo-pro">
       <div className="topo-pro__esquerda">
         {voltarHref ? (
-          <Link href={voltarHref} className="topo-pro__voltar" aria-label="Voltar">
+          <Link href={voltarHref} className="topo-pro__voltar" aria-label={t("Voltar", idioma)}>
             <svg
               viewBox="0 0 24 24"
               width="18"
@@ -53,7 +57,7 @@ export default function CabecalhoPro({
         </div>
       </div>
 
-      <Link href="/perfil" className="topo-pro__avatar-link" aria-label="Perfil do atleta">
+      <Link href="/perfil" className="topo-pro__avatar-link" aria-label={t("Perfil do atleta", idioma)}>
         {perfil ? (
           <Avatar nome={perfil.nome} avatarUrl={perfil.avatarUrl} />
         ) : (

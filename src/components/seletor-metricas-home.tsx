@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import { formatarGrupoMuscular } from "@/lib/texto/grupo-muscular";
+import type { Idioma } from "@/lib/dados/idioma";
+import { t } from "@/lib/texto/i18n";
 
 /**
  * Card de métricas da Home.
@@ -33,6 +35,7 @@ type MetricasHomeProps = {
   treinosNaSemana: number;
   historicoBarras: Barra[];
   seriesPorGrupo: GrupoComSeries[];
+  idioma: Idioma;
 };
 
 type Aba = "volume" | "series" | "grupos";
@@ -84,14 +87,14 @@ function GraficoBarras({
  * horizontais, não verticais: o rótulo é uma palavra ("Posterior de
  * coxa"), e palavra não cabe embaixo de uma coluna de 40px.
  */
-function BarrasGrupos({ grupos }: { grupos: GrupoComSeries[] }) {
+function BarrasGrupos({ grupos, idioma }: { grupos: GrupoComSeries[]; idioma: Idioma }) {
   const maximo = Math.max(...grupos.map((g) => g.series));
 
   return (
     <ul className="grupo-barras">
       {grupos.map((g) => (
         <li className="grupo-barra" key={g.grupo}>
-          <span className="grupo-barra__nome">{formatarGrupoMuscular(g.grupo)}</span>
+          <span className="grupo-barra__nome">{formatarGrupoMuscular(g.grupo, idioma)}</span>
           <span className="grupo-barra__trilho">
             <span
               className="grupo-barra__preenchimento"
@@ -111,13 +114,14 @@ export default function SeletorMetricasHome({
   treinosNaSemana,
   historicoBarras,
   seriesPorGrupo,
+  idioma,
 }: MetricasHomeProps) {
   const [abaAtiva, setAbaAtiva] = useState<Aba>("volume");
 
   const temBarras = historicoBarras.length > 0;
 
   return (
-    <section className="metrica-switcher-card" aria-label="Métricas da Semana">
+    <section className="metrica-switcher-card" aria-label={t("Métricas da Semana", idioma)}>
       <div className="metrica-switcher__tabs" role="tablist">
         <button
           type="button"
@@ -126,7 +130,7 @@ export default function SeletorMetricasHome({
           className={`metrica-tab${abaAtiva === "volume" ? " metrica-tab--ativa" : ""}`}
           onClick={() => setAbaAtiva("volume")}
         >
-          Volume
+          {t("Volume", idioma)}
         </button>
         <button
           type="button"
@@ -135,7 +139,7 @@ export default function SeletorMetricasHome({
           className={`metrica-tab${abaAtiva === "series" ? " metrica-tab--ativa" : ""}`}
           onClick={() => setAbaAtiva("series")}
         >
-          Séries
+          {t("Séries", idioma)}
         </button>
         <button
           type="button"
@@ -144,7 +148,7 @@ export default function SeletorMetricasHome({
           className={`metrica-tab${abaAtiva === "grupos" ? " metrica-tab--ativa" : ""}`}
           onClick={() => setAbaAtiva("grupos")}
         >
-          Grupos
+          {t("Grupos", idioma)}
         </button>
       </div>
 
@@ -157,20 +161,20 @@ export default function SeletorMetricasHome({
                   {volumeFormatado.valor}
                   <span className="metrica-switcher__unidade">{volumeFormatado.unidade}</span>
                 </div>
-                <p className="metrica-switcher__subtitulo">Volume acumulado na semana</p>
+                <p className="metrica-switcher__subtitulo">{t("Volume acumulado na semana", idioma)}</p>
               </div>
               <span className="metrica-switcher__delta">
                 {treinosNaSemana > 0
-                  ? `${treinosNaSemana} ${treinosNaSemana === 1 ? "sessão" : "sessões"}`
-                  : "Sem treinos"}
+                  ? `${treinosNaSemana} ${t(treinosNaSemana === 1 ? "sessão" : "sessões", idioma)}`
+                  : t("Sem treinos", idioma)}
               </span>
             </div>
 
             <GraficoBarras
               barras={historicoBarras}
               valorDe={(b) => b.volume}
-              formatar={(n) => `${Math.round(n).toLocaleString("pt-BR")} kg`}
-              rotuloSerie={`Volume dos últimos ${historicoBarras.length} treinos`}
+              formatar={(n) => `${Math.round(n).toLocaleString(idioma)} kg`}
+              rotuloSerie={`${t("Volume dos últimos", idioma)} ${historicoBarras.length} ${t("treinos", idioma)}`}
             />
           </div>
         )}
@@ -181,24 +185,24 @@ export default function SeletorMetricasHome({
               <div>
                 <div className="metrica-switcher__grande">
                   {seriesValendo}
-                  <span className="metrica-switcher__unidade">séries</span>
+                  <span className="metrica-switcher__unidade">{t("séries", idioma)}</span>
                 </div>
                 <p className="metrica-switcher__subtitulo">
-                  Séries valendo concluídas (aquecimento excluído)
+                  {t("Séries valendo concluídas (aquecimento excluído)", idioma)}
                 </p>
               </div>
               <span className="metrica-switcher__delta">
                 {treinosNaSemana > 0
-                  ? `${treinosNaSemana} ${treinosNaSemana === 1 ? "sessão" : "sessões"}`
-                  : "Sem treinos"}
+                  ? `${treinosNaSemana} ${t(treinosNaSemana === 1 ? "sessão" : "sessões", idioma)}`
+                  : t("Sem treinos", idioma)}
               </span>
             </div>
 
             <GraficoBarras
               barras={historicoBarras}
               valorDe={(b) => b.series}
-              formatar={(n) => `${n} ${n === 1 ? "série" : "séries"}`}
-              rotuloSerie={`Séries dos últimos ${historicoBarras.length} treinos`}
+              formatar={(n) => `${n} ${t(n === 1 ? "série" : "séries", idioma)}`}
+              rotuloSerie={`${t("Séries dos últimos", idioma)} ${historicoBarras.length} ${t("treinos", idioma)}`}
             />
           </div>
         )}
@@ -210,20 +214,20 @@ export default function SeletorMetricasHome({
                 <div className="metrica-switcher__grande">
                   {seriesPorGrupo.length}
                   <span className="metrica-switcher__unidade">
-                    {seriesPorGrupo.length === 1 ? "grupo" : "grupos"}
+                    {t(seriesPorGrupo.length === 1 ? "grupo" : "grupos", idioma)}
                   </span>
                 </div>
                 <p className="metrica-switcher__subtitulo">
-                  Séries por grupo muscular nesta semana
+                  {t("Séries por grupo muscular nesta semana", idioma)}
                 </p>
               </div>
             </div>
 
             {seriesPorGrupo.length > 0 ? (
-              <BarrasGrupos grupos={seriesPorGrupo} />
+              <BarrasGrupos grupos={seriesPorGrupo} idioma={idioma} />
             ) : (
               <p className="metrica-switcher__vazio">
-                Nenhuma série registrada nesta semana ainda.
+                {t("Nenhuma série registrada nesta semana ainda.", idioma)}
               </p>
             )}
           </div>
@@ -231,7 +235,7 @@ export default function SeletorMetricasHome({
 
         {abaAtiva !== "grupos" && !temBarras && (
           <p className="metrica-switcher__vazio">
-            Os treinos que você registrar aparecem aqui como histórico.
+            {t("Os treinos que você registrar aparecem aqui como histórico.", idioma)}
           </p>
         )}
       </div>

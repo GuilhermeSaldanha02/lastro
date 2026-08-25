@@ -2,6 +2,8 @@
 // usa vidro porque o conteúdo rola por baixo dela. O item ativo se marca
 // por PESO além da cor: cor nunca é o único canal.
 import Link from "next/link";
+import { t } from "@/lib/texto/i18n";
+import type { Idioma } from "@/lib/dados/idioma";
 
 type Secao = "inicio" | "bancada" | "analise" | "catalogo" | "ajustes";
 
@@ -47,9 +49,9 @@ const SECOES: {
   },
 ];
 
-export default function AbaInferior({ ativa }: { ativa: Secao }) {
+export default function AbaInferior({ ativa, idioma = "pt-BR" }: { ativa: Secao; idioma?: Idioma }) {
   return (
-    <nav className="nav" aria-label="Seções do app">
+    <nav className="nav" aria-label={t("Seções do app", idioma)}>
       {SECOES.map((secao) => (
         <Link
           key={secao.id}
@@ -67,7 +69,7 @@ export default function AbaInferior({ ativa }: { ativa: Secao }) {
           >
             <path d={secao.caminho} />
           </svg>
-          {secao.rotulo}
+          {t(secao.rotulo, idioma)}
         </Link>
       ))}
     </nav>

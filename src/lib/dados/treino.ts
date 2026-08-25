@@ -12,6 +12,8 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { criarClienteServidor } from "@/lib/supabase/cliente-servidor";
 import { dataLocalBrasil } from "@/lib/tempo";
+import { obterIdioma } from "@/lib/dados/idioma";
+import { mapaTraducaoExercicios, mapaTraducaoGrupos } from "@/lib/dados/traducao";
 
 export type Exercicio = {
   id: string;
@@ -69,13 +71,17 @@ async function usuarioAutenticadoOuErro() {
  */
 export async function listarTreinos(): Promise<Treino[]> {
   const { supabase } = await usuarioAutenticadoOuErro();
-  const { data, error } = await supabase
-    .from("treino")
-    .select(
-      "id, data, serie (tipo, reps, peso, peso_por_lado, exercicio:exercicio_id (grupo_muscular_primario, unilateral))",
-    )
-    .order("data", { ascending: false });
+  const [{ data, error }, idioma] = await Promise.all([
+    supabase
+      .from("treino")
+      .select(
+        "id, data, serie (tipo, reps, peso, peso_por_lado, exercicio:exercicio_id (grupo_muscular_primario, unilateral))",
+      )
+      .order("data", { ascending: false }),
+    obterIdioma(),
+  ]);
   if (error) throw new Error(`Falha ao listar treinos: ${error.message}`);
+  const traducaoGrupos = await mapaTraducaoGrupos(idioma);
 
   type LinhaSerie = {
     tipo: "aquecimento" | "valendo";
@@ -109,7 +115,7 @@ export async function listarTreinos(): Promise<Treino[]> {
           .map((s) => s.exercicio?.grupo_muscular_primario)
           .filter((g): g is string => Boolean(g)),
       ),
-    );
+    ).map((id) => traducaoGrupos.get(id) ?? id);
 
     return {
       id: t.id,
@@ -148,6 +154,9 @@ export async function buscarTreino(
     throw new Error(`Falha ao listar séries: ${erroSeries.message}`);
   }
 
+  const idioma = await obterIdioma();
+  const traducaoExercicios = await mapaTraducaoExercicios(idioma);
+
   type LinhaSerie = {
     id: string;
     exercicio_id: string;
@@ -167,7 +176,7 @@ export async function buscarTreino(
     series: linhasSeries.map((s) => ({
       id: s.id,
       exercicioId: s.exercicio_id,
-      exercicioNome: s.exercicio?.nome ?? "",
+      exercicioNome: traducaoExercicios.get(s.exercicio_id) ?? s.exercicio?.nome ?? "",
       exercicioUnilateral: s.exercicio?.unilateral ?? false,
       exercicioPesoPorLado: s.exercicio?.peso_por_lado ?? false,
       tipo: s.tipo,
@@ -268,13 +277,27 @@ export async function listarExercicios(): Promise<Exercicio[]> {
     .select("id, nome, grupo_muscular_primario, unilateral, peso_por_lado")
     .order("nome", { ascending: true });
   if (error) throw new Error(`Falha ao listar exercícios: ${error.message}`);
-  return (data ?? []).map((e) => ({
+
+  const idioma = await obterIdioma();
+  const traducaoExercicios = await mapaTraducaoExercicios(idioma);
+
+  const exercicios = (data ?? []).map((e) => ({
     id: e.id,
-    nome: e.nome,
+    nome: traducaoExercicios.get(e.id) ?? e.nome,
     grupoMuscularPrimario: e.grupo_muscular_primario,
     unilateral: e.unilateral,
     pesoPorLado: e.peso_por_lado,
   }));
+
+  // A ordem alfabética vem do banco em PT-BR (`order("nome")`); com nome
+  // traduzido no idioma escolhido, reordena aqui pra não misturar
+  // alfabetos (achado do 2/4: "Abdominal..." em PT-BR não é onde
+  // "Bulgarian Split Squat" cairia em inglês).
+  if (idioma !== "pt-BR") {
+    exercicios.sort((a, b) => a.nome.localeCompare(b.nome));
+  }
+
+  return exercicios;
 }
 
 export type ExercicioDoCatalogo = Exercicio & {
@@ -302,6 +325,12 @@ export async function buscarExercicio(
   if (error) throw new Error(`Falha ao buscar exercício: ${error.message}`);
   if (!data) return null;
 
+  const idioma = await obterIdioma();
+  const [traducaoExercicios, traducaoGrupos] = await Promise.all([
+    mapaTraducaoExercicios(idioma),
+    mapaTraducaoGrupos(idioma),
+  ]);
+
   type Linha = {
     id: string;
     nome: string;
@@ -319,9 +348,12 @@ export async function buscarExercicio(
 
   return {
     id: linha.id,
-    nome: linha.nome,
+    nome: traducaoExercicios.get(linha.id) ?? linha.nome,
     grupoMuscularPrimario: linha.grupo_muscular_primario,
-    grupoMuscularNome: grupo?.nome ?? linha.grupo_muscular_primario,
+    grupoMuscularNome:
+      traducaoGrupos.get(linha.grupo_muscular_primario) ??
+      grupo?.nome ??
+      linha.grupo_muscular_primario,
     unilateral: linha.unilateral,
     pesoPorLado: linha.peso_por_lado,
     dicaExecucao: linha.dica_execucao,
@@ -339,6 +371,12 @@ export async function listarCatalogo(): Promise<ExercicioDoCatalogo[]> {
     .order("nome", { ascending: true });
   if (error) throw new Error(`Falha ao listar o catálogo: ${error.message}`);
 
+  const idioma = await obterIdioma();
+  const [traducaoExercicios, traducaoGrupos] = await Promise.all([
+    mapaTraducaoExercicios(idioma),
+    mapaTraducaoGrupos(idioma),
+  ]);
+
   type Linha = {
     id: string;
     nome: string;
@@ -349,20 +387,29 @@ export async function listarCatalogo(): Promise<ExercicioDoCatalogo[]> {
     grupo_muscular: { nome: string } | { nome: string }[] | null;
   };
 
-  return ((data ?? []) as unknown as Linha[]).map((e) => {
+  const catalogo = ((data ?? []) as unknown as Linha[]).map((e) => {
     const grupo = Array.isArray(e.grupo_muscular)
       ? e.grupo_muscular[0]
       : e.grupo_muscular;
     return {
       id: e.id,
-      nome: e.nome,
+      nome: traducaoExercicios.get(e.id) ?? e.nome,
       grupoMuscularPrimario: e.grupo_muscular_primario,
-      grupoMuscularNome: grupo?.nome ?? e.grupo_muscular_primario,
+      grupoMuscularNome:
+        traducaoGrupos.get(e.grupo_muscular_primario) ??
+        grupo?.nome ??
+        e.grupo_muscular_primario,
       unilateral: e.unilateral,
       pesoPorLado: e.peso_por_lado,
       dicaExecucao: e.dica_execucao,
     };
   });
+
+  if (idioma !== "pt-BR") {
+    catalogo.sort((a, b) => a.nome.localeCompare(b.nome));
+  }
+
+  return catalogo;
 }
 
 /**

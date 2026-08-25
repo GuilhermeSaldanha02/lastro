@@ -5,8 +5,10 @@
 // critério A13) — o texto precisa dizer exatamente o que some.
 import { useState, useTransition } from "react";
 import { excluirConta } from "@/lib/dados/conta";
+import { t } from "@/lib/texto/i18n";
+import type { Idioma } from "@/lib/dados/idioma";
 
-export default function ExcluirConta() {
+export default function ExcluirConta({ idioma }: { idioma: Idioma }) {
   const [confirmando, setConfirmando] = useState(false);
   const [erro, setErro] = useState<string | null>(null);
   const [pendente, iniciar] = useTransition();
@@ -17,7 +19,7 @@ export default function ExcluirConta() {
       try {
         await excluirConta();
       } catch {
-        setErro("Não foi possível excluir a conta. Tente de novo.");
+        setErro(t("Não foi possível excluir a conta. Tente de novo.", idioma));
         setConfirmando(false);
       }
     });
@@ -31,7 +33,7 @@ export default function ExcluirConta() {
           className="botao-textual botao-textual--destrutivo"
           onClick={() => setConfirmando(true)}
         >
-          Excluir conta
+          {t("Excluir conta", idioma)}
         </button>
         {erro && (
           <p className="aviso-erro" role="alert">
@@ -44,11 +46,12 @@ export default function ExcluirConta() {
 
   return (
     <div className="zona-risco">
-      <div className="confirma" role="group" aria-label="Confirmar exclusão de conta">
+      <div className="confirma" role="group" aria-label={t("Confirmar exclusão de conta", idioma)}>
         <p className="confirma__texto">
-          Excluir sua conta apaga o perfil, todos os treinos e séries registradas,
-          os modelos de treino e a configuração de anilhas — tudo, sem exceção.
-          Não dá para desfazer.
+          {t(
+            "Excluir sua conta apaga o perfil, todos os treinos e séries registradas, os modelos de treino e a configuração de anilhas — tudo, sem exceção. Não dá para desfazer.",
+            idioma,
+          )}
         </p>
         <div className="confirma__acoes">
           <button
@@ -57,7 +60,7 @@ export default function ExcluirConta() {
             onClick={() => setConfirmando(false)}
             disabled={pendente}
           >
-            Cancelar
+            {t("Cancelar", idioma)}
           </button>
           <button
             type="button"
@@ -65,7 +68,7 @@ export default function ExcluirConta() {
             onClick={excluir}
             disabled={pendente}
           >
-            {pendente ? "Excluindo…" : "Excluir conta"}
+            {pendente ? t("Excluindo…", idioma) : t("Excluir conta", idioma)}
           </button>
         </div>
       </div>

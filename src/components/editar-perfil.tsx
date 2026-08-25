@@ -9,13 +9,17 @@ import { useRef, useState, type ChangeEvent } from "react";
 import { atualizarAvatarManual } from "@/lib/dados/atualizar-avatar";
 import { validarArquivoAvatar } from "@/lib/dados/validar-avatar";
 import Avatar from "./avatar";
+import { t } from "@/lib/texto/i18n";
+import type { Idioma } from "@/lib/dados/idioma";
 
 export default function EditarPerfil({
   nome,
   avatarUrlInicial,
+  idioma,
 }: {
   nome: string;
   avatarUrlInicial: string | null;
+  idioma: Idioma;
 }) {
   const [avatarUrl, setAvatarUrl] = useState(avatarUrlInicial);
   const [enviando, setEnviando] = useState(false);
@@ -31,7 +35,7 @@ export default function EditarPerfil({
 
     setErro(null);
 
-    const validacao = validarArquivoAvatar(arquivo);
+    const validacao = validarArquivoAvatar(arquivo, idioma);
     if (!validacao.ok) {
       setErro(validacao.erro);
       return;
@@ -59,7 +63,7 @@ export default function EditarPerfil({
         accept="image/jpeg,image/png"
         className="campo-arquivo-oculto"
         onChange={aoEscolherArquivo}
-        aria-label="Escolher foto de perfil"
+        aria-label={t("Escolher foto de perfil", idioma)}
       />
       <button
         type="button"
@@ -67,7 +71,7 @@ export default function EditarPerfil({
         onClick={() => inputRef.current?.click()}
         disabled={enviando}
       >
-        {enviando ? "Enviando…" : "Trocar foto"}
+        {enviando ? t("Enviando…", idioma) : t("Trocar foto", idioma)}
       </button>
 
       {erro && (

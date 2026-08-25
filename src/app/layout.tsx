@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Bricolage_Grotesque, Archivo, Fraunces } from "next/font/google";
 import RegistrarServiceWorker from "@/components/registrar-service-worker";
+import { obterIdioma } from "@/lib/dados/idioma";
 import "./globals.css";
 
 // Pedido do dono (2026-08-07) — abrir o app instalado (ícone na tela
@@ -87,10 +88,17 @@ export const viewport: Viewport = {
   viewportFit: "cover",
 };
 
-export default function RootLayout({ children, modal }: LayoutProps<"/">) {
+export default async function RootLayout({ children, modal }: LayoutProps<"/">) {
+  // `<html lang>` precisa refletir o idioma escolhido (achado do
+  // `advisor` antes da etapa 3/4: leitor de tela e ferramentas de
+  // acessibilidade dependem deste atributo, não do texto visível) — lido
+  // aqui, no layout raiz, porque é o único lugar que envolve toda página,
+  // inclusive /login (sem sessão, cai no default pt-BR de `obterIdioma()`).
+  const idioma = await obterIdioma();
+
   return (
     <html
-      lang="pt-BR"
+      lang={idioma}
       className={`${bricolage.variable} ${archivo.variable} ${fraunces.variable}`}
     >
       <head>

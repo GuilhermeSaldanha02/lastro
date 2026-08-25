@@ -16,19 +16,23 @@ import BlocoEvidencia from "@/components/bloco-evidencia";
 import { formatarDataCurta } from "@/lib/tempo";
 import { separarVeredito } from "@/lib/texto/separar-veredito";
 import type { EvidenciaParaTela } from "@/app/api/analise/evidencia";
+import { t } from "@/lib/texto/i18n";
+import type { Idioma } from "@/lib/dados/idioma";
 
 export default function Parecer({
   pergunta,
   texto,
   avisoFalhaInterpretativa,
   evidencia,
+  idioma,
 }: {
   pergunta: string | null;
   texto: string;
   avisoFalhaInterpretativa?: boolean;
   evidencia?: EvidenciaParaTela;
+  idioma: Idioma;
 }) {
-  const emissao = new Date().toLocaleDateString("pt-BR", {
+  const emissao = new Date().toLocaleDateString(idioma, {
     day: "numeric",
     month: "short",
     year: "numeric",
@@ -38,20 +42,21 @@ export default function Parecer({
   return (
     <article className="doc">
       <header className="doc__emissao">
-        <p className="doc__selo">Análise semanal</p>
+        <p className="doc__selo">{t("Análise semanal", idioma)}</p>
         {pergunta && <h2 className="doc__pergunta">{pergunta}</h2>}
         <p className="doc__meta">
           {evidencia
-            ? `Semana de ${formatarDataCurta(evidencia.periodo.semana_atual_inicio)} — ${formatarDataCurta(evidencia.periodo.semana_atual_fim)} · Emitido em ${emissao}`
-            : `Emitido em ${emissao}`}
+            ? `${t("Semana de", idioma)} ${formatarDataCurta(evidencia.periodo.semana_atual_inicio)} — ${formatarDataCurta(evidencia.periodo.semana_atual_fim)} · ${t("Emitido em", idioma)} ${emissao}`
+            : `${t("Emitido em", idioma)} ${emissao}`}
         </p>
       </header>
 
       {avisoFalhaInterpretativa && (
         <p className="aviso-erro" role="alert">
-          A interpretação por IA falhou desta vez (duas tentativas
-          rejeitadas). O texto abaixo é um resumo determinístico dos seus
-          dados, sem prosa gerada — não é o parecer normal.
+          {t(
+            "A interpretação por IA falhou desta vez (duas tentativas rejeitadas). O texto abaixo é um resumo determinístico dos seus dados, sem prosa gerada — não é o parecer normal.",
+            idioma,
+          )}
         </p>
       )}
 
@@ -70,6 +75,7 @@ export default function Parecer({
               key={bloco.exercicio}
               bloco={bloco}
               janelaSemanas={evidencia.periodo.janela_semanas}
+              idioma={idioma}
             />
           ))}
         </div>
@@ -80,20 +86,19 @@ export default function Parecer({
       {/* Rodapé de método: texto fixo, nunca gerado. Procedência se mostra
           com número e com o que foi excluído da conta, não com adesivo. */}
       <footer className="doc__metodo">
-        <h2>Ressalvas do método</h2>
+        <h2>{t("Ressalvas do método", idioma)}</h2>
         <ul>
           <li>
-            A faixa de referência de volume é uma convenção prática, baseada
-            majoritariamente em homens jovens treinados — não tem teto
-            validado.
+            {t(
+              "A faixa de referência de volume é uma convenção prática, baseada majoritariamente em homens jovens treinados — não tem teto validado.",
+              idioma,
+            )}
           </li>
           <li>
-            &quot;Estagnação&quot; de N semanas é uma convenção de mercado, não
-            um critério clínico.
+            {t('"Estagnação" de N semanas é uma convenção de mercado, não um critério clínico.', idioma)}
           </li>
           <li>
-            e1RM calculado acima do teto de reps não é reportado — a fórmula
-            perde precisão nessa faixa.
+            {t("e1RM calculado acima do teto de reps não é reportado — a fórmula perde precisão nessa faixa.", idioma)}
           </li>
         </ul>
       </footer>

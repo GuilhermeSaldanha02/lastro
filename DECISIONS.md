@@ -1140,3 +1140,111 @@ Migração `0011_peso_por_lado_na_serie.sql` adiciona `serie.peso_por_lado` (boo
 **Impacto.** `SerieBruta`/`SerieValendo` (`src/lib/analise/tipos.ts`) ganham `pesoPorLado` como campo obrigatório da série (era do exercício). Cinco caminhos de leitura trocaram a fonte: `dados/treino.ts` (`listarTreinos` e `buscarTreino`), `dados/resumo-home.ts`, `dados/progressao.ts`, `api/analise/route.ts`. Dois testes novos em `agregar.test.ts` (T-V8) provam que é a série que decide, não o catálogo — inclusive o caso em que o catálogo diz `false` mas a série diz `true`. `tsc`/`test` (175)/`lint`/`build` verdes.
 
 **Como reverter.** Código: `git revert` do commit desta entrada. Banco: `alter table public.serie drop column peso_por_lado;` — volta ao estado da entrada anterior (catálogo decide sozinho). Perda real: as 26 séries que tinham `peso_por_lado=true` diferente do padrão do catálogo (se a pessoa tiver usado o interruptor para divergir do padrão) voltariam a depender só do catálogo.
+
+---
+
+## 2026-08-24 (3) — Módulo de idiomas: reverte a posição da ADR contra tradução automática do catálogo
+
+**O que mudou.** Dono pediu módulo de idiomas (inglês e espanhol, além do PT-BR) exposto em `/ajustes`, cobrindo "tudo — não precisa de curadoria humana, é só olhar no meaning". `ADR.md`/`KNOWLEDGE.md` §3.3 tinham rejeitado tradução automática do catálogo de exercícios, citando risco de tradução ruim ("Bent Over Row" → "Fileira Curvada" como exemplo de tradução reversa capenga). Esta entrada registra a reversão explícita dessa posição, por decisão do dono — não é um esquecimento da ADR anterior.
+
+Isto também é Scope Change contra `PRD.md` A9 ("nome em PT-BR de academia") — registrado aqui, não bloqueando o trabalho, porque o dono já decidiu.
+
+**Migração 0012.** Duas tabelas de tradução — `exercicio_traducao` e `grupo_muscular_traducao` (`exercicio_id`/`grupo_muscular_id`, `idioma` em `('en','es')`, `nome`) — em vez de colunas `nome_en`/`nome_es`: um terceiro idioma no futuro é uma linha, não uma migração. `exercicio.nome`/`grupo_muscular.nome` continuam o PT-BR, fonte única, sem nenhum lookup para quem usa o app em português. `usuario.idioma` (nullable, mesmo raciocínio honesto do `meta_treinos_semana` da migração 0009 — sem default `'pt-BR'` que ninguém escolheu).
+
+Os 102 exercícios e 10 grupos musculares foram traduzidos (eu mesmo, terminologia padrão de academia por idioma — ex.: "Rosca direta" → "Barbell Curl"/"Curl con barra", não tradução literal palavra-por-palavra) e inseridos na mesma migração. Conferido: 204 linhas em `exercicio_traducao` (102 × 2 idiomas, cobrindo os 102 exercícios existentes), 20 em `grupo_muscular_traducao`.
+
+**Por que catálogo primeiro, antes de qualquer string de UI.** O parecer semanal (Gemini, `api/analise/route.ts`) recebe o resumo compacto com nome de exercício. Decisão tomada com o dono: o nome já traduzido entra no resumo (não uma instrução solta tipo "responda em inglês" deixando o modelo inventar nome de exercício a cada chamada) — assim o parecer sai consistente entre execuções. Por isso o catálogo é a fundação; UI, prompt e validador dependem dele, não o contrário.
+
+**Sequência combinada com o dono, uma etapa por vez com aprovação entre elas:** (1) esta migração; (2) leitura por idioma + seletor em `/ajustes`; (3) parecer da Gemini (prompt + validador + fallback determinístico) por idioma; (4) ~200 strings fixas de UI, `aria-label`s e `<html lang>`.
+
+**Alternativas descartadas.** Colunas `nome_en`/`nome_es` no lugar de tabela de tradução — mais simples agora, mas um terceiro idioma vira migração em vez de `insert`. Rota com prefixo de idioma (`/en/treino`) — descartada: toda rota é autenticada, nada é indexado por buscador, e mexeria em `src/proxy.ts` e todo `redirect()`/`<Link>` do app. Idioma em `localStorage` (padrão do `tema`) — descartado porque o catálogo e o parecer são resolvidos no servidor antes de qualquer render; precisa estar no banco, lido server-side.
+
+**Impacto.** Nenhuma leitura em PT-BR muda de comportamento (tabelas novas, RLS `select` para `authenticated`, mesmo padrão de `exercicio`/`grupo_muscular`). Nenhum código de leitura/escrita existente foi alterado nesta etapa — só schema. `tsc`/`test`/`lint`/`build` ainda não reexecutados após esta migração pura de banco.
+
+**Como reverter.** Banco: `drop table public.exercicio_traducao; drop table public.grupo_muscular_traducao; alter table public.usuario drop column idioma;`. Sem perda real — nenhum dado de usuário depende ainda destas tabelas.
+
+---
+
+## 2026-08-24 (4) — Módulo de idiomas, etapa 2/4: leitura por idioma + seletor em /ajustes
+
+**O que mudou.** `src/lib/dados/idioma.ts` (novo): `obterIdioma()` lê `usuario.idioma`, resolve `null` para `"pt-BR"` (mesmo raciocínio do restante do app — a leitura decide o padrão de EXIBIÇÃO, a gravação continua honesta sobre "nunca escolheu"); `definirIdioma()` é a Server Action que grava a escolha. `src/lib/dados/traducao.ts` (novo): `mapaTraducaoExercicios`/`mapaTraducaoGrupos` leem as tabelas da migração 0012 e devolvem `Map<id, nome>` — vazio para pt-BR (sem round-trip ao banco pra idioma que não precisa de tradução).
+
+Cinco caminhos de leitura em `dados/treino.ts` e `dados/resumo-home.ts` passaram a resolver nome de exercício/grupo pelo idioma da pessoa, com fallback pro nome PT-BR quando falta linha de tradução: `listarExercicios` (seletor do formulário), `buscarExercicio`/`listarCatalogo` (catálogo), `buscarTreino` (nome de exercício na tela de treino), `listarTreinos`/`carregarResumoHome` (tags de grupo muscular na lista de treinos e na Home). Exercícios/catálogo reordenam por nome traduzido fora do pt-BR — a ordem alfabética do banco é em português, misturar alfabetos ficaria estranho.
+
+`formatarGrupoMuscular` (`src/lib/texto/grupo-muscular.ts`, usado só no cliente pela aba "Grupos" da Home) ganhou parâmetro `idioma` com mapas EN/ES estáticos — roda 100% client-side, não pode fazer round-trip ao banco só pra formatar rótulo. `Perfil` (`dados/perfil.ts`) ganhou o campo `idioma`, seguindo o padrão de já trazer `metaTreinosSemana` — evita fetch duplicado nas páginas que já chamam `obterPerfil()`.
+
+`/ajustes` ganhou `IdiomaForm` (`src/components/idioma-form.tsx`), mesmo padrão de `MetaSemanalForm`: card `card-obsidian`, salva ao clicar. Controle é um segmentado de 3 opções (novo `.segmentado`/`.segmentado__opcao` em `sistema.css`, mesmos tokens do `.chip-filtro`), não um `<select>` — só 3 opções fixas, sem "em branco" possível na tela (a leitura já resolveu `null` antes de chegar aqui).
+
+**Achado ao vivo, corrigido no caminho: RLS sem GRANT não basta.** Depois de aplicar a migração 0012, `/catalogo` quebrou com "permission denied for table exercicio_traducao" — a policy de leitura existia, mas o Postgres nega antes de avaliar RLS se o role não tem `GRANT SELECT` na tabela. `exercicio`/`grupo_muscular` já tinham esse grant desde a bootstrap (0001/0002); tabela nova não herda. Corrigido com uma migração adicional (`grant select on ... to authenticated`) já dobrada de volta pro arquivo `0012_idiomas.sql` local, pra manter o repo igual ao banco real.
+
+**Verificado ao vivo** com usuário QA descartável (`qa-idiomas-2608@teste.lastro.invalid`, criado e removido via `scripts/qa-treino-helper.sh`, cascade confirmado em 0 linhas): login, troca pra inglês em `/ajustes` ("Idioma salvo."), `/catalogo` com 102 exercícios e 10 grupos em inglês, seletor do formulário de série filtrado por grupo ("Chest" → 15 exercícios em inglês, ordem alfabética), série registrada e exibida como "Barbell Bench Press" na tela do treino, tag "CHEST" na Home (Treinos Recentes) e na aba Grupos.
+
+**Fora do escopo desta etapa (fica pra 3/4 e 4/4).** O parecer da Gemini ainda responde só em PT-BR — `api/analise/route.ts` (prompt, validador, fallback determinístico) não foi tocado nesta etapa, e continua lendo `exercicio.nome` direto do banco (PT-BR), não pelos novos caminhos traduzidos de `dados/treino.ts`. As ~200 strings fixas de UI (botões, rótulos, `aria-label`, `<html lang>`) continuam só em PT-BR.
+
+**Impacto.** `tsc`/`test` (175)/`lint`/`build` verdes. Nenhuma leitura em pt-BR muda de resultado (idioma resolvido para `"pt-BR"` continua usando `exercicio.nome`/`grupo_muscular.nome` direto, sem tabela de tradução).
+
+**Como reverter.** Código: `git revert` dos commits desta entrada. Banco: a migração de GRANT pode ficar (é inofensiva e necessária caso a 0012 permaneça); reverter a 0012 já cobre as tabelas.
+
+---
+
+## 2026-08-24 (5) — Módulo de idiomas, etapa 3/4: parecer da Gemini por idioma
+
+**O que mudou.** O parecer semanal (prompt, validador, fallback determinístico) passa a responder no idioma escolhido pela pessoa, com nome de exercício/grupo já traduzido (fundação da migração 0012 + etapa 1/4).
+
+- `carregarExercicios` (`api/analise/route.ts`) agora traduz `nome`/`grupoMuscularPrimario` via `mapaTraducaoExercicios`/`mapaTraducaoGrupos` ANTES de entrar no agregador — o `ResumoCompacto` que vai pro prompt já nasce no idioma certo, o modelo nunca precisa inventar nome de exercício traduzindo na hora (decisão tomada com o dono na etapa 1/4).
+- `prompt.ts`: `SYSTEM_INSTRUCTION`, critério de qualidade e preâmbulo viram `Record<Idioma, string>`. Duas travas mudam de CONTEÚDO, não só de texto: (1) convenção numérica — PT-BR/ES usam vírgula decimal, EN usa ponto decimal, são convenções OPOSTAS; (2) uma trava nova explícita dizendo que as CHAVES do JSON (`"posicao_na_faixa": "abaixo"`) são códigos internos em português e o modelo deve traduzir o SENTIDO pra prosa, nunca citar a chave literal — nomes de campo continuam PT-BR em qualquer idioma (KNOWLEDGE.md §1, termos de contrato não traduzem).
+- `validador.ts`: **achado real, exatamente o que o `advisor` tinha avisado antes de começar esta etapa** — `extrairTokens`/`normalizarToken` assumiam vírgula decimal incondicionalmente. Em inglês, "11.5%" é o número correto e "12,480" é separador de milhar (o OPOSTO de PT-BR/ES); sem a correção, todo parecer em inglês citando decimal seria rejeitado como intruso por engano, ou pior, aceito com o valor errado. `validarNumeros` ganhou parâmetro `idioma` (default `"pt-BR"`, não quebra os 9 testes/chamadas existentes) que troca a convenção de extração. 5 testes novos em `validador.test.ts` provam a convenção inglesa — incluindo um teste que passa o MESMO texto pela convenção errada de propósito, pra provar que a checagem realmente importa (não é teste decorativo).
+- `perguntas.ts`: as 5 perguntas padrão viraram `perguntasDoIdioma(idioma)` — o texto entra literalmente no prompt (não é só rótulo de botão), então tradução mora aqui, não em string de UI solta (evita duas fontes divergindo). `analise-interativa.tsx`/`analise/page.tsx` passam a receber `idioma` de `obterPerfil()`, mesmo padrão da Home.
+- `route.ts`: `fallbackDeterministico` (2ª falha, sem LLM) também ficou idioma-aware — inclusive o enum `posicao_na_faixa` (`abaixo/dentro/acima`), que aparece só nesse template determinístico, nunca na prosa do LLM. Instruções de retry (1ª falha) também traduzidas, porque voltam pro modelo no próximo prompt.
+
+**Verificado ao vivo contra a API real da Gemini** (usuário QA descartável, cascade confirmado em 0 linhas ao final): parecer em inglês citando os 10 grupos musculares traduzidos ("Chest, Biceps, Quadriceps, Back, Shoulders, Glutes, Hamstrings, Calves, Triceps, Abs"), prosa e pontuação decimal corretas; parecer em espanhol citando os mesmos 10 grupos em espanhol ("Pecho, Bíceps, Cuádriceps, Espalda, Hombro, Glúteos, Isquiotibiales, Pantorrilla, Tríceps, Abdomen"), vírgula decimal correta. Ambos passaram o validador (não caíram no fallback).
+
+**Fora do escopo desta etapa.** O "Coach IA" (`api/coach/*`) é uma feature Gemini separada (chat interativo, não a Análise Semanal) — não fazia parte do plano de 4 etapas combinado com o dono e não foi tocado. Fica como possível próximo passo, a confirmar com o dono antes de mexer. As ~200 strings fixas de UI continuam pra etapa 4/4.
+
+**Impacto.** `tsc`/`test` (180, +5 desta etapa)/`lint`/`build` verdes. `validarNumeros` com 4º parâmetro opcional — chamada sem idioma continua pt-BR, sem quebrar nada existente.
+
+**Como reverter.** `git revert` dos commits desta entrada. Sem impacto de banco (só leitura das tabelas já existentes da migração 0012).
+
+---
+
+## 2026-08-24 (6) — Módulo de idiomas, etapa 4/4 (final): as ~200 strings fixas de UI
+
+**O que mudou.** Todo texto fixo da interface — botões, rótulos, mensagens de erro, `aria-label`, placeholders, cabeçalhos, rodapés — passou a resolver pelo idioma escolhido. `src/lib/texto/i18n.ts` (novo) é o dicionário: chave é o texto PT-BR ORIGINAL (não um id inventado), valor é `{ en, es }`. `t(chave, idioma)` devolve a própria chave em pt-BR e faz fallback honesto pra chave PT-BR se faltar entrada — nunca quebra a tela, só não traduz aquele texto específico.
+
+Por que chave = texto PT-BR e não um id: mantém o diff mecânico (`"Salvar"` vira `t("Salvar", idioma)`, sem renomear nada) e deixa óbvio, olhando o dicionário, quando uma tradução ficou desatualizada em relação ao texto PT-BR que a originou.
+
+**Escopo tocado:** 46 arquivos (todas as páginas em `src/app/`, todos os componentes com texto em `src/components/`), incluindo:
+- `<html lang>` no layout raiz (`app/layout.tsx`) — vira `async`, lê `obterIdioma()`. Achado do `advisor` antes da etapa 3/4: leitor de tela depende deste atributo, não do texto visível.
+- Nomes de dia da semana e mês, em três lugares que os tinham como array PT-BR fixo (`app/page.tsx`, `app/treino/[id]/page.tsx`).
+- Convenção decimal (vírgula pt-BR/es, ponto en) também no gráfico de progressão e nos blocos de evidência da Análise (`formatar-delta.ts`, `grafico-progressao.tsx`) — mesmo raciocínio da etapa 3/4 no validador da Gemini, agora estendido aos números que a TELA formata (fora do parecer do LLM).
+- As 7 temas de `/ajustes/temas` (nome, subtítulo, descrição) traduzidos com nome real por idioma, não tradução literal — "Café Moka & Caramelo" vira "Mocha Coffee & Caramel", não "Coffee Mocha & Caramel".
+- Mensagens de erro de Server Actions (`meta-semanal.ts`, `idioma.ts`, `atualizar-avatar.ts`, `validar-avatar.ts`) resolvidas no idioma da pessoa via `obterIdioma()` — essas telas de erro nunca tinham idioma antes desta etapa.
+
+**Decisões de escopo, deliberadas:**
+- `/login` continua só em PT-BR. Antes da autenticação não existe `usuario.idioma` pra ler — o idioma é, por definição, uma preferência de conta. Detectar `navigator.language` do browser era uma feature nova não pedida, com risco de adivinhar errado; ficou de fora.
+- As 3 sugestões de pergunta do Coach IA (`coach-interativo.tsx`) ficam em PT-BR de propósito — o texto do botão É a pergunta enviada ao backend (`/api/coach`, que continua respondendo só em PT-BR, fora do escopo desta etapa). Traduzir só o rótulo criaria um chat onde a pessoa lê a pergunta em inglês no botão e vê ela mesma em português no balão da conversa.
+- `modelo.nome` (nome que a própria pessoa deu ao modelo de treino) nunca passa por `t()` — é conteúdo do usuário, não string de app.
+- Mensagens de erro internas que nunca deveriam aparecer pra pessoa (ex.: `throw new Error("Exercício não encontrado no catálogo.")`, invariante que só quebra se o dropdown estiver dessincronizado do catálogo) ficaram em PT-BR — não são UI, são defesa de programador.
+
+**Achado ao vivo, corrigido no caminho:** duas colisões de nome de variável `t` (loop `TEMAS.map((t) => ...)` em `seletor-temas.tsx`, `for (const t of treinos)` em `lista-treinos.tsx`) com a nova função `t()` do dicionário — renomeadas pra `tema`/`treino` antes de importar. Também dois `useMemo` com `.localeCompare(..., idioma)` sem `idioma` no array de dependências (`treino-detalhe.tsx`, `modelo-treino-form.tsx`), pego pelo `react-hooks/exhaustive-deps` — corrigido.
+
+**Verificado ao vivo** com usuário QA descartável (cascade confirmado em 0 linhas): `<html lang="en">` confirmado via DOM; `/ajustes` inteira em inglês incluindo os 7 temas com nomes reais; Home com data/semana/dias formatados em inglês; fluxo completo de registro de série (seletor de grupo → catálogo filtrado → formulário → interruptor "peso por lado" → botão) em inglês, do início ao fim.
+
+**Impacto.** `tsc`/`test` (180)/`lint` (mesmos 4 avisos pré-existentes, nenhum novo)/`build` verdes. `npm run build` deixou de pré-renderizar `/login`, `/ajustes/temas` e `/_not-found` como estático — consequência esperada de `<html lang>` agora depender de uma leitura de sessão por requisição no layout raiz; sem efeito prático, o app já era majoritariamente autenticado/dinâmico.
+
+**Como reverter.** `git revert` do commit desta entrada. Sem impacto de banco — etapa é só leitura/apresentação.
+
+---
+
+## Módulo de idiomas — resumo das 4 etapas (2026-08-24)
+
+Pedido do dono: "adicionar o módulo de idiomas" (inglês e espanhol, além do PT-BR existente), "quero tudo, não precisa de curadoria humana". Executado em 4 etapas, uma por vez com aprovação do dono entre elas (preferência dele, ver entrada "etapa 3/4"):
+
+1. Migração 0012 — catálogo de exercícios e grupos musculares traduzidos (tabela de tradução, não colunas).
+2. Leitura por idioma nos dados + seletor em `/ajustes`.
+3. Parecer da Gemini responde no idioma escolhido (prompt, validador, fallback determinístico) — nomes já traduzidos alimentam o resumo, convenção decimal corrigida por idioma.
+4. As ~200 strings fixas de UI, incluindo `<html lang>`.
+
+Reverte explicitamente a posição da ADR anterior contra tradução automática do catálogo (registrado na entrada da etapa 1) — por decisão do dono, não por esquecimento. Fora do escopo em todas as 4 etapas: o Coach IA (`api/coach/*`, feature separada da Análise Semanal) e a tela de `/login` (pré-autenticação, sem `usuario.idioma` pra ler).
+
+---
