@@ -8,7 +8,11 @@
     "videoUrl": "/videos/exercicios/d08f9e23-09cd-40c5-a56c-f2a7cb9ac73b.gif",
     "aliasUrl": "/videos/exercicios/lower-ab-crunch.gif",
     "totalFrames": 2,
-    "thumbnailUrl": "/videos/exercicios/frames/d08f9e23-09cd-40c5-a56c-f2a7cb9ac73b/0.jpg"
+    "thumbnailUrl": "/videos/exercicios/frames/d08f9e23-09cd-40c5-a56c-f2a7cb9ac73b/0.jpg",
+    "estilo_visual": "3d_anatomico",
+    "musculo_alvo": "Reto Abdominal (Fibras Inferiores)",
+    "musculos_sinergistas": "Iliopsoas, Oblíquos",
+    "mecanica_articular": "Flexão de Coluna Lombar / Quadril"
   },
   {
     "id": "6fb49df0-a2f5-4865-9d7f-342cc2f67f17",
@@ -19,7 +23,11 @@
     "videoUrl": "/videos/exercicios/6fb49df0-a2f5-4865-9d7f-342cc2f67f17.gif",
     "aliasUrl": "/videos/exercicios/machine-crunch.gif",
     "totalFrames": 2,
-    "thumbnailUrl": "/videos/exercicios/frames/6fb49df0-a2f5-4865-9d7f-342cc2f67f17/0.jpg"
+    "thumbnailUrl": "/videos/exercicios/frames/6fb49df0-a2f5-4865-9d7f-342cc2f67f17/0.jpg",
+    "estilo_visual": "3d_anatomico",
+    "musculo_alvo": "Reto Abdominal (Geral)",
+    "musculos_sinergistas": "Oblíquo Externo / Interno",
+    "mecanica_articular": "Flexão de Coluna Toracolombar"
   },
   {
     "id": "97778ea6-fd70-46aa-95d9-ada174993433",
@@ -30,7 +38,11 @@
     "videoUrl": "/videos/exercicios/97778ea6-fd70-46aa-95d9-ada174993433.gif",
     "aliasUrl": "/videos/exercicios/cable-crunch.gif",
     "totalFrames": 2,
-    "thumbnailUrl": "/videos/exercicios/frames/97778ea6-fd70-46aa-95d9-ada174993433/0.jpg"
+    "thumbnailUrl": "/videos/exercicios/frames/97778ea6-fd70-46aa-95d9-ada174993433/0.jpg",
+    "estilo_visual": "3d_anatomico",
+    "musculo_alvo": "Reto Abdominal e Serrátil",
+    "musculos_sinergistas": "Oblíquos",
+    "mecanica_articular": "Flexão de Tronco no Cabo"
   },
   {
     "id": "1953ad1b-671c-47f2-8cef-40055037cb32",
@@ -41,7 +53,11 @@
     "videoUrl": "/videos/exercicios/1953ad1b-671c-47f2-8cef-40055037cb32.gif",
     "aliasUrl": "/videos/exercicios/bicycle-crunch.gif",
     "totalFrames": 2,
-    "thumbnailUrl": "/videos/exercicios/frames/1953ad1b-671c-47f2-8cef-40055037cb32/0.jpg"
+    "thumbnailUrl": "/videos/exercicios/frames/1953ad1b-671c-47f2-8cef-40055037cb32/0.jpg",
+    "estilo_visual": "3d_anatomico",
+    "musculo_alvo": "Oblíquos Externos e Internos",
+    "musculos_sinergistas": "Reto Abdominal, Flexores de Quadril",
+    "mecanica_articular": "Rotação e Flexão de Tronco Cruzada"
   },
   {
     "id": "2e63f78d-f145-4015-a5d8-84c753e0670a",
@@ -52,7 +68,11 @@
     "videoUrl": "/videos/exercicios/2e63f78d-f145-4015-a5d8-84c753e0670a.gif",
     "aliasUrl": "/videos/exercicios/upper-ab-crunch.gif",
     "totalFrames": 2,
-    "thumbnailUrl": "/videos/exercicios/frames/2e63f78d-f145-4015-a5d8-84c753e0670a/0.jpg"
+    "thumbnailUrl": "/videos/exercicios/frames/2e63f78d-f145-4015-a5d8-84c753e0670a/0.jpg",
+    "estilo_visual": "3d_anatomico",
+    "musculo_alvo": "Reto Abdominal (Fibras Superiores)",
+    "musculos_sinergistas": "Transverso do Abdômen",
+    "mecanica_articular": "Flexão Torácica"
   },
   {
     "id": "4968787c-701a-45d5-b226-d1ee8834ebb8",
@@ -63,7 +83,11 @@
     "videoUrl": "/videos/exercicios/4968787c-701a-45d5-b226-d1ee8834ebb8.gif",
     "aliasUrl": "/videos/exercicios/dumbbell-lunge.gif",
     "totalFrames": 2,
-    "thumbnailUrl": "/videos/exercicios/frames/4968787c-701a-45d5-b226-d1ee8834ebb8/0.jpg"
+    "thumbnailUrl": "/videos/exercicios/frames/4968787c-701a-45d5-b226-d1ee8834ebb8/0.jpg",
+    "estilo_visual": "3d_anatomico",
+    "musculo_alvo": "Quadríceps e Glúteos",
+    "musculos_sinergistas": "Isquiotibiais, Panturrilhas",
+    "mecanica_articular": "Passada / Avanço com Halteres"
   },
   {
     "id": "61b99b77-5085-489a-8ee9-18452c4ed9f2",
@@ -74,7 +98,11 @@
     "videoUrl": "/videos/exercicios/61b99b77-5085-489a-8ee9-18452c4ed9f2.gif",
     "aliasUrl": "/videos/exercicios/bulgarian-split-squat.gif",
     "totalFrames": 2,
-    "thumbnailUrl": "/videos/exercicios/frames/61b99b77-5085-489a-8ee9-18452c4ed9f2/0.jpg"
+    "thumbnailUrl": "/videos/exercicios/frames/61b99b77-5085-489a-8ee9-18452c4ed9f2/0.jpg",
+    "estilo_visual": "3d_anatomico",
+    "musculo_alvo": "Quadríceps e Glúteo Máximo/Médio",
+    "musculos_sinergistas": "Adutores, Isquiotibiais",
+    "mecanica_articular": "Agachamento Búlgaro Unilateral"
   },
   {
     "id": "18bf7a23-2410-4905-b646-e152625c6136",
@@ -85,7 +113,11 @@
     "videoUrl": "/videos/exercicios/18bf7a23-2410-4905-b646-e152625c6136.gif",
     "aliasUrl": "/videos/exercicios/belt-squat.gif",
     "totalFrames": 2,
-    "thumbnailUrl": "/videos/exercicios/frames/18bf7a23-2410-4905-b646-e152625c6136/0.jpg"
+    "thumbnailUrl": "/videos/exercicios/frames/18bf7a23-2410-4905-b646-e152625c6136/0.jpg",
+    "estilo_visual": "3d_anatomico",
+    "musculo_alvo": "Quadríceps (Sem Carga Axial na Coluna)",
+    "musculos_sinergistas": "Glúteos, Adutores",
+    "mecanica_articular": "Agachamento com Cinturão"
   },
   {
     "id": "ab098c28-ac32-4be2-8837-9fb05faf3888",
@@ -96,7 +128,11 @@
     "videoUrl": "/videos/exercicios/ab098c28-ac32-4be2-8837-9fb05faf3888.gif",
     "aliasUrl": "/videos/exercicios/front-squat.gif",
     "totalFrames": 2,
-    "thumbnailUrl": "/videos/exercicios/frames/ab098c28-ac32-4be2-8837-9fb05faf3888/0.jpg"
+    "thumbnailUrl": "/videos/exercicios/frames/ab098c28-ac32-4be2-8837-9fb05faf3888/0.jpg",
+    "estilo_visual": "3d_anatomico",
+    "musculo_alvo": "Quadríceps (Vasto Lateral/Intermédio/Medial)",
+    "musculos_sinergistas": "Glúteos, Core Anterior",
+    "mecanica_articular": "Agachamento Frontal"
   },
   {
     "id": "1db2c316-4c25-4f71-b2f4-6c30ceb75259",
@@ -107,7 +143,11 @@
     "videoUrl": "/videos/exercicios/1db2c316-4c25-4f71-b2f4-6c30ceb75259.gif",
     "aliasUrl": "/videos/exercicios/back-squat.gif",
     "totalFrames": 2,
-    "thumbnailUrl": "/videos/exercicios/frames/1db2c316-4c25-4f71-b2f4-6c30ceb75259/0.jpg"
+    "thumbnailUrl": "/videos/exercicios/frames/1db2c316-4c25-4f71-b2f4-6c30ceb75259/0.jpg",
+    "estilo_visual": "3d_anatomico",
+    "musculo_alvo": "Quadríceps e Glúteo Máximo",
+    "musculos_sinergistas": "Adutores, Isquiotibiais, Eretor da Espinha",
+    "mecanica_articular": "Agachamento Livre com Barra"
   },
   {
     "id": "c5a978dc-cbf2-4b62-bfbf-b2aeb6cafece",
@@ -118,7 +158,11 @@
     "videoUrl": "/videos/exercicios/c5a978dc-cbf2-4b62-bfbf-b2aeb6cafece.gif",
     "aliasUrl": "/videos/exercicios/smith-machine-squat.gif",
     "totalFrames": 2,
-    "thumbnailUrl": "/videos/exercicios/frames/c5a978dc-cbf2-4b62-bfbf-b2aeb6cafece/0.jpg"
+    "thumbnailUrl": "/videos/exercicios/frames/c5a978dc-cbf2-4b62-bfbf-b2aeb6cafece/0.jpg",
+    "estilo_visual": "3d_anatomico",
+    "musculo_alvo": "Quadríceps e Glúteo Máximo",
+    "musculos_sinergistas": "Adutores",
+    "mecanica_articular": "Agachamento no Smith"
   },
   {
     "id": "d2be1b21-dc02-4586-979d-e2fbb6b3010e",
@@ -129,7 +173,11 @@
     "videoUrl": "/videos/exercicios/d2be1b21-dc02-4586-979d-e2fbb6b3010e.gif",
     "aliasUrl": "/videos/exercicios/dumbbell-sumo-squat.gif",
     "totalFrames": 2,
-    "thumbnailUrl": "/videos/exercicios/frames/d2be1b21-dc02-4586-979d-e2fbb6b3010e/0.jpg"
+    "thumbnailUrl": "/videos/exercicios/frames/d2be1b21-dc02-4586-979d-e2fbb6b3010e/0.jpg",
+    "estilo_visual": "3d_anatomico",
+    "musculo_alvo": "Adutores e Glúteos",
+    "musculos_sinergistas": "Quadríceps",
+    "mecanica_articular": "Agachamento Sumô com Halter"
   },
   {
     "id": "b8b73c8e-066c-4a4d-ae29-2b1ae21331c5",
@@ -140,7 +188,11 @@
     "videoUrl": "/videos/exercicios/b8b73c8e-066c-4a4d-ae29-2b1ae21331c5.gif",
     "aliasUrl": "/videos/exercicios/arnold-press.gif",
     "totalFrames": 2,
-    "thumbnailUrl": "/videos/exercicios/frames/b8b73c8e-066c-4a4d-ae29-2b1ae21331c5/0.jpg"
+    "thumbnailUrl": "/videos/exercicios/frames/b8b73c8e-066c-4a4d-ae29-2b1ae21331c5/0.jpg",
+    "estilo_visual": "3d_anatomico",
+    "musculo_alvo": "Deltoide Anterior e Lateral",
+    "musculos_sinergistas": "Tríceps, Trapézio Superior",
+    "mecanica_articular": "Abdução e Rotação de Ombro"
   },
   {
     "id": "36bb6cc1-0315-462d-944d-fdadd20d2e09",
@@ -151,7 +203,11 @@
     "videoUrl": "/videos/exercicios/36bb6cc1-0315-462d-944d-fdadd20d2e09.gif",
     "aliasUrl": "/videos/exercicios/pull-up.gif",
     "totalFrames": 2,
-    "thumbnailUrl": "/videos/exercicios/frames/36bb6cc1-0315-462d-944d-fdadd20d2e09/0.jpg"
+    "thumbnailUrl": "/videos/exercicios/frames/36bb6cc1-0315-462d-944d-fdadd20d2e09/0.jpg",
+    "estilo_visual": "3d_anatomico",
+    "musculo_alvo": "Latíssimo do Dorso e Redondo Maior",
+    "musculos_sinergistas": "Bíceps Braquial, Braquiorradial, Trapézio Inferior",
+    "mecanica_articular": "Adução e Depressão Escapular"
   },
   {
     "id": "3698a49e-4b51-4d00-8222-986f44afd191",
@@ -162,7 +218,11 @@
     "videoUrl": "/videos/exercicios/3698a49e-4b51-4d00-8222-986f44afd191.gif",
     "aliasUrl": "/videos/exercicios/barbell-good-morning.gif",
     "totalFrames": 2,
-    "thumbnailUrl": "/videos/exercicios/frames/3698a49e-4b51-4d00-8222-986f44afd191/0.jpg"
+    "thumbnailUrl": "/videos/exercicios/frames/3698a49e-4b51-4d00-8222-986f44afd191/0.jpg",
+    "estilo_visual": "3d_anatomico",
+    "musculo_alvo": "Isquiotibiais e Eretores da Espinha",
+    "musculos_sinergistas": "Glúteo Máximo",
+    "mecanica_articular": "Bom Dia / Good Morning"
   },
   {
     "id": "e2f6ae67-b7b9-46ed-833a-5053f5a5d6ee",
@@ -173,7 +233,11 @@
     "videoUrl": "/videos/exercicios/e2f6ae67-b7b9-46ed-833a-5053f5a5d6ee.gif",
     "aliasUrl": "/videos/exercicios/hip-abductor-machine.gif",
     "totalFrames": 2,
-    "thumbnailUrl": "/videos/exercicios/frames/e2f6ae67-b7b9-46ed-833a-5053f5a5d6ee/0.jpg"
+    "thumbnailUrl": "/videos/exercicios/frames/e2f6ae67-b7b9-46ed-833a-5053f5a5d6ee/0.jpg",
+    "estilo_visual": "3d_anatomico",
+    "musculo_alvo": "Glúteo Médio e Mínimo",
+    "musculos_sinergistas": "Tensor da Fáscia Lata",
+    "mecanica_articular": "Abdução de Quadril na Máquina"
   },
   {
     "id": "edeb574d-ecf7-48d0-8cf0-c69c771b3708",
@@ -184,7 +248,11 @@
     "videoUrl": "/videos/exercicios/edeb574d-ecf7-48d0-8cf0-c69c771b3708.gif",
     "aliasUrl": "/videos/exercicios/hip-adductor-machine.gif",
     "totalFrames": 2,
-    "thumbnailUrl": "/videos/exercicios/frames/edeb574d-ecf7-48d0-8cf0-c69c771b3708/0.jpg"
+    "thumbnailUrl": "/videos/exercicios/frames/edeb574d-ecf7-48d0-8cf0-c69c771b3708/0.jpg",
+    "estilo_visual": "3d_anatomico",
+    "musculo_alvo": "Adutor Magno, Longo e Breve",
+    "musculos_sinergistas": "Grácil, Pectíneo",
+    "mecanica_articular": "Adução de Quadril na Máquina"
   },
   {
     "id": "4d125765-74b7-4171-bb0f-f0b8fbae5aee",
@@ -195,7 +263,11 @@
     "videoUrl": "/videos/exercicios/4d125765-74b7-4171-bb0f-f0b8fbae5aee.gif",
     "aliasUrl": "/videos/exercicios/machine-hip-thrust.gif",
     "totalFrames": 2,
-    "thumbnailUrl": "/videos/exercicios/frames/4d125765-74b7-4171-bb0f-f0b8fbae5aee/0.jpg"
+    "thumbnailUrl": "/videos/exercicios/frames/4d125765-74b7-4171-bb0f-f0b8fbae5aee/0.jpg",
+    "estilo_visual": "3d_anatomico",
+    "musculo_alvo": "Glúteo Máximo",
+    "musculos_sinergistas": "Isquiotibiais",
+    "mecanica_articular": "Hip Thrust em Máquina"
   },
   {
     "id": "2193c8f0-877b-408e-89f5-777d38a08b19",
@@ -206,7 +278,11 @@
     "videoUrl": "/videos/exercicios/2193c8f0-877b-408e-89f5-777d38a08b19.gif",
     "aliasUrl": "/videos/exercicios/leg-extension.gif",
     "totalFrames": 2,
-    "thumbnailUrl": "/videos/exercicios/frames/2193c8f0-877b-408e-89f5-777d38a08b19/0.jpg"
+    "thumbnailUrl": "/videos/exercicios/frames/2193c8f0-877b-408e-89f5-777d38a08b19/0.jpg",
+    "estilo_visual": "3d_anatomico",
+    "musculo_alvo": "Quadríceps (Reto Femoral / Vasto Medial/Lateral)",
+    "musculos_sinergistas": "Tensor da Fáscia Lata",
+    "mecanica_articular": "Extensão de Joelhos na Cadeira"
   },
   {
     "id": "8da6b2fc-4d68-40e7-96d1-65a525527463",
@@ -217,7 +293,11 @@
     "videoUrl": "/videos/exercicios/8da6b2fc-4d68-40e7-96d1-65a525527463.gif",
     "aliasUrl": "/videos/exercicios/seated-leg-curl.gif",
     "totalFrames": 2,
-    "thumbnailUrl": "/videos/exercicios/frames/8da6b2fc-4d68-40e7-96d1-65a525527463/0.jpg"
+    "thumbnailUrl": "/videos/exercicios/frames/8da6b2fc-4d68-40e7-96d1-65a525527463/0.jpg",
+    "estilo_visual": "3d_anatomico",
+    "musculo_alvo": "Isquiotibiais (Porção Distal/Proximal)",
+    "musculos_sinergistas": "Gastrocnêmio",
+    "mecanica_articular": "Flexão de Joelho na Cadeira Flexora"
   },
   {
     "id": "0e3dbd0b-bfb1-4359-8e86-647847b12100",
@@ -228,7 +308,11 @@
     "videoUrl": "/videos/exercicios/0e3dbd0b-bfb1-4359-8e86-647847b12100.gif",
     "aliasUrl": "/videos/exercicios/single-leg-seated-leg-curl.gif",
     "totalFrames": 2,
-    "thumbnailUrl": "/videos/exercicios/frames/0e3dbd0b-bfb1-4359-8e86-647847b12100/0.jpg"
+    "thumbnailUrl": "/videos/exercicios/frames/0e3dbd0b-bfb1-4359-8e86-647847b12100/0.jpg",
+    "estilo_visual": "3d_anatomico",
+    "musculo_alvo": "Isquiotibiais (Unilateral)",
+    "musculos_sinergistas": "Gastrocnêmio",
+    "mecanica_articular": "Flexão de Joelho Unilateral Sentado"
   },
   {
     "id": "54e723c0-df3d-4bb9-a950-a59f0e5481a2",
@@ -239,7 +323,11 @@
     "videoUrl": "/videos/exercicios/54e723c0-df3d-4bb9-a950-a59f0e5481a2.gif",
     "aliasUrl": "/videos/exercicios/cable-kickback.gif",
     "totalFrames": 2,
-    "thumbnailUrl": "/videos/exercicios/frames/54e723c0-df3d-4bb9-a950-a59f0e5481a2/0.jpg"
+    "thumbnailUrl": "/videos/exercicios/frames/54e723c0-df3d-4bb9-a950-a59f0e5481a2/0.jpg",
+    "estilo_visual": "3d_anatomico",
+    "musculo_alvo": "Glúteo Máximo (Extensão Pura)",
+    "musculos_sinergistas": "Isquiotibiais",
+    "mecanica_articular": "Coice / Glute Kickback na Polia"
   },
   {
     "id": "38ec491c-5d77-47d6-b324-48dae887f06f",
@@ -250,7 +338,11 @@
     "videoUrl": "/videos/exercicios/38ec491c-5d77-47d6-b324-48dae887f06f.gif",
     "aliasUrl": "/videos/exercicios/cable-crossover.gif",
     "totalFrames": 2,
-    "thumbnailUrl": "/videos/exercicios/frames/38ec491c-5d77-47d6-b324-48dae887f06f/0.jpg"
+    "thumbnailUrl": "/videos/exercicios/frames/38ec491c-5d77-47d6-b324-48dae887f06f/0.jpg",
+    "estilo_visual": "3d_anatomico",
+    "musculo_alvo": "Peitoral Maior (Fibras Médias/Esternais)",
+    "musculos_sinergistas": "Deltoide Anterior",
+    "mecanica_articular": "Adução Horizontal no Cabo"
   },
   {
     "id": "c7e6d68c-144a-4137-9bb0-0eebb3f00587",
@@ -261,7 +353,11 @@
     "videoUrl": "/videos/exercicios/c7e6d68c-144a-4137-9bb0-0eebb3f00587.gif",
     "aliasUrl": "/videos/exercicios/incline-dumbbell-fly.gif",
     "totalFrames": 2,
-    "thumbnailUrl": "/videos/exercicios/frames/c7e6d68c-144a-4137-9bb0-0eebb3f00587/0.jpg"
+    "thumbnailUrl": "/videos/exercicios/frames/c7e6d68c-144a-4137-9bb0-0eebb3f00587/0.jpg",
+    "estilo_visual": "3d_anatomico",
+    "musculo_alvo": "Peitoral Maior (Porção Clavicular / Superior)",
+    "musculos_sinergistas": "Deltoide Anterior, Coracobraquial",
+    "mecanica_articular": "Adução Horizontal Inclinada"
   },
   {
     "id": "d5cf25c0-8d09-4ff8-8c98-bdfca89811ce",
@@ -272,7 +368,11 @@
     "videoUrl": "/videos/exercicios/d5cf25c0-8d09-4ff8-8c98-bdfca89811ce.gif",
     "aliasUrl": "/videos/exercicios/reverse-fly.gif",
     "totalFrames": 2,
-    "thumbnailUrl": "/videos/exercicios/frames/d5cf25c0-8d09-4ff8-8c98-bdfca89811ce/0.jpg"
+    "thumbnailUrl": "/videos/exercicios/frames/d5cf25c0-8d09-4ff8-8c98-bdfca89811ce/0.jpg",
+    "estilo_visual": "3d_anatomico",
+    "musculo_alvo": "Deltoide Posterior",
+    "musculos_sinergistas": "Infraespinhal, Rombóides",
+    "mecanica_articular": "Abdução Horizontal Reversa"
   },
   {
     "id": "d6ebe533-c67b-4c0c-a222-29513cd011cf",
@@ -283,7 +383,11 @@
     "videoUrl": "/videos/exercicios/d6ebe533-c67b-4c0c-a222-29513cd011cf.gif",
     "aliasUrl": "/videos/exercicios/flat-dumbbell-fly.gif",
     "totalFrames": 2,
-    "thumbnailUrl": "/videos/exercicios/frames/d6ebe533-c67b-4c0c-a222-29513cd011cf/0.jpg"
+    "thumbnailUrl": "/videos/exercicios/frames/d6ebe533-c67b-4c0c-a222-29513cd011cf/0.jpg",
+    "estilo_visual": "3d_anatomico",
+    "musculo_alvo": "Peitoral Maior (Esternocostal)",
+    "musculos_sinergistas": "Deltoide Anterior",
+    "mecanica_articular": "Adução Horizontal com Halteres"
   },
   {
     "id": "2220953e-8fff-49e0-afdf-2b2d510336c2",
@@ -294,7 +398,11 @@
     "videoUrl": "/videos/exercicios/2220953e-8fff-49e0-afdf-2b2d510336c2.gif",
     "aliasUrl": "/videos/exercicios/dumbbell-shoulder-press.gif",
     "totalFrames": 2,
-    "thumbnailUrl": "/videos/exercicios/frames/2220953e-8fff-49e0-afdf-2b2d510336c2/0.jpg"
+    "thumbnailUrl": "/videos/exercicios/frames/2220953e-8fff-49e0-afdf-2b2d510336c2/0.jpg",
+    "estilo_visual": "3d_anatomico",
+    "musculo_alvo": "Deltoide Anterior",
+    "musculos_sinergistas": "Tríceps Braquial, Serrátil",
+    "mecanica_articular": "Desenvolvimento com Halteres"
   },
   {
     "id": "8647dbab-a45a-4b00-bf61-965d2096b6ec",
@@ -305,7 +413,11 @@
     "videoUrl": "/videos/exercicios/8647dbab-a45a-4b00-bf61-965d2096b6ec.gif",
     "aliasUrl": "/videos/exercicios/machine-shoulder-press.gif",
     "totalFrames": 2,
-    "thumbnailUrl": "/videos/exercicios/frames/8647dbab-a45a-4b00-bf61-965d2096b6ec/0.jpg"
+    "thumbnailUrl": "/videos/exercicios/frames/8647dbab-a45a-4b00-bf61-965d2096b6ec/0.jpg",
+    "estilo_visual": "3d_anatomico",
+    "musculo_alvo": "Deltoide Anterior e Médio",
+    "musculos_sinergistas": "Tríceps Braquial",
+    "mecanica_articular": "Desenvolvimento em Máquina"
   },
   {
     "id": "71c5a306-acad-4c55-8609-b8947d00ab28",
@@ -316,7 +428,11 @@
     "videoUrl": "/videos/exercicios/71c5a306-acad-4c55-8609-b8947d00ab28.gif",
     "aliasUrl": "/videos/exercicios/barbell-military-press.gif",
     "totalFrames": 2,
-    "thumbnailUrl": "/videos/exercicios/frames/71c5a306-acad-4c55-8609-b8947d00ab28/0.jpg"
+    "thumbnailUrl": "/videos/exercicios/frames/71c5a306-acad-4c55-8609-b8947d00ab28/0.jpg",
+    "estilo_visual": "3d_anatomico",
+    "musculo_alvo": "Deltoide Anterior e Core",
+    "musculos_sinergistas": "Tríceps, Clavicular do Peitoral",
+    "mecanica_articular": "Press Militar com Barra"
   },
   {
     "id": "256ee63f-4348-4a8f-99ee-a6faa2472750",
@@ -327,7 +443,11 @@
     "videoUrl": "/videos/exercicios/256ee63f-4348-4a8f-99ee-a6faa2472750.gif",
     "aliasUrl": "/videos/exercicios/leg-raise.gif",
     "totalFrames": 2,
-    "thumbnailUrl": "/videos/exercicios/frames/256ee63f-4348-4a8f-99ee-a6faa2472750/0.jpg"
+    "thumbnailUrl": "/videos/exercicios/frames/256ee63f-4348-4a8f-99ee-a6faa2472750/0.jpg",
+    "estilo_visual": "3d_anatomico",
+    "musculo_alvo": "Reto Abdominal e Flexores de Quadril",
+    "musculos_sinergistas": "Oblíquos, Reto Femoral",
+    "mecanica_articular": "Flexão Pélvica"
   },
   {
     "id": "a25b4dc2-563f-439b-897e-c3facf5c600e",
@@ -338,7 +458,11 @@
     "videoUrl": "/videos/exercicios/a25b4dc2-563f-439b-897e-c3facf5c600e.gif",
     "aliasUrl": "/videos/exercicios/dumbbell-front-raise.gif",
     "totalFrames": 2,
-    "thumbnailUrl": "/videos/exercicios/frames/a25b4dc2-563f-439b-897e-c3facf5c600e/0.jpg"
+    "thumbnailUrl": "/videos/exercicios/frames/a25b4dc2-563f-439b-897e-c3facf5c600e/0.jpg",
+    "estilo_visual": "3d_anatomico",
+    "musculo_alvo": "Deltoide Anterior",
+    "musculos_sinergistas": "Peitoral Superior",
+    "mecanica_articular": "Flexão de Ombro"
   },
   {
     "id": "ff8a4f89-15e6-4c97-85cc-90cd5c15d03f",
@@ -349,7 +473,11 @@
     "videoUrl": "/videos/exercicios/ff8a4f89-15e6-4c97-85cc-90cd5c15d03f.gif",
     "aliasUrl": "/videos/exercicios/dumbbell-lateral-raise.gif",
     "totalFrames": 2,
-    "thumbnailUrl": "/videos/exercicios/frames/ff8a4f89-15e6-4c97-85cc-90cd5c15d03f/0.jpg"
+    "thumbnailUrl": "/videos/exercicios/frames/ff8a4f89-15e6-4c97-85cc-90cd5c15d03f/0.jpg",
+    "estilo_visual": "3d_anatomico",
+    "musculo_alvo": "Deltoide Lateral",
+    "musculos_sinergistas": "Supraespinhal, Trapézio",
+    "mecanica_articular": "Abdução no Plano Escapular"
   },
   {
     "id": "f806164a-38a2-4e98-b8f9-b6487685f234",
@@ -360,7 +488,11 @@
     "videoUrl": "/videos/exercicios/f806164a-38a2-4e98-b8f9-b6487685f234.gif",
     "aliasUrl": "/videos/exercicios/machine-lateral-raise.gif",
     "totalFrames": 2,
-    "thumbnailUrl": "/videos/exercicios/frames/f806164a-38a2-4e98-b8f9-b6487685f234/0.jpg"
+    "thumbnailUrl": "/videos/exercicios/frames/f806164a-38a2-4e98-b8f9-b6487685f234/0.jpg",
+    "estilo_visual": "3d_anatomico",
+    "musculo_alvo": "Deltoide Lateral (Isolamento)",
+    "musculos_sinergistas": "Trapézio Superior",
+    "mecanica_articular": "Abdução Guiada em Máquina"
   },
   {
     "id": "aeb20b7e-7928-4ea9-9ab3-0695e5d84183",
@@ -371,7 +503,11 @@
     "videoUrl": "/videos/exercicios/aeb20b7e-7928-4ea9-9ab3-0695e5d84183.gif",
     "aliasUrl": "/videos/exercicios/barbell-hip-thrust.gif",
     "totalFrames": 2,
-    "thumbnailUrl": "/videos/exercicios/frames/aeb20b7e-7928-4ea9-9ab3-0695e5d84183/0.jpg"
+    "thumbnailUrl": "/videos/exercicios/frames/aeb20b7e-7928-4ea9-9ab3-0695e5d84183/0.jpg",
+    "estilo_visual": "3d_anatomico",
+    "musculo_alvo": "Glúteo Máximo (Pico de Contração)",
+    "musculos_sinergistas": "Isquiotibiais, Adutores",
+    "mecanica_articular": "Extensão de Quadril com Barra"
   },
   {
     "id": "203ffb85-feef-4a36-8f4c-2dc3dbad88c9",
@@ -382,7 +518,11 @@
     "videoUrl": "/videos/exercicios/203ffb85-feef-4a36-8f4c-2dc3dbad88c9.gif",
     "aliasUrl": "/videos/exercicios/single-leg-hip-thrust.gif",
     "totalFrames": 2,
-    "thumbnailUrl": "/videos/exercicios/frames/203ffb85-feef-4a36-8f4c-2dc3dbad88c9/0.jpg"
+    "thumbnailUrl": "/videos/exercicios/frames/203ffb85-feef-4a36-8f4c-2dc3dbad88c9/0.jpg",
+    "estilo_visual": "3d_anatomico",
+    "musculo_alvo": "Glúteo Máximo (Unilateral)",
+    "musculos_sinergistas": "Isquiotibiais, Core",
+    "mecanica_articular": "Hip Thrust Unilateral"
   },
   {
     "id": "6a0bf165-1172-4de4-8167-875290c3fb99",
@@ -393,7 +533,11 @@
     "videoUrl": "/videos/exercicios/6a0bf165-1172-4de4-8167-875290c3fb99.gif",
     "aliasUrl": "/videos/exercicios/dumbbell-shrug.gif",
     "totalFrames": 2,
-    "thumbnailUrl": "/videos/exercicios/frames/6a0bf165-1172-4de4-8167-875290c3fb99/0.jpg"
+    "thumbnailUrl": "/videos/exercicios/frames/6a0bf165-1172-4de4-8167-875290c3fb99/0.jpg",
+    "estilo_visual": "3d_anatomico",
+    "musculo_alvo": "Trapézio Superior",
+    "musculos_sinergistas": "Levantador da Escápula",
+    "mecanica_articular": "Elevação Escapular com Halteres"
   },
   {
     "id": "960fe5e9-f480-48bd-bbe1-dbeaee22ca1c",
@@ -404,7 +548,11 @@
     "videoUrl": "/videos/exercicios/960fe5e9-f480-48bd-bbe1-dbeaee22ca1c.gif",
     "aliasUrl": "/videos/exercicios/machine-shrug.gif",
     "totalFrames": 2,
-    "thumbnailUrl": "/videos/exercicios/frames/960fe5e9-f480-48bd-bbe1-dbeaee22ca1c/0.jpg"
+    "thumbnailUrl": "/videos/exercicios/frames/960fe5e9-f480-48bd-bbe1-dbeaee22ca1c/0.jpg",
+    "estilo_visual": "3d_anatomico",
+    "musculo_alvo": "Trapézio Superior",
+    "musculos_sinergistas": "Levantador da Escápula",
+    "mecanica_articular": "Elevação Escapular em Máquina"
   },
   {
     "id": "a57e020d-7afc-41c4-b372-6066386848c1",
@@ -415,7 +563,11 @@
     "videoUrl": "/videos/exercicios/a57e020d-7afc-41c4-b372-6066386848c1.gif",
     "aliasUrl": "/videos/exercicios/cable-hip-extension.gif",
     "totalFrames": 2,
-    "thumbnailUrl": "/videos/exercicios/frames/a57e020d-7afc-41c4-b372-6066386848c1/0.jpg"
+    "thumbnailUrl": "/videos/exercicios/frames/a57e020d-7afc-41c4-b372-6066386848c1/0.jpg",
+    "estilo_visual": "3d_anatomico",
+    "musculo_alvo": "Glúteo Máximo e Isquiotibiais",
+    "musculos_sinergistas": "Eretores",
+    "mecanica_articular": "Extensão de Quadril no Cabo"
   },
   {
     "id": "d902793c-9a6e-418c-a7b7-956771eaa0a0",
@@ -426,7 +578,11 @@
     "videoUrl": "/videos/exercicios/d902793c-9a6e-418c-a7b7-956771eaa0a0.gif",
     "aliasUrl": "/videos/exercicios/single-arm-overhead-cable-triceps-extension.gif",
     "totalFrames": 2,
-    "thumbnailUrl": "/videos/exercicios/frames/d902793c-9a6e-418c-a7b7-956771eaa0a0/0.jpg"
+    "thumbnailUrl": "/videos/exercicios/frames/d902793c-9a6e-418c-a7b7-956771eaa0a0/0.jpg",
+    "estilo_visual": "3d_anatomico",
+    "musculo_alvo": "Tríceps Braquial (Cabeça Longa)",
+    "musculos_sinergistas": "Cabeça Lateral/Medial",
+    "mecanica_articular": "Extensão Unilateral Francesa no Cabo"
   },
   {
     "id": "2f4874ac-e461-4916-89b2-07380a817ae1",
@@ -437,7 +593,11 @@
     "videoUrl": "/videos/exercicios/2f4874ac-e461-4916-89b2-07380a817ae1.gif",
     "aliasUrl": "/videos/exercicios/machine-back-extension.gif",
     "totalFrames": 2,
-    "thumbnailUrl": "/videos/exercicios/frames/2f4874ac-e461-4916-89b2-07380a817ae1/0.jpg"
+    "thumbnailUrl": "/videos/exercicios/frames/2f4874ac-e461-4916-89b2-07380a817ae1/0.jpg",
+    "estilo_visual": "3d_anatomico",
+    "musculo_alvo": "Eretores da Espinha (Lombar)",
+    "musculos_sinergistas": "Glúteo Máximo, Isquiotibiais",
+    "mecanica_articular": "Extensão Lombar na Máquina"
   },
   {
     "id": "c80d5e23-d24b-464e-a4e0-4b1450b480b6",
@@ -448,7 +608,11 @@
     "videoUrl": "/videos/exercicios/c80d5e23-d24b-464e-a4e0-4b1450b480b6.gif",
     "aliasUrl": "/videos/exercicios/cable-face-pull.gif",
     "totalFrames": 2,
-    "thumbnailUrl": "/videos/exercicios/frames/c80d5e23-d24b-464e-a4e0-4b1450b480b6/0.jpg"
+    "thumbnailUrl": "/videos/exercicios/frames/c80d5e23-d24b-464e-a4e0-4b1450b480b6/0.jpg",
+    "estilo_visual": "3d_anatomico",
+    "musculo_alvo": "Deltoide Posterior e Manguito Rotador",
+    "musculos_sinergistas": "Trapézio Médio/Superior, Rombóides",
+    "mecanica_articular": "Rotação Externa e Retração Escapular"
   },
   {
     "id": "2f09b9a4-46dc-4c6c-9333-14224c5ee431",
@@ -459,7 +623,11 @@
     "videoUrl": "/videos/exercicios/2f09b9a4-46dc-4c6c-9333-14224c5ee431.gif",
     "aliasUrl": "/videos/exercicios/push-up.gif",
     "totalFrames": 2,
-    "thumbnailUrl": "/videos/exercicios/frames/2f09b9a4-46dc-4c6c-9333-14224c5ee431/0.jpg"
+    "thumbnailUrl": "/videos/exercicios/frames/2f09b9a4-46dc-4c6c-9333-14224c5ee431/0.jpg",
+    "estilo_visual": "3d_anatomico",
+    "musculo_alvo": "Peitoral Maior",
+    "musculos_sinergistas": "Tríceps Braquial, Deltoide Anterior",
+    "mecanica_articular": "Adução Horizontal de Ombro e Extensão de Cotovelo"
   },
   {
     "id": "79efba5d-33a4-470d-a526-41f7383c1c83",
@@ -470,7 +638,11 @@
     "videoUrl": "/videos/exercicios/79efba5d-33a4-470d-a526-41f7383c1c83.gif",
     "aliasUrl": "/videos/exercicios/single-leg-cable-curl.gif",
     "totalFrames": 2,
-    "thumbnailUrl": "/videos/exercicios/frames/79efba5d-33a4-470d-a526-41f7383c1c83/0.jpg"
+    "thumbnailUrl": "/videos/exercicios/frames/79efba5d-33a4-470d-a526-41f7383c1c83/0.jpg",
+    "estilo_visual": "3d_anatomico",
+    "musculo_alvo": "Isquiotibiais (Unilateral no Cabo)",
+    "musculos_sinergistas": "Gastrocnêmio",
+    "mecanica_articular": "Flexão Unilateral no Cabo"
   },
   {
     "id": "c7a31b7d-1f7d-4b1c-a2cb-b89fe1d19446",
@@ -481,7 +653,11 @@
     "videoUrl": "/videos/exercicios/c7a31b7d-1f7d-4b1c-a2cb-b89fe1d19446.gif",
     "aliasUrl": "/videos/exercicios/hack-squat.gif",
     "totalFrames": 2,
-    "thumbnailUrl": "/videos/exercicios/frames/c7a31b7d-1f7d-4b1c-a2cb-b89fe1d19446/0.jpg"
+    "thumbnailUrl": "/videos/exercicios/frames/c7a31b7d-1f7d-4b1c-a2cb-b89fe1d19446/0.jpg",
+    "estilo_visual": "3d_anatomico",
+    "musculo_alvo": "Quadríceps (Foco Vasto Lateral/Reto Femoral)",
+    "musculos_sinergistas": "Glúteos",
+    "mecanica_articular": "Agachamento Hack Machine"
   },
   {
     "id": "c59fc8a9-8fdf-494e-a418-e10f356d7656",
@@ -492,7 +668,11 @@
     "videoUrl": "/videos/exercicios/c59fc8a9-8fdf-494e-a418-e10f356d7656.gif",
     "aliasUrl": "/videos/exercicios/45-leg-press.gif",
     "totalFrames": 2,
-    "thumbnailUrl": "/videos/exercicios/frames/c59fc8a9-8fdf-494e-a418-e10f356d7656/0.jpg"
+    "thumbnailUrl": "/videos/exercicios/frames/c59fc8a9-8fdf-494e-a418-e10f356d7656/0.jpg",
+    "estilo_visual": "3d_anatomico",
+    "musculo_alvo": "Quadríceps e Glúteo Máximo",
+    "musculos_sinergistas": "Isquiotibiais, Adutores",
+    "mecanica_articular": "Leg Press 45°"
   },
   {
     "id": "3fdbf48a-5310-4373-9e95-8dfa1e912955",
@@ -503,7 +683,11 @@
     "videoUrl": "/videos/exercicios/3fdbf48a-5310-4373-9e95-8dfa1e912955.gif",
     "aliasUrl": "/videos/exercicios/horizontal-leg-press.gif",
     "totalFrames": 2,
-    "thumbnailUrl": "/videos/exercicios/frames/3fdbf48a-5310-4373-9e95-8dfa1e912955/0.jpg"
+    "thumbnailUrl": "/videos/exercicios/frames/3fdbf48a-5310-4373-9e95-8dfa1e912955/0.jpg",
+    "estilo_visual": "3d_anatomico",
+    "musculo_alvo": "Quadríceps",
+    "musculos_sinergistas": "Glúteos, Isquiotibiais",
+    "mecanica_articular": "Leg Press Horizontal"
   },
   {
     "id": "54030c65-0b66-4995-af4e-5d968ac0cbb8",
@@ -514,7 +698,11 @@
     "videoUrl": "/videos/exercicios/54030c65-0b66-4995-af4e-5d968ac0cbb8.gif",
     "aliasUrl": "/videos/exercicios/single-leg-press.gif",
     "totalFrames": 2,
-    "thumbnailUrl": "/videos/exercicios/frames/54030c65-0b66-4995-af4e-5d968ac0cbb8/0.jpg"
+    "thumbnailUrl": "/videos/exercicios/frames/54030c65-0b66-4995-af4e-5d968ac0cbb8/0.jpg",
+    "estilo_visual": "3d_anatomico",
+    "musculo_alvo": "Quadríceps (Unilateral)",
+    "musculos_sinergistas": "Glúteos",
+    "mecanica_articular": "Prensa de Pernas Unilateral"
   },
   {
     "id": "4450b391-ffe0-4c1e-bec8-4176536c04bb",
@@ -525,7 +713,11 @@
     "videoUrl": "/videos/exercicios/4450b391-ffe0-4c1e-bec8-4176536c04bb.gif",
     "aliasUrl": "/videos/exercicios/deadlift.gif",
     "totalFrames": 2,
-    "thumbnailUrl": "/videos/exercicios/frames/4450b391-ffe0-4c1e-bec8-4176536c04bb/0.jpg"
+    "thumbnailUrl": "/videos/exercicios/frames/4450b391-ffe0-4c1e-bec8-4176536c04bb/0.jpg",
+    "estilo_visual": "3d_anatomico",
+    "musculo_alvo": "Cadeia Posterior Completa (Glúteos, Isquiotibiais, Eretores)",
+    "musculos_sinergistas": "Trapézio, Quadríceps, Antebraços",
+    "mecanica_articular": "Extensão de Quadril e Joelho (Deadlift)"
   },
   {
     "id": "f98c766c-4631-4d12-9064-3145525336a3",
@@ -536,7 +728,11 @@
     "videoUrl": "/videos/exercicios/f98c766c-4631-4d12-9064-3145525336a3.gif",
     "aliasUrl": "/videos/exercicios/dumbbell-romanian-deadlift.gif",
     "totalFrames": 2,
-    "thumbnailUrl": "/videos/exercicios/frames/f98c766c-4631-4d12-9064-3145525336a3/0.jpg"
+    "thumbnailUrl": "/videos/exercicios/frames/f98c766c-4631-4d12-9064-3145525336a3/0.jpg",
+    "estilo_visual": "3d_anatomico",
+    "musculo_alvo": "Isquiotibiais (Bíceps Femoral/Semimembranoso) e Glúteos",
+    "musculos_sinergistas": "Eretor da Espinha",
+    "mecanica_articular": "Extensão de Quadril (RDL)"
   },
   {
     "id": "ac1b9b26-a4bd-407e-bf37-57517b0c3cb9",
@@ -547,7 +743,11 @@
     "videoUrl": "/videos/exercicios/ac1b9b26-a4bd-407e-bf37-57517b0c3cb9.gif",
     "aliasUrl": "/videos/exercicios/bench-dip.gif",
     "totalFrames": 2,
-    "thumbnailUrl": "/videos/exercicios/frames/ac1b9b26-a4bd-407e-bf37-57517b0c3cb9/0.jpg"
+    "thumbnailUrl": "/videos/exercicios/frames/ac1b9b26-a4bd-407e-bf37-57517b0c3cb9/0.jpg",
+    "estilo_visual": "3d_anatomico",
+    "musculo_alvo": "Tríceps Braquial (Cabeça Lateral/Medial)",
+    "musculos_sinergistas": "Deltoide Anterior, Peitoral",
+    "mecanica_articular": "Extensão de Cotovelo no Banco"
   },
   {
     "id": "5bafb2e4-1b95-4987-bb67-a4d413c82cf4",
@@ -558,7 +758,11 @@
     "videoUrl": "/videos/exercicios/5bafb2e4-1b95-4987-bb67-a4d413c82cf4.gif",
     "aliasUrl": "/videos/exercicios/lying-leg-curl.gif",
     "totalFrames": 2,
-    "thumbnailUrl": "/videos/exercicios/frames/5bafb2e4-1b95-4987-bb67-a4d413c82cf4/0.jpg"
+    "thumbnailUrl": "/videos/exercicios/frames/5bafb2e4-1b95-4987-bb67-a4d413c82cf4/0.jpg",
+    "estilo_visual": "3d_anatomico",
+    "musculo_alvo": "Isquiotibiais (Bíceps Femoral / Semitendinoso)",
+    "musculos_sinergistas": "Gastrocnêmio",
+    "mecanica_articular": "Flexão de Joelho na Mesa Flexora"
   },
   {
     "id": "fd8bff1e-1306-4dec-8a62-dd1a6dc31058",
@@ -569,7 +773,11 @@
     "videoUrl": "/videos/exercicios/fd8bff1e-1306-4dec-8a62-dd1a6dc31058.gif",
     "aliasUrl": "/videos/exercicios/donkey-calf-raise.gif",
     "totalFrames": 2,
-    "thumbnailUrl": "/videos/exercicios/frames/fd8bff1e-1306-4dec-8a62-dd1a6dc31058/0.jpg"
+    "thumbnailUrl": "/videos/exercicios/frames/fd8bff1e-1306-4dec-8a62-dd1a6dc31058/0.jpg",
+    "estilo_visual": "3d_anatomico",
+    "musculo_alvo": "Gastrocnêmio (Alongamento Máximo)",
+    "musculos_sinergistas": "Sóleo",
+    "mecanica_articular": "Donkey Calf Raise"
   },
   {
     "id": "e455709a-9ff8-47c1-8040-3cfff3860180",
@@ -580,7 +788,11 @@
     "videoUrl": "/videos/exercicios/e455709a-9ff8-47c1-8040-3cfff3860180.gif",
     "aliasUrl": "/videos/exercicios/standing-calf-raise.gif",
     "totalFrames": 2,
-    "thumbnailUrl": "/videos/exercicios/frames/e455709a-9ff8-47c1-8040-3cfff3860180/0.jpg"
+    "thumbnailUrl": "/videos/exercicios/frames/e455709a-9ff8-47c1-8040-3cfff3860180/0.jpg",
+    "estilo_visual": "3d_anatomico",
+    "musculo_alvo": "Gastrocnêmio (Cabeça Medial e Lateral)",
+    "musculos_sinergistas": "Sóleo",
+    "mecanica_articular": "Flexão Plantar com Joelhos Estendidos"
   },
   {
     "id": "021e4c30-b247-424d-ac49-5c7939c3cad7",
@@ -591,7 +803,11 @@
     "videoUrl": "/videos/exercicios/021e4c30-b247-424d-ac49-5c7939c3cad7.gif",
     "aliasUrl": "/videos/exercicios/calf-raise-on-leg-press.gif",
     "totalFrames": 2,
-    "thumbnailUrl": "/videos/exercicios/frames/021e4c30-b247-424d-ac49-5c7939c3cad7/0.jpg"
+    "thumbnailUrl": "/videos/exercicios/frames/021e4c30-b247-424d-ac49-5c7939c3cad7/0.jpg",
+    "estilo_visual": "3d_anatomico",
+    "musculo_alvo": "Gastrocnêmio e Sóleo",
+    "musculos_sinergistas": "Tibial Posterior",
+    "mecanica_articular": "Flexão Plantar no Leg Press"
   },
   {
     "id": "ebc8498c-20c4-427e-b6d6-b778c0b545d0",
@@ -602,7 +818,11 @@
     "videoUrl": "/videos/exercicios/ebc8498c-20c4-427e-b6d6-b778c0b545d0.gif",
     "aliasUrl": "/videos/exercicios/seated-calf-raise.gif",
     "totalFrames": 2,
-    "thumbnailUrl": "/videos/exercicios/frames/ebc8498c-20c4-427e-b6d6-b778c0b545d0/0.jpg"
+    "thumbnailUrl": "/videos/exercicios/frames/ebc8498c-20c4-427e-b6d6-b778c0b545d0/0.jpg",
+    "estilo_visual": "3d_anatomico",
+    "musculo_alvo": "Sóleo",
+    "musculos_sinergistas": "Gastrocnêmio",
+    "mecanica_articular": "Flexão Plantar Sentado"
   },
   {
     "id": "d4411272-aaa7-4a56-97e9-58cde19d65ad",
@@ -613,7 +833,11 @@
     "videoUrl": "/videos/exercicios/d4411272-aaa7-4a56-97e9-58cde19d65ad.gif",
     "aliasUrl": "/videos/exercicios/single-leg-dumbbell-calf-raise.gif",
     "totalFrames": 2,
-    "thumbnailUrl": "/videos/exercicios/frames/d4411272-aaa7-4a56-97e9-58cde19d65ad/0.jpg"
+    "thumbnailUrl": "/videos/exercicios/frames/d4411272-aaa7-4a56-97e9-58cde19d65ad/0.jpg",
+    "estilo_visual": "3d_anatomico",
+    "musculo_alvo": "Gastrocnêmio (Unilateral)",
+    "musculos_sinergistas": "Sóleo",
+    "mecanica_articular": "Elevação de Panturrilha Unilateral"
   },
   {
     "id": "e9d96eea-745d-4b4b-a00c-44227f1b2f60",
@@ -624,7 +848,11 @@
     "videoUrl": "/videos/exercicios/e9d96eea-745d-4b4b-a00c-44227f1b2f60.gif",
     "aliasUrl": "/videos/exercicios/dips.gif",
     "totalFrames": 2,
-    "thumbnailUrl": "/videos/exercicios/frames/e9d96eea-745d-4b4b-a00c-44227f1b2f60/0.jpg"
+    "thumbnailUrl": "/videos/exercicios/frames/e9d96eea-745d-4b4b-a00c-44227f1b2f60/0.jpg",
+    "estilo_visual": "3d_anatomico",
+    "musculo_alvo": "Tríceps Braquial e Peitoral Inferior",
+    "musculos_sinergistas": "Deltoide Anterior",
+    "mecanica_articular": "Extensão em Paralelas"
   },
   {
     "id": "6c6196c2-f34f-40a5-ba1c-44d53ea5c17c",
@@ -635,7 +863,11 @@
     "videoUrl": "/videos/exercicios/6c6196c2-f34f-40a5-ba1c-44d53ea5c17c.gif",
     "aliasUrl": "/videos/exercicios/step-up.gif",
     "totalFrames": 2,
-    "thumbnailUrl": "/videos/exercicios/frames/6c6196c2-f34f-40a5-ba1c-44d53ea5c17c/0.jpg"
+    "thumbnailUrl": "/videos/exercicios/frames/6c6196c2-f34f-40a5-ba1c-44d53ea5c17c/0.jpg",
+    "estilo_visual": "3d_anatomico",
+    "musculo_alvo": "Quadríceps e Glúteo Máximo",
+    "musculos_sinergistas": "Isquiotibiais, Panturrilhas",
+    "mecanica_articular": "Subida no Banco / Step-Up"
   },
   {
     "id": "7dca79cf-beac-497d-94a0-a5c15b94f45c",
@@ -646,7 +878,11 @@
     "videoUrl": "/videos/exercicios/7dca79cf-beac-497d-94a0-a5c15b94f45c.gif",
     "aliasUrl": "/videos/exercicios/pec-deck.gif",
     "totalFrames": 2,
-    "thumbnailUrl": "/videos/exercicios/frames/7dca79cf-beac-497d-94a0-a5c15b94f45c/0.jpg"
+    "thumbnailUrl": "/videos/exercicios/frames/7dca79cf-beac-497d-94a0-a5c15b94f45c/0.jpg",
+    "estilo_visual": "3d_anatomico",
+    "musculo_alvo": "Peitoral Maior (Isolamento)",
+    "musculos_sinergistas": "Deltoide Anterior",
+    "mecanica_articular": "Adução Guiada em Máquina"
   },
   {
     "id": "068a8275-2484-485e-911b-5ca21de4bb3c",
@@ -657,7 +893,11 @@
     "videoUrl": "/videos/exercicios/068a8275-2484-485e-911b-5ca21de4bb3c.gif",
     "aliasUrl": "/videos/exercicios/glute-bridge.gif",
     "totalFrames": 2,
-    "thumbnailUrl": "/videos/exercicios/frames/068a8275-2484-485e-911b-5ca21de4bb3c/0.jpg"
+    "thumbnailUrl": "/videos/exercicios/frames/068a8275-2484-485e-911b-5ca21de4bb3c/0.jpg",
+    "estilo_visual": "3d_anatomico",
+    "musculo_alvo": "Glúteo Máximo",
+    "musculos_sinergistas": "Isquiotibiais, Eretores",
+    "mecanica_articular": "Ponte de Glúteos no Solo"
   },
   {
     "id": "c2cd8199-e5ea-4928-8703-659ff37ebedb",
@@ -668,7 +908,11 @@
     "videoUrl": "/videos/exercicios/c2cd8199-e5ea-4928-8703-659ff37ebedb.gif",
     "aliasUrl": "/videos/exercicios/plank.gif",
     "totalFrames": 2,
-    "thumbnailUrl": "/videos/exercicios/frames/c2cd8199-e5ea-4928-8703-659ff37ebedb/0.jpg"
+    "thumbnailUrl": "/videos/exercicios/frames/c2cd8199-e5ea-4928-8703-659ff37ebedb/0.jpg",
+    "estilo_visual": "3d_anatomico",
+    "musculo_alvo": "Core Geral e Transverso do Abdômen",
+    "musculos_sinergistas": "Reto Abdominal, Deltóides, Glúteos",
+    "mecanica_articular": "Anti-Extensão Lombar Isométrica"
   },
   {
     "id": "1fd198de-8af3-4bd5-845d-130a6a19f7aa",
@@ -679,7 +923,11 @@
     "videoUrl": "/videos/exercicios/1fd198de-8af3-4bd5-845d-130a6a19f7aa.gif",
     "aliasUrl": "/videos/exercicios/side-plank.gif",
     "totalFrames": 2,
-    "thumbnailUrl": "/videos/exercicios/frames/1fd198de-8af3-4bd5-845d-130a6a19f7aa/0.jpg"
+    "thumbnailUrl": "/videos/exercicios/frames/1fd198de-8af3-4bd5-845d-130a6a19f7aa/0.jpg",
+    "estilo_visual": "3d_anatomico",
+    "musculo_alvo": "Oblíquos e Quadrado Lombar",
+    "musculos_sinergistas": "Glúteo Médio, Tensor da Fáscia Lata",
+    "mecanica_articular": "Anti-Flexão Lateral Isométrica"
   },
   {
     "id": "da5cbe01-2fee-410f-b3a2-823318537a04",
@@ -690,7 +938,11 @@
     "videoUrl": "/videos/exercicios/da5cbe01-2fee-410f-b3a2-823318537a04.gif",
     "aliasUrl": "/videos/exercicios/dumbbell-pullover.gif",
     "totalFrames": 2,
-    "thumbnailUrl": "/videos/exercicios/frames/da5cbe01-2fee-410f-b3a2-823318537a04/0.jpg"
+    "thumbnailUrl": "/videos/exercicios/frames/da5cbe01-2fee-410f-b3a2-823318537a04/0.jpg",
+    "estilo_visual": "3d_anatomico",
+    "musculo_alvo": "Peitoral Maior e Latíssimo do Dorso",
+    "musculos_sinergistas": "Tríceps (Cabeça Longa), Serrátil Anterior",
+    "mecanica_articular": "Extensão e Flexão Sagital de Ombro"
   },
   {
     "id": "0f4d2b26-f2eb-4e16-b9e8-48d1d737590d",
@@ -701,7 +953,11 @@
     "videoUrl": "/videos/exercicios/0f4d2b26-f2eb-4e16-b9e8-48d1d737590d.gif",
     "aliasUrl": "/videos/exercicios/lat-pulldown.gif",
     "totalFrames": 2,
-    "thumbnailUrl": "/videos/exercicios/frames/0f4d2b26-f2eb-4e16-b9e8-48d1d737590d/0.jpg"
+    "thumbnailUrl": "/videos/exercicios/frames/0f4d2b26-f2eb-4e16-b9e8-48d1d737590d/0.jpg",
+    "estilo_visual": "3d_anatomico",
+    "musculo_alvo": "Latíssimo do Dorso",
+    "musculos_sinergistas": "Bíceps, Braquial, Rombóides",
+    "mecanica_articular": "Adução Frontal no Pulley"
   },
   {
     "id": "7a4402da-f39a-4a75-ad03-f2ef9775ac7e",
@@ -712,7 +968,11 @@
     "videoUrl": "/videos/exercicios/7a4402da-f39a-4a75-ad03-f2ef9775ac7e.gif",
     "aliasUrl": "/videos/exercicios/wide-grip-pulldown.gif",
     "totalFrames": 2,
-    "thumbnailUrl": "/videos/exercicios/frames/7a4402da-f39a-4a75-ad03-f2ef9775ac7e/0.jpg"
+    "thumbnailUrl": "/videos/exercicios/frames/7a4402da-f39a-4a75-ad03-f2ef9775ac7e/0.jpg",
+    "estilo_visual": "3d_anatomico",
+    "musculo_alvo": "Latíssimo do Dorso (Fibras Superiores)",
+    "musculos_sinergistas": "Redondo Maior, Bíceps",
+    "mecanica_articular": "Adução com Pegada Aberta"
   },
   {
     "id": "267c6648-e80e-4d90-ad8c-abfb7c5fabf0",
@@ -723,7 +983,11 @@
     "videoUrl": "/videos/exercicios/267c6648-e80e-4d90-ad8c-abfb7c5fabf0.gif",
     "aliasUrl": "/videos/exercicios/underhand-grip-pulldown.gif",
     "totalFrames": 2,
-    "thumbnailUrl": "/videos/exercicios/frames/267c6648-e80e-4d90-ad8c-abfb7c5fabf0/0.jpg"
+    "thumbnailUrl": "/videos/exercicios/frames/267c6648-e80e-4d90-ad8c-abfb7c5fabf0/0.jpg",
+    "estilo_visual": "3d_anatomico",
+    "musculo_alvo": "Latíssimo do Dorso (Fibras Inferiores) e Bíceps",
+    "musculos_sinergistas": "Braquial, Trapézio Médio",
+    "mecanica_articular": "Extensão Sagital com Pegada Supinada"
   },
   {
     "id": "964bf20c-48bf-49c7-8bec-070079768d00",
@@ -734,7 +998,11 @@
     "videoUrl": "/videos/exercicios/964bf20c-48bf-49c7-8bec-070079768d00.gif",
     "aliasUrl": "/videos/exercicios/machine-lat-pulldown-articulated.gif",
     "totalFrames": 2,
-    "thumbnailUrl": "/videos/exercicios/frames/964bf20c-48bf-49c7-8bec-070079768d00/0.jpg"
+    "thumbnailUrl": "/videos/exercicios/frames/964bf20c-48bf-49c7-8bec-070079768d00/0.jpg",
+    "estilo_visual": "3d_anatomico",
+    "musculo_alvo": "Latíssimo do Dorso (Movimento Articulado)",
+    "musculos_sinergistas": "Bíceps Braquial, Rombóides",
+    "mecanica_articular": "Puxada Articulada Convergente"
   },
   {
     "id": "d4e52f27-d643-406d-8850-56e6cd457f24",
@@ -745,7 +1013,11 @@
     "videoUrl": "/videos/exercicios/d4e52f27-d643-406d-8850-56e6cd457f24.gif",
     "aliasUrl": "/videos/exercicios/barbell-upright-row.gif",
     "totalFrames": 2,
-    "thumbnailUrl": "/videos/exercicios/frames/d4e52f27-d643-406d-8850-56e6cd457f24/0.jpg"
+    "thumbnailUrl": "/videos/exercicios/frames/d4e52f27-d643-406d-8850-56e6cd457f24/0.jpg",
+    "estilo_visual": "3d_anatomico",
+    "musculo_alvo": "Deltoide Lateral e Trapézio Superior",
+    "musculos_sinergistas": "Bíceps Braquial, Braquial",
+    "mecanica_articular": "Remo Vertical ao Queixo"
   },
   {
     "id": "38f23b62-e6a9-4826-a7ff-293427607b45",
@@ -756,7 +1028,11 @@
     "videoUrl": "/videos/exercicios/38f23b62-e6a9-4826-a7ff-293427607b45.gif",
     "aliasUrl": "/videos/exercicios/seated-cable-row.gif",
     "totalFrames": 2,
-    "thumbnailUrl": "/videos/exercicios/frames/38f23b62-e6a9-4826-a7ff-293427607b45/0.jpg"
+    "thumbnailUrl": "/videos/exercicios/frames/38f23b62-e6a9-4826-a7ff-293427607b45/0.jpg",
+    "estilo_visual": "3d_anatomico",
+    "musculo_alvo": "Trapézio Médio/Inferior e Rombóides",
+    "musculos_sinergistas": "Latíssimo do Dorso, Bíceps",
+    "mecanica_articular": "Retração Escapular no Cabo"
   },
   {
     "id": "83a0faee-9b3d-4920-8bc6-8621127fba60",
@@ -767,7 +1043,11 @@
     "videoUrl": "/videos/exercicios/83a0faee-9b3d-4920-8bc6-8621127fba60.gif",
     "aliasUrl": "/videos/exercicios/t-bar-row.gif",
     "totalFrames": 2,
-    "thumbnailUrl": "/videos/exercicios/frames/83a0faee-9b3d-4920-8bc6-8621127fba60/0.jpg"
+    "thumbnailUrl": "/videos/exercicios/frames/83a0faee-9b3d-4920-8bc6-8621127fba60/0.jpg",
+    "estilo_visual": "3d_anatomico",
+    "musculo_alvo": "Espessura de Costas e Rombóides",
+    "musculos_sinergistas": "Latíssimo, Eretor da Espinha, Bíceps",
+    "mecanica_articular": "Extensão de Ombro e Retração Escapular"
   },
   {
     "id": "00b173f0-17e1-4c57-8429-7d7cb876ded0",
@@ -778,7 +1058,11 @@
     "videoUrl": "/videos/exercicios/00b173f0-17e1-4c57-8429-7d7cb876ded0.gif",
     "aliasUrl": "/videos/exercicios/bent-over-barbell-row.gif",
     "totalFrames": 2,
-    "thumbnailUrl": "/videos/exercicios/frames/00b173f0-17e1-4c57-8429-7d7cb876ded0/0.jpg"
+    "thumbnailUrl": "/videos/exercicios/frames/00b173f0-17e1-4c57-8429-7d7cb876ded0/0.jpg",
+    "estilo_visual": "3d_anatomico",
+    "musculo_alvo": "Latíssimo do Dorso e Rombóides",
+    "musculos_sinergistas": "Trapézio, Eretor da Espinha, Bíceps",
+    "mecanica_articular": "Remo Curvado Livre com Barra"
   },
   {
     "id": "8da3b406-5e31-47b7-993d-d3c478d45a23",
@@ -789,7 +1073,11 @@
     "videoUrl": "/videos/exercicios/8da3b406-5e31-47b7-993d-d3c478d45a23.gif",
     "aliasUrl": "/videos/exercicios/machine-row.gif",
     "totalFrames": 2,
-    "thumbnailUrl": "/videos/exercicios/frames/8da3b406-5e31-47b7-993d-d3c478d45a23/0.jpg"
+    "thumbnailUrl": "/videos/exercicios/frames/8da3b406-5e31-47b7-993d-d3c478d45a23/0.jpg",
+    "estilo_visual": "3d_anatomico",
+    "musculo_alvo": "Rombóides e Trapézio Médio",
+    "musculos_sinergistas": "Latíssimo do Dorso, Bíceps",
+    "mecanica_articular": "Remo Guiado em Máquina"
   },
   {
     "id": "7b3d2f7d-e646-40ae-9b0a-1b3fa2bce1bb",
@@ -800,7 +1088,11 @@
     "videoUrl": "/videos/exercicios/7b3d2f7d-e646-40ae-9b0a-1b3fa2bce1bb.gif",
     "aliasUrl": "/videos/exercicios/chest-supported-machine-row.gif",
     "totalFrames": 2,
-    "thumbnailUrl": "/videos/exercicios/frames/7b3d2f7d-e646-40ae-9b0a-1b3fa2bce1bb/0.jpg"
+    "thumbnailUrl": "/videos/exercicios/frames/7b3d2f7d-e646-40ae-9b0a-1b3fa2bce1bb/0.jpg",
+    "estilo_visual": "3d_anatomico",
+    "musculo_alvo": "Musculatura Alvo Principal",
+    "musculos_sinergistas": "Músculos Estabilizadores",
+    "mecanica_articular": "Padrão Biomecânico Anatômico"
   },
   {
     "id": "518c8216-bfc7-4c68-a708-1f5c9e178326",
@@ -811,7 +1103,11 @@
     "videoUrl": "/videos/exercicios/518c8216-bfc7-4c68-a708-1f5c9e178326.gif",
     "aliasUrl": "/videos/exercicios/single-arm-dumbbell-row.gif",
     "totalFrames": 2,
-    "thumbnailUrl": "/videos/exercicios/frames/518c8216-bfc7-4c68-a708-1f5c9e178326/0.jpg"
+    "thumbnailUrl": "/videos/exercicios/frames/518c8216-bfc7-4c68-a708-1f5c9e178326/0.jpg",
+    "estilo_visual": "3d_anatomico",
+    "musculo_alvo": "Musculatura Alvo Principal",
+    "musculos_sinergistas": "Músculos Estabilizadores",
+    "mecanica_articular": "Padrão Biomecânico Anatômico"
   },
   {
     "id": "47ad084e-e614-4948-9fb2-91a3aa476af3",
@@ -822,7 +1118,11 @@
     "videoUrl": "/videos/exercicios/47ad084e-e614-4948-9fb2-91a3aa476af3.gif",
     "aliasUrl": "/videos/exercicios/alternating-dumbbell-curl.gif",
     "totalFrames": 2,
-    "thumbnailUrl": "/videos/exercicios/frames/47ad084e-e614-4948-9fb2-91a3aa476af3/0.jpg"
+    "thumbnailUrl": "/videos/exercicios/frames/47ad084e-e614-4948-9fb2-91a3aa476af3/0.jpg",
+    "estilo_visual": "3d_anatomico",
+    "musculo_alvo": "Musculatura Alvo Principal",
+    "musculos_sinergistas": "Músculos Estabilizadores",
+    "mecanica_articular": "Padrão Biomecânico Anatômico"
   },
   {
     "id": "255d734f-e5e4-4a2d-83c7-280fd1166c9d",
@@ -833,7 +1133,11 @@
     "videoUrl": "/videos/exercicios/255d734f-e5e4-4a2d-83c7-280fd1166c9d.gif",
     "aliasUrl": "/videos/exercicios/concentration-curl.gif",
     "totalFrames": 2,
-    "thumbnailUrl": "/videos/exercicios/frames/255d734f-e5e4-4a2d-83c7-280fd1166c9d/0.jpg"
+    "thumbnailUrl": "/videos/exercicios/frames/255d734f-e5e4-4a2d-83c7-280fd1166c9d/0.jpg",
+    "estilo_visual": "3d_anatomico",
+    "musculo_alvo": "Musculatura Alvo Principal",
+    "musculos_sinergistas": "Músculos Estabilizadores",
+    "mecanica_articular": "Padrão Biomecânico Anatômico"
   },
   {
     "id": "39c48554-3192-4072-a877-f8259e737d29",
@@ -844,7 +1148,11 @@
     "videoUrl": "/videos/exercicios/39c48554-3192-4072-a877-f8259e737d29.gif",
     "aliasUrl": "/videos/exercicios/barbell-curl.gif",
     "totalFrames": 2,
-    "thumbnailUrl": "/videos/exercicios/frames/39c48554-3192-4072-a877-f8259e737d29/0.jpg"
+    "thumbnailUrl": "/videos/exercicios/frames/39c48554-3192-4072-a877-f8259e737d29/0.jpg",
+    "estilo_visual": "3d_anatomico",
+    "musculo_alvo": "Musculatura Alvo Principal",
+    "musculos_sinergistas": "Músculos Estabilizadores",
+    "mecanica_articular": "Padrão Biomecânico Anatômico"
   },
   {
     "id": "32b0855f-a34f-4134-9a86-3f89a045beb2",
@@ -855,7 +1163,11 @@
     "videoUrl": "/videos/exercicios/32b0855f-a34f-4134-9a86-3f89a045beb2.gif",
     "aliasUrl": "/videos/exercicios/reverse-grip-barbell-curl.gif",
     "totalFrames": 2,
-    "thumbnailUrl": "/videos/exercicios/frames/32b0855f-a34f-4134-9a86-3f89a045beb2/0.jpg"
+    "thumbnailUrl": "/videos/exercicios/frames/32b0855f-a34f-4134-9a86-3f89a045beb2/0.jpg",
+    "estilo_visual": "3d_anatomico",
+    "musculo_alvo": "Musculatura Alvo Principal",
+    "musculos_sinergistas": "Músculos Estabilizadores",
+    "mecanica_articular": "Padrão Biomecânico Anatômico"
   },
   {
     "id": "10594042-7f90-42f0-a8aa-22142b737944",
@@ -866,7 +1178,11 @@
     "videoUrl": "/videos/exercicios/10594042-7f90-42f0-a8aa-22142b737944.gif",
     "aliasUrl": "/videos/exercicios/machine-curl.gif",
     "totalFrames": 2,
-    "thumbnailUrl": "/videos/exercicios/frames/10594042-7f90-42f0-a8aa-22142b737944/0.jpg"
+    "thumbnailUrl": "/videos/exercicios/frames/10594042-7f90-42f0-a8aa-22142b737944/0.jpg",
+    "estilo_visual": "3d_anatomico",
+    "musculo_alvo": "Musculatura Alvo Principal",
+    "musculos_sinergistas": "Músculos Estabilizadores",
+    "mecanica_articular": "Padrão Biomecânico Anatômico"
   },
   {
     "id": "ab6bcbd8-97b1-4a50-ad5a-6732ad54ee25",
@@ -877,7 +1193,11 @@
     "videoUrl": "/videos/exercicios/ab6bcbd8-97b1-4a50-ad5a-6732ad54ee25.gif",
     "aliasUrl": "/videos/exercicios/hammer-curl.gif",
     "totalFrames": 2,
-    "thumbnailUrl": "/videos/exercicios/frames/ab6bcbd8-97b1-4a50-ad5a-6732ad54ee25/0.jpg"
+    "thumbnailUrl": "/videos/exercicios/frames/ab6bcbd8-97b1-4a50-ad5a-6732ad54ee25/0.jpg",
+    "estilo_visual": "3d_anatomico",
+    "musculo_alvo": "Musculatura Alvo Principal",
+    "musculos_sinergistas": "Músculos Estabilizadores",
+    "mecanica_articular": "Padrão Biomecânico Anatômico"
   },
   {
     "id": "27939fac-14b9-4e90-809d-dd3ee62c0613",
@@ -888,7 +1208,11 @@
     "videoUrl": "/videos/exercicios/27939fac-14b9-4e90-809d-dd3ee62c0613.gif",
     "aliasUrl": "/videos/exercicios/cable-curl.gif",
     "totalFrames": 2,
-    "thumbnailUrl": "/videos/exercicios/frames/27939fac-14b9-4e90-809d-dd3ee62c0613/0.jpg"
+    "thumbnailUrl": "/videos/exercicios/frames/27939fac-14b9-4e90-809d-dd3ee62c0613/0.jpg",
+    "estilo_visual": "3d_anatomico",
+    "musculo_alvo": "Musculatura Alvo Principal",
+    "musculos_sinergistas": "Músculos Estabilizadores",
+    "mecanica_articular": "Padrão Biomecânico Anatômico"
   },
   {
     "id": "620bd50a-ad67-4029-8a00-34cf40200698",
@@ -899,7 +1223,11 @@
     "videoUrl": "/videos/exercicios/620bd50a-ad67-4029-8a00-34cf40200698.gif",
     "aliasUrl": "/videos/exercicios/preacher-curl.gif",
     "totalFrames": 2,
-    "thumbnailUrl": "/videos/exercicios/frames/620bd50a-ad67-4029-8a00-34cf40200698/0.jpg"
+    "thumbnailUrl": "/videos/exercicios/frames/620bd50a-ad67-4029-8a00-34cf40200698/0.jpg",
+    "estilo_visual": "3d_anatomico",
+    "musculo_alvo": "Musculatura Alvo Principal",
+    "musculos_sinergistas": "Músculos Estabilizadores",
+    "mecanica_articular": "Padrão Biomecânico Anatômico"
   },
   {
     "id": "9a21b5de-0de3-4e3d-a36c-ef094e5f9d34",
@@ -910,7 +1238,11 @@
     "videoUrl": "/videos/exercicios/9a21b5de-0de3-4e3d-a36c-ef094e5f9d34.gif",
     "aliasUrl": "/videos/exercicios/spider-curl.gif",
     "totalFrames": 2,
-    "thumbnailUrl": "/videos/exercicios/frames/9a21b5de-0de3-4e3d-a36c-ef094e5f9d34/0.jpg"
+    "thumbnailUrl": "/videos/exercicios/frames/9a21b5de-0de3-4e3d-a36c-ef094e5f9d34/0.jpg",
+    "estilo_visual": "3d_anatomico",
+    "musculo_alvo": "Musculatura Alvo Principal",
+    "musculos_sinergistas": "Músculos Estabilizadores",
+    "mecanica_articular": "Padrão Biomecânico Anatômico"
   },
   {
     "id": "b33347e8-056c-4f15-8a3a-bd00bf7852e6",
@@ -921,7 +1253,11 @@
     "videoUrl": "/videos/exercicios/b33347e8-056c-4f15-8a3a-bd00bf7852e6.gif",
     "aliasUrl": "/videos/exercicios/machine-torso-rotation.gif",
     "totalFrames": 2,
-    "thumbnailUrl": "/videos/exercicios/frames/b33347e8-056c-4f15-8a3a-bd00bf7852e6/0.jpg"
+    "thumbnailUrl": "/videos/exercicios/frames/b33347e8-056c-4f15-8a3a-bd00bf7852e6/0.jpg",
+    "estilo_visual": "3d_anatomico",
+    "musculo_alvo": "Musculatura Alvo Principal",
+    "musculos_sinergistas": "Músculos Estabilizadores",
+    "mecanica_articular": "Padrão Biomecânico Anatômico"
   },
   {
     "id": "a150a4c3-3baf-4856-975a-b7fe8e3397f5",
@@ -932,7 +1268,11 @@
     "videoUrl": "/videos/exercicios/a150a4c3-3baf-4856-975a-b7fe8e3397f5.gif",
     "aliasUrl": "/videos/exercicios/cable-torso-rotation.gif",
     "totalFrames": 2,
-    "thumbnailUrl": "/videos/exercicios/frames/a150a4c3-3baf-4856-975a-b7fe8e3397f5/0.jpg"
+    "thumbnailUrl": "/videos/exercicios/frames/a150a4c3-3baf-4856-975a-b7fe8e3397f5/0.jpg",
+    "estilo_visual": "3d_anatomico",
+    "musculo_alvo": "Musculatura Alvo Principal",
+    "musculos_sinergistas": "Músculos Estabilizadores",
+    "mecanica_articular": "Padrão Biomecânico Anatômico"
   },
   {
     "id": "271cdb53-55e6-450e-ae1c-aa7ab99550d9",
@@ -943,7 +1283,11 @@
     "videoUrl": "/videos/exercicios/271cdb53-55e6-450e-ae1c-aa7ab99550d9.gif",
     "aliasUrl": "/videos/exercicios/barbell-stiff-leg-deadlift.gif",
     "totalFrames": 2,
-    "thumbnailUrl": "/videos/exercicios/frames/271cdb53-55e6-450e-ae1c-aa7ab99550d9/0.jpg"
+    "thumbnailUrl": "/videos/exercicios/frames/271cdb53-55e6-450e-ae1c-aa7ab99550d9/0.jpg",
+    "estilo_visual": "3d_anatomico",
+    "musculo_alvo": "Musculatura Alvo Principal",
+    "musculos_sinergistas": "Músculos Estabilizadores",
+    "mecanica_articular": "Padrão Biomecânico Anatômico"
   },
   {
     "id": "65a08759-42c9-49ae-bbbe-dee88006bcad",
@@ -954,7 +1298,11 @@
     "videoUrl": "/videos/exercicios/65a08759-42c9-49ae-bbbe-dee88006bcad.gif",
     "aliasUrl": "/videos/exercicios/decline-barbell-bench-press.gif",
     "totalFrames": 2,
-    "thumbnailUrl": "/videos/exercicios/frames/65a08759-42c9-49ae-bbbe-dee88006bcad/0.jpg"
+    "thumbnailUrl": "/videos/exercicios/frames/65a08759-42c9-49ae-bbbe-dee88006bcad/0.jpg",
+    "estilo_visual": "3d_anatomico",
+    "musculo_alvo": "Musculatura Alvo Principal",
+    "musculos_sinergistas": "Músculos Estabilizadores",
+    "mecanica_articular": "Padrão Biomecânico Anatômico"
   },
   {
     "id": "c914e17f-dfb2-4add-a946-842ca5d68edc",
@@ -965,7 +1313,11 @@
     "videoUrl": "/videos/exercicios/c914e17f-dfb2-4add-a946-842ca5d68edc.gif",
     "aliasUrl": "/videos/exercicios/decline-dumbbell-bench-press.gif",
     "totalFrames": 2,
-    "thumbnailUrl": "/videos/exercicios/frames/c914e17f-dfb2-4add-a946-842ca5d68edc/0.jpg"
+    "thumbnailUrl": "/videos/exercicios/frames/c914e17f-dfb2-4add-a946-842ca5d68edc/0.jpg",
+    "estilo_visual": "3d_anatomico",
+    "musculo_alvo": "Musculatura Alvo Principal",
+    "musculos_sinergistas": "Músculos Estabilizadores",
+    "mecanica_articular": "Padrão Biomecânico Anatômico"
   },
   {
     "id": "229427b2-09e8-456c-862f-b2d2fe76d76b",
@@ -976,7 +1328,11 @@
     "videoUrl": "/videos/exercicios/229427b2-09e8-456c-862f-b2d2fe76d76b.gif",
     "aliasUrl": "/videos/exercicios/decline-machine-bench-press.gif",
     "totalFrames": 2,
-    "thumbnailUrl": "/videos/exercicios/frames/229427b2-09e8-456c-862f-b2d2fe76d76b/0.jpg"
+    "thumbnailUrl": "/videos/exercicios/frames/229427b2-09e8-456c-862f-b2d2fe76d76b/0.jpg",
+    "estilo_visual": "3d_anatomico",
+    "musculo_alvo": "Musculatura Alvo Principal",
+    "musculos_sinergistas": "Músculos Estabilizadores",
+    "mecanica_articular": "Padrão Biomecânico Anatômico"
   },
   {
     "id": "d9e55da6-25ef-43a3-aa11-3eee9d1481cf",
@@ -987,7 +1343,11 @@
     "videoUrl": "/videos/exercicios/d9e55da6-25ef-43a3-aa11-3eee9d1481cf.gif",
     "aliasUrl": "/videos/exercicios/close-grip-bench-press.gif",
     "totalFrames": 2,
-    "thumbnailUrl": "/videos/exercicios/frames/d9e55da6-25ef-43a3-aa11-3eee9d1481cf/0.jpg"
+    "thumbnailUrl": "/videos/exercicios/frames/d9e55da6-25ef-43a3-aa11-3eee9d1481cf/0.jpg",
+    "estilo_visual": "3d_anatomico",
+    "musculo_alvo": "Musculatura Alvo Principal",
+    "musculos_sinergistas": "Músculos Estabilizadores",
+    "mecanica_articular": "Padrão Biomecânico Anatômico"
   },
   {
     "id": "f116e33e-4305-4c50-ac45-ee38c88d243f",
@@ -998,7 +1358,11 @@
     "videoUrl": "/videos/exercicios/f116e33e-4305-4c50-ac45-ee38c88d243f.gif",
     "aliasUrl": "/videos/exercicios/incline-barbell-bench-press.gif",
     "totalFrames": 2,
-    "thumbnailUrl": "/videos/exercicios/frames/f116e33e-4305-4c50-ac45-ee38c88d243f/0.jpg"
+    "thumbnailUrl": "/videos/exercicios/frames/f116e33e-4305-4c50-ac45-ee38c88d243f/0.jpg",
+    "estilo_visual": "3d_anatomico",
+    "musculo_alvo": "Musculatura Alvo Principal",
+    "musculos_sinergistas": "Músculos Estabilizadores",
+    "mecanica_articular": "Padrão Biomecânico Anatômico"
   },
   {
     "id": "f557f83e-22a8-46e6-bc4f-05de0ec71bbe",
@@ -1009,7 +1373,11 @@
     "videoUrl": "/videos/exercicios/f557f83e-22a8-46e6-bc4f-05de0ec71bbe.gif",
     "aliasUrl": "/videos/exercicios/incline-dumbbell-bench-press.gif",
     "totalFrames": 2,
-    "thumbnailUrl": "/videos/exercicios/frames/f557f83e-22a8-46e6-bc4f-05de0ec71bbe/0.jpg"
+    "thumbnailUrl": "/videos/exercicios/frames/f557f83e-22a8-46e6-bc4f-05de0ec71bbe/0.jpg",
+    "estilo_visual": "3d_anatomico",
+    "musculo_alvo": "Musculatura Alvo Principal",
+    "musculos_sinergistas": "Músculos Estabilizadores",
+    "mecanica_articular": "Padrão Biomecânico Anatômico"
   },
   {
     "id": "404f2294-cb02-4305-9789-303bda7e11bd",
@@ -1020,7 +1388,11 @@
     "videoUrl": "/videos/exercicios/404f2294-cb02-4305-9789-303bda7e11bd.gif",
     "aliasUrl": "/videos/exercicios/incline-machine-bench-press.gif",
     "totalFrames": 2,
-    "thumbnailUrl": "/videos/exercicios/frames/404f2294-cb02-4305-9789-303bda7e11bd/0.jpg"
+    "thumbnailUrl": "/videos/exercicios/frames/404f2294-cb02-4305-9789-303bda7e11bd/0.jpg",
+    "estilo_visual": "3d_anatomico",
+    "musculo_alvo": "Musculatura Alvo Principal",
+    "musculos_sinergistas": "Músculos Estabilizadores",
+    "mecanica_articular": "Padrão Biomecânico Anatômico"
   },
   {
     "id": "e839d170-8262-430d-b1d2-268309c7d418",
@@ -1031,7 +1403,11 @@
     "videoUrl": "/videos/exercicios/e839d170-8262-430d-b1d2-268309c7d418.gif",
     "aliasUrl": "/videos/exercicios/machine-bench-press.gif",
     "totalFrames": 2,
-    "thumbnailUrl": "/videos/exercicios/frames/e839d170-8262-430d-b1d2-268309c7d418/0.jpg"
+    "thumbnailUrl": "/videos/exercicios/frames/e839d170-8262-430d-b1d2-268309c7d418/0.jpg",
+    "estilo_visual": "3d_anatomico",
+    "musculo_alvo": "Musculatura Alvo Principal",
+    "musculos_sinergistas": "Músculos Estabilizadores",
+    "mecanica_articular": "Padrão Biomecânico Anatômico"
   },
   {
     "id": "339a305e-4c52-4744-86c5-6b830b707032",
@@ -1042,7 +1418,11 @@
     "videoUrl": "/videos/exercicios/339a305e-4c52-4744-86c5-6b830b707032.gif",
     "aliasUrl": "/videos/exercicios/barbell-bench-press.gif",
     "totalFrames": 2,
-    "thumbnailUrl": "/videos/exercicios/frames/339a305e-4c52-4744-86c5-6b830b707032/0.jpg"
+    "thumbnailUrl": "/videos/exercicios/frames/339a305e-4c52-4744-86c5-6b830b707032/0.jpg",
+    "estilo_visual": "3d_anatomico",
+    "musculo_alvo": "Musculatura Alvo Principal",
+    "musculos_sinergistas": "Músculos Estabilizadores",
+    "mecanica_articular": "Padrão Biomecânico Anatômico"
   },
   {
     "id": "b0e8350d-0c06-4982-b3da-6f63569aab71",
@@ -1053,7 +1433,11 @@
     "videoUrl": "/videos/exercicios/b0e8350d-0c06-4982-b3da-6f63569aab71.gif",
     "aliasUrl": "/videos/exercicios/dumbbell-bench-press.gif",
     "totalFrames": 2,
-    "thumbnailUrl": "/videos/exercicios/frames/b0e8350d-0c06-4982-b3da-6f63569aab71/0.jpg"
+    "thumbnailUrl": "/videos/exercicios/frames/b0e8350d-0c06-4982-b3da-6f63569aab71/0.jpg",
+    "estilo_visual": "3d_anatomico",
+    "musculo_alvo": "Musculatura Alvo Principal",
+    "musculos_sinergistas": "Músculos Estabilizadores",
+    "mecanica_articular": "Padrão Biomecânico Anatômico"
   },
   {
     "id": "148801b9-dc8e-47d5-9198-4cd8aec022e7",
@@ -1064,7 +1448,11 @@
     "videoUrl": "/videos/exercicios/148801b9-dc8e-47d5-9198-4cd8aec022e7.gif",
     "aliasUrl": "/videos/exercicios/flat-machine-bench-press.gif",
     "totalFrames": 2,
-    "thumbnailUrl": "/videos/exercicios/frames/148801b9-dc8e-47d5-9198-4cd8aec022e7/0.jpg"
+    "thumbnailUrl": "/videos/exercicios/frames/148801b9-dc8e-47d5-9198-4cd8aec022e7/0.jpg",
+    "estilo_visual": "3d_anatomico",
+    "musculo_alvo": "Musculatura Alvo Principal",
+    "musculos_sinergistas": "Músculos Estabilizadores",
+    "mecanica_articular": "Padrão Biomecânico Anatômico"
   },
   {
     "id": "60f66f23-8938-4c64-8fc4-bb132788e263",
@@ -1075,7 +1463,11 @@
     "videoUrl": "/videos/exercicios/60f66f23-8938-4c64-8fc4-bb132788e263.gif",
     "aliasUrl": "/videos/exercicios/dumbbell-triceps-kickback.gif",
     "totalFrames": 2,
-    "thumbnailUrl": "/videos/exercicios/frames/60f66f23-8938-4c64-8fc4-bb132788e263/0.jpg"
+    "thumbnailUrl": "/videos/exercicios/frames/60f66f23-8938-4c64-8fc4-bb132788e263/0.jpg",
+    "estilo_visual": "3d_anatomico",
+    "musculo_alvo": "Musculatura Alvo Principal",
+    "musculos_sinergistas": "Músculos Estabilizadores",
+    "mecanica_articular": "Padrão Biomecânico Anatômico"
   },
   {
     "id": "2ab88592-0522-4375-a5bd-49b3c66c32ca",
@@ -1086,7 +1478,11 @@
     "videoUrl": "/videos/exercicios/2ab88592-0522-4375-a5bd-49b3c66c32ca.gif",
     "aliasUrl": "/videos/exercicios/dumbbell-french-press.gif",
     "totalFrames": 2,
-    "thumbnailUrl": "/videos/exercicios/frames/2ab88592-0522-4375-a5bd-49b3c66c32ca/0.jpg"
+    "thumbnailUrl": "/videos/exercicios/frames/2ab88592-0522-4375-a5bd-49b3c66c32ca/0.jpg",
+    "estilo_visual": "3d_anatomico",
+    "musculo_alvo": "Musculatura Alvo Principal",
+    "musculos_sinergistas": "Músculos Estabilizadores",
+    "mecanica_articular": "Padrão Biomecânico Anatômico"
   },
   {
     "id": "5399465a-2a4c-47a3-aaf1-c6fd806dfbb8",
@@ -1097,7 +1493,11 @@
     "videoUrl": "/videos/exercicios/5399465a-2a4c-47a3-aaf1-c6fd806dfbb8.gif",
     "aliasUrl": "/videos/exercicios/machine-triceps-extension.gif",
     "totalFrames": 2,
-    "thumbnailUrl": "/videos/exercicios/frames/5399465a-2a4c-47a3-aaf1-c6fd806dfbb8/0.jpg"
+    "thumbnailUrl": "/videos/exercicios/frames/5399465a-2a4c-47a3-aaf1-c6fd806dfbb8/0.jpg",
+    "estilo_visual": "3d_anatomico",
+    "musculo_alvo": "Musculatura Alvo Principal",
+    "musculos_sinergistas": "Músculos Estabilizadores",
+    "mecanica_articular": "Padrão Biomecânico Anatômico"
   },
   {
     "id": "05d30e37-7b2c-45f4-9e71-34abf1703ef3",
@@ -1108,7 +1508,11 @@
     "videoUrl": "/videos/exercicios/05d30e37-7b2c-45f4-9e71-34abf1703ef3.gif",
     "aliasUrl": "/videos/exercicios/triceps-rope-pushdown.gif",
     "totalFrames": 2,
-    "thumbnailUrl": "/videos/exercicios/frames/05d30e37-7b2c-45f4-9e71-34abf1703ef3/0.jpg"
+    "thumbnailUrl": "/videos/exercicios/frames/05d30e37-7b2c-45f4-9e71-34abf1703ef3/0.jpg",
+    "estilo_visual": "3d_anatomico",
+    "musculo_alvo": "Musculatura Alvo Principal",
+    "musculos_sinergistas": "Músculos Estabilizadores",
+    "mecanica_articular": "Padrão Biomecânico Anatômico"
   },
   {
     "id": "963a1f70-4cb6-4117-b1a6-c1e4215debe9",
@@ -1119,6 +1523,10 @@
     "videoUrl": "/videos/exercicios/963a1f70-4cb6-4117-b1a6-c1e4215debe9.gif",
     "aliasUrl": "/videos/exercicios/barbell-skull-crusher.gif",
     "totalFrames": 2,
-    "thumbnailUrl": "/videos/exercicios/frames/963a1f70-4cb6-4117-b1a6-c1e4215debe9/0.jpg"
+    "thumbnailUrl": "/videos/exercicios/frames/963a1f70-4cb6-4117-b1a6-c1e4215debe9/0.jpg",
+    "estilo_visual": "3d_anatomico",
+    "musculo_alvo": "Musculatura Alvo Principal",
+    "musculos_sinergistas": "Músculos Estabilizadores",
+    "mecanica_articular": "Padrão Biomecânico Anatômico"
   }
 ]

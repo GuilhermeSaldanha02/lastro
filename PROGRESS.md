@@ -11,20 +11,18 @@
 
 > Bloco de handoff entre agentes (Antigravity ⇄ Claude). **Sobrescrever a cada sessão**, nunca acumular. Formato e regras: `AGENTS.md` §3.
 
-- **Última sessão:** 2026-08-25 (2) · agente: antigravity · branch: main (merge `--no-ff` de `feat/player-execucao-exercicio` concluído)
-- **Em andamento:** nada — Player interativo (Ver Execução / Ver Aparelho) integrado com sucesso na tela `/catalogo/[id]` e mergeado na main.
-- **Fechado nesta sessão — Player de Execução e Aparelho em `/catalogo/[id]`:**
-  1. **Componente `PlayerExecucaoExercicio`:** Criado em `src/components/player-execucao-exercicio.tsx` com alternância tátil entre:
-     - **Ver Execução:** animação fluida e contínua do movimento em loop com badge animado de status.
-     - **Ver Aparelho / Posição:** visualização estática dos quadros-chave (Posição 1: Inicial / Posição 2: Ponto de Contração) com botões seletores.
-  2. **Integração na Tela de Detalhes:** Adicionado em `src/app/catalogo/[id]/page.tsx` dentro do card de apresentação do exercício, acima das instruções técnicas e histórico de séries.
-  3. **Estilos e Design System:** Estilização responsiva em `src/app/sistema.css` alinhada ao padrão Apex Pro com suporte completo a i18n (`t(chave, idioma)`).
-  4. **Conformidade:** 183 testes passando (`npm test`) e `tsc --noEmit` 100% verde.
+- **Última sessão:** 2026-08-25 (3) · agente: antigravity · branch: feat/midia-exercicios-3d-anatomico
+- **Em andamento:** finalização do modelo 3D anatômico e badges de foco muscular.
+- **Fechado nesta sessão — Modelo 3D Anatômico & Foco Muscular nos 102 Exercícios:**
+  1. **Pipeline de Metadados Anatômicos:** Criado `scripts/gerar-midia-3d-anatomico.mjs` mapeando músculo-alvo, sinergistas e mecânica articular para todos os 102 exercícios do catálogo.
+  2. **Manifesto e Helpers Enriquecidos:** `src/lib/dados/exercicios-midia.json` e `src/lib/dados/midia-exercicio.ts` atualizados com tipagem completa (`musculo_alvo`, `musculos_sinergistas`, `mecanica_articular`).
+  3. **Player de Exercício Aprimorado:** `src/components/player-execucao-exercicio.tsx` agora exibe dinamicamente o badge de foco muscular com indicador vermelho neon e estilos em `src/app/sistema.css`.
+  4. **Validação e Testes:** 183 testes passando (`npm test`), `tsc --noEmit` limpo, `npm run build` gerando todas as rotas e teste E2E do Playwright validado na íntegra.
 - **Bloqueado / a decidir:** nada.
-- **Próximo passo:** verificar visualmente no navegador ou dispositivo mobile.
+- **Próximo passo:** merge `--no-ff` de `feat/midia-exercicios-3d-anatomico` na `main` e push para o repositório remoto.
 - **Para o outro agente saber:**
-  - O player lê os assets diretamente de `public/videos/exercicios/` via helper `obterMidiaExercicio(exercicioId)`.
-  - Para adicionar visualização de miniatura em outras telas (ex.: `/catalogo`), basta utilizar o mesmo helper `obterMidiaExercicio`.
+  - O componente `PlayerExecucaoExercicio` lê automaticamente os dados de foco muscular do helper `obterMidiaExercicio(id)`.
+  - As screenshots atualizadas ficam salvas em `docs/screenshots/player_exercicio/`.
 
 ---
 

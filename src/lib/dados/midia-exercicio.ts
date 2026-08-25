@@ -10,6 +10,10 @@ export interface ExercicioMidia {
   aliasUrl: string;
   totalFrames: number;
   thumbnailUrl: string;
+  estilo_visual?: string;
+  musculo_alvo?: string;
+  musculos_sinergistas?: string;
+  mecanica_articular?: string;
 }
 
 const MAPA_MIDIA_POR_ID = new Map<string, ExercicioMidia>();

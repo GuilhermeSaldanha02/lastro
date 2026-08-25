@@ -3710,6 +3710,34 @@
   animation: pulse-vivo 1.8s infinite ease-in-out;
 }
 
+.player-exercicio-card__badge-foco {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(15, 17, 21, 0.88);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(239, 68, 68, 0.35);
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: var(--lastro-peso-forte);
+  color: #fca5a5;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+}
+
+.player-exercicio-card__ponto-vermelho {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #ef4444;
+  box-shadow: 0 0 8px #ef4444;
+  display: inline-block;
+}
+
 @keyframes pulse-vivo {
   0%, 100% {
     opacity: 1;
