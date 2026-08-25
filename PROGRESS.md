@@ -11,7 +11,7 @@
 
 > Bloco de handoff entre agentes (Antigravity ⇄ Claude). **Sobrescrever a cada sessão**, nunca acumular. Formato e regras: `AGENTS.md` §3.
 
-- **Última sessão:** 2026-08-25 (4) · agente: antigravity · branch: feat/midia-exercicios-3d-anatomico
+- **Última sessão:** 2026-08-25 (4) · agente: antigravity · branch: main (Player Anatômico 3D integrado e mergeado na main)
 - **Em andamento:** nada — Player Anatômico 3D (IlustracaoAnatomica3D com músculo-alvo em destaque neon) integrado diretamente no aplicativo na rota `/catalogo/[id]`.
 - **Fechado nesta sessão — Player Anatômico 3D nos 102 Exercícios do Catálogo:**
   1. **Motor Visual Anatômico 3D:** Criado `src/components/ilustracao-anatomica-3d.tsx` que renderiza o modelo vetorial anatômico 3D limpo, corpo em tons de cinza técnicos e o músculo ativado em vermelho neon fluorescente com arcos biomecânicos.
