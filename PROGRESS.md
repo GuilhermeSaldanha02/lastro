@@ -11,7 +11,7 @@
 
 > Bloco de handoff entre agentes (Antigravity ⇄ Claude). **Sobrescrever a cada sessão**, nunca acumular. Formato e regras: `AGENTS.md` §3.
 
-- **Última sessão:** 2026-08-25 (5) · agente: antigravity · branch: feat/midia-102-gifs-catalogo
+- **Última sessão:** 2026-08-25 (5) · agente: antigravity · branch: main (102 GIFs integrados e mergeados na main)
 - **Em andamento:** nada — 102 GIFs reais de exercícios integrados em `public/videos/exercicios/`, manifesto atualizado e PlayerExecucaoExercicio exibindo GIFs de alta fidelidade + modo Anatomia 3D.
 - **Fechado nesta sessão — 102 GIFs nos Exercícios do Catálogo:**
   1. **Mapeamento & Importação:** Mapeados e copiados 100% dos 102 GIFs da pasta local de downloads para `public/videos/exercicios/[id].gif` e `[slug].gif`, cobrindo todos os 10 grupos musculares.
@@ -19,7 +19,7 @@
   3. **Player Híbrido:** `PlayerExecucaoExercicio` atualizado com aba "Ver Execução" (renderizando o GIF animado nítido em looping contínuo com badge de status e créditos) e aba "Anatomia & Foco" (renderizando a ilustração anatômica com músculo-alvo em destaque e fases de movimento).
   4. **Testes & Qualidade:** 183 testes unitários passando (`npm test`), `tsc --noEmit` 0 erros, build do Next.js sem erros e teste E2E Playwright validado com 100% de sucesso.
 - **Bloqueado / a decidir:** nada.
-- **Próximo passo:** merge `--no-ff` na `main` e push para o repositório remoto.
+- **Próximo passo:** push final para o repositório remoto concluído.
 - **Para o outro agente saber:**
   - Os GIFs dos 102 exercícios estão servidos localmente via `public/videos/exercicios/[id].gif` e `public/videos/exercicios/[slug].gif`.
   - O player possui fallback automático e suporte a ambos os modos (GIF animado e Anatomia 3D).
