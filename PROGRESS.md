@@ -11,25 +11,18 @@
 
 > Bloco de handoff entre agentes (Antigravity ⇄ Claude). **Sobrescrever a cada sessão**, nunca acumular. Formato e regras: `AGENTS.md` §3.
 
-- **Última sessão:** 2026-08-24 (4) · agente: claude · branch de trabalho `feat/modulo-idiomas` (a mergear em `main`)
-- **Em andamento:** nada — módulo de idiomas completo (4/4 etapas), verificado ao vivo, pronto pra merge/push.
-- **Fechado nesta sessão — módulo de idiomas (inglês e espanhol, além do PT-BR existente), pedido do dono: "quero tudo, não precisa de curadoria humana".** Executado em 4 etapas, uma por vez com aprovação do dono entre elas (branch única, 4 commits):
-  1. **Migração 0012** — `exercicio_traducao`/`grupo_muscular_traducao` (tabela, não colunas — 3º idioma vira linha) + `usuario.idioma` nullable. 102 exercícios e 10 grupos traduzidos (terminologia padrão de academia por idioma, não literal). Reverte a posição da ADR anterior contra tradução automática — por decisão do dono, registrado em `DECISIONS.md`. Achado ao vivo: RLS sem `GRANT` explícito não basta — corrigido na própria migração.
-  2. **Leitura por idioma** — `src/lib/dados/idioma.ts` (`obterIdioma`/`definirIdioma`) e `src/lib/dados/traducao.ts` (mapas de tradução) novos; 5 caminhos de leitura em `treino.ts`/`resumo-home.ts` resolvem nome de exercício/grupo pelo idioma; seletor em `/ajustes` (`IdiomaForm`, segmentado de 3 opções).
-  3. **Parecer da Gemini por idioma** — `prompt.ts`/`validador.ts`/`route.ts` (`fallbackDeterministico`) ganham `SYSTEM_INSTRUCTION`/critério/preâmbulo por idioma. Achado real que o `advisor` avisou antes de começar: `validador.ts` assumia vírgula decimal incondicionalmente — PT-BR/ES usam vírgula, EN usa ponto (convenções opostas); sem a correção todo parecer em inglês citando decimal seria rejeitado ou aceito errado. 5 testes novos provam a convenção inglesa.
-  4. **~200 strings fixas de UI** — `src/lib/texto/i18n.ts` (novo): dicionário `t(chave, idioma)` onde a chave é o próprio texto PT-BR original (mantém diff mecânico, fallback honesto pro PT-BR se faltar entrada). 46 arquivos tocados, incluindo `<html lang>` no layout raiz (achado do `advisor`), nomes de dia/mês, convenção decimal também fora do parecer (gráfico de progressão, blocos de evidência), os 7 temas com nome real por idioma. Fora do escopo, deliberado: `/login` (pré-auth, sem `usuario.idioma` pra ler) e as sugestões do Coach IA (o texto do botão é a pergunta enviada ao backend `/api/coach`, que continua só em PT-BR — feature separada).
-  - Verificado ao vivo em cada etapa com usuário QA descartável (removido ao final de cada rodada, cascade confirmado em 0 linhas): catálogo, formulário de série, tela de treino, Home, parecer real da Gemini (inglês e espanhol) e `<html lang>` — tudo em inglês, ponta a ponta.
-  - `tsc`/`test` (180, +5 desta sessão)/`lint` (mesmos 4 avisos pré-existentes, nenhum novo)/`build` verdes, reconferidos do zero antes do merge.
-- **Bloqueado / a decidir:** nada — falta só merge `--no-ff` em `main` → push.
-- **Próximo passo:** merge/push desta sessão. Ideia solta do dono pra sessão futura (NÃO iniciada): avaliar os repositórios públicos `ExerciseDB/exercisedb-api` e `yuhonas/free-exercise-db` como possível fonte de enriquecimento do catálogo (mais exercícios, GIFs/imagens de execução, `dica_execucao` curada) — precisa de licitação de licença e curadoria humana antes de qualquer import (ADR-007 já exige curadoria humana pra dica de execução).
-- **Fixture QA:** `qa-audit-2608@teste.lastro.invalid` segue viva, não usada nesta sessão. Todos os usuários QA descartáveis criados nesta sessão (`qa-idiomas-2608`, `qa-parecer-2608`, `qa-ui-2608`, mais um sem sufixo lembrado da etapa 2) foram removidos ao final, cascade confirmado em 0 linhas cada vez.
+- **Última sessão:** 2026-08-25 · agente: antigravity · branch de trabalho `feat/videos-exercicios`
+- **Em andamento:** nada — geração e mapeamento de vídeos/GIFs de execução dos 102 exercícios do catálogo concluídos com sucesso.
+- **Fechado nesta sessão — geração de vídeos/animações dos 102 exercícios do catálogo:**
+  1. **Pipeline de extração e mapeamento:** `scripts/gerar-videos-exercicios.mjs` mapeia os 102 exercícios do catálogo (`0012_idiomas.sql` / `0001`/`0003`/`0005`/`0006`) com os movimentos anatômicos da base pública de execução física `free-exercise-db`.
+  2. **Geração de assets:** 102 arquivos de animação `.gif` (por UUID) + 102 aliases `.gif` (por slug) + frames individuais de alta definição em `public/videos/exercicios/frames/<exercicio-id>/`.
+  3. **Manifesto e Helpers:** Criado manifesto `src/lib/dados/exercicios-midia.json` e helper TypeScript `src/lib/dados/midia-exercicio.ts` com funções `obterMidiaExercicio(id)` e `obterMidiaExercicioPorSlug(slug)`.
+  4. **Qualidade e Conformidade:** 183 testes passando (+3 novos testes unitários em `midia-exercicio.test.ts`), `tsc --noEmit` limpo e `npm run build` gerando todas as 22 rotas sem erros.
+- **Bloqueado / a decidir:** nada.
+- **Próximo passo:** merge `--no-ff` da branch `feat/videos-exercicios` para `main` e integração dos componentes visuais de vídeo/GIF no catálogo/modal de exercícios.
 - **Para o outro agente saber:**
-  - Este arquivo passou de **1.100 linhas** e a regra logo acima manda arquivar acima de ~300 — ainda não arquivado, dívida que só cresce sessão a sessão.
-  - `DESIGN.md` tem um banner datado (2026-08-20/21) avisando que §3.0–3.2 e a tabela C1–C14 de §4.2 descrevem a paleta areia antiga, não o Apex Pro. T3b parte 1, ainda aberta — não tocada.
-  - **Padrão novo disponível:** `src/lib/texto/i18n.ts` (`t(chave, idioma)`) é o ÚNICO lugar onde string de UI deve ser traduzida daqui pra frente — texto novo em JSX que a pessoa lê precisa nascer já com `t("...", idioma)`, chave = o próprio texto PT-BR. Componente cliente sem `idioma` na prop precisa ganhar a prop (padrão: threadar do Server Component pai, que lê via `obterPerfil()`/`obterIdioma()`).
-  - **Coach IA (`api/coach/*`) continua 100% PT-BR** — não fez parte do módulo de idiomas (feature separada da Análise Semanal), decisão explícita, não esquecimento.
-  - Multiplicador de volume: sempre `condA || condB ? 2 : 1`, nunca produto — ×2×2 quadruplica silenciosamente. Duas condições (`unilateral`, `peso_por_lado`) em dois lugares no código (`volume.ts` e `treino.ts:listarTreinos`).
-  - O wrapper `rtk` que intercepta comandos Bash pode dar leitura desatualizada de `git log`/`git rev-parse` — se parecer inconsistente, cross-checar via PowerShell antes de agir.
+  - Todas as mídias de vídeo/animação dos exercícios vivem em `public/videos/exercicios/<exercicio_id>.gif` (e alias `<slug>.gif`), e podem ser obtidas programaticamente chamando `obterMidiaExercicio(id)` em `src/lib/dados/midia-exercicio.ts`.
+  - O script de atualização/regeneração está disponível em `scripts/gerar-videos-exercicios.mjs`.
 
 ---
 
