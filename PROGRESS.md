@@ -11,7 +11,7 @@
 
 > Bloco de handoff entre agentes (Antigravity ⇄ Claude). **Sobrescrever a cada sessão**, nunca acumular. Formato e regras: `AGENTS.md` §3.
 
-- **Última sessão:** 2026-08-25 (6) · agente: antigravity · branch: feat/player-gif-tela-cheia
+- **Última sessão:** 2026-08-25 (6) · agente: antigravity · branch: main (Player GIF em tela cheia integrado e mergeado na main)
 - **Em andamento:** nada — PlayerExecucaoExercicio atualizado para modo direto (sem abas), com fundo branco integrado (#ffffff), ocupando todo o espaço do card sem faixas pretas.
 - **Fechado nesta sessão — Redesenho do Player de Exercício:**
   1. **Remoção de Faixas Pretas:** Fundo do container atualizado para `#ffffff` integrado com o GIF original, eliminando completamente as faixas e letterbox pretos.
@@ -19,7 +19,7 @@
   3. **Badges de Alto Contraste:** Badge de músculo-alvo e status de animação posicionados nos cantos com acabamento escuro translúcido legível.
   4. **Qualidade & Testes:** 183 testes unitários passando (`npm test`), build do Next.js limpo e screenshots Playwright validados.
 - **Bloqueado / a decidir:** nada.
-- **Próximo passo:** merge `--no-ff` na `main` e push para o repositório remoto.
+- **Próximo passo:** push final para o repositório remoto concluído.
 - **Para o outro agente saber:**
   - O player de exercício é direto e focado no GIF oficial, sem abas adicionais.
   - A moldura do player é branca/integrada com o fundo dos GIFs.
