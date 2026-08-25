@@ -9,6 +9,7 @@ import AbaInferior from "@/components/aba-inferior";
 import SetaNavegacao from "@/components/seta-navegacao";
 import EtiquetaRecorde from "@/components/etiqueta-recorde";
 import CabecalhoPro from "@/components/cabecalho-pro";
+import PlayerExecucaoExercicio from "@/components/player-execucao-exercicio";
 import { t } from "@/lib/texto/i18n";
 
 export default async function PaginaHistoricoExercicio({
@@ -57,6 +58,13 @@ export default async function PaginaHistoricoExercicio({
               </span>
             )}
           </div>
+
+          {/* Player com modos: Ver Execução (vídeo animado) e Ver Aparelho / Posição */}
+          <PlayerExecucaoExercicio
+            exercicioId={exercicio.id}
+            nomeExercicio={exercicio.nome}
+            idioma={idioma}
+          />
 
           {exercicio.dicaExecucao ? (
             <div className="exercicio-hero-card__dica">

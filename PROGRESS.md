@@ -11,18 +11,20 @@
 
 > Bloco de handoff entre agentes (Antigravity ⇄ Claude). **Sobrescrever a cada sessão**, nunca acumular. Formato e regras: `AGENTS.md` §3.
 
-- **Última sessão:** 2026-08-25 · agente: antigravity · branch: main (merge `--no-ff` de `feat/videos-exercicios` concluído)
-- **Em andamento:** nada — geração e mapeamento de vídeos/GIFs de execução dos 102 exercícios do catálogo concluídos e mergeados na main.
-- **Fechado nesta sessão — geração de vídeos/animações dos 102 exercícios do catálogo:**
-  1. **Pipeline de extração e mapeamento:** `scripts/gerar-videos-exercicios.mjs` mapeia os 102 exercícios do catálogo (`0012_idiomas.sql` / `0001`/`0003`/`0005`/`0006`) com os movimentos anatômicos da base pública de execução física `free-exercise-db`.
-  2. **Geração de assets:** 102 arquivos de animação `.gif` (por UUID) + 102 aliases `.gif` (por slug) + frames individuais de alta definição em `public/videos/exercicios/frames/<exercicio-id>/`.
-  3. **Manifesto e Helpers:** Criado manifesto `src/lib/dados/exercicios-midia.json` e helper TypeScript `src/lib/dados/midia-exercicio.ts` com funções `obterMidiaExercicio(id)` e `obterMidiaExercicioPorSlug(slug)`.
-  4. **Qualidade e Conformidade:** 183 testes passando (+3 novos testes unitários em `midia-exercicio.test.ts`), `tsc --noEmit` limpo e `npm run build` gerando todas as 22 rotas sem erros.
+- **Última sessão:** 2026-08-25 (2) · agente: antigravity · branch de trabalho `feat/player-execucao-exercicio`
+- **Em andamento:** nada — Player interativo (Ver Execução / Ver Aparelho) integrado com sucesso na tela `/catalogo/[id]`.
+- **Fechado nesta sessão — Player de Execução e Aparelho em `/catalogo/[id]`:**
+  1. **Componente `PlayerExecucaoExercicio`:** Criado em `src/components/player-execucao-exercicio.tsx` com alternância tátil entre:
+     - **Ver Execução:** animação fluida e contínua do movimento em loop com badge animado de status.
+     - **Ver Aparelho / Posição:** visualização estática dos quadros-chave (Posição 1: Inicial / Posição 2: Ponto de Contração) com botões seletores.
+  2. **Integração na Tela de Detalhes:** Adicionado em `src/app/catalogo/[id]/page.tsx` dentro do card de apresentação do exercício, acima das instruções técnicas e histórico de séries.
+  3. **Estilos e Design System:** Estilização responsiva em `src/app/sistema.css` alinhada ao padrão Apex Pro com suporte completo a i18n (`t(chave, idioma)`).
+  4. **Conformidade:** 183 testes passando (`npm test`) e `tsc --noEmit` 100% verde.
 - **Bloqueado / a decidir:** nada.
-- **Próximo passo:** integração dos componentes visuais de vídeo/GIF no catálogo/modal de exercícios.
+- **Próximo passo:** merge `--no-ff` de `feat/player-execucao-exercicio` na `main`.
 - **Para o outro agente saber:**
-  - Todas as mídias de vídeo/animação dos exercícios vivem em `public/videos/exercicios/<exercicio_id>.gif` (e alias `<slug>.gif`), e podem ser obtidas programaticamente chamando `obterMidiaExercicio(id)` em `src/lib/dados/midia-exercicio.ts`.
-  - O script de atualização/regeneração está disponível em `scripts/gerar-videos-exercicios.mjs`.
+  - O player lê os assets diretamente de `public/videos/exercicios/` via helper `obterMidiaExercicio(exercicioId)`.
+  - Para adicionar visualização de miniatura em outras telas (ex.: `/catalogo`), basta utilizar o mesmo helper `obterMidiaExercicio`.
 
 ---
 
