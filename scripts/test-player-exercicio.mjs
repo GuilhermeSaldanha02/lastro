@@ -87,9 +87,9 @@ async function esperarServidor(url, timeoutMs = 60000) {
 async function main() {
   console.log("🚀 Iniciando teste E2E com Playwright para o Player de Exercício...");
 
-  // Iniciar servidor local na porta 3005
-  console.log("🌐 Iniciando servidor Next.js na porta 3005...");
-  const devServer = spawn("npx", ["next", "start", "-p", "3005"], {
+  // Iniciar servidor local na porta 3020
+  console.log("🌐 Iniciando servidor Next.js na porta 3020...");
+  const devServer = spawn("npx", ["next", "start", "-p", "3020"], {
     stdio: "pipe",
     shell: true,
   });
@@ -98,8 +98,8 @@ async function main() {
   devServer.stderr.on("data", (d) => process.stderr.write(d));
 
   try {
-    await esperarServidor("http://localhost:3005");
-    console.log("✅ Servidor pronto em http://localhost:3005");
+    await esperarServidor("http://localhost:3020");
+    console.log("✅ Servidor pronto em http://localhost:3020");
 
     const session = await obterSessaoTeste();
     console.log("✅ Sessão de teste autenticada. Aguardando 5s para sincronia de relógio...");
@@ -149,7 +149,7 @@ async function main() {
 
     // 1. Acessar catálogo
     console.log("📱 Navegando para /catalogo...");
-    await page.goto("http://localhost:3005/catalogo", { waitUntil: "networkidle" });
+    await page.goto("http://localhost:3020/catalogo", { waitUntil: "networkidle" });
     await page.waitForTimeout(1000);
 
     const shotCatalogo = path.join(outputDir, "01_catalogo_lista.png");
@@ -159,7 +159,7 @@ async function main() {
 
     // 2. Acessar página de detalhes do exercício
     console.log("📱 Navegando para detalhes do exercício (Lower Ab Crunch)...");
-    await page.goto("http://localhost:3005/catalogo/d08f9e23-09cd-40c5-a56c-f2a7cb9ac73b", {
+    await page.goto("http://localhost:3020/catalogo/d08f9e23-09cd-40c5-a56c-f2a7cb9ac73b", {
       waitUntil: "networkidle",
     });
     await page.waitForTimeout(1000);

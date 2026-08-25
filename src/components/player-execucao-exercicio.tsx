@@ -1,10 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import Image from "next/image";
 import { obterMidiaExercicio } from "@/lib/dados/midia-exercicio";
 import { t } from "@/lib/texto/i18n";
 import type { Idioma } from "@/lib/dados/idioma";
+import IlustracaoAnatomica3D from "./ilustracao-anatomica-3d";
 
 interface PlayerExecucaoExercicioProps {
   exercicioId: string;
@@ -25,12 +25,9 @@ export default function PlayerExecucaoExercicio({
     return null;
   }
 
-  const frame0Url = `/videos/exercicios/frames/${midia.id}/0.jpg`;
-  const frame1Url = `/videos/exercicios/frames/${midia.id}/1.jpg`;
-
   return (
-    <div className="player-exercicio-card">
-      {/* Barra de controle de abas: Execução vs Aparelho/Posição */}
+    <div className="player-exercicio-card player-exercicio-card--3d">
+      {/* Barra de controle de abas: Execução 3D vs Posição & Aparelho */}
       <div className="player-exercicio-card__seletor">
         <button
           type="button"
@@ -42,7 +39,7 @@ export default function PlayerExecucaoExercicio({
           <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
             <path d="M8 5v14l11-7z" />
           </svg>
-          <span>{t("Ver Execução", idioma)}</span>
+          <span>{t("Ver Execução 3D", idioma)}</span>
         </button>
 
         <button
@@ -55,12 +52,12 @@ export default function PlayerExecucaoExercicio({
           <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
             <path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z" />
           </svg>
-          <span>{t("Ver Aparelho / Posição", idioma)}</span>
+          <span>{t("Posição & Aparelho", idioma)}</span>
         </button>
       </div>
 
-      {/* Área de Visualização */}
-      <div className="player-exercicio-card__display">
+      {/* Área de Visualização Anatômica 3D */}
+      <div className="player-exercicio-card__display player-exercicio-card__display--3d">
         {/* Badge Anatômico de Músculo-Alvo */}
         {midia.musculo_alvo && (
           <div className="player-exercicio-card__badge-foco">
@@ -71,59 +68,45 @@ export default function PlayerExecucaoExercicio({
           </div>
         )}
 
-        {modo === "execucao" ? (
-          <div className="player-exercicio-card__animacao-container">
-            {/* Imagem/GIF animado */}
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={midia.videoUrl}
-              alt={`${nomeExercicio} - ${t("Execução do exercício", idioma)}`}
-              className="player-exercicio-card__midia"
-              loading="lazy"
-            />
+        {/* Modelo Anatômico 3D Vetorial de Alta Precisão */}
+        <div className="player-exercicio-card__canvas-3d">
+          <IlustracaoAnatomica3D
+            exercicioId={midia.id}
+            slug={midia.slug}
+            musculoAlvo={midia.musculo_alvo}
+            modo={modo}
+            fase={faseAtiva}
+          />
+
+          {modo === "execucao" && (
             <div className="player-exercicio-card__badge-status">
               <span className="player-exercicio-card__ponto-vivo" />
-              <span>{t("Execução em Movimento", idioma)}</span>
+              <span>{t("Anatomia 3D Ativa", idioma)}</span>
             </div>
-          </div>
-        ) : (
-          <div className="player-exercicio-card__aparelho-container">
-            {/* Visualização de Posição / Aparelho */}
-            <div className="player-exercicio-card__frame-wrapper">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src={faseAtiva === 0 ? frame0Url : frame1Url}
-                alt={`${nomeExercicio} - ${
-                  faseAtiva === 0
-                    ? t("Posição Inicial / Aparelho", idioma)
-                    : t("Ponto de Contração / Final", idioma)
-                }`}
-                className="player-exercicio-card__midia"
-                loading="lazy"
-              />
-            </div>
+          )}
+        </div>
 
-            {/* Seletor de Fases do Movimento */}
-            <div className="player-exercicio-card__fases-controles">
-              <button
-                type="button"
-                onClick={() => setFaseAtiva(0)}
-                className={`player-exercicio-card__fase-btn ${
-                  faseAtiva === 0 ? "player-exercicio-card__fase-btn--ativo" : ""
-                }`}
-              >
-                1. {t("Posição Inicial", idioma)}
-              </button>
-              <button
-                type="button"
-                onClick={() => setFaseAtiva(1)}
-                className={`player-exercicio-card__fase-btn ${
-                  faseAtiva === 1 ? "player-exercicio-card__fase-btn--ativo" : ""
-                }`}
-              >
-                2. {t("Ponto de Contração", idioma)}
-              </button>
-            </div>
+        {/* Controles de Fase em Modo Aparelho/Posição */}
+        {modo === "aparelho" && (
+          <div className="player-exercicio-card__fases-controles">
+            <button
+              type="button"
+              onClick={() => setFaseAtiva(0)}
+              className={`player-exercicio-card__fase-btn ${
+                faseAtiva === 0 ? "player-exercicio-card__fase-btn--ativo" : ""
+              }`}
+            >
+              1. {t("Posição Inicial", idioma)}
+            </button>
+            <button
+              type="button"
+              onClick={() => setFaseAtiva(1)}
+              className={`player-exercicio-card__fase-btn ${
+                faseAtiva === 1 ? "player-exercicio-card__fase-btn--ativo" : ""
+              }`}
+            >
+              2. {t("Ponto de Contração", idioma)}
+            </button>
           </div>
         )}
       </div>

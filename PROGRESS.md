@@ -11,18 +11,18 @@
 
 > Bloco de handoff entre agentes (Antigravity ⇄ Claude). **Sobrescrever a cada sessão**, nunca acumular. Formato e regras: `AGENTS.md` §3.
 
-- **Última sessão:** 2026-08-25 (3) · agente: antigravity · branch: feat/midia-exercicios-3d-anatomico
-- **Em andamento:** finalização do modelo 3D anatômico e badges de foco muscular.
-- **Fechado nesta sessão — Modelo 3D Anatômico & Foco Muscular nos 102 Exercícios:**
-  1. **Pipeline de Metadados Anatômicos:** Criado `scripts/gerar-midia-3d-anatomico.mjs` mapeando músculo-alvo, sinergistas e mecânica articular para todos os 102 exercícios do catálogo.
-  2. **Manifesto e Helpers Enriquecidos:** `src/lib/dados/exercicios-midia.json` e `src/lib/dados/midia-exercicio.ts` atualizados com tipagem completa (`musculo_alvo`, `musculos_sinergistas`, `mecanica_articular`).
-  3. **Player de Exercício Aprimorado:** `src/components/player-execucao-exercicio.tsx` agora exibe dinamicamente o badge de foco muscular com indicador vermelho neon e estilos em `src/app/sistema.css`.
-  4. **Validação e Testes:** 183 testes passando (`npm test`), `tsc --noEmit` limpo, `npm run build` gerando todas as rotas e teste E2E do Playwright validado na íntegra.
+- **Última sessão:** 2026-08-25 (4) · agente: antigravity · branch: feat/midia-exercicios-3d-anatomico
+- **Em andamento:** nada — Player Anatômico 3D (IlustracaoAnatomica3D com músculo-alvo em destaque neon) integrado diretamente no aplicativo na rota `/catalogo/[id]`.
+- **Fechado nesta sessão — Player Anatômico 3D nos 102 Exercícios do Catálogo:**
+  1. **Motor Visual Anatômico 3D:** Criado `src/components/ilustracao-anatomica-3d.tsx` que renderiza o modelo vetorial anatômico 3D limpo, corpo em tons de cinza técnicos e o músculo ativado em vermelho neon fluorescente com arcos biomecânicos.
+  2. **Integração no Player:** `src/components/player-execucao-exercicio.tsx` atualizado para usar o motor anatômico 3D nas abas "Ver Execução 3D" (animação contínua de contração) e "Posição & Aparelho" (alternância entre Fase 1 Inicial e Fase 2 Contração).
+  3. **Estilos e Animações:** `src/app/sistema.css` enriquecido com animações biomecânicas (`animTriceps`, `animPeito`, `animCostas`, `animOmbro`), gradientes de profundidade e badge de foco muscular.
+  4. **Testes & Qualidade:** 183 testes unitários passando (`npm test`), `tsc --noEmit` 0 erros e validação E2E via Playwright.
 - **Bloqueado / a decidir:** nada.
-- **Próximo passo:** merge `--no-ff` de `feat/midia-exercicios-3d-anatomico` na `main` e push para o repositório remoto.
+- **Próximo passo:** merge `--no-ff` na `main` e push para o repositório remoto.
 - **Para o outro agente saber:**
-  - O componente `PlayerExecucaoExercicio` lê automaticamente os dados de foco muscular do helper `obterMidiaExercicio(id)`.
-  - As screenshots atualizadas ficam salvas em `docs/screenshots/player_exercicio/`.
+  - O player não depende mais de imagens externas nem de fotos antigas reais; todo o render é realizado pelo componente `IlustracaoAnatomica3D` de alta precisão.
+  - Para novos exercícios, basta cadastrar o `slug` ou `musculo_alvo` no manifesto.
 
 ---
 
