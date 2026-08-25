@@ -11,18 +11,18 @@
 
 > Bloco de handoff entre agentes (Antigravity ⇄ Claude). **Sobrescrever a cada sessão**, nunca acumular. Formato e regras: `AGENTS.md` §3.
 
-- **Última sessão:** 2026-08-25 (5) · agente: antigravity · branch: main (102 GIFs integrados e mergeados na main)
-- **Em andamento:** nada — 102 GIFs reais de exercícios integrados em `public/videos/exercicios/`, manifesto atualizado e PlayerExecucaoExercicio exibindo GIFs de alta fidelidade + modo Anatomia 3D.
-- **Fechado nesta sessão — 102 GIFs nos Exercícios do Catálogo:**
-  1. **Mapeamento & Importação:** Mapeados e copiados 100% dos 102 GIFs da pasta local de downloads para `public/videos/exercicios/[id].gif` e `[slug].gif`, cobrindo todos os 10 grupos musculares.
-  2. **Manifesto e Metadados:** `src/lib/dados/exercicios-midia.json` e `src/lib/dados/midia-exercicio.ts` enriquecidos com URLs de vídeo, slugs em português/inglês, créditos de autoria (Gym Visual) e tags de foco muscular.
-  3. **Player Híbrido:** `PlayerExecucaoExercicio` atualizado com aba "Ver Execução" (renderizando o GIF animado nítido em looping contínuo com badge de status e créditos) e aba "Anatomia & Foco" (renderizando a ilustração anatômica com músculo-alvo em destaque e fases de movimento).
-  4. **Testes & Qualidade:** 183 testes unitários passando (`npm test`), `tsc --noEmit` 0 erros, build do Next.js sem erros e teste E2E Playwright validado com 100% de sucesso.
+- **Última sessão:** 2026-08-25 (6) · agente: antigravity · branch: feat/player-gif-tela-cheia
+- **Em andamento:** nada — PlayerExecucaoExercicio atualizado para modo direto (sem abas), com fundo branco integrado (#ffffff), ocupando todo o espaço do card sem faixas pretas.
+- **Fechado nesta sessão — Redesenho do Player de Exercício:**
+  1. **Remoção de Faixas Pretas:** Fundo do container atualizado para `#ffffff` integrado com o GIF original, eliminando completamente as faixas e letterbox pretos.
+  2. **Player Direto e Sem Abas:** Removida a alternância de abas ("Anatomia & Foco") a pedido do dono, focando 100% no GIF animado em grande escala e alta definição.
+  3. **Badges de Alto Contraste:** Badge de músculo-alvo e status de animação posicionados nos cantos com acabamento escuro translúcido legível.
+  4. **Qualidade & Testes:** 183 testes unitários passando (`npm test`), build do Next.js limpo e screenshots Playwright validados.
 - **Bloqueado / a decidir:** nada.
-- **Próximo passo:** push final para o repositório remoto concluído.
+- **Próximo passo:** merge `--no-ff` na `main` e push para o repositório remoto.
 - **Para o outro agente saber:**
-  - Os GIFs dos 102 exercícios estão servidos localmente via `public/videos/exercicios/[id].gif` e `public/videos/exercicios/[slug].gif`.
-  - O player possui fallback automático e suporte a ambos os modos (GIF animado e Anatomia 3D).
+  - O player de exercício é direto e focado no GIF oficial, sem abas adicionais.
+  - A moldura do player é branca/integrada com o fundo dos GIFs.
 
 ---
 
