@@ -2,15 +2,22 @@ import manifestoMidia from './exercicios-midia.json';
 
 export interface ExercicioMidia {
   id: string;
+  nomePt?: string;
   nomeEn: string;
   nomeEs: string;
   slug: string;
-  folderOrigem: string;
+  folderOrigem?: string;
+  arquivoOrigem?: string;
   videoUrl: string;
   aliasUrl: string;
   totalFrames: number;
   thumbnailUrl: string;
   estilo_visual?: string;
+  creditos?: string;
+  grupoMuscular?: string;
+  grupoMuscularId?: string;
+  unilateral?: boolean;
+  pesoPorLado?: boolean;
   musculo_alvo?: string;
   musculos_sinergistas?: string;
   mecanica_articular?: string;

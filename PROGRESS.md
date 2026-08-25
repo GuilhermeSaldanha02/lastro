@@ -11,18 +11,18 @@
 
 > Bloco de handoff entre agentes (Antigravity ⇄ Claude). **Sobrescrever a cada sessão**, nunca acumular. Formato e regras: `AGENTS.md` §3.
 
-- **Última sessão:** 2026-08-25 (4) · agente: antigravity · branch: main (Player Anatômico 3D integrado e mergeado na main)
-- **Em andamento:** nada — Player Anatômico 3D (IlustracaoAnatomica3D com músculo-alvo em destaque neon) integrado diretamente no aplicativo na rota `/catalogo/[id]`.
-- **Fechado nesta sessão — Player Anatômico 3D nos 102 Exercícios do Catálogo:**
-  1. **Motor Visual Anatômico 3D:** Criado `src/components/ilustracao-anatomica-3d.tsx` que renderiza o modelo vetorial anatômico 3D limpo, corpo em tons de cinza técnicos e o músculo ativado em vermelho neon fluorescente com arcos biomecânicos.
-  2. **Integração no Player:** `src/components/player-execucao-exercicio.tsx` atualizado para usar o motor anatômico 3D nas abas "Ver Execução 3D" (animação contínua de contração) e "Posição & Aparelho" (alternância entre Fase 1 Inicial e Fase 2 Contração).
-  3. **Estilos e Animações:** `src/app/sistema.css` enriquecido com animações biomecânicas (`animTriceps`, `animPeito`, `animCostas`, `animOmbro`), gradientes de profundidade e badge de foco muscular.
-  4. **Testes & Qualidade:** 183 testes unitários passando (`npm test`), `tsc --noEmit` 0 erros e validação E2E via Playwright.
+- **Última sessão:** 2026-08-25 (5) · agente: antigravity · branch: feat/midia-102-gifs-catalogo
+- **Em andamento:** nada — 102 GIFs reais de exercícios integrados em `public/videos/exercicios/`, manifesto atualizado e PlayerExecucaoExercicio exibindo GIFs de alta fidelidade + modo Anatomia 3D.
+- **Fechado nesta sessão — 102 GIFs nos Exercícios do Catálogo:**
+  1. **Mapeamento & Importação:** Mapeados e copiados 100% dos 102 GIFs da pasta local de downloads para `public/videos/exercicios/[id].gif` e `[slug].gif`, cobrindo todos os 10 grupos musculares.
+  2. **Manifesto e Metadados:** `src/lib/dados/exercicios-midia.json` e `src/lib/dados/midia-exercicio.ts` enriquecidos com URLs de vídeo, slugs em português/inglês, créditos de autoria (Gym Visual) e tags de foco muscular.
+  3. **Player Híbrido:** `PlayerExecucaoExercicio` atualizado com aba "Ver Execução" (renderizando o GIF animado nítido em looping contínuo com badge de status e créditos) e aba "Anatomia & Foco" (renderizando a ilustração anatômica com músculo-alvo em destaque e fases de movimento).
+  4. **Testes & Qualidade:** 183 testes unitários passando (`npm test`), `tsc --noEmit` 0 erros, build do Next.js sem erros e teste E2E Playwright validado com 100% de sucesso.
 - **Bloqueado / a decidir:** nada.
 - **Próximo passo:** merge `--no-ff` na `main` e push para o repositório remoto.
 - **Para o outro agente saber:**
-  - O player não depende mais de imagens externas nem de fotos antigas reais; todo o render é realizado pelo componente `IlustracaoAnatomica3D` de alta precisão.
-  - Para novos exercícios, basta cadastrar o `slug` ou `musculo_alvo` no manifesto.
+  - Os GIFs dos 102 exercícios estão servidos localmente via `public/videos/exercicios/[id].gif` e `public/videos/exercicios/[slug].gif`.
+  - O player possui fallback automático e suporte a ambos os modos (GIF animado e Anatomia 3D).
 
 ---
 
