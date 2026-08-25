@@ -11,8 +11,8 @@
 
 > Bloco de handoff entre agentes (Antigravity ⇄ Claude). **Sobrescrever a cada sessão**, nunca acumular. Formato e regras: `AGENTS.md` §3.
 
-- **Última sessão:** 2026-08-25 (2) · agente: antigravity · branch de trabalho `feat/player-execucao-exercicio`
-- **Em andamento:** nada — Player interativo (Ver Execução / Ver Aparelho) integrado com sucesso na tela `/catalogo/[id]`.
+- **Última sessão:** 2026-08-25 (2) · agente: antigravity · branch: main (merge `--no-ff` de `feat/player-execucao-exercicio` concluído)
+- **Em andamento:** nada — Player interativo (Ver Execução / Ver Aparelho) integrado com sucesso na tela `/catalogo/[id]` e mergeado na main.
 - **Fechado nesta sessão — Player de Execução e Aparelho em `/catalogo/[id]`:**
   1. **Componente `PlayerExecucaoExercicio`:** Criado em `src/components/player-execucao-exercicio.tsx` com alternância tátil entre:
      - **Ver Execução:** animação fluida e contínua do movimento em loop com badge animado de status.
@@ -21,7 +21,7 @@
   3. **Estilos e Design System:** Estilização responsiva em `src/app/sistema.css` alinhada ao padrão Apex Pro com suporte completo a i18n (`t(chave, idioma)`).
   4. **Conformidade:** 183 testes passando (`npm test`) e `tsc --noEmit` 100% verde.
 - **Bloqueado / a decidir:** nada.
-- **Próximo passo:** merge `--no-ff` de `feat/player-execucao-exercicio` na `main`.
+- **Próximo passo:** verificar visualmente no navegador ou dispositivo mobile.
 - **Para o outro agente saber:**
   - O player lê os assets diretamente de `public/videos/exercicios/` via helper `obterMidiaExercicio(exercicioId)`.
   - Para adicionar visualização de miniatura em outras telas (ex.: `/catalogo`), basta utilizar o mesmo helper `obterMidiaExercicio`.
