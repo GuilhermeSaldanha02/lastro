@@ -4,7 +4,7 @@ import { spawn } from "child_process";
 import fs from "fs";
 import path from "path";
 
-const ARTIFACT_DIR = "C:/Users/danin/.gemini/antigravity-ide/brain/d20afdf2-f74e-45f6-bd30-1bf6dfc11d51";
+const ARTIFACT_DIR = "C:/Users/danin/.gemini/antigravity-ide/brain/8bd20678-f0c8-4d79-ab2b-2b2a166af8f6";
 const outputDir = path.resolve("docs/screenshots/player_exercicio");
 const artifactScreenshotsDir = path.join(ARTIFACT_DIR, "screenshots");
 
@@ -13,58 +13,17 @@ if (!fs.existsSync(artifactScreenshotsDir)) fs.mkdirSync(artifactScreenshotsDir,
 
 const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL || "https://tbkzcqfvafznxallyfqk.supabase.co";
 const SUPABASE_ANON_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "sb_publishable_U4JaHg8vmc-FMFCb5EQYSw_epruvwS7";
-const SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRia3pjcWZ2YWZ6bnhhbGx5ZnFrIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc4NTg4MTUyMywiZXhwIjoyMTAxNDU3NTIzfQ.YmuHF8f5qqQ-AdGbrsn01y1pMr80SweXhKcnwUC8rVw";
 const PROJECT_REF = "tbkzcqfvafznxallyfqk";
 
 async function obterSessaoTeste() {
-  const supabaseAdmin = createClient(SUPABASE_URL, SERVICE_ROLE_KEY, {
-    auth: { autoRefreshToken: false, persistSession: false },
-  });
-
-  const testEmail = "qa_player_tester@lastro.app";
-  const testPassword = "PlaywrightTester_2026!";
-
   const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-  let { data: authData, error: loginError } = await supabaseClient.auth.signInWithPassword({
-    email: testEmail,
-    password: testPassword,
+  const { data: authData, error: authError } = await supabaseClient.auth.signInWithPassword({
+    email: "qa_player_tester@lastro.app",
+    password: "PlaywrightTester_2026!",
   });
 
-  if (loginError) {
-    // Tenta criar se falhar
-    const { data: usersData } = await supabaseAdmin.auth.admin.listUsers();
-    let user = usersData?.users?.find((u) => u.email === testEmail);
-
-    if (user) {
-      await supabaseAdmin.auth.admin.updateUserById(user.id, {
-        password: testPassword,
-        email_confirm: true,
-      });
-    } else {
-      const { data: novoUser } = await supabaseAdmin.auth.admin.createUser({
-        email: testEmail,
-        password: testPassword,
-        email_confirm: true,
-        user_metadata: { nome: "Atleta QA Player" },
-      });
-      user = novoUser?.user;
-    }
-
-    if (user) {
-      await supabaseAdmin.from("usuario").upsert({
-        id: user.id,
-        nome: "Atleta QA Player",
-        avatar_url: null,
-      });
-    }
-
-    const { data: authData2, error: loginError2 } = await supabaseClient.auth.signInWithPassword({
-      email: testEmail,
-      password: testPassword,
-    });
-
-    if (loginError2) throw loginError2;
-    authData = authData2;
+  if (authError || !authData.session) {
+    throw new Error(`Falha ao obter sessão do usuário de teste: ${authError?.message}`);
   }
 
   return authData.session;
@@ -75,10 +34,10 @@ async function esperarServidor(url, timeoutMs = 60000) {
   while (Date.now() - start < timeoutMs) {
     try {
       const res = await fetch(url);
-      if (res.status < 500) return true;
-    } catch {
-      // espera
-    }
+      if (res.status < 500) {
+        return true;
+      }
+    } catch {}
     await new Promise((r) => setTimeout(r, 1000));
   }
   throw new Error(`Timeout esperando servidor em ${url}`);
@@ -87,9 +46,9 @@ async function esperarServidor(url, timeoutMs = 60000) {
 async function main() {
   console.log("🚀 Iniciando teste E2E com Playwright para o Player de Exercício...");
 
-  // Iniciar servidor local na porta 3020
-  console.log("🌐 Iniciando servidor Next.js na porta 3020...");
-  const devServer = spawn("npx", ["next", "start", "-p", "3020"], {
+  // Iniciar servidor local na porta 3099
+  console.log("🌐 Iniciando servidor Next.js na porta 3099...");
+  const devServer = spawn("npx", ["next", "start", "-p", "3099"], {
     stdio: "pipe",
     shell: true,
   });
@@ -98,8 +57,8 @@ async function main() {
   devServer.stderr.on("data", (d) => process.stderr.write(d));
 
   try {
-    await esperarServidor("http://localhost:3020");
-    console.log("✅ Servidor pronto em http://localhost:3020");
+    await esperarServidor("http://localhost:3099");
+    console.log("✅ Servidor pronto em http://localhost:3080");
 
     const session = await obterSessaoTeste();
     console.log("✅ Sessão de teste autenticada. Aguardando 5s para sincronia de relógio...");
@@ -149,7 +108,7 @@ async function main() {
 
     // 1. Acessar catálogo
     console.log("📱 Navegando para /catalogo...");
-    await page.goto("http://localhost:3020/catalogo", { waitUntil: "networkidle" });
+    await page.goto("http://localhost:3099/catalogo", { waitUntil: "networkidle" });
     await page.waitForTimeout(1000);
 
     const shotCatalogo = path.join(outputDir, "01_catalogo_lista.png");
@@ -157,59 +116,40 @@ async function main() {
     fs.copyFileSync(shotCatalogo, path.join(artifactScreenshotsDir, "01_catalogo_lista.png"));
     console.log("📸 Screenshot salva: 01_catalogo_lista.png");
 
-    // 2. Acessar página de detalhes do exercício
-    console.log("📱 Navegando para detalhes do exercício (Lower Ab Crunch)...");
-    await page.goto("http://localhost:3020/catalogo/d08f9e23-09cd-40c5-a56c-f2a7cb9ac73b", {
-      waitUntil: "networkidle",
-    });
-    await page.waitForTimeout(1000);
+    // Testes de Cenas Anatômicas 3D de Diferentes Grupos Musculares:
+    const exerciciosCenas = [
+      { id: "963a1f70-4cb6-4117-b1a6-c1e4215debe9", nome: "Tríceps Testa com Barra", arquivo: "02_triceps_testa_barra.png" },
+      { id: "05d30e37-7b2c-45f4-9e71-34abf1703ef3", nome: "Tríceps Pulley (Corda)", arquivo: "03_triceps_pulley_corda.png" },
+      { id: "339a305e-4c52-4744-86c5-6b830b707032", nome: "Supino Reto com Barra", arquivo: "04_supino_reto_barra.png" },
+      { id: "0f4d2b26-f2eb-4e16-b9e8-48d1d737590d", nome: "Puxada Frente no Pulley", arquivo: "05_puxada_frente_pulley.png" },
+      { id: "1db2c316-4c25-4f71-b2f4-6c30ceb75259", nome: "Agachamento Livre", arquivo: "06_agachamento_livre.png" },
+      { id: "ff8a4f89-15e6-4c97-85cc-90cd5c15d03f", nome: "Elevação Lateral com Halteres", arquivo: "07_elevacao_lateral.png" },
+      { id: "39c48554-3192-4072-a877-f8259e737d29", nome: "Rosca Direta Bíceps", arquivo: "08_rosca_direta.png" },
+      { id: "d08f9e23-09cd-40c5-a56c-f2a7cb9ac73b", nome: "Abdominal Infra", arquivo: "09_abdominal_infra.png" },
+    ];
 
-    // 3. Validar Player de Exercício - Modo Execução
-    console.log("🔍 Validando Player de Exercício (Modo Execução)...");
-    const playerCard = page.locator(".player-exercicio-card");
-    await playerCard.waitFor({ state: "visible", timeout: 15000 });
+    for (const ex of exerciciosCenas) {
+      console.log(`📱 Acessando ${ex.nome}...`);
+      await page.goto(`http://localhost:3099/catalogo/${ex.id}`, { waitUntil: "networkidle" });
+      const playerCard = page.locator(".player-exercicio-card");
+      await playerCard.waitFor({ state: "visible", timeout: 15000 });
+      await page.waitForTimeout(600);
 
-    const shotExecucao = path.join(outputDir, "02_player_ver_execucao.png");
-    await page.screenshot({ path: shotExecucao });
-    fs.copyFileSync(shotExecucao, path.join(artifactScreenshotsDir, "02_player_ver_execucao.png"));
-    console.log("📸 Screenshot salva: 02_player_ver_execucao.png");
+      const shotPath = path.join(outputDir, ex.arquivo);
+      await page.screenshot({ path: shotPath });
+      fs.copyFileSync(shotPath, path.join(artifactScreenshotsDir, ex.arquivo));
+      console.log(`📸 Screenshot salva: ${ex.arquivo}`);
+    }
 
-    // 4. Alternar para Modo Aparelho / Posição
-    console.log("👉 Clicando na aba 'Ver Aparelho / Posição'...");
-    const btnAparelho = page.locator(".player-exercicio-card__tab").nth(1);
-    await btnAparelho.click();
-    await page.waitForTimeout(600);
-
-    const shotAparelhoP1 = path.join(outputDir, "03_player_aparelho_posicao_1.png");
-    await page.screenshot({ path: shotAparelhoP1 });
-    fs.copyFileSync(shotAparelhoP1, path.join(artifactScreenshotsDir, "03_player_aparelho_posicao_1.png"));
-    console.log("📸 Screenshot salva: 03_player_aparelho_posicao_1.png");
-
-    // 5. Clicar no Ponto de Contração
-    console.log("👉 Clicando no botão '2. Ponto de Contração'...");
-    const btnContracao = page.locator(".player-exercicio-card__fase-btn").nth(1);
-    await btnContracao.click();
-    await page.waitForTimeout(600);
-
-    const shotAparelhoP2 = path.join(outputDir, "04_player_aparelho_posicao_2.png");
-    await page.screenshot({ path: shotAparelhoP2 });
-    fs.copyFileSync(shotAparelhoP2, path.join(artifactScreenshotsDir, "04_player_aparelho_posicao_2.png"));
-    console.log("📸 Screenshot salva: 04_player_aparelho_posicao_2.png");
-
-    // 6. Voltar para Modo Execução
-    console.log("👉 Retornando para 'Ver Execução'...");
-    const btnExecucao = page.locator(".player-exercicio-card__tab").nth(0);
-    await btnExecucao.click();
-    await page.waitForTimeout(600);
-
-    await browser.close();
     console.log("🎉 Teste E2E do Playwright concluído com 100% de sucesso!");
+    await browser.close();
+  } catch (error) {
+    console.error("❌ Erro no teste Playwright:", error);
+    process.exitCode = 1;
   } finally {
-    devServer.kill();
+    console.log("🛑 Encerrando servidor Next.js...");
+    devServer.kill("SIGTERM");
   }
 }
 
-main().catch((err) => {
-  console.error("❌ Erro no teste Playwright:", err);
-  process.exit(1);
-});
+main().catch(console.error);

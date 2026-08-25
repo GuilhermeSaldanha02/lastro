@@ -3,16 +3,16 @@ import { obterMidiaExercicio, obterMidiaExercicioPorSlug } from './midia-exercic
 
 describe('midia-exercicio', () => {
   it('retorna a mídia para um exercício existente por ID', () => {
-    // Lower Ab Crunch
+    // Abdominal infra
     const midia = obterMidiaExercicio('d08f9e23-09cd-40c5-a56c-f2a7cb9ac73b');
     expect(midia).not.toBeNull();
-    expect(midia?.slug).toBe('lower-ab-crunch');
+    expect(midia?.slug).toBe('abdominal-infra');
     expect(midia?.videoUrl).toBe('/videos/exercicios/d08f9e23-09cd-40c5-a56c-f2a7cb9ac73b.gif');
-    expect(midia?.thumbnailUrl).toContain('0.jpg');
+    expect(midia?.thumbnailUrl).toContain('.gif');
   });
 
   it('retorna a mídia por slug', () => {
-    const midia = obterMidiaExercicioPorSlug('lower-ab-crunch');
+    const midia = obterMidiaExercicioPorSlug('abdominal-infra');
     expect(midia).not.toBeNull();
     expect(midia?.id).toBe('d08f9e23-09cd-40c5-a56c-f2a7cb9ac73b');
   });

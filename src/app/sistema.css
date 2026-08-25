@@ -3700,6 +3700,25 @@
   color: var(--lastro-txt-2);
 }
 
+.player-exercicio-card__credito {
+  position: absolute;
+  bottom: 12px;
+  left: 12px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: rgba(10, 10, 10, 0.7);
+  backdrop-filter: blur(6px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 3px 8px;
+  border-radius: 12px;
+  font-size: 10px;
+  font-weight: var(--lastro-peso-medio);
+  color: var(--lastro-txt-3, #71717a);
+  pointer-events: none;
+  user-select: none;
+}
+
 .player-exercicio-card__ponto-vivo {
   width: 7px;
   height: 7px;
@@ -3865,6 +3884,20 @@
   }
 }
 
+.anatomia-3d-animada .triceps-polia-antebraco {
+  animation: animTricepsPolia 2s infinite ease-in-out alternate;
+  transform-origin: 180px 160px;
+}
+
+@keyframes animTricepsPolia {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(45deg);
+  }
+}
+
 .anatomia-3d-contracao .triceps-antebraco-movimento {
   transform: rotate(65deg);
   transform-origin: 160px 110px;
@@ -3873,5 +3906,15 @@
 .anatomia-3d-inicial .triceps-antebraco-movimento {
   transform: rotate(0deg);
   transform-origin: 160px 110px;
+}
+
+.anatomia-3d-contracao .triceps-polia-antebraco {
+  transform: rotate(45deg);
+  transform-origin: 180px 160px;
+}
+
+.anatomia-3d-inicial .triceps-polia-antebraco {
+  transform: rotate(0deg);
+  transform-origin: 180px 160px;
 }
 
