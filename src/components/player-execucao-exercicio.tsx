@@ -61,6 +61,16 @@ export default function PlayerExecucaoExercicio({
 
       {/* Área de Visualização */}
       <div className="player-exercicio-card__display">
+        {/* Badge Anatômico de Músculo-Alvo */}
+        {midia.musculo_alvo && (
+          <div className="player-exercicio-card__badge-foco">
+            <span className="player-exercicio-card__ponto-vermelho" />
+            <span>
+              {t("Foco:", idioma)} {midia.musculo_alvo}
+            </span>
+          </div>
+        )}
+
         {modo === "execucao" ? (
           <div className="player-exercicio-card__animacao-container">
             {/* Imagem/GIF animado */}

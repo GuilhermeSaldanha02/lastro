@@ -87,20 +87,19 @@ async function esperarServidor(url, timeoutMs = 60000) {
 async function main() {
   console.log("🚀 Iniciando teste E2E com Playwright para o Player de Exercício...");
 
-  // Iniciar servidor local
-  console.log("🌐 Iniciando servidor Next.js...");
-  const devServer = spawn("npm", ["run", "start"], {
+  // Iniciar servidor local na porta 3005
+  console.log("🌐 Iniciando servidor Next.js na porta 3005...");
+  const devServer = spawn("npx", ["next", "start", "-p", "3005"], {
     stdio: "pipe",
     shell: true,
-    env: { ...process.env, PORT: "3000" },
   });
 
   devServer.stdout.on("data", (d) => process.stdout.write(d));
   devServer.stderr.on("data", (d) => process.stderr.write(d));
 
   try {
-    await esperarServidor("http://localhost:3000");
-    console.log("✅ Servidor pronto em http://localhost:3000");
+    await esperarServidor("http://localhost:3005");
+    console.log("✅ Servidor pronto em http://localhost:3005");
 
     const session = await obterSessaoTeste();
     console.log("✅ Sessão de teste autenticada. Aguardando 5s para sincronia de relógio...");
@@ -150,7 +149,7 @@ async function main() {
 
     // 1. Acessar catálogo
     console.log("📱 Navegando para /catalogo...");
-    await page.goto("http://localhost:3000/catalogo", { waitUntil: "networkidle" });
+    await page.goto("http://localhost:3005/catalogo", { waitUntil: "networkidle" });
     await page.waitForTimeout(1000);
 
     const shotCatalogo = path.join(outputDir, "01_catalogo_lista.png");
@@ -160,7 +159,7 @@ async function main() {
 
     // 2. Acessar página de detalhes do exercício
     console.log("📱 Navegando para detalhes do exercício (Lower Ab Crunch)...");
-    await page.goto("http://localhost:3000/catalogo/d08f9e23-09cd-40c5-a56c-f2a7cb9ac73b", {
+    await page.goto("http://localhost:3005/catalogo/d08f9e23-09cd-40c5-a56c-f2a7cb9ac73b", {
       waitUntil: "networkidle",
     });
     await page.waitForTimeout(1000);
@@ -177,7 +176,7 @@ async function main() {
 
     // 4. Alternar para Modo Aparelho / Posição
     console.log("👉 Clicando na aba 'Ver Aparelho / Posição'...");
-    const btnAparelho = page.locator("button:has-text('Ver Aparelho')");
+    const btnAparelho = page.locator(".player-exercicio-card__tab").nth(1);
     await btnAparelho.click();
     await page.waitForTimeout(600);
 
@@ -188,7 +187,7 @@ async function main() {
 
     // 5. Clicar no Ponto de Contração
     console.log("👉 Clicando no botão '2. Ponto de Contração'...");
-    const btnContracao = page.locator("button:has-text('Ponto de Contração')");
+    const btnContracao = page.locator(".player-exercicio-card__fase-btn").nth(1);
     await btnContracao.click();
     await page.waitForTimeout(600);
 
@@ -199,7 +198,7 @@ async function main() {
 
     // 6. Voltar para Modo Execução
     console.log("👉 Retornando para 'Ver Execução'...");
-    const btnExecucao = page.locator("button:has-text('Ver Execução')");
+    const btnExecucao = page.locator(".player-exercicio-card__tab").nth(0);
     await btnExecucao.click();
     await page.waitForTimeout(600);
 
