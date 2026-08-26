@@ -11,18 +11,17 @@
 
 > Bloco de handoff entre agentes (Antigravity ⇄ Claude). **Sobrescrever a cada sessão**, nunca acumular. Formato e regras: `AGENTS.md` §3.
 
-- **Última sessão:** 2026-08-26 (2) · agente: antigravity · branch: feat/timer-descanso-e-relatorio-pos-treino
-- **Em andamento:** Concluída a implementação do Timer de Descanso no Topo, Área de Ação Dividida Lado a Lado e Relatório Pós-Treino (Estilo Strava). Testes Vitest (185/185), build Next.js e Playwright E2E 100% aprovados.
-- **Fechado nesta sessão — Timer de Descanso no Topo & Relatório Pós-Treino:**
-  1. **Timer de Descanso no Topo:** Disparo manual com 1 toque, contagem regressiva baseada em timestamp absoluto (resiliente a bloqueio de tela/troca de app), micro-ajuste `+30s`, barra de progresso verde esmeralda e alertas de som/vibração.
-  2. **Área de Ações Dividida Lado a Lado:** Grid ergonômico com `[ Repetir última série ]` (dourado) à esquerda e `[ Outra série ]` (ardósia) à direita, preservando o toque único da ação mais frequente.
-  3. **Botão Finalizar Treino & Relatório Pós-Treino:** Modal de celebração pós-treino exibindo duração da sessão (minutos), tonelagem total movimentada (kg), contagem de séries válidas e novos recordes pessoais (PRs) batidos no dia.
-  4. **Verificação Automatizada:** Testes unitários (`src/lib/dados/metricas-treino.test.ts`), suíte completa Vitest 185/185, Next.js build e validação Playwright mobile.
+- **Última sessão:** 2026-08-26 (3) · agente: antigravity · branch: feat/refinamento-botoes-pilula-e-finalizar-vermelho
+- **Em andamento:** Concluído o refinamento visual da tela de treino: formato de pílula em todos os botões de ação, remoção de emojis do timer e do botão finalizar, texto enxuto "Repetir série" e botão "Finalizar Treino" destacado em vermelho atlético. Testes Vitest (185/185) e Playwright 100% aprovados.
+- **Fechado nesta sessão — Refinamento Visual de Botões & Timer:**
+  1. **Remoção de Emojis:** Timer no topo e botão de finalizar treino agora com tipografia limpa e refinada sem emojis.
+  2. **Formato Pílula:** Botões `Repetir série` e `Outra série` com formato arredondado de pílula (`--lastro-r-pilula`).
+  3. **Botão Finalizar Treino em Vermelho:** Estilizado com acabamento rubi atlético com alto contraste e brilho sutil em vez de borda vazia/verde.
+  4. **Texto Direto:** Botão principal atualizado para `"Repetir série"`.
 - **Bloqueado / a decidir:** Nada.
 - **Próximo passo:** Subir a branch e fazer merge na main.
 - **Para o outro agente saber:**
-  - O cálculo de tonelagem total e métricas da sessão vive de forma pura e determinística em `src/lib/dados/metricas-treino.ts`.
-  - O timer no topo (`src/components/timer-topo.tsx`) utiliza `Date.now()` para garantir precisão mesmo quando o celular fica em repouso no bolso entre séries.
+  - Todos os botões da área de ação inferior usam formato de pílula consistente com os tokens do sistema.
 
 ---
 

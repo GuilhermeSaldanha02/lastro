@@ -196,6 +196,8 @@ const DICIONARIO: Record<string, { en: string; es: string }> = {
   "Treino novo": { en: "New workout", es: "Entrenamiento nuevo" },
 
   // --- components/formulario-serie.tsx ---
+  "Repetir série": { en: "Repeat set", es: "Repetir serie" },
+  "Finalizar Treino": { en: "Finish Workout", es: "Finalizar Entrenamiento" },
   "Exercício é obrigatório.": { en: "Exercise is required.", es: "El ejercicio es obligatorio." },
   "Escolha o tipo: aquecimento ou valendo.": {
     en: "Choose the type: warm-up or working set.",

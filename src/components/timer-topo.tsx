@@ -100,7 +100,7 @@ export default function TimerTopo({
 
   return (
     <div className="timer-topo-container">
-      {/* 1. Modo Normal: Botão compacto de disparo manual no topo */}
+      {/* 1. Modo Normal: Botão pílula elegante de disparo manual no topo */}
       {!ativo && !finalizado && (
         <div className="timer-topo-gatilho">
           <button
@@ -109,7 +109,6 @@ export default function TimerTopo({
             onClick={() => iniciarTimer(duracaoPadraoSegundos)}
             title="Iniciar descanso entre séries"
           >
-            <span className="timer-topo-icone">⏱</span>
             <span>{t("Descanso", idioma)}</span>
             <span className="timer-topo-duracao-tag">
               {formatarMinutosSegundos(duracaoPadraoSegundos)}
@@ -118,12 +117,12 @@ export default function TimerTopo({
         </div>
       )}
 
-      {/* 2. Modo Ativo: Cápsula de contagem regressiva no topo */}
+      {/* 2. Modo Ativo: Cápsula pílula de contagem regressiva no topo */}
       {ativo && (
         <div className="timer-topo-card-ativo">
           <div className="timer-topo-conteudo">
             <div className="timer-topo-tempo-bloco">
-              <span className="timer-topo-icone-pulsante">⏱</span>
+              <span className="timer-topo-tempo-label">{t("Descanso", idioma)}</span>
               <span className="timer-topo-tempo-txt">
                 {formatarMinutosSegundos(segundosRestantes)}
               </span>
@@ -171,9 +170,8 @@ export default function TimerTopo({
       {finalizado && (
         <div className="timer-topo-card-concluido">
           <div className="timer-topo-concluido-info">
-            <span className="timer-topo-concluido-icone">🔔</span>
             <span className="timer-topo-concluido-txt">
-              {t("Descanso finalizado!", idioma)}
+              {t("Descanso finalizado", idioma)}
             </span>
           </div>
           <div style={{ display: "flex", gap: "8px" }}>

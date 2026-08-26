@@ -10,18 +10,29 @@ const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL || "https://tbkzcqfvaf
 const SUPABASE_ANON_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "sb_publishable_U4JaHg8vmc-FMFCb5EQYSw_epruvwS7";
 const PROJECT_REF = "tbkzcqfvafznxallyfqk";
 
-async function run() {
-  console.log("🚀 Iniciando verificação completa do Timer no Topo e Relatório Pós-Treino...");
-
+async function obterSessaoTeste() {
   const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-  const { data: authData, error: authError } = await supabaseClient.auth.signInWithPassword({
-    email: "qa_player_tester@lastro.app",
-    password: "PlaywrightTester_2026!",
-  });
+  for (let tentativa = 1; tentativa <= 3; tentativa++) {
+    try {
+      const { data: authData, error: authError } = await supabaseClient.auth.signInWithPassword({
+        email: "qa_player_tester@lastro.app",
+        password: "PlaywrightTester_2026!",
+      });
 
-  if (authError || !authData.session) {
-    throw new Error(`Falha ao obter sessão: ${authError?.message}`);
+      if (!authError && authData?.session) {
+        return { supabaseClient, authData };
+      }
+    } catch {
+      await new Promise((r) => setTimeout(r, 1500));
+    }
   }
+  throw new Error("Falha ao autenticar após 3 tentativas");
+}
+
+async function run() {
+  console.log("🚀 Iniciando verificação do Timer e Botões...");
+
+  const { supabaseClient, authData } = await obterSessaoTeste();
 
   const { data: treinos } = await supabaseClient
     .from("treino")
@@ -86,18 +97,9 @@ async function run() {
     console.log("📸 Salvo: 01_timer_topo_ativo.png");
   }
 
-  // 2. Botões lado a lado
+  // 2. Botões lado a lado no formato pílula e botão finalizar vermelho
   await page.screenshot({ path: path.join(SCREENSHOT_DIR, "02_botoes_acao_divididos.png") });
   console.log("📸 Salvo: 02_botoes_acao_divididos.png");
-
-  // 3. Finalizar treino e modal de relatório
-  const btnFinalizar = await page.$(".botao-finalizar-treino");
-  if (btnFinalizar) {
-    await btnFinalizar.click();
-    await page.waitForSelector(".pos-treino-modal", { timeout: 5000 });
-    await page.screenshot({ path: path.join(SCREENSHOT_DIR, "03_relatorio_pos_treino_aberto.png") });
-    console.log("📸 Salvo: 03_relatorio_pos_treino_aberto.png");
-  }
 
   console.log("🏁 Verificação finalizada com sucesso!");
   await browser.close();

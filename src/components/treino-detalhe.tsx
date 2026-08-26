@@ -503,7 +503,7 @@ export default function TreinoDetalhe({
               className="botao-primario botao-acao-duplo"
               onClick={repetirUltimaSerie}
             >
-              {t("Repetir última série", idioma)}
+              {t("Repetir série", idioma)}
               <span className="botao-primario__estado">
                 {ultima.reps} × {ultima.peso} kg · {t(ultima.tipo, idioma)}
               </span>
@@ -535,7 +535,6 @@ export default function TreinoDetalhe({
             className="botao-finalizar-treino"
             onClick={() => setMostrarRelatorio(true)}
           >
-            <span>🏁</span>
             <span>{t("Finalizar Treino", idioma)}</span>
           </button>
         )}
