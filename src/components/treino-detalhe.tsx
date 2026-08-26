@@ -121,7 +121,7 @@ export default function TreinoDetalhe({
   // isto é conveniência de tela, não um plano salvo.
   const [gruposEscolhidos, setGruposEscolhidos] = useState<string[]>([]);
   const [mostrarRelatorio, setMostrarRelatorio] = useState(false);
-  const [iniciadoEm] = useState<string>(() => new Date().toISOString());
+  const [duracaoSegundos, setDuracaoSegundos] = useState(0);
   const grupos = useMemo(() => agruparPorExercicio(series), [series]);
   const ultima = series[series.length - 1];
 
@@ -309,10 +309,14 @@ export default function TreinoDetalhe({
 
   return (
     <>
-      <div className="corpo corpo--com-nav corpo--titulo-conteudo">
-        {/* Timer de Descanso com disparo manual no topo */}
-        <TimerTopo idioma={idioma} />
+      {/* Barra de Status Sticky no Topo: Tempo de Treino Decorrido + Timer de Descanso */}
+      <TimerTopo
+        treinoId={treinoId}
+        idioma={idioma}
+        onTempoTreinoAtualizado={setDuracaoSegundos}
+      />
 
+      <div className="corpo corpo--com-nav corpo--titulo-conteudo">
         {series.length > 0 && (
           <div className="grupo__cab">
             <h2 className="grupo__nome">{t("Séries", idioma)}</h2>
@@ -494,7 +498,7 @@ export default function TreinoDetalhe({
         )}
       </div>
 
-      {/* Área de Ações do Treino Refinada: Lado a Lado + Finalizar Treino */}
+      {/* Área de Ações do Treino Refinada: Pílulas Compactas Lado a Lado + Finalizar Treino */}
       <div className="acao-area">
         {ultima ? (
           <div className="acao-area-grid">
@@ -504,9 +508,6 @@ export default function TreinoDetalhe({
               onClick={repetirUltimaSerie}
             >
               {t("Repetir série", idioma)}
-              <span className="botao-primario__estado">
-                {ultima.reps} × {ultima.peso} kg · {t(ultima.tipo, idioma)}
-              </span>
             </button>
 
             <button
@@ -521,7 +522,7 @@ export default function TreinoDetalhe({
         ) : (
           <button
             type="button"
-            className="botao-secundario"
+            className="botao-secundario botao-acao-duplo"
             aria-expanded={formularioAberto}
             onClick={() => setFormularioAberto((aberto) => !aberto)}
           >
@@ -551,7 +552,7 @@ export default function TreinoDetalhe({
       {/* Relatório Pós-Treino Imediato (Estilo Strava) */}
       {mostrarRelatorio && (
         <RelatorioPosTreino
-          metricas={calcularMetricasSessao(series, iniciadoEm)}
+          metricas={calcularMetricasSessao(series, duracaoSegundos)}
           idioma={idioma}
           onFechar={() => setMostrarRelatorio(false)}
         />

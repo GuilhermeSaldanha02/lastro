@@ -3912,32 +3912,86 @@
    ===================================================================== */
 
 /* Container Sticky no Topo da Tela */
+/* Container Sticky no Topo da Tela - Pinned Real na Rolagem */
 .timer-topo-container {
   position: sticky;
-  top: 0;
-  z-index: 40;
+  top: calc(56px + env(safe-area-inset-top, 0px));
+  z-index: 45;
   width: 100%;
-  margin-bottom: var(--lastro-e-3);
-  padding: var(--lastro-e-2) 0;
-  background: linear-gradient(180deg, var(--lastro-fundo) 70%, transparent 100%);
-  backdrop-filter: blur(8px);
+  padding: 6px var(--lastro-e-4);
+  background: var(--lastro-barra-b);
+  border-bottom: 1px solid var(--lastro-linha);
+  backdrop-filter: blur(12px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
 }
 
-.timer-topo-gatilho {
-  width: 100%;
-}
-
-.timer-topo-botao-disparar {
-  width: 100%;
-  min-height: var(--lastro-alvo-min);
+.barra-status-treino {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 8px 16px;
+  gap: var(--lastro-e-3);
+  width: 100%;
+}
+
+.status-tempo-treino {
+  display: flex;
+  align-items: center;
+  gap: var(--lastro-e-2);
+  background: var(--lastro-sup-2);
+  border: 1px solid var(--lastro-linha);
+  padding: 6px 12px;
+  border-radius: var(--lastro-raio-pilula);
+  color: var(--lastro-txt);
+  flex-shrink: 0;
+}
+
+.status-tempo-treino__icone {
+  display: flex;
+  align-items: center;
+  color: var(--lastro-ouro);
+}
+
+.status-tempo-treino__conteudo {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+}
+
+.status-tempo-treino__rotulo {
+  font-size: var(--lastro-papel-detalhe);
+  color: var(--lastro-txt-3);
+  text-transform: uppercase;
+  font-weight: 600;
+}
+
+.status-tempo-treino__valor {
+  font-size: var(--lastro-papel-rotulo);
+  font-weight: 700;
+  color: var(--lastro-txt);
+  font-family: var(--lastro-fonte-mono);
+  font-variant-numeric: tabular-nums;
+}
+
+.status-descanso-wrapper {
+  flex: 1;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.timer-topo-gatilho {
+  width: auto;
+}
+
+.timer-topo-botao-disparar {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--lastro-e-2);
+  min-height: 38px;
+  padding: 6px 14px;
   background: var(--lastro-sup-2);
   border: 1px solid var(--lastro-borda-ouro);
-  border-radius: var(--lastro-r-pilula);
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4), 0 0 15px var(--lastro-ouro-glow);
+  border-radius: var(--lastro-raio-pilula) !important;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.3), 0 0 12px var(--lastro-ouro-glow);
   color: var(--lastro-txt);
   font-size: var(--lastro-papel-rotulo);
   font-weight: 500;
@@ -3954,19 +4008,12 @@
 .timer-topo-disparar-rotulo {
   display: inline-flex;
   align-items: center;
-  gap: var(--lastro-e-2);
-}
-
-.timer-topo-disparar-icone {
-  width: 18px;
-  height: 18px;
-  color: var(--lastro-ouro);
-  flex-shrink: 0;
+  gap: 6px;
 }
 
 .timer-topo-duracao-tag {
   color: var(--lastro-ouro);
-  font-weight: 600;
+  font-weight: 700;
   font-family: var(--lastro-fonte-mono);
 }
 
@@ -3984,25 +4031,18 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 8px 16px;
+  padding: 4px 12px;
+  gap: var(--lastro-e-2);
 }
 
 .timer-topo-tempo-bloco {
   display: flex;
   align-items: center;
-  gap: var(--lastro-e-2);
-}
-
-.timer-topo-tempo-label {
-  font-size: var(--lastro-papel-detalhe);
-  font-weight: 600;
-  color: var(--lastro-txt-3);
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
+  gap: var(--lastro-e-1);
 }
 
 .timer-topo-tempo-txt {
-  font-size: var(--lastro-papel-subtitulo);
+  font-size: var(--lastro-papel-corpo);
   font-weight: 700;
   font-family: var(--lastro-fonte-mono);
   color: var(--lastro-txt);
@@ -4012,16 +4052,16 @@
 .timer-topo-acoes {
   display: flex;
   align-items: center;
-  gap: var(--lastro-e-2);
+  gap: 6px;
 }
 
 .timer-topo-chip-tempo {
   background: rgba(16, 185, 129, 0.15);
   border: 1px solid var(--lastro-borda-verde);
   color: var(--lastro-esmeralda-claro);
-  font-size: var(--lastro-papel-detalhe);
+  font-size: 11px;
   font-weight: 600;
-  padding: 4px 12px;
+  padding: 3px 8px;
   border-radius: var(--lastro-raio-pilula) !important;
   cursor: pointer;
   transition: background var(--lastro-dur-1);
@@ -4035,9 +4075,9 @@
   background: var(--lastro-sup-3);
   border: 1px solid var(--lastro-linha);
   color: var(--lastro-txt-2);
-  font-size: var(--lastro-papel-detalhe);
+  font-size: 11px;
   font-weight: 500;
-  padding: 4px 12px;
+  padding: 3px 8px;
   border-radius: var(--lastro-raio-pilula) !important;
   cursor: pointer;
 }
@@ -4051,8 +4091,8 @@
   background: transparent;
   border: none;
   color: var(--lastro-txt-3);
-  font-size: 1rem;
-  padding: 4px 8px;
+  font-size: 0.9rem;
+  padding: 2px 6px;
   cursor: pointer;
 }
 
@@ -4063,7 +4103,7 @@
 /* Barra de Progresso Fina */
 .timer-topo-barra-trilho {
   width: 100%;
-  height: 3px;
+  height: 2px;
   background: rgba(255, 255, 255, 0.06);
 }
 
@@ -4082,19 +4122,14 @@
   background: rgba(16, 185, 129, 0.15);
   border: 1px solid var(--lastro-esmeralda);
   border-radius: var(--lastro-raio-pilula) !important;
-  padding: 8px 16px;
-  animation: lastro-pilula-entra var(--lastro-dur-2) ease;
-}
-
-.timer-topo-concluido-info {
-  display: flex;
-  align-items: center;
+  padding: 4px 12px;
   gap: var(--lastro-e-2);
+  animation: lastro-pilula-entra var(--lastro-dur-2) ease;
 }
 
 .timer-topo-concluido-txt {
   font-size: var(--lastro-papel-rotulo);
-  font-weight: 600;
+  font-weight: 700;
   color: var(--lastro-esmeralda-claro);
 }
 
@@ -4117,8 +4152,8 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  min-height: 54px;
-  padding: var(--lastro-e-2) var(--lastro-e-3);
+  min-height: 48px;
+  padding: 8px var(--lastro-e-3);
   font-weight: 600;
   cursor: pointer;
   text-align: center;
@@ -4128,7 +4163,7 @@
 /* Botão Finalizar Treino em Vermelho Sólido Vibrante com Letras Brancas */
 .botao-finalizar-treino {
   width: 100%;
-  min-height: 50px;
+  min-height: 48px;
   margin-top: var(--lastro-e-2);
   display: flex;
   align-items: center;
@@ -4154,11 +4189,6 @@
 .botao-finalizar-treino:active {
   transform: translateY(1px);
   box-shadow: 0 2px 8px rgba(220, 38, 38, 0.5);
-}
-
-.botao-finalizar-treino:hover {
-  border-color: var(--lastro-erro);
-  box-shadow: 0 0 20px var(--lastro-erro-glow);
 }
 
 /* ---------- Modal de Compartilhamento Pós-Treino Transparente (Estilo Strava) ---------- */
@@ -4222,10 +4252,6 @@
     linear-gradient(-45deg, transparent 75%, #181F2A 75%);
   background-size: 24px 24px;
   background-position: 0 0, 0 12px, 12px -12px, -12px 0px;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
 }
 
 .pos-treino-tag-transparente {
@@ -4241,63 +4267,69 @@
   color: #FFFFFF;
   background: rgba(0, 0, 0, 0.35);
   backdrop-filter: blur(4px);
+  z-index: 2;
 }
 
 .pos-treino-card-dados-flutuantes {
+  position: absolute;
+  top: 48px;
+  left: 20px;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  text-align: center;
+  align-items: flex-start;
+  text-align: left;
   gap: var(--lastro-e-3);
-  padding: var(--lastro-e-4);
-  width: 100%;
+  z-index: 2;
 }
 
 .pos-treino-dado-item {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  gap: 2px;
+  align-items: flex-start;
+  gap: 1px;
 }
 
 .pos-treino-dado-rotulo {
   font-size: var(--lastro-papel-detalhe);
-  font-weight: 600;
+  font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.06em;
   color: rgba(255, 255, 255, 0.8);
 }
 
 .pos-treino-dado-valor {
-  font-size: 1.7rem;
-  font-weight: 800;
+  font-size: 1.8rem;
+  font-weight: 900;
   font-family: var(--lastro-fonte-txt);
   color: #FFFFFF;
   letter-spacing: -0.02em;
-  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.6);
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.7);
 }
 
-.pos-treino-logo-box {
+.pos-treino-logo-canto {
+  position: absolute;
+  bottom: 18px;
+  right: 18px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 4px;
-  margin-top: var(--lastro-e-1);
+  gap: 2px;
+  z-index: 2;
 }
 
-.pos-treino-logo-img {
-  width: 44px;
-  height: 44px;
+.pos-treino-logo-canto__img {
+  width: 62px;
+  height: 62px;
   object-fit: contain;
-  filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.6));
+  filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.8));
 }
 
-.pos-treino-logo-txt {
-  font-size: var(--lastro-papel-corpo);
+.pos-treino-logo-canto__txt {
+  font-size: 13px;
   font-weight: 800;
-  letter-spacing: 0.2em;
+  letter-spacing: 0.18em;
   color: var(--lastro-ouro);
-  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.8);
+  text-shadow: 0 2px 6px rgba(0, 0, 0, 0.9);
 }
 
 /* Toast de confirmação */
@@ -4367,6 +4399,7 @@
   align-items: center;
   justify-content: center;
   font-size: 1.4rem;
+  color: var(--lastro-txt);
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
 }
 

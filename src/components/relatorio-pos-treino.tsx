@@ -20,7 +20,6 @@ export default function RelatorioPosTreino({
   const router = useRouter();
   const [copiado, setCopiado] = useState(false);
   const [salvando, setSalvando] = useState(false);
-  const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
   function concluirTreino() {
     onFechar();
@@ -29,7 +28,7 @@ export default function RelatorioPosTreino({
 
   /**
    * Gera a imagem PNG em alta resolução (1080x1080) com fundo 100% transparente
-   * e o logo do LASTRO, pronta para ser colada como sticker no Instagram Story.
+   * e o logo do LASTRO destacado no canto inferior direito.
    */
   async function gerarBlobImagemTransparente(): Promise<Blob | null> {
     const canvas = document.createElement("canvas");
@@ -38,63 +37,68 @@ export default function RelatorioPosTreino({
     const ctx = canvas.getContext("2d");
     if (!ctx) return null;
 
-    // Garante que o fundo é 100% transparente (sem preenchimento)
+    // Fundo 100% transparente
     ctx.clearRect(0, 0, 1080, 1080);
 
-    // Tipografia e Cores
-    ctx.textAlign = "center";
+    // 1. Métricas no lado esquerdo (Estilo Strava)
+    ctx.textAlign = "left";
     ctx.textBaseline = "middle";
 
-    // 1. Métrica 1: Carga Total / Tonelagem
-    ctx.font = "600 36px system-ui, -apple-system, sans-serif";
+    const startX = 110;
+
+    // Carga Total / Tonelagem
+    ctx.font = "700 34px system-ui, -apple-system, sans-serif";
     ctx.fillStyle = "rgba(255, 255, 255, 0.75)";
-    ctx.fillText(t("Carga Total", idioma).toUpperCase(), 540, 180);
+    ctx.fillText(t("Carga Total", idioma).toUpperCase(), startX, 220);
 
-    ctx.font = "800 84px system-ui, -apple-system, sans-serif";
+    ctx.font = "900 92px system-ui, -apple-system, sans-serif";
     ctx.fillStyle = "#FFFFFF";
-    ctx.fillText(`${metricas.tonelagemTotalKg.toLocaleString("pt-BR")} kg`, 540, 255);
+    ctx.fillText(`${metricas.tonelagemTotalKg.toLocaleString("pt-BR")} kg`, startX, 300);
 
-    // 2. Métrica 2: Séries Válidas
-    ctx.font = "600 36px system-ui, -apple-system, sans-serif";
+    // Séries Válidas
+    ctx.font = "700 34px system-ui, -apple-system, sans-serif";
     ctx.fillStyle = "rgba(255, 255, 255, 0.75)";
-    ctx.fillText(t("Séries Válidas", idioma).toUpperCase(), 540, 390);
+    ctx.fillText(t("Séries Válidas", idioma).toUpperCase(), startX, 450);
 
-    ctx.font = "800 84px system-ui, -apple-system, sans-serif";
+    ctx.font = "900 92px system-ui, -apple-system, sans-serif";
     ctx.fillStyle = "#FFFFFF";
-    ctx.fillText(`${metricas.totalSeriesValendo} séries`, 540, 465);
+    ctx.fillText(`${metricas.totalSeriesValendo} séries`, startX, 530);
 
-    // 3. Métrica 3: Tempo / Duração
-    ctx.font = "600 36px system-ui, -apple-system, sans-serif";
+    // Tempo de Treino
+    ctx.font = "700 34px system-ui, -apple-system, sans-serif";
     ctx.fillStyle = "rgba(255, 255, 255, 0.75)";
-    ctx.fillText(t("Tempo", idioma).toUpperCase(), 540, 600);
+    ctx.fillText(t("Tempo", idioma).toUpperCase(), startX, 680);
 
-    ctx.font = "800 84px system-ui, -apple-system, sans-serif";
+    ctx.font = "900 92px system-ui, -apple-system, sans-serif";
     ctx.fillStyle = "#FFFFFF";
-    ctx.fillText(`${metricas.duracaoMinutos} min`, 540, 675);
+    ctx.fillText(`${metricas.duracaoMinutos} min`, startX, 760);
 
-    // 4. Logo Oficial do LASTRO no Rodapé
+    // 2. Logo Oficial do LASTRO Ampliado no Canto Inferior Direito
     try {
       const imgLogo = new Image();
       imgLogo.crossOrigin = "anonymous";
-      await new Promise<void>((resolve, reject) => {
+      await new Promise<void>((resolve) => {
         imgLogo.onload = () => resolve();
-        imgLogo.onerror = () => resolve(); // continua se der erro
+        imgLogo.onerror = () => resolve();
         imgLogo.src = "/logo-lastro.png";
       });
 
       if (imgLogo.complete && imgLogo.naturalWidth > 0) {
-        const logoSize = 130;
-        ctx.drawImage(imgLogo, 540 - logoSize / 2, 780, logoSize, logoSize);
+        const logoSize = 180;
+        const logoX = 1080 - logoSize - 100;
+        const logoY = 1080 - logoSize - 140;
+        ctx.drawImage(imgLogo, logoX, logoY, logoSize, logoSize);
+
+        // Marca textual LASTRO
+        ctx.textAlign = "center";
+        ctx.font = "900 40px system-ui, -apple-system, sans-serif";
+        ctx.fillStyle = "#D4AF37"; // Ouro champagne
+        ctx.letterSpacing = "6px";
+        ctx.fillText("LASTRO", logoX + logoSize / 2, logoY + logoSize + 40);
       }
     } catch {
-      // Ignora erro no carregamento da imagem
+      // Ignora erro de imagem se offline
     }
-
-    // Marca textual LASTRO
-    ctx.font = "900 48px system-ui, -apple-system, sans-serif";
-    ctx.fillStyle = "#D4AF37"; // Ouro champagne assinatura
-    ctx.letterSpacing = "6px";
-    ctx.fillText("LASTRO", 540, 945);
 
     return new Promise<Blob | null>((resolve) => {
       canvas.toBlob((blob) => resolve(blob), "image/png");
@@ -119,7 +123,6 @@ export default function RelatorioPosTreino({
         setCopiado(true);
         setTimeout(() => setCopiado(false), 3000);
       } else {
-        // Fallback: download
         salvarImagem();
       }
     } catch (err) {
@@ -168,7 +171,7 @@ export default function RelatorioPosTreino({
         await copiarParaClipboard();
       }
     } catch {
-      // Usuário cancelou ou navegador não suporta
+      // Cancelado ou não suportado
     }
   }
 
@@ -220,18 +223,18 @@ export default function RelatorioPosTreino({
                 {metricas.duracaoMinutos} min
               </span>
             </div>
+          </div>
 
-            {/* Logo do Lastro Atual */}
-            <div className="pos-treino-logo-box">
-              <img
-                src="/logo-lastro.png"
-                alt="LASTRO"
-                className="pos-treino-logo-img"
-                width={50}
-                height={50}
-              />
-              <span className="pos-treino-logo-txt">LASTRO</span>
-            </div>
+          {/* Logo do Lastro Ampliado no Canto Inferior Direito */}
+          <div className="pos-treino-logo-canto">
+            <img
+              src="/logo-lastro.png"
+              alt="LASTRO"
+              className="pos-treino-logo-canto__img"
+              width={64}
+              height={64}
+            />
+            <span className="pos-treino-logo-canto__txt">LASTRO</span>
           </div>
         </div>
 
@@ -257,7 +260,11 @@ export default function RelatorioPosTreino({
               title="Copiar sticker para o Instagram Story"
             >
               <div className="pos-treino-icone-circulo pos-treino-icone-instagram">
-                📸
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <rect x="2" y="2" width="20" height="20" rx="5" ry="5" />
+                  <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" />
+                  <line x1="17.5" y1="6.5" x2="17.51" y2="6.5" />
+                </svg>
               </div>
               <span className="pos-treino-rotulo-acao">Instagram Story</span>
             </button>
@@ -270,7 +277,10 @@ export default function RelatorioPosTreino({
               title="Copiar imagem transparente"
             >
               <div className="pos-treino-icone-circulo">
-                📋
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
+                  <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+                </svg>
               </div>
               <span className="pos-treino-rotulo-acao">
                 {copiado ? "Copiado!" : "Copiar"}
@@ -286,7 +296,11 @@ export default function RelatorioPosTreino({
               title="Salvar imagem transparente"
             >
               <div className="pos-treino-icone-circulo">
-                ⬇️
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                  <polyline points="7 10 12 15 17 10" />
+                  <line x1="12" y1="15" x2="12" y2="3" />
+                </svg>
               </div>
               <span className="pos-treino-rotulo-acao">
                 {salvando ? "Salvando..." : "Salvar"}
@@ -301,7 +315,13 @@ export default function RelatorioPosTreino({
               title="Mais opções de compartilhamento"
             >
               <div className="pos-treino-icone-circulo">
-                📤
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <circle cx="18" cy="5" r="3" />
+                  <circle cx="6" cy="12" r="3" />
+                  <circle cx="18" cy="19" r="3" />
+                  <line x1="8.59" y1="13.51" x2="15.42" y2="17.49" />
+                  <line x1="15.41" y1="6.51" x2="8.59" y2="10.49" />
+                </svg>
               </div>
               <span className="pos-treino-rotulo-acao">Mais</span>
             </button>
