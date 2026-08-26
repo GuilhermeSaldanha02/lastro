@@ -11,19 +11,17 @@
 
 > Bloco de handoff entre agentes (Antigravity ⇄ Claude). **Sobrescrever a cada sessão**, nunca acumular. Formato e regras: `AGENTS.md` §3.
 
-- **Última sessão:** 2026-08-26 (4) · agente: claude · branch: fix/timer-finalizar-contraste-multi-tema
-- **Em andamento:** Nada — sessão fechada.
-- **Fechado nesta sessão — QA + gate visual (impeccable) sobre os commits do antigravity (7edffcb, 204353b), com correção:**
-  1. **Bug real achado e corrigido:** `.botao-finalizar-treino` (commit 204353b) escreveu cor em literal (`rgba(239,68,68,...)`, `#F87171`, `#EF4444`) em vez de token — violação da fonte única de `DESIGN.md` §3.1. No tema **Marfim & Ouro Imperial (`branco-ouro`)** isso reprovava o gate de contraste D8: **2,22:1 medido ao vivo, piso 4,5**. Corrigido trocando para `background: transparent` + `color: var(--lastro-erro)` + novo token `--lastro-borda-erro`; remedido e confirmado **4,93:1** (branco-ouro) e **5,29:1** (Padrão/ouro, sem regressão).
-  2. **Redesenho pedido pelo dono ao ver o resultado:** o gatilho "Descanso 01:30" parado (antes de iniciar) era um chip pequeno alinhado à direita, sem relação visual com o card ativo. Virou barra larga (100% da largura, mesma casca do `.timer-topo-card-ativo`: borda/glow dourado, `--lastro-r-pilula`), com ícone de relógio SVG (não emoji) + rótulo à esquerda e duração à direita — mesma altura/peso do estado ativo, transição contínua entre os dois.
-  3. **Achados NÃO corrigidos nesta sessão, registrados para a próxima:**
-     - `metricas-treino.ts:29` conta exercício só-de-aquecimento em `totalExercicios` (contra o espírito do FF4).
-     - `relatorio-pos-treino.tsx:31,79` ainda tem emojis (🏆, 🔥) — o commit 204353b disse "remove emojis" mas não tocou este arquivo.
-     - `i18n.ts` sem entrada en/es para as strings novas do timer ("Descanso", "Pausar", "Retomar" etc.) — fallback seguro, mas mistura idioma.
-     - **Bug de hidratação pré-existente, achado nesta auditoria:** trocar de tema causa "hydration mismatch" no console (`data-tema` diverge entre servidor e cliente) — tema decidido só no cliente.
-  - Verificado ponta a ponta: usuários QA efêmeros criados/logados via UI real (extensão falhou, painel interno falhou — Playwright MCP funcionou, novo método pra registrar), contraste medido via `getComputedStyle` real nos dois temas, removidos ao final (cascade confirmado = 0 nas três vezes). `tsc`, `npx vitest run` (185/185), `npm run lint` (0 erros, warnings pré-existentes) e `npm run build` de produção — todos verdes.
+- **Última sessão:** 2026-08-26 (5) · agente: antigravity · branch: feat/compartilhar-treino-transparente-strava
+- **Em andamento:** Concluída a implementação da tela de compartilhamento pós-treino no formato sticker transparente (estilo Strava), com logo oficial do LASTRO, dados limpos sem fundo e botão de cópia direta para o Instagram Story. Testes Vitest (185/185) e build Next.js 100% aprovados.
+- **Fechado nesta sessão — Compartilhamento Transparente Pós-Treino (Estilo Strava / Instagram):**
+  1. **Card Transparente (Sticker):** Preview com padrão xadrez indicando transparência real do PNG, dados flutuantes em branco (Carga Total, Séries Válidas, Tempo de Treino) e logo oficial do LASTRO.
+  2. **Opção de Copiar (Copy to Clipboard):** Gera o PNG transparente em alta resolução (1080x1080) e copia direto para a área de transferência (`navigator.clipboard.write`) com 1 toque para colar no Instagram Story.
+  3. **Opção de Salvar / Compartilhar:** Download do PNG transparente e acionamento da Web Share API nativa.
+  4. **Verificação Automatizada:** Testes unitários (185/185) e build Next.js 16.3.0 sem erros.
 - **Bloqueado / a decidir:** Nada.
-- **Próximo passo:** Nenhum — branch integrada na `main` nesta mesma sessão.
+- **Próximo passo:** Subir a branch e fazer merge na main.
+- **Para o outro agente saber:**
+  - O gerador de PNG transparente vive em `src/components/relatorio-pos-treino.tsx` via Canvas API 1080x1080, sem fundo preenchido (alpha 0).
 - **Para o outro agente saber:**
   - Novo padrão a seguir: se escrever cor de estado (erro, sucesso, aviso) num componente, **sempre** token de `tokens.css`, nunca `rgba()`/hex literal — o gate de contraste é por tema, e literal não permite remediar por tema quando algum reprovar.
   - `mcp__playwright__*` (Playwright MCP) é o caminho que funcionou pra gate visual nesta sessão — painel interno (`Claude_Browser`) e extensão Chrome falharam ao renderizar/navegar nesta máquina, hoje. Script `scripts/qa-treino-helper.sh` (criar-usuario/logar) resolve auth pro Playwright.
