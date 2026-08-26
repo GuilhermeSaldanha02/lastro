@@ -27,29 +27,31 @@ export type MetricasSessao = {
 
 export function calcularMetricasSessao(
   series: SerieParaMetricas[],
-  iniciadoEmIso: string,
+  iniciadoEmOuSegundos: string | number,
   finalizadoEmIso?: string
 ): MetricasSessao {
-  const inicio = new Date(iniciadoEmIso).getTime();
-  const fim = finalizadoEmIso ? new Date(finalizadoEmIso).getTime() : Date.now();
-  
-  // Duração mínima de 1 minuto para exibição coerente
-  const duracaoMs = Math.max(0, fim - inicio);
-  const duracaoMinutos = Math.max(1, Math.round(duracaoMs / 60000));
+  let duracaoMinutos = 1;
+  if (typeof iniciadoEmOuSegundos === "number") {
+    duracaoMinutos = Math.max(1, Math.round(iniciadoEmOuSegundos / 60));
+  } else {
+    const inicio = new Date(iniciadoEmOuSegundos).getTime();
+    const fim = finalizadoEmIso ? new Date(finalizadoEmIso).getTime() : Date.now();
+    const duracaoMs = Math.max(0, fim - inicio);
+    duracaoMinutos = Math.max(1, Math.round(duracaoMs / 60000));
+  }
 
   let tonelagemTotalKg = 0;
   let totalSeriesValendo = 0;
   let totalSeriesAquecimento = 0;
-  const exerciciosUnicos = new Set<string>();
+  const exerciciosUnicosValendo = new Set<string>();
   const prsBatidos: { exercicioNome: string; reps: number; peso: number }[] = [];
 
   for (const s of series) {
-    exerciciosUnicos.add(s.exercicioId);
-    
     const pesoEfetivo = s.pesoPorLado ? s.peso * 2 : s.peso;
     const volumeSerie = s.reps * pesoEfetivo;
 
     if (s.tipo === "valendo") {
+      exerciciosUnicosValendo.add(s.exercicioId);
       totalSeriesValendo++;
       tonelagemTotalKg += volumeSerie;
       
@@ -70,7 +72,7 @@ export function calcularMetricasSessao(
     tonelagemTotalKg: Math.round(tonelagemTotalKg * 10) / 10,
     totalSeriesValendo,
     totalSeriesAquecimento,
-    totalExercicios: exerciciosUnicos.size,
+    totalExercicios: exerciciosUnicosValendo.size || (series.length > 0 ? 1 : 0),
     prsBatidos,
   };
 }

@@ -42,6 +42,7 @@ export default async function PaginaHistoricoExercicio({
         titulo={exercicio.nome}
         destaque={exercicio.grupoMuscularNome}
         voltarHref="/catalogo"
+        perfil={perfil}
         idioma={idioma}
       />
 

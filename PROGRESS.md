@@ -11,21 +11,21 @@
 
 > Bloco de handoff entre agentes (Antigravity ⇄ Claude). **Sobrescrever a cada sessão**, nunca acumular. Formato e regras: `AGENTS.md` §3.
 
-- **Última sessão:** 2026-08-26 (5) · agente: antigravity · branch: feat/compartilhar-treino-transparente-strava
-- **Em andamento:** Concluída a implementação da tela de compartilhamento pós-treino no formato sticker transparente (estilo Strava), com logo oficial do LASTRO, dados limpos sem fundo e botão de cópia direta para o Instagram Story. Testes Vitest (185/185) e build Next.js 100% aprovados.
-- **Fechado nesta sessão — Compartilhamento Transparente Pós-Treino (Estilo Strava / Instagram):**
-  1. **Card Transparente (Sticker):** Preview com padrão xadrez indicando transparência real do PNG, dados flutuantes em branco (Carga Total, Séries Válidas, Tempo de Treino) e logo oficial do LASTRO.
-  2. **Opção de Copiar (Copy to Clipboard):** Gera o PNG transparente em alta resolução (1080x1080) e copia direto para a área de transferência (`navigator.clipboard.write`) com 1 toque para colar no Instagram Story.
-  3. **Opção de Salvar / Compartilhar:** Download do PNG transparente e acionamento da Web Share API nativa.
-  4. **Verificação Automatizada:** Testes unitários (185/185) e build Next.js 16.3.0 sem erros.
+- **Última sessão:** 2026-08-26 (6) · agente: antigravity · branch: feat/refinamentos-treino-timer-catalogo
+- **Em andamento:** Concluídos os 8 itens de refinamento do treino, timer e catálogo:
+  1. **Barra Sticky Pinned no Topo:** Acompanha 100% da rolagem da tela com `position: sticky; z-index: 45`.
+  2. **Layout Integrado:** Tempo de treino decorrido em tempo real na esquerda (`Treino MM:SS`) e descanso sob demanda na direita (`Descanso 01:30 ▶`).
+  3. **Alerta Sonoro e Vibração:** Áudio Web Audio API com desbloqueio prévio no toque e padrão de vibração nítido ao zerar.
+  4. **Contagem de Tempo Real e Persistente:** Início da sessão salvo no `localStorage` por `treinoId`, evitando cálculo zerado ou incorreto no relatório.
+  5. **Logo do LASTRO no Canto:** Posicionado no canto inferior direito do sticker transparente, ampliado para destaque.
+  6. **Pílula "Repetir série" Compacta:** Removido subtexto de carga/reps, gerando botões elegantes de altura reduzida.
+  7. **Correção do Catálogo:** Gerado novo GIF 3D anatômico de alta fidelidade para `Abdominal infra`.
+  8. **Foto de Perfil:** `perfil={perfil}` passado ao `CabecalhoPro` em `/catalogo/[id]`, exibindo avatar real do usuário.
 - **Bloqueado / a decidir:** Nada.
 - **Próximo passo:** Subir a branch e fazer merge na main.
 - **Para o outro agente saber:**
-  - O gerador de PNG transparente vive em `src/components/relatorio-pos-treino.tsx` via Canvas API 1080x1080, sem fundo preenchido (alpha 0).
-- **Para o outro agente saber:**
-  - Novo padrão a seguir: se escrever cor de estado (erro, sucesso, aviso) num componente, **sempre** token de `tokens.css`, nunca `rgba()`/hex literal — o gate de contraste é por tema, e literal não permite remediar por tema quando algum reprovar.
-  - `mcp__playwright__*` (Playwright MCP) é o caminho que funcionou pra gate visual nesta sessão — painel interno (`Claude_Browser`) e extensão Chrome falharam ao renderizar/navegar nesta máquina, hoje. Script `scripts/qa-treino-helper.sh` (criar-usuario/logar) resolve auth pro Playwright.
-  - Os 3 achados não corrigidos (item 3 acima) seguem abertos — próxima sessão que tocar o timer/relatório pós-treino deveria fechá-los junto.
+  - O tempo de treino persistido por ID garante resiliência mesmo se o atleta recarregar o app ou bloquear a tela.
+  - A suíte completa Vitest 185/185 e build Next.js 16.3.0 estão 100% verdes.
 
 ---
 
