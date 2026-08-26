@@ -11,17 +11,23 @@
 
 > Bloco de handoff entre agentes (Antigravity ⇄ Claude). **Sobrescrever a cada sessão**, nunca acumular. Formato e regras: `AGENTS.md` §3.
 
-- **Última sessão:** 2026-08-26 (3) · agente: antigravity · branch: feat/refinamento-botoes-pilula-e-finalizar-vermelho
-- **Em andamento:** Concluído o refinamento visual da tela de treino: formato de pílula em todos os botões de ação, remoção de emojis do timer e do botão finalizar, texto enxuto "Repetir série" e botão "Finalizar Treino" destacado em vermelho atlético. Testes Vitest (185/185) e Playwright 100% aprovados.
-- **Fechado nesta sessão — Refinamento Visual de Botões & Timer:**
-  1. **Remoção de Emojis:** Timer no topo e botão de finalizar treino agora com tipografia limpa e refinada sem emojis.
-  2. **Formato Pílula:** Botões `Repetir série` e `Outra série` com formato arredondado de pílula (`--lastro-r-pilula`).
-  3. **Botão Finalizar Treino em Vermelho:** Estilizado com acabamento rubi atlético com alto contraste e brilho sutil em vez de borda vazia/verde.
-  4. **Texto Direto:** Botão principal atualizado para `"Repetir série"`.
+- **Última sessão:** 2026-08-26 (4) · agente: claude · branch: fix/timer-finalizar-contraste-multi-tema
+- **Em andamento:** Nada — sessão fechada.
+- **Fechado nesta sessão — QA + gate visual (impeccable) sobre os commits do antigravity (7edffcb, 204353b), com correção:**
+  1. **Bug real achado e corrigido:** `.botao-finalizar-treino` (commit 204353b) escreveu cor em literal (`rgba(239,68,68,...)`, `#F87171`, `#EF4444`) em vez de token — violação da fonte única de `DESIGN.md` §3.1. No tema **Marfim & Ouro Imperial (`branco-ouro`)** isso reprovava o gate de contraste D8: **2,22:1 medido ao vivo, piso 4,5**. Corrigido trocando para `background: transparent` + `color: var(--lastro-erro)` + novo token `--lastro-borda-erro`; remedido e confirmado **4,93:1** (branco-ouro) e **5,29:1** (Padrão/ouro, sem regressão).
+  2. **Redesenho pedido pelo dono ao ver o resultado:** o gatilho "Descanso 01:30" parado (antes de iniciar) era um chip pequeno alinhado à direita, sem relação visual com o card ativo. Virou barra larga (100% da largura, mesma casca do `.timer-topo-card-ativo`: borda/glow dourado, `--lastro-r-pilula`), com ícone de relógio SVG (não emoji) + rótulo à esquerda e duração à direita — mesma altura/peso do estado ativo, transição contínua entre os dois.
+  3. **Achados NÃO corrigidos nesta sessão, registrados para a próxima:**
+     - `metricas-treino.ts:29` conta exercício só-de-aquecimento em `totalExercicios` (contra o espírito do FF4).
+     - `relatorio-pos-treino.tsx:31,79` ainda tem emojis (🏆, 🔥) — o commit 204353b disse "remove emojis" mas não tocou este arquivo.
+     - `i18n.ts` sem entrada en/es para as strings novas do timer ("Descanso", "Pausar", "Retomar" etc.) — fallback seguro, mas mistura idioma.
+     - **Bug de hidratação pré-existente, achado nesta auditoria:** trocar de tema causa "hydration mismatch" no console (`data-tema` diverge entre servidor e cliente) — tema decidido só no cliente.
+  - Verificado ponta a ponta: usuários QA efêmeros criados/logados via UI real (extensão falhou, painel interno falhou — Playwright MCP funcionou, novo método pra registrar), contraste medido via `getComputedStyle` real nos dois temas, removidos ao final (cascade confirmado = 0 nas três vezes). `tsc`, `npx vitest run` (185/185), `npm run lint` (0 erros, warnings pré-existentes) e `npm run build` de produção — todos verdes.
 - **Bloqueado / a decidir:** Nada.
-- **Próximo passo:** Subir a branch e fazer merge na main.
+- **Próximo passo:** Nenhum — branch integrada na `main` nesta mesma sessão.
 - **Para o outro agente saber:**
-  - Todos os botões da área de ação inferior usam formato de pílula consistente com os tokens do sistema.
+  - Novo padrão a seguir: se escrever cor de estado (erro, sucesso, aviso) num componente, **sempre** token de `tokens.css`, nunca `rgba()`/hex literal — o gate de contraste é por tema, e literal não permite remediar por tema quando algum reprovar.
+  - `mcp__playwright__*` (Playwright MCP) é o caminho que funcionou pra gate visual nesta sessão — painel interno (`Claude_Browser`) e extensão Chrome falharam ao renderizar/navegar nesta máquina, hoje. Script `scripts/qa-treino-helper.sh` (criar-usuario/logar) resolve auth pro Playwright.
+  - Os 3 achados não corrigidos (item 3 acima) seguem abertos — próxima sessão que tocar o timer/relatório pós-treino deveria fechá-los junto.
 
 ---
 
@@ -1130,6 +1136,18 @@ Surgiu de pedido direto do dono no meio da sessão, não estava em nenhum docume
     **Verificado ponta a ponta no navegador real** (usuário QA efêmero `qa-lastro-ajustes@example.com`, extensão Chrome — o painel interno de novo não compositou frame nenhum, mesma limitação já registrada; o método que funciona continua sendo extensão + upload de arquivo real via `file_upload`, não clique em seletor nativo): pílula mostra "Ajustes" com engrenagem, rótulo sem quebra de linha; `/ajustes` mostra card do perfil + linha Coach + botão Sair; `/perfil` mostra avatar + botão "Trocar foto"; upload de uma foto JPEG real trocou o avatar na tela **sem reload** e sem apertar F5; conferido no Postgres que `usuario.avatar_url` gravou com o cache-buster; navegação pra Início mostrou o avatar novo (confirma o `revalidatePath`) e confirmou que **não há mais botão Sair na Início**; `/coach` abre normal a partir do link dentro de Ajustes, com "Ajustes" continuando em destaque na pílula; "Sair" encerrou a sessão de verdade e redirecionou pra `/login`. Usuário QA removido ao final, cascade confirmado = 0.
     `tsc`/`test` (108 passando, 4 novos de `validarArquivoAvatar`)/`lint`/`build` verdes, rodados do zero (`rm -rf .next`) antes do PR.
     **Mergeado na `main`** ([PR #26](https://github.com/GuilhermeSaldanha02/lastro/pull/26)), branch `feat/ajustes-nav-perfil` apagada. **Confirmado pelo dono no aparelho real, mesmo dia:** "tudo está rodando corretamente".
+
+18. **QA + gate visual (impeccable) sobre o refinamento de botões do antigravity (7edffcb, 204353b) — achado real corrigido, redesenho pedido pelo dono feito na mesma sessão, 2026-08-26.** O dono pediu para acionar o QA e o gate de qualidade de design ("impeccable", https://impeccable.style) sobre os dois commits mais recentes. `inspetor-qa` (subagente, contexto limpo) revisou corretude; eu revisei o visual ao vivo, tema a tema, via Playwright MCP autenticado (usuário QA efêmero + `scripts/qa-treino-helper.sh`).
+    **Bug real, medido e corrigido:** `.botao-finalizar-treino` (`sistema.css`) tinha cor em literal (`rgba(239,68,68,...)`, `#F87171`) em vez de token — viola a fonte única de `DESIGN.md` §3.1. No tema **Marfim & Ouro Imperial (`branco-ouro`)**, o texto ficava a **2,22:1** contra o fundo — reprova D8 (piso 4,5). Causa raiz: o commit trocou o padrão anterior (`transparent` + token `--lastro-esmeralda-claro`) por literais hardcoded, perdendo a remediação por tema que só token permite. Corrigido: `background: transparent`, `color: var(--lastro-erro)` (já remedido por tema), novo token `--lastro-borda-erro` em `tokens.css`. Remedido e confirmado ao vivo: **4,93:1** (branco-ouro) e **5,29:1** (Padrão/ouro — sem regressão).
+    **Redesenho, pedido pelo dono depois de ver o resultado:** o gatilho "Descanso 01:30" (estado parado, antes do treino) era um chip pequeno no canto direito, cinza neutro, sem relação com o card do estado ativo — "não tá me agradando". Após brainstorm rápido (`AskUserQuestion`, 2 rodadas: direção de cor → depois ficou claro que era layout, não cor), o dono escolheu "barra larga no topo, mesma forma do card ativo, sempre visível". Implementado em `timer-topo.tsx`/`sistema.css`: barra 100% da largura, mesma casca do `.timer-topo-card-ativo` (borda + glow dourado, `--lastro-r-pilula`, `min-height: --lastro-alvo-min`), ícone de relógio em SVG (não emoji, coerente com a decisão do próprio commit 204353b) + rótulo à esquerda, duração à direita.
+    **Achados NÃO corrigidos nesta sessão — ficam para a próxima que tocar esta tela:**
+    - `metricas-treino.ts:29` conta exercício só-de-aquecimento em `totalExercicios` do relatório pós-treino (contra o espírito do FF4).
+    - `relatorio-pos-treino.tsx:31,79` ainda tem emojis (🏆, 🔥) — o commit 204353b disse "remove emojis" mas não tocou este arquivo.
+    - `i18n.ts` sem entrada en/es para as strings novas do timer.
+    - Hydration mismatch pré-existente no console ao trocar de tema (`data-tema` diverge servidor/cliente) — achado ao trocar de tema pra auditar, não introduzido nesta sessão.
+    **Achado de tooling desta sessão:** nem o painel interno (`Claude_Browser`, "the Browser pane is not displayed") nem a extensão Chrome (`claude-in-chrome`, "not connected") funcionaram nesta máquina hoje — diferente do que `browser-pane-precisa-estar-visivel` (memória) registrava. **O que funcionou: Playwright MCP** (`mcp__playwright__*`) direto contra `localhost:3000`, com login real via `scripts/qa-treino-helper.sh criar-usuario`/`logar` (cookie de sessão via formulário de login, não injeção de cookie — `addCookies` com o token do helper não autenticou, motivo não investigado).
+    Verificado ponta a ponta: 3 usuários QA efêmeros criados, logados via UI real, removidos ao final (cascade confirmado = 0 nas três vezes). Contraste medido via `getComputedStyle`/fórmula WCAG real no navegador, não estimado. `tsc` sem erros, `npx vitest run` 185/185, `npm run lint` 0 erros (warnings pré-existentes, arquivos não tocados), `npm run build` de produção limpo.
+    **Mergeado na `main`**, branch `fix/timer-finalizar-contraste-multi-tema` apagada.
 
 ---
 

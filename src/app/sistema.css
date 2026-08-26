@@ -3924,28 +3924,44 @@
 }
 
 .timer-topo-gatilho {
-  display: flex;
-  justify-content: flex-end;
+  width: 100%;
 }
 
 .timer-topo-botao-disparar {
-  display: inline-flex;
+  width: 100%;
+  min-height: var(--lastro-alvo-min);
+  display: flex;
   align-items: center;
-  gap: var(--lastro-e-2);
-  padding: 6px 14px;
+  justify-content: space-between;
+  padding: 8px 16px;
   background: var(--lastro-sup-2);
-  border: 1px solid var(--lastro-linha);
+  border: 1px solid var(--lastro-borda-ouro);
   border-radius: var(--lastro-r-pilula);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4), 0 0 15px var(--lastro-ouro-glow);
   color: var(--lastro-txt);
   font-size: var(--lastro-papel-rotulo);
   font-weight: 500;
   cursor: pointer;
   transition: all var(--lastro-dur-1) ease;
+  animation: lastro-pilula-entra var(--lastro-dur-2) ease;
 }
 
 .timer-topo-botao-disparar:hover {
   background: var(--lastro-sup-3);
   border-color: var(--lastro-ouro);
+}
+
+.timer-topo-disparar-rotulo {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--lastro-e-2);
+}
+
+.timer-topo-disparar-icone {
+  width: 18px;
+  height: 18px;
+  color: var(--lastro-ouro);
+  flex-shrink: 0;
 }
 
 .timer-topo-duracao-tag {
@@ -4112,22 +4128,20 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(239, 68, 68, 0.12);
-  border: 1px solid rgba(239, 68, 68, 0.45);
-  color: #F87171;
+  background: transparent;
+  border: 1px solid var(--lastro-borda-erro);
+  color: var(--lastro-erro);
   border-radius: var(--lastro-r-pilula);
   font-size: var(--lastro-papel-rotulo);
   font-weight: 600;
   cursor: pointer;
-  box-shadow: 0 0 15px rgba(239, 68, 68, 0.12);
+  box-shadow: 0 0 15px var(--lastro-erro-glow);
   transition: all var(--lastro-dur-1) ease;
 }
 
 .botao-finalizar-treino:hover {
-  background: rgba(239, 68, 68, 0.22);
-  border-color: #EF4444;
-  color: #FCA5A5;
-  box-shadow: 0 0 20px rgba(239, 68, 68, 0.25);
+  border-color: var(--lastro-erro);
+  box-shadow: 0 0 20px var(--lastro-erro-glow);
 }
 
 /* ---------- Modal do Relatório Pós-Treino (Estilo Strava) ---------- */
