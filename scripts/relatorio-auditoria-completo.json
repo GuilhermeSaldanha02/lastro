@@ -1,0 +1,1022 @@
+[
+  {
+    "num": 1,
+    "grupo": "Abdômen",
+    "nomePt": "Abdominal infra",
+    "nomeEnDataset": "lying leg-hip raise",
+    "gifAtual": "videos/0865-9IxJdtC.gif",
+    "status": "CORRETO",
+    "observacao": "Movimento e equipamento 100% condizentes.",
+    "acaoRecomendada": "Manter GIF atual."
+  },
+  {
+    "num": 2,
+    "grupo": "Abdômen",
+    "nomePt": "Abdominal máquina",
+    "nomeEnDataset": "lever seated crunch",
+    "gifAtual": "videos/1452-Wgaz7pm.gif",
+    "status": "CORRETO",
+    "observacao": "Movimento e equipamento 100% condizentes.",
+    "acaoRecomendada": "Manter GIF atual."
+  },
+  {
+    "num": 3,
+    "grupo": "Abdômen",
+    "nomePt": "Abdominal na polia",
+    "nomeEnDataset": "cable kneeling crunch",
+    "gifAtual": "videos/0175-WW95auq.gif",
+    "status": "CORRETO",
+    "observacao": "Movimento e equipamento 100% condizentes.",
+    "acaoRecomendada": "Manter GIF atual."
+  },
+  {
+    "num": 4,
+    "grupo": "Abdômen",
+    "nomePt": "Abdominal oblíquo na bicicleta",
+    "nomeEnDataset": "band bicycle crunch",
+    "gifAtual": "videos/0972-tZkGYZ9.gif",
+    "status": "CORRETO",
+    "observacao": "Movimento e equipamento 100% condizentes.",
+    "acaoRecomendada": "Manter GIF atual."
+  },
+  {
+    "num": 5,
+    "grupo": "Abdômen",
+    "nomePt": "Abdominal supra",
+    "nomeEnDataset": "frog crunch",
+    "gifAtual": "videos/2429-FFRP97T.gif",
+    "status": "CORRETO",
+    "observacao": "Movimento e equipamento 100% condizentes.",
+    "acaoRecomendada": "Manter GIF atual."
+  },
+  {
+    "num": 6,
+    "grupo": "Abdômen",
+    "nomePt": "Elevação de pernas",
+    "nomeEnDataset": "hanging leg raise",
+    "gifAtual": "videos/0472-I3tsCnC.gif",
+    "status": "CORRETO",
+    "observacao": "Movimento e equipamento 100% condizentes.",
+    "acaoRecomendada": "Manter GIF atual."
+  },
+  {
+    "num": 7,
+    "grupo": "Abdômen",
+    "nomePt": "Prancha",
+    "nomeEnDataset": "power point plank",
+    "gifAtual": "videos/3665-hCjGsRQ.gif",
+    "status": "CORRETO",
+    "observacao": "Movimento e equipamento 100% condizentes.",
+    "acaoRecomendada": "Manter GIF atual."
+  },
+  {
+    "num": 8,
+    "grupo": "Abdômen",
+    "nomePt": "Prancha lateral",
+    "nomeEnDataset": "push-up to side plank",
+    "gifAtual": "videos/0664-KhHJ338.gif",
+    "status": "CORRETO",
+    "observacao": "Movimento e equipamento 100% condizentes.",
+    "acaoRecomendada": "Manter GIF atual."
+  },
+  {
+    "num": 9,
+    "grupo": "Abdômen",
+    "nomePt": "Rotação de tronco máquina",
+    "nomeEnDataset": "lever seated dip",
+    "gifAtual": "videos/1451-BRImeP8.gif",
+    "status": "FALHA_CRITICA",
+    "observacao": "Exercício de Abdômen (rotação de tronco) está com GIF de Tríceps Dip (mergulho).",
+    "acaoRecomendada": "GERAR NOVO GIF: Máquina rotacional de tronco para oblíquos."
+  },
+  {
+    "num": 10,
+    "grupo": "Abdômen",
+    "nomePt": "Rotação de tronco no cabo",
+    "nomeEnDataset": "cable standing twist row (v-bar)",
+    "gifAtual": "videos/0236-JOZhu2h.gif",
+    "status": "CORRETO",
+    "observacao": "Movimento e equipamento 100% condizentes.",
+    "acaoRecomendada": "Manter GIF atual."
+  },
+  {
+    "num": 11,
+    "grupo": "Bíceps",
+    "nomePt": "Rosca alternada com halteres",
+    "nomeEnDataset": "dumbbell alternate biceps curl",
+    "gifAtual": "videos/0285-BU15nH4.gif",
+    "status": "CORRETO",
+    "observacao": "Movimento e equipamento 100% condizentes.",
+    "acaoRecomendada": "Manter GIF atual."
+  },
+  {
+    "num": 12,
+    "grupo": "Bíceps",
+    "nomePt": "Rosca concentrada",
+    "nomeEnDataset": "dumbbell concentration curl",
+    "gifAtual": "videos/0297-gvsWLQw.gif",
+    "status": "CORRETO",
+    "observacao": "Movimento e equipamento 100% condizentes.",
+    "acaoRecomendada": "Manter GIF atual."
+  },
+  {
+    "num": 13,
+    "grupo": "Bíceps",
+    "nomePt": "Rosca direta",
+    "nomeEnDataset": "barbell standing wide grip biceps curl",
+    "gifAtual": "videos/1629-faHKVkK.gif",
+    "status": "CORRETO",
+    "observacao": "Movimento e equipamento 100% condizentes.",
+    "acaoRecomendada": "Manter GIF atual."
+  },
+  {
+    "num": 14,
+    "grupo": "Bíceps",
+    "nomePt": "Rosca inversa com barra",
+    "nomeEnDataset": "barbell reverse curl",
+    "gifAtual": "videos/0080-xNrS20v.gif",
+    "status": "CORRETO",
+    "observacao": "Movimento e equipamento 100% condizentes.",
+    "acaoRecomendada": "Manter GIF atual."
+  },
+  {
+    "num": 15,
+    "grupo": "Bíceps",
+    "nomePt": "Rosca máquina",
+    "nomeEnDataset": "lever preacher curl",
+    "gifAtual": "videos/0592-b6hQYMb.gif",
+    "status": "CORRETO",
+    "observacao": "Movimento e equipamento 100% condizentes.",
+    "acaoRecomendada": "Manter GIF atual."
+  },
+  {
+    "num": 16,
+    "grupo": "Bíceps",
+    "nomePt": "Rosca martelo",
+    "nomeEnDataset": "dumbbell hammer curl",
+    "gifAtual": "videos/0313-slDvUAU.gif",
+    "status": "CORRETO",
+    "observacao": "Movimento e equipamento 100% condizentes.",
+    "acaoRecomendada": "Manter GIF atual."
+  },
+  {
+    "num": 17,
+    "grupo": "Bíceps",
+    "nomePt": "Rosca no cabo",
+    "nomeEnDataset": "cable curl",
+    "gifAtual": "videos/0868-G08RZcQ.gif",
+    "status": "CORRETO",
+    "observacao": "Movimento e equipamento 100% condizentes.",
+    "acaoRecomendada": "Manter GIF atual."
+  },
+  {
+    "num": 18,
+    "grupo": "Bíceps",
+    "nomePt": "Rosca scott",
+    "nomeEnDataset": "barbell preacher curl",
+    "gifAtual": "videos/0070-qOgPVf6.gif",
+    "status": "CORRETO",
+    "observacao": "Movimento e equipamento 100% condizentes.",
+    "acaoRecomendada": "Manter GIF atual."
+  },
+  {
+    "num": 19,
+    "grupo": "Bíceps",
+    "nomePt": "Rosca spider",
+    "nomeEnDataset": "dumbbell reverse spider curl",
+    "gifAtual": "videos/1675-6sMAmNv.gif",
+    "status": "CORRETO",
+    "observacao": "Movimento e equipamento 100% condizentes.",
+    "acaoRecomendada": "Manter GIF atual."
+  },
+  {
+    "num": 20,
+    "grupo": "Costas",
+    "nomePt": "Barra fixa",
+    "nomeEnDataset": "pull-up",
+    "gifAtual": "videos/0652-lBDjFxJ.gif",
+    "status": "CORRETO",
+    "observacao": "Movimento e equipamento 100% condizentes.",
+    "acaoRecomendada": "Manter GIF atual."
+  },
+  {
+    "num": 21,
+    "grupo": "Costas",
+    "nomePt": "Extensora lombar máquina",
+    "nomeEnDataset": "lever back extension",
+    "gifAtual": "videos/0573-rUXfn3R.gif",
+    "status": "CORRETO",
+    "observacao": "Movimento e equipamento 100% condizentes.",
+    "acaoRecomendada": "Manter GIF atual."
+  },
+  {
+    "num": 22,
+    "grupo": "Costas",
+    "nomePt": "Levantamento terra",
+    "nomeEnDataset": "barbell deadlift",
+    "gifAtual": "videos/0032-ila4NZS.gif",
+    "status": "CORRETO",
+    "observacao": "Movimento e equipamento 100% condizentes.",
+    "acaoRecomendada": "Manter GIF atual."
+  },
+  {
+    "num": 23,
+    "grupo": "Costas",
+    "nomePt": "Pull-over com halter",
+    "nomeEnDataset": "dumbbell pullover",
+    "gifAtual": "videos/0375-9XjtHvS.gif",
+    "status": "CORRETO",
+    "observacao": "Movimento e equipamento 100% condizentes.",
+    "acaoRecomendada": "Manter GIF atual."
+  },
+  {
+    "num": 24,
+    "grupo": "Costas",
+    "nomePt": "Puxada frente no pulley",
+    "nomeEnDataset": "cable pulldown (pro lat bar)",
+    "gifAtual": "videos/0197-qdRxqCj.gif",
+    "status": "CORRETO",
+    "observacao": "Movimento e equipamento 100% condizentes.",
+    "acaoRecomendada": "Manter GIF atual."
+  },
+  {
+    "num": 25,
+    "grupo": "Costas",
+    "nomePt": "Puxada pegada aberta",
+    "nomeEnDataset": "twin handle parallel grip lat pulldown",
+    "gifAtual": "videos/0818-rkg41Fb.gif",
+    "status": "CORRETO",
+    "observacao": "Movimento e equipamento 100% condizentes.",
+    "acaoRecomendada": "Manter GIF atual."
+  },
+  {
+    "num": 26,
+    "grupo": "Costas",
+    "nomePt": "Puxada pegada supinada",
+    "nomeEnDataset": "reverse grip machine lat pulldown",
+    "gifAtual": "videos/0673-ecpY0rH.gif",
+    "status": "CORRETO",
+    "observacao": "Movimento e equipamento 100% condizentes.",
+    "acaoRecomendada": "Manter GIF atual."
+  },
+  {
+    "num": 27,
+    "grupo": "Costas",
+    "nomePt": "Puxador articulado máquina",
+    "nomeEnDataset": "lever front pulldown",
+    "gifAtual": "videos/0579-7F1DVzn.gif",
+    "status": "CORRETO",
+    "observacao": "Movimento e equipamento 100% condizentes.",
+    "acaoRecomendada": "Manter GIF atual."
+  },
+  {
+    "num": 28,
+    "grupo": "Costas",
+    "nomePt": "Remada baixa no cabo",
+    "nomeEnDataset": "cable seated row",
+    "gifAtual": "videos/0861-fUBheHs.gif",
+    "status": "CORRETO",
+    "observacao": "Movimento e equipamento 100% condizentes.",
+    "acaoRecomendada": "Manter GIF atual."
+  },
+  {
+    "num": 29,
+    "grupo": "Costas",
+    "nomePt": "Remada cavalinho",
+    "nomeEnDataset": "lever t bar row",
+    "gifAtual": "videos/0606-aaXr7ld.gif",
+    "status": "CORRETO",
+    "observacao": "Movimento e equipamento 100% condizentes.",
+    "acaoRecomendada": "Manter GIF atual."
+  },
+  {
+    "num": 30,
+    "grupo": "Costas",
+    "nomePt": "Remada curvada com barra",
+    "nomeEnDataset": "barbell bent over row",
+    "gifAtual": "videos/0027-eZyBC3j.gif",
+    "status": "CORRETO",
+    "observacao": "Movimento e equipamento 100% condizentes.",
+    "acaoRecomendada": "Manter GIF atual."
+  },
+  {
+    "num": 31,
+    "grupo": "Costas",
+    "nomePt": "Remada máquina",
+    "nomeEnDataset": "lever seated row",
+    "gifAtual": "videos/1350-7I6LNUG.gif",
+    "status": "CORRETO",
+    "observacao": "Movimento e equipamento 100% condizentes.",
+    "acaoRecomendada": "Manter GIF atual."
+  },
+  {
+    "num": 32,
+    "grupo": "Costas",
+    "nomePt": "Remada máquina peito-apoiado",
+    "nomeEnDataset": "lever bent over row",
+    "gifAtual": "videos/0574-X3cqyXz.gif",
+    "status": "CORRETO",
+    "observacao": "Movimento e equipamento 100% condizentes.",
+    "acaoRecomendada": "Manter GIF atual."
+  },
+  {
+    "num": 33,
+    "grupo": "Costas",
+    "nomePt": "Remada unilateral com halter",
+    "nomeEnDataset": "dumbbell one arm upright row",
+    "gifAtual": "videos/0363-6cKQC5E.gif",
+    "status": "FALHA_IMPORTANTE",
+    "observacao": "Remada unilateral com halter (serrote/costas) está com GIF de remada alta de pé (trapézio/ombro).",
+    "acaoRecomendada": "GERAR NOVO GIF: Remada unilateral serrote no banco com halter."
+  },
+  {
+    "num": 34,
+    "grupo": "Glúteos",
+    "nomePt": "Agachamento sumô com halter",
+    "nomeEnDataset": "dumbbell squat",
+    "gifAtual": "videos/0413-HsvHqgf.gif",
+    "status": "CORRETO",
+    "observacao": "Movimento e equipamento 100% condizentes.",
+    "acaoRecomendada": "Manter GIF atual."
+  },
+  {
+    "num": 35,
+    "grupo": "Glúteos",
+    "nomePt": "Cadeira abdutora",
+    "nomeEnDataset": "lever seated hip abduction",
+    "gifAtual": "videos/0597-CHpahtl.gif",
+    "status": "CORRETO",
+    "observacao": "Movimento e equipamento 100% condizentes.",
+    "acaoRecomendada": "Manter GIF atual."
+  },
+  {
+    "num": 36,
+    "grupo": "Glúteos",
+    "nomePt": "Cadeira adutora",
+    "nomeEnDataset": "lever seated hip adduction",
+    "gifAtual": "videos/0598-oHsrypV.gif",
+    "status": "CORRETO",
+    "observacao": "Movimento e equipamento 100% condizentes.",
+    "acaoRecomendada": "Manter GIF atual."
+  },
+  {
+    "num": 37,
+    "grupo": "Glúteos",
+    "nomePt": "Cadeira de glúteo (hip thrust máquina)",
+    "nomeEnDataset": "lever hip extension v. 2",
+    "gifAtual": "videos/2286-OPqShYN.gif",
+    "status": "CORRETO",
+    "observacao": "Movimento e equipamento 100% condizentes.",
+    "acaoRecomendada": "Manter GIF atual."
+  },
+  {
+    "num": 38,
+    "grupo": "Glúteos",
+    "nomePt": "Coice no cabo",
+    "nomeEnDataset": "cable kickback",
+    "gifAtual": "videos/0860-HEJ6DIX.gif",
+    "status": "CORRETO",
+    "observacao": "Movimento e equipamento 100% condizentes.",
+    "acaoRecomendada": "Manter GIF atual."
+  },
+  {
+    "num": 39,
+    "grupo": "Glúteos",
+    "nomePt": "Elevação pélvica com barra",
+    "nomeEnDataset": "barbell lying lifting (on hip)",
+    "gifAtual": "videos/0058-SNFfUff.gif",
+    "status": "CORRETO",
+    "observacao": "Movimento e equipamento 100% condizentes.",
+    "acaoRecomendada": "Manter GIF atual."
+  },
+  {
+    "num": 40,
+    "grupo": "Glúteos",
+    "nomePt": "Elevação pélvica unilateral",
+    "nomeEnDataset": "hanging leg hip raise",
+    "gifAtual": "videos/1764-VEcJRo2.gif",
+    "status": "FALHA_CRITICA",
+    "observacao": "Elevação pélvica unilateral (Glúteo) está com GIF de elevação de pernas na barra (Abdômen).",
+    "acaoRecomendada": "GERAR NOVO GIF: Elevação pélvica com apoio unilateral."
+  },
+  {
+    "num": 41,
+    "grupo": "Glúteos",
+    "nomePt": "Extensão de quadril no cabo",
+    "nomeEnDataset": "cable standing hip extension",
+    "gifAtual": "videos/0228-Kpajagk.gif",
+    "status": "CORRETO",
+    "observacao": "Movimento e equipamento 100% condizentes.",
+    "acaoRecomendada": "Manter GIF atual."
+  },
+  {
+    "num": 42,
+    "grupo": "Glúteos",
+    "nomePt": "Ponte de glúteo",
+    "nomeEnDataset": "glute bridge march",
+    "gifAtual": "videos/3561-GibBPPg.gif",
+    "status": "CORRETO",
+    "observacao": "Movimento e equipamento 100% condizentes.",
+    "acaoRecomendada": "Manter GIF atual."
+  },
+  {
+    "num": 43,
+    "grupo": "Ombro",
+    "nomePt": "Arnold press",
+    "nomeEnDataset": "dumbbell arnold press",
+    "gifAtual": "videos/2137-Xy4jlWA.gif",
+    "status": "CORRETO",
+    "observacao": "Movimento e equipamento 100% condizentes.",
+    "acaoRecomendada": "Manter GIF atual."
+  },
+  {
+    "num": 44,
+    "grupo": "Ombro",
+    "nomePt": "Crucifixo inverso",
+    "nomeEnDataset": "dumbbell rear fly",
+    "gifAtual": "videos/0378-8DiFDVA.gif",
+    "status": "CORRETO",
+    "observacao": "Movimento e equipamento 100% condizentes.",
+    "acaoRecomendada": "Manter GIF atual."
+  },
+  {
+    "num": 45,
+    "grupo": "Ombro",
+    "nomePt": "Desenvolvimento com halteres",
+    "nomeEnDataset": "dumbbell seated shoulder press",
+    "gifAtual": "videos/0405-znQUdHY.gif",
+    "status": "CORRETO",
+    "observacao": "Movimento e equipamento 100% condizentes.",
+    "acaoRecomendada": "Manter GIF atual."
+  },
+  {
+    "num": 46,
+    "grupo": "Ombro",
+    "nomePt": "Desenvolvimento máquina",
+    "nomeEnDataset": "lever shoulder press",
+    "gifAtual": "videos/0603-67n3r98.gif",
+    "status": "CORRETO",
+    "observacao": "Movimento e equipamento 100% condizentes.",
+    "acaoRecomendada": "Manter GIF atual."
+  },
+  {
+    "num": 47,
+    "grupo": "Ombro",
+    "nomePt": "Desenvolvimento militar com barra",
+    "nomeEnDataset": "barbell standing wide military press",
+    "gifAtual": "videos/1457-Kyd9Rz5.gif",
+    "status": "CORRETO",
+    "observacao": "Movimento e equipamento 100% condizentes.",
+    "acaoRecomendada": "Manter GIF atual."
+  },
+  {
+    "num": 48,
+    "grupo": "Ombro",
+    "nomePt": "Elevação frontal com halteres",
+    "nomeEnDataset": "dumbbell front raise",
+    "gifAtual": "videos/0310-3eGE2JC.gif",
+    "status": "CORRETO",
+    "observacao": "Movimento e equipamento 100% condizentes.",
+    "acaoRecomendada": "Manter GIF atual."
+  },
+  {
+    "num": 49,
+    "grupo": "Ombro",
+    "nomePt": "Elevação lateral com halteres",
+    "nomeEnDataset": "dumbbell lateral raise",
+    "gifAtual": "videos/0334-DsgkuIt.gif",
+    "status": "CORRETO",
+    "observacao": "Movimento e equipamento 100% condizentes.",
+    "acaoRecomendada": "Manter GIF atual."
+  },
+  {
+    "num": 50,
+    "grupo": "Ombro",
+    "nomePt": "Elevação lateral máquina",
+    "nomeEnDataset": "lever lateral raise",
+    "gifAtual": "videos/0584-dRTfGZT.gif",
+    "status": "CORRETO",
+    "observacao": "Movimento e equipamento 100% condizentes.",
+    "acaoRecomendada": "Manter GIF atual."
+  },
+  {
+    "num": 51,
+    "grupo": "Ombro",
+    "nomePt": "Encolhimento com halteres",
+    "nomeEnDataset": "dumbbell shrug",
+    "gifAtual": "videos/0406-NJzBsGJ.gif",
+    "status": "CORRETO",
+    "observacao": "Movimento e equipamento 100% condizentes.",
+    "acaoRecomendada": "Manter GIF atual."
+  },
+  {
+    "num": 52,
+    "grupo": "Ombro",
+    "nomePt": "Encolhimento máquina",
+    "nomeEnDataset": "lever shrug",
+    "gifAtual": "videos/0604-ZZKbeMw.gif",
+    "status": "CORRETO",
+    "observacao": "Movimento e equipamento 100% condizentes.",
+    "acaoRecomendada": "Manter GIF atual."
+  },
+  {
+    "num": 53,
+    "grupo": "Ombro",
+    "nomePt": "Face pull no cabo",
+    "nomeEnDataset": "cable twisting pull",
+    "gifAtual": "videos/0244-zCgxPbV.gif",
+    "status": "FALHA_IMPORTANTE",
+    "observacao": "Face pull no cabo está com puxada com giro diagonal, não o face pull clássico para deltoide posterior.",
+    "acaoRecomendada": "GERAR NOVO GIF: Face pull na polia alta com corda direcionada à testa."
+  },
+  {
+    "num": 54,
+    "grupo": "Ombro",
+    "nomePt": "Remada alta com barra",
+    "nomeEnDataset": "barbell upright row",
+    "gifAtual": "videos/0120-UDlhcO8.gif",
+    "status": "CORRETO",
+    "observacao": "Movimento e equipamento 100% condizentes.",
+    "acaoRecomendada": "Manter GIF atual."
+  },
+  {
+    "num": 55,
+    "grupo": "Panturrilha",
+    "nomePt": "Panturrilha burrinho",
+    "nomeEnDataset": "donkey calf raise",
+    "gifAtual": "videos/0284-u5ESqzH.gif",
+    "status": "CORRETO",
+    "observacao": "Movimento e equipamento 100% condizentes.",
+    "acaoRecomendada": "Manter GIF atual."
+  },
+  {
+    "num": 56,
+    "grupo": "Panturrilha",
+    "nomePt": "Panturrilha em pé",
+    "nomeEnDataset": "cable standing calf raise",
+    "gifAtual": "videos/1375-yl2IYyy.gif",
+    "status": "VARIACAO_CABO",
+    "observacao": "Panturrilha em pé está com GIF na polia/cabo em vez da máquina de panturrilha em pé tradicional.",
+    "acaoRecomendada": "GERAR NOVO GIF (Opcional): Máquina clássica de panturrilha em pé com apoio nos ombros."
+  },
+  {
+    "num": 57,
+    "grupo": "Panturrilha",
+    "nomePt": "Panturrilha no leg press",
+    "nomeEnDataset": "lever seated squat calf raise on leg press machine",
+    "gifAtual": "videos/1385-IeDEXTe.gif",
+    "status": "CORRETO",
+    "observacao": "Movimento e equipamento 100% condizentes.",
+    "acaoRecomendada": "Manter GIF atual."
+  },
+  {
+    "num": 58,
+    "grupo": "Panturrilha",
+    "nomePt": "Panturrilha sentado",
+    "nomeEnDataset": "lever seated calf raise",
+    "gifAtual": "videos/0594-bOOdeyc.gif",
+    "status": "CORRETO",
+    "observacao": "Movimento e equipamento 100% condizentes.",
+    "acaoRecomendada": "Manter GIF atual."
+  },
+  {
+    "num": 59,
+    "grupo": "Panturrilha",
+    "nomePt": "Panturrilha unilateral com halter",
+    "nomeEnDataset": "dumbbell single leg calf raise",
+    "gifAtual": "videos/0409-1kB3Wmk.gif",
+    "status": "CORRETO",
+    "observacao": "Movimento e equipamento 100% condizentes.",
+    "acaoRecomendada": "Manter GIF atual."
+  },
+  {
+    "num": 60,
+    "grupo": "Peito",
+    "nomePt": "Crossover no cabo",
+    "nomeEnDataset": "cable rope crossover seated row",
+    "gifAtual": "videos/1320-UFGF6gk.gif",
+    "status": "FALHA_CRITICA",
+    "observacao": "Crossover no cabo (Peito) está com GIF de remada sentada no cabo (Costas).",
+    "acaoRecomendada": "GERAR NOVO GIF: Crucifixo/Crossover no crossover duplo de polias."
+  },
+  {
+    "num": 61,
+    "grupo": "Peito",
+    "nomePt": "Crucifixo inclinado com halteres",
+    "nomeEnDataset": "dumbbell incline fly",
+    "gifAtual": "videos/0319-ESOd5Pl.gif",
+    "status": "CORRETO",
+    "observacao": "Movimento e equipamento 100% condizentes.",
+    "acaoRecomendada": "Manter GIF atual."
+  },
+  {
+    "num": 62,
+    "grupo": "Peito",
+    "nomePt": "Crucifixo reto com halteres",
+    "nomeEnDataset": "dumbbell fly",
+    "gifAtual": "videos/0308-yz9nUhF.gif",
+    "status": "CORRETO",
+    "observacao": "Movimento e equipamento 100% condizentes.",
+    "acaoRecomendada": "Manter GIF atual."
+  },
+  {
+    "num": 63,
+    "grupo": "Peito",
+    "nomePt": "Flexão de braço",
+    "nomeEnDataset": "push-up",
+    "gifAtual": "videos/0662-I4hDWkc.gif",
+    "status": "CORRETO",
+    "observacao": "Movimento e equipamento 100% condizentes.",
+    "acaoRecomendada": "Manter GIF atual."
+  },
+  {
+    "num": 64,
+    "grupo": "Peito",
+    "nomePt": "Peck deck",
+    "nomeEnDataset": "lever seated fly",
+    "gifAtual": "videos/0596-v3xmPAR.gif",
+    "status": "CORRETO",
+    "observacao": "Movimento e equipamento 100% condizentes.",
+    "acaoRecomendada": "Manter GIF atual."
+  },
+  {
+    "num": 65,
+    "grupo": "Peito",
+    "nomePt": "Supino declinado com barra",
+    "nomeEnDataset": "barbell decline bench press",
+    "gifAtual": "videos/0033-GrO65fd.gif",
+    "status": "CORRETO",
+    "observacao": "Movimento e equipamento 100% condizentes.",
+    "acaoRecomendada": "Manter GIF atual."
+  },
+  {
+    "num": 66,
+    "grupo": "Peito",
+    "nomePt": "Supino declinado com halteres",
+    "nomeEnDataset": "dumbbell decline bench press",
+    "gifAtual": "videos/0301-DwhEmmE.gif",
+    "status": "CORRETO",
+    "observacao": "Movimento e equipamento 100% condizentes.",
+    "acaoRecomendada": "Manter GIF atual."
+  },
+  {
+    "num": 67,
+    "grupo": "Peito",
+    "nomePt": "Supino declinado máquina",
+    "nomeEnDataset": "lever decline chest press",
+    "gifAtual": "videos/1300-vsVoPHt.gif",
+    "status": "CORRETO",
+    "observacao": "Movimento e equipamento 100% condizentes.",
+    "acaoRecomendada": "Manter GIF atual."
+  },
+  {
+    "num": 68,
+    "grupo": "Peito",
+    "nomePt": "Supino inclinado com barra",
+    "nomeEnDataset": "barbell incline bench press",
+    "gifAtual": "videos/0047-3TZduzM.gif",
+    "status": "CORRETO",
+    "observacao": "Movimento e equipamento 100% condizentes.",
+    "acaoRecomendada": "Manter GIF atual."
+  },
+  {
+    "num": 69,
+    "grupo": "Peito",
+    "nomePt": "Supino inclinado com halteres",
+    "nomeEnDataset": "dumbbell incline bench press",
+    "gifAtual": "videos/0314-ns0SIbU.gif",
+    "status": "CORRETO",
+    "observacao": "Movimento e equipamento 100% condizentes.",
+    "acaoRecomendada": "Manter GIF atual."
+  },
+  {
+    "num": 70,
+    "grupo": "Peito",
+    "nomePt": "Supino inclinado máquina",
+    "nomeEnDataset": "lever incline chest press",
+    "gifAtual": "videos/1299-jHAnWmT.gif",
+    "status": "CORRETO",
+    "observacao": "Movimento e equipamento 100% condizentes.",
+    "acaoRecomendada": "Manter GIF atual."
+  },
+  {
+    "num": 71,
+    "grupo": "Peito",
+    "nomePt": "Supino máquina",
+    "nomeEnDataset": "lever chest press",
+    "gifAtual": "videos/0577-T0yTjgW.gif",
+    "status": "CORRETO",
+    "observacao": "Movimento e equipamento 100% condizentes.",
+    "acaoRecomendada": "Manter GIF atual."
+  },
+  {
+    "num": 72,
+    "grupo": "Peito",
+    "nomePt": "Supino reto com barra",
+    "nomeEnDataset": "barbell bench press",
+    "gifAtual": "videos/0025-EIeI8Vf.gif",
+    "status": "CORRETO",
+    "observacao": "Movimento e equipamento 100% condizentes.",
+    "acaoRecomendada": "Manter GIF atual."
+  },
+  {
+    "num": 73,
+    "grupo": "Peito",
+    "nomePt": "Supino reto com halteres",
+    "nomeEnDataset": "dumbbell bench press",
+    "gifAtual": "videos/0289-SpYC0Kp.gif",
+    "status": "CORRETO",
+    "observacao": "Movimento e equipamento 100% condizentes.",
+    "acaoRecomendada": "Manter GIF atual."
+  },
+  {
+    "num": 74,
+    "grupo": "Peito",
+    "nomePt": "Supino reto máquina",
+    "nomeEnDataset": "lever horizontal one leg press",
+    "gifAtual": "videos/2611-9KU9TYF.gif",
+    "status": "FALHA_CRITICA",
+    "observacao": "Supino reto máquina (Peito) está com GIF de Leg Press unilateral (Pernas).",
+    "acaoRecomendada": "GERAR NOVO GIF: Supino reto em máquina articulada ou horizontal."
+  },
+  {
+    "num": 75,
+    "grupo": "Posterior de coxa",
+    "nomePt": "Bom dia (good morning) com barra",
+    "nomeEnDataset": "barbell good morning",
+    "gifAtual": "videos/0044-XlZ4lAC.gif",
+    "status": "CORRETO",
+    "observacao": "Movimento e equipamento 100% condizentes.",
+    "acaoRecomendada": "Manter GIF atual."
+  },
+  {
+    "num": 76,
+    "grupo": "Posterior de coxa",
+    "nomePt": "Cadeira flexora",
+    "nomeEnDataset": "lever lying leg curl",
+    "gifAtual": "videos/0586-17lJ1kr.gif",
+    "status": "VARIACAO_DIVERGENTE",
+    "observacao": "Cadeira flexora (sentada) está com GIF de mesa flexora deitada.",
+    "acaoRecomendada": "GERAR NOVO GIF: Cadeira flexora sentada com almofada sobre as coxas."
+  },
+  {
+    "num": 77,
+    "grupo": "Posterior de coxa",
+    "nomePt": "Cadeira flexora unilateral",
+    "nomeEnDataset": "lever seated leg curl",
+    "gifAtual": "videos/0599-Zg3XY7P.gif",
+    "status": "MODALIDADE_BILATERAL",
+    "observacao": "Exercício cadastrado como unilateral, mas GIF mostra execução com as duas pernas juntas.",
+    "acaoRecomendada": "GERAR NOVO GIF: Flexão de joelhos unilateral na cadeira flexora."
+  },
+  {
+    "num": 78,
+    "grupo": "Posterior de coxa",
+    "nomePt": "Flexora unilateral no cabo",
+    "nomeEnDataset": "cable assisted inverse leg curl",
+    "gifAtual": "videos/3235-zHEpuuc.gif",
+    "status": "MODALIDADE_BILATERAL",
+    "observacao": "Flexora unilateral no cabo está com GIF de flexão nórdica invertida com elástico.",
+    "acaoRecomendada": "GERAR NOVO GIF: Flexora de pé unilateral com tornozeleira no cabo."
+  },
+  {
+    "num": 79,
+    "grupo": "Posterior de coxa",
+    "nomePt": "Levantamento terra romeno com halteres",
+    "nomeEnDataset": "dumbbell romanian deadlift",
+    "gifAtual": "videos/1459-rR0LJzx.gif",
+    "status": "CORRETO",
+    "observacao": "Movimento e equipamento 100% condizentes.",
+    "acaoRecomendada": "Manter GIF atual."
+  },
+  {
+    "num": 80,
+    "grupo": "Posterior de coxa",
+    "nomePt": "Mesa flexora",
+    "nomeEnDataset": "lever lying two-one leg curl",
+    "gifAtual": "videos/3195-UXpKJoq.gif",
+    "status": "CORRETO",
+    "observacao": "Movimento e equipamento 100% condizentes.",
+    "acaoRecomendada": "Manter GIF atual."
+  },
+  {
+    "num": 81,
+    "grupo": "Posterior de coxa",
+    "nomePt": "Stiff com barra",
+    "nomeEnDataset": "barbell straight leg deadlift",
+    "gifAtual": "videos/0116-hrVQWvE.gif",
+    "status": "CORRETO",
+    "observacao": "Movimento e equipamento 100% condizentes.",
+    "acaoRecomendada": "Manter GIF atual."
+  },
+  {
+    "num": 82,
+    "grupo": "Quadríceps",
+    "nomePt": "Afundo com halteres",
+    "nomeEnDataset": "dumbbell lunge",
+    "gifAtual": "videos/0336-RRWFUcw.gif",
+    "status": "CORRETO",
+    "observacao": "Movimento e equipamento 100% condizentes.",
+    "acaoRecomendada": "Manter GIF atual."
+  },
+  {
+    "num": 83,
+    "grupo": "Quadríceps",
+    "nomePt": "Agachamento búlgaro",
+    "nomeEnDataset": "dumbbell step-up split squat",
+    "gifAtual": "videos/2812-QjE2DcA.gif",
+    "status": "CORRETO",
+    "observacao": "Movimento e equipamento 100% condizentes.",
+    "acaoRecomendada": "Manter GIF atual."
+  },
+  {
+    "num": 84,
+    "grupo": "Quadríceps",
+    "nomePt": "Agachamento com cinto (belt squat)",
+    "nomeEnDataset": "band squat",
+    "gifAtual": "videos/1004-TUZLh71.gif",
+    "status": "EQUIPAMENTO_DIVERGENTE",
+    "observacao": "Agachamento com cinto (máquina belt squat) está com GIF de agachamento com elástico preso nos pés.",
+    "acaoRecomendada": "GERAR NOVO GIF: Máquina de belt squat com cinto e carga na cintura."
+  },
+  {
+    "num": 85,
+    "grupo": "Quadríceps",
+    "nomePt": "Agachamento frontal",
+    "nomeEnDataset": "barbell front squat",
+    "gifAtual": "videos/0042-zG0zs85.gif",
+    "status": "CORRETO",
+    "observacao": "Movimento e equipamento 100% condizentes.",
+    "acaoRecomendada": "Manter GIF atual."
+  },
+  {
+    "num": 86,
+    "grupo": "Quadríceps",
+    "nomePt": "Agachamento livre",
+    "nomeEnDataset": "barbell full squat",
+    "gifAtual": "videos/0043-qXTaZnJ.gif",
+    "status": "CORRETO",
+    "observacao": "Movimento e equipamento 100% condizentes.",
+    "acaoRecomendada": "Manter GIF atual."
+  },
+  {
+    "num": 87,
+    "grupo": "Quadríceps",
+    "nomePt": "Agachamento no smith",
+    "nomeEnDataset": "smith chair squat",
+    "gifAtual": "videos/0750-Gu2rNJd.gif",
+    "status": "CORRETO",
+    "observacao": "Movimento e equipamento 100% condizentes.",
+    "acaoRecomendada": "Manter GIF atual."
+  },
+  {
+    "num": 88,
+    "grupo": "Quadríceps",
+    "nomePt": "Cadeira extensora",
+    "nomeEnDataset": "lever leg extension",
+    "gifAtual": "videos/0585-my33uHU.gif",
+    "status": "CORRETO",
+    "observacao": "Movimento e equipamento 100% condizentes.",
+    "acaoRecomendada": "Manter GIF atual."
+  },
+  {
+    "num": 89,
+    "grupo": "Quadríceps",
+    "nomePt": "Hack squat",
+    "nomeEnDataset": "sled hack squat",
+    "gifAtual": "videos/0743-Qa55kX1.gif",
+    "status": "CORRETO",
+    "observacao": "Movimento e equipamento 100% condizentes.",
+    "acaoRecomendada": "Manter GIF atual."
+  },
+  {
+    "num": 90,
+    "grupo": "Quadríceps",
+    "nomePt": "Leg press 45 graus",
+    "nomeEnDataset": "sled 45в° leg press",
+    "gifAtual": "videos/0739-10Z2DXU.gif",
+    "status": "CORRETO",
+    "observacao": "Movimento e equipamento 100% condizentes.",
+    "acaoRecomendada": "Manter GIF atual."
+  },
+  {
+    "num": 91,
+    "grupo": "Quadríceps",
+    "nomePt": "Leg press horizontal",
+    "nomeEnDataset": "band horizontal pallof press",
+    "gifAtual": "videos/0979-9pa4H5m.gif",
+    "status": "FALHA_CRITICA",
+    "observacao": "Leg press horizontal (Quadríceps) está com GIF de Pallof press com elástico.",
+    "acaoRecomendada": "GERAR NOVO GIF: Leg press horizontal (banco corrediço/placas)."
+  },
+  {
+    "num": 92,
+    "grupo": "Quadríceps",
+    "nomePt": "Leg press unilateral",
+    "nomeEnDataset": "smith leg press",
+    "gifAtual": "videos/0760-7zdxRTl.gif",
+    "status": "MODALIDADE_BILATERAL",
+    "observacao": "Leg press unilateral está com GIF de leg press bilateral no Smith.",
+    "acaoRecomendada": "GERAR NOVO GIF: Leg press 45º empurrando com apenas uma perna."
+  },
+  {
+    "num": 93,
+    "grupo": "Quadríceps",
+    "nomePt": "Passada (step-up)",
+    "nomeEnDataset": "barbell step-up",
+    "gifAtual": "videos/0114-Kxquu2E.gif",
+    "status": "CORRETO",
+    "observacao": "Movimento e equipamento 100% condizentes.",
+    "acaoRecomendada": "Manter GIF atual."
+  },
+  {
+    "num": 94,
+    "grupo": "Tríceps",
+    "nomePt": "Extensão de tríceps na polia alta unilateral",
+    "nomeEnDataset": "cable standing reverse grip one arm overhead tricep extension",
+    "gifAtual": "videos/1727-i11JWU7.gif",
+    "status": "CORRETO",
+    "observacao": "Movimento e equipamento 100% condizentes.",
+    "acaoRecomendada": "Manter GIF atual."
+  },
+  {
+    "num": 95,
+    "grupo": "Tríceps",
+    "nomePt": "Mergulho no banco",
+    "nomeEnDataset": "three bench dip",
+    "gifAtual": "videos/1753-DQ0cqkT.gif",
+    "status": "CORRETO",
+    "observacao": "Movimento e equipamento 100% condizentes.",
+    "acaoRecomendada": "Manter GIF atual."
+  },
+  {
+    "num": 96,
+    "grupo": "Tríceps",
+    "nomePt": "Paralelas",
+    "nomeEnDataset": "weighted straight bar dip",
+    "gifAtual": "videos/3313-Ff18ItA.gif",
+    "status": "CORRETO",
+    "observacao": "Movimento e equipamento 100% condizentes.",
+    "acaoRecomendada": "Manter GIF atual."
+  },
+  {
+    "num": 97,
+    "grupo": "Tríceps",
+    "nomePt": "Supino fechado",
+    "nomeEnDataset": "barbell close-grip bench press",
+    "gifAtual": "videos/0030-J6Dx1Mu.gif",
+    "status": "CORRETO",
+    "observacao": "Movimento e equipamento 100% condizentes.",
+    "acaoRecomendada": "Manter GIF atual."
+  },
+  {
+    "num": 98,
+    "grupo": "Tríceps",
+    "nomePt": "Tríceps coice com halter",
+    "nomeEnDataset": "dumbbell kickback",
+    "gifAtual": "videos/0333-W6PxUkg.gif",
+    "status": "CORRETO",
+    "observacao": "Movimento e equipamento 100% condizentes.",
+    "acaoRecomendada": "Manter GIF atual."
+  },
+  {
+    "num": 99,
+    "grupo": "Tríceps",
+    "nomePt": "Tríceps francês com halter",
+    "nomeEnDataset": "dumbbell seated reverse grip one arm overhead tricep extension",
+    "gifAtual": "videos/1738-5fKX7wi.gif",
+    "status": "CORRETO",
+    "observacao": "Movimento e equipamento 100% condizentes.",
+    "acaoRecomendada": "Manter GIF atual."
+  },
+  {
+    "num": 100,
+    "grupo": "Tríceps",
+    "nomePt": "Tríceps máquina",
+    "nomeEnDataset": "lever triceps extension",
+    "gifAtual": "videos/0607-Ser9eQp.gif",
+    "status": "CORRETO",
+    "observacao": "Movimento e equipamento 100% condizentes.",
+    "acaoRecomendada": "Manter GIF atual."
+  },
+  {
+    "num": 101,
+    "grupo": "Tríceps",
+    "nomePt": "Tríceps pulley (corda)",
+    "nomeEnDataset": "cable pushdown (with rope attachment)",
+    "gifAtual": "videos/0200-dU605di.gif",
+    "status": "CORRETO",
+    "observacao": "Movimento e equipamento 100% condizentes.",
+    "acaoRecomendada": "Manter GIF atual."
+  },
+  {
+    "num": 102,
+    "grupo": "Tríceps",
+    "nomePt": "Tríceps testa com barra",
+    "nomeEnDataset": "barbell lying triceps extension",
+    "gifAtual": "videos/0061-iZop9xO.gif",
+    "status": "CORRETO",
+    "observacao": "Movimento e equipamento 100% condizentes.",
+    "acaoRecomendada": "Manter GIF atual."
+  }
+]

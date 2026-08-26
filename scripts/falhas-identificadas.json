@@ -1,0 +1,62 @@
+[
+  {
+    "id": 9,
+    "grupo": "Abdômen",
+    "nomePt": "Rotação de tronco máquina",
+    "consulta": "lever seated twist",
+    "nomeEn": "lever seated dip",
+    "gif": "videos/1451-BRImeP8.gif",
+    "tipoFalha": "CRÍTICO: Exercício trocado",
+    "detalhe": "Mapeou \"Rotação de tronco máquina\" (Abdômen) para \"lever seated dip\" (Tríceps/Dip)!"
+  },
+  {
+    "id": 40,
+    "grupo": "Glúteos",
+    "nomePt": "Elevação pélvica unilateral",
+    "consulta": "single leg hip thrust",
+    "nomeEn": "hanging leg hip raise",
+    "gif": "videos/1764-VEcJRo2.gif",
+    "tipoFalha": "MODERADO: Unilateral x Bilateral",
+    "detalhe": "Exercício é Unilateral no Lastro, mas o GIF mostra execução bilateral (hanging leg hip raise)"
+  },
+  {
+    "id": 77,
+    "grupo": "Posterior de coxa",
+    "nomePt": "Cadeira flexora unilateral",
+    "consulta": "single leg seated leg curl",
+    "nomeEn": "lever seated leg curl",
+    "gif": "videos/0599-Zg3XY7P.gif",
+    "tipoFalha": "MODERADO: Unilateral x Bilateral",
+    "detalhe": "Exercício é Unilateral no Lastro, mas o GIF mostra execução bilateral (lever seated leg curl)"
+  },
+  {
+    "id": 78,
+    "grupo": "Posterior de coxa",
+    "nomePt": "Flexora unilateral no cabo",
+    "consulta": "cable leg curl",
+    "nomeEn": "cable assisted inverse leg curl",
+    "gif": "videos/3235-zHEpuuc.gif",
+    "tipoFalha": "MODERADO: Unilateral x Bilateral",
+    "detalhe": "Exercício é Unilateral no Lastro, mas o GIF mostra execução bilateral (cable assisted inverse leg curl)"
+  },
+  {
+    "id": 84,
+    "grupo": "Quadríceps",
+    "nomePt": "Agachamento com cinto (belt squat)",
+    "consulta": "belt squat",
+    "nomeEn": "band squat",
+    "gif": "videos/1004-TUZLh71.gif",
+    "tipoFalha": "LEVE/MODERADO: Equipamento incorreto",
+    "detalhe": "Belt squat mapeado para agachamento com elástico (band squat)"
+  },
+  {
+    "id": 92,
+    "grupo": "Quadríceps",
+    "nomePt": "Leg press unilateral",
+    "consulta": "single leg press",
+    "nomeEn": "smith leg press",
+    "gif": "videos/0760-7zdxRTl.gif",
+    "tipoFalha": "MODERADO: Unilateral x Bilateral",
+    "detalhe": "Exercício é Unilateral no Lastro, mas o GIF mostra execução bilateral (smith leg press)"
+  }
+]

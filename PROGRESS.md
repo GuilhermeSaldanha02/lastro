@@ -11,18 +11,16 @@
 
 > Bloco de handoff entre agentes (Antigravity ⇄ Claude). **Sobrescrever a cada sessão**, nunca acumular. Formato e regras: `AGENTS.md` §3.
 
-- **Última sessão:** 2026-08-25 (9) · agente: antigravity · branch: fix/corrigir-gifs-trocados-catalogo
-- **Em andamento:** Auditoria dos 102 GIFs concluída via Playwright. 89 exercícios aprovados (100% fidedignos) e 13 identificados com divergências de mapeamento/aparelho para o dono gerar.
-- **Fechado nesta sessão — Auditoria Playwright dos 102 Exercícios do Catálogo:**
-  1. **Auditoria Automatizada:** Navegação e inspeção individual de cada um dos 102 exercícios do catálogo via Playwright.
-  2. **Classificação Rigorosa:** Relatório completo gerado em `docs/RELATORIO_AUDITORIA_GIFS_102.md`, identificando 89 exercícios com movimento exato e 13 exercícios com GIFs trocados/divergentes no dataset original Gym Visual.
-  3. **Lista de Geração para o Dono:** Mapeados os 13 exercícios faltantes (5 falhas críticas, 4 bilaterais em exercícios unilaterais e 4 variações de equipamento).
-- **Bloqueado / a decidir:** Dono gerar os 13 GIFs faltantes para substituição.
-- **Próximo passo:** Integrar os novos GIFs assim que forem fornecidos pelo dono.
+- **Última sessão:** 2026-08-26 · agente: antigravity · branch: fix/corrigir-gifs-trocados-catalogo
+- **Em andamento:** Concluída a geração e compilação dos 13 GIFs corrigidos do catálogo. Testes Playwright, Vitest (183/183) e build Next.js 100% aprovados.
+- **Fechado nesta sessão — Geração e Integração dos 13 GIFs do Catálogo:**
+  1. **Geração das Poses Finais Pendentes:** Criadas as 6 poses finais em 3D anatômico de alta qualidade (belt squat, cadeira flexora sentada/unilateral, flexora cabo, leg press unilateral, panturrilha em pé).
+  2. **Compilação de GIFs:** Gerados os 13 GIFs animados com loop suave de 700ms e sincronizados nos diretórios de download e `public/videos/exercicios/`.
+  3. **Verificação Automatizada:** Testes Playwright de carregamento dos 13 GIFs (status 200 OK), suíte Vitest 183/183 e build Next.js sem erros.
+- **Bloqueado / a decidir:** Nada.
+- **Próximo passo:** Subir a branch e realizar merge na main.
 - **Para o outro agente saber:**
-  - Licença dos GIFs (Gym Visual) segue pendente de confirmação para uso além de app pessoal — não é bloqueio de código, é decisão do dono.
-  - `backups/` existe localmente e está no `.gitignore` — não commitar dado de usuário real.
-  - O delay de navegação no mobile relatado pelo dono é custo normal de primeira visita à rota (code-splitting), pior em `/catalogo/[id]` por causa do player de mídia — não é bug a "corrigir", é característica a otimizar se incomodar de verdade (candidatos: prefetch mais agressivo das rotas da aba inferior, ou aliviar o bundle do player).
+  - Os 13 GIFs divergentes do catálogo foram substituídos por animações anatômicas 3D de alta fidelidade e estão com aliases e UUIDs sincronizados em `public/videos/exercicios/`.
 
 ---
 
