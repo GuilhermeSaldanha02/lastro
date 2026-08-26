@@ -27,6 +27,9 @@ import FormularioSerie, { type DadosNovaSerie } from "./formulario-serie";
 import EditarSerie, { type DadosEdicaoSerie } from "./editar-serie";
 import SeletorGrupoMuscular, { type OpcaoGrupo } from "./seletor-grupo-muscular";
 import EtiquetaRecorde from "./etiqueta-recorde";
+import TimerTopo from "./timer-topo";
+import RelatorioPosTreino from "./relatorio-pos-treino";
+import { calcularMetricasSessao } from "@/lib/dados/metricas-treino";
 import { t } from "@/lib/texto/i18n";
 import type { Idioma } from "@/lib/dados/idioma";
 
@@ -117,6 +120,8 @@ export default function TreinoDetalhe({
   // é persistido: o app não prescreve programa (PRD §5, escopo negativo),
   // isto é conveniência de tela, não um plano salvo.
   const [gruposEscolhidos, setGruposEscolhidos] = useState<string[]>([]);
+  const [mostrarRelatorio, setMostrarRelatorio] = useState(false);
+  const [iniciadoEm] = useState<string>(() => new Date().toISOString());
   const grupos = useMemo(() => agruparPorExercicio(series), [series]);
   const ultima = series[series.length - 1];
 
@@ -305,6 +310,9 @@ export default function TreinoDetalhe({
   return (
     <>
       <div className="corpo corpo--com-nav corpo--titulo-conteudo">
+        {/* Timer de Descanso com disparo manual no topo */}
+        <TimerTopo idioma={idioma} />
+
         {series.length > 0 && (
           <div className="grupo__cab">
             <h2 className="grupo__nome">{t("Séries", idioma)}</h2>
@@ -486,35 +494,53 @@ export default function TreinoDetalhe({
         )}
       </div>
 
-      {/* D2/D3 — a ação mais frequente do app, na metade inferior. */}
+      {/* Área de Ações do Treino Refinada: Lado a Lado + Finalizar Treino */}
       <div className="acao-area">
-        {ultima && (
+        {ultima ? (
+          <div className="acao-area-grid">
+            <button
+              type="button"
+              className="botao-primario botao-acao-duplo"
+              onClick={repetirUltimaSerie}
+            >
+              {t("Repetir última série", idioma)}
+              <span className="botao-primario__estado">
+                {ultima.reps} × {ultima.peso} kg · {t(ultima.tipo, idioma)}
+              </span>
+            </button>
+
+            <button
+              type="button"
+              className="botao-secundario botao-acao-duplo"
+              aria-expanded={formularioAberto}
+              onClick={() => setFormularioAberto((aberto) => !aberto)}
+            >
+              {t(formularioAberto ? "Fechar" : "Outra série", idioma)}
+            </button>
+          </div>
+        ) : (
           <button
             type="button"
-            className="botao-primario"
-            onClick={repetirUltimaSerie}
+            className="botao-secundario"
+            aria-expanded={formularioAberto}
+            onClick={() => setFormularioAberto((aberto) => !aberto)}
           >
-            {t("Repetir última série", idioma)}
-            <span className="botao-primario__estado">
-              {ultima.reps} × {ultima.peso} kg · {t(ultima.tipo, idioma)}
-            </span>
+            {t(formularioAberto ? "Fechar" : "Adicionar exercício", idioma)}
           </button>
         )}
 
-        {/* A folga vem de `.acao-area > * + *` (D1) — não de um invólucro,
-            que só espaça irmãos internos e deixaria os dois encostados. */}
-        <button
-          type="button"
-          className="botao-secundario"
-          aria-expanded={formularioAberto}
-          onClick={() => setFormularioAberto((aberto) => !aberto)}
-        >
-          {t(formularioAberto ? "Fechar" : series.length === 0 ? "Adicionar exercício" : "Outra série", idioma)}
-        </button>
+        {series.length > 0 && (
+          <button
+            type="button"
+            className="botao-finalizar-treino"
+            onClick={() => setMostrarRelatorio(true)}
+          >
+            <span>🏁</span>
+            <span>{t("Finalizar Treino", idioma)}</span>
+          </button>
+        )}
 
-        {/* D7 — estado de sincronização sempre visível, nunca alarmante.
-            "salvo no aparelho" é estado normal, não falha: a série já
-            está gravada local e a fila sobe sozinha quando a rede voltar. */}
+        {/* D7 — estado de sincronização sempre visível, nunca alarmante. */}
         <div className="sync--area">
           <p className="sync">
             <span className="sync__ponto" />
@@ -522,6 +548,15 @@ export default function TreinoDetalhe({
           </p>
         </div>
       </div>
+
+      {/* Relatório Pós-Treino Imediato (Estilo Strava) */}
+      {mostrarRelatorio && (
+        <RelatorioPosTreino
+          metricas={calcularMetricasSessao(series, iniciadoEm)}
+          idioma={idioma}
+          onFechar={() => setMostrarRelatorio(false)}
+        />
+      )}
     </>
   );
 }

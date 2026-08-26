@@ -3907,3 +3907,358 @@
   transform-origin: 180px 160px;
 }
 
+/* =====================================================================
+   lastro · TIMER DE DESCANSO NO TOPO & ÁREA DE AÇÃO DIVIDIDA
+   ===================================================================== */
+
+/* Container Sticky no Topo da Tela */
+.timer-topo-container {
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  width: 100%;
+  margin-bottom: var(--lastro-e-3);
+  padding: var(--lastro-e-2) 0;
+  background: linear-gradient(180deg, var(--lastro-fundo) 70%, transparent 100%);
+  backdrop-filter: blur(8px);
+}
+
+.timer-topo-gatilho {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.timer-topo-botao-disparar {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--lastro-e-2);
+  padding: 6px 14px;
+  background: var(--lastro-sup-2);
+  border: 1px solid var(--lastro-linha);
+  border-radius: var(--lastro-r-pilula);
+  color: var(--lastro-txt);
+  font-size: var(--lastro-papel-rotulo);
+  font-weight: 500;
+  cursor: pointer;
+  transition: all var(--lastro-dur-1) ease;
+}
+
+.timer-topo-botao-disparar:hover {
+  background: var(--lastro-sup-3);
+  border-color: var(--lastro-ouro);
+}
+
+.timer-topo-duracao-tag {
+  color: var(--lastro-ouro);
+  font-weight: 600;
+  font-family: var(--lastro-fonte-mono);
+}
+
+/* Card Ativo no Topo */
+.timer-topo-card-ativo {
+  background: var(--lastro-sup-2);
+  border: 1px solid var(--lastro-ouro-glow);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4), 0 0 15px rgba(212, 175, 55, 0.15);
+  border-radius: var(--lastro-r-cartao);
+  overflow: hidden;
+  animation: lastro-pilula-entra var(--lastro-dur-2) ease;
+}
+
+.timer-topo-conteudo {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px;
+}
+
+.timer-topo-tempo-bloco {
+  display: flex;
+  align-items: center;
+  gap: var(--lastro-e-2);
+}
+
+.timer-topo-icone-pulsante {
+  font-size: 1.1rem;
+  animation: lastro-pulso 1.5s infinite ease-in-out;
+}
+
+@keyframes lastro-pulso {
+  0%, 100% { opacity: 0.6; transform: scale(0.95); }
+  50% { opacity: 1; transform: scale(1.1); }
+}
+
+.timer-topo-tempo-txt {
+  font-size: var(--lastro-papel-subtitulo);
+  font-weight: 700;
+  font-family: var(--lastro-fonte-mono);
+  color: var(--lastro-txt);
+  letter-spacing: 0.05em;
+}
+
+.timer-topo-acoes {
+  display: flex;
+  align-items: center;
+  gap: var(--lastro-e-2);
+}
+
+.timer-topo-chip-tempo {
+  background: rgba(16, 185, 129, 0.15);
+  border: 1px solid var(--lastro-borda-verde);
+  color: var(--lastro-esmeralda-claro);
+  font-size: var(--lastro-papel-detalhe);
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: var(--lastro-r-pilula);
+  cursor: pointer;
+  transition: background var(--lastro-dur-1);
+}
+
+.timer-topo-chip-tempo:hover {
+  background: rgba(16, 185, 129, 0.3);
+}
+
+.timer-topo-btn-controle {
+  background: var(--lastro-sup-3);
+  border: 1px solid var(--lastro-linha);
+  color: var(--lastro-txt-2);
+  font-size: var(--lastro-papel-detalhe);
+  font-weight: 500;
+  padding: 4px 10px;
+  border-radius: var(--lastro-r-pilula);
+  cursor: pointer;
+}
+
+.timer-topo-btn-controle:hover {
+  color: var(--lastro-txt);
+  border-color: var(--lastro-txt-3);
+}
+
+.timer-topo-btn-fechar {
+  background: transparent;
+  border: none;
+  color: var(--lastro-txt-3);
+  font-size: 1rem;
+  padding: 4px 8px;
+  cursor: pointer;
+}
+
+.timer-topo-btn-fechar:hover {
+  color: var(--lastro-txt);
+}
+
+/* Barra de Progresso Fina */
+.timer-topo-barra-trilho {
+  width: 100%;
+  height: 3px;
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.timer-topo-barra-progresso {
+  height: 100%;
+  background: var(--lastro-esmeralda-grad);
+  transition: width 0.25s linear;
+  box-shadow: 0 0 8px rgba(16, 185, 129, 0.5);
+}
+
+/* Card de Conclusão */
+.timer-topo-card-concluido {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: rgba(16, 185, 129, 0.15);
+  border: 1px solid var(--lastro-esmeralda);
+  border-radius: var(--lastro-r-cartao);
+  padding: 10px 14px;
+  animation: lastro-pilula-entra var(--lastro-dur-2) ease;
+}
+
+.timer-topo-concluido-info {
+  display: flex;
+  align-items: center;
+  gap: var(--lastro-e-2);
+}
+
+.timer-topo-concluido-txt {
+  font-size: var(--lastro-papel-rotulo);
+  font-weight: 600;
+  color: var(--lastro-esmeralda-claro);
+}
+
+/* ---------- Grid da Área de Ação Refinada (Lado a Lado + Finalizar) ---------- */
+.acao-area-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--lastro-e-3);
+  width: 100%;
+}
+
+.botao-acao-duplo {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 52px;
+  padding: var(--lastro-e-2) var(--lastro-e-3);
+  border-radius: var(--lastro-r-cartao);
+  font-weight: 600;
+  cursor: pointer;
+  text-align: center;
+  transition: all var(--lastro-dur-1) ease;
+}
+
+.botao-finalizar-treino {
+  width: 100%;
+  min-height: 48px;
+  margin-top: var(--lastro-e-2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--lastro-e-2);
+  background: transparent;
+  border: 1px solid var(--lastro-borda-verde);
+  color: var(--lastro-esmeralda-claro);
+  border-radius: var(--lastro-r-cartao);
+  font-size: var(--lastro-papel-rotulo);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--lastro-dur-1) ease;
+}
+
+.botao-finalizar-treino:hover {
+  background: var(--lastro-esmeralda-fundo);
+  border-color: var(--lastro-esmeralda);
+}
+
+/* ---------- Modal do Relatório Pós-Treino (Estilo Strava) ---------- */
+.pos-treino-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  background: rgba(7, 9, 13, 0.85);
+  backdrop-filter: blur(12px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--lastro-e-4);
+  animation: lastro-pilula-entra var(--lastro-dur-2) ease;
+}
+
+.pos-treino-modal {
+  width: 100%;
+  max-width: 440px;
+  background: var(--lastro-sup-1);
+  border: 1px solid var(--lastro-borda-ouro);
+  border-radius: var(--lastro-r-cartao);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.8), 0 0 30px rgba(212, 175, 55, 0.15);
+  padding: var(--lastro-e-6);
+  display: flex;
+  flex-direction: column;
+  gap: var(--lastro-e-5);
+}
+
+.pos-treino-header {
+  text-align: center;
+}
+
+.pos-treino-badge-trofeu {
+  font-size: 2.8rem;
+  margin-bottom: var(--lastro-e-2);
+  filter: drop-shadow(0 4px 12px rgba(212, 175, 55, 0.4));
+}
+
+.pos-treino-titulo {
+  font-size: var(--lastro-papel-titulo);
+  font-weight: 700;
+  color: var(--lastro-ouro-claro);
+  margin-bottom: var(--lastro-e-1);
+}
+
+.pos-treino-subtitulo {
+  font-size: var(--lastro-papel-rotulo);
+  color: var(--lastro-txt-2);
+}
+
+.pos-treino-grid-metricas {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--lastro-e-3);
+}
+
+.pos-treino-card-metrica {
+  background: var(--lastro-sup-2);
+  border: 1px solid var(--lastro-linha);
+  border-radius: var(--lastro-r-cartao);
+  padding: var(--lastro-e-3) var(--lastro-e-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--lastro-e-1);
+}
+
+.pos-treino-card-metrica--destaque {
+  border-color: var(--lastro-borda-ouro);
+  background: linear-gradient(135deg, var(--lastro-sup-2) 0%, rgba(212, 175, 55, 0.08) 100%);
+}
+
+.pos-treino-metrica-rotulo {
+  font-size: var(--lastro-papel-detalhe);
+  color: var(--lastro-txt-3);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.pos-treino-metrica-valor {
+  font-size: 1.4rem;
+  font-weight: 700;
+  font-family: var(--lastro-fonte-mono);
+  color: var(--lastro-txt);
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+}
+
+.pos-treino-metrica-unidade {
+  font-size: var(--lastro-papel-detalhe);
+  color: var(--lastro-txt-2);
+  font-weight: 400;
+}
+
+.pos-treino-bloco-prs {
+  background: rgba(212, 175, 55, 0.1);
+  border: 1px solid var(--lastro-borda-ouro);
+  border-radius: var(--lastro-r-cartao);
+  padding: var(--lastro-e-3) var(--lastro-e-4);
+}
+
+.pos-treino-prs-titulo {
+  display: flex;
+  align-items: center;
+  gap: var(--lastro-e-2);
+  font-size: var(--lastro-papel-rotulo);
+  font-weight: 600;
+  color: var(--lastro-ouro-claro);
+  margin-bottom: var(--lastro-e-2);
+}
+
+.pos-treino-prs-lista {
+  display: flex;
+  flex-direction: column;
+  gap: var(--lastro-e-2);
+}
+
+.pos-treino-pr-item {
+  display: flex;
+  justify-content: space-between;
+  font-size: var(--lastro-papel-rotulo);
+}
+
+.pos-treino-pr-nome {
+  color: var(--lastro-txt);
+  font-weight: 500;
+}
+
+.pos-treino-pr-detalhe {
+  color: var(--lastro-ouro);
+  font-weight: 600;
+  font-family: var(--lastro-fonte-mono);
+}
+
