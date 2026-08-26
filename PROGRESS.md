@@ -11,16 +11,18 @@
 
 > Bloco de handoff entre agentes (Antigravity ⇄ Claude). **Sobrescrever a cada sessão**, nunca acumular. Formato e regras: `AGENTS.md` §3.
 
-- **Última sessão:** 2026-08-26 · agente: antigravity · branch: fix/corrigir-gifs-trocados-catalogo
-- **Em andamento:** Concluída a geração e compilação dos 13 GIFs corrigidos do catálogo. Testes Playwright, Vitest (183/183) e build Next.js 100% aprovados.
-- **Fechado nesta sessão — Geração e Integração dos 13 GIFs do Catálogo:**
-  1. **Geração das Poses Finais Pendentes:** Criadas as 6 poses finais em 3D anatômico de alta qualidade (belt squat, cadeira flexora sentada/unilateral, flexora cabo, leg press unilateral, panturrilha em pé).
-  2. **Compilação de GIFs:** Gerados os 13 GIFs animados com loop suave de 700ms e sincronizados nos diretórios de download e `public/videos/exercicios/`.
-  3. **Verificação Automatizada:** Testes Playwright de carregamento dos 13 GIFs (status 200 OK), suíte Vitest 183/183 e build Next.js sem erros.
+- **Última sessão:** 2026-08-26 (2) · agente: antigravity · branch: feat/timer-descanso-e-relatorio-pos-treino
+- **Em andamento:** Concluída a implementação do Timer de Descanso no Topo, Área de Ação Dividida Lado a Lado e Relatório Pós-Treino (Estilo Strava). Testes Vitest (185/185), build Next.js e Playwright E2E 100% aprovados.
+- **Fechado nesta sessão — Timer de Descanso no Topo & Relatório Pós-Treino:**
+  1. **Timer de Descanso no Topo:** Disparo manual com 1 toque, contagem regressiva baseada em timestamp absoluto (resiliente a bloqueio de tela/troca de app), micro-ajuste `+30s`, barra de progresso verde esmeralda e alertas de som/vibração.
+  2. **Área de Ações Dividida Lado a Lado:** Grid ergonômico com `[ Repetir última série ]` (dourado) à esquerda e `[ Outra série ]` (ardósia) à direita, preservando o toque único da ação mais frequente.
+  3. **Botão Finalizar Treino & Relatório Pós-Treino:** Modal de celebração pós-treino exibindo duração da sessão (minutos), tonelagem total movimentada (kg), contagem de séries válidas e novos recordes pessoais (PRs) batidos no dia.
+  4. **Verificação Automatizada:** Testes unitários (`src/lib/dados/metricas-treino.test.ts`), suíte completa Vitest 185/185, Next.js build e validação Playwright mobile.
 - **Bloqueado / a decidir:** Nada.
-- **Próximo passo:** Subir a branch e realizar merge na main.
+- **Próximo passo:** Subir a branch e fazer merge na main.
 - **Para o outro agente saber:**
-  - Os 13 GIFs divergentes do catálogo foram substituídos por animações anatômicas 3D de alta fidelidade e estão com aliases e UUIDs sincronizados em `public/videos/exercicios/`.
+  - O cálculo de tonelagem total e métricas da sessão vive de forma pura e determinística em `src/lib/dados/metricas-treino.ts`.
+  - O timer no topo (`src/components/timer-topo.tsx`) utiliza `Date.now()` para garantir precisão mesmo quando o celular fica em repouso no bolso entre séries.
 
 ---
 
