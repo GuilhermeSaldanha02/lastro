@@ -1,0 +1,1022 @@
+[
+  {
+    "num": 1,
+    "grupo": "Abdômen",
+    "nomePt": "Abdominal infra",
+    "consulta": "lying leg raise",
+    "nomeEn": "lying leg-hip raise",
+    "gif": "videos/0865-9IxJdtC.gif",
+    "suspeito": false,
+    "motivo": "OK ou verificar visualmente"
+  },
+  {
+    "num": 2,
+    "grupo": "Abdômen",
+    "nomePt": "Abdominal máquina",
+    "consulta": "lever seated crunch",
+    "nomeEn": "lever seated crunch",
+    "gif": "videos/1452-Wgaz7pm.gif",
+    "suspeito": false,
+    "motivo": "OK ou verificar visualmente"
+  },
+  {
+    "num": 3,
+    "grupo": "Abdômen",
+    "nomePt": "Abdominal na polia",
+    "consulta": "cable kneeling crunch",
+    "nomeEn": "cable kneeling crunch",
+    "gif": "videos/0175-WW95auq.gif",
+    "suspeito": false,
+    "motivo": "OK ou verificar visualmente"
+  },
+  {
+    "num": 4,
+    "grupo": "Abdômen",
+    "nomePt": "Abdominal oblíquo na bicicleta",
+    "consulta": "bicycle crunch",
+    "nomeEn": "band bicycle crunch",
+    "gif": "videos/0972-tZkGYZ9.gif",
+    "suspeito": false,
+    "motivo": "OK ou verificar visualmente"
+  },
+  {
+    "num": 5,
+    "grupo": "Abdômen",
+    "nomePt": "Abdominal supra",
+    "consulta": "crunch",
+    "nomeEn": "frog crunch",
+    "gif": "videos/2429-FFRP97T.gif",
+    "suspeito": false,
+    "motivo": "OK ou verificar visualmente"
+  },
+  {
+    "num": 6,
+    "grupo": "Abdômen",
+    "nomePt": "Elevação de pernas",
+    "consulta": "hanging leg raise",
+    "nomeEn": "hanging leg raise",
+    "gif": "videos/0472-I3tsCnC.gif",
+    "suspeito": false,
+    "motivo": "OK ou verificar visualmente"
+  },
+  {
+    "num": 7,
+    "grupo": "Abdômen",
+    "nomePt": "Prancha",
+    "consulta": "plank",
+    "nomeEn": "power point plank",
+    "gif": "videos/3665-hCjGsRQ.gif",
+    "suspeito": false,
+    "motivo": "OK ou verificar visualmente"
+  },
+  {
+    "num": 8,
+    "grupo": "Abdômen",
+    "nomePt": "Prancha lateral",
+    "consulta": "side plank",
+    "nomeEn": "push-up to side plank",
+    "gif": "videos/0664-KhHJ338.gif",
+    "suspeito": false,
+    "motivo": "OK ou verificar visualmente"
+  },
+  {
+    "num": 9,
+    "grupo": "Abdômen",
+    "nomePt": "Rotação de tronco máquina",
+    "consulta": "lever seated twist",
+    "nomeEn": "lever seated dip",
+    "gif": "videos/1451-BRImeP8.gif",
+    "suspeito": false,
+    "motivo": "OK ou verificar visualmente"
+  },
+  {
+    "num": 10,
+    "grupo": "Abdômen",
+    "nomePt": "Rotação de tronco no cabo",
+    "consulta": "cable standing twist",
+    "nomeEn": "cable standing twist row (v-bar)",
+    "gif": "videos/0236-JOZhu2h.gif",
+    "suspeito": false,
+    "motivo": "OK ou verificar visualmente"
+  },
+  {
+    "num": 11,
+    "grupo": "Bíceps",
+    "nomePt": "Rosca alternada com halteres",
+    "consulta": "dumbbell alternate biceps curl",
+    "nomeEn": "dumbbell alternate biceps curl",
+    "gif": "videos/0285-BU15nH4.gif",
+    "suspeito": false,
+    "motivo": "OK ou verificar visualmente"
+  },
+  {
+    "num": 12,
+    "grupo": "Bíceps",
+    "nomePt": "Rosca concentrada",
+    "consulta": "dumbbell concentration curl",
+    "nomeEn": "dumbbell concentration curl",
+    "gif": "videos/0297-gvsWLQw.gif",
+    "suspeito": false,
+    "motivo": "OK ou verificar visualmente"
+  },
+  {
+    "num": 13,
+    "grupo": "Bíceps",
+    "nomePt": "Rosca direta",
+    "consulta": "barbell standing wide grip biceps curl",
+    "nomeEn": "barbell standing wide grip biceps curl",
+    "gif": "videos/1629-faHKVkK.gif",
+    "suspeito": false,
+    "motivo": "OK ou verificar visualmente"
+  },
+  {
+    "num": 14,
+    "grupo": "Bíceps",
+    "nomePt": "Rosca inversa com barra",
+    "consulta": "barbell reverse curl",
+    "nomeEn": "barbell reverse curl",
+    "gif": "videos/0080-xNrS20v.gif",
+    "suspeito": false,
+    "motivo": "OK ou verificar visualmente"
+  },
+  {
+    "num": 15,
+    "grupo": "Bíceps",
+    "nomePt": "Rosca máquina",
+    "consulta": "lever preacher curl",
+    "nomeEn": "lever preacher curl",
+    "gif": "videos/0592-b6hQYMb.gif",
+    "suspeito": false,
+    "motivo": "OK ou verificar visualmente"
+  },
+  {
+    "num": 16,
+    "grupo": "Bíceps",
+    "nomePt": "Rosca martelo",
+    "consulta": "dumbbell hammer curl",
+    "nomeEn": "dumbbell hammer curl",
+    "gif": "videos/0313-slDvUAU.gif",
+    "suspeito": false,
+    "motivo": "OK ou verificar visualmente"
+  },
+  {
+    "num": 17,
+    "grupo": "Bíceps",
+    "nomePt": "Rosca no cabo",
+    "consulta": "cable curl",
+    "nomeEn": "cable curl",
+    "gif": "videos/0868-G08RZcQ.gif",
+    "suspeito": false,
+    "motivo": "OK ou verificar visualmente"
+  },
+  {
+    "num": 18,
+    "grupo": "Bíceps",
+    "nomePt": "Rosca scott",
+    "consulta": "barbell preacher curl",
+    "nomeEn": "barbell preacher curl",
+    "gif": "videos/0070-qOgPVf6.gif",
+    "suspeito": false,
+    "motivo": "OK ou verificar visualmente"
+  },
+  {
+    "num": 19,
+    "grupo": "Bíceps",
+    "nomePt": "Rosca spider",
+    "consulta": "dumbbell spider curl",
+    "nomeEn": "dumbbell reverse spider curl",
+    "gif": "videos/1675-6sMAmNv.gif",
+    "suspeito": false,
+    "motivo": "OK ou verificar visualmente"
+  },
+  {
+    "num": 20,
+    "grupo": "Costas",
+    "nomePt": "Barra fixa",
+    "consulta": "pull up",
+    "nomeEn": "pull-up",
+    "gif": "videos/0652-lBDjFxJ.gif",
+    "suspeito": false,
+    "motivo": "OK ou verificar visualmente"
+  },
+  {
+    "num": 21,
+    "grupo": "Costas",
+    "nomePt": "Extensora lombar máquina",
+    "consulta": "lever back extension",
+    "nomeEn": "lever back extension",
+    "gif": "videos/0573-rUXfn3R.gif",
+    "suspeito": false,
+    "motivo": "OK ou verificar visualmente"
+  },
+  {
+    "num": 22,
+    "grupo": "Costas",
+    "nomePt": "Levantamento terra",
+    "consulta": "barbell deadlift",
+    "nomeEn": "barbell deadlift",
+    "gif": "videos/0032-ila4NZS.gif",
+    "suspeito": false,
+    "motivo": "OK ou verificar visualmente"
+  },
+  {
+    "num": 23,
+    "grupo": "Costas",
+    "nomePt": "Pull-over com halter",
+    "consulta": "dumbbell pullover",
+    "nomeEn": "dumbbell pullover",
+    "gif": "videos/0375-9XjtHvS.gif",
+    "suspeito": false,
+    "motivo": "OK ou verificar visualmente"
+  },
+  {
+    "num": 24,
+    "grupo": "Costas",
+    "nomePt": "Puxada frente no pulley",
+    "consulta": "cable lat pulldown",
+    "nomeEn": "cable pulldown (pro lat bar)",
+    "gif": "videos/0197-qdRxqCj.gif",
+    "suspeito": false,
+    "motivo": "OK ou verificar visualmente"
+  },
+  {
+    "num": 25,
+    "grupo": "Costas",
+    "nomePt": "Puxada pegada aberta",
+    "consulta": "wide grip lat pulldown",
+    "nomeEn": "twin handle parallel grip lat pulldown",
+    "gif": "videos/0818-rkg41Fb.gif",
+    "suspeito": false,
+    "motivo": "OK ou verificar visualmente"
+  },
+  {
+    "num": 26,
+    "grupo": "Costas",
+    "nomePt": "Puxada pegada supinada",
+    "consulta": "reverse grip lat pulldown",
+    "nomeEn": "reverse grip machine lat pulldown",
+    "gif": "videos/0673-ecpY0rH.gif",
+    "suspeito": false,
+    "motivo": "OK ou verificar visualmente"
+  },
+  {
+    "num": 27,
+    "grupo": "Costas",
+    "nomePt": "Puxador articulado máquina",
+    "consulta": "lever front pulldown",
+    "nomeEn": "lever front pulldown",
+    "gif": "videos/0579-7F1DVzn.gif",
+    "suspeito": false,
+    "motivo": "OK ou verificar visualmente"
+  },
+  {
+    "num": 28,
+    "grupo": "Costas",
+    "nomePt": "Remada baixa no cabo",
+    "consulta": "cable seated row",
+    "nomeEn": "cable seated row",
+    "gif": "videos/0861-fUBheHs.gif",
+    "suspeito": false,
+    "motivo": "OK ou verificar visualmente"
+  },
+  {
+    "num": 29,
+    "grupo": "Costas",
+    "nomePt": "Remada cavalinho",
+    "consulta": "t bar row",
+    "nomeEn": "lever t bar row",
+    "gif": "videos/0606-aaXr7ld.gif",
+    "suspeito": false,
+    "motivo": "OK ou verificar visualmente"
+  },
+  {
+    "num": 30,
+    "grupo": "Costas",
+    "nomePt": "Remada curvada com barra",
+    "consulta": "barbell bent over row",
+    "nomeEn": "barbell bent over row",
+    "gif": "videos/0027-eZyBC3j.gif",
+    "suspeito": false,
+    "motivo": "OK ou verificar visualmente"
+  },
+  {
+    "num": 31,
+    "grupo": "Costas",
+    "nomePt": "Remada máquina",
+    "consulta": "lever seated row",
+    "nomeEn": "lever seated row",
+    "gif": "videos/1350-7I6LNUG.gif",
+    "suspeito": false,
+    "motivo": "OK ou verificar visualmente"
+  },
+  {
+    "num": 32,
+    "grupo": "Costas",
+    "nomePt": "Remada máquina peito-apoiado",
+    "consulta": "lever chest supported row",
+    "nomeEn": "lever bent over row",
+    "gif": "videos/0574-X3cqyXz.gif",
+    "suspeito": false,
+    "motivo": "OK ou verificar visualmente"
+  },
+  {
+    "num": 33,
+    "grupo": "Costas",
+    "nomePt": "Remada unilateral com halter",
+    "consulta": "dumbbell one arm row",
+    "nomeEn": "dumbbell one arm upright row",
+    "gif": "videos/0363-6cKQC5E.gif",
+    "suspeito": false,
+    "motivo": "OK ou verificar visualmente"
+  },
+  {
+    "num": 34,
+    "grupo": "Glúteos",
+    "nomePt": "Agachamento sumô com halter",
+    "consulta": "dumbbell sumo squat",
+    "nomeEn": "dumbbell squat",
+    "gif": "videos/0413-HsvHqgf.gif",
+    "suspeito": false,
+    "motivo": "OK ou verificar visualmente"
+  },
+  {
+    "num": 35,
+    "grupo": "Glúteos",
+    "nomePt": "Cadeira abdutora",
+    "consulta": "lever seated hip abduction",
+    "nomeEn": "lever seated hip abduction",
+    "gif": "videos/0597-CHpahtl.gif",
+    "suspeito": false,
+    "motivo": "OK ou verificar visualmente"
+  },
+  {
+    "num": 36,
+    "grupo": "Glúteos",
+    "nomePt": "Cadeira adutora",
+    "consulta": "lever seated hip adduction",
+    "nomeEn": "lever seated hip adduction",
+    "gif": "videos/0598-oHsrypV.gif",
+    "suspeito": false,
+    "motivo": "OK ou verificar visualmente"
+  },
+  {
+    "num": 37,
+    "grupo": "Glúteos",
+    "nomePt": "Cadeira de glúteo (hip thrust máquina)",
+    "consulta": "lever hip thrust",
+    "nomeEn": "lever hip extension v. 2",
+    "gif": "videos/2286-OPqShYN.gif",
+    "suspeito": false,
+    "motivo": "OK ou verificar visualmente"
+  },
+  {
+    "num": 38,
+    "grupo": "Glúteos",
+    "nomePt": "Coice no cabo",
+    "consulta": "cable glute kickback",
+    "nomeEn": "cable kickback",
+    "gif": "videos/0860-HEJ6DIX.gif",
+    "suspeito": false,
+    "motivo": "OK ou verificar visualmente"
+  },
+  {
+    "num": 39,
+    "grupo": "Glúteos",
+    "nomePt": "Elevação pélvica com barra",
+    "consulta": "barbell hip thrust",
+    "nomeEn": "barbell lying lifting (on hip)",
+    "gif": "videos/0058-SNFfUff.gif",
+    "suspeito": false,
+    "motivo": "OK ou verificar visualmente"
+  },
+  {
+    "num": 40,
+    "grupo": "Glúteos",
+    "nomePt": "Elevação pélvica unilateral",
+    "consulta": "single leg hip thrust",
+    "nomeEn": "hanging leg hip raise",
+    "gif": "videos/1764-VEcJRo2.gif",
+    "suspeito": true,
+    "motivo": "Exercício unilateral no Lastro mapeado para GIF bilateral"
+  },
+  {
+    "num": 41,
+    "grupo": "Glúteos",
+    "nomePt": "Extensão de quadril no cabo",
+    "consulta": "cable hip extension",
+    "nomeEn": "cable standing hip extension",
+    "gif": "videos/0228-Kpajagk.gif",
+    "suspeito": false,
+    "motivo": "OK ou verificar visualmente"
+  },
+  {
+    "num": 42,
+    "grupo": "Glúteos",
+    "nomePt": "Ponte de glúteo",
+    "consulta": "glute bridge",
+    "nomeEn": "glute bridge march",
+    "gif": "videos/3561-GibBPPg.gif",
+    "suspeito": false,
+    "motivo": "OK ou verificar visualmente"
+  },
+  {
+    "num": 43,
+    "grupo": "Ombro",
+    "nomePt": "Arnold press",
+    "consulta": "dumbbell arnold press",
+    "nomeEn": "dumbbell arnold press",
+    "gif": "videos/2137-Xy4jlWA.gif",
+    "suspeito": false,
+    "motivo": "OK ou verificar visualmente"
+  },
+  {
+    "num": 44,
+    "grupo": "Ombro",
+    "nomePt": "Crucifixo inverso",
+    "consulta": "dumbbell rear delt fly",
+    "nomeEn": "dumbbell rear fly",
+    "gif": "videos/0378-8DiFDVA.gif",
+    "suspeito": false,
+    "motivo": "OK ou verificar visualmente"
+  },
+  {
+    "num": 45,
+    "grupo": "Ombro",
+    "nomePt": "Desenvolvimento com halteres",
+    "consulta": "dumbbell shoulder press",
+    "nomeEn": "dumbbell seated shoulder press",
+    "gif": "videos/0405-znQUdHY.gif",
+    "suspeito": false,
+    "motivo": "OK ou verificar visualmente"
+  },
+  {
+    "num": 46,
+    "grupo": "Ombro",
+    "nomePt": "Desenvolvimento máquina",
+    "consulta": "lever shoulder press",
+    "nomeEn": "lever shoulder press",
+    "gif": "videos/0603-67n3r98.gif",
+    "suspeito": false,
+    "motivo": "OK ou verificar visualmente"
+  },
+  {
+    "num": 47,
+    "grupo": "Ombro",
+    "nomePt": "Desenvolvimento militar com barra",
+    "consulta": "barbell standing military press",
+    "nomeEn": "barbell standing wide military press",
+    "gif": "videos/1457-Kyd9Rz5.gif",
+    "suspeito": false,
+    "motivo": "OK ou verificar visualmente"
+  },
+  {
+    "num": 48,
+    "grupo": "Ombro",
+    "nomePt": "Elevação frontal com halteres",
+    "consulta": "dumbbell front raise",
+    "nomeEn": "dumbbell front raise",
+    "gif": "videos/0310-3eGE2JC.gif",
+    "suspeito": false,
+    "motivo": "OK ou verificar visualmente"
+  },
+  {
+    "num": 49,
+    "grupo": "Ombro",
+    "nomePt": "Elevação lateral com halteres",
+    "consulta": "dumbbell lateral raise",
+    "nomeEn": "dumbbell lateral raise",
+    "gif": "videos/0334-DsgkuIt.gif",
+    "suspeito": false,
+    "motivo": "OK ou verificar visualmente"
+  },
+  {
+    "num": 50,
+    "grupo": "Ombro",
+    "nomePt": "Elevação lateral máquina",
+    "consulta": "lever lateral raise",
+    "nomeEn": "lever lateral raise",
+    "gif": "videos/0584-dRTfGZT.gif",
+    "suspeito": false,
+    "motivo": "OK ou verificar visualmente"
+  },
+  {
+    "num": 51,
+    "grupo": "Ombro",
+    "nomePt": "Encolhimento com halteres",
+    "consulta": "dumbbell shrug",
+    "nomeEn": "dumbbell shrug",
+    "gif": "videos/0406-NJzBsGJ.gif",
+    "suspeito": false,
+    "motivo": "OK ou verificar visualmente"
+  },
+  {
+    "num": 52,
+    "grupo": "Ombro",
+    "nomePt": "Encolhimento máquina",
+    "consulta": "lever shrug",
+    "nomeEn": "lever shrug",
+    "gif": "videos/0604-ZZKbeMw.gif",
+    "suspeito": false,
+    "motivo": "OK ou verificar visualmente"
+  },
+  {
+    "num": 53,
+    "grupo": "Ombro",
+    "nomePt": "Face pull no cabo",
+    "consulta": "cable face pull",
+    "nomeEn": "cable twisting pull",
+    "gif": "videos/0244-zCgxPbV.gif",
+    "suspeito": false,
+    "motivo": "OK ou verificar visualmente"
+  },
+  {
+    "num": 54,
+    "grupo": "Ombro",
+    "nomePt": "Remada alta com barra",
+    "consulta": "barbell upright row",
+    "nomeEn": "barbell upright row",
+    "gif": "videos/0120-UDlhcO8.gif",
+    "suspeito": false,
+    "motivo": "OK ou verificar visualmente"
+  },
+  {
+    "num": 55,
+    "grupo": "Panturrilha",
+    "nomePt": "Panturrilha burrinho",
+    "consulta": "donkey calf raise",
+    "nomeEn": "donkey calf raise",
+    "gif": "videos/0284-u5ESqzH.gif",
+    "suspeito": false,
+    "motivo": "OK ou verificar visualmente"
+  },
+  {
+    "num": 56,
+    "grupo": "Panturrilha",
+    "nomePt": "Panturrilha em pé",
+    "consulta": "standing calf raise",
+    "nomeEn": "cable standing calf raise",
+    "gif": "videos/1375-yl2IYyy.gif",
+    "suspeito": false,
+    "motivo": "OK ou verificar visualmente"
+  },
+  {
+    "num": 57,
+    "grupo": "Panturrilha",
+    "nomePt": "Panturrilha no leg press",
+    "consulta": "leg press calf raise",
+    "nomeEn": "lever seated squat calf raise on leg press machine",
+    "gif": "videos/1385-IeDEXTe.gif",
+    "suspeito": false,
+    "motivo": "OK ou verificar visualmente"
+  },
+  {
+    "num": 58,
+    "grupo": "Panturrilha",
+    "nomePt": "Panturrilha sentado",
+    "consulta": "seated calf raise",
+    "nomeEn": "lever seated calf raise",
+    "gif": "videos/0594-bOOdeyc.gif",
+    "suspeito": false,
+    "motivo": "OK ou verificar visualmente"
+  },
+  {
+    "num": 59,
+    "grupo": "Panturrilha",
+    "nomePt": "Panturrilha unilateral com halter",
+    "consulta": "dumbbell single leg calf raise",
+    "nomeEn": "dumbbell single leg calf raise",
+    "gif": "videos/0409-1kB3Wmk.gif",
+    "suspeito": false,
+    "motivo": "OK ou verificar visualmente"
+  },
+  {
+    "num": 60,
+    "grupo": "Peito",
+    "nomePt": "Crossover no cabo",
+    "consulta": "cable crossover",
+    "nomeEn": "cable rope crossover seated row",
+    "gif": "videos/1320-UFGF6gk.gif",
+    "suspeito": false,
+    "motivo": "OK ou verificar visualmente"
+  },
+  {
+    "num": 61,
+    "grupo": "Peito",
+    "nomePt": "Crucifixo inclinado com halteres",
+    "consulta": "dumbbell incline fly",
+    "nomeEn": "dumbbell incline fly",
+    "gif": "videos/0319-ESOd5Pl.gif",
+    "suspeito": false,
+    "motivo": "OK ou verificar visualmente"
+  },
+  {
+    "num": 62,
+    "grupo": "Peito",
+    "nomePt": "Crucifixo reto com halteres",
+    "consulta": "dumbbell fly",
+    "nomeEn": "dumbbell fly",
+    "gif": "videos/0308-yz9nUhF.gif",
+    "suspeito": false,
+    "motivo": "OK ou verificar visualmente"
+  },
+  {
+    "num": 63,
+    "grupo": "Peito",
+    "nomePt": "Flexão de braço",
+    "consulta": "push up",
+    "nomeEn": "push-up",
+    "gif": "videos/0662-I4hDWkc.gif",
+    "suspeito": false,
+    "motivo": "OK ou verificar visualmente"
+  },
+  {
+    "num": 64,
+    "grupo": "Peito",
+    "nomePt": "Peck deck",
+    "consulta": "lever pec deck fly",
+    "nomeEn": "lever seated fly",
+    "gif": "videos/0596-v3xmPAR.gif",
+    "suspeito": false,
+    "motivo": "OK ou verificar visualmente"
+  },
+  {
+    "num": 65,
+    "grupo": "Peito",
+    "nomePt": "Supino declinado com barra",
+    "consulta": "barbell decline bench press",
+    "nomeEn": "barbell decline bench press",
+    "gif": "videos/0033-GrO65fd.gif",
+    "suspeito": false,
+    "motivo": "OK ou verificar visualmente"
+  },
+  {
+    "num": 66,
+    "grupo": "Peito",
+    "nomePt": "Supino declinado com halteres",
+    "consulta": "dumbbell decline bench press",
+    "nomeEn": "dumbbell decline bench press",
+    "gif": "videos/0301-DwhEmmE.gif",
+    "suspeito": false,
+    "motivo": "OK ou verificar visualmente"
+  },
+  {
+    "num": 67,
+    "grupo": "Peito",
+    "nomePt": "Supino declinado máquina",
+    "consulta": "lever decline chest press",
+    "nomeEn": "lever decline chest press",
+    "gif": "videos/1300-vsVoPHt.gif",
+    "suspeito": false,
+    "motivo": "OK ou verificar visualmente"
+  },
+  {
+    "num": 68,
+    "grupo": "Peito",
+    "nomePt": "Supino inclinado com barra",
+    "consulta": "barbell incline bench press",
+    "nomeEn": "barbell incline bench press",
+    "gif": "videos/0047-3TZduzM.gif",
+    "suspeito": false,
+    "motivo": "OK ou verificar visualmente"
+  },
+  {
+    "num": 69,
+    "grupo": "Peito",
+    "nomePt": "Supino inclinado com halteres",
+    "consulta": "dumbbell incline bench press",
+    "nomeEn": "dumbbell incline bench press",
+    "gif": "videos/0314-ns0SIbU.gif",
+    "suspeito": false,
+    "motivo": "OK ou verificar visualmente"
+  },
+  {
+    "num": 70,
+    "grupo": "Peito",
+    "nomePt": "Supino inclinado máquina",
+    "consulta": "lever incline chest press",
+    "nomeEn": "lever incline chest press",
+    "gif": "videos/1299-jHAnWmT.gif",
+    "suspeito": false,
+    "motivo": "OK ou verificar visualmente"
+  },
+  {
+    "num": 71,
+    "grupo": "Peito",
+    "nomePt": "Supino máquina",
+    "consulta": "lever chest press",
+    "nomeEn": "lever chest press",
+    "gif": "videos/0577-T0yTjgW.gif",
+    "suspeito": false,
+    "motivo": "OK ou verificar visualmente"
+  },
+  {
+    "num": 72,
+    "grupo": "Peito",
+    "nomePt": "Supino reto com barra",
+    "consulta": "barbell bench press",
+    "nomeEn": "barbell bench press",
+    "gif": "videos/0025-EIeI8Vf.gif",
+    "suspeito": false,
+    "motivo": "OK ou verificar visualmente"
+  },
+  {
+    "num": 73,
+    "grupo": "Peito",
+    "nomePt": "Supino reto com halteres",
+    "consulta": "dumbbell bench press",
+    "nomeEn": "dumbbell bench press",
+    "gif": "videos/0289-SpYC0Kp.gif",
+    "suspeito": false,
+    "motivo": "OK ou verificar visualmente"
+  },
+  {
+    "num": 74,
+    "grupo": "Peito",
+    "nomePt": "Supino reto máquina",
+    "consulta": "lever horizontal chest press",
+    "nomeEn": "lever horizontal one leg press",
+    "gif": "videos/2611-9KU9TYF.gif",
+    "suspeito": false,
+    "motivo": "OK ou verificar visualmente"
+  },
+  {
+    "num": 75,
+    "grupo": "Posterior de coxa",
+    "nomePt": "Bom dia (good morning) com barra",
+    "consulta": "barbell good morning",
+    "nomeEn": "barbell good morning",
+    "gif": "videos/0044-XlZ4lAC.gif",
+    "suspeito": false,
+    "motivo": "OK ou verificar visualmente"
+  },
+  {
+    "num": 76,
+    "grupo": "Posterior de coxa",
+    "nomePt": "Cadeira flexora",
+    "consulta": "lever leg curl",
+    "nomeEn": "lever lying leg curl",
+    "gif": "videos/0586-17lJ1kr.gif",
+    "suspeito": false,
+    "motivo": "OK ou verificar visualmente"
+  },
+  {
+    "num": 77,
+    "grupo": "Posterior de coxa",
+    "nomePt": "Cadeira flexora unilateral",
+    "consulta": "single leg seated leg curl",
+    "nomeEn": "lever seated leg curl",
+    "gif": "videos/0599-Zg3XY7P.gif",
+    "suspeito": true,
+    "motivo": "Exercício unilateral no Lastro mapeado para GIF bilateral"
+  },
+  {
+    "num": 78,
+    "grupo": "Posterior de coxa",
+    "nomePt": "Flexora unilateral no cabo",
+    "consulta": "cable leg curl",
+    "nomeEn": "cable assisted inverse leg curl",
+    "gif": "videos/3235-zHEpuuc.gif",
+    "suspeito": true,
+    "motivo": "Exercício unilateral no Lastro mapeado para GIF bilateral"
+  },
+  {
+    "num": 79,
+    "grupo": "Posterior de coxa",
+    "nomePt": "Levantamento terra romeno com halteres",
+    "consulta": "dumbbell romanian deadlift",
+    "nomeEn": "dumbbell romanian deadlift",
+    "gif": "videos/1459-rR0LJzx.gif",
+    "suspeito": false,
+    "motivo": "OK ou verificar visualmente"
+  },
+  {
+    "num": 80,
+    "grupo": "Posterior de coxa",
+    "nomePt": "Mesa flexora",
+    "consulta": "lying leg curl",
+    "nomeEn": "lever lying two-one leg curl",
+    "gif": "videos/3195-UXpKJoq.gif",
+    "suspeito": false,
+    "motivo": "OK ou verificar visualmente"
+  },
+  {
+    "num": 81,
+    "grupo": "Posterior de coxa",
+    "nomePt": "Stiff com barra",
+    "consulta": "barbell stiff leg deadlift",
+    "nomeEn": "barbell straight leg deadlift",
+    "gif": "videos/0116-hrVQWvE.gif",
+    "suspeito": false,
+    "motivo": "OK ou verificar visualmente"
+  },
+  {
+    "num": 82,
+    "grupo": "Quadríceps",
+    "nomePt": "Afundo com halteres",
+    "consulta": "dumbbell lunge",
+    "nomeEn": "dumbbell lunge",
+    "gif": "videos/0336-RRWFUcw.gif",
+    "suspeito": false,
+    "motivo": "OK ou verificar visualmente"
+  },
+  {
+    "num": 83,
+    "grupo": "Quadríceps",
+    "nomePt": "Agachamento búlgaro",
+    "consulta": "dumbbell bulgarian split squat",
+    "nomeEn": "dumbbell step-up split squat",
+    "gif": "videos/2812-QjE2DcA.gif",
+    "suspeito": false,
+    "motivo": "OK ou verificar visualmente"
+  },
+  {
+    "num": 84,
+    "grupo": "Quadríceps",
+    "nomePt": "Agachamento com cinto (belt squat)",
+    "consulta": "belt squat",
+    "nomeEn": "band squat",
+    "gif": "videos/1004-TUZLh71.gif",
+    "suspeito": true,
+    "motivo": "Belt squat mapeado para agachamento com elástico (band squat)"
+  },
+  {
+    "num": 85,
+    "grupo": "Quadríceps",
+    "nomePt": "Agachamento frontal",
+    "consulta": "barbell front squat",
+    "nomeEn": "barbell front squat",
+    "gif": "videos/0042-zG0zs85.gif",
+    "suspeito": false,
+    "motivo": "OK ou verificar visualmente"
+  },
+  {
+    "num": 86,
+    "grupo": "Quadríceps",
+    "nomePt": "Agachamento livre",
+    "consulta": "barbell full squat",
+    "nomeEn": "barbell full squat",
+    "gif": "videos/0043-qXTaZnJ.gif",
+    "suspeito": false,
+    "motivo": "OK ou verificar visualmente"
+  },
+  {
+    "num": 87,
+    "grupo": "Quadríceps",
+    "nomePt": "Agachamento no smith",
+    "consulta": "smith machine squat",
+    "nomeEn": "smith chair squat",
+    "gif": "videos/0750-Gu2rNJd.gif",
+    "suspeito": false,
+    "motivo": "OK ou verificar visualmente"
+  },
+  {
+    "num": 88,
+    "grupo": "Quadríceps",
+    "nomePt": "Cadeira extensora",
+    "consulta": "lever leg extension",
+    "nomeEn": "lever leg extension",
+    "gif": "videos/0585-my33uHU.gif",
+    "suspeito": false,
+    "motivo": "OK ou verificar visualmente"
+  },
+  {
+    "num": 89,
+    "grupo": "Quadríceps",
+    "nomePt": "Hack squat",
+    "consulta": "hack squat",
+    "nomeEn": "sled hack squat",
+    "gif": "videos/0743-Qa55kX1.gif",
+    "suspeito": false,
+    "motivo": "OK ou verificar visualmente"
+  },
+  {
+    "num": 90,
+    "grupo": "Quadríceps",
+    "nomePt": "Leg press 45 graus",
+    "consulta": "sled 45 leg press",
+    "nomeEn": "sled 45в° leg press",
+    "gif": "videos/0739-10Z2DXU.gif",
+    "suspeito": false,
+    "motivo": "OK ou verificar visualmente"
+  },
+  {
+    "num": 91,
+    "grupo": "Quadríceps",
+    "nomePt": "Leg press horizontal",
+    "consulta": "horizontal leg press",
+    "nomeEn": "band horizontal pallof press",
+    "gif": "videos/0979-9pa4H5m.gif",
+    "suspeito": false,
+    "motivo": "OK ou verificar visualmente"
+  },
+  {
+    "num": 92,
+    "grupo": "Quadríceps",
+    "nomePt": "Leg press unilateral",
+    "consulta": "single leg press",
+    "nomeEn": "smith leg press",
+    "gif": "videos/0760-7zdxRTl.gif",
+    "suspeito": true,
+    "motivo": "Exercício unilateral no Lastro mapeado para GIF bilateral"
+  },
+  {
+    "num": 93,
+    "grupo": "Quadríceps",
+    "nomePt": "Passada (step-up)",
+    "consulta": "barbell step up",
+    "nomeEn": "barbell step-up",
+    "gif": "videos/0114-Kxquu2E.gif",
+    "suspeito": false,
+    "motivo": "OK ou verificar visualmente"
+  },
+  {
+    "num": 94,
+    "grupo": "Tríceps",
+    "nomePt": "Extensão de tríceps na polia alta unilateral",
+    "consulta": "cable one arm tricep extension",
+    "nomeEn": "cable standing reverse grip one arm overhead tricep extension",
+    "gif": "videos/1727-i11JWU7.gif",
+    "suspeito": false,
+    "motivo": "OK ou verificar visualmente"
+  },
+  {
+    "num": 95,
+    "grupo": "Tríceps",
+    "nomePt": "Mergulho no banco",
+    "consulta": "bench dip",
+    "nomeEn": "three bench dip",
+    "gif": "videos/1753-DQ0cqkT.gif",
+    "suspeito": false,
+    "motivo": "OK ou verificar visualmente"
+  },
+  {
+    "num": 96,
+    "grupo": "Tríceps",
+    "nomePt": "Paralelas",
+    "consulta": "parallel bar dip",
+    "nomeEn": "weighted straight bar dip",
+    "gif": "videos/3313-Ff18ItA.gif",
+    "suspeito": false,
+    "motivo": "OK ou verificar visualmente"
+  },
+  {
+    "num": 97,
+    "grupo": "Tríceps",
+    "nomePt": "Supino fechado",
+    "consulta": "barbell close grip bench press",
+    "nomeEn": "barbell close-grip bench press",
+    "gif": "videos/0030-J6Dx1Mu.gif",
+    "suspeito": true,
+    "motivo": "Supino fechado sem close-grip no nome em inglês"
+  },
+  {
+    "num": 98,
+    "grupo": "Tríceps",
+    "nomePt": "Tríceps coice com halter",
+    "consulta": "dumbbell kickback",
+    "nomeEn": "dumbbell kickback",
+    "gif": "videos/0333-W6PxUkg.gif",
+    "suspeito": false,
+    "motivo": "OK ou verificar visualmente"
+  },
+  {
+    "num": 99,
+    "grupo": "Tríceps",
+    "nomePt": "Tríceps francês com halter",
+    "consulta": "dumbbell overhead tricep extension",
+    "nomeEn": "dumbbell seated reverse grip one arm overhead tricep extension",
+    "gif": "videos/1738-5fKX7wi.gif",
+    "suspeito": false,
+    "motivo": "OK ou verificar visualmente"
+  },
+  {
+    "num": 100,
+    "grupo": "Tríceps",
+    "nomePt": "Tríceps máquina",
+    "consulta": "lever tricep extension",
+    "nomeEn": "lever triceps extension",
+    "gif": "videos/0607-Ser9eQp.gif",
+    "suspeito": false,
+    "motivo": "OK ou verificar visualmente"
+  },
+  {
+    "num": 101,
+    "grupo": "Tríceps",
+    "nomePt": "Tríceps pulley (corda)",
+    "consulta": "cable rope pushdown",
+    "nomeEn": "cable pushdown (with rope attachment)",
+    "gif": "videos/0200-dU605di.gif",
+    "suspeito": false,
+    "motivo": "OK ou verificar visualmente"
+  },
+  {
+    "num": 102,
+    "grupo": "Tríceps",
+    "nomePt": "Tríceps testa com barra",
+    "consulta": "barbell lying triceps extension",
+    "nomeEn": "barbell lying triceps extension",
+    "gif": "videos/0061-iZop9xO.gif",
+    "suspeito": false,
+    "motivo": "OK ou verificar visualmente"
+  }
+]
