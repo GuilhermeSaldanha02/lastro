@@ -100,7 +100,7 @@ export default function TimerTopo({
 
   return (
     <div className="timer-topo-container">
-      {/* 1. Modo Normal: Botão pílula elegante de disparo manual no topo */}
+      {/* 1. Modo Normal: barra larga, mesma forma e peso do card ativo */}
       {!ativo && !finalizado && (
         <div className="timer-topo-gatilho">
           <button
@@ -109,7 +109,24 @@ export default function TimerTopo({
             onClick={() => iniciarTimer(duracaoPadraoSegundos)}
             title="Iniciar descanso entre séries"
           >
-            <span>{t("Descanso", idioma)}</span>
+            <span className="timer-topo-disparar-rotulo">
+              <svg
+                className="timer-topo-disparar-icone"
+                viewBox="0 0 24 24"
+                fill="none"
+                aria-hidden="true"
+              >
+                <circle cx="12" cy="12" r="9" stroke="currentColor" strokeWidth="2" />
+                <path
+                  d="M12 7v5l3.5 2"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+              {t("Descanso", idioma)}
+            </span>
             <span className="timer-topo-duracao-tag">
               {formatarMinutosSegundos(duracaoPadraoSegundos)}
             </span>

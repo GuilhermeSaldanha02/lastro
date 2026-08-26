@@ -68,6 +68,8 @@
   --lastro-sync:         #06B6D4; /* Sincronização - Ciano */
   --lastro-erro:         #EF4444; /* Falha e ações destrutivas */
   --lastro-erro-txt:     #FFFFFF;
+  --lastro-borda-erro:   rgba(239, 68, 68, 0.45); /* Contorno vermelho sutil */
+  --lastro-erro-glow:    rgba(239, 68, 68, 0.25); /* Sombra decorativa — nunca carrega texto */
   --lastro-foco:         #D4AF37;
   /* Era #FCD34D cravado direto em `.chip-serie--aquecimento` (P7) —
      virou token porque reprovava no branco-ouro (T3b, 2026-08-21) e
