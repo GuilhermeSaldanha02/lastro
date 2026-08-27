@@ -103,14 +103,27 @@
   --lastro-fonte-num:   var(--fonte-archivo), system-ui, sans-serif;
   --lastro-fonte-serif: var(--fonte-fraunces), Georgia, serif;
 
-  /* ---- Papéis Tipográficos ---- */
-  --lastro-papel-rotulo:        13px;
-  --lastro-papel-corpo:         15px;
-  --lastro-papel-corpo-leitura: 17px;
-  --lastro-papel-secao:         19px;
-  --lastro-papel-titulo-tela:   28px;
-  --lastro-papel-numero-heroi:  42px;
-  --lastro-papel-bancada:       72px;
+  /* ---- Papéis Tipográficos ----
+     Reconciliados com DESIGN.md §3.4 em 2026-08-27. Toda a escala estava
+     de 1 a 6px ABAIXO do que o documento especifica, e o corpo a 15px
+     violava D4 direto — "legível a um braço de distância, corpo nunca
+     abaixo de 16px", restrição marcada como não negociável. O piso de 16
+     não é gosto: é o número que a cena de uso exige (celular apoiado no
+     banco, lido em pé, entre séries).
+
+     `--lastro-papel-detalhe` era usado em `.status-tempo-treino__rotulo`
+     (sistema.css) sem nunca ter sido definido aqui — variável fantasma,
+     que fazia o rótulo herdar o tamanho do pai em vez de ter papel. Entra
+     abaixo do Rótulo, como o degrau de metadado ínfimo que aquele uso
+     pedia, e é o ÚNICO consumidor: não espalhar. */
+  --lastro-papel-detalhe:       12px;
+  --lastro-papel-rotulo:        14px;
+  --lastro-papel-corpo:         16px;
+  --lastro-papel-corpo-leitura: 18px;
+  --lastro-papel-secao:         20px;
+  --lastro-papel-titulo-tela:   30px;
+  --lastro-papel-numero-heroi:  48px;
+  --lastro-papel-bancada:       76px;
 
   /* ---- Entrelinha ---- */
   --lastro-el-apertada: 1.15;
