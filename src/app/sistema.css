@@ -20,17 +20,27 @@
    ocupa a própria altura. Reservar espaço aqui contava a nav duas vezes e
    empurrava a página 27px além do viewport, cortando os rótulos — medido
    a 390×844 em 2026-08-06. Aqui só entra respiro de leitura. */
-/* A barra é `fixed` — reserva a altura dela mais respiro, senão a
-   última série/linha da lista renderiza embaixo da barra (2026-08-06). */
-/* A barra de topo também é `fixed` (2026-08-07) — mesmo motivo, mas no
-   topo: sem este padding, o primeiro conteúdo renderiza embaixo dela. */
+/* A aba INFERIOR é `fixed` — reserva a altura dela mais respiro, senão a
+   última série/linha da lista renderiza embaixo dela (2026-08-06).
+
+   O topo NÃO precisa de reserva: `.topo-pro` virou `position: sticky`
+   (regra "CABECALHO PRO", mais abaixo), e sticky OCUPA o próprio lugar no
+   fluxo — o `.corpo` já começa depois dela. O `padding-top` de 60px+
+   escrito aqui em 2026-08-07, quando a barra ainda era `fixed`, passou a
+   somar em cima disso: media 72px de vão morto no alto de TODA tela
+   (achado do dono, 2026-08-27). É o mesmo erro que o comentário acima
+   descreve para a nav inferior, repetido no topo — reservar espaço para
+   um elemento que não saiu do fluxo conta a altura dele duas vezes.
+
+   Sticky também é o que faz a barra "descer acompanhando" a rolagem, que
+   é o comportamento que o dono queria: o que atrapalhava era só o vão. */
 .corpo--com-nav {
-  padding-top: calc(60px + env(safe-area-inset-top, 0px) + var(--lastro-e-3));
+  padding-top: var(--lastro-e-3);
   padding-bottom: calc(var(--lastro-clearance-nav) + var(--lastro-e-6));
 }
 
 .corpo--titulo-conteudo {
-  padding-top: calc(60px + env(safe-area-inset-top, 0px) + var(--lastro-e-3));
+  padding-top: var(--lastro-e-3);
 }
 
 /* ---------- Transição "pílula" (H3, D7) ----------
@@ -2310,7 +2320,15 @@
    ESTILOS APEX PRO — Redesign 2026 (NTC / Strava / Hevy Standard)
    ===================================================================== */
 
-/* Topo Pro */
+/* Topo Pro
+   ⚠️ Esta regra está MORTA em quase tudo: existe uma segunda `.topo-pro`
+   na seção "CABECALHO PRO", bem mais abaixo, que vence a cascata inteira
+   (`sticky` em vez de `fixed`, `min-height: 56px` em vez de `height: 60px`,
+   outro padding, outro fundo, outro z-index). Só `left`/`right` sobrevivem
+   daqui, e nem fazem efeito em sticky.
+   Não removida junto com a correção do vão de 2026-08-27 porque apagar
+   regra base é mudança de risco próprio, que merece o seu próprio gate
+   visual — mas NÃO EDITE esta aqui esperando efeito: edite a de baixo. */
 .topo-pro {
   position: fixed;
   top: 0;
@@ -3334,9 +3352,17 @@
   background: rgba(212, 175, 55, 0.08);
 }
 
+/* ⚠️ Existe uma segunda `.barra-conversa` mais acima (linha ~1845); esta,
+   por vir depois, é a que vale. Editar a de cima não tem efeito.
+
+   O `- var(--lastro-e-2)` de antes SUBTRAÍA do clearance da nav, puxando
+   a barra 8px para DENTRO da aba inferior — o campo de digitar ficava por
+   baixo dela (T5 do backlog; medido em 1px a 390px e 9px a 360×640, e o
+   dono reportou de novo em 2026-08-27). Somar é o que dá folga acima da
+   nav, que é o que o nome do token promete. */
 .barra-conversa {
   position: fixed;
-  bottom: calc(var(--lastro-clearance-nav) - var(--lastro-e-2));
+  bottom: calc(var(--lastro-clearance-nav) + var(--lastro-e-2));
   left: var(--lastro-e-4);
   right: var(--lastro-e-4);
   display: flex;
@@ -4495,21 +4521,39 @@
   color: var(--lastro-txt);
 }
 
-/* Card com Fundo Quadriculado Transparente (Checkerboard) */
+/* Cartão do treino — estado de REPOUSO.
+   O xadrez de transparência é jargão de editor de imagem e, em repouso,
+   só suja o cartão de quem acabou de treinar (pedido do dono,
+   2026-08-27). Aqui ele vira uma peça acabada, com a mesma tinta do resto
+   do app; o xadrez entra só no modificador abaixo, durante a ação. */
 .pos-treino-card-transparente-wrapper {
   position: relative;
   width: 100%;
   aspect-ratio: 1 / 1;
   border-radius: var(--lastro-raio-2);
   overflow: hidden;
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  border: 1px solid var(--lastro-borda-ouro);
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.7), 0 0 24px var(--lastro-ouro-glow);
+  background-color: var(--lastro-sup-1);
+  background-image: radial-gradient(
+    circle at 78% 18%,
+    var(--lastro-ouro-glow) 0%,
+    transparent 58%
+  );
+  transition: background-color var(--lastro-dur-2) ease;
+}
+
+/* Estado de AÇÃO: copiou/salvou/compartilhou. Aqui o xadrez informa —
+   é o momento em que "o fundo sai transparente" importa de verdade. */
+.pos-treino-card-transparente-wrapper--xadrez {
+  border-color: rgba(255, 255, 255, 0.12);
   box-shadow: 0 16px 36px rgba(0, 0, 0, 0.7);
-  background-color: #0E1218;
+  background-color: #0e1218;
   background-image:
-    linear-gradient(45deg, #181F2A 25%, transparent 25%),
-    linear-gradient(-45deg, #181F2A 25%, transparent 25%),
-    linear-gradient(45deg, transparent 75%, #181F2A 75%),
-    linear-gradient(-45deg, transparent 75%, #181F2A 75%);
+    linear-gradient(45deg, #181f2a 25%, transparent 25%),
+    linear-gradient(-45deg, #181f2a 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, #181f2a 75%),
+    linear-gradient(-45deg, transparent 75%, #181f2a 75%);
   background-size: 24px 24px;
   background-position: 0 0, 0 12px, 12px -12px, -12px 0px;
 }

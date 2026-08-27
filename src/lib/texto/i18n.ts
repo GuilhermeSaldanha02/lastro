@@ -342,6 +342,7 @@ const DICIONARIO: Record<string, { en: string; es: string }> = {
   // existiam em PT-BR: a tela do relatório aparecia meio traduzida em
   // en/es (achado do teste de jornada, 2026-08-27).
   "Compartilhar Treino": { en: "Share Workout", es: "Compartir Entrenamiento" },
+  "Fundo transparente": { en: "Transparent background", es: "Fondo transparente" },
   "Compartilhar com": { en: "Share with", es: "Compartir con" },
   "Carga Total": { en: "Total Load", es: "Carga Total" },
   "Séries Válidas": { en: "Working Sets", es: "Series Válidas" },
