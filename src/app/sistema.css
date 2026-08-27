@@ -3911,18 +3911,18 @@
    lastro · TIMER DE DESCANSO NO TOPO & ÁREA DE AÇÃO DIVIDIDA
    ===================================================================== */
 
-/* Container Sticky no Topo da Tela */
-/* Container Sticky no Topo da Tela - Pinned Real na Rolagem */
+/* Container Sticky no Topo da Tela - Docked perfeitamente abaixo de topo-pro */
 .timer-topo-container {
   position: sticky;
-  top: calc(56px + env(safe-area-inset-top, 0px));
-  z-index: 45;
+  top: 60px;
+  z-index: 50;
   width: 100%;
-  padding: 6px var(--lastro-e-4);
+  padding: 8px var(--lastro-e-4);
   background: var(--lastro-barra-b);
   border-bottom: 1px solid var(--lastro-linha);
-  backdrop-filter: blur(12px);
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(16px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
+  margin-bottom: var(--lastro-e-2);
 }
 
 .barra-status-treino {
@@ -3937,9 +3937,9 @@
   display: flex;
   align-items: center;
   gap: var(--lastro-e-2);
-  background: var(--lastro-sup-2);
+  background: var(--lastro-sup-1);
   border: 1px solid var(--lastro-linha);
-  padding: 6px 12px;
+  padding: 6px 14px;
   border-radius: var(--lastro-raio-pilula);
   color: var(--lastro-txt);
   flex-shrink: 0;
@@ -3988,10 +3988,10 @@
   gap: var(--lastro-e-2);
   min-height: 38px;
   padding: 6px 14px;
-  background: var(--lastro-sup-2);
+  background: var(--lastro-sup-1);
   border: 1px solid var(--lastro-borda-ouro);
   border-radius: var(--lastro-raio-pilula) !important;
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.3), 0 0 12px var(--lastro-ouro-glow);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25), 0 0 10px var(--lastro-ouro-glow);
   color: var(--lastro-txt);
   font-size: var(--lastro-papel-rotulo);
   font-weight: 500;
@@ -4001,7 +4001,7 @@
 }
 
 .timer-topo-botao-disparar:hover {
-  background: var(--lastro-sup-3);
+  background: var(--lastro-sup-2);
   border-color: var(--lastro-ouro);
 }
 
@@ -4019,7 +4019,7 @@
 
 /* Card Ativo no Topo - Formato Pílula */
 .timer-topo-card-ativo {
-  background: var(--lastro-sup-2);
+  background: var(--lastro-sup-1);
   border: 1px solid var(--lastro-ouro-glow);
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4), 0 0 15px rgba(212, 175, 55, 0.15);
   border-radius: var(--lastro-raio-pilula) !important;
@@ -4072,7 +4072,7 @@
 }
 
 .timer-topo-btn-controle {
-  background: var(--lastro-sup-3);
+  background: var(--lastro-sup-2);
   border: 1px solid var(--lastro-linha);
   color: var(--lastro-txt-2);
   font-size: 11px;
@@ -4270,46 +4270,102 @@
   z-index: 2;
 }
 
-.pos-treino-card-dados-flutuantes {
+/* Conteúdo do Sticker Strava Real */
+.pos-treino-strava-conteudo {
   position: absolute;
-  top: 48px;
-  left: 20px;
+  inset: 0;
+  padding: 36px 20px 16px;
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
-  text-align: left;
-  gap: var(--lastro-e-3);
+  justify-content: flex-start;
   z-index: 2;
 }
 
-.pos-treino-dado-item {
+.pos-treino-strava-metricas {
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
-  gap: 1px;
+  gap: 8px;
 }
 
-.pos-treino-dado-rotulo {
-  font-size: var(--lastro-papel-detalhe);
+.pos-treino-strava-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0px;
+}
+
+.pos-treino-strava-label {
+  font-size: 10px;
   font-weight: 700;
+  letter-spacing: 0.1em;
+  color: rgba(255, 255, 255, 0.7);
   text-transform: uppercase;
-  letter-spacing: 0.06em;
-  color: rgba(255, 255, 255, 0.8);
 }
 
-.pos-treino-dado-valor {
-  font-size: 1.8rem;
+.pos-treino-strava-valor {
+  font-size: 1.55rem;
   font-weight: 900;
-  font-family: var(--lastro-fonte-txt);
   color: #FFFFFF;
   letter-spacing: -0.02em;
-  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.7);
+  font-family: var(--lastro-fonte-txt);
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.8);
+}
+
+.pos-treino-strava-exercicios {
+  margin-top: 10px;
+  padding-top: 8px;
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.pos-treino-strava-exercicios-titulo {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--lastro-ouro);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.pos-treino-strava-exercicios-lista {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  max-width: 65%;
+}
+
+.pos-treino-strava-exercicio-linha {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 11px;
+  color: #FFFFFF;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8);
+}
+
+.pos-treino-strava-exercicio-nome {
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.pos-treino-strava-exercicio-series {
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.85);
+  margin-left: 8px;
+}
+
+.pos-treino-strava-exercicio-mais {
+  font-size: 10px;
+  color: rgba(255, 255, 255, 0.6);
+  font-style: italic;
 }
 
 .pos-treino-logo-canto {
   position: absolute;
-  bottom: 18px;
-  right: 18px;
+  bottom: 16px;
+  right: 16px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -4318,14 +4374,14 @@
 }
 
 .pos-treino-logo-canto__img {
-  width: 62px;
-  height: 62px;
+  width: 54px;
+  height: 54px;
   object-fit: contain;
-  filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.8));
+  filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.9));
 }
 
 .pos-treino-logo-canto__txt {
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 800;
   letter-spacing: 0.18em;
   color: var(--lastro-ouro);

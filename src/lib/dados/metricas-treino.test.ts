@@ -52,6 +52,9 @@ describe("calcularMetricasSessao", () => {
     expect(metricas.prsBatidos).toHaveLength(1);
     expect(metricas.prsBatidos[0].exercicioNome).toBe("Supino Reto");
     expect(metricas.prsBatidos[0].peso).toBe(85);
+    expect(metricas.exerciciosDetalhados).toHaveLength(2);
+    expect(metricas.exerciciosDetalhados[0].exercicioNome).toBe("Supino Reto");
+    expect(metricas.exerciciosDetalhados[0].totalSeries).toBe(3);
   });
 
   it("lida com lista vazia de séries sem quebrar", () => {
