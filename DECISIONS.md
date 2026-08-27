@@ -1248,3 +1248,23 @@ Pedido do dono: "adicionar o módulo de idiomas" (inglês e espanhol, além do P
 Reverte explicitamente a posição da ADR anterior contra tradução automática do catálogo (registrado na entrada da etapa 1) — por decisão do dono, não por esquecimento. Fora do escopo em todas as 4 etapas: o Coach IA (`api/coach/*`, feature separada da Análise Semanal) e a tela de `/login` (pré-autenticação, sem `usuario.idioma` pra ler).
 
 ---
+
+---
+
+## 2026-08-27 — Scope Change: compartilhamento de imagem e cronômetro de descanso entram no escopo
+
+**O que mudou.** Duas funcionalidades que estavam no escopo NEGATIVO do `PRD.md` §5 passam a fazer parte do produto, com o texto do §5 emendado (notas A e B). Nenhuma linha de código muda nesta entrada — o código já existia; o que faltava era o registro, e o protocolo do próprio PRD exige um.
+
+**Por quê agora.** A auditoria de 2026-08-26 (`docs/RELATORIO-ESTADO-PROJETO.md`, achado D1) levantou as duas como divergência entre o que estava no ar e o que o documento dizia, e apresentou a pergunta ao dono. Ele respondeu **agindo**: pediu a correção dos botões de compartilhar e do relatório pós-treino em 2026-08-27, e havia dirigido pessoalmente o desenho do cronômetro em 2026-08-26. Pedir para consertar é decidir manter. A decisão estava tomada; só não estava escrita.
+
+**Compartilhar — o que entra e o que continua fora.** Entra **exportação de imagem gerada no próprio aparelho**: PNG 1080×1080 desenhado em `<canvas>` no cliente (`relatorio-pos-treino.tsx`), entregue por clipboard, download ou `navigator.share`. Não há servidor, não há feed, não há seguir, comparar, ranking nem perfil público; nada sai do aparelho sem o dono mandar. A proibição do §5 era contra o app **virar rede social**, e essa continua de pé — a linha passa a ler "sem feed, seguir, comparar ou ranking". Exportar o próprio dado tem a mesma natureza de salvar um print da tela.
+
+**Cronômetro — a distinção que importa.** O §5 o excluía "**na v1**", com a ressalva explícita de que não era descarte permanente; esta entrada exerce essa ressalva. O que entrou é **manual**, disparado por toque. O "cronômetro de descanso **automático**" registrado como não aprovado em `DECISIONS.md` 2026-08-13 **continua fora** — aquela linha nunca proibiu o manual, e é por isso que ela não precisa ser revista.
+
+**Alternativa descartada.** Remover as duas funcionalidades para o código voltar a bater com o documento. Descartada porque o dono as quer: o documento é que estava desatualizado, não o produto. A alternativa oposta — deixar como estava, sem registrar — é a que o protocolo de Scope Change existe para impedir, e é o que já tinha acontecido duas vezes.
+
+**Classificação.** **ADIÇÃO** nas duas. Não mudam a tese (a Análise Semanal continua a peça-assinatura, o produto continua sendo a leitura); acrescentam ao redor dela.
+
+**Impacto.** `PRD.md` §5 (notas A e B). Nenhum arquivo de `src/` tocado por esta decisão.
+
+**Como reverter.** Apagar `relatorio-pos-treino.tsx` e o bloco `.pos-treino-*` de `sistema.css` (compartilhar); apagar `timer-topo.tsx` e o bloco `.timer-topo-*` (cronômetro). As duas são aditivas e isoladas — nenhuma outra tela depende delas.

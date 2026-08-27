@@ -83,14 +83,18 @@ Um app de treino **pessoal** que registra cada série executada e, uma vez por s
 
 ## 5. Escopo NEGATIVO (explícito — não entra, e não é esquecimento)
 
-- ❌ Qualquer coisa social: feed, seguir, comparar, ranking, compartilhar.
+- ❌ Qualquer coisa social: feed, seguir, comparar, ranking. ~~compartilhar~~ → **REVISTO em 2026-08-27, ver nota A abaixo.**
 - ❌ Planos e periodizações gerados automaticamente. O app **analisa** o que foi feito; não prescreve programa.
 - ❌ Integração com relógio, balança, wearable, Health/Google Fit.
 - ❌ Contagem de calorias, macros, dieta.
 - ❌ Múltiplos usuários, planos pagos, onboarding para estranhos, tela de billing, limite de uso.
 - ❌ Catálogo gigante de exercícios. ~100 curados vencem 1500 auto-traduzidos.
 - ❌ App nativo em loja.
-- ❌ Cronômetro de descanso, vídeo próprio, importação de outros apps — **na v1**. Nenhum está descartado para sempre; estão fora do MVP.
+- ~~❌ Cronômetro de descanso~~ → **REVISTO em 2026-08-27, ver nota B.** · ❌ vídeo próprio, importação de outros apps — **na v1**. Nenhum está descartado para sempre; estão fora do MVP.
+
+**Nota A — exportar imagem do treino ENTRA; rede social continua fora (Scope Change, ADIÇÃO, 2026-08-27).** O dono aprovou o relatório pós-treino com botão de compartilhar (Instagram Story · copiar · salvar · folha nativa). O que entra é **exportação de uma imagem gerada no próprio aparelho**: PNG desenhado em `<canvas>` no cliente, entregue via clipboard, download ou `navigator.share`. **Nada sai do aparelho sem o dono mandar, não há servidor envolvido, nem feed, nem seguir, nem comparar, nem perfil público.** O que o §5 proíbe — o app virar rede social — segue valendo integralmente: a linha acima passa a ler "sem feed, seguir, comparar ou ranking". Exportar o próprio dado não é socializar; é a mesma natureza de salvar um print. Registrado em `DECISIONS.md` 2026-08-27.
+
+**Nota B — cronômetro de descanso ENTRA (Scope Change, ADIÇÃO, 2026-08-27).** Estava fora "na v1", com a ressalva explícita de que não era descarte definitivo. Foi construído, o dono dirigiu o desenho pessoalmente e pediu o merge. É **manual** (disparado por toque), não automático — o "cronômetro de descanso **automático**" registrado como não aprovado em `DECISIONS.md` 2026-08-13 continua fora. Registrado em `DECISIONS.md` 2026-08-27.
 
 ---
 

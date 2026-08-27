@@ -18,8 +18,25 @@ export default function RelatorioPosTreino({
   onFechar,
 }: RelatorioPosTreinoProps) {
   const router = useRouter();
-  const [copiado, setCopiado] = useState(false);
   const [salvando, setSalvando] = useState(false);
+  /**
+   * Resultado da última ação de compartilhar. Substitui o `copiado`
+   * booleano, que só sabia dizer "deu certo" — e por isso todo caminho de
+   * falha terminava mudo (achado do dono, 2026-08-27).
+   *
+   * `atencao` é âmbar, nunca `--lastro-erro`: não conseguir copiar um
+   * sticker não é falha do treino nem culpa de quem tocou. Mesmo
+   * raciocínio de D7 e de DESIGN.md §3.6.6.
+   */
+  const [aviso, setAviso] = useState<{
+    texto: string;
+    tom: "ok" | "atencao";
+  } | null>(null);
+
+  function avisar(texto: string, tom: "ok" | "atencao") {
+    setAviso({ texto, tom });
+    window.setTimeout(() => setAviso(null), 4000);
+  }
 
   function concluirTreino() {
     onFechar();
@@ -149,36 +166,57 @@ export default function RelatorioPosTreino({
    * Copia a imagem transparente para a área de transferência (Clipboard)
    * para colar diretamente no Story do Instagram.
    */
+  /**
+   * Copiar o sticker para a área de transferência.
+   *
+   * Antes: em qualquer falha caía no `salvarImagem()` sem dizer nada, e o
+   * `setCopiado(true)` só existia no ramo de sucesso — ou seja, o botão
+   * "Copiar" **trocava silenciosamente de ação** e baixava um arquivo que
+   * a pessoa não pediu, sem um único aviso na tela (achado do dono,
+   * 2026-08-27). A permissão de escrever imagem no clipboard é negada por
+   * padrão em vários navegadores, então esse ramo é o comum, não o raro.
+   *
+   * Agora toda saída termina em aviso. O fallback continua existindo — é
+   * melhor que nada — mas passa a ser anunciado, nunca substituído às
+   * escondidas.
+   */
   async function copiarParaClipboard() {
-    try {
-      const blob = await gerarBlobImagemTransparente();
-      if (!blob) return;
-
-      if (navigator.clipboard && typeof ClipboardItem !== "undefined") {
-        await navigator.clipboard.write([
-          new ClipboardItem({
-            "image/png": blob,
-          }),
-        ]);
-        setCopiado(true);
-        setTimeout(() => setCopiado(false), 3000);
-      } else {
-        salvarImagem();
-      }
-    } catch (err) {
-      console.warn("Erro ao copiar imagem:", err);
-      salvarImagem();
+    const blob = await gerarBlobImagemTransparente();
+    if (!blob) {
+      avisar(t("Não foi possível gerar a imagem do treino.", idioma), "atencao");
+      return;
     }
+
+    const temClipboardDeImagem =
+      typeof navigator.clipboard?.write === "function" &&
+      typeof ClipboardItem !== "undefined";
+
+    if (temClipboardDeImagem) {
+      try {
+        await navigator.clipboard.write([new ClipboardItem({ "image/png": blob })]);
+        avisar(t("Sticker copiado! Cole no Story do Instagram.", idioma), "ok");
+        return;
+      } catch (erro) {
+        console.warn("Clipboard recusou a imagem:", erro);
+      }
+    }
+
+    const salvou = await baixarBlob(blob);
+    avisar(
+      salvou
+        ? t("Seu aparelho não deixou copiar. A imagem foi salva.", idioma)
+        : t("Não foi possível copiar nem salvar a imagem.", idioma),
+      "atencao",
+    );
   }
 
   /**
    * Faz o download do arquivo PNG transparente.
    */
-  async function salvarImagem() {
-    setSalvando(true);
+  /** Dispara o download. Separado de `salvarImagem` para os outros
+   *  caminhos poderem reaproveitá-lo como fallback ANUNCIADO. */
+  async function baixarBlob(blob: Blob): Promise<boolean> {
     try {
-      const blob = await gerarBlobImagemTransparente();
-      if (!blob) return;
       const url = URL.createObjectURL(blob);
       const link = document.createElement("a");
       link.href = url;
@@ -187,6 +225,28 @@ export default function RelatorioPosTreino({
       link.click();
       document.body.removeChild(link);
       URL.revokeObjectURL(url);
+      return true;
+    } catch (erro) {
+      console.warn("Falha ao baixar a imagem:", erro);
+      return false;
+    }
+  }
+
+  async function salvarImagem() {
+    setSalvando(true);
+    try {
+      const blob = await gerarBlobImagemTransparente();
+      if (!blob) {
+        avisar(t("Não foi possível gerar a imagem do treino.", idioma), "atencao");
+        return;
+      }
+      const salvou = await baixarBlob(blob);
+      avisar(
+        salvou
+          ? t("Imagem salva no aparelho.", idioma)
+          : t("Não foi possível salvar a imagem.", idioma),
+        salvou ? "ok" : "atencao",
+      );
     } finally {
       setSalvando(false);
     }
@@ -195,23 +255,44 @@ export default function RelatorioPosTreino({
   /**
    * Compartilha via Web Share API
    */
+  /**
+   * Compartilhar pela folha nativa do sistema — no celular é ESTE o
+   * caminho que chega ao Instagram de verdade.
+   *
+   * O `catch {}` de antes engolia tudo em silêncio: sem folha nativa
+   * (navegador de PC) e com o clipboard recusando, o toque não produzia
+   * nada visível. Fechar a sessão sem `navigator.share` é caso normal, não
+   * defeito, então a cadeia de fallback fica — só deixa de ser muda.
+   */
   async function compartilharNativo() {
-    try {
-      const blob = await gerarBlobImagemTransparente();
-      if (!blob) return;
-      const file = new File([blob], "lastro-treino.png", { type: "image/png" });
+    const blob = await gerarBlobImagemTransparente();
+    if (!blob) {
+      avisar(t("Não foi possível gerar a imagem do treino.", idioma), "atencao");
+      return;
+    }
 
-      if (navigator.canShare && navigator.canShare({ files: [file] })) {
-        await navigator.share({
-          files: [file],
-          title: "Treino LASTRO",
-          text: `Duração: ${metricas.duracaoMinutos} min | Séries: ${metricas.totalSeriesValendo}`,
-        });
-      } else {
-        await copiarParaClipboard();
-      }
-    } catch {
-      // Cancelado ou não suportado
+    const arquivo = new File([blob], "lastro-treino.png", { type: "image/png" });
+    const podeCompartilhar =
+      typeof navigator.canShare === "function" &&
+      navigator.canShare({ files: [arquivo] });
+
+    if (!podeCompartilhar) {
+      await copiarParaClipboard();
+      return;
+    }
+
+    try {
+      await navigator.share({
+        files: [arquivo],
+        title: "Treino LASTRO",
+        text: `${t("Tempo", idioma)}: ${metricas.duracaoMinutos} min · ${t("Séries Válidas", idioma)}: ${metricas.totalSeriesValendo}`,
+      });
+    } catch (erro) {
+      // Fechar a folha de compartilhamento é escolha da pessoa, não erro:
+      // avisar aqui seria acusar quem desistiu de propósito.
+      if ((erro as Error)?.name === "AbortError") return;
+      console.warn("Compartilhamento nativo falhou:", erro);
+      await copiarParaClipboard();
     }
   }
 
@@ -293,10 +374,16 @@ export default function RelatorioPosTreino({
           </div>
         </div>
 
-        {/* Notificação / Toast de confirmação */}
-        {copiado && (
-          <div className="pos-treino-toast-copiado">
-            Sticker copiado com fundo transparente! Cole no Instagram Story.
+        {/* Resultado da última ação — sucesso E falha. `aria-live` porque
+            quem usa leitor de tela precisa saber o que aconteceu tanto
+            quanto quem enxerga o toast. */}
+        {aviso && (
+          <div
+            className={`pos-treino-toast-copiado pos-treino-toast-copiado--${aviso.tom}`}
+            role="status"
+            aria-live="polite"
+          >
+            {aviso.texto}
           </div>
         )}
 
@@ -337,9 +424,10 @@ export default function RelatorioPosTreino({
                   <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
                 </svg>
               </div>
-              <span className="pos-treino-rotulo-acao">
-                {copiado ? "Copiado!" : "Copiar"}
-              </span>
+              {/* O rótulo não vira "Copiado!" sozinho: quem conta o
+                  desfecho é o aviso acima, que sabe distinguir copiado de
+                  salvo-porque-não-deu-pra-copiar. */}
+              <span className="pos-treino-rotulo-acao">{t("Copiar", idioma)}</span>
             </button>
 
             {/* 3. Save */}
@@ -358,7 +446,7 @@ export default function RelatorioPosTreino({
                 </svg>
               </div>
               <span className="pos-treino-rotulo-acao">
-                {salvando ? "Salvando..." : "Salvar"}
+                {t(salvando ? "Salvando..." : "Salvar", idioma)}
               </span>
             </button>
 
@@ -378,7 +466,7 @@ export default function RelatorioPosTreino({
                   <line x1="15.41" y1="6.51" x2="8.59" y2="10.49" />
                 </svg>
               </div>
-              <span className="pos-treino-rotulo-acao">Mais</span>
+              <span className="pos-treino-rotulo-acao">{t("Mais", idioma)}</span>
             </button>
           </div>
 
