@@ -32,16 +32,16 @@ Regras completas: skill `qa-registro`. Prova crua obrigatória em `qa/evidencias
 
 | ID | Área | O que prova | Resultado | SHA | Data | Evidência |
 |---|---|---|---|---|---|---|
-| TR-01 | treino | Cronômetro de treino congela no finalizar, cancela descanso e persiste | ALEGADO | 88f58c0 | 2026-08-26 | qa/evidencias/TR-01/ |
-| VS-01 | visual | Renderização e contraste do tema Obsidian Ouro (Padrão) | ALEGADO | 88f58c0 | 2026-08-26 | qa/evidencias/VS-01/ |
-| VS-02 | visual | Renderização e contraste do tema Marfim & Ouro Imperial (Claro) | ALEGADO | 88f58c0 | 2026-08-26 | qa/evidencias/VS-02/ |
-| AN-01 | analise | Painel de Análise Semanal com métricas e gráficos carregados | ALEGADO | 88f58c0 | 2026-08-26 | qa/evidencias/AN-01/ |
-| CT-01 | catalogo | Catálogo de exercícios com busca, filtros de grupo e preview 3D | ALEGADO | 88f58c0 | 2026-08-26 | qa/evidencias/CT-01/ |
-| CH-01 | coach | Interface de Coach IA operacional e responsiva | ALEGADO | 88f58c0 | 2026-08-26 | qa/evidencias/CH-01/ |
-| PF-01 | perfil | Perfil do atleta com seletor de idioma e dados do usuário | ALEGADO | 88f58c0 | 2026-08-26 | qa/evidencias/PF-01/ |
-| AJ-01 | ajustes | Tela de ajustes com seletor interativo dos 7 temas e anilhas | ALEGADO | 88f58c0 | 2026-08-26 | qa/evidencias/AJ-01/ |
-| AU-01 | auth | Tela de login, formulário e controle de sessão | ALEGADO | 88f58c0 | 2026-08-26 | qa/evidencias/AU-01/ |
-| OF-01 | offline | Registro do Service Worker e persistência de dados offline | ALEGADO | 88f58c0 | 2026-08-26 | qa/evidencias/OF-01/ |
+| TR-01 | treino | Cronômetro de treino congela no finalizar, cancela descanso e persiste | ALEGADO | 14edc71 | 2026-08-26 | qa/evidencias/TR-01/ |
+| VS-01 | visual | Renderização e contraste do tema Obsidian Ouro (Padrão) | ALEGADO | 14edc71 | 2026-08-26 | qa/evidencias/VS-01/ |
+| VS-02 | visual | Renderização e contraste do tema Marfim & Ouro Imperial (Claro) | ALEGADO | 14edc71 | 2026-08-26 | qa/evidencias/VS-02/ |
+| AN-01 | analise | Painel de Análise Semanal com métricas e gráficos carregados | ALEGADO | 14edc71 | 2026-08-26 | qa/evidencias/AN-01/ |
+| CT-01 | catalogo | Catálogo de exercícios com busca, filtros de grupo e preview 3D | ALEGADO | 14edc71 | 2026-08-26 | qa/evidencias/CT-01/ |
+| CH-01 | coach | Interface de Coach IA operacional e responsiva | ALEGADO | 14edc71 | 2026-08-26 | qa/evidencias/CH-01/ |
+| PF-01 | perfil | Perfil do atleta com seletor de idioma e dados do usuário | ALEGADO | 14edc71 | 2026-08-26 | qa/evidencias/PF-01/ |
+| AJ-01 | ajustes | Tela de ajustes com seletor interativo dos 7 temas e anilhas | ALEGADO | 14edc71 | 2026-08-26 | qa/evidencias/AJ-01/ |
+| AU-01 | auth | Tela de login, formulário e controle de sessão | ALEGADO | 14edc71 | 2026-08-26 | qa/evidencias/AU-01/ |
+| OF-01 | offline | Registro do Service Worker e persistência de dados offline | ALEGADO | 14edc71 | 2026-08-26 | qa/evidencias/OF-01/ |
 
 ---
 
