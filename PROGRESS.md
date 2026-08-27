@@ -11,18 +11,18 @@
 
 > Bloco de handoff entre agentes (Antigravity ⇄ Claude). **Sobrescrever a cada sessão**, nunca acumular. Formato e regras: `AGENTS.md` §3.
 
-- **Última sessão:** 2026-08-26 (9) · agente: antigravity · branch: main
-- **Em andamento:** Concluída a Opção C (Polimento Visual Geral) e travada a regra de proibição de emoticons:
-  1. **Regra D10 Registrada:** Proibição explícita e absoluta do uso de emoticons e emojis no projeto registrada em `CLAUDE.md`, `DESIGN.md` e `PROGRESS.md`. Removido emoticon do modal pós-treino.
-  2. **Refino de Layout e Scroll no Coach 24h (`/coach`):** Barra de envio `.barra-conversa` posicionada com folga garantida e `padding-bottom` de 84px no corpo da conversa, impedindo qualquer corte ou sobreposição pela `AbaInferior` em viewports compactos (360px–390px).
-  3. **Hierarquia Nobre na Análise Semanal (`/analise`):** Estilização dedicada dos 5 cards com destaque especial na pergunta primária (`.pergunta--primaria`), botão de solicitação com 48px de altura e suporte a `aria-disabled`.
-  4. **Alvos de Toque Globais (≥ 48px):** Ajustadas as áreas de toque no topo (`.topo-pro__voltar`, `.topo-pro__avatar-link`), nos chips de filtro e no botão de envio do coach.
-  5. **Limpeza do Catálogo (`/catalogo`):** Suprimido o parágrafo de dica ausente em exercícios sem descrição longa, mantendo a densidade de lista.
+- **Última sessão:** 2026-08-27 · agente: antigravity · branch: feat/melhorias-design-relatorios-contraste-botoes
+- **Em andamento:** Concluídas as 4 frentes de design e funcionalidade aprovadas pelo dono:
+  1. **Relatórios & Stickers em Ajustes (`/ajustes/relatorios`):** Rota e componente interativo dedicados permitindo consultar o histórico de treinos passados e gerar a qualquer momento o sticker oficial PNG transparente (1080×1080) para Instagram Stories, com cópia para clipboard, download e Web Share. Adicionado item no Bento Menu de `/ajustes`.
+  2. **Calibração de Contraste nos Temas Claros (T3b):** Calibrados os tokens de acento e sinalização (`--lastro-ouro`, `--lastro-esmeralda`, `--lastro-esmeralda-claro`, `--lastro-ciano`, `--lastro-erro`, `--lastro-alta`, `--lastro-plato`, `--lastro-queda`, `--lastro-foco`, `--lastro-sync`, `--lastro-aquecimento`) sob `[data-tema="branco-ouro"]` em `tokens.css` para entregar conformidade WCAG AA (≥ 4.5:1 / ≥ 3.0:1) sobre fundos claros compostos. Tabela C1-C14 em `DESIGN.md` §4.2 atualizada com medições de ambos os temas.
+  3. **Diagramação e Instruções Biomecânicas no Catálogo (`/catalogo/[id]`):** Card estruturado com músculo-alvo, sinergistas e mecânica articular (`obterMidiaExercicio`), instruções técnicas de execução, preservando o aviso de saúde (PRD §4.5). Removido emoji residual do player (D10).
+  4. **Enriquecimento Visual dos Botões Textuais com Ícones SVG (D1/D10):** Adicionados ícones vetoriais em `ExcluirConta` (lixeira de alerta), logout em `/ajustes`, toggles de modo de edição em `ListaTreinos`, `ListaModelos` e `AnilhasForm` (lápis e checkmark), com alvos ≥ 48px e zero emojis.
 - **Bloqueado / a decidir:** Nada.
-- **Próximo passo:** Prosseguir para a próxima frente aprovada pelo dono (Coluna de carga anterior e PR em tempo real).
+- **Próximo passo:** Teste no aparelho físico para validação visual dos stickers e botões.
 - **Para o outro agente saber:**
-  - Zero emojis no código de UI. Toda sinalização usa SVG e tokens de cor.
-  - Vitest 190/190 testes verdes e build Next.js 16.3.0 sem falhas.
+  - 28 arquivos de teste, 208/208 testes passando no Vitest.
+  - Build Next.js com 23 rotas estáticas/dinâmicas 100% limpo.
+  - Tokens semânticos para o tema claro `branco-ouro` garantem contraste sem alterar os valores do tema escuro padrão `:root`.
 
 ---
 

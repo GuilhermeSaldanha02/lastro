@@ -10,6 +10,7 @@ import SetaNavegacao from "@/components/seta-navegacao";
 import EtiquetaRecorde from "@/components/etiqueta-recorde";
 import CabecalhoPro from "@/components/cabecalho-pro";
 import PlayerExecucaoExercicio from "@/components/player-execucao-exercicio";
+import { obterMidiaExercicio } from "@/lib/dados/midia-exercicio";
 import { t } from "@/lib/texto/i18n";
 
 export default async function PaginaHistoricoExercicio({
@@ -67,21 +68,52 @@ export default async function PaginaHistoricoExercicio({
             idioma={idioma}
           />
 
-          {exercicio.dicaExecucao ? (
-            <div className="exercicio-hero-card__dica">
-              <div className="dica-header">
-                <svg viewBox="0 0 24 24" width="16" height="16" fill="var(--lastro-ouro)">
-                  <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z" />
-                </svg>
-                <span>{t("Instruções Técnicas", idioma)}</span>
-              </div>
-              <p>{exercicio.dicaExecucao}</p>
+          {/* Informações Biomecânicas e Instruções Técnicas */}
+          <div className="exercicio-hero-card__dica">
+            <div className="dica-header">
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="var(--lastro-ouro)" aria-hidden="true">
+                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z" />
+              </svg>
+              <span>{t("Biomecânica & Instruções Técnicas", idioma)}</span>
             </div>
-          ) : (
-            <p className="exercicio-hero-card__sem-dica">
-              {t("Dica técnica de execução ainda não cadastrada.", idioma)}
-            </p>
-          )}
+
+            {(() => {
+              const midia = obterMidiaExercicio(exercicio.id);
+              return (
+                <div className="dica-corpo">
+                  {midia?.musculo_alvo && (
+                    <div className="dica-item-linha">
+                      <span className="dica-rotulo">{t("Músculo Alvo:", idioma)}</span>
+                      <span className="dica-valor">{midia.musculo_alvo}</span>
+                    </div>
+                  )}
+                  {midia?.musculos_sinergistas && (
+                    <div className="dica-item-linha">
+                      <span className="dica-rotulo">{t("Sinergistas:", idioma)}</span>
+                      <span className="dica-valor">{midia.musculos_sinergistas}</span>
+                    </div>
+                  )}
+                  {midia?.mecanica_articular && (
+                    <div className="dica-item-linha">
+                      <span className="dica-rotulo">{t("Mecânica Articular:", idioma)}</span>
+                      <span className="dica-valor">{midia.mecanica_articular}</span>
+                    </div>
+                  )}
+
+                  {exercicio.dicaExecucao ? (
+                    <p className="dica-texto-principal">{exercicio.dicaExecucao}</p>
+                  ) : (
+                    <p className="dica-texto-principal">
+                      {t(
+                        "Execute o movimento com controle articular completo, preservando a estabilidade da coluna e cadência uniforme na fase excêntrica e concêntrica.",
+                        idioma,
+                      )}
+                    </p>
+                  )}
+                </div>
+              );
+            })()}
+          </div>
 
           {/* Aviso de saúde — PRD §4.5 o exige junto da demonstração de
               execução, e não existia em lugar nenhum do app (achado do teste

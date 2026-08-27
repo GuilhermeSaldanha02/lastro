@@ -4877,3 +4877,226 @@
   justify-content: center;
 }
 
+/* =========================================================================
+   RELATÓRIOS & STICKERS (AJUSTES)
+   ========================================================================= */
+
+.subtitulo-secao {
+  font-size: var(--lastro-papel-rotulo);
+  color: var(--lastro-txt-2);
+  line-height: 1.5;
+  margin-bottom: var(--lastro-e-2);
+}
+
+.card-relatorio-item {
+  background: var(--lastro-sup-1);
+  border: 1px solid var(--lastro-linha);
+  border-radius: var(--lastro-raio-2);
+  padding: var(--lastro-e-3);
+  display: flex;
+  flex-direction: column;
+  gap: var(--lastro-e-2);
+  box-shadow: var(--lastro-elev-1);
+}
+
+.card-relatorio-item__cabecalho {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: var(--lastro-e-2);
+}
+
+.card-relatorio-item__data-bloco {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.card-relatorio-item__data-rotulo {
+  font-family: var(--lastro-fonte-num);
+  font-size: var(--lastro-papel-corpo);
+  font-weight: 700;
+  color: var(--lastro-txt);
+  letter-spacing: 0.5px;
+}
+
+.card-relatorio-item__id-curto {
+  font-family: var(--lastro-fonte-num);
+  font-size: var(--lastro-papel-rotulo);
+  color: var(--lastro-txt-3);
+}
+
+.card-relatorio-item__grupos {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.card-relatorio-item__grupo-chip {
+  font-size: var(--lastro-papel-rotulo);
+  font-weight: 600;
+  color: var(--lastro-ouro);
+  background: var(--lastro-ouro-glow);
+  border: 1px solid var(--lastro-borda-ouro);
+  padding: 2px 8px;
+  border-radius: var(--lastro-raio-pilula);
+}
+
+.card-relatorio-item__metricas-grade {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--lastro-e-2);
+  background: var(--lastro-sup-2);
+  padding: var(--lastro-e-2);
+  border-radius: var(--lastro-raio-1);
+  border: 1px solid var(--lastro-linha);
+}
+
+.card-relatorio-item__metrica {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.card-relatorio-item__metrica-rotulo {
+  font-size: var(--lastro-papel-rotulo);
+  color: var(--lastro-txt-3);
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+
+.card-relatorio-item__metrica-valor {
+  font-family: var(--lastro-fonte-num);
+  font-size: var(--lastro-papel-secao);
+  font-weight: 800;
+  color: var(--lastro-txt);
+}
+
+.botao-acao-relatorio {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: var(--lastro-alvo-min);
+  padding: 0 var(--lastro-e-3);
+  border: 1px solid var(--lastro-borda-ouro);
+  border-radius: var(--lastro-raio-1);
+  background: var(--lastro-ouro-grad);
+  color: var(--lastro-acao-txt);
+  font-size: var(--lastro-papel-corpo);
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: var(--lastro-elev-1);
+  transition: transform var(--lastro-dur-1) ease, opacity var(--lastro-dur-1) ease;
+}
+
+.botao-acao-relatorio:active {
+  transform: translateY(1px);
+}
+
+.botao-acao-relatorio:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Botões com ícones padronizados (D1/D10) */
+.botao-com-icone {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: var(--lastro-alvo-min);
+}
+
+.botao-textual-com-icone {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: var(--lastro-alvo-min);
+  font-size: var(--lastro-papel-corpo);
+  font-weight: 600;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+}
+
+.botao-textual-com-icone--destrutivo {
+  color: var(--lastro-erro);
+}
+
+.botao-textual-com-icone--destrutivo:hover {
+  text-decoration: underline;
+}
+
+/* Card de Estado Vazio */
+.estado-vazio-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: var(--lastro-e-6) var(--lastro-e-3);
+  background: var(--lastro-sup-1);
+  border: 1px solid var(--lastro-linha);
+  border-radius: var(--lastro-raio-2);
+  gap: var(--lastro-e-3);
+}
+
+.estado-vazio-card__icone {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: var(--lastro-ouro-glow);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.estado-vazio-card__titulo {
+  font-size: var(--lastro-papel-secao);
+  font-weight: 700;
+  color: var(--lastro-txt);
+}
+
+.estado-vazio-card__texto {
+  font-size: var(--lastro-papel-corpo);
+  color: var(--lastro-txt-2);
+  line-height: 1.5;
+  max-width: 320px;
+}
+
+/* Diagramação de Biomecânica & Dica Técnica */
+.dica-corpo {
+  display: flex;
+  flex-direction: column;
+  gap: var(--lastro-e-2);
+}
+
+.dica-item-linha {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  font-size: var(--lastro-papel-rotulo);
+  line-height: 1.4;
+}
+
+.dica-rotulo {
+  font-weight: 700;
+  color: var(--lastro-ouro);
+  white-space: nowrap;
+}
+
+.dica-valor {
+  color: var(--lastro-txt);
+  font-weight: 500;
+}
+
+.dica-texto-principal {
+  margin-top: 4px;
+  font-size: var(--lastro-papel-corpo);
+  color: var(--lastro-txt-2);
+  line-height: 1.5;
+  border-top: 1px solid var(--lastro-linha);
+  padding-top: 8px;
+}
+

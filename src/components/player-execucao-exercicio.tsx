@@ -64,7 +64,11 @@ export default function PlayerExecucaoExercicio({
             </div>
           ) : (
             <div className="player-exercicio-card__fallback">
-              <span className="player-exercicio-card__fallback-icone">🏋️</span>
+              <span className="player-exercicio-card__fallback-icone">
+                <svg viewBox="0 0 24 24" width="32" height="32" fill="none" stroke="var(--lastro-ouro)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                  <path d="M6 5v14M18 5v14M2 9v6M22 9v6M6 12h12" />
+                </svg>
+              </span>
               <p>{nomeExercicio}</p>
             </div>
           )}
