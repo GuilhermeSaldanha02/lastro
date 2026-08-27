@@ -50,17 +50,32 @@ async function auditarAlvos(page) {
         return visivel && (r.height < MIN || r.width < MIN);
       })
       .filter((el) => !el.closest("nextjs-portal")) // devtools do Next, não é o app
+      // Input escondido atrás de um <label> clicável: quem recebe o toque é
+      // o label, e ele é medido por conta própria. Contar o input seria
+      // falso positivo.
+      .filter((el) => !(el.tagName === "INPUT" && el.closest("label")))
       .map((el) => {
         const r = el.getBoundingClientRect();
+        // A classe é o que torna o achado acionável: 94 cartões do catálogo
+        // são UMA regra de CSS, não 94 correções.
+        const classe = (el.className || "").toString().trim().split(/\s+/)[0];
         return {
-          texto: (el.innerText || el.getAttribute("aria-label") || el.tagName).trim().slice(0, 40),
+          seletor: classe ? `.${classe}` : el.tagName.toLowerCase(),
           w: Math.round(r.width),
           h: Math.round(r.height),
         };
       });
   });
+  // Agrupa por seletor + dimensão: o relatório fala de regras, não de nós.
+  const porSeletor = new Map();
   for (const a of pequenos) {
-    anotar("alvo-de-toque", `"${a.texto}" mede ${a.w}×${a.h}px — piso é 48×48 (D1)`);
+    const chave = `${a.seletor} ${a.w}×${a.h}`;
+    porSeletor.set(chave, (porSeletor.get(chave) ?? 0) + 1);
+  }
+  for (const [chave, quantos] of porSeletor) {
+    const [seletor, dim] = chave.split(" ");
+    const sufixo = quantos > 1 ? ` (${quantos} elementos)` : "";
+    anotar("alvo-de-toque", `${seletor} mede ${dim}px — piso é 48×48 (D1)${sufixo}`);
   }
 }
 
@@ -84,12 +99,54 @@ async function auditarOverflow(page) {
   }
 }
 
+/**
+ * Conteúdo cortado DENTRO de um container com `overflow: hidden`.
+ *
+ * `auditarOverflow` sozinha não pega isto: o container esconde o excesso,
+ * a página não rola de lado, e o botão simplesmente some pela borda. Foi
+ * exatamente o que aconteceu com o ✕ do descanso ao subir os alvos para
+ * 48px (2026-08-27) — passou na auditoria e estava visivelmente quebrado
+ * no print.
+ */
+async function auditarClipping(page) {
+  const cortados = await page.evaluate(() => {
+    const achados = [];
+    for (const el of document.querySelectorAll("button, a[href], select, input")) {
+      if (el.closest("nextjs-portal")) continue;
+      const caixa = el.getBoundingClientRect();
+      if (caixa.width === 0 || caixa.height === 0) continue;
+
+      for (let pai = el.parentElement; pai; pai = pai.parentElement) {
+        const estilo = getComputedStyle(pai);
+        if (estilo.overflow === "visible" && estilo.overflowX === "visible") continue;
+        if (estilo.overflowX === "auto" || estilo.overflowX === "scroll") break;
+
+        const limite = pai.getBoundingClientRect();
+        const cortadoEm = caixa.right - limite.right;
+        if (cortadoEm > 1) {
+          achados.push({
+            texto: (el.innerText || el.getAttribute("aria-label") || el.tagName).trim().slice(0, 30),
+            px: Math.round(cortadoEm),
+            pai: `${pai.tagName.toLowerCase()}.${(pai.className || "").toString().split(" ")[0]}`,
+          });
+        }
+        break;
+      }
+    }
+    return achados;
+  });
+  for (const c of cortados) {
+    anotar("cortado", `"${c.texto}" some ${c.px}px pela borda de ${c.pai} (overflow: hidden)`);
+  }
+}
+
 async function passo(page, nome, acao) {
   passoAtual = nome;
   await acao();
   await page.waitForTimeout(700);
   await auditarAlvos(page);
   await auditarOverflow(page);
+  await auditarClipping(page);
   await page.screenshot({ path: `${DIR}/${nome}.png` });
   console.log(`  ✓ ${nome}`);
 }

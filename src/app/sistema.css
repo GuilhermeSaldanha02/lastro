@@ -2509,6 +2509,7 @@
 
 .metrica-tab {
   padding: 8px 10px;
+  min-height: var(--lastro-alvo-min); /* D1 — media 38px */
   border: none;
   background: transparent;
   color: var(--lastro-txt-2);
@@ -2790,6 +2791,14 @@
   color: var(--lastro-ouro);
   font-weight: var(--lastro-peso-forte);
   text-decoration: none;
+  /* Media 62×20px — o menor alvo do app. D1 pede 48. O texto não muda de
+     tamanho: cresce a área ao redor, alinhada à direita pelo flex do
+     `.secao-header`, sem deslocar o título ao lado. */
+  min-height: var(--lastro-alvo-min);
+  min-width: var(--lastro-alvo-min);
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-end;
 }
 
 .feed-treinos {
@@ -2997,6 +3006,8 @@
   border: 1px solid var(--lastro-linha);
   border-radius: var(--lastro-raio-pilula);
   padding: 6px 14px;
+  /* O piso de toque desta classe vive na regra "Alvos de toque nos filtros
+     do catálogo", mais abaixo — é ela que ganha a cascata. Não duplicar. */
   font-size: var(--lastro-papel-rotulo);
   font-weight: var(--lastro-peso-forte);
   color: var(--lastro-txt-2);
@@ -3035,6 +3046,7 @@
   border: none;
   border-radius: var(--lastro-raio-pilula);
   padding: 8px 10px;
+  min-height: var(--lastro-alvo-min); /* D1 — media 36px */
   font-size: var(--lastro-papel-rotulo);
   font-weight: var(--lastro-peso-forte);
   color: var(--lastro-txt-2);
@@ -3119,6 +3131,7 @@
   border: 1px solid var(--lastro-linha);
   border-radius: var(--lastro-raio-2);
   padding: var(--lastro-e-3) var(--lastro-e-4);
+  min-height: var(--lastro-alvo-min); /* D1 — media 46px, faltavam 2 */
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -4103,6 +4116,12 @@
   justify-content: space-between;
   gap: var(--lastro-e-3);
   width: 100%;
+  /* Com alvos de 48px (D1), a cápsula do descanso ativo não cabe mais ao
+     lado do cronômetro de treino em 390px — o ✕ ficava cortado pelo
+     `overflow: hidden` do card, sem estourar a página (por isso a
+     auditoria de overflow não pegava). Quebrar a linha é a saída que
+     mantém os alvos grandes e o desenho de barra larga que o dono pediu. */
+  flex-wrap: wrap;
 }
 
 .status-tempo-treino {
@@ -4150,6 +4169,16 @@
   justify-content: flex-end;
 }
 
+/* Descanso rodando: linha própria, largura toda. O gatilho parado
+   (compacto) continua ao lado do cronômetro, como antes. */
+.status-descanso-wrapper--ativo {
+  flex-basis: 100%;
+}
+
+.status-descanso-wrapper--ativo .timer-topo-card-ativo {
+  width: 100%;
+}
+
 .timer-topo-gatilho {
   width: auto;
 }
@@ -4158,7 +4187,9 @@
   display: inline-flex;
   align-items: center;
   gap: var(--lastro-e-2);
-  min-height: 38px;
+  /* Era `38px` cravado, que reprovava D1. O token existe justamente para
+     este piso não voltar a ser um número solto (P7). */
+  min-height: var(--lastro-alvo-min);
   padding: 6px 14px;
   background: var(--lastro-sup-1);
   border: 1px solid var(--lastro-borda-ouro);
@@ -4221,10 +4252,29 @@
   letter-spacing: 0.05em;
 }
 
+/* Os três controles do descanso (+30s · Pausar · ✕) mediam 43×25, 54×25 e
+   24×26 — os menores alvos do app inteiro, e justamente os que se tocam
+   no meio da série, em pé, com a mão suada. Passam a cumprir D1 de
+   verdade (48×48 medido no elemento, não hit-area invisível: alvo que só
+   uma pseudo-classe enxerga engana a próxima auditoria).
+
+   O desenho do dono não muda: os três continuam pílulas na mesma linha,
+   com o mesmo preenchimento e a mesma tinta. O que cresce é o espaço em
+   volta do rótulo — a cápsula fica com a altura de um alvo de verdade. */
 .timer-topo-acoes {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: var(--lastro-e-2);
+}
+
+.timer-topo-chip-tempo,
+.timer-topo-btn-controle,
+.timer-topo-btn-fechar {
+  min-height: var(--lastro-alvo-min);
+  min-width: var(--lastro-alvo-min);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .timer-topo-chip-tempo {
@@ -4233,7 +4283,7 @@
   color: var(--lastro-esmeralda-claro);
   font-size: 11px;
   font-weight: 600;
-  padding: 3px 8px;
+  padding: 3px 10px;
   border-radius: var(--lastro-raio-pilula) !important;
   cursor: pointer;
   transition: background var(--lastro-dur-1);
@@ -4249,7 +4299,7 @@
   color: var(--lastro-txt-2);
   font-size: 11px;
   font-weight: 500;
-  padding: 3px 8px;
+  padding: 3px 10px;
   border-radius: var(--lastro-raio-pilula) !important;
   cursor: pointer;
 }
@@ -4264,7 +4314,7 @@
   border: none;
   color: var(--lastro-txt-3);
   font-size: 0.9rem;
-  padding: 2px 6px;
+  padding: 0;
   cursor: pointer;
 }
 
@@ -4720,10 +4770,13 @@
   justify-content: center;
 }
 
-/* Alvos de toque nos filtros do catálogo */
+/* Alvos de toque nos filtros do catálogo.
+   Era `min-height: 44px` — 4px abaixo do piso, e esta regra vem depois da
+   de cima, então era ela que valia. Token em vez de número solto (P7): é
+   o que impede o piso de voltar a divergir de D1 em outra sessão. */
 .chip-filtro {
-  min-height: 44px;
-  min-width: 48px;
+  min-height: var(--lastro-alvo-min);
+  min-width: var(--lastro-alvo-min);
   display: inline-flex;
   align-items: center;
   justify-content: center;
