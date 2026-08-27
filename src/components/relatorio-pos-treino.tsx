@@ -117,7 +117,30 @@ export default function RelatorioPosTreino({
     ctx.letterSpacing = "-1px";
     ctx.fillText(`${metricas.totalExercicios}`, xEx, yMetricas + 40);
 
-    // 3. EXERCÍCIOS REALIZADOS (Lista Vertical Limpa e Idêntica ao Preview)
+    // 3. Logotipo Oficial do LASTRO no Canto Superior Direito (Acima de Exercícios)
+    try {
+      const imgLogo = new Image();
+      imgLogo.crossOrigin = "anonymous";
+      await new Promise<void>((resolve) => {
+        imgLogo.onload = () => resolve();
+        imgLogo.onerror = () => resolve();
+        imgLogo.src = "/logo-lastro.png";
+      });
+
+      if (imgLogo.complete && imgLogo.naturalWidth > 0) {
+        const logoSize = 190;
+        const logoX = 1080 - logoSize - 90;
+        const logoY = 90;
+
+        ctx.shadowColor = "rgba(0, 0, 0, 0.85)";
+        ctx.shadowBlur = 14;
+        ctx.drawImage(imgLogo, logoX, logoY, logoSize, logoSize);
+      }
+    } catch {
+      // Continua
+    }
+
+    // 4. EXERCÍCIOS REALIZADOS (Lista Vertical Limpa ocupando a largura total)
     const yListaInicio = 460;
     ctx.font = "800 24px system-ui, -apple-system, sans-serif";
     ctx.fillStyle = "#D4AF37"; // Dourado champagne
@@ -142,29 +165,6 @@ export default function RelatorioPosTreino({
       ctx.font = "600 26px system-ui, -apple-system, sans-serif";
       ctx.fillStyle = "rgba(255, 255, 255, 0.65)";
       ctx.fillText(`+ ${extras} outros exercícios`, startX, curY + 6);
-    }
-
-    // 4. Logotipo Oficial do LASTRO no Canto Inferior Direito (Sem duplicar texto)
-    try {
-      const imgLogo = new Image();
-      imgLogo.crossOrigin = "anonymous";
-      await new Promise<void>((resolve) => {
-        imgLogo.onload = () => resolve();
-        imgLogo.onerror = () => resolve();
-        imgLogo.src = "/logo-lastro.png";
-      });
-
-      if (imgLogo.complete && imgLogo.naturalWidth > 0) {
-        const logoSize = 180;
-        const logoX = 1080 - logoSize - 80;
-        const logoY = 1080 - logoSize - 80;
-
-        ctx.shadowColor = "rgba(0, 0, 0, 0.85)";
-        ctx.shadowBlur = 14;
-        ctx.drawImage(imgLogo, logoX, logoY, logoSize, logoSize);
-      }
-    } catch {
-      // Continua
     }
 
     return new Promise<Blob | null>((resolve) => {
@@ -346,22 +346,35 @@ export default function RelatorioPosTreino({
           )}
 
           <div className="pos-treino-strava-conteudo">
-            {/* Bloco de Métricas Principais */}
-            <div className="pos-treino-strava-metricas">
-              <div className="pos-treino-strava-item">
-                <span className="pos-treino-strava-label">{t("TEMPO DE TREINO", idioma)}</span>
-                <span className="pos-treino-strava-valor-destaque">{metricas.duracaoMinutos} min</span>
+            {/* Bloco Superior: Métricas à esquerda e Logo no Canto Superior Direito */}
+            <div className="pos-treino-strava-topo-linha">
+              <div className="pos-treino-strava-metricas">
+                <div className="pos-treino-strava-item">
+                  <span className="pos-treino-strava-label">{t("TEMPO DE TREINO", idioma)}</span>
+                  <span className="pos-treino-strava-valor-destaque">{metricas.duracaoMinutos} min</span>
+                </div>
+
+                <div className="pos-treino-strava-dupla-linha">
+                  <div className="pos-treino-strava-item">
+                    <span className="pos-treino-strava-label">{t("SÉRIES VÁLIDAS", idioma)}</span>
+                    <span className="pos-treino-strava-valor">{metricas.totalSeriesValendo}</span>
+                  </div>
+                  <div className="pos-treino-strava-item">
+                    <span className="pos-treino-strava-label">{t("EXERCÍCIOS", idioma)}</span>
+                    <span className="pos-treino-strava-valor">{metricas.totalExercicios}</span>
+                  </div>
+                </div>
               </div>
 
-              <div className="pos-treino-strava-dupla-linha">
-                <div className="pos-treino-strava-item">
-                  <span className="pos-treino-strava-label">{t("SÉRIES VÁLIDAS", idioma)}</span>
-                  <span className="pos-treino-strava-valor">{metricas.totalSeriesValendo}</span>
-                </div>
-                <div className="pos-treino-strava-item">
-                  <span className="pos-treino-strava-label">{t("EXERCÍCIOS", idioma)}</span>
-                  <span className="pos-treino-strava-valor">{metricas.totalExercicios}</span>
-                </div>
+              {/* Logo do LASTRO no Canto Superior Direito */}
+              <div className="pos-treino-logo-topo-direito">
+                <img
+                  src="/logo-lastro.png"
+                  alt="LASTRO"
+                  className="pos-treino-logo-topo-direito__img"
+                  width={68}
+                  height={68}
+                />
               </div>
             </div>
 
@@ -385,17 +398,6 @@ export default function RelatorioPosTreino({
                 </div>
               </div>
             )}
-
-            {/* Logo do LASTRO no Canto Inferior Direito (Sem texto duplicado) */}
-            <div className="pos-treino-logo-canto">
-              <img
-                src="/logo-lastro.png"
-                alt="LASTRO"
-                className="pos-treino-logo-canto__img"
-                width={62}
-                height={62}
-              />
-            </div>
           </div>
         </div>
 

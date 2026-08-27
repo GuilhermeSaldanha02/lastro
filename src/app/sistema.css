@@ -4578,17 +4578,26 @@
 .pos-treino-strava-conteudo {
   position: absolute;
   inset: 0;
-  padding: 36px 20px 16px;
+  padding: 30px 20px 16px;
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
   z-index: 2;
+  gap: 12px;
+}
+
+.pos-treino-strava-topo-linha {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--lastro-e-2);
+  width: 100%;
 }
 
 .pos-treino-strava-metricas {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 6px;
 }
 
 .pos-treino-strava-item {
@@ -4618,12 +4627,12 @@
 .pos-treino-strava-dupla-linha {
   display: flex;
   align-items: center;
-  gap: 28px;
-  margin-top: 4px;
+  gap: 24px;
+  margin-top: 2px;
 }
 
 .pos-treino-strava-valor {
-  font-size: 1.6rem;
+  font-size: 1.5rem;
   font-weight: 900;
   color: #FFFFFF;
   letter-spacing: -0.02em;
@@ -4631,13 +4640,30 @@
   text-shadow: 0 2px 8px rgba(0, 0, 0, 0.8);
 }
 
+.pos-treino-logo-topo-direito {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  margin-top: -4px;
+}
+
+.pos-treino-logo-topo-direito__img {
+  width: 68px;
+  height: 68px;
+  object-fit: contain;
+  filter: drop-shadow(0 4px 14px rgba(0, 0, 0, 0.95));
+}
+
 .pos-treino-strava-exercicios {
-  margin-top: 10px;
+  margin-top: 4px;
   padding-top: 8px;
   border-top: 1px solid rgba(255, 255, 255, 0.2);
   display: flex;
   flex-direction: column;
   gap: 4px;
+  width: 100%;
 }
 
 .pos-treino-strava-exercicios-titulo {
@@ -4651,12 +4677,12 @@
 .pos-treino-strava-lista-vertical {
   display: flex;
   flex-direction: column;
-  gap: 3px;
-  max-width: 68%;
+  gap: 4px;
+  width: 100%;
 }
 
 .pos-treino-strava-linha-ex {
-  font-size: 11px;
+  font-size: 11.5px;
   font-weight: 600;
   color: #FFFFFF;
   text-shadow: 0 2px 4px rgba(0, 0, 0, 0.85);
@@ -4671,32 +4697,6 @@
   font-style: italic;
   display: flex;
   align-items: center;
-}
-
-.pos-treino-logo-canto {
-  position: absolute;
-  bottom: 16px;
-  right: 16px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 2px;
-  z-index: 2;
-}
-
-.pos-treino-logo-canto__img {
-  width: 54px;
-  height: 54px;
-  object-fit: contain;
-  filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.9));
-}
-
-.pos-treino-logo-canto__txt {
-  font-size: 12px;
-  font-weight: 800;
-  letter-spacing: 0.18em;
-  color: var(--lastro-ouro);
-  text-shadow: 0 2px 6px rgba(0, 0, 0, 0.9);
 }
 
 /* Toast de confirmação */
@@ -5141,37 +5141,44 @@
 .dica-corpo {
   display: flex;
   flex-direction: column;
-  gap: var(--lastro-e-2);
-  margin-top: 4px;
+  gap: var(--lastro-e-3);
+  margin-top: 6px;
 }
 
-.dica-item-linha {
+.dica-grade-anatomi {
   display: flex;
-  align-items: baseline;
-  flex-wrap: wrap;
-  gap: 6px;
-  font-size: var(--lastro-papel-corpo);
-  line-height: 1.4;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.dica-bloco-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
 }
 
 .dica-rotulo {
+  font-size: var(--lastro-papel-rotulo);
   font-weight: 700;
   color: var(--lastro-ouro);
-  white-space: nowrap;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
 }
 
 .dica-valor {
-  color: var(--lastro-txt);
+  font-size: var(--lastro-papel-corpo);
+  color: var(--lastro-txt) !important;
   font-weight: 600;
+  line-height: 1.4;
 }
 
 .dica-texto-principal {
-  margin-top: 6px;
   font-size: var(--lastro-papel-corpo);
-  color: var(--lastro-txt);
+  color: var(--lastro-txt) !important;
   line-height: 1.6;
   border-top: 1px solid var(--lastro-linha);
-  padding-top: 8px;
+  padding-top: 10px;
+  margin-top: 2px;
 }
 
 .exercicio-hero-card__aviso {
