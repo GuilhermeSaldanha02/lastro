@@ -1693,6 +1693,7 @@
   display: flex;
   flex-direction: column;
   gap: var(--lastro-e-3);
+  padding-bottom: calc(var(--lastro-clearance-nav) + 84px);
 }
 
 .balao {
@@ -1744,32 +1745,134 @@
   color: var(--lastro-txt-3);
 }
 
-/* Fica logo acima da barra fixa (`/coach`) — mesma razão de `.acao-area`. */
-.campo-conversa {
+/* Boas-vindas e sugestões do Coach */
+.coach-boas-vindas {
   display: flex;
-  gap: var(--lastro-e-2);
+  flex-direction: column;
   align-items: center;
-  padding: var(--lastro-e-3) var(--lastro-e-5)
-    calc(var(--lastro-clearance-nav) + var(--lastro-e-3));
-  border-top: 1px solid var(--lastro-linha);
-  background: var(--lastro-fundo);
+  text-align: center;
+  padding: var(--lastro-e-4) var(--lastro-e-2);
+  margin-bottom: var(--lastro-e-4);
 }
 
-.campo-conversa input {
+.coach-avatar-badge {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: var(--lastro-sup-2);
+  border: 1px solid var(--lastro-ouro-traco, var(--lastro-linha));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: var(--lastro-e-3);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+}
+
+.coach-boas-vindas__titulo {
+  font-size: var(--lastro-papel-destaque);
+  font-weight: 700;
+  color: var(--lastro-txt);
+  margin-bottom: var(--lastro-e-1);
+}
+
+.coach-boas-vindas__desc {
+  font-size: var(--lastro-papel-corpo);
+  color: var(--lastro-txt-2);
+  line-height: 1.5;
+  max-width: 320px;
+  margin-bottom: var(--lastro-e-5);
+}
+
+.coach-sugestoes {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: var(--lastro-e-2);
+}
+
+.coach-sugestoes__rotulo {
+  font-size: var(--lastro-papel-rotulo);
+  font-weight: 600;
+  color: var(--lastro-txt-3);
+  text-align: left;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 2px;
+}
+
+.chip-sugestao {
+  width: 100%;
+  min-height: 48px;
+  padding: var(--lastro-e-3) var(--lastro-e-4);
+  background: var(--lastro-sup-1);
+  border: 1px solid var(--lastro-linha);
+  border-radius: var(--lastro-raio-2);
+  color: var(--lastro-txt);
+  font-size: var(--lastro-papel-corpo);
+  text-align: left;
+  line-height: 1.4;
+  cursor: pointer;
+  transition: all var(--lastro-dur-1) ease;
+  display: flex;
+  align-items: center;
+}
+
+.chip-sugestao:hover:not(:disabled) {
+  background: var(--lastro-sup-2);
+  border-color: var(--lastro-controle);
+}
+
+.chip-sugestao:active:not(:disabled) {
+  transform: scale(0.99);
+}
+
+.chip-sugestao:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+/* Barra de envio do Coach — fixada com folga garantida da AbaInferior */
+.barra-conversa {
+  position: fixed;
+  bottom: calc(var(--lastro-clearance-nav) + 6px);
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(100%, 480px);
+  padding: 8px 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(7, 9, 13, 0.92);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-top: 1px solid var(--lastro-linha);
+  z-index: 35;
+  box-sizing: border-box;
+}
+
+.barra-conversa__input {
   flex: 1;
   min-width: 0;
-  min-height: var(--lastro-alvo-min);
+  min-height: 48px;
   padding: 0 var(--lastro-e-4);
   border: 1px solid var(--lastro-controle);
-  border-radius: var(--lastro-raio-3);
-  background: var(--lastro-campo-fundo);
+  border-radius: var(--lastro-raio-pilula);
+  background: var(--lastro-campo-fundo, var(--lastro-sup-1));
   box-shadow: var(--lastro-elev-afundado);
   font-size: var(--lastro-papel-corpo);
+  color: var(--lastro-txt);
 }
 
-.enviar {
-  width: var(--lastro-alvo-min);
-  height: var(--lastro-alvo-min);
+.barra-conversa__input:focus {
+  outline: none;
+  border-color: var(--lastro-ouro);
+}
+
+.barra-conversa__botao {
+  width: 48px;
+  height: 48px;
+  min-width: 48px;
+  min-height: 48px;
   flex: none;
   border: 1px solid var(--lastro-acao-borda);
   border-radius: 50%;
@@ -1785,19 +1888,81 @@
     transform var(--lastro-dur-1) ease;
 }
 
-.enviar:active:not(:disabled) {
+.barra-conversa__botao:active:not(:disabled) {
   box-shadow: var(--lastro-elev-1), var(--lastro-elev-afundado);
   transform: translateY(1px);
 }
 
-.enviar:disabled {
+.barra-conversa__botao:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+/* =====================================================================
+   ANÁLISE SEMANAL — Hierarquia dos 5 cards e botão de solicitação
+   ===================================================================== */
+.botao-solicitar-analise {
+  min-height: 48px;
+  width: 100%;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  margin-bottom: var(--lastro-e-4);
+}
+
+.perguntas {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: var(--lastro-e-3);
+  margin-top: var(--lastro-e-2);
+  padding: 0;
+}
+
+.pergunta {
+  width: 100%;
+  min-height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 18px;
+  border-radius: var(--lastro-raio-2);
+  background: var(--lastro-sup-1);
+  border: 1px solid var(--lastro-linha);
+  color: var(--lastro-txt);
+  text-align: left;
+  font-size: var(--lastro-papel-corpo);
+  cursor: pointer;
+  transition: all var(--lastro-dur-1) ease;
+  box-sizing: border-box;
+}
+
+.pergunta:hover:not([aria-disabled="true"]) {
+  background: var(--lastro-sup-2);
+  border-color: var(--lastro-controle);
+}
+
+.pergunta:active:not([aria-disabled="true"]) {
+  transform: scale(0.99);
+}
+
+.pergunta[aria-disabled="true"] {
   opacity: 0.55;
   cursor: not-allowed;
 }
 
-.enviar svg {
-  width: var(--lastro-e-5);
-  height: var(--lastro-e-5);
+/* Card Primário: A pergunta mais importante ("O que mudar na próxima semana?") */
+.pergunta--primaria {
+  background: linear-gradient(135deg, var(--lastro-sup-2) 0%, var(--lastro-sup-1) 100%);
+  border: 1px solid var(--lastro-ouro);
+  box-shadow: 0 4px 16px rgba(212, 175, 55, 0.12);
+  font-weight: 600;
+  padding: 18px 20px;
+}
+
+.pergunta--primaria:hover:not([aria-disabled="true"]) {
+  border-color: var(--lastro-ouro-claro, var(--lastro-ouro));
+  box-shadow: 0 6px 20px rgba(212, 175, 55, 0.22);
 }
 
 /* =====================================================================
@@ -4483,5 +4648,84 @@
   font-size: 11px;
   font-weight: 500;
   color: var(--lastro-txt-2);
+}
+
+/* =====================================================================
+   CABECALHO PRO & ALVOS DE TOQUE (Touch Targets ≥ 48px)
+   ===================================================================== */
+.topo-pro {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 16px;
+  min-height: 56px;
+  border-bottom: 1px solid var(--lastro-linha);
+  background: var(--lastro-fundo);
+  position: sticky;
+  top: 0;
+  z-index: 30;
+}
+
+.topo-pro__esquerda {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.topo-pro__voltar {
+  min-width: 48px;
+  min-height: 48px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--lastro-txt);
+  border-radius: 50%;
+  transition: background var(--lastro-dur-1) ease;
+  margin: -6px 0 -6px -6px;
+}
+
+.topo-pro__voltar:active {
+  background: var(--lastro-sup-2);
+}
+
+.topo-pro__logo-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.topo-pro__data-pill {
+  font-size: var(--lastro-papel-rotulo);
+  font-weight: 600;
+  color: var(--lastro-txt);
+  background: var(--lastro-sup-1);
+  border: 1px solid var(--lastro-linha);
+  border-radius: var(--lastro-raio-pilula);
+  padding: 4px 12px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.topo-pro__data-pill span {
+  color: var(--lastro-ouro);
+}
+
+.topo-pro__avatar-link {
+  min-width: 48px;
+  min-height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Alvos de toque nos filtros do catálogo */
+.chip-filtro {
+  min-height: 44px;
+  min-width: 48px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 

@@ -11,17 +11,17 @@
 
 > Bloco de handoff entre agentes (Antigravity ⇄ Claude). **Sobrescrever a cada sessão**, nunca acumular. Formato e regras: `AGENTS.md` §3.
 
-- **Última sessão:** 2026-08-26 (8) · agente: antigravity · branch: fix/qa-auditoria-relogio-temas
-- **Em andamento:** Auditoria completa com Playwright, correção do cronômetro, temas e resiliência da rota de Análise Semanal da Gemini:
-  1. **Correção de Exceção não Tratada em `/api/analise`:** Adicionada proteção com `try/catch` para capturar instabilidades, rate limit ou timeout da API Gemini, recorrendo graciosamente ao **fallback determinístico** do agregador com evidências matemáticas sem jamais disparar erro 500 para o usuário.
-  2. **Correção do Cronômetro no Finalizar:** Término persistido imediatamente via `lastro_fim_treino_${treinoId}` e relógio congelado de forma determinística no valor da sessão.
-  3. **Interrupção de Descanso no Finalizar:** Qualquer contagem regressiva de descanso em andamento é cancelada ao finalizar o treino.
-  4. **Revisão e Padronização dos 7 Temas:** Validados e mapeados `:root, [data-tema="ouro"]` e `[data-tema="branco-ouro"]`.
-  5. **QA Automatizado & Registro `QA.md`:** 10/10 áreas com evidências e testes Playwright completos.
+- **Última sessão:** 2026-08-26 (9) · agente: antigravity · branch: main
+- **Em andamento:** Concluída a Opção C (Polimento Visual Geral) e travada a regra de proibição de emoticons:
+  1. **Regra D10 Registrada:** Proibição explícita e absoluta do uso de emoticons e emojis no projeto registrada em `CLAUDE.md`, `DESIGN.md` e `PROGRESS.md`. Removido emoticon do modal pós-treino.
+  2. **Refino de Layout e Scroll no Coach 24h (`/coach`):** Barra de envio `.barra-conversa` posicionada com folga garantida e `padding-bottom` de 84px no corpo da conversa, impedindo qualquer corte ou sobreposição pela `AbaInferior` em viewports compactos (360px–390px).
+  3. **Hierarquia Nobre na Análise Semanal (`/analise`):** Estilização dedicada dos 5 cards com destaque especial na pergunta primária (`.pergunta--primaria`), botão de solicitação com 48px de altura e suporte a `aria-disabled`.
+  4. **Alvos de Toque Globais (≥ 48px):** Ajustadas as áreas de toque no topo (`.topo-pro__voltar`, `.topo-pro__avatar-link`), nos chips de filtro e no botão de envio do coach.
+  5. **Limpeza do Catálogo (`/catalogo`):** Suprimido o parágrafo de dica ausente em exercícios sem descrição longa, mantendo a densidade de lista.
 - **Bloqueado / a decidir:** Nada.
-- **Próximo passo:** Subir a branch e abrir PR.
+- **Próximo passo:** Prosseguir para a próxima frente aprovada pelo dono (Coluna de carga anterior e PR em tempo real).
 - **Para o outro agente saber:**
-  - A rota `/api/analise` agora é à prova de falhas com fallback gracioso automático.
+  - Zero emojis no código de UI. Toda sinalização usa SVG e tokens de cor.
   - Vitest 190/190 testes verdes e build Next.js 16.3.0 sem falhas.
 
 ---

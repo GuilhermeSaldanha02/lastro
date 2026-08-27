@@ -296,7 +296,7 @@ export default function RelatorioPosTreino({
         {/* Notificação / Toast de confirmação */}
         {copiado && (
           <div className="pos-treino-toast-copiado">
-            ✨ Sticker copiado com fundo transparente! Cole no Instagram Story.
+            Sticker copiado com fundo transparente! Cole no Instagram Story.
           </div>
         )}
 

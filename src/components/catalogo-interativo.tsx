@@ -146,10 +146,8 @@ export default function CatalogoInterativo({
                         )}
                       </div>
 
-                      {exercicio.dicaExecucao ? (
+                      {exercicio.dicaExecucao && (
                         <p className="cartao-exercicio-pro__dica">{exercicio.dicaExecucao}</p>
-                      ) : (
-                        <p className="cartao-exercicio-pro__sem-dica">{t("Sem dica registrada", idioma)}</p>
                       )}
                     </div>
                     <SetaNavegacao />

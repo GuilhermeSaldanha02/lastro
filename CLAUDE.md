@@ -25,13 +25,14 @@ Responda sempre em **pt-BR** e instrua todo subagente a responder em pt-BR — a
 
 ---
 
-## As cinco regras que este projeto não perdoa
+## As seis regras que este projeto não perdoa
 
 1. **A chave da Gemini nunca toca o cliente.** Toda chamada passa por route handler. (ADR-002, FF1, FF2)
 2. **O agregador calcula; o LLM interpreta.** O modelo nunca recebe linhas cruas de série — só um resumo já calculado. Se ele fizer conta, ele erra a conta. (ADR-003, FF3)
 3. **Aquecimento nunca entra em métrica.** Volume, e1RM e frequência contam apenas séries valendo. (FF4)
 4. **Dica de execução de exercício é curada, nunca gerada.** É assunto de saúde. (ADR-007, FF7)
 5. **Gravar série não tem `await` de rede no caminho crítico.** O app roda no subsolo da academia — sem sinal é o caso de uso real, não a exceção. (FF6)
+6. **Proibido o uso de emoticons e emojis.** Toda comunicação visual deve ser expressa exclusivamente através de ícones SVG vetorizados, tipografia sóbria e tokens de cor oficiais (decisão do dono 2026-08-26).
 
 Escreveu código que viola uma destas? Pare — a spec está errada, mesmo que compile. Invariantes derivadas, mais técnicas:
 
@@ -39,6 +40,7 @@ Escreveu código que viola uma destas? Pare — a spec está errada, mesmo que c
 - `src/lib/analise/` não importa rede, HTTP nem Supabase. É matemática pura.
 - Toda função de métrica filtra `tipo = valendo` antes de somar.
 - RIR ausente é ausência de informação, não RIR alto.
+- Zero emojis unicode ou caracteres de emoticon no código de UI, badges, toasts e pareceres.
 
 ---
 

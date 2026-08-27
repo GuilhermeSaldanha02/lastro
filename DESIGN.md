@@ -45,6 +45,7 @@ Isso não é detalhe de acabamento — é a restrição que decide o layout inte
 | D7 | **Estado de sincronização sempre visível, nunca alarmante** | O usuário precisa saber que o dado está salvo local, sem que isso pareça erro |
 | D8 | **Contraste AA medido, não estimado** | Gate de acessibilidade é critério do gate visual, não fase posterior |
 | D9 | **Foco visível e navegação por teclado funcionais** no PC | O PC é onde os gráficos são lidos com calma |
+| D10 | **Proibido o uso de emoticons e emojis** | Decisão do dono (2026-08-26): estética de precisão, sóbria e premium. Toda sinalização visual é feita com ícones SVG vetorizados, tipografia e tokens oficiais, sem emojis informais. |
 
 ---
 
