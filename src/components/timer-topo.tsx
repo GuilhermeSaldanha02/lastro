@@ -1,6 +1,12 @@
 "use client";
 
-import { useEffect, useState, useRef, useCallback } from "react";
+import {
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+  useSyncExternalStore,
+} from "react";
 import {
   formatarMinutosSegundos,
   tocarBipConclusao,
@@ -26,10 +32,9 @@ const chaveFimTreino = (treinoId: string) => `lastro_fim_treino_${treinoId}`;
  * escrever nada. Congelado em `fim - início` quando o treino terminou;
  * corrente (`agora - início`) enquanto roda.
  *
- * Separado de `garantirMarcosTreino` de propósito: esta função roda no
- * inicializador do `useState` (durante o render, onde escrever é proibido)
- * e a cada tique do intervalo. Devolve 0 no servidor, onde não há
- * localStorage — o valor real chega no primeiro render do cliente.
+ * Separado de `garantirMarcosTreino` de propósito: esta é o `getSnapshot`
+ * do `useSyncExternalStore` e roda DURANTE o render, onde escrever é
+ * proibido. Devolve 0 no servidor, onde não há localStorage.
  */
 function calcularSegundosTreino(treinoId: string): number {
   if (typeof window === "undefined") return 0;
@@ -42,6 +47,17 @@ function calcularSegundosTreino(treinoId: string): number {
   const ateMs = fimIso ? new Date(fimIso).getTime() : Date.now();
 
   return Math.floor(Math.max(0, ateMs - inicioMs) / 1000);
+}
+
+/**
+ * Fonte de mudança do cronômetro: um tique por segundo. `useSyncExternalStore`
+ * chama isto para saber QUANDO reler o snapshot — o que ele lê é
+ * `calcularSegundosTreino`. Fica fora do componente porque a identidade da
+ * função precisa ser estável entre renders.
+ */
+function assinarSegundo(aoMudar: () => void): () => void {
+  const id = setInterval(aoMudar, 1000);
+  return () => clearInterval(id);
 }
 
 /**
@@ -72,13 +88,25 @@ export default function TimerTopo({
 }: TimerTopoProps) {
   // 1. Cronômetro Contínuo da Sessão de Treino (Persistido e Congelável)
   //
-  // Inicializador preguiçoso em vez de `useState(0)` + `setState` dentro do
-  // efeito: aquele padrão encadeava render (react-hooks/set-state-in-effect,
-  // erro que reprovava o `npm run lint` do CI) e ainda piscava "00:00" por
-  // um quadro ao voltar pra um treino em andamento. Ler o localStorage aqui
-  // é leitura pura — quem escreve é `garantirMarcosTreino`, no efeito.
-  const [segundosTreino, setSegundosTreino] = useState(() =>
-    calcularSegundosTreino(treinoId),
+  // `useSyncExternalStore` é a ferramenta desenhada exatamente para isto:
+  // um valor que vive FORA do React (localStorage + relógio) e precisa de
+  // uma resposta diferente no servidor.
+  //
+  // As duas tentativas anteriores falharam cada uma de um jeito, e as duas
+  // aparecem nos comentários acima por honestidade:
+  //   · `useState(0)` + `setState` no corpo do efeito → encadeava render e
+  //     reprovava o lint do CI (react-hooks/set-state-in-effect);
+  //   · `useState(() => calcular…)` → o inicializador lê localStorage, que
+  //     no servidor não existe: ao REABRIR um treino em andamento o
+  //     servidor renderizava "00:00" e o cliente "02:15", e o React
+  //     descartava a árvore inteira com erro de hidratação (achado do
+  //     passo 13 do teste de jornada, 2026-08-27).
+  // Aqui o servidor tem snapshot próprio (0) e o cliente lê o valor real
+  // depois da hidratação, sem divergência e sem `setState` em efeito.
+  const segundosTreino = useSyncExternalStore(
+    assinarSegundo,
+    () => calcularSegundosTreino(treinoId),
+    () => 0,
   );
 
   // 2. Timer de Descanso entre Séries
@@ -91,25 +119,17 @@ export default function TimerTopo({
   // Timestamp absoluto para resiliência a bloqueio de tela
   const fimTimestampRef = useRef<number | null>(null);
 
+  // Único lado escritor do cronômetro: sincroniza o localStorage com o que
+  // o React sabe. É o que efeito deve fazer — atualizar sistema externo.
   useEffect(() => {
-    if (typeof window === "undefined") return;
-
-    // Único lado escritor: sincroniza o localStorage com o que o React sabe.
     garantirMarcosTreino(treinoId, treinoFinalizado);
+  }, [treinoId, treinoFinalizado]);
 
-    // `setState` só dentro do callback do intervalo — assíncrono ao render,
-    // que é o que a regra do React pede. Quando o treino está congelado,
-    // `calcularSegundosTreino` devolve sempre o mesmo número e o React
-    // descarta o re-render sozinho, sem precisar parar o intervalo.
-    const aplicar = () => {
-      const seg = calcularSegundosTreino(treinoId);
-      setSegundosTreino(seg);
-      onTempoTreinoAtualizado?.(seg);
-    };
-
-    const intervalTreino = setInterval(aplicar, 1000);
-    return () => clearInterval(intervalTreino);
-  }, [treinoId, treinoFinalizado, onTempoTreinoAtualizado]);
+  // Espelha o valor para o pai (que monta o relatório pós-treino). Separado
+  // do efeito acima porque depende do tique, não dos marcos.
+  useEffect(() => {
+    onTempoTreinoAtualizado?.(segundosTreino);
+  }, [segundosTreino, onTempoTreinoAtualizado]);
 
   const iniciarTimer = useCallback((segundos: number) => {
     desbloquearAudio();

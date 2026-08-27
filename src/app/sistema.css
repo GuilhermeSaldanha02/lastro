@@ -4431,6 +4431,17 @@
 }
 
 /* ---------- Modal de Compartilhamento Pós-Treino Transparente (Estilo Strava) ---------- */
+/* O conteúdo deste modal é mais alto que a tela de um celular (medido:
+   668px de conteúdo em 664px de viewport, e pior ainda em 360×640). Com
+   `align-items: center` e sem rolagem, sobrava e sumia pelas DUAS pontas —
+   e como "Fechar" e "Concluir e Voltar ao Início" são as pontas, a pessoa
+   ficava presa na tela sem saída (achado do dono, 2026-08-27).
+
+   `align-items: flex-start` + `margin: auto` no filho é o par que resolve:
+   centraliza enquanto cabe e, quando não cabe, ancora no topo em vez de
+   estourar para cima — um filho centralizado que transborda tem o topo
+   cortado e INALCANÇÁVEL por rolagem, então `overflow-y: auto` sozinho
+   não bastaria. */
 .pos-treino-overlay {
   position: fixed;
   inset: 0;
@@ -4438,8 +4449,10 @@
   background: rgba(7, 9, 13, 0.95);
   backdrop-filter: blur(16px);
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: center;
+  overflow-y: auto;
+  overscroll-behavior: contain;
   padding: var(--lastro-e-3);
   animation: lastro-pilula-entra var(--lastro-dur-2) ease;
 }
@@ -4447,6 +4460,7 @@
 .pos-treino-share-container {
   width: 100%;
   max-width: 400px;
+  margin: auto;
   display: flex;
   flex-direction: column;
   gap: var(--lastro-e-3);
@@ -4456,6 +4470,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: var(--lastro-e-2);
   padding: var(--lastro-e-1) 0;
 }
 
@@ -4466,6 +4481,12 @@
   font-size: var(--lastro-papel-corpo);
   font-weight: 500;
   cursor: pointer;
+  /* Media 52×25 — a saída da tela era o menor alvo dela (D1). */
+  min-height: var(--lastro-alvo-min);
+  min-width: var(--lastro-alvo-min);
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-start;
 }
 
 .pos-treino-share-titulo {
@@ -4636,15 +4657,28 @@
 
 /* Toast de confirmação */
 .pos-treino-toast-copiado {
-  background: var(--lastro-esmeralda);
-  color: #07090D;
   font-weight: 700;
   font-size: var(--lastro-papel-rotulo);
-  padding: 8px 14px;
+  padding: 10px 14px;
   border-radius: var(--lastro-raio-pilula);
   text-align: center;
-  box-shadow: 0 4px 14px rgba(16, 185, 129, 0.4);
+  line-height: 1.4;
   animation: lastro-pilula-entra var(--lastro-dur-1) ease;
+}
+
+.pos-treino-toast-copiado--ok {
+  background: var(--lastro-esmeralda);
+  color: #07090d;
+  box-shadow: 0 4px 14px rgba(16, 185, 129, 0.4);
+}
+
+/* Âmbar, nunca `--lastro-erro`: não conseguir copiar um sticker não é
+   falha do treino nem culpa de quem tocou — é limite do aparelho. Vermelho
+   diria "você errou" (DESIGN.md §3.6.6, mesma regra do platô). */
+.pos-treino-toast-copiado--atencao {
+  background: var(--lastro-plato);
+  color: #07090d;
+  box-shadow: 0 4px 14px rgba(245, 158, 11, 0.35);
 }
 
 /* Rodapé Share To */

@@ -28,6 +28,8 @@ fs.mkdirSync(DIR, { recursive: true });
 /** Achados do teste — nada é lançado, tudo é colecionado e relatado no fim. */
 const achados = [];
 let passoAtual = "abertura";
+/** URL do treino aberto no passo 03, reusada no passo 13. */
+let urlDoTreino = "";
 
 const anotar = (tipo, detalhe) =>
   achados.push({ passo: passoAtual, tipo, detalhe });
@@ -192,6 +194,9 @@ async function run() {
     await passo(page, "03-treino-iniciado", async () => {
       await page.getByRole("button", { name: /iniciar treino/i }).click();
       await page.waitForURL(/\/treino\//, { timeout: 20000 });
+      // Guardado para o passo 13 voltar a este treino depois de passear
+      // pelas outras telas.
+      urlDoTreino = page.url();
     });
 
     await passo(page, "04-escolher-grupo", async () => {
@@ -268,7 +273,50 @@ async function run() {
       await page.goto(`${BASE}/ajustes`, { waitUntil: "networkidle" });
     });
 
-    await passo(page, "12-coach", async () => {
+    console.log("\nFim do treino — relatório pós-treino");
+
+    // Este modal nunca era visitado, e foi por isso que o dono achou antes
+    // do teste: conteúdo mais alto que a tela, sem rolagem, com "Fechar" e
+    // "Concluir" nas pontas — a pessoa ficava presa (2026-08-27). Nem
+    // `auditarOverflow` (só horizontal) nem `auditarClipping` (pula
+    // container com `overflow: visible`) pegam esta classe.
+    await passo(page, "13-relatorio-pos-treino", async () => {
+      await page.goto(urlDoTreino, { waitUntil: "networkidle" });
+      await page.waitForTimeout(900);
+      const finalizar = page.getByRole("button", { name: /finalizar treino|ver relatório/i });
+      if (!(await finalizar.count())) {
+        anotar("requisito", "botão de finalizar treino não encontrado");
+        return;
+      }
+      await finalizar.click();
+      await page.waitForTimeout(1600);
+
+      const presos = await page.evaluate(() => {
+        const overlay = document.querySelector(".pos-treino-overlay");
+        if (!overlay) return { ausente: true };
+        const rolavel = ["auto", "scroll"].includes(getComputedStyle(overlay).overflowY);
+        const vh = window.innerHeight;
+        const fora = [];
+        for (const btn of overlay.querySelectorAll("button")) {
+          const r = btn.getBoundingClientRect();
+          // Fora da tela E sem rolagem que o traga de volta = inalcançável.
+          if ((r.top < 0 || r.bottom > vh) && !rolavel) {
+            fora.push((btn.innerText || btn.title).replace(/\s+/g, " ").trim().slice(0, 30));
+          }
+        }
+        return { rolavel, fora };
+      });
+
+      if (presos.ausente) {
+        anotar("requisito", "relatório pós-treino não abriu ao finalizar");
+      } else {
+        for (const rotulo of presos.fora) {
+          anotar("inalcançável", `"${rotulo}" fica fora da tela e o modal não rola`);
+        }
+      }
+    });
+
+    await passo(page, "14-coach", async () => {
       await page.goto(`${BASE}/coach`, { waitUntil: "networkidle" });
       // T5 do backlog: o campo do coach ficava por baixo da aba inferior.
       const sobreposto = await page.evaluate(() => {

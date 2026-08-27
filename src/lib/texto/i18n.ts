@@ -337,6 +337,48 @@ const DICIONARIO: Record<string, { en: string; es: string }> = {
     es: "Las instrucciones de este catálogo no reemplazan la orientación médica o fisioterapéutica.",
   },
 
+  // --- relatorio-pos-treino.tsx ---
+  // Os rótulos da tela e os avisos de desfecho de cada ação. Antes só
+  // existiam em PT-BR: a tela do relatório aparecia meio traduzida em
+  // en/es (achado do teste de jornada, 2026-08-27).
+  "Compartilhar Treino": { en: "Share Workout", es: "Compartir Entrenamiento" },
+  "Compartilhar com": { en: "Share with", es: "Compartir con" },
+  "Carga Total": { en: "Total Load", es: "Carga Total" },
+  "Séries Válidas": { en: "Working Sets", es: "Series Válidas" },
+  "Tempo": { en: "Time", es: "Tiempo" },
+  "Copiar": { en: "Copy", es: "Copiar" },
+  // "Salvar" já existe acima (formulários) — mesma tradução, uma entrada só.
+  "Salvando...": { en: "Saving...", es: "Guardando..." },
+  "Mais": { en: "More", es: "Más" },
+  "Concluir e Voltar ao Início": {
+    en: "Finish and Back to Home",
+    es: "Concluir y Volver al Inicio",
+  },
+  "Sticker copiado! Cole no Story do Instagram.": {
+    en: "Sticker copied! Paste it into your Instagram Story.",
+    es: "¡Sticker copiado! Pégalo en tu Historia de Instagram.",
+  },
+  "Imagem salva no aparelho.": {
+    en: "Image saved to your device.",
+    es: "Imagen guardada en tu dispositivo.",
+  },
+  "Seu aparelho não deixou copiar. A imagem foi salva.": {
+    en: "Your device blocked copying. The image was saved instead.",
+    es: "Tu dispositivo no permitió copiar. La imagen fue guardada.",
+  },
+  "Não foi possível copiar nem salvar a imagem.": {
+    en: "Could not copy or save the image.",
+    es: "No fue posible copiar ni guardar la imagen.",
+  },
+  "Não foi possível salvar a imagem.": {
+    en: "Could not save the image.",
+    es: "No fue posible guardar la imagen.",
+  },
+  "Não foi possível gerar a imagem do treino.": {
+    en: "Could not generate the workout image.",
+    es: "No fue posible generar la imagen del entrenamiento.",
+  },
+
   // --- app/catalogo/[id]/page.tsx ---
   "Exercícios": { en: "Exercises", es: "Ejercicios" },
   "Instruções Técnicas": { en: "Technical Instructions", es: "Instrucciones Técnicas" },
