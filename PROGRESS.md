@@ -11,18 +11,15 @@
 
 > Bloco de handoff entre agentes (Antigravity ⇄ Claude). **Sobrescrever a cada sessão**, nunca acumular. Formato e regras: `AGENTS.md` §3.
 
-- **Última sessão:** 2026-08-27 · agente: antigravity · branch: feat/melhorias-design-relatorios-contraste-botoes
-- **Em andamento:** Concluídas as 4 frentes de design e funcionalidade aprovadas pelo dono:
-  1. **Relatórios & Stickers em Ajustes (`/ajustes/relatorios`):** Rota e componente interativo dedicados permitindo consultar o histórico de treinos passados e gerar a qualquer momento o sticker oficial PNG transparente (1080×1080) para Instagram Stories, com cópia para clipboard, download e Web Share. Adicionado item no Bento Menu de `/ajustes`.
-  2. **Calibração de Contraste nos Temas Claros (T3b):** Calibrados os tokens de acento e sinalização (`--lastro-ouro`, `--lastro-esmeralda`, `--lastro-esmeralda-claro`, `--lastro-ciano`, `--lastro-erro`, `--lastro-alta`, `--lastro-plato`, `--lastro-queda`, `--lastro-foco`, `--lastro-sync`, `--lastro-aquecimento`) sob `[data-tema="branco-ouro"]` em `tokens.css` para entregar conformidade WCAG AA (≥ 4.5:1 / ≥ 3.0:1) sobre fundos claros compostos. Tabela C1-C14 em `DESIGN.md` §4.2 atualizada com medições de ambos os temas.
-  3. **Diagramação e Instruções Biomecânicas no Catálogo (`/catalogo/[id]`):** Card estruturado com músculo-alvo, sinergistas e mecânica articular (`obterMidiaExercicio`), instruções técnicas de execução, preservando o aviso de saúde (PRD §4.5). Removido emoji residual do player (D10).
-  4. **Enriquecimento Visual dos Botões Textuais com Ícones SVG (D1/D10):** Adicionados ícones vetoriais em `ExcluirConta` (lixeira de alerta), logout em `/ajustes`, toggles de modo de edição em `ListaTreinos`, `ListaModelos` e `AnilhasForm` (lápis e checkmark), com alvos ≥ 48px e zero emojis.
+- **Última sessão:** 2026-08-27 (2) · agente: antigravity · branch: fix/contraste-preview-sticker-e-card-biomecanica
+- **Em andamento:** Corrigido o contraste visual no tema claro (*Marfim & Ouro Imperial*) e no preview de stickers para Stories:
+  1. **Preview de Stickers para Instagram Stories:** Fixado o container do preview em fundo escuro obsidiana acetinado (`#07090D`) com iluminação radial dourada, impedindo que textos brancos e métricas ("45 min", séries, volume, brasão LASTRO) fiquem ilegíveis quando o app está em tema claro.
+  2. **Card de Biomecânica & Hero no Catálogo (`/catalogo/[id]`):** Estilização dedicada com superfícies semânticas (`--lastro-sup-1` e `--lastro-sup-2`), tags com alto contraste, rótulos anatômicos em ouro imperial e textos descritivos com contraste WCAG AAA (`#0F172A` no tema claro).
 - **Bloqueado / a decidir:** Nada.
-- **Próximo passo:** Teste no aparelho físico para validação visual dos stickers e botões.
+- **Próximo passo:** Validação visual pelo dono no aparelho físico.
 - **Para o outro agente saber:**
   - 28 arquivos de teste, 208/208 testes passando no Vitest.
-  - Build Next.js com 23 rotas estáticas/dinâmicas 100% limpo.
-  - Tokens semânticos para o tema claro `branco-ouro` garantem contraste sem alterar os valores do tema escuro padrão `:root`.
+  - Build Next.js 16.3.0 sem falhas com 23 rotas estáticas/dinâmicas.
 
 ---
 

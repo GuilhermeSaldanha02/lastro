@@ -4534,12 +4534,12 @@
   overflow: hidden;
   border: 1px solid var(--lastro-borda-ouro);
   box-shadow: 0 16px 36px rgba(0, 0, 0, 0.7), 0 0 24px var(--lastro-ouro-glow);
-  background-color: var(--lastro-sup-1);
+  background-color: #07090D !important;
   background-image: radial-gradient(
     circle at 78% 18%,
-    var(--lastro-ouro-glow) 0%,
-    transparent 58%
-  );
+    rgba(212, 175, 55, 0.18) 0%,
+    transparent 60%
+  ) !important;
   transition: background-color var(--lastro-dur-2) ease;
 }
 
@@ -5065,18 +5065,92 @@
   max-width: 320px;
 }
 
-/* Diagramação de Biomecânica & Dica Técnica */
-.dica-corpo {
+/* =========================================================================
+   DETALHES DO EXERCÍCIO, BIOMECÂNICA & HERO CARD
+   ========================================================================= */
+
+.exercicio-hero-card {
+  background: var(--lastro-sup-1);
+  border: 1px solid var(--lastro-linha);
+  border-radius: var(--lastro-raio-2);
+  padding: var(--lastro-e-3);
+  display: flex;
+  flex-direction: column;
+  gap: var(--lastro-e-3);
+  box-shadow: var(--lastro-elev-1);
+}
+
+.exercicio-hero-card__tags {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--lastro-e-2);
+}
+
+.tag-grupo {
+  font-size: var(--lastro-papel-rotulo);
+  font-weight: 700;
+  color: var(--lastro-esmeralda-claro);
+  background: rgba(16, 185, 129, 0.12);
+  border: 1px solid var(--lastro-esmeralda);
+  padding: 3px 10px;
+  border-radius: var(--lastro-raio-pilula);
+}
+
+.tag-unilateral {
+  font-size: var(--lastro-papel-rotulo);
+  font-weight: 700;
+  color: var(--lastro-ciano);
+  background: rgba(6, 182, 212, 0.12);
+  border: 1px solid var(--lastro-ciano);
+  padding: 3px 10px;
+  border-radius: var(--lastro-raio-pilula);
+}
+
+.disciplina-card__streak {
+  font-family: var(--lastro-fonte-num);
+  font-size: var(--lastro-papel-rotulo);
+  font-weight: 700;
+  color: var(--lastro-ouro);
+  background: var(--lastro-ouro-glow);
+  border: 1px solid var(--lastro-borda-ouro);
+  padding: 3px 10px;
+  border-radius: var(--lastro-raio-pilula);
+}
+
+/* Card de Biomecânica & Dica Técnica */
+.exercicio-hero-card__dica {
+  background: var(--lastro-sup-2);
+  border: 1px solid var(--lastro-linha);
+  border-radius: var(--lastro-raio-1);
+  padding: var(--lastro-e-3);
   display: flex;
   flex-direction: column;
   gap: var(--lastro-e-2);
 }
 
+.dica-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: var(--lastro-papel-corpo);
+  font-weight: 700;
+  color: var(--lastro-txt);
+}
+
+.dica-corpo {
+  display: flex;
+  flex-direction: column;
+  gap: var(--lastro-e-2);
+  margin-top: 4px;
+}
+
 .dica-item-linha {
   display: flex;
   align-items: baseline;
+  flex-wrap: wrap;
   gap: 6px;
-  font-size: var(--lastro-papel-rotulo);
+  font-size: var(--lastro-papel-corpo);
   line-height: 1.4;
 }
 
@@ -5088,15 +5162,120 @@
 
 .dica-valor {
   color: var(--lastro-txt);
-  font-weight: 500;
+  font-weight: 600;
 }
 
 .dica-texto-principal {
-  margin-top: 4px;
+  margin-top: 6px;
   font-size: var(--lastro-papel-corpo);
-  color: var(--lastro-txt-2);
-  line-height: 1.5;
+  color: var(--lastro-txt);
+  line-height: 1.6;
   border-top: 1px solid var(--lastro-linha);
   padding-top: 8px;
 }
+
+.exercicio-hero-card__aviso {
+  background: var(--lastro-sup-2);
+  border: 1px solid var(--lastro-linha);
+  border-radius: var(--lastro-raio-1);
+  padding: var(--lastro-e-2) var(--lastro-e-3);
+  font-size: var(--lastro-papel-rotulo);
+  color: var(--lastro-txt-2);
+  line-height: 1.5;
+}
+
+.exercicio-hero-card__aviso strong {
+  color: var(--lastro-txt);
+}
+
+/* Player de Execução e Mídia */
+.player-exercicio-card {
+  background: var(--lastro-sup-2);
+  border: 1px solid var(--lastro-linha);
+  border-radius: var(--lastro-raio-1);
+  overflow: hidden;
+  position: relative;
+}
+
+.player-exercicio-card__display {
+  position: relative;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #000000;
+  min-height: 220px;
+}
+
+.player-exercicio-card__midia {
+  width: 100%;
+  max-height: 320px;
+  object-fit: contain;
+  display: block;
+}
+
+.player-exercicio-card__badge-foco {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  background: rgba(7, 9, 13, 0.85);
+  border: 1px solid var(--lastro-linha);
+  color: #FFFFFF;
+  font-size: var(--lastro-papel-rotulo);
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: var(--lastro-raio-pilula);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  z-index: 2;
+  backdrop-filter: blur(8px);
+}
+
+.player-exercicio-card__ponto-vermelho {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #EF4444;
+  box-shadow: 0 0 6px #EF4444;
+}
+
+.player-exercicio-card__badge-status {
+  position: absolute;
+  bottom: 10px;
+  left: 10px;
+  background: rgba(7, 9, 13, 0.85);
+  border: 1px solid var(--lastro-linha);
+  color: #FFFFFF;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 3px 8px;
+  border-radius: var(--lastro-raio-pilula);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  z-index: 2;
+  backdrop-filter: blur(8px);
+}
+
+.player-exercicio-card__ponto-vivo {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #10B981;
+  box-shadow: 0 0 6px #10B981;
+}
+
+.player-exercicio-card__credito {
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  background: rgba(7, 9, 13, 0.75);
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 10px;
+  padding: 2px 6px;
+  border-radius: 4px;
+  z-index: 2;
+}
+
 
