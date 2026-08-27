@@ -24,8 +24,23 @@ export type Modelo = {
   nome: string;
 };
 
+/**
+ * Plano de um exercício dentro do modelo (ADR-010, 2026-08-27).
+ *
+ * `reps`/`peso` são `null` quando o dono ainda não cadastrou — e `null` é
+ * significado, não ausência de dado a ser preenchida com zero: a UI cai no
+ * histórico real do exercício. Modelo criado antes desta mudança chega
+ * inteiro com `null` e continua funcionando.
+ */
+export type ExercicioDoModelo = {
+  exercicioId: string;
+  nome: string;
+  reps: number | null;
+  peso: number | null;
+};
+
 export type ModeloComExercicios = Modelo & {
-  exercicios: { exercicioId: string; nome: string }[];
+  exercicios: ExercicioDoModelo[];
 };
 
 /** Lista os modelos do usuário, mais recente primeiro — só nome e id (a
@@ -56,12 +71,17 @@ export async function buscarModelo(
 
   const { data: itens, error: erroItens } = await supabase
     .from("modelo_treino_exercicio")
-    .select("exercicio_id, exercicio:exercicio_id (nome)")
+    .select("exercicio_id, reps, peso, exercicio:exercicio_id (nome)")
     .eq("modelo_treino_id", modeloId)
     .order("ordem", { ascending: true });
   if (erroItens) throw new Error(`Falha ao buscar exercícios do modelo: ${erroItens.message}`);
 
-  type LinhaItem = { exercicio_id: string; exercicio: { nome: string } | null };
+  type LinhaItem = {
+    exercicio_id: string;
+    reps: number | null;
+    peso: number | string | null;
+    exercicio: { nome: string } | null;
+  };
 
   return {
     id: modelo.id,
@@ -69,6 +89,10 @@ export async function buscarModelo(
     exercicios: ((itens ?? []) as unknown as LinhaItem[]).map((i) => ({
       exercicioId: i.exercicio_id,
       nome: i.exercicio?.nome ?? "",
+      reps: i.reps,
+      // `numeric` do Postgres chega como string no supabase-js — converter
+      // aqui evita "60.00" virando texto num campo numérico da tela.
+      peso: i.peso === null ? null : Number(i.peso),
     })),
   };
 }

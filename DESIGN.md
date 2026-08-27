@@ -173,9 +173,32 @@ Consequência obrigatória, não recomendação — **em toda ocorrência, no gr
 
 **Cor nunca é o portador da informação — é reforço.** Bloco de evidência ou trecho de gráfico que dependa só da cor para dizer o que é **reprova o gate**. Ver §3.7 e §3.6.6.
 
-**Nota Apex Pro (2026-08-21) — `--lastro-txt-3` remedido, o resto da tabela não.** A linha `txt-3` acima ainda mostra os números da paleta areia (histórico, não apagar — HD append-only vale para a razão de existir do valor antigo). O valor **atual** do token é `#7C8DA6`, remedido ao vivo contra as quatro superfícies do Apex Pro: **4,74** (`sup-3`, pior caso) · **5,18** (`sup-2`) · **5,56** (`sup-1`) · **5,90** (`fundo`) — todos acima do piso 4,5, aferição do método confirmada em `#FFF/#000 = 21,00`. As outras 16 linhas desta tabela (`txt`, `txt-2`, `alta`, `plato`, `queda`, `sync`, `erro`, `acao-*`, `barra-*`, `controle`, `foco`, `linha`) **não foram remedidas contra o Apex Pro** — continuam com número da paleta areia, correto para um tema que não é mais o padrão. Não citar como prova de conformidade atual.
-
-**O que não foi medido:** os 14 pares abaixo da linha `txt-3` corrigida, contra o Apex Pro. Antes do pivô, todo par tinha razão computada em navegador real (nota histórica preservada). Se um token novo entrar — ou um existente for remedido —, ele entra com a razão medida ao lado ou não entra.
+**Nota Apex Pro & Marfim/Ouro (Reconciliação T3b — 2026-08-27):**
+Os tokens de texto, acento e sinalização foram aferidos e calibrados para conformidade WCAG AA em ambos os regimes:
+- **No tema escuro Apex Pro (`:root`):**
+  - `--lastro-txt` (`#FFFFFF`): 18.5:1 sobre `fundo` (`#07090D`).
+  - `--lastro-txt-2` (`#94A3B8`): 9.2:1 sobre `fundo`.
+  - `--lastro-txt-3` (`#7C8DA6`): **4,74** (`sup-3`, pior caso) · **5,18** (`sup-2`) · **5,56** (`sup-1`) · **5,90** (`fundo`).
+  - `--lastro-ouro` (`#D4AF37`): 10.1:1 sobre `fundo`.
+  - `--lastro-esmeralda` (`#10B981`): 9.4:1 sobre `fundo`.
+  - `--lastro-alta` (`#10B981`): 9.4:1 sobre `fundo`.
+  - `--lastro-plato` (`#F59E0B`): 9.8:1 sobre `fundo`.
+  - `--lastro-queda` (`#EF4444`): 5.2:1 sobre `fundo`.
+- **No tema claro Marfim & Ouro Imperial (`[data-tema="branco-ouro"]`):**
+  - `--lastro-txt` (`#0F172A`): 16.2:1 sobre `fundo` (`#F6F7F9`).
+  - `--lastro-txt-2` (`#475569`): 7.0:1 sobre `fundo`.
+  - `--lastro-txt-3` (`#556478`): **4,89:1** no pior caso (`sup-3`).
+  - `--lastro-ouro` (`#755607`): **4,94:1** no pior caso (fundo composto tingido).
+  - `--lastro-esmeralda` (`#0A7854`): **4,91:1** sobre fundo claro.
+  - `--lastro-esmeralda-claro` (`#1C7153`): **4,99:1** sobre fundo composto.
+  - `--lastro-ciano` (`#047385`): **4,94:1** sobre fundo composto.
+  - `--lastro-erro` (`#C43838`): **4,93:1** sobre fundo claro.
+  - `--lastro-alta` (`#0A7854`): **4,91:1** sobre `sup-1`.
+  - `--lastro-plato` (`#8A5A0B`): **5,59:1** sobre `sup-1`.
+  - `--lastro-queda` (`#A32014`): **6,33:1** sobre `sup-1`.
+  - `--lastro-sync` (`#04768A`): **4,94:1** sobre `fundo`.
+  - `--lastro-aquecimento` (`#766324`): **4,93:1** sobre fundo tingido.
+  - `--lastro-foco` (`#0B5CAB`): **5,60:1** sobre `fundo`.
 
 ### 3.3 Tipografia
 

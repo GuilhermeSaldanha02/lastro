@@ -298,6 +298,13 @@
      rodada — chip com o próprio fundo tingido (rgba(245,158,11,.12)).
      Remedido: 4,93:1. */
   --lastro-aquecimento:     #766324;
+  /* Tokens semânticos de sinal e parecer (T3b) — no :root são calibrados
+     para o tema escuro (cores claras). No tema claro precisam ser escuros
+     para entregar contraste AA (≥ 4.5:1) contra superfícies claras. */
+  --lastro-alta:            #0A7854;
+  --lastro-plato:           #8A5A0B;
+  --lastro-queda:           #A32014;
+  --lastro-foco:            #0B5CAB;
 }
 
 /* 2. DUNA AREIA & ÂMBAR (SANDSTONE WARMTH) */
