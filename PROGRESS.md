@@ -11,16 +11,20 @@
 
 > Bloco de handoff entre agentes (Antigravity ⇄ Claude). **Sobrescrever a cada sessão**, nunca acumular. Formato e regras: `AGENTS.md` §3.
 
-- **Última sessão:** 2026-08-27 (5) · agente: antigravity · branch: fix/sticker-logo-topo-esquerdo
-- **Em andamento:** Logotipo oficial do LASTRO posicionado no topo no **lado esquerdo** (acima do bloco de *Tempo de Treino* e alinhado aos textos), tanto no Canvas 1080×1080 quanto no preview HTML do modal:
-  1. Topo: Brasão LASTRO alinhado à esquerda.
-  2. Bloco central: Tempo de treino ("45 min"), Séries válidas e Exercícios com tipografia de alto impacto.
-  3. Base: Lista de exercícios realizados ocupando 100% da largura útil.
+- **Última sessão:** 2026-08-27 (6) · agente: antigravity · branch: feat/sticker-story-minimalista-premium
+- **Em andamento:** Novo modelo minimalista e premium de Sticker de Story implementado e verificado via Playwright:
+  1. Topo Esquerdo: Brasão oficial dourado LASTRO com logotipo.
+  2. Hero: Rótulo `SESSÃO FINALIZADA` com tracking aberto + Tempo hero em destaque (`45 min` / `91 min`).
+  3. Divisor Dourado Champagne: Linha horizontal com seta vetorial na extremidade direita (`──────>`).
+  4. Linha de 3 Métricas: `[X] SÉRIES`, `[Y] EXERCÍCIOS` e foco muscular/divisão (`PERNAS`, `SUPERIORES`, etc.) alinhado à direita.
+  5. Rodapé: Frase sutil de assinatura `Mais uma sessão no histórico.` + Badge retangular dourado com o código da sessão (`TREINO 6B57`).
+  6. Fundo transparente em PNG 1080×1080 com sombras projetadas para alto contraste sobre fotos claras ou escuras.
 - **Bloqueado / a decidir:** Nada.
-- **Próximo passo:** Validação visual pelo dono no aparelho físico.
+- **Próximo passo:** Validação pelo dono no celular / Instagram Stories.
 - **Para o outro agente saber:**
-  - 28 arquivos de teste, 208/208 testes passando no Vitest.
+  - 28 arquivos de teste, 210/210 testes passando no Vitest.
   - Build Next.js 16.3.0 sem falhas com 23 rotas estáticas/dinâmicas.
+  - Script Playwright de verificação e screenshots disponíveis em `docs/screenshots/verificacao_sticker_story/`.
 
 ---
 

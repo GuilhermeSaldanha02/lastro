@@ -38,18 +38,33 @@ export type DadosNovaSerie = {
 export default function FormularioSerie({
   exercicios,
   onRegistrar,
+  preenchimento,
   idioma,
 }: {
   exercicios: Exercicio[];
   onRegistrar: (dados: DadosNovaSerie) => void | Promise<void>;
+  /**
+   * Abre o formulário JÁ preenchido (ADR-010) — usado pelo `+` do
+   * exercício vindo de modelo. Quem chama monta o valor: plano do modelo
+   * quando existe, última série do histórico quando o plano é `null`.
+   *
+   * Aplicado por `defaultValue`, e o componente é remontado por `key` na
+   * chamada. É o que permite preencher sem `setState` dentro de efeito —
+   * o padrão que já custou um erro de lint e um de hidratação neste
+   * projeto (ver `timer-topo.tsx`).
+   */
+  preenchimento?: { exercicioId: string; reps: number; peso: number } | null;
   idioma: Idioma;
 }) {
   // Começa em branco de propósito — a pessoa escolhe o exercício e o tipo,
   // nenhum dos dois vem pré-marcado. Com o catálogo crescendo, pré-marcar
   // `exercicios[0]` viraria "o primeiro em ordem alfabética", que não tem
   // relação nenhuma com o que a pessoa vai treinar (achado do dono, 2026-08-07).
-  const [exercicioId, setExercicioId] = useState("");
-  const [tipo, setTipo] = useState<"aquecimento" | "valendo" | "">("");
+  const [exercicioId, setExercicioId] = useState(preenchimento?.exercicioId ?? "");
+  // Vindo do `+`, o tipo já é "valendo": é o que a pessoa vai fazer.
+  const [tipo, setTipo] = useState<"aquecimento" | "valendo" | "">(
+    preenchimento ? "valendo" : "",
+  );
   const [erro, setErro] = useState<string | null>(null);
   // Histórico do exercício escolhido — fonte única pra "última vez" (C1),
   // "repetir por exercício" (C2) e detecção de PR (C4). `null` = ainda não
@@ -234,6 +249,7 @@ export default function FormularioSerie({
             ref={repsRef}
             id="reps"
             name="reps"
+            defaultValue={preenchimento?.reps ?? ""}
             type="number"
             inputMode="numeric"
             placeholder="0"
@@ -251,6 +267,7 @@ export default function FormularioSerie({
             ref={pesoRef}
             id="peso"
             name="peso"
+            defaultValue={preenchimento?.peso ?? ""}
             type="number"
             inputMode="decimal"
             placeholder="0.0"

@@ -253,7 +253,19 @@ async function run() {
 
     await passo(page, "10-exercicio", async () => {
       await page.locator("a[href^='/catalogo/']").first().click();
-      await page.waitForTimeout(1200);
+
+      // Esperar o CARTÃO existir, não um tempo fixo. Com `waitForTimeout`
+      // este passo acusou "sem aviso de saúde" com o aviso na tela: o
+      // `innerText` era lido antes de a página terminar de montar, e o
+      // falso positivo me fez caçar um bug que não existia (2026-08-27).
+      // Teste que mente custa mais que teste que falta.
+      await page
+        .locator(".exercicio-hero-card")
+        .first()
+        .waitFor({ state: "visible", timeout: 15000 })
+        .catch(() => anotar("requisito", "cartão do exercício não renderizou"));
+      await page.waitForTimeout(400);
+
       const texto = await page.evaluate(() => document.body.innerText);
       if (/ainda não (foi )?cadastrada|não escrita/i.test(texto)) {
         anotar(

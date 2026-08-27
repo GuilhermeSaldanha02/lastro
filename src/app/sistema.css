@@ -4561,7 +4561,7 @@
 .pos-treino-tag-transparente {
   position: absolute;
   top: 14px;
-  left: 14px;
+  right: 14px;
   border: 1px solid rgba(255, 255, 255, 0.4);
   padding: 2px 8px;
   border-radius: 4px;
@@ -4578,83 +4578,141 @@
 .pos-treino-strava-conteudo {
   position: absolute;
   inset: 0;
-  padding: 24px 20px 16px;
+  padding: 22px 20px 18px;
   display: flex;
   flex-direction: column;
-  justify-content: flex-start;
+  justify-content: space-between;
   z-index: 2;
-  gap: 8px;
 }
 
-.pos-treino-strava-cabecalho-topo {
+.pos-treino-sticker-logo-wrapper {
   display: flex;
   align-items: center;
   justify-content: flex-start;
-  width: 100%;
 }
 
-.pos-treino-strava-cabecalho-topo--esquerdo {
-  justify-content: flex-start !important;
-}
-
-.pos-treino-logo-topo-esquerdo {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  justify-content: center;
-}
-
-.pos-treino-logo-topo-esquerdo__img {
-  width: 52px;
-  height: 52px;
+.pos-treino-sticker-logo-img {
+  width: 48px;
+  height: 48px;
   object-fit: contain;
-  filter: drop-shadow(0 4px 14px rgba(0, 0, 0, 0.95));
+  filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.9));
 }
 
-.pos-treino-strava-metricas {
+.pos-treino-sticker-hero {
   display: flex;
   flex-direction: column;
+  gap: 2px;
+  margin-top: 4px;
+}
+
+.pos-treino-sticker-sessao-label {
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.15em;
+  color: rgba(255, 255, 255, 0.85);
+  text-transform: uppercase;
+  text-shadow: 0 2px 6px rgba(0, 0, 0, 0.8);
+}
+
+.pos-treino-sticker-tempo-destaque {
+  font-size: 2.5rem;
+  font-weight: 900;
+  color: #FFFFFF;
+  letter-spacing: -0.04em;
+  font-family: var(--lastro-fonte-txt);
+  text-shadow: 0 3px 12px rgba(0, 0, 0, 0.9);
+  line-height: 1.05;
+}
+
+.pos-treino-sticker-divisor {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  margin: 6px 0;
+  color: var(--lastro-ouro);
+  filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.8));
+}
+
+.pos-treino-sticker-divisor-traco {
+  flex: 1;
+  height: 1.5px;
+  background: var(--lastro-ouro);
+}
+
+.pos-treino-sticker-divisor-seta {
+  flex: none;
+  margin-left: -2px;
+  color: var(--lastro-ouro);
+}
+
+.pos-treino-sticker-stats-grid {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  width: 100%;
+  gap: 12px;
+}
+
+.pos-treino-sticker-stat-col {
+  display: flex;
+  align-items: baseline;
   gap: 6px;
 }
 
-.pos-treino-strava-item {
-  display: flex;
-  flex-direction: column;
-  gap: 0px;
-}
-
-.pos-treino-strava-label {
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: 0.1em;
-  color: rgba(255, 255, 255, 0.7);
-  text-transform: uppercase;
-}
-
-.pos-treino-strava-valor-destaque {
-  font-size: 2.1rem;
-  font-weight: 900;
-  color: #FFFFFF;
-  letter-spacing: -0.03em;
-  font-family: var(--lastro-fonte-txt);
-  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.85);
-  line-height: 1.1;
-}
-
-.pos-treino-strava-dupla-linha {
-  display: flex;
-  align-items: center;
-  gap: 24px;
-  margin-top: 2px;
-}
-
-.pos-treino-strava-valor {
-  font-size: 1.5rem;
+.pos-treino-sticker-stat-num {
+  font-size: 1.6rem;
   font-weight: 900;
   color: #FFFFFF;
   letter-spacing: -0.02em;
-  font-family: var(--lastro-fonte-txt);
-  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.8);
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.85);
+  line-height: 1;
+}
+
+.pos-treino-sticker-stat-label {
+  font-size: 9.5px;
+  font-weight: 800;
+  color: var(--lastro-ouro);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.pos-treino-sticker-stat-foco {
+  font-size: 1.15rem;
+  font-weight: 900;
+  color: #FFFFFF;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.85);
+  text-align: right;
+}
+
+.pos-treino-sticker-rodape {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  margin-top: auto;
+  padding-top: 10px;
+}
+
+.pos-treino-sticker-frase {
+  font-size: 11px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.65);
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.8);
+}
+
+.pos-treino-sticker-badge {
+  border: 1px solid var(--lastro-ouro);
+  color: var(--lastro-ouro);
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  padding: 3px 8px;
+  text-transform: uppercase;
+  background: rgba(0, 0, 0, 0.25);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.7);
+  white-space: nowrap;
 }
 
 .pos-treino-logo-topo-direito {
@@ -5303,3 +5361,64 @@
 }
 
 
+
+/* =====================================================================
+   MODELO DE TREINO COM PLANO (reps/peso) — ADR-010, 2026-08-27
+   ===================================================================== */
+
+/* Linha de exercício no cadastro do modelo: a caixa de seleção e, quando
+   marcada, os dois campos do plano logo abaixo. */
+.modelo-item {
+  display: flex;
+  flex-direction: column;
+  gap: var(--lastro-e-2);
+}
+
+.modelo-item__plano {
+  display: flex;
+  gap: var(--lastro-e-3);
+  padding: 0 0 var(--lastro-e-2) var(--lastro-e-6);
+}
+
+/* Campo estreito, para os dois caberem lado a lado no celular sem
+   espremer o rótulo. */
+.campo--compacto {
+  flex: 1;
+  min-width: 0;
+}
+
+.campo--compacto input {
+  width: 100%;
+}
+
+/* O `+` do exercício vindo de modelo. Mostra o plano ao lado quando ele
+   existe — ler "8 × 60 kg" antes de tocar é o que evita abrir o
+   formulário só para conferir. */
+.botao-plano {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--lastro-e-2);
+  min-height: var(--lastro-alvo-min);
+  min-width: var(--lastro-alvo-min);
+  justify-content: flex-end;
+  padding: 0 var(--lastro-e-3);
+  background: var(--lastro-sup-2);
+  border: 1px solid var(--lastro-borda-ouro);
+  border-radius: var(--lastro-raio-pilula);
+  color: var(--lastro-ouro);
+  font-size: var(--lastro-papel-rotulo);
+  font-weight: var(--lastro-peso-forte);
+  cursor: pointer;
+  transition: background var(--lastro-dur-1) ease;
+}
+
+.botao-plano:hover {
+  background: var(--lastro-sup-3);
+}
+
+.botao-plano__valor {
+  font-family: var(--lastro-fonte-num);
+  font-variant-numeric: tabular-nums;
+  color: var(--lastro-txt-2);
+  font-weight: var(--lastro-peso-medio);
+}

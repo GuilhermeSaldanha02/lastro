@@ -75,6 +75,11 @@ export default async function PaginaTreinoDetalhe({
         seriesIniciais={treino.series}
         exercicios={exercicios}
         exerciciosPreSelecionados={exerciciosPreSelecionados}
+        /* Só quem veio de um modelo ganha o `+` com plano — "se for em um
+           treino normal, não aparecer" (dono, 2026-08-27). Passar o id em
+           vez de um booleano é o que permite o write-back saber ONDE
+           gravar de volta. */
+        modeloId={exerciciosPreSelecionados ? modeloId : undefined}
         idioma={idioma}
       />
 
