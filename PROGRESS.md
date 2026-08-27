@@ -11,10 +11,10 @@
 
 > Bloco de handoff entre agentes (Antigravity ⇄ Claude). **Sobrescrever a cada sessão**, nunca acumular. Formato e regras: `AGENTS.md` §3.
 
-- **Última sessão:** 2026-08-27 (2) · agente: antigravity · branch: fix/contraste-preview-sticker-e-card-biomecanica
-- **Em andamento:** Corrigido o contraste visual no tema claro (*Marfim & Ouro Imperial*) e no preview de stickers para Stories:
-  1. **Preview de Stickers para Instagram Stories:** Fixado o container do preview em fundo escuro obsidiana acetinado (`#07090D`) com iluminação radial dourada, impedindo que textos brancos e métricas ("45 min", séries, volume, brasão LASTRO) fiquem ilegíveis quando o app está em tema claro.
-  2. **Card de Biomecânica & Hero no Catálogo (`/catalogo/[id]`):** Estilização dedicada com superfícies semânticas (`--lastro-sup-1` e `--lastro-sup-2`), tags com alto contraste, rótulos anatômicos em ouro imperial e textos descritivos com contraste WCAG AAA (`#0F172A` no tema claro).
+- **Última sessão:** 2026-08-27 (3) · agente: antigravity · branch: fix/contraste-preview-sticker-e-card-biomecanica
+- **Em andamento:** Concluído o refinamento da logo no sticker de treino e do card anatômico no catálogo:
+  1. **Logotipo LASTRO no Topo Direito do Sticker:** A logo oficial com brasão foi movida para o canto superior direito (ao lado do tempo de treino e das métricas de séries/exercícios, acima da lista de exercícios), liberando 100% da largura para a lista de exercícios realizados tanto no arquivo gerado via Canvas quanto no preview HTML.
+  2. **Card Anatômico & Biomecânico de Alto Contraste ([/catalogo/[id]](file:///c:/lastro/src/app/catalogo/%5Bid%5D/page.tsx)):** Grade estruturada de informações (Músculo Alvo, Sinergistas, Mecânica Articular) com tipografia destacada em ouro imperial e texto descritivo com contraste máximo `#0F172A` no tema *Marfim & Ouro Imperial*, eliminando qualquer texto apagado.
 - **Bloqueado / a decidir:** Nada.
 - **Próximo passo:** Validação visual pelo dono no aparelho físico.
 - **Para o outro agente saber:**

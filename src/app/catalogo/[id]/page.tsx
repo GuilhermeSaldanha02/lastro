@@ -81,24 +81,26 @@ export default async function PaginaHistoricoExercicio({
               const midia = obterMidiaExercicio(exercicio.id);
               return (
                 <div className="dica-corpo">
-                  {midia?.musculo_alvo && (
-                    <div className="dica-item-linha">
-                      <span className="dica-rotulo">{t("Músculo Alvo:", idioma)}</span>
-                      <span className="dica-valor">{midia.musculo_alvo}</span>
-                    </div>
-                  )}
-                  {midia?.musculos_sinergistas && (
-                    <div className="dica-item-linha">
-                      <span className="dica-rotulo">{t("Sinergistas:", idioma)}</span>
-                      <span className="dica-valor">{midia.musculos_sinergistas}</span>
-                    </div>
-                  )}
-                  {midia?.mecanica_articular && (
-                    <div className="dica-item-linha">
-                      <span className="dica-rotulo">{t("Mecânica Articular:", idioma)}</span>
-                      <span className="dica-valor">{midia.mecanica_articular}</span>
-                    </div>
-                  )}
+                  <div className="dica-grade-anatomi">
+                    {midia?.musculo_alvo && (
+                      <div className="dica-bloco-info">
+                        <span className="dica-rotulo">{t("Músculo Alvo", idioma)}</span>
+                        <span className="dica-valor">{midia.musculo_alvo}</span>
+                      </div>
+                    )}
+                    {midia?.musculos_sinergistas && (
+                      <div className="dica-bloco-info">
+                        <span className="dica-rotulo">{t("Sinergistas", idioma)}</span>
+                        <span className="dica-valor">{midia.musculos_sinergistas}</span>
+                      </div>
+                    )}
+                    {midia?.mecanica_articular && (
+                      <div className="dica-bloco-info">
+                        <span className="dica-rotulo">{t("Mecânica Articular", idioma)}</span>
+                        <span className="dica-valor">{midia.mecanica_articular}</span>
+                      </div>
+                    )}
+                  </div>
 
                   {exercicio.dicaExecucao ? (
                     <p className="dica-texto-principal">{exercicio.dicaExecucao}</p>
