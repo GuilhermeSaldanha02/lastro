@@ -11,18 +11,17 @@
 
 > Bloco de handoff entre agentes (Antigravity ⇄ Claude). **Sobrescrever a cada sessão**, nunca acumular. Formato e regras: `AGENTS.md` §3.
 
-- **Última sessão:** 2026-08-26 (7) · agente: antigravity · branch: fix/qa-auditoria-relogio-temas
-- **Em andamento:** Auditoria completa com Playwright, correção definitiva do cronômetro pós-finalização e padronização dos 7 temas:
-  1. **Correção do Cronômetro no Finalizar:** Corrigido o bug onde o cronômetro continuava rodando se a página fosse recarregada ou se o modal fosse fechado; agora o término é persistido imediatamente via `lastro_fim_treino_${treinoId}` e o tempo congela de forma determinística no valor da sessão.
-  2. **Interrupção de Descanso no Finalizar:** Qualquer contagem regressiva de descanso em andamento é imediatamente cancelada ao finalizar a sessão, evitando bips/vibrações pós-treino.
-  3. **Revisão e Padronização dos 7 Temas:** Validados e mapeados `:root, [data-tema="ouro"]` (Obsidian Ouro - Padrão) e `[data-tema="branco-ouro"]` (Marfim & Ouro Imperial), além dos temas `areia`, `clean`, `petroleo`, `moka` e `oliva`, garantindo contraste AAA/AA e fidelidade visual.
-  4. **Correção de Hydration Warning no Theme Script:** Adicionado `suppressHydrationWarning` na tag `<html>` do `RootLayout` eliminando avisos de atributos injetados antes da hidratação.
-  5. **QA Automatizado & Registro `QA.md`:** Suíte Playwright completa cobrindo todas as 10 áreas mapeadas (`auth`, `treino`, `analise`, `catalogo`, `coach`, `perfil`, `ajustes`, `offline`, `visual`), gerando evidências completas (`print.png`, `console.txt`, `rede.txt`) em `qa/evidencias/` e executável via `node scripts/qa-obsoletos.mjs` sem nenhum alerta de formato.
+- **Última sessão:** 2026-08-26 (8) · agente: antigravity · branch: fix/qa-auditoria-relogio-temas
+- **Em andamento:** Auditoria completa com Playwright, correção do cronômetro, temas e resiliência da rota de Análise Semanal da Gemini:
+  1. **Correção de Exceção não Tratada em `/api/analise`:** Adicionada proteção com `try/catch` para capturar instabilidades, rate limit ou timeout da API Gemini, recorrendo graciosamente ao **fallback determinístico** do agregador com evidências matemáticas sem jamais disparar erro 500 para o usuário.
+  2. **Correção do Cronômetro no Finalizar:** Término persistido imediatamente via `lastro_fim_treino_${treinoId}` e relógio congelado de forma determinística no valor da sessão.
+  3. **Interrupção de Descanso no Finalizar:** Qualquer contagem regressiva de descanso em andamento é cancelada ao finalizar o treino.
+  4. **Revisão e Padronização dos 7 Temas:** Validados e mapeados `:root, [data-tema="ouro"]` e `[data-tema="branco-ouro"]`.
+  5. **QA Automatizado & Registro `QA.md`:** 10/10 áreas com evidências e testes Playwright completos.
 - **Bloqueado / a decidir:** Nada.
 - **Próximo passo:** Subir a branch e abrir PR.
 - **Para o outro agente saber:**
-  - A suíte Playwright completa pode ser executada por `node scripts/executar-qa-suite.mjs`.
-  - O cálculo incremental de QA `node scripts/qa-obsoletos.mjs` valida 10/10 itens sem erros.
+  - A rota `/api/analise` agora é à prova de falhas com fallback gracioso automático.
   - Vitest 190/190 testes verdes e build Next.js 16.3.0 sem falhas.
 
 ---
