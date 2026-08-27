@@ -100,6 +100,7 @@ export default async function RootLayout({ children, modal }: LayoutProps<"/">) 
     <html
       lang={idioma}
       className={`${bricolage.variable} ${archivo.variable} ${fraunces.variable}`}
+      suppressHydrationWarning
     >
       <head>
         <script

@@ -28,6 +28,16 @@ export default function TimerTopo({
   // 1. Cronômetro Contínuo da Sessão de Treino (Persistido e Congelável)
   const [segundosTreino, setSegundosTreino] = useState(0);
 
+  // 2. Timer de Descanso entre Séries
+  const [ativo, setAtivo] = useState(false);
+  const [pausado, setPausado] = useState(false);
+  const [segundosRestantes, setSegundosRestantes] = useState(duracaoPadraoSegundos);
+  const [duracaoTotal, setDuracaoTotal] = useState(duracaoPadraoSegundos);
+  const [finalizado, setFinalizado] = useState(false);
+
+  // Timestamp absoluto para resiliência a bloqueio de tela
+  const fimTimestampRef = useRef<number | null>(null);
+
   useEffect(() => {
     if (typeof window === "undefined") return;
 
@@ -41,10 +51,12 @@ export default function TimerTopo({
     }
 
     const inicioMs = new Date(inicioIso).getTime();
+    const fimSalvo = localStorage.getItem(chaveFim);
+    const estaFinalizado = Boolean(treinoFinalizado || fimSalvo);
 
     // Se já foi finalizado anteriormente ou agora
-    if (treinoFinalizado) {
-      let fimIso = localStorage.getItem(chaveFim);
+    if (estaFinalizado) {
+      let fimIso = fimSalvo;
       if (!fimIso) {
         fimIso = new Date().toISOString();
         localStorage.setItem(chaveFim, fimIso);
@@ -54,6 +66,11 @@ export default function TimerTopo({
       const seg = Math.floor(decorridoMs / 1000);
       setSegundosTreino(seg);
       onTempoTreinoAtualizado?.(seg);
+
+      // Cancela descanso ativo imediatamente ao finalizar o treino
+      setAtivo(false);
+      setPausado(false);
+      fimTimestampRef.current = null;
       return;
     }
 
@@ -69,16 +86,6 @@ export default function TimerTopo({
     const intervalTreino = setInterval(atualizarTempo, 1000);
     return () => clearInterval(intervalTreino);
   }, [treinoId, treinoFinalizado, onTempoTreinoAtualizado]);
-
-  // 2. Timer de Descanso entre Séries
-  const [ativo, setAtivo] = useState(false);
-  const [pausado, setPausado] = useState(false);
-  const [segundosRestantes, setSegundosRestantes] = useState(duracaoPadraoSegundos);
-  const [duracaoTotal, setDuracaoTotal] = useState(duracaoPadraoSegundos);
-  const [finalizado, setFinalizado] = useState(false);
-
-  // Timestamp absoluto para resiliência a bloqueio de tela
-  const fimTimestampRef = useRef<number | null>(null);
 
   const iniciarTimer = useCallback((segundos: number) => {
     desbloquearAudio();

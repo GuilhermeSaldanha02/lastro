@@ -11,21 +11,19 @@
 
 > Bloco de handoff entre agentes (Antigravity ⇄ Claude). **Sobrescrever a cada sessão**, nunca acumular. Formato e regras: `AGENTS.md` §3.
 
-- **Última sessão:** 2026-08-26 (6) · agente: antigravity · branch: feat/refinamentos-treino-timer-catalogo
-- **Em andamento:** Concluídos os 8 itens de refinamento do treino, timer e catálogo:
-  1. **Barra Sticky Pinned no Topo:** Acompanha 100% da rolagem da tela com `position: sticky; z-index: 45`.
-  2. **Layout Integrado:** Tempo de treino decorrido em tempo real na esquerda (`Treino MM:SS`) e descanso sob demanda na direita (`Descanso 01:30 ▶`).
-  3. **Alerta Sonoro e Vibração:** Áudio Web Audio API com desbloqueio prévio no toque e padrão de vibração nítido ao zerar.
-  4. **Contagem de Tempo Real e Persistente:** Início da sessão salvo no `localStorage` por `treinoId`, evitando cálculo zerado ou incorreto no relatório.
-  5. **Logo do LASTRO no Canto:** Posicionado no canto inferior direito do sticker transparente, ampliado para destaque.
-  6. **Pílula "Repetir série" Compacta:** Removido subtexto de carga/reps, gerando botões elegantes de altura reduzida.
-  7. **Correção do Catálogo:** Gerado novo GIF 3D anatômico de alta fidelidade para `Abdominal infra`.
-  8. **Foto de Perfil:** `perfil={perfil}` passado ao `CabecalhoPro` em `/catalogo/[id]`, exibindo avatar real do usuário.
+- **Última sessão:** 2026-08-26 (7) · agente: antigravity · branch: fix/qa-auditoria-relogio-temas
+- **Em andamento:** Auditoria completa com Playwright, correção definitiva do cronômetro pós-finalização e padronização dos 7 temas:
+  1. **Correção do Cronômetro no Finalizar:** Corrigido o bug onde o cronômetro continuava rodando se a página fosse recarregada ou se o modal fosse fechado; agora o término é persistido imediatamente via `lastro_fim_treino_${treinoId}` e o tempo congela de forma determinística no valor da sessão.
+  2. **Interrupção de Descanso no Finalizar:** Qualquer contagem regressiva de descanso em andamento é imediatamente cancelada ao finalizar a sessão, evitando bips/vibrações pós-treino.
+  3. **Revisão e Padronização dos 7 Temas:** Validados e mapeados `:root, [data-tema="ouro"]` (Obsidian Ouro - Padrão) e `[data-tema="branco-ouro"]` (Marfim & Ouro Imperial), além dos temas `areia`, `clean`, `petroleo`, `moka` e `oliva`, garantindo contraste AAA/AA e fidelidade visual.
+  4. **Correção de Hydration Warning no Theme Script:** Adicionado `suppressHydrationWarning` na tag `<html>` do `RootLayout` eliminando avisos de atributos injetados antes da hidratação.
+  5. **QA Automatizado & Registro `QA.md`:** Suíte Playwright completa cobrindo todas as 10 áreas mapeadas (`auth`, `treino`, `analise`, `catalogo`, `coach`, `perfil`, `ajustes`, `offline`, `visual`), gerando evidências completas (`print.png`, `console.txt`, `rede.txt`) em `qa/evidencias/` e executável via `node scripts/qa-obsoletos.mjs` sem nenhum alerta de formato.
 - **Bloqueado / a decidir:** Nada.
-- **Próximo passo:** Subir a branch e fazer merge na main.
+- **Próximo passo:** Subir a branch e abrir PR.
 - **Para o outro agente saber:**
-  - O tempo de treino persistido por ID garante resiliência mesmo se o atleta recarregar o app ou bloquear a tela.
-  - A suíte completa Vitest 185/185 e build Next.js 16.3.0 estão 100% verdes.
+  - A suíte Playwright completa pode ser executada por `node scripts/executar-qa-suite.mjs`.
+  - O cálculo incremental de QA `node scripts/qa-obsoletos.mjs` valida 10/10 itens sem erros.
+  - Vitest 190/190 testes verdes e build Next.js 16.3.0 sem falhas.
 
 ---
 

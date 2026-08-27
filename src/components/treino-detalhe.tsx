@@ -137,6 +137,10 @@ export default function TreinoDetalhe({
   );
   const [mostrarRelatorio, setMostrarRelatorio] = useState(false);
   const [duracaoSegundos, setDuracaoSegundos] = useState(0);
+  const [treinoConcluido, setTreinoConcluido] = useState(() => {
+    if (typeof window === "undefined") return false;
+    return Boolean(localStorage.getItem(`lastro_fim_treino_${treinoId}`));
+  });
   const grupos = useMemo(() => agruparPorExercicio(series), [series]);
   const ultima = series[series.length - 1];
 
@@ -328,7 +332,7 @@ export default function TreinoDetalhe({
       <TimerTopo
         treinoId={treinoId}
         idioma={idioma}
-        treinoFinalizado={mostrarRelatorio}
+        treinoFinalizado={treinoConcluido || mostrarRelatorio}
         onTempoTreinoAtualizado={setDuracaoSegundos}
       />
 
@@ -550,9 +554,18 @@ export default function TreinoDetalhe({
           <button
             type="button"
             className="botao-finalizar-treino"
-            onClick={() => setMostrarRelatorio(true)}
+            onClick={() => {
+              if (typeof window !== "undefined") {
+                const chaveFim = `lastro_fim_treino_${treinoId}`;
+                if (!localStorage.getItem(chaveFim)) {
+                  localStorage.setItem(chaveFim, new Date().toISOString());
+                }
+              }
+              setTreinoConcluido(true);
+              setMostrarRelatorio(true);
+            }}
           >
-            <span>{t("Finalizar Treino", idioma)}</span>
+            <span>{t(treinoConcluido ? "Ver Relatório do Treino" : "Finalizar Treino", idioma)}</span>
           </button>
         )}
 

@@ -1,0 +1,1 @@
+[INFO] Service Worker presente: true

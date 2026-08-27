@@ -3,7 +3,8 @@
    Padrão de nível mundial, mobile-first, 100% calibrado para contraste e toque.
    ===================================================================== */
 
-:root {
+:root,
+[data-tema="ouro"] {
   /* ---- Superfícies e Profundidade (Obsidiana e Vidro Fumê) ---- */
   --lastro-fundo:        #07090D;
   --lastro-sup-1:        #0E1218; /* Cartões de vidro escuro, blocos principais */
