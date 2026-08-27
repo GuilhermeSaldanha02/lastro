@@ -82,6 +82,28 @@ export default async function PaginaHistoricoExercicio({
               {t("Dica técnica de execução ainda não cadastrada.", idioma)}
             </p>
           )}
+
+          {/* Aviso de saúde — PRD §4.5 o exige junto da demonstração de
+              execução, e não existia em lugar nenhum do app (achado do teste
+              de jornada, 2026-08-27).
+
+              Fica FORA do `dicaExecucao ?` acima de propósito: a animação do
+              player já demonstra o movimento mesmo quando a dica escrita
+              ainda não foi curada — é a demonstração que cria o risco, não o
+              texto. Esconder o aviso justamente onde falta orientação escrita
+              seria o pior lugar para escondê-lo.
+
+              Tom de nota de rodapé, nunca de alarme: `--lastro-txt-3` e
+              Rótulo, sem ícone de alerta e sem `--lastro-erro` — vermelho
+              aqui diria "você errou", e ler o catálogo não é erro (mesmo
+              raciocínio de D7 e de DESIGN.md §3.6.6). */}
+          <p className="exercicio-hero-card__aviso">
+            <strong>{t("Referência de execução, não prescrição.", idioma)}</strong>{" "}
+            {t(
+              "Não substitui a orientação de um profissional de educação física. Sentindo dor ou em dúvida sobre a técnica, procure acompanhamento presencial.",
+              idioma,
+            )}
+          </p>
         </div>
 
         {/* Histórico de Séries Executadas */}
