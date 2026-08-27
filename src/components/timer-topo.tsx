@@ -212,7 +212,13 @@ export default function TimerTopo({
         </div>
 
         {/* Direita: Módulo de Descanso (Parado, Ativo ou Concluído) */}
-        <div className="status-descanso-wrapper">
+        <div
+          className={
+            descansoAtivo || descansoFinalizado
+              ? "status-descanso-wrapper status-descanso-wrapper--ativo"
+              : "status-descanso-wrapper"
+          }
+        >
           {!descansoAtivo && !descansoFinalizado && (
             <button
               type="button"
