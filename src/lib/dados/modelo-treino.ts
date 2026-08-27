@@ -101,9 +101,16 @@ export async function buscarModelo(
  * Cria um modelo com os exercícios escolhidos, na ordem em que vieram.
  * Só grava lista de exercícios — nunca série, peso, reps (ADR-009/FF8).
  */
+/** Um exercício a gravar no modelo. `reps`/`peso` ausentes = não cadastrados. */
+export type PlanoDoExercicio = {
+  exercicioId: string;
+  reps?: number | null;
+  peso?: number | null;
+};
+
 export async function criarModelo(
   nome: string,
-  exercicioIds: string[],
+  plano: PlanoDoExercicio[],
 ): Promise<void> {
   const { supabase, user } = await usuarioAutenticadoOuErro();
 
@@ -114,10 +121,14 @@ export async function criarModelo(
     .single();
   if (erroModelo) throw new Error(`Falha ao criar modelo: ${erroModelo.message}`);
 
-  const itens = exercicioIds.map((exercicioId, indice) => ({
+  const itens = plano.map((item, indice) => ({
     modelo_treino_id: modelo.id,
-    exercicio_id: exercicioId,
+    exercicio_id: item.exercicioId,
     ordem: indice + 1,
+    // `null` explícito, nunca 0: ADR-010 trata ausência como "cai no
+    // histórico real", e 0 seria um número que ninguém escolheu.
+    reps: item.reps ?? null,
+    peso: item.peso ?? null,
   }));
   const { error: erroItens } = await supabase
     .from("modelo_treino_exercicio")
@@ -127,6 +138,44 @@ export async function criarModelo(
   }
 
   revalidatePath("/ajustes/modelos");
+}
+
+/**
+ * Grava de volta no modelo a carga/reps que a pessoa ajustou durante o
+ * treino (ADR-010, limite 3: só pelo caminho do `+`, nunca em toda
+ * alteração de série).
+ *
+ * **Nunca lança.** É deliberado, e é o limite 4 da ADR-010: registrar
+ * série é offline-first (D6) e `modelo_treino` é online-only (SDD §9.2).
+ * Se a rede caiu ou a escrita falhou, a série JÁ foi registrada e o treino
+ * não pode parar por causa da atualização de um plano. Devolve `false` para
+ * quem quiser saber, e ninguém é obrigado a olhar.
+ *
+ * O `update` no banco só alcança `reps`/`peso` — o grant é por coluna
+ * (migração 0015), então nem um bug aqui consegue reordenar o modelo.
+ */
+export async function atualizarPlanoDoExercicio(
+  modeloId: string,
+  exercicioId: string,
+  reps: number,
+  peso: number,
+): Promise<boolean> {
+  try {
+    const { supabase } = await usuarioAutenticadoOuErro();
+    const { error } = await supabase
+      .from("modelo_treino_exercicio")
+      .update({ reps, peso })
+      .eq("modelo_treino_id", modeloId)
+      .eq("exercicio_id", exercicioId);
+    if (error) {
+      console.warn("[modelo] não gravou o plano de volta:", error.message);
+      return false;
+    }
+    return true;
+  } catch (erro) {
+    console.warn("[modelo] não gravou o plano de volta:", erro);
+    return false;
+  }
 }
 
 /** Exclui um modelo (e seus itens, via cascade). Não afeta treino/série já

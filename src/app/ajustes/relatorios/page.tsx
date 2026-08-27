@@ -34,7 +34,9 @@ export default async function PaginaRelatoriosAjustes() {
       pesoPorLado: s.pesoPorLado,
     }));
 
-    return calcularMetricasSessao(seriesParaMetricas, 45 * 60); // fallback de duração padrão
+    return calcularMetricasSessao(seriesParaMetricas, 45 * 60, undefined, {
+      identificadorTreino: `TREINO ${treinoId.slice(-4).toUpperCase()}`,
+    }); // fallback de duração padrão
   }
 
   return (

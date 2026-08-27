@@ -341,6 +341,13 @@ const DICIONARIO: Record<string, { en: string; es: string }> = {
   // Os rótulos da tela e os avisos de desfecho de cada ação. Antes só
   // existiam em PT-BR: a tela do relatório aparecia meio traduzida em
   // en/es (achado do teste de jornada, 2026-08-27).
+  "SESSÃO FINALIZADA": { en: "WORKOUT COMPLETED", es: "SESIÓN FINALIZADA" },
+  "SÉRIES": { en: "SETS", es: "SERIES" },
+  "EXERCÍCIOS": { en: "EXERCISES", es: "EJERCICIOS" },
+  "Mais uma sessão no histórico.": {
+    en: "Another session in the books.",
+    es: "Otra sesión en el historial.",
+  },
   "Compartilhar Treino": { en: "Share Workout", es: "Compartir Entrenamiento" },
   "Fundo transparente": { en: "Transparent background", es: "Fondo transparente" },
   "Compartilhar com": { en: "Share with", es: "Compartir con" },
@@ -379,6 +386,13 @@ const DICIONARIO: Record<string, { en: string; es: string }> = {
     en: "Could not generate the workout image.",
     es: "No fue posible generar la imagen del entrenamiento.",
   },
+
+  // --- modelo de treino com plano (ADR-010) ---
+  "Reps e peso são opcionais. Em branco, o app usa a sua última série daquele exercício.":
+    {
+      en: "Reps and weight are optional. Left blank, the app uses your last set of that exercise.",
+      es: "Reps y peso son opcionales. En blanco, la app usa tu última serie de ese ejercicio.",
+    },
 
   // --- app/catalogo/[id]/page.tsx ---
   "Exercícios": { en: "Exercises", es: "Ejercicios" },

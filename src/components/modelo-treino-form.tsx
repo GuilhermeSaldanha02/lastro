@@ -35,6 +35,10 @@ export default function ModeloTreinoForm({
   const router = useRouter();
   const [gruposEscolhidos, setGruposEscolhidos] = useState<string[]>([]);
   const [exerciciosEscolhidos, setExerciciosEscolhidos] = useState<string[]>([]);
+  /** Plano por exercício, como TEXTO do campo (ver `definirPlano`). */
+  const [planos, setPlanos] = useState<
+    Record<string, { reps?: string; peso?: string }>
+  >({});
   const [nome, setNome] = useState("");
   const [nomeConfirmado, setNomeConfirmado] = useState(false);
   const [erro, setErro] = useState<string | null>(null);
@@ -67,6 +71,24 @@ export default function ModeloTreinoForm({
     );
   }
 
+  /** Guarda o que foi DIGITADO, como texto, não como número: o campo
+   *  precisa poder ficar vazio (= não cadastrado) e aceitar "6" enquanto a
+   *  pessoa ainda vai digitar "60". A conversão acontece só no salvar. */
+  function definirPlano(id: string, campo: "reps" | "peso", valor: string) {
+    setPlanos((atual) => ({
+      ...atual,
+      [id]: { ...atual[id], [campo]: valor },
+    }));
+  }
+
+  /** Texto do campo → número, ou `null` quando vazio/inválido. `null` é o
+   *  estado honesto de "não cadastrado" (ADR-010), nunca 0. */
+  function numeroOuNulo(valor: string | undefined): number | null {
+    if (valor === undefined || valor.trim() === "") return null;
+    const n = Number(valor.replace(",", "."));
+    return Number.isFinite(n) && n > 0 ? n : null;
+  }
+
   async function salvar() {
     setErro(null);
     if (!nome.trim()) {
@@ -79,7 +101,14 @@ export default function ModeloTreinoForm({
     }
     setEnviando(true);
     try {
-      await criarModelo(nome.trim(), exerciciosEscolhidos);
+      await criarModelo(
+        nome.trim(),
+        exerciciosEscolhidos.map((exercicioId) => ({
+          exercicioId,
+          reps: numeroOuNulo(planos[exercicioId]?.reps),
+          peso: numeroOuNulo(planos[exercicioId]?.peso),
+        })),
+      );
       if (naFolha) {
         router.back();
       } else {
@@ -156,18 +185,72 @@ export default function ModeloTreinoForm({
         </button>
       </div>
 
+      {/* Marcado o exercício, abrem os campos do plano (ADR-010). Ficam
+          escondidos até marcar de propósito: mostrar reps/peso de 24
+          exercícios que a pessoa não vai usar viraria um formulário
+          gigante. Os dois são OPCIONAIS — vazio grava `null`, e no dia do
+          treino o `+` cai no histórico real daquele exercício. */}
       <div className="selecao-grupos" role="group" aria-label={t("Exercícios do modelo", idioma)}>
-        {exerciciosFiltrados.map((exercicio) => (
-          <label key={exercicio.id} className="selecao-grupos__opcao">
-            <input
-              type="checkbox"
-              checked={exerciciosEscolhidos.includes(exercicio.id)}
-              onChange={() => alternarExercicio(exercicio.id)}
-            />
-            {exercicio.nome}
-          </label>
-        ))}
+        {exerciciosFiltrados.map((exercicio) => {
+          const escolhido = exerciciosEscolhidos.includes(exercicio.id);
+          const plano = planos[exercicio.id];
+          return (
+            <div key={exercicio.id} className="modelo-item">
+              <label className="selecao-grupos__opcao">
+                <input
+                  type="checkbox"
+                  checked={escolhido}
+                  onChange={() => alternarExercicio(exercicio.id)}
+                />
+                {exercicio.nome}
+              </label>
+
+              {escolhido && (
+                <div className="modelo-item__plano">
+                  <div className="campo campo--compacto">
+                    <label className="campo__rotulo" htmlFor={`reps_${exercicio.id}`}>
+                      {t("Reps", idioma)}
+                    </label>
+                    <input
+                      id={`reps_${exercicio.id}`}
+                      type="number"
+                      inputMode="numeric"
+                      min={1}
+                      max={100}
+                      value={plano?.reps ?? ""}
+                      placeholder="—"
+                      onChange={(e) => definirPlano(exercicio.id, "reps", e.target.value)}
+                    />
+                  </div>
+                  <div className="campo campo--compacto">
+                    <label className="campo__rotulo" htmlFor={`peso_${exercicio.id}`}>
+                      {t("Peso (kg)", idioma)}
+                    </label>
+                    <input
+                      id={`peso_${exercicio.id}`}
+                      type="number"
+                      inputMode="decimal"
+                      min={0}
+                      max={1000}
+                      step="0.5"
+                      value={plano?.peso ?? ""}
+                      placeholder="—"
+                      onChange={(e) => definirPlano(exercicio.id, "peso", e.target.value)}
+                    />
+                  </div>
+                </div>
+              )}
+            </div>
+          );
+        })}
       </div>
+
+      <p className="campo__nota">
+        {t(
+          "Reps e peso são opcionais. Em branco, o app usa a sua última série daquele exercício.",
+          idioma,
+        )}
+      </p>
 
       {erro && (
         <p className="aviso-erro" role="alert">

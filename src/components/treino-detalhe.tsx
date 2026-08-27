@@ -17,6 +17,7 @@ import {
   criarSerieRemoto,
   excluirSerieRemoto,
   excluirTreinoRemoto,
+  historicoDoExercicio,
 } from "@/lib/dados/treino";
 import { enfileirar, sincronizar } from "@/lib/offline/outbox";
 import {
@@ -31,6 +32,10 @@ import TimerTopo from "./timer-topo";
 import RelatorioPosTreino from "./relatorio-pos-treino";
 import { calcularMetricasSessao } from "@/lib/dados/metricas-treino";
 import { gruposConhecidos } from "@/lib/dados/grupos-conhecidos";
+import {
+  atualizarPlanoDoExercicio,
+  type ExercicioDoModelo,
+} from "@/lib/dados/modelo-treino";
 import { t } from "@/lib/texto/i18n";
 import type { Idioma } from "@/lib/dados/idioma";
 
@@ -96,6 +101,7 @@ export default function TreinoDetalhe({
   seriesIniciais,
   exercicios,
   exerciciosPreSelecionados,
+  modeloId,
   idioma,
 }: {
   treinoId: string;
@@ -105,7 +111,10 @@ export default function TreinoDetalhe({
    * sem nenhuma série ainda. `agruparPorExercicio` não consegue expressar
    * isso (só cria grupo a partir de série existente), por isso é uma prop
    * separada, renderizada ao lado, nunca dentro dela. */
-  exerciciosPreSelecionados?: { exercicioId: string; nome: string }[];
+  exerciciosPreSelecionados?: ExercicioDoModelo[];
+  /** Modelo de origem, quando o treino veio de um. `undefined` num treino
+   *  novo — e é o que faz o `+` com plano NÃO aparecer ali (ADR-010). */
+  modeloId?: string;
   idioma: Idioma;
 }) {
   const [series, setSeries] = useState<SerieUI[]>(seriesIniciais);
@@ -135,6 +144,13 @@ export default function TreinoDetalhe({
   const [gruposEscolhidos, setGruposEscolhidos] = useState<string[]>(() =>
     gruposConhecidos(exercicios, seriesIniciais, exerciciosPreSelecionados),
   );
+  /** Valores com que o formulário abre quando veio do `+` do modelo.
+   *  `null` = formulário normal, em branco. */
+  const [preenchimento, setPreenchimento] = useState<{
+    exercicioId: string;
+    reps: number;
+    peso: number;
+  } | null>(null);
   const [mostrarRelatorio, setMostrarRelatorio] = useState(false);
   const [duracaoSegundos, setDuracaoSegundos] = useState(0);
   const [treinoConcluido, setTreinoConcluido] = useState(() => {
@@ -262,6 +278,56 @@ export default function TreinoDetalhe({
   async function registrarPeloFormulario(dados: DadosNovaSerie): Promise<void> {
     await registrarSerie(dados);
     setFormularioAberto(false);
+
+    // Write-back do plano (ADR-010, limites 3 e 4). Só acontece pelo
+    // caminho do `+` — `preenchimento` é o que marca esse caminho —, e
+    // NUNCA espera nem quebra: a série já foi registrada acima, offline
+    // ou não. `atualizarPlanoDoExercicio` não lança, por desenho.
+    if (modeloId && preenchimento && dados.exercicioId === preenchimento.exercicioId) {
+      void atualizarPlanoDoExercicio(
+        modeloId,
+        dados.exercicioId,
+        dados.reps,
+        dados.peso,
+      );
+    }
+    setPreenchimento(null);
+  }
+
+  /**
+   * Abre o formulário com o exercício do modelo já preenchido.
+   *
+   * O plano do modelo tem prioridade; quando ele é `null` (modelo antigo,
+   * ou campo deixado em branco no cadastro), cai na ÚLTIMA SÉRIE REAL
+   * daquele exercício — que é o fallback que a ADR-010 promete, e o que
+   * mantém os modelos criados antes desta mudança funcionando.
+   *
+   * Buscar o histórico pode falhar sem rede; aí abre com o exercício
+   * escolhido e os campos vazios, que ainda é melhor que não abrir.
+   */
+  async function abrirComPlano(exercicio: ExercicioDoModelo): Promise<void> {
+    let reps = exercicio.reps;
+    let peso = exercicio.peso;
+
+    if (reps === null || peso === null) {
+      try {
+        const historico = await historicoDoExercicio(exercicio.exercicioId);
+        const ultimaReal = historico[0];
+        if (ultimaReal) {
+          reps = reps ?? ultimaReal.reps;
+          peso = peso ?? ultimaReal.peso;
+        }
+      } catch {
+        // Sem rede: segue com o que tiver. D6 — nada aqui pode travar.
+      }
+    }
+
+    setPreenchimento(
+      reps !== null && peso !== null
+        ? { exercicioId: exercicio.exercicioId, reps, peso }
+        : { exercicioId: exercicio.exercicioId, reps: 0, peso: 0 },
+    );
+    setFormularioAberto(true);
   }
 
   /**
@@ -349,14 +415,37 @@ export default function TreinoDetalhe({
         {/* Exercícios do modelo escolhido, ainda sem nenhuma série (SDD
             §9.3) — mesmo cabeçalho visual dos grupos de verdade, só sem
             linhas de série dentro. Sempre ANTES dos grupos de série real. */}
-        {pendentesDoModelo.map((exercicio) => (
-          <section className="grupo" key={exercicio.exercicioId}>
-            <div className="grupo__cab">
-              <h2 className="grupo__nome">{exercicio.nome}</h2>
-              <span className="grupo__cont">0 {t("valendo", idioma)}</span>
-            </div>
-          </section>
-        ))}
+        {pendentesDoModelo.map((exercicio) => {
+          const temPlano = exercicio.reps !== null && exercicio.peso !== null;
+          return (
+            <section className="grupo" key={exercicio.exercicioId}>
+              <div className="grupo__cab">
+                <h2 className="grupo__nome">{exercicio.nome}</h2>
+                {/* O `+` abre o formulário JÁ preenchido (ADR-010). Só
+                    existe em treino vindo de modelo — `modeloId` é
+                    `undefined` no treino novo, e ali a pessoa tem
+                    liberdade total, como o dono pediu. */}
+                {modeloId ? (
+                  <button
+                    type="button"
+                    className="botao-plano"
+                    onClick={() => abrirComPlano(exercicio)}
+                    aria-label={`${t("Registrar série", idioma)}: ${exercicio.nome}`}
+                  >
+                    {temPlano && (
+                      <span className="botao-plano__valor">
+                        {exercicio.reps} × {exercicio.peso} kg
+                      </span>
+                    )}
+                    <span aria-hidden="true">+</span>
+                  </button>
+                ) : (
+                  <span className="grupo__cont">0 {t("valendo", idioma)}</span>
+                )}
+              </div>
+            </section>
+          );
+        })}
 
         {series.length === 0 && pendentesDoModelo.length === 0 ? (
           <p className="vazio">
@@ -510,8 +599,13 @@ export default function TreinoDetalhe({
               </button>
             </div>
             <FormularioSerie
+              /* `key` remonta o formulário quando o `+` traz outro
+                 exercício — é o que faz `defaultValue` pegar sem
+                 `setState` dentro de efeito. */
+              key={preenchimento?.exercicioId ?? "vazio"}
               exercicios={exerciciosFiltrados}
               onRegistrar={registrarPeloFormulario}
+              preenchimento={preenchimento}
               idioma={idioma}
             />
           </section>
@@ -578,10 +672,12 @@ export default function TreinoDetalhe({
         </div>
       </div>
 
-      {/* Relatório Pós-Treino Imediato (Estilo Strava) */}
+      {/* Relatório Pós-Treino Imediato (Sticker Story Minimalista Premium) */}
       {mostrarRelatorio && (
         <RelatorioPosTreino
-          metricas={calcularMetricasSessao(series, duracaoSegundos)}
+          metricas={calcularMetricasSessao(series, duracaoSegundos, undefined, {
+            identificadorTreino: treinoId ? `TREINO ${treinoId.slice(-4).toUpperCase()}` : "TREINO 404B",
+          })}
           idioma={idioma}
           onFechar={() => setMostrarRelatorio(false)}
         />

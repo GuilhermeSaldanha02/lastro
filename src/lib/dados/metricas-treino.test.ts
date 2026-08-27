@@ -66,5 +66,30 @@ describe("calcularMetricasSessao", () => {
     expect(metricas.totalSeriesValendo).toBe(0);
     expect(metricas.totalExercicios).toBe(0);
     expect(metricas.prsBatidos).toEqual([]);
+    expect(metricas.focoOuDivisao).toBe("TREINO");
+    expect(metricas.identificadorTreino).toBe("TREINO 404B");
+  });
+
+  it("infere foco muscular 'PERNAS' quando há exercícios de membros inferiores", () => {
+    const series: SerieParaMetricas[] = [
+      { id: "1", exercicioId: "agachamento", exercicioNome: "Agachamento Livre", reps: 8, peso: 100, tipo: "valendo" },
+      { id: "2", exercicioId: "leg-press", exercicioNome: "Leg Press 45", reps: 10, peso: 200, tipo: "valendo" },
+    ];
+    const metricas = calcularMetricasSessao(series, 60 * 60);
+    expect(metricas.focoOuDivisao).toBe("PERNAS");
+  });
+
+  it("aceita opções personalizadas de foco e identificador", () => {
+    const series: SerieParaMetricas[] = [
+      { id: "1", exercicioId: "supino", exercicioNome: "Supino", reps: 8, peso: 80, tipo: "valendo" },
+    ];
+    const metricas = calcularMetricasSessao(series, 45 * 60, undefined, {
+      focoOuDivisao: "PEITO & TRÍCEPS",
+      identificadorTreino: "TREINO #042",
+      fraseAssinatura: "Foco total.",
+    });
+    expect(metricas.focoOuDivisao).toBe("PEITO & TRÍCEPS");
+    expect(metricas.identificadorTreino).toBe("TREINO #042");
+    expect(metricas.fraseAssinatura).toBe("Foco total.");
   });
 });
