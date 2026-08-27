@@ -344,6 +344,16 @@ const DICIONARIO: Record<string, { en: string; es: string }> = {
     en: "Technical execution tip not registered yet.",
     es: "Consejo técnico de ejecución aún no registrado.",
   },
+  // Aviso de saúde exigido pelo PRD §4.5 — ver `.exercicio-hero-card__aviso`.
+  "Referência de execução, não prescrição.": {
+    en: "Execution reference, not prescription.",
+    es: "Referencia de ejecución, no prescripción.",
+  },
+  "Não substitui a orientação de um profissional de educação física. Sentindo dor ou em dúvida sobre a técnica, procure acompanhamento presencial.":
+    {
+      en: "It does not replace guidance from a qualified fitness professional. If you feel pain or are unsure about your form, seek in-person coaching.",
+      es: "No sustituye la orientación de un profesional de educación física. Si sientes dolor o tienes dudas sobre la técnica, busca acompañamiento presencial.",
+    },
   "registro": { en: "record", es: "registro" },
   "registros": { en: "records", es: "registros" },
   "Nenhuma série valendo registrada ainda para": {

@@ -14,6 +14,7 @@ import { criarClienteServidor } from "@/lib/supabase/cliente-servidor";
 import { dataLocalBrasil } from "@/lib/tempo";
 import { obterIdioma } from "@/lib/dados/idioma";
 import { mapaTraducaoExercicios, mapaTraducaoGrupos } from "@/lib/dados/traducao";
+import { formatarGrupoMuscular } from "@/lib/texto/grupo-muscular";
 
 export type Exercicio = {
   id: string;
@@ -115,7 +116,14 @@ export async function listarTreinos(): Promise<Treino[]> {
           .map((s) => s.exercicio?.grupo_muscular_primario)
           .filter((g): g is string => Boolean(g)),
       ),
-    ).map((id) => traducaoGrupos.get(id) ?? id);
+      // `?? id` cravava a CHAVE DO BANCO na tela: `mapaTraducaoGrupos`
+      // devolve mapa vazio para pt-BR (é o idioma de origem), então o
+      // fallback disparava SEMPRE no idioma padrão — os chips do histórico
+      // liam "posterior_coxa", "abdomen", "biceps" (achado do dono,
+      // 2026-08-27). Esta consulta não traz `grupo_muscular(nome)`, então
+      // quem sabe o rótulo em pt-BR é `formatarGrupoMuscular`, que já
+      // existia justamente para isso.
+    ).map((id) => traducaoGrupos.get(id) ?? formatarGrupoMuscular(id, idioma));
 
     return {
       id: t.id,

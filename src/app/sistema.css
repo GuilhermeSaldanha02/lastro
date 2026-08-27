@@ -3243,6 +3243,23 @@
   font-style: italic;
 }
 
+/* Aviso de saúde do PRD §4.5. Nota de rodapé do bloco de execução: fio
+   fino em cima para separar da dica, tinta de metadado, tamanho de Rótulo.
+   Sem cor de sinal e sem ícone — é procedência, não alerta. */
+.exercicio-hero-card__aviso {
+  margin-top: var(--lastro-e-4);
+  padding-top: var(--lastro-e-3);
+  border-top: 1px solid var(--lastro-linha);
+  font-size: var(--lastro-papel-rotulo);
+  line-height: 1.5;
+  color: var(--lastro-txt-3);
+}
+
+.exercicio-hero-card__aviso strong {
+  color: var(--lastro-txt-2);
+  font-weight: var(--lastro-peso-forte);
+}
+
 /* Coach IA Interativo */
 .coach-boas-vindas {
   display: flex;

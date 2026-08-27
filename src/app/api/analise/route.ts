@@ -24,6 +24,7 @@ import { validarNumeros } from "./validador";
 import { perguntaValida } from "./perguntas";
 import { obterIdioma, type Idioma } from "@/lib/dados/idioma";
 import { mapaTraducaoExercicios, mapaTraducaoGrupos } from "@/lib/dados/traducao";
+import { formatarGrupoMuscular } from "@/lib/texto/grupo-muscular";
 
 type ClienteSupabaseServidor = Awaited<ReturnType<typeof criarClienteServidor>>;
 
@@ -106,8 +107,16 @@ async function carregarExercicios(
   return ((data ?? []) as LinhaExercicio[]).map((e) => ({
     id: e.id,
     nome: traducaoExercicios.get(e.id) ?? e.nome,
+    // O mais caro dos três vazamentos da mesma raiz (2026-08-27): em pt-BR
+    // `mapaTraducaoGrupos` devolve mapa vazio, então este `??` disparava
+    // SEMPRE no idioma padrão e a CHAVE DO BANCO (`posterior_coxa`) entrava
+    // no resumo que vai pro prompt — saindo impressa no parecer, que é a
+    // peça-assinatura. Mesma razão do comentário acima sobre traduzir ANTES
+    // do agregador: o resumo é a única fonte que o LLM pode citar, então
+    // precisa chegar legível, não com identificador de tabela.
     grupoMuscularPrimario:
-      traducaoGrupos.get(e.grupo_muscular_primario) ?? e.grupo_muscular_primario,
+      traducaoGrupos.get(e.grupo_muscular_primario) ??
+      formatarGrupoMuscular(e.grupo_muscular_primario, idioma),
     unilateral: e.unilateral,
     pesoPorLado: e.peso_por_lado,
   }));

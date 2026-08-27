@@ -16,6 +16,7 @@ import { semanaInicioDoTreino, semanaAnaliseAtual, paraISO, segundaFeiraDaSemana
 import type { SerieValendo } from "@/lib/analise/tipos";
 import { obterIdioma } from "@/lib/dados/idioma";
 import { mapaTraducaoGrupos } from "@/lib/dados/traducao";
+import { formatarGrupoMuscular } from "@/lib/texto/grupo-muscular";
 
 /**
  * Quantos treinos entram no gráfico de barras da Home. Oito cabe na
@@ -169,7 +170,10 @@ export async function carregarResumoHome(hojeISO: string): Promise<ResumoHome> {
             .map((s) => s.exercicio?.grupo_muscular_primario)
             .filter((g): g is string => Boolean(g)),
         ),
-      ).map((id) => traducaoGrupos.get(id) ?? id);
+        // Mesmo vazamento de `listarTreinos`: em pt-BR o mapa de tradução é
+        // vazio e o fallback imprimia a chave crua do banco nos chips de
+        // "Treinos Recentes".
+      ).map((id) => traducaoGrupos.get(id) ?? formatarGrupoMuscular(id, idioma));
       return {
         id: t.id,
         data: t.data,
