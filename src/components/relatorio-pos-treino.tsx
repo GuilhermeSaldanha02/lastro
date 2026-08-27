@@ -33,9 +33,19 @@ export default function RelatorioPosTreino({
     tom: "ok" | "atencao";
   } | null>(null);
 
+  /** Xadrez de transparência: só durante a ação, nunca em repouso. */
+  const [mostrandoTransparencia, setMostrandoTransparencia] = useState(false);
+
   function avisar(texto: string, tom: "ok" | "atencao") {
     setAviso({ texto, tom });
     window.setTimeout(() => setAviso(null), 4000);
+  }
+
+  /** Revela o fundo transparente por alguns segundos — chamado por quem
+   *  entrega o arquivo (copiar/salvar/compartilhar), nunca no render. */
+  function revelarTransparencia() {
+    setMostrandoTransparencia(true);
+    window.setTimeout(() => setMostrandoTransparencia(false), 3500);
   }
 
   function concluirTreino() {
@@ -181,6 +191,7 @@ export default function RelatorioPosTreino({
    * escondidas.
    */
   async function copiarParaClipboard() {
+    revelarTransparencia();
     const blob = await gerarBlobImagemTransparente();
     if (!blob) {
       avisar(t("Não foi possível gerar a imagem do treino.", idioma), "atencao");
@@ -233,6 +244,7 @@ export default function RelatorioPosTreino({
   }
 
   async function salvarImagem() {
+    revelarTransparencia();
     setSalvando(true);
     try {
       const blob = await gerarBlobImagemTransparente();
@@ -265,6 +277,7 @@ export default function RelatorioPosTreino({
    * defeito, então a cadeia de fallback fica — só deixa de ser muda.
    */
   async function compartilharNativo() {
+    revelarTransparencia();
     const blob = await gerarBlobImagemTransparente();
     if (!blob) {
       avisar(t("Não foi possível gerar a imagem do treino.", idioma), "atencao");
@@ -314,11 +327,23 @@ export default function RelatorioPosTreino({
           <div style={{ width: "40px" }} />
         </div>
 
-        {/* Card Central com Preview 1:1 ao arquivo gerado */}
-        <div className="pos-treino-card-transparente-wrapper">
-          <div className="pos-treino-tag-transparente">
-            <span>TRANSPARENT</span>
-          </div>
+        {/* Card Central com Preview 1:1 ao arquivo gerado.
+            O xadrez de transparência é jargão de editor de imagem: para
+            quem acabou de treinar ele só suja o cartão. Por padrão o
+            preview aparece limpo, e o xadrez entra por alguns segundos
+            SÓ quando a pessoa copia ou salva — que é o momento em que
+            saber "o fundo vai sair transparente" importa de verdade
+            (pedido do dono, 2026-08-27). */}
+        <div
+          className={`pos-treino-card-transparente-wrapper${
+            mostrandoTransparencia ? " pos-treino-card-transparente-wrapper--xadrez" : ""
+          }`}
+        >
+          {mostrandoTransparencia && (
+            <div className="pos-treino-tag-transparente">
+              <span>{t("Fundo transparente", idioma)}</span>
+            </div>
+          )}
 
           <div className="pos-treino-strava-conteudo">
             {/* Bloco de Métricas Principais */}
@@ -394,22 +419,13 @@ export default function RelatorioPosTreino({
           </span>
 
           <div className="pos-treino-botoes-share-grid">
-            {/* 1. Instagram Story */}
-            <button
-              type="button"
-              className="pos-treino-btn-acao-share"
-              onClick={copiarParaClipboard}
-              title="Copiar sticker para o Instagram Story"
-            >
-              <div className="pos-treino-icone-circulo pos-treino-icone-instagram">
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <rect x="2" y="2" width="20" height="20" rx="5" ry="5" />
-                  <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" />
-                  <line x1="17.5" y1="6.5" x2="17.51" y2="6.5" />
-                </svg>
-              </div>
-              <span className="pos-treino-rotulo-acao">Instagram Story</span>
-            </button>
+            {/* O botão "Instagram Story" saiu a pedido do dono
+                (2026-08-27). Ele chamava exatamente a mesma função de
+                "Copiar" — a web não abre o Story de terceiro com imagem —,
+                então prometia pela marca e pelo logo colorido algo que
+                nenhum navegador entrega. Quem quer o Story usa "Mais", que
+                abre a folha nativa do sistema e ali sim tem o Instagram.
+                Sobram três ações, cada uma fazendo o que o rótulo diz. */}
 
             {/* 2. Copy to Clipboard */}
             <button

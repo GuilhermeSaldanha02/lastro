@@ -19,10 +19,22 @@ html {
   color-scheme: dark;
 }
 
-html,
-body {
+/* `overflow-x: hidden` fica só no `html`, nunca no `body`.
+   Pela regra do CSS, declarar `overflow-x` num elemento força o
+   `overflow-y` dele a sair de `visible` e virar `auto`. Com isso o `body`
+   passava a ser o "scrollport" de qualquer `position: sticky` dentro dele
+   — mas quem rola de fato é o `html`, então a barra de topo grudava num
+   contêiner que nunca se move e rolava para fora da tela junto com o
+   conteúdo (medido: `barraTop` = -scroll, `body.scrollTop` sempre 0).
+   Era o motivo de a barra de treino não acompanhar a rolagem (achado do
+   dono, 2026-08-27). */
+html {
   max-width: 100vw;
   overflow-x: hidden;
+}
+
+body {
+  max-width: 100vw;
 }
 
 body {

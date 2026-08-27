@@ -1,7 +1,8 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useCallback } from "react";
 import Link from "next/link";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import type { ExercicioDoCatalogo } from "@/lib/dados/treino";
 import SetaNavegacao from "@/components/seta-navegacao";
 import { t } from "@/lib/texto/i18n";
@@ -16,8 +17,50 @@ export default function CatalogoInterativo({
   semDicaCount: number;
   idioma: Idioma;
 }) {
-  const [busca, setBusca] = useState("");
-  const [grupoSelecionado, setGrupoSelecionado] = useState<string>("todos");
+  // O filtro vive na URL, não só em `useState` (achado do dono,
+  // 2026-08-27): abrir um exercício e voltar desmontava o componente e
+  // zerava o estado, jogando de volta pro topo do catálogo inteiro com
+  // "todos" selecionado — perdia o grupo E o termo buscado. Na
+  // querystring, o "voltar" do navegador restaura o filtro sozinho,
+  // porque a URL anterior JÁ o carrega.
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+
+  const grupoSelecionado = searchParams.get("grupo") ?? "todos";
+  const buscaNaUrl = searchParams.get("busca") ?? "";
+  // Espelho local só para o campo responder a cada tecla sem esperar a
+  // rota. A URL continua sendo a fonte de verdade de quem volta.
+  const [busca, setBusca] = useState(buscaNaUrl);
+
+  /** Reescreve a querystring sem empilhar histórico nem rolar a página:
+   *  cada tecla digitada não pode virar um "voltar" a mais. */
+  const aplicarFiltro = useCallback(
+    (mudancas: Record<string, string>) => {
+      const params = new URLSearchParams(searchParams.toString());
+      for (const [chave, valor] of Object.entries(mudancas)) {
+        // Valor "vazio" sai da URL em vez de virar `?grupo=todos&busca=`.
+        if (!valor || valor === "todos") params.delete(chave);
+        else params.set(chave, valor);
+      }
+      const query = params.toString();
+      router.replace(query ? `${pathname}?${query}` : pathname, { scroll: false });
+    },
+    [pathname, router, searchParams],
+  );
+
+  const selecionarGrupo = useCallback(
+    (id: string) => aplicarFiltro({ grupo: id }),
+    [aplicarFiltro],
+  );
+
+  const digitarBusca = useCallback(
+    (valor: string) => {
+      setBusca(valor);
+      aplicarFiltro({ busca: valor });
+    },
+    [aplicarFiltro],
+  );
 
   // Grupos musculares únicos
   const grupos = useMemo(() => {
@@ -72,14 +115,14 @@ export default function CatalogoInterativo({
           type="text"
           placeholder={t("Buscar exercício ou músculo…", idioma)}
           value={busca}
-          onChange={(e) => setBusca(e.target.value)}
+          onChange={(e) => digitarBusca(e.target.value)}
           className="busca-box__input"
         />
         {busca && (
           <button
             type="button"
             className="busca-box__limpar"
-            onClick={() => setBusca("")}
+            onClick={() => digitarBusca("")}
             aria-label={t("Limpar busca", idioma)}
           >
             ✕
@@ -92,7 +135,7 @@ export default function CatalogoInterativo({
         <button
           type="button"
           className={`chip-filtro${grupoSelecionado === "todos" ? " chip-filtro--ativo" : ""}`}
-          onClick={() => setGrupoSelecionado("todos")}
+          onClick={() => selecionarGrupo("todos")}
         >
           {t("Todos", idioma)} ({exercicios.length})
         </button>
@@ -101,7 +144,7 @@ export default function CatalogoInterativo({
             key={g.id}
             type="button"
             className={`chip-filtro${grupoSelecionado === g.id ? " chip-filtro--ativo" : ""}`}
-            onClick={() => setGrupoSelecionado(g.id)}
+            onClick={() => selecionarGrupo(g.id)}
           >
             {g.nome}
           </button>
