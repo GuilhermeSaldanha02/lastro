@@ -82,7 +82,7 @@ export default function RelatorioPosTreino({
     ctx.textAlign = "left";
     ctx.textBaseline = "top";
 
-    // 1. Logotipo Oficial do LASTRO no Topo Direito (Em cima de tudo no canto superior direito)
+    // 1. Logotipo Oficial do LASTRO no Topo Esquerdo (Acima de Tempo de Treino, alinhado à esquerda)
     try {
       const imgLogo = new Image();
       imgLogo.crossOrigin = "anonymous";
@@ -93,8 +93,8 @@ export default function RelatorioPosTreino({
       });
 
       if (imgLogo.complete && imgLogo.naturalWidth > 0) {
-        const logoSize = 160;
-        const logoX = 1080 - logoSize - 80;
+        const logoSize = 150;
+        const logoX = startX;
         const logoY = 60;
 
         ctx.shadowColor = "rgba(0, 0, 0, 0.85)";
@@ -105,8 +105,8 @@ export default function RelatorioPosTreino({
       // Continua
     }
 
-    // 2. TEMPO DE TREINO (Abaixo do topo)
-    const yTempo = 210;
+    // 2. TEMPO DE TREINO (Logo abaixo da logo alinhado à esquerda)
+    const yTempo = 235;
     ctx.font = "800 28px system-ui, -apple-system, sans-serif";
     ctx.fillStyle = "rgba(255, 255, 255, 0.75)";
     ctx.letterSpacing = "2px";
@@ -118,7 +118,7 @@ export default function RelatorioPosTreino({
     ctx.fillText(`${metricas.duracaoMinutos} min`, startX, yTempo + 40);
 
     // 3. SÉRIES VÁLIDAS E TOTAL DE EXERCÍCIOS
-    const yMetricas = 400;
+    const yMetricas = 415;
     ctx.font = "800 26px system-ui, -apple-system, sans-serif";
     ctx.fillStyle = "rgba(255, 255, 255, 0.75)";
     ctx.letterSpacing = "2px";
@@ -142,7 +142,7 @@ export default function RelatorioPosTreino({
     ctx.fillText(`${metricas.totalExercicios}`, xEx, yMetricas + 40);
 
     // 4. EXERCÍCIOS REALIZADOS (Lista Vertical Limpa ocupando a largura total)
-    const yListaInicio = 560;
+    const yListaInicio = 575;
     ctx.font = "800 24px system-ui, -apple-system, sans-serif";
     ctx.fillStyle = "#D4AF37"; // Dourado champagne
     ctx.letterSpacing = "3px";
@@ -347,15 +347,15 @@ export default function RelatorioPosTreino({
           )}
 
           <div className="pos-treino-strava-conteudo">
-            {/* Topo: Logo no Canto Superior Direito acima de Tempo de Treino */}
-            <div className="pos-treino-strava-cabecalho-topo">
-              <div className="pos-treino-logo-topo-direito">
+            {/* Topo: Logo no Canto Superior Esquerdo acima de Tempo de Treino */}
+            <div className="pos-treino-strava-cabecalho-topo pos-treino-strava-cabecalho-topo--esquerdo">
+              <div className="pos-treino-logo-topo-esquerdo">
                 <img
                   src="/logo-lastro.png"
                   alt="LASTRO"
-                  className="pos-treino-logo-topo-direito__img"
-                  width={56}
-                  height={56}
+                  className="pos-treino-logo-topo-esquerdo__img"
+                  width={52}
+                  height={52}
                 />
               </div>
             </div>

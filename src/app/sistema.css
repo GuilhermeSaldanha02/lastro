@@ -4589,20 +4589,24 @@
 .pos-treino-strava-cabecalho-topo {
   display: flex;
   align-items: center;
-  justify-content: flex-end;
+  justify-content: flex-start;
   width: 100%;
 }
 
-.pos-treino-logo-topo-direito {
+.pos-treino-strava-cabecalho-topo--esquerdo {
+  justify-content: flex-start !important;
+}
+
+.pos-treino-logo-topo-esquerdo {
   display: flex;
   flex-direction: column;
-  align-items: flex-end;
+  align-items: flex-start;
   justify-content: center;
 }
 
-.pos-treino-logo-topo-direito__img {
-  width: 56px;
-  height: 56px;
+.pos-treino-logo-topo-esquerdo__img {
+  width: 52px;
+  height: 52px;
   object-fit: contain;
   filter: drop-shadow(0 4px 14px rgba(0, 0, 0, 0.95));
 }

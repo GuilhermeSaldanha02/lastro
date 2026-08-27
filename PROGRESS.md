@@ -11,9 +11,9 @@
 
 > Bloco de handoff entre agentes (Antigravity ⇄ Claude). **Sobrescrever a cada sessão**, nunca acumular. Formato e regras: `AGENTS.md` §3.
 
-- **Última sessão:** 2026-08-27 (4) · agente: antigravity · branch: fix/sticker-logo-topo-acima-tempo
-- **Em andamento:** Logotipo oficial do LASTRO posicionado no topo absoluto no canto direito (acima de *Tempo de Treino*), tanto no canvas do sticker exportado quanto no preview HTML do modal:
-  1. Topo: Logo com brasão alinhada à direita.
+- **Última sessão:** 2026-08-27 (5) · agente: antigravity · branch: fix/sticker-logo-topo-esquerdo
+- **Em andamento:** Logotipo oficial do LASTRO posicionado no topo no **lado esquerdo** (acima do bloco de *Tempo de Treino* e alinhado aos textos), tanto no Canvas 1080×1080 quanto no preview HTML do modal:
+  1. Topo: Brasão LASTRO alinhado à esquerda.
   2. Bloco central: Tempo de treino ("45 min"), Séries válidas e Exercícios com tipografia de alto impacto.
   3. Base: Lista de exercícios realizados ocupando 100% da largura útil.
 - **Bloqueado / a decidir:** Nada.
