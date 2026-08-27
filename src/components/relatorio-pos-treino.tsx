@@ -28,9 +28,10 @@ export default function RelatorioPosTreino({
 
   /**
    * Gera a imagem PNG em alta resolução (1080x1080) com fundo 100% transparente
-   * no formato Strava minimalista e harmônico (Sem poluição):
-   * - Tempo de Treino e Séries Totais em tipografia esportiva bold
-   * - Chips elegantes com resumo dos exercícios realizados
+   * com fidelidade visual 1:1 ao preview:
+   * - Tempo de Treino em destaque
+   * - Séries Válidas e Total de Exercícios
+   * - Lista vertical limpa dos exercícios realizados
    * - Logotipo oficial do LASTRO posicionado no canto inferior direito
    */
   async function gerarBlobImagemTransparente(): Promise<Blob | null> {
@@ -45,93 +46,78 @@ export default function RelatorioPosTreino({
 
     const startX = 90;
 
-    // Sombra para contraste absoluto em qualquer foto (escura ou clara)
-    ctx.shadowColor = "rgba(0, 0, 0, 0.85)";
-    ctx.shadowBlur = 18;
+    // Sombra suave e nítida para contraste em fotos claras ou escuras
+    ctx.shadowColor = "rgba(0, 0, 0, 0.75)";
+    ctx.shadowBlur = 10;
     ctx.shadowOffsetX = 0;
-    ctx.shadowOffsetY = 4;
+    ctx.shadowOffsetY = 3;
 
     ctx.textAlign = "left";
     ctx.textBaseline = "top";
 
-    // 1. TEMPO DE TREINO (Destaque Principal)
-    ctx.font = "800 32px system-ui, -apple-system, sans-serif";
+    // 1. TEMPO DE TREINO
+    ctx.font = "800 28px system-ui, -apple-system, sans-serif";
     ctx.fillStyle = "rgba(255, 255, 255, 0.75)";
-    ctx.letterSpacing = "3px";
-    ctx.fillText(t("TEMPO DE TREINO", idioma).toUpperCase(), startX, 100);
+    ctx.letterSpacing = "2px";
+    ctx.fillText(t("TEMPO DE TREINO", idioma).toUpperCase(), startX, 90);
 
-    ctx.font = "900 120px system-ui, -apple-system, sans-serif";
+    ctx.font = "900 115px system-ui, -apple-system, sans-serif";
     ctx.fillStyle = "#FFFFFF";
     ctx.letterSpacing = "-2px";
-    ctx.fillText(`${metricas.duracaoMinutos} min`, startX, 145);
+    ctx.fillText(`${metricas.duracaoMinutos} min`, startX, 130);
 
-    // 2. SÉRIES VÁLIDAS E TOTAL DE EXERCÍCIOS (Badges Horizontais Limpos)
-    const yMetricas = 310;
-    ctx.font = "800 30px system-ui, -apple-system, sans-serif";
+    // 2. SÉRIES VÁLIDAS E TOTAL DE EXERCÍCIOS
+    const yMetricas = 290;
+    ctx.font = "800 26px system-ui, -apple-system, sans-serif";
     ctx.fillStyle = "rgba(255, 255, 255, 0.75)";
     ctx.letterSpacing = "2px";
     ctx.fillText(t("SÉRIES VÁLIDAS", idioma).toUpperCase(), startX, yMetricas);
 
-    ctx.font = "900 90px system-ui, -apple-system, sans-serif";
+    ctx.font = "900 84px system-ui, -apple-system, sans-serif";
     ctx.fillStyle = "#FFFFFF";
     ctx.letterSpacing = "-1px";
-    ctx.fillText(`${metricas.totalSeriesValendo}`, startX, yMetricas + 45);
+    ctx.fillText(`${metricas.totalSeriesValendo}`, startX, yMetricas + 40);
 
     // Destaque de Exercícios ao lado
-    const xEx = startX + 380;
-    ctx.font = "800 30px system-ui, -apple-system, sans-serif";
+    const xEx = startX + 340;
+    ctx.font = "800 26px system-ui, -apple-system, sans-serif";
     ctx.fillStyle = "rgba(255, 255, 255, 0.75)";
     ctx.letterSpacing = "2px";
     ctx.fillText(t("EXERCÍCIOS", idioma).toUpperCase(), xEx, yMetricas);
 
-    ctx.font = "900 90px system-ui, -apple-system, sans-serif";
+    ctx.font = "900 84px system-ui, -apple-system, sans-serif";
     ctx.fillStyle = "#FFFFFF";
     ctx.letterSpacing = "-1px";
-    ctx.fillText(`${metricas.totalExercicios}`, xEx, yMetricas + 45);
+    ctx.fillText(`${metricas.totalExercicios}`, xEx, yMetricas + 40);
 
-    // 3. Linha divisória fina e elegante
-    ctx.strokeStyle = "rgba(255, 255, 255, 0.22)";
-    ctx.lineWidth = 2;
-    ctx.beginPath();
-    ctx.moveTo(startX, 490);
-    ctx.lineTo(startX + 650, 490);
-    ctx.stroke();
-
-    // 4. Resumo Harmônico de Exercícios (Em Tags Esportivas Compactas 2 Colunas)
+    // 3. EXERCÍCIOS REALIZADOS (Lista Vertical Limpa e Idêntica ao Preview)
+    const yListaInicio = 460;
     ctx.font = "800 24px system-ui, -apple-system, sans-serif";
     ctx.fillStyle = "#D4AF37"; // Dourado champagne
     ctx.letterSpacing = "3px";
-    ctx.fillText(t("EXERCÍCIOS REALIZADOS", idioma).toUpperCase(), startX, 520);
+    ctx.fillText(t("EXERCÍCIOS REALIZADOS", idioma).toUpperCase(), startX, yListaInicio);
 
     const exerciciosParaExibir = metricas.exerciciosDetalhados.slice(0, 6);
-    let curX = startX;
-    let curY = 575;
-    const colWidth = 320;
+    let curY = yListaInicio + 48;
 
-    for (let i = 0; i < exerciciosParaExibir.length; i++) {
-      const ex = exerciciosParaExibir[i];
-      const posX = i % 2 === 0 ? startX : startX + colWidth + 20;
-      const posY = curY + Math.floor(i / 2) * 64;
-
-      // Nome do exercício + séries em formato tag limpa
-      ctx.font = "700 28px system-ui, -apple-system, sans-serif";
+    for (const ex of exerciciosParaExibir) {
+      ctx.font = "700 32px system-ui, -apple-system, sans-serif";
       ctx.fillStyle = "#FFFFFF";
-      
-      const nomeCurto = ex.exercicioNome.length > 15 
-        ? `${ex.exercicioNome.slice(0, 13)}...` 
-        : ex.exercicioNome;
+      ctx.letterSpacing = "0px";
 
-      ctx.fillText(`• ${nomeCurto} (${ex.totalSeries}×)`, posX, posY);
+      const linhaTexto = `• ${ex.exercicioNome} (${ex.totalSeries}×)`;
+      ctx.fillText(linhaTexto, startX, curY);
+      curY += 50;
     }
 
     if (metricas.exerciciosDetalhados.length > 6) {
       const extras = metricas.exerciciosDetalhados.length - 6;
-      ctx.font = "600 24px system-ui, -apple-system, sans-serif";
-      ctx.fillStyle = "rgba(255, 255, 255, 0.6)";
-      ctx.fillText(`+ ${extras} outros exercícios`, startX, curY + 3 * 64 + 10);
+      ctx.font = "600 26px system-ui, -apple-system, sans-serif";
+      ctx.fillStyle = "rgba(255, 255, 255, 0.65)";
+      ctx.fillText(`+ ${extras} outros exercícios`, startX, curY + 6);
     }
 
-    // 5. Logotipo Oficial do LASTRO no Canto Inferior Direito
+    // 4. Logotipo Oficial do LASTRO no Canto Inferior Direito (Sem duplicar texto)
     try {
       const imgLogo = new Image();
       imgLogo.crossOrigin = "anonymous";
@@ -142,20 +128,13 @@ export default function RelatorioPosTreino({
       });
 
       if (imgLogo.complete && imgLogo.naturalWidth > 0) {
-        const logoSize = 170;
+        const logoSize = 180;
         const logoX = 1080 - logoSize - 80;
-        const logoY = 1080 - logoSize - 130;
+        const logoY = 1080 - logoSize - 80;
 
-        ctx.shadowColor = "rgba(0, 0, 0, 0.9)";
-        ctx.shadowBlur = 20;
+        ctx.shadowColor = "rgba(0, 0, 0, 0.85)";
+        ctx.shadowBlur = 14;
         ctx.drawImage(imgLogo, logoX, logoY, logoSize, logoSize);
-
-        // Marca textual LASTRO abaixo do brasão
-        ctx.textAlign = "center";
-        ctx.font = "900 44px system-ui, -apple-system, sans-serif";
-        ctx.fillStyle = "#D4AF37";
-        ctx.letterSpacing = "6px";
-        ctx.fillText("LASTRO", logoX + logoSize / 2, logoY + logoSize + 40);
       }
     } catch {
       // Continua
@@ -254,14 +233,14 @@ export default function RelatorioPosTreino({
           <div style={{ width: "40px" }} />
         </div>
 
-        {/* Card Central no Estilo Strava com Fundo Transparente Checkerboard */}
+        {/* Card Central com Preview 1:1 ao arquivo gerado */}
         <div className="pos-treino-card-transparente-wrapper">
           <div className="pos-treino-tag-transparente">
             <span>TRANSPARENT</span>
           </div>
 
           <div className="pos-treino-strava-conteudo">
-            {/* Bloco de Métricas Principais Harmônicas */}
+            {/* Bloco de Métricas Principais */}
             <div className="pos-treino-strava-metricas">
               <div className="pos-treino-strava-item">
                 <span className="pos-treino-strava-label">{t("TEMPO DE TREINO", idioma)}</span>
@@ -280,37 +259,36 @@ export default function RelatorioPosTreino({
               </div>
             </div>
 
-            {/* Resumo de Exercícios em Tags Compactas */}
+            {/* Lista Vertical de Exercícios */}
             {metricas.exerciciosDetalhados.length > 0 && (
               <div className="pos-treino-strava-exercicios">
                 <span className="pos-treino-strava-exercicios-titulo">
                   {t("EXERCÍCIOS REALIZADOS", idioma)}
                 </span>
-                <div className="pos-treino-strava-tags-grid">
+                <div className="pos-treino-strava-lista-vertical">
                   {metricas.exerciciosDetalhados.slice(0, 6).map((ex, i) => (
-                    <span key={i} className="pos-treino-strava-tag-ex">
+                    <div key={i} className="pos-treino-strava-linha-ex">
                       • {ex.exercicioNome} ({ex.totalSeries}×)
-                    </span>
+                    </div>
                   ))}
                   {metricas.exerciciosDetalhados.length > 6 && (
-                    <span className="pos-treino-strava-tag-mais">
+                    <div className="pos-treino-strava-tag-mais">
                       +{metricas.exerciciosDetalhados.length - 6} outros
-                    </span>
+                    </div>
                   )}
                 </div>
               </div>
             )}
 
-            {/* Logo do LASTRO no Canto Inferior Direito */}
+            {/* Logo do LASTRO no Canto Inferior Direito (Sem texto duplicado) */}
             <div className="pos-treino-logo-canto">
               <img
                 src="/logo-lastro.png"
                 alt="LASTRO"
                 className="pos-treino-logo-canto__img"
-                width={56}
-                height={56}
+                width={62}
+                height={62}
               />
-              <span className="pos-treino-logo-canto__txt">LASTRO</span>
             </div>
           </div>
         </div>

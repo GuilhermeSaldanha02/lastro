@@ -14,6 +14,7 @@ type TimerTopoProps = {
   treinoId: string;
   idioma: Idioma;
   duracaoPadraoSegundos?: number;
+  treinoFinalizado?: boolean;
   onTempoTreinoAtualizado?: (segundos: number) => void;
 };
 
@@ -21,23 +22,42 @@ export default function TimerTopo({
   treinoId,
   idioma,
   duracaoPadraoSegundos = 90,
+  treinoFinalizado = false,
   onTempoTreinoAtualizado,
 }: TimerTopoProps) {
-  // 1. Cronômetro Contínuo da Sessão de Treino (Persistido por treinoId)
+  // 1. Cronômetro Contínuo da Sessão de Treino (Persistido e Congelável)
   const [segundosTreino, setSegundosTreino] = useState(0);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
 
-    const chaveStorage = `lastro_inicio_treino_${treinoId}`;
-    let inicioIso = localStorage.getItem(chaveStorage);
+    const chaveInicio = `lastro_inicio_treino_${treinoId}`;
+    const chaveFim = `lastro_fim_treino_${treinoId}`;
+
+    let inicioIso = localStorage.getItem(chaveInicio);
     if (!inicioIso) {
       inicioIso = new Date().toISOString();
-      localStorage.setItem(chaveStorage, inicioIso);
+      localStorage.setItem(chaveInicio, inicioIso);
     }
 
     const inicioMs = new Date(inicioIso).getTime();
 
+    // Se já foi finalizado anteriormente ou agora
+    if (treinoFinalizado) {
+      let fimIso = localStorage.getItem(chaveFim);
+      if (!fimIso) {
+        fimIso = new Date().toISOString();
+        localStorage.setItem(chaveFim, fimIso);
+      }
+      const fimMs = new Date(fimIso).getTime();
+      const decorridoMs = Math.max(0, fimMs - inicioMs);
+      const seg = Math.floor(decorridoMs / 1000);
+      setSegundosTreino(seg);
+      onTempoTreinoAtualizado?.(seg);
+      return;
+    }
+
+    // Se o treino não está finalizado, atualiza a cada segundo
     const atualizarTempo = () => {
       const decorridoMs = Math.max(0, Date.now() - inicioMs);
       const seg = Math.floor(decorridoMs / 1000);
@@ -48,7 +68,7 @@ export default function TimerTopo({
     atualizarTempo();
     const intervalTreino = setInterval(atualizarTempo, 1000);
     return () => clearInterval(intervalTreino);
-  }, [treinoId, onTempoTreinoAtualizado]);
+  }, [treinoId, treinoFinalizado, onTempoTreinoAtualizado]);
 
   // 2. Timer de Descanso entre Séries
   const [ativo, setAtivo] = useState(false);

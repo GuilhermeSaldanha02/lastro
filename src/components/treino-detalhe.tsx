@@ -30,6 +30,7 @@ import EtiquetaRecorde from "./etiqueta-recorde";
 import TimerTopo from "./timer-topo";
 import RelatorioPosTreino from "./relatorio-pos-treino";
 import { calcularMetricasSessao } from "@/lib/dados/metricas-treino";
+import { gruposConhecidos } from "@/lib/dados/grupos-conhecidos";
 import { t } from "@/lib/texto/i18n";
 import type { Idioma } from "@/lib/dados/idioma";
 
@@ -119,7 +120,21 @@ export default function TreinoDetalhe({
   // exercício mostrado no formulário. Vive só nesta sessão de treino, não
   // é persistido: o app não prescreve programa (PRD §5, escopo negativo),
   // isto é conveniência de tela, não um plano salvo.
-  const [gruposEscolhidos, setGruposEscolhidos] = useState<string[]>([]);
+  //
+  // Começa PREENCHIDO sempre que o treino já diz quais exercícios são
+  // (achado do dono, 2026-08-26): perguntar "qual grupo muscular?" logo
+  // abaixo de uma lista dos exercícios do próprio modelo é pedir uma
+  // informação que a tela acabou de exibir. Duas fontes, ambas já
+  // conhecidas sem perguntar nada:
+  //   1. o modelo escolhido ao iniciar o treino (SDD §9.3);
+  //   2. as séries já registradas — cobre o recarregar no meio do treino,
+  //      quando o modelo já saiu de cena (`series.length > 0` zera
+  //      `exerciciosPreSelecionados` em `treino/[id]/page.tsx`).
+  // Sem nenhuma das duas (o "Treino novo" puro, sem série ainda), continua
+  // vazio e o seletor aparece — ali a pergunta é legítima, nada é sabido.
+  const [gruposEscolhidos, setGruposEscolhidos] = useState<string[]>(() =>
+    gruposConhecidos(exercicios, seriesIniciais, exerciciosPreSelecionados),
+  );
   const [mostrarRelatorio, setMostrarRelatorio] = useState(false);
   const [duracaoSegundos, setDuracaoSegundos] = useState(0);
   const grupos = useMemo(() => agruparPorExercicio(series), [series]);
@@ -313,6 +328,7 @@ export default function TreinoDetalhe({
       <TimerTopo
         treinoId={treinoId}
         idioma={idioma}
+        treinoFinalizado={mostrarRelatorio}
         onTempoTreinoAtualizado={setDuracaoSegundos}
       />
 
