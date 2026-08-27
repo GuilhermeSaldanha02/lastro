@@ -316,7 +316,7 @@ export default function TreinoDetalhe({
         onTempoTreinoAtualizado={setDuracaoSegundos}
       />
 
-      <div className="corpo corpo--com-nav corpo--titulo-conteudo">
+      <div className="corpo corpo--com-nav corpo--titulo-conteudo corpo--treino-detalhe">
         {series.length > 0 && (
           <div className="grupo__cab">
             <h2 className="grupo__nome">{t("Séries", idioma)}</h2>

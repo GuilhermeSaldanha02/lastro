@@ -3911,18 +3911,25 @@
    lastro · TIMER DE DESCANSO NO TOPO & ÁREA DE AÇÃO DIVIDIDA
    ===================================================================== */
 
-/* Container Sticky no Topo da Tela - Docked perfeitamente abaixo de topo-pro */
+/* Container Fixed no Topo da Tela - Pinned Real na Rolagem */
 .timer-topo-container {
-  position: sticky;
-  top: 60px;
-  z-index: 50;
+  position: fixed;
+  top: calc(60px + env(safe-area-inset-top, 0px));
+  left: 0;
+  right: 0;
+  z-index: 95;
   width: 100%;
+  max-width: 480px;
+  margin: 0 auto;
   padding: 8px var(--lastro-e-4);
   background: var(--lastro-barra-b);
   border-bottom: 1px solid var(--lastro-linha);
   backdrop-filter: blur(16px);
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
-  margin-bottom: var(--lastro-e-2);
+}
+
+.corpo--treino-detalhe {
+  padding-top: calc(60px + 54px + env(safe-area-inset-top, 0px) + var(--lastro-e-3)) !important;
 }
 
 .barra-status-treino {
@@ -4301,8 +4308,25 @@
   text-transform: uppercase;
 }
 
+.pos-treino-strava-valor-destaque {
+  font-size: 2.1rem;
+  font-weight: 900;
+  color: #FFFFFF;
+  letter-spacing: -0.03em;
+  font-family: var(--lastro-fonte-txt);
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.85);
+  line-height: 1.1;
+}
+
+.pos-treino-strava-dupla-linha {
+  display: flex;
+  align-items: center;
+  gap: 28px;
+  margin-top: 4px;
+}
+
 .pos-treino-strava-valor {
-  font-size: 1.55rem;
+  font-size: 1.6rem;
   font-weight: 900;
   color: #FFFFFF;
   letter-spacing: -0.02em;
@@ -4327,39 +4351,27 @@
   text-transform: uppercase;
 }
 
-.pos-treino-strava-exercicios-lista {
+.pos-treino-strava-tags-grid {
   display: flex;
-  flex-direction: column;
-  gap: 3px;
+  flex-wrap: wrap;
+  gap: 6px;
   max-width: 65%;
 }
 
-.pos-treino-strava-exercicio-linha {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
+.pos-treino-strava-tag-ex {
   font-size: 11px;
+  font-weight: 600;
   color: #FFFFFF;
   text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8);
-}
-
-.pos-treino-strava-exercicio-nome {
-  font-weight: 600;
   white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
 }
 
-.pos-treino-strava-exercicio-series {
-  font-weight: 700;
-  color: rgba(255, 255, 255, 0.85);
-  margin-left: 8px;
-}
-
-.pos-treino-strava-exercicio-mais {
+.pos-treino-strava-tag-mais {
   font-size: 10px;
   color: rgba(255, 255, 255, 0.6);
   font-style: italic;
+  display: flex;
+  align-items: center;
 }
 
 .pos-treino-logo-canto {
