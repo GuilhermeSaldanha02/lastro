@@ -11,20 +11,26 @@
 
 > Bloco de handoff entre agentes (Antigravity ⇄ Claude). **Sobrescrever a cada sessão**, nunca acumular. Formato e regras: `AGENTS.md` §3.
 
-- **Última sessão:** 2026-08-27 (6) · agente: antigravity · branch: feat/sticker-story-minimalista-premium
-- **Em andamento:** Novo modelo minimalista e premium de Sticker de Story implementado e verificado via Playwright:
-  1. Topo Esquerdo: Brasão oficial dourado LASTRO com logotipo.
-  2. Hero: Rótulo `SESSÃO FINALIZADA` com tracking aberto + Tempo hero em destaque (`45 min` / `91 min`).
-  3. Divisor Dourado Champagne: Linha horizontal com seta vetorial na extremidade direita (`──────>`).
-  4. Linha de 3 Métricas: `[X] SÉRIES`, `[Y] EXERCÍCIOS` e foco muscular/divisão (`PERNAS`, `SUPERIORES`, etc.) alinhado à direita.
-  5. Rodapé: Frase sutil de assinatura `Mais uma sessão no histórico.` + Badge retangular dourado com o código da sessão (`TREINO 6B57`).
-  6. Fundo transparente em PNG 1080×1080 com sombras projetadas para alto contraste sobre fotos claras ou escuras.
+- **Última sessão:** 2026-08-27 (7) · agente: claude · branch: main
+- **Em andamento:** Nada — sessão fechada.
+- **Fechado nesta sessão:**
+  1. **`GEMINI_API_KEY` ausente no Vercel** era a causa ÚNICA da Análise e do Coach falharem em produção (24 erros em 24h nos logs). O dono configurou; confirmado funcionando com dado real semeado (5 semanas, progressão + platô + queda): o parecer cita exercício e número específicos e passa no A6.
+  2. **Vão de 72px no topo de toda tela.** `.topo-pro` virou `sticky` mas o `padding-top` que compensava a versão `fixed` ficou — espaço contado duas vezes. Agora 12px.
+  3. **Barra de topo não acompanhava a rolagem.** `overflow-x: hidden` estava no `body`, o que pela regra do CSS força `overflow-y: auto` e faz o `body` virar o scrollport da sticky — mas quem rola é o `html`. Movido para o `html`.
+  4. **Barra do coach fora da tela** (`x = -179`). Duas regras `.barra-conversa`: a segunda definia `left/right` sem zerar o `transform: translateX(-50%)` da primeira. Consolidadas em uma.
+  5. **Catálogo perdia o filtro** ao voltar de um exercício. Filtro foi para a querystring.
+  6. **Relatório pós-treino:** xadrez de transparência só durante a ação (era permanente); botão do Instagram removido (chamava a mesma função de "Copiar" e prometia algo que a web não entrega).
+  7. **Escala tipográfica reconciliada com o DESIGN.md** — o corpo estava em 15px, violando D4 ("nunca abaixo de 16px").
+  8. **Modelo de treino guarda reps/peso** (ADR-010, migração 0015) — ver abaixo.
 - **Bloqueado / a decidir:** Nada.
-- **Próximo passo:** Validação pelo dono no celular / Instagram Stories.
+- **Próximo passo:** O dono validar no celular. Item aberto que ninguém além dele pode fazer: as 102 dicas de execução (critério A9).
 - **Para o outro agente saber:**
-  - 28 arquivos de teste, 210/210 testes passando no Vitest.
-  - Build Next.js 16.3.0 sem falhas com 23 rotas estáticas/dinâmicas.
-  - Script Playwright de verificação e screenshots disponíveis em `docs/screenshots/verificacao_sticker_story/`.
+  - **ADR-010 reverteu UMA frase da ADR-009** (a que proibia colunas de reps/peso no modelo). A restrição estrutural continua INTEIRA: `src/lib/analise/` não pode enxergar `modelo_treino`, e agora isso é teste (`sem-modelo-treino.test.ts`), não só prosa. Não derrube essa barreira para "comparar planejado vs executado" — é a razão de existir da ADR-008.
+  - `grant update` em `modelo_treino_exercicio` é **por coluna** (só `reps`/`peso`). Reordenar segue impossível pelo banco.
+  - **Dívida:** o histórico de migração divergiu — remoto tem `0001`–`0009` numeradas e cinco com timestamp; o repo tem `0010`–`0014`. São as mesmas migrações. `db push` recusa enquanto isso durar; a `0015` foi aplicada via `db query` e registrada à mão. Não rodei `migration repair` (risco próprio).
+  - **Três pares de regras CSS duplicadas** encontrados hoje (`.topo-pro`, `.chip-filtro`, `.barra-conversa`), dois causando bug visível. Comentei cada um dizendo qual vence. Antes de editar CSS, confira se existe uma segunda regra do mesmo seletor mais abaixo.
+  - `scripts/test-jornada-usuario.mjs` percorre as 3 jornadas do PRD em 13 etapas e audita alvo de toque, overflow, conteúdo cortado e botão inalcançável em modal. **Fechou a sessão com zero achados.**
+  - ⚠️ **Colisão de trabalho real:** minhas mudanças não commitadas foram varridas duas vezes por commits do antigravity (`88f58c0` e `b0a3dcc`) enquanto ele trocava de branch. Nada se perdeu, mas commite cedo e com frequência enquanto os dois estiverem no mesmo repo.
 
 ---
 
