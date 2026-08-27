@@ -1841,21 +1841,33 @@
   cursor: not-allowed;
 }
 
-/* Barra de envio do Coach — fixada com folga garantida da AbaInferior */
+/* Barra de envio do Coach — REGRA ÚNICA (consolidada em 2026-08-27).
+   Existia uma segunda `.barra-conversa` lá embaixo, e a combinação das
+   duas jogava a barra para FORA da tela: a de baixo definia
+   `left`/`right`, mas não zerava o `transform: translateX(-50%)` nem o
+   `width` desta — sobrava `width: 390px` + deslocamento de -195px, e a
+   barra renderizava em `x = -179` (medido). Era o campo cortado que o
+   dono via.
+
+   Centralização por `margin: auto` em vez de `transform`: um deslocamento
+   que depende da própria largura é exatamente o que quebrou aqui, e
+   `margin` não deixa resto para outra regra herdar por engano. */
 .barra-conversa {
   position: fixed;
-  bottom: calc(var(--lastro-clearance-nav) + 6px);
-  left: 50%;
-  transform: translateX(-50%);
-  width: min(100%, 480px);
-  padding: 8px 16px;
+  bottom: calc(var(--lastro-clearance-nav) + var(--lastro-e-2));
+  left: 0;
+  right: 0;
+  margin: 0 auto;
+  width: min(calc(100% - var(--lastro-e-8)), 480px);
+  padding: 8px 12px;
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: var(--lastro-e-2);
   background: rgba(7, 9, 13, 0.92);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
-  border-top: 1px solid var(--lastro-linha);
+  border: 1px solid var(--lastro-linha);
+  border-radius: var(--lastro-raio-pilula);
   z-index: 35;
   box-sizing: border-box;
 }
@@ -3352,23 +3364,11 @@
   background: rgba(212, 175, 55, 0.08);
 }
 
-/* ⚠️ Existe uma segunda `.barra-conversa` mais acima (linha ~1845); esta,
-   por vir depois, é a que vale. Editar a de cima não tem efeito.
-
-   O `- var(--lastro-e-2)` de antes SUBTRAÍA do clearance da nav, puxando
-   a barra 8px para DENTRO da aba inferior — o campo de digitar ficava por
-   baixo dela (T5 do backlog; medido em 1px a 390px e 9px a 360×640, e o
-   dono reportou de novo em 2026-08-27). Somar é o que dá folga acima da
-   nav, que é o que o nome do token promete. */
-.barra-conversa {
-  position: fixed;
-  bottom: calc(var(--lastro-clearance-nav) + var(--lastro-e-2));
-  left: var(--lastro-e-4);
-  right: var(--lastro-e-4);
-  display: flex;
-  gap: var(--lastro-e-2);
-  z-index: 15;
-}
+/* A `.barra-conversa` que existia aqui foi FUNDIDA na regra única lá em
+   cima (2026-08-27). Ela definia `left`/`right` sem zerar o `transform` e
+   o `width` da outra, e a soma das duas jogava a barra para fora da tela.
+   Duas regras para o mesmo seletor, em arquivos deste tamanho, é como o
+   bug nasceu — não recriar. */
 
 .barra-conversa__input {
   flex: 1;
