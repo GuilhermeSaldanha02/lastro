@@ -310,56 +310,77 @@ export async function POST(request: Request) {
     );
   }
 
-  const { sistema, usuario, contexto } = montarPrompt(resumo, pergunta, agora, idioma);
-  const cliente = new ClienteParecerGemini();
+  try {
+    const { sistema, usuario, contexto } = montarPrompt(resumo, pergunta, agora, idioma);
+    const cliente = new ClienteParecerGemini();
 
-  const respostaUm = await cliente.gerar(sistema, usuario);
-  let resultado = validarNumeros(respostaUm, resumo, contexto, idioma);
-  // Sempre logar pergunta, intrusos e resposta bruta (SDD §6.4, tabela).
-  console.log("[analise] tentativa 1", {
-    pergunta,
-    resultado,
-    respostaBruta: respostaUm,
-  });
+    let respostaUm: string | null = null;
+    try {
+      respostaUm = await cliente.gerar(sistema, usuario);
+    } catch (erroGiac) {
+      console.error("[analise] falha na chamada inicial da Gemini:", erroGiac);
+    }
 
-  const evidencia = montarEvidenciaParaTela(resumo);
+    const evidencia = montarEvidenciaParaTela(resumo);
 
-  if (resultado.ok) {
-    return NextResponse.json({ parecer: respostaUm, evidencia });
+    if (respostaUm) {
+      let resultado = validarNumeros(respostaUm, resumo, contexto, idioma);
+      console.log("[analise] tentativa 1", {
+        pergunta,
+        resultado,
+        respostaBruta: respostaUm,
+      });
+
+      if (resultado.ok) {
+        return NextResponse.json({ parecer: respostaUm, evidencia });
+      }
+
+      // 1ª falha (SDD §6.4, tabela): uma nova chamada, com o parecer rejeitado
+      // e os intrusos anexados. Instrução de retry também é lida pelo modelo.
+      const instrucaoRetry =
+        resultado.motivo === "intrusos"
+          ? INSTRUCAO_RETRY_INTRUSOS_POR_IDIOMA[idioma](resultado.intrusos)
+          : INSTRUCAO_RETRY_SEM_NUMERO_POR_IDIOMA[idioma];
+      const usuarioRetry = [
+        usuario,
+        "",
+        REJEITADA_POR_IDIOMA[idioma](respostaUm),
+        instrucaoRetry,
+      ].join("\n\n");
+
+      try {
+        const respostaDois = await cliente.gerar(sistema, usuarioRetry);
+        resultado = validarNumeros(respostaDois, resumo, contexto, idioma);
+        console.log("[analise] tentativa 2", {
+          pergunta,
+          resultado,
+          respostaBruta: respostaDois,
+        });
+
+        if (resultado.ok) {
+          return NextResponse.json({ parecer: respostaDois, evidencia });
+        }
+      } catch (erroRetry) {
+        console.error("[analise] falha no retry da Gemini:", erroRetry);
+      }
+    }
+
+    // 2ª falha ou indisponibilidade da API: Fallback determinístico + aviso.
+    // A evidência estruturada do agregador continua íntegra mesmo quando a prosa falha.
+    return NextResponse.json({
+      parecer: fallbackDeterministico(resumo, idioma),
+      avisoFalhaInterpretativa: true,
+      evidencia,
+    });
+  } catch (erroGeral) {
+    console.error("[analise] erro inesperado ao gerar parecer:", erroGeral);
+    return NextResponse.json(
+      {
+        parecer: fallbackDeterministico(resumo, idioma),
+        avisoFalhaInterpretativa: true,
+        evidencia: montarEvidenciaParaTela(resumo),
+      },
+      { status: 200 },
+    );
   }
-
-  // 1ª falha (SDD §6.4, tabela): uma nova chamada, com o parecer rejeitado
-  // e os intrusos anexados. Instrução de retry também é lida pelo modelo,
-  // então segue o idioma da resposta esperada.
-  const instrucaoRetry =
-    resultado.motivo === "intrusos"
-      ? INSTRUCAO_RETRY_INTRUSOS_POR_IDIOMA[idioma](resultado.intrusos)
-      : INSTRUCAO_RETRY_SEM_NUMERO_POR_IDIOMA[idioma];
-  const usuarioRetry = [
-    usuario,
-    "",
-    REJEITADA_POR_IDIOMA[idioma](respostaUm),
-    instrucaoRetry,
-  ].join("\n\n");
-
-  const respostaDois = await cliente.gerar(sistema, usuarioRetry);
-  resultado = validarNumeros(respostaDois, resumo, contexto, idioma);
-  console.log("[analise] tentativa 2", {
-    pergunta,
-    resultado,
-    respostaBruta: respostaDois,
-  });
-
-  if (resultado.ok) {
-    return NextResponse.json({ parecer: respostaDois, evidencia });
-  }
-
-  // 2ª falha: não exibir parecer do LLM. Fallback determinístico + aviso.
-  // A evidência estruturada é do agregador, não do LLM — continua íntegra
-  // mesmo quando a prosa falha (DESIGN.md §3.6.5, estado "Erro da API").
-  return NextResponse.json({
-    parecer: fallbackDeterministico(resumo, idioma),
-    avisoFalhaInterpretativa: true,
-    evidencia,
-  });
 }
