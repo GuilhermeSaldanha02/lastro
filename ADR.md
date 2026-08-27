@@ -150,3 +150,30 @@ Esta entrada não reescreve a ADR-008 — ela continua valendo como registro da 
 **Por que não RLS/policy comum.** RLS filtra linha dentro de uma tabela que o Postgres deixa o `authenticated` tocar; `auth.users` é schema gerenciado pelo Supabase, sem `grant delete` disponível pro role `authenticated` mesmo com policy favorável — não é uma omissão de configuração, é o desenho do produto. A `service_role key` é o único caminho documentado pelo próprio Supabase para excluir uma conta pelo backend.
 
 **Consequência de segurança prática.** `SUPABASE_SERVICE_ROLE_KEY` não tem prefixo `NEXT_PUBLIC_` (nunca entra no bundle do cliente) e vive só em `.env.local` (`.gitignore` já cobre `.env.*`). `cliente-admin.ts` não tem `"use client"` nem é importado por nenhum Client Component — só por `src/lib/dados/conta.ts`, que é `"use server"`.
+
+---
+
+## ADR-010 — O modelo de treino passa a guardar `reps`/`peso`; a barreira do agregador continua intacta
+
+**Contexto.** A ADR-009 aprovou `modelo_treino` como "lista de atalho" e fechou uma porta por escrito: *"não existe coluna de série, peso, reps, rir ou tipo, e não pode passar a existir sem uma entrada nova de ADR"*. Esta é a entrada nova.
+
+Em 2026-08-27 o dono pediu que o modelo carregue quantas repetições e qual carga ele costuma fazer, para que, ao treinar por um modelo, tocar no `+` de um exercício já abra o formulário preenchido — restando editar. Perguntado explicitamente de onde deveria vir o número (histórico real vs. cadastrado no modelo), respondeu: **cadastrado no modelo**, e mais — alterar carga/reps durante o treino deve **gravar de volta** no modelo.
+
+**Decisão.** Aprovado `reps` e `peso` em `modelo_treino_exercicio` (migração `0015`), com quatro limites:
+
+1. **Colunas nullable.** `NULL` é o estado honesto de "ainda não cadastrado" — mesmo raciocínio de `meta_treinos_semana` (0009). Modelo antigo continua funcionando, e quando não há valor a UI cai no **histórico real** do exercício. Nenhum número inventado entra por padrão.
+2. **`grant update` POR COLUNA**, só em `(reps, peso)`. A 0007 omitia `update` de propósito, para "editar modelo depois de criado" ser impossível por construção. Esse limite sobrevive onde ainda vale: reordenar e trocar o exercício de uma linha continuam barrados pelo Postgres, não por convenção de código.
+3. **Write-back só pelo caminho do `+`.** Não é toda alteração de carga que reescreve o modelo — só a ação em que a pessoa deliberadamente ajusta o planejado. Caso contrário um dia pesado redefiniria o template para sempre.
+4. **O write-back nunca bloqueia o registro da série.** `modelo-treino.ts` é online-only (SDD §9.2) e a série é offline-first (D6). Gravar no modelo é *fire-and-forget*: falha ou ausência de rede é silenciosamente ignorada, e a série é registrada do mesmo jeito. Registrar série jamais espera rede.
+
+**O que esta entrada NÃO reverte — e é o que importava.** A restrição estrutural da ADR-009 continua **integralmente** em vigor:
+
+> nenhum módulo de `src/lib/analise/` importa, consulta ou recebe dado de `modelo_treino`/`modelo_treino_exercicio`, em nenhuma forma — nem linha crua, nem métrica derivada, nem menção em prompt à Gemini.
+
+Essa era a razão real da ADR-008: impedir a Análise de comparar **executado contra planejado**, comparação que tende a lisonjear num produto que existe para medir o que foi feito. Guardar carga no modelo não toca nisso — desde que a barreira siga de pé. Como guardar carga torna quebrá-la mais tentador (um `join` "só para comparar" resolveria uma pergunta fácil e destruiria a tese), a proibição **deixou de ser só prosa** e virou teste: `src/lib/analise/sem-modelo-treino.test.ts` varre os 15 arquivos do agregador.
+
+**Alternativa descartada.** Preencher o `+` a partir do histórico real do exercício, sem coluna nova (era a recomendação levada ao dono). Descartada por ele: quer o número que **planejou**, não o que fez da última vez. O histórico permanece como *fallback* quando o modelo não tem valor — item 1 acima —, então a alternativa não foi perdida, virou o piso.
+
+**Impacto.** Migração `0015`; `PRD.md` §9 e critério A14; `SDD.md` §9; `modelo-treino.ts`; as duas telas (cadastro do modelo e registro durante o treino). `src/lib/analise/` **não é tocado** — e agora há teste que garante.
+
+**Como reverter.** `alter table … drop column reps, drop column peso` e `revoke update (reps, peso)`. As colunas são aditivas e nullable: nada mais depende delas para funcionar, porque o caminho do histórico continua existindo como fallback.
