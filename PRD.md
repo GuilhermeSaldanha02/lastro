@@ -127,7 +127,7 @@ Um app de treino **pessoal** que registra cada série executada e, uma vez por s
 | A11 | Editar peso/reps de uma série muda o que a Análise Semanal calcula para ela | Editar uma série já usada num teste do agregador, recalcular, conferir que o número mudou |
 | A12 | Excluir um treino leva as séries dele junto, e não aparece mais na lista nem entra em cálculo nenhum | Excluir um treino com séries, conferir que `select` por `treino_id` não retorna nada |
 | A13 | Nenhuma exclusão acontece sem uma segunda confirmação explícita na tela | Tocar excluir uma vez não apaga nada; só o segundo toque, no botão de confirmação, apaga |
-| A14 | Um treino salvo em `/ajustes` guarda só a lista de exercícios (sem série, peso ou reps); iniciar um treino sem escolher nenhum treino salvo funciona exatamente como hoje | Criar um treino salvo, iniciar um treino "novo" sem selecioná-lo, conferir que o fluxo de registro é idêntico ao anterior a esta feature; inspecionar o schema/payload do treino salvo e confirmar ausência de campos de série/peso/reps |
+| A14 | **Revisto em 2026-08-27 (ADR-010).** Um treino salvo em `/ajustes` pode guardar reps/peso por exercício, e `src/lib/analise/` continua sem lê-lo; iniciar um treino sem escolher nenhum treino salvo funciona exatamente como hoje | Rodar `src/lib/analise/sem-modelo-treino.test.ts` (varre os arquivos do agregador atrás de referência a `modelo_treino`); criar um treino salvo, iniciar um treino "novo" sem selecioná-lo, e conferir que o fluxo de registro é idêntico ao anterior a esta feature — sem `+` preenchido, com liberdade total |
 
 ---
 
@@ -144,10 +144,16 @@ Um app de treino **pessoal** que registra cada série executada e, uma vez por s
 
 **Revisão de 2026-08-13 — tela de Configuração de Treinos aprovada, com limites explícitos (Scope Change, ADIÇÃO — ver `DECISIONS.md` "2026-08-13 (2)" e "2026-08-13 (3)").** O dono pediu, e aprovou com estes limites de próprio punho, uma tela em **`/ajustes`** (Configurações) onde é possível pré-cadastrar treinos com antecedência:
 
-- A pré-configuração é **só a lista de exercícios** de um treino salvo — **nunca série, peso ou reps**. Isso continua sendo preenchido normalmente no dia, no fluxo de registro atual, sem nenhuma mudança.
+- ~~A pré-configuração é **só a lista de exercícios** — **nunca série, peso ou reps**.~~ → **REVISTO em 2026-08-27, ver nota C abaixo.**
 - É **opcional**. "Treino novo" continua existindo e é o caminho padrão para quem não montou nada — não é substituído, é complementado.
 - A tela mora em **`/ajustes`**, não em rota nova solta na navegação principal.
 - No dia do treino, a pessoa escolhe entre o(s) treino(s) já montado(s) (pré-popula os exercícios a registrar) ou começar do zero (fluxo atual, inalterado).
+
+**Nota C — o modelo passa a guardar reps/peso (Scope Change, 2026-08-27; ver `ADR-010`).** O dono pediu que, ao montar um modelo, já se cadastre quantas repetições e qual carga ele costuma fazer, para que tocar no `+` de um exercício durante o treino abra o formulário já preenchido. Perguntado de onde deveria vir o número — histórico real ou cadastrado no modelo — escolheu **cadastrado no modelo**, e acrescentou que ajustar carga/reps durante o treino deve gravar de volta nele.
+
+Quatro limites, todos em `ADR-010`: colunas **nullable** (modelo sem valor cai no histórico real, nada é inventado); `grant update` **por coluna**, só em `reps`/`peso` (reordenar segue impossível pelo banco); write-back **só pelo caminho do `+`**, não em toda alteração de carga; e o write-back **nunca bloqueia o registro da série** (D6 continua acima disso).
+
+**O que NÃO muda:** `src/lib/analise/` continua sem enxergar `modelo_treino`, em nenhuma forma. É essa barreira — não a ausência de colunas — que impede a Análise de comparar executado contra planejado, que era a razão de 2026-08-04. Ela agora tem teste: `src/lib/analise/sem-modelo-treino.test.ts`.
 
 Isto reabre conscientemente o "Sem tela de configuração de rotina" acima e o ADR-008 (que descartava por nome o "Configurador de divisão") — é reversão **aprovada e registrada**, não silenciosa. O limite que evita cruzar para o escopo negativo do §5 ("não prescreve programa") é o mesmo que o dono impôs sozinho: sem série/peso/reps na pré-configuração, e a Análise Semanal segue derivando o padrão dos dados reais, nunca do treino salvo.
 

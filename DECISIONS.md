@@ -1268,3 +1268,23 @@ Reverte explicitamente a posição da ADR anterior contra tradução automática
 **Impacto.** `PRD.md` §5 (notas A e B). Nenhum arquivo de `src/` tocado por esta decisão.
 
 **Como reverter.** Apagar `relatorio-pos-treino.tsx` e o bloco `.pos-treino-*` de `sistema.css` (compartilhar); apagar `timer-topo.tsx` e o bloco `.timer-topo-*` (cronômetro). As duas são aditivas e isoladas — nenhuma outra tela depende delas.
+
+---
+
+## 2026-08-27 (2) — Scope Change: modelo de treino guarda `reps`/`peso`
+
+**O que mudou.** `modelo_treino_exercicio` ganhou as colunas `reps` e `peso` (migração `0015`), revertendo a frase da ADR-009 que as proibia. Detalhe completo do raciocínio em **`ADR-010`** — esta entrada registra a decisão e o pedido que a originou.
+
+**O pedido, literal.** O dono: *"no cadastrar já deveria ter quantas repetições e séries são feitas (…) ele só apertaria em cima do exercício em um + aí ele conseguiria editar a repetição e o peso. Mas isso somente se a pessoa estiver em um treino já montando; se for em um treino normal, não aparecer."* E, quando perguntado de onde viria o número: *"quem vai pelo exercício novo, ele tem total liberdade; agora quem vai pelo treino que montou, ele deve cadastrar lá quando montou os exercícios, mas quando ele tá treinando e ele apertar no mais e decidir alterar carga ou reps, muda também no banco."*
+
+**Por que houve pergunta antes de implementar.** O pedido reverte uma decisão que o próprio dono tomou e registrou em três lugares (PRD §9, critério A14, ADR-009). Havia duas leituras possíveis — preencher do histórico real (não reverteria nada, e era a recomendação levada a ele) ou cadastrar no modelo (reverte). Ele escolheu a segunda, com conhecimento do custo. Registrado porque decisão revertida em silêncio é o que o protocolo de Scope Change existe para impedir.
+
+**Classificação.** **ADIÇÃO** que reabre decisão fechada — mesma categoria da revisão de 2026-08-13 que criou a tela. Não muda a tese: a Análise Semanal continua a peça-assinatura e continua medindo só o que foi executado.
+
+**A barreira que continua de pé.** `src/lib/analise/` segue proibido de enxergar `modelo_treino`. Era essa restrição — não a ausência de colunas — que carregava a razão da ADR-008 (impedir a Análise de comparar executado contra planejado). Como guardar carga torna a violação tentadora, a proibição saiu da prosa e virou teste: `src/lib/analise/sem-modelo-treino.test.ts`, varrendo os 15 arquivos do agregador.
+
+**Achado colateral, registrado e NÃO corrigido.** O `supabase db push` recusou aplicar a `0015`: o histórico remoto tem `0001`–`0009` numeradas e as cinco seguintes com **timestamp** (`20260824132220`…), enquanto o repositório tem `0010`–`0014`. São as mesmas migrações, com convenção de versão diferente — alguma sessão rodou por um caminho que gera timestamp. A `0015` foi aplicada via `db query` e registrada à mão em `supabase_migrations.schema_migrations`. **Não rodei `migration repair`**: mexer em histórico de migração de produção é risco próprio e não era o pedido. Fica como dívida — enquanto durar, `db push` continua recusando.
+
+**Impacto.** Migração `0015`; `ADR.md` (ADR-010); `PRD.md` §9 nota C e critério A14 reescrito; teste novo em `src/lib/analise/`. Nenhuma tela nesta leva — a UI vem em PR própria.
+
+**Como reverter.** `drop column reps, peso` e `revoke update (reps, peso)`. Aditivo e nullable: o caminho do histórico continua existindo como fallback, então nada para de funcionar.
