@@ -35,10 +35,14 @@ ou a senha vazarem, revogue: `./scripts/qa-treino-helper.sh limpar-usuario qa.pe
 
 ## Dado de teste que já existe nesta conta
 
-- 1 treino (grupo Peito, 28/08/2026) com 1 série real: Supino reto com barra, 12 reps × 60kg.
+- 1 treino (28/08/2026, via modelo "Peito e Tríceps QA") com 2 séries: Supino reto com
+  barra 10×70kg, Tríceps testa com barra 12×30kg. O treino de teste anterior (grupo Peito
+  isolado) foi apagado antes deste, pra testar o fluxo de modelo do zero.
+- 3 modelos de treino: "Peito e Tríceps QA" (criado nesta sessão, 2 exercícios) + "triceps"
+  e "peito" (herdados de sessão anterior, não mexidos).
 - Fila offline (outbox) local do navegador **vazia** — foi limpa manualmente depois dos
   testes adversariais de 28/08 (achado OF-02 em `QA.md`, item que ficava preso pra sempre
   foi removido do IndexedDB do navegador de teste; o banco em si nunca teve dado inválido).
 
-Achados de bug desta sessão de teste adversarial: ver `QA.md` (itens OF-02, VS-03, TR-02) e
-as evidências em `qa/evidencias/`.
+Achados de bug desta sessão de teste adversarial: ver `QA.md` (itens OF-02, VS-03, TR-02,
+TR-03, VS-04) e as evidências em `qa/evidencias/`.

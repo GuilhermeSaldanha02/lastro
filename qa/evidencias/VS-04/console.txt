@@ -1,0 +1,23 @@
+Achado durante teste adversarial do fluxo de modelo de treino (28/08).
+
+O avatar do cabeçalho (link "Perfil do atleta", topo direito) mostra o
+texto cravado "AT" em vez do avatar/inicial real do usuário logado
+("Q", visível corretamente na própria tela /perfil e em outras telas).
+
+Causa: src/components/cabecalho-pro.tsx renderiza
+  {perfil ? <Avatar nome={perfil.nome} avatarUrl={perfil.avatarUrl} /> : <div className="topo-avatar">AT</div>}
+"AT" é um placeholder que nunca foi substituído — dispara sempre que a
+página não passa a prop `perfil` para <CabecalhoPro>.
+
+5 páginas buscam `perfil` via obterPerfil() (usam pra idioma) mas
+esquecem de repassar como prop pro cabeçalho:
+  - src/app/perfil/page.tsx
+  - src/app/ajustes/temas/page.tsx
+  - src/app/ajustes/modelos/page.tsx
+  - src/app/ajustes/modelos/novo/page.tsx
+  - src/app/ajustes/anilhas/page.tsx
+
+Confirmado por busca: 8 dos 13 arquivos que usam <CabecalhoPro> passam
+`perfil={perfil}` corretamente; estes 5 não passam.
+
+Ver print.png: /ajustes/modelos mostrando "AT" no lugar do avatar real.
