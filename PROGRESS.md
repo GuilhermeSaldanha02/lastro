@@ -11,17 +11,15 @@
 
 > Bloco de handoff entre agentes (Antigravity ⇄ Claude). **Sobrescrever a cada sessão**, nunca acumular. Formato e regras: `AGENTS.md` §3.
 
-- **Última sessão:** 2026-08-28 · agente: claude · branch: main (5 PRs mergeados)
-- **Em andamento:** Nada — sessão fechada, todas as 5 entregas mergeadas em `main` (`bdd6e19`), sincronizado com `origin/main`.
-- **O que foi entregue:**
-  1. `fix(relatorio)`: relatório histórico em Ajustes > Relatórios usava fallback fixo de 45min; agora calcula duração real a partir de `serie.criado_em`, igual ao relatório pós-treino ao vivo.
-  2. `feat(ajustes)`: exportar dados em CSV — botão em Ajustes, rota `GET /api/exportar` (`src/lib/dados/exportar.ts` + `src/app/api/exportar/route.ts`).
-  3. `feat(home)`: sub-toggle Séries/Volume na aba Grupos do card de métricas da Home, reaproveitando `volumePorGrupoMuscular` (mesma função da Análise Semanal).
-  4. `feat(analise)`: card "Grupos sem estímulo recente" (`src/components/grupos-sem-estimulo.tsx`, `src/lib/analise/recencia.ts`) — puramente informativo, não prescreve (PRD §5).
-  5. `feat(analise)`: alerta passivo de possível deload por tendência de RIR (`src/components/alerta-deload.tsx`, `src/lib/analise/alerta-deload.ts`) — nunca escreve no modelo de treino sozinho (ADR-010).
-- **Bug achado e corrigido antes do merge:** card de "dias sem estímulo" podia mostrar "-1 dias" por skew de fuso entre a data da série e o "hoje" do servidor. Corrigido com piso em 0 (`Math.max(0, ...)`) em `src/lib/analise/recencia.ts` (commit `bdd6e19`). Achado só na revisão visual manual com Playwright + dado seedado, não pelo Vitest.
-- **Bloqueado / a decidir:** Apple Watch / Wear OS — colide com duas linhas do `PRD.md` congelado (proíbe wearable e proíbe app nativo em loja). Exige Scope Change formal em `DECISIONS.md` antes de qualquer código. **Não iniciar sem o dono decidir.**
-- **Próximo passo:** Nenhum item específico enfileirado; ver dívidas antigas abaixo.
+- **Última sessão:** 2026-08-28 (2) · agente: claude · branch: qa/teste-adversarial-final-triste-28-08 (PR #138, não mergeado ainda)
+- **Em andamento:** Teste adversarial de ponta a ponta via Playwright + Chrome, logado como usuário real (não review de código) — pedido explícito do dono: "não quero final feliz". 3 bugs reais encontrados e registrados em `QA.md` como `REPROVOU`, com evidência crua em `qa/evidencias/`. Nenhum código de produto foi tocado — só achados + doc + registro.
+- **Achados desta sessão, por gravidade:**
+  1. **CRÍTICO — OF-02:** `formulario-serie.tsx`/`editar-serie.tsx` declaram `min={0} max={10}` no input de RIR, mas a validação em JS só checa se é número finito — nunca o intervalo. Um RIR fora da faixa (ex.: 99) entra na fila offline (`outbox`), falha pra sempre no sync (erro de validação, não de rede — nunca vai se resolver sozinho), e como `sincronizar()` em `src/lib/offline/outbox.ts` é FIFO e para no primeiro item que falha, **trava todas as séries seguintes atrás dele, pra sempre**. O indicador de sync (`treino-detalhe.tsx`) só tem dois estados — "sincronizado" e "salvo no aparelho" — e o segundo nunca vira erro, então o usuário nunca fica sabendo. Confirmado com o banco direto: 0 séries no servidor enquanto a UI mostrava 2 como registradas.
+  2. **VS-03:** em viewport curto (teclado do celular aberto — cenário real), o cabeçalho fixo `.topo-pro` (há duas regras duplicadas para esse seletor em `sistema.css`, já documentado como dívida antiga) sobrepõe a grade de grupos musculares e o botão "Continuar", tornando-os inclicáveis.
+  3. **TR-02:** recarregar `/treino/[id]` pode mostrar "Nenhuma série registrada ainda" por alguns minutos mesmo com a série já confirmada no Postgres — um `fetch` direto com `cache: 'no-store'` na mesma URL, no mesmo instante, já trazia o dado certo. Hipótese mais provável: `criarSerieRemoto` grava direto no Supabase pelo cliente, sem `revalidatePath`, então o cache de dados do Next não recebe sinal de invalidação. Autocorrige sozinho depois de alguns minutos (a série nunca se perde — só a tela mente por um tempo).
+- **Usuário de QA persistente criado, por pedido explícito do dono (desvio do protocolo padrão de sempre limpar):** `qa.persona@lastro.test`, documentado em `docs/qa-acesso.md` — senha só em `.qa-credentials.local` (gitignored, nunca commitada). Ver esse doc antes de reusar ou de decidir revogar.
+- **Bloqueado / a decidir:** (1) Apple Watch / Wear OS — colide com duas linhas do `PRD.md` congelado. Exige Scope Change formal em `DECISIONS.md`. **Não iniciar sem o dono decidir.** (2) Os 3 bugs achados nesta sessão — corrigir agora ou depois é decisão do dono, não foram tocados.
+- **Próximo passo:** Dono decide se quer os 3 bugs corrigidos já (o OF-02 é o único que classifico como realmente urgente — risco de perda silenciosa de dado real) ou se entra na fila normal.
 - **Para o outro agente saber:**
   - **ADR-010 reverteu UMA frase da ADR-009** (a que proibia colunas de reps/peso no modelo). A restrição estrutural continua INTEIRA: `src/lib/analise/` não pode enxergar `modelo_treino`, e agora isso é teste (`sem-modelo-treino.test.ts`), não só prosa. Não derrube essa barreira para "comparar planejado vs executado" — é a razão de existir da ADR-008.
   - `grant update` em `modelo_treino_exercicio` é **por coluna** (só `reps`/`peso`). Reordenar segue impossível pelo banco.
