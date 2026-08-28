@@ -65,4 +65,11 @@ describe("diasSemEstimuloPorGrupo", () => {
     const r = diasSemEstimuloPorGrupo([serie("PEITO", "2026-08-28")], "2026-08-28");
     expect(r).toEqual([{ grupo: "PEITO", diasSemEstimulo: 0 }]);
   });
+
+  it("nunca fica negativo quando a última série é posterior a hojeISO", () => {
+    // Achado de revisão (2026-08-28): série datada "depois" de hojeISO
+    // (skew de fuso entre gravação e leitura) não pode ler "-1 dias".
+    const r = diasSemEstimuloPorGrupo([serie("PEITO", "2026-08-29")], "2026-08-28");
+    expect(r).toEqual([{ grupo: "PEITO", diasSemEstimulo: 0 }]);
+  });
 });

@@ -37,8 +37,13 @@ export function diasSemEstimuloPorGrupo(
 
   return Array.from(ultimaDataPorGrupo, ([grupo, ultimaData]) => ({
     grupo,
-    diasSemEstimulo: Math.round(
-      (hoje.getTime() - paraDataUTC(ultimaData).getTime()) / MS_POR_DIA,
+    // Piso em 0: `ultimaData` vem do próprio treino e pode, por skew de
+    // fuso entre onde a data foi gravada e onde é lida (achado de
+    // revisão, 2026-08-28), cair "depois" de `hojeISO` — sem o piso isso
+    // lia "-1 dias" na tela, o que não existe pra quem treinou.
+    diasSemEstimulo: Math.max(
+      0,
+      Math.round((hoje.getTime() - paraDataUTC(ultimaData).getTime()) / MS_POR_DIA),
     ),
   })).sort(
     (a, b) => b.diasSemEstimulo - a.diasSemEstimulo || a.grupo.localeCompare(b.grupo),
