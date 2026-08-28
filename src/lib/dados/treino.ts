@@ -515,8 +515,18 @@ export type NovaSerieInput = {
  * Grava no servidor uma série já validada e com `id`/`ordem` decididos
  * pelo cliente (D6 — offline-first, `src/lib/offline/`). Chamada tanto
  * direto (se online) quanto pela fila de sincronização (se a rede caiu no
- * meio do treino) — por isso não faz `redirect`/`revalidatePath`: quem
- * chama já atualizou a UI de forma otimista antes desta chamada existir.
+ * meio do treino) — por isso não faz `redirect`: quem chama já atualizou
+ * a UI de forma otimista antes desta chamada existir.
+ *
+ * `revalidatePath` AQUI (achado TR-02, QA.md 2026-08-28): sem isso, o
+ * cache de dados do Next não sabia que a página mudou, e recarregar
+ * `/treino/[id]` logo depois de sincronizar podia mostrar "nenhuma série"
+ * por alguns minutos mesmo com a série já confirmada no Postgres — a
+ * série nunca se perdia, só a tela mentia por um tempo. Não é await de
+ * rede (FF6): é só marcar o cache do servidor como velho, síncrono,
+ * mesma chamada que já grava a série; nunca força um re-render de quem
+ * está no meio do treino agora — só garante que a PRÓXIMA navegação
+ * (recarregar, voltar depois, abrir em outro aparelho) vê o dado real.
  *
  * `usuario_id` NÃO entra no insert: o trigger `serie_usuario_id_bi`
  * (SDD §3.2) preenche a partir de `treino_id`.
@@ -539,6 +549,8 @@ export async function criarSerieRemoto(input: NovaSerieInput): Promise<void> {
     const mensagem = `Falha ao registrar série: ${error.message}`;
     throw new Error(ehErroPermanenteDoPostgres(error.code) ? marcarComoPermanente(mensagem) : mensagem);
   }
+  revalidatePath("/treino/[id]", "page");
+  revalidatePath("/");
 }
 
 /* ====================================================================
@@ -549,9 +561,12 @@ export async function criarSerieRemoto(input: NovaSerieInput): Promise<void> {
    `on delete cascade` de série para treino), mas nenhuma função de
    aplicação existia: dava para registrar e nunca para corrigir.
 
-   Nenhuma destas funções faz `redirect`/`revalidatePath` quando é
-   chamada pela fila offline — quem chama já atualizou a UI de forma
-   otimista. As variantes de página fazem o `revalidatePath`.
+   Nenhuma destas funções faz `redirect` — quem chama já atualizou a UI
+   de forma otimista, online ou pela fila offline. Todas fazem
+   `revalidatePath` (achado TR-02, QA.md 2026-08-28: ver o comentário de
+   `criarSerieRemoto` acima para o porquê — sem isso, o cache do Next
+   ficava desatualizado até expirar sozinho, e uma tela recarregada logo
+   depois de editar/excluir podia mostrar o estado antigo por minutos).
    ==================================================================== */
 
 export type AtualizacaoSerieInput = {
@@ -592,6 +607,8 @@ export async function atualizarSerieRemoto(
     const mensagem = `Falha ao atualizar série: ${error.message}`;
     throw new Error(ehErroPermanenteDoPostgres(error.code) ? marcarComoPermanente(mensagem) : mensagem);
   }
+  revalidatePath("/treino/[id]", "page");
+  revalidatePath("/");
 }
 
 /** Exclui uma série. A RLS impede excluir série de outro usuário. */
@@ -600,6 +617,8 @@ export async function excluirSerieRemoto(id: string): Promise<void> {
 
   const { error } = await supabase.from("serie").delete().eq("id", id);
   if (error) throw new Error(`Falha ao excluir série: ${error.message}`);
+  revalidatePath("/treino/[id]", "page");
+  revalidatePath("/");
 }
 
 /**
