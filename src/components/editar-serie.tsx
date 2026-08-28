@@ -7,6 +7,7 @@
 // nem mostra o seletor de exercício: só o que pode mudar.
 import { useState, type FormEvent } from "react";
 import type { Serie } from "@/lib/dados/treino";
+import { RIR_MINIMO, RIR_MAXIMO } from "@/lib/dados/limites-serie";
 import { t } from "@/lib/texto/i18n";
 import type { Idioma } from "@/lib/dados/idioma";
 
@@ -57,6 +58,10 @@ export default function EditarSerie({
       const rirNumero = Number(rirBruto);
       if (!Number.isFinite(rirNumero)) {
         setErro(t("RIR precisa ser um número válido.", idioma));
+        return;
+      }
+      if (rirNumero < RIR_MINIMO || rirNumero > RIR_MAXIMO) {
+        setErro(t("RIR precisa estar entre 0 e 10.", idioma));
         return;
       }
       rir = rirNumero;
@@ -136,8 +141,8 @@ export default function EditarSerie({
             name="rir"
             type="number"
             inputMode="numeric"
-            min={0}
-            max={10}
+            min={RIR_MINIMO}
+            max={RIR_MAXIMO}
             defaultValue={serie.rir ?? undefined}
           />
         </div>

@@ -19,6 +19,7 @@ import { useEffect, useRef, useState, type FormEvent } from "react";
 import type { Exercicio, SerieHistorica } from "@/lib/dados/treino";
 import { historicoDoExercicio } from "@/lib/dados/treino";
 import { ehRecorde } from "@/lib/analise/recorde-serie";
+import { RIR_MINIMO, RIR_MAXIMO } from "@/lib/dados/limites-serie";
 import { t } from "@/lib/texto/i18n";
 import type { Idioma } from "@/lib/dados/idioma";
 
@@ -154,6 +155,10 @@ export default function FormularioSerie({
         setErro(t("RIR precisa ser um número válido.", idioma));
         return;
       }
+      if (rirNumero < RIR_MINIMO || rirNumero > RIR_MAXIMO) {
+        setErro(t("RIR precisa estar entre 0 e 10.", idioma));
+        return;
+      }
       rir = rirNumero;
     }
 
@@ -284,7 +289,7 @@ export default function FormularioSerie({
           <label className="campo__rotulo" htmlFor="rir">
             {t("RIR (Repetições na Reserva — Opcional)", idioma)}
           </label>
-          <input id="rir" name="rir" type="number" inputMode="numeric" placeholder={t("Ex: 2", idioma)} min={0} max={10} />
+          <input id="rir" name="rir" type="number" inputMode="numeric" placeholder={t("Ex: 2", idioma)} min={RIR_MINIMO} max={RIR_MAXIMO} />
         </div>
       )}
 

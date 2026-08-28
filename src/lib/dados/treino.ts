@@ -15,6 +15,7 @@ import { dataLocalBrasil } from "@/lib/tempo";
 import { obterIdioma } from "@/lib/dados/idioma";
 import { mapaTraducaoExercicios, mapaTraducaoGrupos } from "@/lib/dados/traducao";
 import { formatarGrupoMuscular } from "@/lib/texto/grupo-muscular";
+import { ehErroPermanenteDoPostgres, marcarComoPermanente } from "@/lib/offline/erro-permanente";
 
 export type Exercicio = {
   id: string;
@@ -534,7 +535,10 @@ export async function criarSerieRemoto(input: NovaSerieInput): Promise<void> {
     rir: input.rir,
     peso_por_lado: input.pesoPorLado,
   });
-  if (error) throw new Error(`Falha ao registrar série: ${error.message}`);
+  if (error) {
+    const mensagem = `Falha ao registrar série: ${error.message}`;
+    throw new Error(ehErroPermanenteDoPostgres(error.code) ? marcarComoPermanente(mensagem) : mensagem);
+  }
 }
 
 /* ====================================================================
@@ -584,7 +588,10 @@ export async function atualizarSerieRemoto(
       peso_por_lado: input.pesoPorLado,
     })
     .eq("id", input.id);
-  if (error) throw new Error(`Falha ao atualizar série: ${error.message}`);
+  if (error) {
+    const mensagem = `Falha ao atualizar série: ${error.message}`;
+    throw new Error(ehErroPermanenteDoPostgres(error.code) ? marcarComoPermanente(mensagem) : mensagem);
+  }
 }
 
 /** Exclui uma série. A RLS impede excluir série de outro usuário. */
