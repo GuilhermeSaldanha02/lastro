@@ -519,6 +519,20 @@ const DICIONARIO: Record<string, { en: string; es: string }> = {
   "Parecer em emissão": { en: "Report in progress", es: "Informe en emisión" },
   "escrevendo a leitura": { en: "writing the readout", es: "escribiendo la lectura" },
 
+  // --- components/alerta-deload.tsx ---
+  "Suas séries valendo estão mais difíceis do que o normal:": {
+    en: "Your working sets are harder than usual:",
+    es: "Tus series válidas están más difíciles de lo normal:",
+  },
+  "delas foram próximas da falha esta semana, contra": {
+    en: "of them were close to failure this week, versus",
+    es: "de ellas estuvieron cerca del fallo esta semana, contra",
+  },
+  "nas semanas anteriores. Pode ser hora de uma semana mais leve.": {
+    en: "in the previous weeks. It might be time for a lighter week.",
+    es: "en las semanas anteriores. Puede ser hora de una semana más ligera.",
+  },
+
   // --- components/bloco-evidencia.tsx ---
   "Alta": { en: "Up", es: "Alza" },
   "Platô": { en: "Plateau", es: "Meseta" },

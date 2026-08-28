@@ -1155,6 +1155,28 @@
   font-weight: var(--lastro-peso-medio);
 }
 
+/* Sinal de deload — informativo, não erro: mesma moldura do aviso acima,
+   mas acento dourado (não vermelho) e texto na cor de leitura normal.
+   O app não decide nada aqui, só mostra o número (PRD §5). */
+.alerta-deload {
+  border: 1px solid var(--lastro-linha);
+  border-left: var(--lastro-barra-evidencia) solid var(--lastro-ouro);
+  border-radius: var(--lastro-raio-1);
+  background: var(--lastro-sup-1);
+  padding: var(--lastro-e-3) var(--lastro-e-4);
+  margin-bottom: var(--lastro-e-4);
+}
+
+.alerta-deload__texto {
+  color: var(--lastro-txt-2);
+  font-size: var(--lastro-papel-rotulo);
+  line-height: 1.5;
+}
+
+.alerta-deload__texto strong {
+  color: var(--lastro-txt);
+}
+
 /* O input nativo de arquivo some da tela; o botão estilizado abaixo
    dispara o clique nele. Sem isto o navegador desenha seu próprio
    controle de upload, fora do sistema visual. */
