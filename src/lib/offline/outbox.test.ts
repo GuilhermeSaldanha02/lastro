@@ -1,10 +1,12 @@
 import "fake-indexeddb/auto";
 import { beforeEach, describe, expect, it } from "vitest";
 import { db } from "./db";
-import { contarPendentes, enfileirar, sincronizar } from "./outbox";
+import { marcarComoPermanente } from "./erro-permanente";
+import { contarFalhas, contarPendentes, enfileirar, sincronizar } from "./outbox";
 
 beforeEach(async () => {
   await db.outbox.clear();
+  await db.falhas.clear();
 });
 
 describe("outbox", () => {
@@ -31,7 +33,7 @@ describe("outbox", () => {
     });
 
     expect(ordem).toEqual(["treino", "serie"]);
-    expect(resultado).toEqual({ sincronizados: 2, falhou: false });
+    expect(resultado).toEqual({ sincronizados: 2, falhou: false, descartados: 0 });
     expect(await contarPendentes()).toBe(0);
   });
 
@@ -53,7 +55,7 @@ describe("outbox", () => {
     });
 
     expect(executado).toEqual([]);
-    expect(resultado).toEqual({ sincronizados: 0, falhou: true });
+    expect(resultado).toEqual({ sincronizados: 0, falhou: true, descartados: 0 });
     expect(await contarPendentes()).toBe(2);
   });
 
@@ -93,10 +95,79 @@ describe("outbox", () => {
     };
 
     const primeira = await sincronizar(executores);
-    expect(primeira).toEqual({ sincronizados: 0, falhou: true });
+    expect(primeira).toEqual({ sincronizados: 0, falhou: true, descartados: 0 });
 
     const segunda = await sincronizar(executores);
-    expect(segunda).toEqual({ sincronizados: 2, falhou: false });
+    expect(segunda).toEqual({ sincronizados: 2, falhou: false, descartados: 0 });
     expect(await contarPendentes()).toBe(0);
+  });
+
+  describe("item permanentemente inválido (OF-02)", () => {
+    it("sai da fila em vez de travar tudo que vem depois pra sempre", async () => {
+      await enfileirar("criar_serie", { treinoId: "t1", rir: 99 });
+      await enfileirar("criar_serie", { treinoId: "t1", rir: 2 });
+
+      const executado: unknown[] = [];
+      const resultado = await sincronizar({
+        criar_treino: async () => {},
+        criar_serie: async (payload) => {
+          if (payload.rir === 99) {
+            throw new Error(marcarComoPermanente("violates check constraint \"serie_rir_valido\""));
+          }
+          executado.push(payload);
+        },
+        atualizar_serie: async () => {},
+        excluir_serie: async () => {},
+        excluir_treino: async () => {},
+      });
+
+      expect(executado).toEqual([{ treinoId: "t1", rir: 2 }]);
+      expect(resultado).toEqual({ sincronizados: 1, falhou: false, descartados: 1 });
+      expect(await contarPendentes()).toBe(0);
+      expect(await contarFalhas()).toBe(1);
+    });
+
+    it("guarda o item descartado em `falhas`, com o erro, em vez de simplesmente apagar", async () => {
+      await enfileirar("criar_serie", { treinoId: "t1", rir: 99 });
+
+      await sincronizar({
+        criar_treino: async () => {},
+        criar_serie: async () => {
+          throw new Error(marcarComoPermanente("violates check constraint \"serie_rir_valido\""));
+        },
+        atualizar_serie: async () => {},
+        excluir_serie: async () => {},
+        excluir_treino: async () => {},
+      });
+
+      const [falha] = await db.falhas.toArray();
+      expect(falha.payload).toEqual({ treinoId: "t1", rir: 99 });
+      expect(falha.tentativas).toBe(1);
+      expect(falha.erro).toContain("serie_rir_valido");
+    });
+
+    it("continua parando (não descarta) num erro transitório comum, mesmo depois de várias tentativas", async () => {
+      await enfileirar("criar_serie", { treinoId: "t1" });
+
+      const executores = {
+        criar_treino: async () => {},
+        criar_serie: async () => {
+          throw new Error("sem rede");
+        },
+        atualizar_serie: async () => {},
+        excluir_serie: async () => {},
+        excluir_treino: async () => {},
+      };
+
+      for (let vez = 0; vez < 5; vez++) {
+        const resultado = await sincronizar(executores);
+        expect(resultado).toEqual({ sincronizados: 0, falhou: true, descartados: 0 });
+      }
+
+      expect(await contarPendentes()).toBe(1);
+      expect(await contarFalhas()).toBe(0);
+      const [item] = await db.outbox.toArray();
+      expect(item.tentativas).toBe(5);
+    });
   });
 });

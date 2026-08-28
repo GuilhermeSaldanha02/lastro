@@ -25,13 +25,30 @@ export type MutacaoPendente = {
   tentativas: number;
 };
 
+/**
+ * Item que saiu da fila porque o erro é permanente (dado que o servidor
+ * sempre vai rejeitar, ex.: RIR fora da faixa) — retry infinito não
+ * resolveria (achado OF-02, QA.md 2026-08-28). Guardado aqui em vez de
+ * simplesmente descartado, pra não desaparecer sem rastro: `outbox.ts`
+ * decide sair da fila, nenhum código apaga isto sozinho.
+ */
+export type MutacaoFalha = MutacaoPendente & {
+  falhouEm: number;
+  erro: string;
+};
+
 class LastroDB extends Dexie {
   outbox!: EntityTable<MutacaoPendente, "id">;
+  falhas!: EntityTable<MutacaoFalha, "id">;
 
   constructor() {
     super("lastro");
     this.version(1).stores({
       outbox: "++id, tipo, criadoEm",
+    });
+    this.version(2).stores({
+      outbox: "++id, tipo, criadoEm",
+      falhas: "++id, tipo, criadoEm, falhouEm",
     });
   }
 }

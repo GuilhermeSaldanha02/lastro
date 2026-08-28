@@ -208,6 +208,7 @@ const DICIONARIO: Record<string, { en: string; es: string }> = {
   "Reps precisa ser um número positivo.": { en: "Reps must be a positive number.", es: "Las repeticiones deben ser un número positivo." },
   "Peso precisa ser um número válido.": { en: "Weight must be a valid number.", es: "El peso debe ser un número válido." },
   "RIR precisa ser um número válido.": { en: "RIR must be a valid number.", es: "El RIR debe ser un número válido." },
+  "RIR precisa estar entre 0 e 10.": { en: "RIR must be between 0 and 10.", es: "El RIR debe estar entre 0 y 10." },
   "Exercício": { en: "Exercise", es: "Ejercicio" },
   "Selecione o exercício": { en: "Select the exercise", es: "Selecciona el ejercicio" },
   "Unilateral · reps contam por lado": { en: "Unilateral · reps count per side", es: "Unilateral · las repeticiones cuentan por lado" },
