@@ -5,7 +5,7 @@
 // sem o dono esperar. Se a rede caiu no meio do treino (PRD J1, "o
 // elevador derruba o sinal"), o registro continua funcionando — a série
 // fica na fila até o próximo evento `online`.
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState, useSyncExternalStore } from "react";
 import type {
   AtualizacaoSerieInput,
   ExercicioDoCatalogo,
@@ -96,6 +96,39 @@ function agruparPorExercicio(series: SerieUI[]) {
   return grupos;
 }
 
+/**
+ * Lê **puro**, sem escrever nada — mesmo motivo do `calcularSegundosTreino`
+ * de `timer-topo.tsx`: é o `getSnapshot` de um `useSyncExternalStore`, e
+ * roda DURANTE o render, onde `setState` é proibido. Devolve `false` no
+ * servidor, onde `localStorage` não existe.
+ *
+ * Antes disso era `useState(() => localStorage...)` — o inicializador só
+ * roda no cliente com o valor real, então reabrir um treino já finalizado
+ * (numa sessão anterior) fazia o servidor renderizar "Finalizar Treino" e
+ * o cliente hidratar direto pra "Ver Relatório do Treino": erro de
+ * hidratação real, achado numa auditoria de QA revisitando um treino de
+ * teste concluído (2026-08-28). `useSyncExternalStore` resolve isso do
+ * mesmo jeito que já resolvia pro cronômetro — o servidor e a PRIMEIRA
+ * pintura do cliente concordam (`false` nos dois), e o valor real aparece
+ * no próximo render depois disso, sem inicializador divergente.
+ */
+function treinoFoiFinalizado(treinoId: string): boolean {
+  if (typeof window === "undefined") return false;
+  return Boolean(localStorage.getItem(`lastro_fim_treino_${treinoId}`));
+}
+
+/**
+ * Este valor não muda por conta própria (não é um relógio) — muda só
+ * quando o próprio clique em "Finalizar Treino" grava o `localStorage` E
+ * dispara outros `setState` no mesmo handler (`setMostrarRelatorio`), o
+ * que já força o próximo render a rechamar `getSnapshot` e pegar o valor
+ * novo. Por isso não precisa de assinatura de verdade — só satisfaz a
+ * API do `useSyncExternalStore`.
+ */
+function semAssinaturaExterna(): () => void {
+  return () => {};
+}
+
 export default function TreinoDetalhe({
   treinoId,
   seriesIniciais,
@@ -153,10 +186,11 @@ export default function TreinoDetalhe({
   } | null>(null);
   const [mostrarRelatorio, setMostrarRelatorio] = useState(false);
   const [duracaoSegundos, setDuracaoSegundos] = useState(0);
-  const [treinoConcluido, setTreinoConcluido] = useState(() => {
-    if (typeof window === "undefined") return false;
-    return Boolean(localStorage.getItem(`lastro_fim_treino_${treinoId}`));
-  });
+  const treinoConcluido = useSyncExternalStore(
+    semAssinaturaExterna,
+    () => treinoFoiFinalizado(treinoId),
+    () => false,
+  );
   const grupos = useMemo(() => agruparPorExercicio(series), [series]);
   const ultima = series[series.length - 1];
 
@@ -656,7 +690,6 @@ export default function TreinoDetalhe({
                   localStorage.setItem(chaveFim, new Date().toISOString());
                 }
               }
-              setTreinoConcluido(true);
               setMostrarRelatorio(true);
             }}
           >
