@@ -1,0 +1,35 @@
+Achado registrado por duas auditorias independentes (28/08), como nota
+fora de escopo dos 5 itens que auditavam — investigado e corrigido agora.
+
+Erro de hidratação do React ao recarregar um treino já finalizado:
+
+  Error: Hydration failed because the server rendered text didn't
+  match the client. As a result this tree will be regenerated on the
+  client.
+  ...
+  <button type="button" className="botao-fina..." onClick={function onClick}>
+    <span>
++       Ver Relatório do Treino
+-       Finalizar Treino
+
+Causa raiz (src/components/treino-detalhe.tsx): `treinoConcluido` vinha
+de `useState(() => { if (typeof window === "undefined") return false;
+return Boolean(localStorage.getItem(...)); })`. No SERVIDOR, `window`
+não existe — o inicializador sempre devolve `false`, então o HTML
+gerado no servidor SEMPRE mostra "Finalizar Treino", nunca "Ver
+Relatório", não importa se o treino já foi finalizado numa sessão
+anterior. No CLIENTE, o inicializador roda de novo durante a hidratação,
+e aí `window` existe: se o `localStorage` tiver a flag
+(`lastro_fim_treino_<id>`) de uma finalização anterior, o cliente calcula
+`true` de cara — texto diferente do que o servidor já mandou no HTML,
+e o React descarta a árvore inteira com erro de hidratação.
+
+Mesma classe de bug que `timer-topo.tsx` já tinha corrigido pro
+cronômetro (comentário no próprio arquivo, achado do teste de jornada,
+2026-08-27) — essa segunda ocorrência, no botão de finalizar, não tinha
+levado a mesma correção.
+
+Sintomas colaterais observados pelas auditorias no mesmo treino, durante
+o erro: o avatar do cabeçalho mostrou "AT" (VS-04) uma vez, e o timer de
+descanso pareceu não responder a clique — ambos consistentes com o React
+descartando e re-renderizando a árvore no meio de uma interação.

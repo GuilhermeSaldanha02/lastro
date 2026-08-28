@@ -47,6 +47,7 @@ Regras completas: skill `qa-registro`. Prova crua obrigatória em `qa/evidencias
 | TR-02 | treino | Recarregar a tela do treino reflete o estado real do banco logo após uma série sincronizar | PASSOU | c334034 | 2026-08-28 | qa/evidencias/TR-02/ |
 | TR-03 | treino | Fluxo completo: criar modelo com 2+ exercícios → iniciar treino a partir dele → registrar série de cada exercício, todos com atalho de plano visível até o fim | PASSOU | c334034 | 2026-08-28 | qa/evidencias/TR-03/ |
 | VS-04 | visual | Avatar do cabeçalho mostra a foto/inicial real do usuário em toda página, nunca o placeholder cravado | PASSOU | c334034 | 2026-08-28 | qa/evidencias/VS-04/ |
+| TR-04 | treino | Recarregar um treino já finalizado não gera erro de hidratação do React | ALEGADO (corrigido, aguarda auditoria independente) | 4c0067a | 2026-08-28 | qa/evidencias/TR-04/ |
 
 ---
 
