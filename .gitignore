@@ -4,6 +4,10 @@
 .env.*
 !.env.example
 
+# Credencial do usuário de QA persistente (docs/qa-acesso.md explica o que é;
+# a senha em si nunca entra no git).
+.qa-credentials.local
+
 # Dependências e build
 node_modules/
 .next/
