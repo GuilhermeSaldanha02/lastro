@@ -11,7 +11,7 @@
 import { criarClienteServidor } from "@/lib/supabase/cliente-servidor";
 import { calcularVolume } from "@/lib/analise/volume";
 import { calcularSequenciaAtual } from "@/lib/analise/sequencia";
-import { calcularSeriesPorGrupo } from "@/lib/analise/equilibrio";
+import { calcularSeriesPorGrupo, calcularVolumePorGrupo } from "@/lib/analise/equilibrio";
 import { semanaInicioDoTreino, semanaAnaliseAtual, paraISO, segundaFeiraDaSemana } from "@/lib/analise/semanas";
 import type { SerieValendo } from "@/lib/analise/tipos";
 import { obterIdioma } from "@/lib/dados/idioma";
@@ -61,6 +61,12 @@ export type ResumoHome = {
    * treinado para o menos. Alimenta a aba "Grupos" da Home.
    */
   seriesPorGrupo: { grupo: string; series: number }[];
+  /**
+   * Mesma distribuição, em volume (kg) — segunda métrica da aba "Grupos"
+   * (achado do dono, 2026-08-28: contagem de séries não diz se o grupo
+   * recebeu carga alta ou baixa).
+   */
+  volumePorGrupo: { grupo: string; volumeKg: number }[];
   /** Os 3 treinos mais recentes, para a lista de atividade com grupos musculares. */
   recentes: TreinoRecente[];
   /** Quantas semanas ISO fechadas já têm treino — a Análise precisa disso. */
@@ -163,6 +169,7 @@ export async function carregarResumoHome(hojeISO: string): Promise<ResumoHome> {
       })
       .reverse(),
     seriesPorGrupo: calcularSeriesPorGrupo(valendoDaSemana),
+    volumePorGrupo: calcularVolumePorGrupo(valendoDaSemana),
     recentes: comSerie.slice(0, 3).map((t) => {
       const grupos = Array.from(
         new Set(

@@ -146,6 +146,7 @@ export default async function PaginaInicial() {
           treinosNaSemana={resumo.treinosNaSemana}
           historicoBarras={resumo.historicoBarras}
           seriesPorGrupo={resumo.seriesPorGrupo}
+          volumePorGrupo={resumo.volumePorGrupo}
           idioma={idioma}
         />
 

@@ -2604,6 +2604,38 @@
   flex: 0 0 auto;
 }
 
+/* Sub-escolha Séries/Volume dentro da aba "Grupos" — mesma linguagem do
+   .metrica-tab, só que menor e à direita do topo (2026-08-28). */
+.metrica-switcher__subtabs {
+  display: flex;
+  gap: 4px;
+  background: var(--lastro-fundo);
+  padding: 4px;
+  border-radius: var(--lastro-raio-2);
+  border: 1px solid var(--lastro-linha);
+  flex: 0 0 auto;
+}
+
+.metrica-subtab {
+  padding: 6px 10px;
+  min-height: var(--lastro-alvo-min); /* D1 */
+  border: none;
+  background: transparent;
+  color: var(--lastro-txt-2);
+  font-size: var(--lastro-papel-rotulo);
+  font-weight: var(--lastro-peso-forte);
+  border-radius: var(--lastro-raio-1);
+  cursor: pointer;
+  transition: all var(--lastro-dur-1) ease;
+}
+
+.metrica-subtab--ativa {
+  background: var(--lastro-sup-2);
+  color: var(--lastro-txt);
+  box-shadow: var(--lastro-elev-1);
+  border: 1px solid var(--lastro-linha);
+}
+
 /* Barras do histórico — uma por treino real (`resumo.historicoBarras`).
    Substituíram três SVGs de `path` fixo que desenhavam a mesma curva
    para qualquer usuário, inclusive com zero treino (auditoria

@@ -270,6 +270,8 @@ const DICIONARIO: Record<string, { en: string; es: string }> = {
   "grupo": { en: "group", es: "grupo" },
   "grupos": { en: "groups", es: "grupos" },
   "Séries por grupo muscular nesta semana": { en: "Sets by muscle group this week", es: "Series por grupo muscular esta semana" },
+  "Volume por grupo muscular nesta semana": { en: "Volume by muscle group this week", es: "Volumen por grupo muscular esta semana" },
+  "Métrica dos grupos": { en: "Group metric", es: "Métrica de los grupos" },
   "Grupos sem estímulo recente": { en: "Groups without recent stimulus", es: "Grupos sin estímulo reciente" },
   "Dias desde a última série valendo de cada grupo.": {
     en: "Days since the last working set of each group.",

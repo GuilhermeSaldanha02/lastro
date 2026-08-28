@@ -39,6 +39,7 @@ export type Serie = {
   rir: number | null;
   /** Valor REAL desta série (interruptor do formulário) — é isto que o agregador usa para dobrar volume (D3.5). */
   pesoPorLado: boolean;
+  criadoEm: string;
 };
 
 export type Treino = {
@@ -154,7 +155,7 @@ export async function buscarTreino(
   const { data: series, error: erroSeries } = await supabase
     .from("serie")
     .select(
-      "id, exercicio_id, tipo, reps, peso, rir, peso_por_lado, exercicio:exercicio_id (nome, unilateral, peso_por_lado)",
+      "id, exercicio_id, tipo, reps, peso, rir, peso_por_lado, criado_em, exercicio:exercicio_id (nome, unilateral, peso_por_lado)",
     )
     .eq("treino_id", treinoId)
     .order("ordem", { ascending: true });
@@ -173,6 +174,7 @@ export async function buscarTreino(
     peso: number;
     rir: number | null;
     peso_por_lado: boolean;
+    criado_em: string;
     exercicio: { nome: string; unilateral: boolean; peso_por_lado: boolean } | null;
   };
   const linhasSeries = (series ?? []) as unknown as LinhaSerie[];
@@ -192,6 +194,7 @@ export async function buscarTreino(
       peso: Number(s.peso),
       rir: s.rir,
       pesoPorLado: s.peso_por_lado,
+      criadoEm: s.criado_em,
     })),
   };
 }

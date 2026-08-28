@@ -34,9 +34,23 @@ export default async function PaginaRelatoriosAjustes() {
       pesoPorLado: s.pesoPorLado,
     }));
 
-    return calcularMetricasSessao(seriesParaMetricas, 45 * 60, undefined, {
+    // Duração real: intervalo entre a primeira e a última série registrada
+    // (mesma fonte que o relatório gerado na tela de treino usa, só que ali
+    // vem de um cronômetro ao vivo — aqui não existe, então reconstruímos a
+    // partir de `serie.criado_em`). Antes disto o fallback era um valor fixo
+    // de 45 min pra todo treino, por isso o tempo batia diferente do
+    // relatório original (achado do dono, 2026-08-27).
+    const timestamps = treinoComSeries.series
+      .map((s) => new Date(s.criadoEm).getTime())
+      .filter((t) => !Number.isNaN(t));
+    const duracaoSegundos =
+      timestamps.length > 0
+        ? Math.round((Math.max(...timestamps) - Math.min(...timestamps)) / 1000)
+        : 0;
+
+    return calcularMetricasSessao(seriesParaMetricas, duracaoSegundos, undefined, {
       identificadorTreino: `TREINO ${treinoId.slice(-4).toUpperCase()}`,
-    }); // fallback de duração padrão
+    });
   }
 
   return (
