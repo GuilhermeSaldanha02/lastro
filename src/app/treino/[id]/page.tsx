@@ -52,13 +52,18 @@ export default async function PaginaTreinoDetalhe({
 
   const idioma = perfil?.idioma ?? "pt-BR";
 
-  // Pré-seleção só faz sentido no primeiro carregamento de um treino vazio
-  // (SDD §9.3) — um treino que já tem série não tem mais "exercício ainda
-  // não começado" pra oferecer.
-  const exerciciosPreSelecionados =
-    modeloId && treino.series.length === 0
-      ? (await buscarModelo(modeloId))?.exercicios
-      : undefined;
+  // Busca o plano sempre que veio de um modelo — SEM travar em
+  // `treino.series.length === 0` (achado TR-03, QA.md 2026-08-28): esse
+  // gate era por TREINO INTEIRO, não por exercício, então a primeira
+  // série de QUALQUER exercício do modelo apagava os atalhos de TODOS os
+  // outros, mesmo os que ainda não tinham nenhuma série. Quem decide
+  // quais exercícios ainda estão pendentes é `pendentesDoModelo` em
+  // `treino-detalhe.tsx` — ele já filtra corretamente POR EXERCÍCIO (via
+  // `jaTemGrupo`); esse filtro nunca chegava a rodar porque o servidor
+  // zerava a lista inteira antes.
+  const exerciciosPreSelecionados = modeloId
+    ? (await buscarModelo(modeloId))?.exercicios
+    : undefined;
 
   return (
     <main className="tela">
