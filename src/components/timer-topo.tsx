@@ -143,8 +143,18 @@ export default function TimerTopo({
     }
     publicarAltura(elemento.getBoundingClientRect().height);
 
+    // `entrada.contentRect` é content-box — não inclui padding. Esse
+    // container tem padding vertical (~16-17px) que a MEDIÇÃO INICIAL
+    // acima (`getBoundingClientRect`, border-box) capturava certo, mas o
+    // ResizeObserver não — deixando a altura publicada sistematicamente
+    // curta depois da primeira atualização (achado da auditoria
+    // independente, QA.md VS-03, 2026-08-28: ~17px de erro tanto parado
+    // quanto com descanso ativo, confirmado casualmente — injetar o
+    // valor certo destravava o clique que a diferença quebrava).
+    // `getBoundingClientRect` de novo aqui mantém as duas medições no
+    // mesmo box model.
     const observador = new ResizeObserver(([entrada]) => {
-      if (entrada) publicarAltura(entrada.contentRect.height);
+      if (entrada) publicarAltura(entrada.target.getBoundingClientRect().height);
     });
     observador.observe(elemento);
     return () => {
