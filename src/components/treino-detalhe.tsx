@@ -247,6 +247,7 @@ export default function TreinoDetalhe({
       rir: dados.rir,
       pesoPorLado: dados.pesoPorLado,
       ehRecordePessoal: dados.ehRecordePessoal,
+      criadoEm: new Date().toISOString(),
     };
     const ordem = series.length + 1;
 
