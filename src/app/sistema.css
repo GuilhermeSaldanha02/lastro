@@ -2717,6 +2717,64 @@
   text-align: right;
 }
 
+/* Card "grupos sem estímulo recente" (Análise) — informação passiva, sem
+   barra de progresso: não é uma corrida nem uma meta batida, é só um
+   número. Sem cor de alerta/gamificação (ESCOPO.md proíbe medalha, selo,
+   confete) — o dono decide o que fazer com o dado, o app só mostra. */
+.recencia-card {
+  background: var(--lastro-sup-1);
+  border: 1px solid var(--lastro-linha);
+  border-radius: var(--lastro-raio-3);
+  padding: var(--lastro-e-4);
+  margin-bottom: var(--lastro-e-4);
+}
+
+.recencia-card__titulo {
+  font-size: var(--lastro-papel-corpo);
+  font-weight: var(--lastro-peso-forte);
+  color: var(--lastro-txt);
+}
+
+.recencia-card__subtitulo {
+  font-size: var(--lastro-papel-rotulo);
+  color: var(--lastro-txt-3);
+  margin-top: 2px;
+  margin-bottom: var(--lastro-e-3);
+}
+
+.recencia-lista {
+  list-style: none;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--lastro-e-2);
+}
+
+.recencia-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 0;
+  border-top: 1px solid var(--lastro-linha);
+}
+
+.recencia-item:first-child {
+  border-top: none;
+}
+
+.recencia-item__nome {
+  font-size: var(--lastro-papel-rotulo);
+  color: var(--lastro-txt-2);
+}
+
+.recencia-item__dias {
+  font-family: var(--lastro-fonte-num);
+  font-variant-numeric: tabular-nums;
+  font-size: var(--lastro-papel-rotulo);
+  font-weight: var(--lastro-peso-forte);
+  color: var(--lastro-txt);
+}
+
 .metrica-switcher__vazio {
   font-size: var(--lastro-papel-corpo);
   color: var(--lastro-txt-2);
