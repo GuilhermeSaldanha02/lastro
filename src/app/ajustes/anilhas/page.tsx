@@ -16,6 +16,7 @@ export default async function PaginaAnilhas() {
         titulo={t("Ajustes", idioma)}
         destaque={t("Anilhas", idioma)}
         voltarHref="/ajustes"
+        perfil={perfil}
         idioma={idioma}
       />
 
