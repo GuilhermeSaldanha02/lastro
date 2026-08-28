@@ -43,7 +43,7 @@ Regras completas: skill `qa-registro`. Prova crua obrigatória em `qa/evidencias
 | AU-01 | auth | Tela de login, formulário e controle de sessão | ALEGADO | 14edc71 | 2026-08-26 | qa/evidencias/AU-01/ |
 | OF-01 | offline | Registro do Service Worker e persistência de dados offline | ALEGADO | 14edc71 | 2026-08-26 | qa/evidencias/OF-01/ |
 | OF-02 | offline | Fila de sincronização (outbox) não trava para sempre quando um item é permanentemente inválido, não só sem rede | ALEGADO (corrigido, aguarda auditoria independente) | d4c79c5 | 2026-08-28 | qa/evidencias/OF-02/ |
-| VS-03 | visual | Cabeçalho fixo do treino não sobrepõe conteúdo interativo em viewport curto (teclado aberto) | **REPROVOU** | bdd6e19 | 2026-08-28 | qa/evidencias/VS-03/ |
+| VS-03 | visual | Cabeçalho fixo do treino não sobrepõe conteúdo interativo em viewport curto (teclado aberto) | ALEGADO (corrigido, aguarda auditoria independente) | 4335059 | 2026-08-28 | qa/evidencias/VS-03/ |
 | TR-02 | treino | Recarregar a tela do treino reflete o estado real do banco logo após uma série sincronizar | **REPROVOU** | bdd6e19 | 2026-08-28 | qa/evidencias/TR-02/ |
 
 ---
