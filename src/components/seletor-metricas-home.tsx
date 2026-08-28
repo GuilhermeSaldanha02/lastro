@@ -28,6 +28,7 @@ import { t } from "@/lib/texto/i18n";
 
 type Barra = { data: string; volume: number; series: number };
 type GrupoComSeries = { grupo: string; series: number };
+type GrupoComVolume = { grupo: string; volumeKg: number };
 
 type MetricasHomeProps = {
   volumeFormatado: { valor: string; unidade: string };
@@ -35,8 +36,11 @@ type MetricasHomeProps = {
   treinosNaSemana: number;
   historicoBarras: Barra[];
   seriesPorGrupo: GrupoComSeries[];
+  volumePorGrupo: GrupoComVolume[];
   idioma: Idioma;
 };
+
+type MetricaGrupo = "series" | "volume";
 
 type Aba = "volume" | "series" | "grupos";
 
@@ -83,27 +87,41 @@ function GraficoBarras({
 }
 
 /**
- * Distribuição de séries por grupo muscular na semana. Barras
- * horizontais, não verticais: o rótulo é uma palavra ("Posterior de
- * coxa"), e palavra não cabe embaixo de uma coluna de 40px.
+ * Distribuição por grupo muscular na semana — séries ou volume (kg),
+ * conforme `formatarValor`/`valorDe`. Barras horizontais, não verticais:
+ * o rótulo é uma palavra ("Posterior de coxa"), e palavra não cabe
+ * embaixo de uma coluna de 40px.
  */
-function BarrasGrupos({ grupos, idioma }: { grupos: GrupoComSeries[]; idioma: Idioma }) {
-  const maximo = Math.max(...grupos.map((g) => g.series));
+function BarrasGrupos<T extends { grupo: string }>({
+  grupos,
+  valorDe,
+  formatarValor,
+  idioma,
+}: {
+  grupos: T[];
+  valorDe: (g: T) => number;
+  formatarValor: (n: number) => string;
+  idioma: Idioma;
+}) {
+  const maximo = Math.max(...grupos.map(valorDe));
 
   return (
     <ul className="grupo-barras">
-      {grupos.map((g) => (
-        <li className="grupo-barra" key={g.grupo}>
-          <span className="grupo-barra__nome">{formatarGrupoMuscular(g.grupo, idioma)}</span>
-          <span className="grupo-barra__trilho">
-            <span
-              className="grupo-barra__preenchimento"
-              style={{ width: `${Math.max(6, (g.series / maximo) * 100)}%` }}
-            />
-          </span>
-          <span className="grupo-barra__valor">{g.series}</span>
-        </li>
-      ))}
+      {grupos.map((g) => {
+        const valor = valorDe(g);
+        return (
+          <li className="grupo-barra" key={g.grupo}>
+            <span className="grupo-barra__nome">{formatarGrupoMuscular(g.grupo, idioma)}</span>
+            <span className="grupo-barra__trilho">
+              <span
+                className="grupo-barra__preenchimento"
+                style={{ width: `${maximo > 0 ? Math.max(6, (valor / maximo) * 100) : 6}%` }}
+              />
+            </span>
+            <span className="grupo-barra__valor">{formatarValor(valor)}</span>
+          </li>
+        );
+      })}
     </ul>
   );
 }
@@ -114,9 +132,14 @@ export default function SeletorMetricasHome({
   treinosNaSemana,
   historicoBarras,
   seriesPorGrupo,
+  volumePorGrupo,
   idioma,
 }: MetricasHomeProps) {
   const [abaAtiva, setAbaAtiva] = useState<Aba>("volume");
+  // Sub-escolha dentro da aba "Grupos": contagem de séries não diz se o
+  // grupo levou carga alta ou baixa, então o dono pediu as duas leituras
+  // no mesmo lugar em vez de espalhar (2026-08-28).
+  const [metricaGrupo, setMetricaGrupo] = useState<MetricaGrupo>("series");
 
   const temBarras = historicoBarras.length > 0;
 
@@ -218,13 +241,53 @@ export default function SeletorMetricasHome({
                   </span>
                 </div>
                 <p className="metrica-switcher__subtitulo">
-                  {t("Séries por grupo muscular nesta semana", idioma)}
+                  {metricaGrupo === "series"
+                    ? t("Séries por grupo muscular nesta semana", idioma)
+                    : t("Volume por grupo muscular nesta semana", idioma)}
                 </p>
+              </div>
+              <div className="metrica-switcher__subtabs" role="tablist" aria-label={t("Métrica dos grupos", idioma)}>
+                <button
+                  type="button"
+                  role="tab"
+                  aria-selected={metricaGrupo === "series"}
+                  className={`metrica-subtab${metricaGrupo === "series" ? " metrica-subtab--ativa" : ""}`}
+                  onClick={() => setMetricaGrupo("series")}
+                >
+                  {t("Séries", idioma)}
+                </button>
+                <button
+                  type="button"
+                  role="tab"
+                  aria-selected={metricaGrupo === "volume"}
+                  className={`metrica-subtab${metricaGrupo === "volume" ? " metrica-subtab--ativa" : ""}`}
+                  onClick={() => setMetricaGrupo("volume")}
+                >
+                  {t("Volume", idioma)}
+                </button>
               </div>
             </div>
 
-            {seriesPorGrupo.length > 0 ? (
-              <BarrasGrupos grupos={seriesPorGrupo} idioma={idioma} />
+            {metricaGrupo === "series" ? (
+              seriesPorGrupo.length > 0 ? (
+                <BarrasGrupos
+                  grupos={seriesPorGrupo}
+                  valorDe={(g) => g.series}
+                  formatarValor={(n) => String(n)}
+                  idioma={idioma}
+                />
+              ) : (
+                <p className="metrica-switcher__vazio">
+                  {t("Nenhuma série registrada nesta semana ainda.", idioma)}
+                </p>
+              )
+            ) : volumePorGrupo.length > 0 ? (
+              <BarrasGrupos
+                grupos={volumePorGrupo}
+                valorDe={(g) => g.volumeKg}
+                formatarValor={(n) => `${Math.round(n).toLocaleString(idioma)} kg`}
+                idioma={idioma}
+              />
             ) : (
               <p className="metrica-switcher__vazio">
                 {t("Nenhuma série registrada nesta semana ainda.", idioma)}

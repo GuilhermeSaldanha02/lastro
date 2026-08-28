@@ -2626,6 +2626,38 @@
   flex: 0 0 auto;
 }
 
+/* Sub-escolha Séries/Volume dentro da aba "Grupos" — mesma linguagem do
+   .metrica-tab, só que menor e à direita do topo (2026-08-28). */
+.metrica-switcher__subtabs {
+  display: flex;
+  gap: 4px;
+  background: var(--lastro-fundo);
+  padding: 4px;
+  border-radius: var(--lastro-raio-2);
+  border: 1px solid var(--lastro-linha);
+  flex: 0 0 auto;
+}
+
+.metrica-subtab {
+  padding: 6px 10px;
+  min-height: var(--lastro-alvo-min); /* D1 */
+  border: none;
+  background: transparent;
+  color: var(--lastro-txt-2);
+  font-size: var(--lastro-papel-rotulo);
+  font-weight: var(--lastro-peso-forte);
+  border-radius: var(--lastro-raio-1);
+  cursor: pointer;
+  transition: all var(--lastro-dur-1) ease;
+}
+
+.metrica-subtab--ativa {
+  background: var(--lastro-sup-2);
+  color: var(--lastro-txt);
+  box-shadow: var(--lastro-elev-1);
+  border: 1px solid var(--lastro-linha);
+}
+
 /* Barras do histórico — uma por treino real (`resumo.historicoBarras`).
    Substituíram três SVGs de `path` fixo que desenhavam a mesma curva
    para qualquer usuário, inclusive com zero treino (auditoria
@@ -2737,6 +2769,64 @@
   font-weight: var(--lastro-peso-forte);
   color: var(--lastro-txt);
   text-align: right;
+}
+
+/* Card "grupos sem estímulo recente" (Análise) — informação passiva, sem
+   barra de progresso: não é uma corrida nem uma meta batida, é só um
+   número. Sem cor de alerta/gamificação (ESCOPO.md proíbe medalha, selo,
+   confete) — o dono decide o que fazer com o dado, o app só mostra. */
+.recencia-card {
+  background: var(--lastro-sup-1);
+  border: 1px solid var(--lastro-linha);
+  border-radius: var(--lastro-raio-3);
+  padding: var(--lastro-e-4);
+  margin-bottom: var(--lastro-e-4);
+}
+
+.recencia-card__titulo {
+  font-size: var(--lastro-papel-corpo);
+  font-weight: var(--lastro-peso-forte);
+  color: var(--lastro-txt);
+}
+
+.recencia-card__subtitulo {
+  font-size: var(--lastro-papel-rotulo);
+  color: var(--lastro-txt-3);
+  margin-top: 2px;
+  margin-bottom: var(--lastro-e-3);
+}
+
+.recencia-lista {
+  list-style: none;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--lastro-e-2);
+}
+
+.recencia-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 0;
+  border-top: 1px solid var(--lastro-linha);
+}
+
+.recencia-item:first-child {
+  border-top: none;
+}
+
+.recencia-item__nome {
+  font-size: var(--lastro-papel-rotulo);
+  color: var(--lastro-txt-2);
+}
+
+.recencia-item__dias {
+  font-family: var(--lastro-fonte-num);
+  font-variant-numeric: tabular-nums;
+  font-size: var(--lastro-papel-rotulo);
+  font-weight: var(--lastro-peso-forte);
+  color: var(--lastro-txt);
 }
 
 .metrica-switcher__vazio {
