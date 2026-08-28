@@ -1,6 +1,8 @@
 import type { SerieValendo } from "./tipos";
+import { volumePorGrupoMuscular } from "./volume";
 
 export type GrupoComSeries = { grupo: string; series: number };
+export type GrupoComVolume = { grupo: string; volumeKg: number };
 
 /**
  * Distribuição de séries valendo por grupo muscular.
@@ -28,4 +30,19 @@ export function calcularSeriesPorGrupo(
   return Array.from(porGrupo, ([grupo, series]) => ({ grupo, series })).sort(
     (a, b) => b.series - a.series || a.grupo.localeCompare(b.grupo),
   );
+}
+
+/**
+ * Mesma distribuição, mas por volume (kg) em vez de contagem de séries —
+ * usa `volumePorGrupoMuscular` (já validada pela Análise Semanal) para não
+ * duplicar a aritmética de volume numa segunda fonte de verdade.
+ */
+export function calcularVolumePorGrupo(
+  seriesValendo: SerieValendo[],
+): GrupoComVolume[] {
+  const porGrupo = volumePorGrupoMuscular(seriesValendo);
+
+  return Array.from(porGrupo, ([grupo, volumeKg]) => ({ grupo, volumeKg }))
+    .filter((g) => g.grupo)
+    .sort((a, b) => b.volumeKg - a.volumeKg || a.grupo.localeCompare(b.grupo));
 }
