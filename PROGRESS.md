@@ -11,18 +11,18 @@
 
 > Bloco de handoff entre agentes (Antigravity ⇄ Claude). **Sobrescrever a cada sessão**, nunca acumular. Formato e regras: `AGENTS.md` §3.
 
-- **Última sessão:** 2026-08-27 (7) · agente: claude · branch: main
-- **Em andamento:** Nada — sessão fechada.
-- **Fechado nesta sessão:**
-  1. **`GEMINI_API_KEY` ausente no Vercel** era a causa ÚNICA da Análise e do Coach falharem em produção (24 erros em 24h nos logs). O dono configurou; confirmado funcionando com dado real semeado (5 semanas, progressão + platô + queda): o parecer cita exercício e número específicos e passa no A6.
-  2. **Vão de 72px no topo de toda tela.** `.topo-pro` virou `sticky` mas o `padding-top` que compensava a versão `fixed` ficou — espaço contado duas vezes. Agora 12px.
-  3. **Barra de topo não acompanhava a rolagem.** `overflow-x: hidden` estava no `body`, o que pela regra do CSS força `overflow-y: auto` e faz o `body` virar o scrollport da sticky — mas quem rola é o `html`. Movido para o `html`.
-  4. **Barra do coach fora da tela** (`x = -179`). Duas regras `.barra-conversa`: a segunda definia `left/right` sem zerar o `transform: translateX(-50%)` da primeira. Consolidadas em uma.
-  5. **Catálogo perdia o filtro** ao voltar de um exercício. Filtro foi para a querystring.
-  6. **Relatório pós-treino:** xadrez de transparência só durante a ação (era permanente); botão do Instagram removido (chamava a mesma função de "Copiar" e prometia algo que a web não entrega).
-  7. **Escala tipográfica reconciliada com o DESIGN.md** — o corpo estava em 15px, violando D4 ("nunca abaixo de 16px").
-  8. **Modelo de treino guarda reps/peso** (ADR-010, migração 0015) — ver abaixo.
+- **Última sessão:** 2026-08-27 (8) · agente: antigravity · branch: feat/sticker-logo-direita-compacto
+- **Em andamento:** Refinamento do layout do Sticker Story:
+  1. Topo: Logo oficial do LASTRO posicionado no **lado direito**, alinhado horizontalmente na mesma linha com o bloco de `SESSÃO FINALIZADA` e `${tempo} min`.
+  2. Divisor: Linha horizontal em dourado champagne com terminação em seta vetorial (`──────>`).
+  3. Métricas: 3 colunas de dados (`SÉRIES`, `EXERCÍCIOS`, `DIVISÃO / FOCO`).
+  4. Rodapé e espaços excessivos removidos para um design mais limpo, imponente e compacto.
 - **Bloqueado / a decidir:** Nada.
+- **Próximo passo:** Validação pelo dono no aparelho físico.
+- **Para o outro agente saber:**
+  - 28 arquivos de teste, 210/210 testes passando no Vitest.
+  - Build Next.js 16.3.0 sem falhas.
+  - Screenshots de validação disponíveis em `docs/screenshots/verificacao_sticker_story/`.
 - **Próximo passo:** O dono validar no celular. Item aberto que ninguém além dele pode fazer: as 102 dicas de execução (critério A9).
 - **Para o outro agente saber:**
   - **ADR-010 reverteu UMA frase da ADR-009** (a que proibia colunas de reps/peso no modelo). A restrição estrutural continua INTEIRA: `src/lib/analise/` não pode enxergar `modelo_treino`, e agora isso é teste (`sem-modelo-treino.test.ts`), não só prosa. Não derrube essa barreira para "comparar planejado vs executado" — é a razão de existir da ADR-008.

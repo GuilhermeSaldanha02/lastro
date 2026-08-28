@@ -4574,35 +4574,44 @@
   z-index: 2;
 }
 
-/* Conteúdo do Sticker Strava Real */
+/* Conteúdo do Sticker Strava / Story Premium */
 .pos-treino-strava-conteudo {
   position: absolute;
   inset: 0;
-  padding: 22px 20px 18px;
+  padding: 24px 22px;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  justify-content: center;
+  gap: 16px;
   z-index: 2;
 }
 
-.pos-treino-sticker-logo-wrapper {
+.pos-treino-sticker-topo-linha {
   display: flex;
   align-items: center;
-  justify-content: flex-start;
-}
-
-.pos-treino-sticker-logo-img {
-  width: 48px;
-  height: 48px;
-  object-fit: contain;
-  filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.9));
+  justify-content: space-between;
+  width: 100%;
+  gap: 12px;
 }
 
 .pos-treino-sticker-hero {
   display: flex;
   flex-direction: column;
   gap: 2px;
-  margin-top: 4px;
+}
+
+.pos-treino-sticker-logo-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex: none;
+}
+
+.pos-treino-sticker-logo-img {
+  width: 60px;
+  height: 60px;
+  object-fit: contain;
+  filter: drop-shadow(0 4px 14px rgba(0, 0, 0, 0.95));
 }
 
 .pos-treino-sticker-sessao-label {
@@ -4628,7 +4637,7 @@
   display: flex;
   align-items: center;
   width: 100%;
-  margin: 6px 0;
+  margin: 2px 0;
   color: var(--lastro-ouro);
   filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.8));
 }
@@ -4684,35 +4693,6 @@
   text-transform: uppercase;
   text-shadow: 0 2px 8px rgba(0, 0, 0, 0.85);
   text-align: right;
-}
-
-.pos-treino-sticker-rodape {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  width: 100%;
-  margin-top: auto;
-  padding-top: 10px;
-}
-
-.pos-treino-sticker-frase {
-  font-size: 11px;
-  font-weight: 500;
-  color: rgba(255, 255, 255, 0.65);
-  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.8);
-}
-
-.pos-treino-sticker-badge {
-  border: 1px solid var(--lastro-ouro);
-  color: var(--lastro-ouro);
-  font-size: 9px;
-  font-weight: 800;
-  letter-spacing: 0.14em;
-  padding: 3px 8px;
-  text-transform: uppercase;
-  background: rgba(0, 0, 0, 0.25);
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.7);
-  white-space: nowrap;
 }
 
 .pos-treino-logo-topo-direito {

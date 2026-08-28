@@ -84,7 +84,9 @@ export default function RelatorioPosTreino({
     ctx.textAlign = "left";
     ctx.textBaseline = "top";
 
-    // 1. Logotipo Oficial do LASTRO no Topo Esquerdo
+    const yInicio = 360;
+
+    // 1. Logotipo Oficial do LASTRO no Lado Direito (na mesma linha que sessão e tempo)
     try {
       const imgLogo = new Image();
       imgLogo.crossOrigin = "anonymous";
@@ -95,9 +97,9 @@ export default function RelatorioPosTreino({
       });
 
       if (imgLogo.complete && imgLogo.naturalWidth > 0) {
-        const logoSize = 135;
-        const logoX = startX;
-        const logoY = 90;
+        const logoSize = 165;
+        const logoX = endX - logoSize;
+        const logoY = yInicio + 15;
 
         ctx.shadowColor = "rgba(0, 0, 0, 0.9)";
         ctx.shadowBlur = 16;
@@ -107,14 +109,14 @@ export default function RelatorioPosTreino({
       // Continua sem quebrar se a imagem falhar
     }
 
-    // 2. SESSÃO FINALIZADA
-    const ySessao = 260;
+    // 2. SESSÃO FINALIZADA (Lado Esquerdo)
+    const ySessao = yInicio;
     ctx.font = "800 28px system-ui, -apple-system, sans-serif";
     ctx.fillStyle = "rgba(255, 255, 255, 0.8)";
     ctx.letterSpacing = "4px";
     ctx.fillText(t("SESSÃO FINALIZADA", idioma).toUpperCase(), startX, ySessao);
 
-    // 3. TEMPO EM DESTAQUE (Hero)
+    // 3. TEMPO EM DESTAQUE (Hero: Lado Esquerdo abaixo de Sessão Finalizada)
     const yTempo = ySessao + 46;
     ctx.font = "900 135px system-ui, -apple-system, sans-serif";
     ctx.fillStyle = "#FFFFFF";
@@ -179,36 +181,6 @@ export default function RelatorioPosTreino({
     ctx.letterSpacing = "2px";
     ctx.textAlign = "right";
     ctx.fillText(focoTexto, endX, yStats + 22);
-
-    // 6. RODAPÉ (Frase de assinatura + Badge Código)
-    const yRodape = yStats + 180;
-
-    // Lado esquerdo: Frase de assinatura
-    ctx.textAlign = "left";
-    ctx.font = "500 24px system-ui, -apple-system, sans-serif";
-    ctx.fillStyle = "rgba(255, 255, 255, 0.65)";
-    ctx.letterSpacing = "0px";
-    const fraseTexto = t(metricas.fraseAssinatura || "Mais uma sessão no histórico.", idioma);
-    ctx.fillText(fraseTexto, startX, yRodape + 14);
-
-    // Lado direito: Badge Retangular Dourado
-    const badgeTexto = (metricas.identificadorTreino || "TREINO 404B").toUpperCase();
-    ctx.font = "800 22px system-ui, -apple-system, sans-serif";
-    ctx.letterSpacing = "3px";
-    const badgeTextWidth = ctx.measureText(badgeTexto).width;
-    const badgeW = badgeTextWidth + 34;
-    const badgeH = 46;
-    const badgeX = endX - badgeW;
-    const badgeY = yRodape;
-
-    ctx.strokeStyle = "#D4AF37";
-    ctx.lineWidth = 2;
-    ctx.strokeRect(badgeX, badgeY, badgeW, badgeH);
-
-    ctx.fillStyle = "#D4AF37";
-    ctx.textAlign = "center";
-    ctx.fillText(badgeTexto, badgeX + badgeW / 2, badgeY + 12);
-    ctx.textAlign = "left";
 
     return new Promise<Blob | null>((resolve) => {
       canvas.toBlob((blob) => resolve(blob), "image/png");
@@ -389,25 +361,26 @@ export default function RelatorioPosTreino({
           )}
 
           <div className="pos-treino-strava-conteudo pos-treino-sticker-novo">
-            {/* Topo: Logo no Canto Superior Esquerdo */}
-            <div className="pos-treino-sticker-logo-wrapper">
-              <img
-                src="/logo-lastro.png"
-                alt="LASTRO"
-                className="pos-treino-sticker-logo-img"
-                width={52}
-                height={52}
-              />
-            </div>
+            {/* Topo: Lado Esquerdo = Sessão + Tempo; Lado Direito = Logo Oficial */}
+            <div className="pos-treino-sticker-topo-linha">
+              <div className="pos-treino-sticker-hero">
+                <span className="pos-treino-sticker-sessao-label">
+                  {t("SESSÃO FINALIZADA", idioma)}
+                </span>
+                <span className="pos-treino-sticker-tempo-destaque">
+                  {metricas.duracaoMinutos} min
+                </span>
+              </div>
 
-            {/* Bloco Hero */}
-            <div className="pos-treino-sticker-hero">
-              <span className="pos-treino-sticker-sessao-label">
-                {t("SESSÃO FINALIZADA", idioma)}
-              </span>
-              <span className="pos-treino-sticker-tempo-destaque">
-                {metricas.duracaoMinutos} min
-              </span>
+              <div className="pos-treino-sticker-logo-wrapper">
+                <img
+                  src="/logo-lastro.png"
+                  alt="LASTRO"
+                  className="pos-treino-sticker-logo-img"
+                  width={64}
+                  height={64}
+                />
+              </div>
             </div>
 
             {/* Linha Divisória Dourada com Seta */}
@@ -436,16 +409,6 @@ export default function RelatorioPosTreino({
               </div>
               <div className="pos-treino-sticker-stat-foco">
                 {metricas.focoOuDivisao || "TREINO"}
-              </div>
-            </div>
-
-            {/* Rodapé: Frase + Badge */}
-            <div className="pos-treino-sticker-rodape">
-              <span className="pos-treino-sticker-frase">
-                {t(metricas.fraseAssinatura || "Mais uma sessão no histórico.", idioma)}
-              </span>
-              <div className="pos-treino-sticker-badge">
-                {metricas.identificadorTreino || "TREINO 404B"}
               </div>
             </div>
           </div>
