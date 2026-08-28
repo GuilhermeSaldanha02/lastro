@@ -23,8 +23,10 @@ import {
 import type { EvidenciaParaTela } from "@/app/api/analise/evidencia";
 import { MINIMO_SEMANAS_PARECER } from "@/lib/analise/limiares";
 import type { Idioma } from "@/lib/dados/idioma";
+import type { GrupoComRecencia } from "@/lib/analise/recencia";
 import Parecer from "@/components/parecer";
 import GraficoProgressao from "@/components/grafico-progressao";
+import GruposSemEstimulo from "@/components/grupos-sem-estimulo";
 import { t } from "@/lib/texto/i18n";
 
 type Resultado = {
@@ -35,9 +37,11 @@ type Resultado = {
 
 export default function AnaliseInterativa({
   semanasFechadasComTreino,
+  gruposSemEstimulo,
   idioma,
 }: {
   semanasFechadasComTreino: number;
+  gruposSemEstimulo: GrupoComRecencia[];
   idioma: Idioma;
 }) {
   const PERGUNTAS = perguntasDoIdioma(idioma);
@@ -103,6 +107,8 @@ export default function AnaliseInterativa({
 
   return (
     <div className="corpo corpo--com-nav corpo--titulo-conteudo transicao-pilula">
+      <GruposSemEstimulo grupos={gruposSemEstimulo} idioma={idioma} />
+
       <GraficoProgressao
         onStatus={(temPainel) => setGraficoTemPainel(temPainel)}
         ocultarQuandoVazio={!dadosSuficientes}

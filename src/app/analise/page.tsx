@@ -5,6 +5,7 @@
 // `components/analise-interativa.tsx`.
 import { obterPerfil } from "@/lib/dados/perfil";
 import { carregarResumoHome } from "@/lib/dados/resumo-home";
+import { carregarDiasSemEstimuloPorGrupo } from "@/lib/dados/recencia-grupos";
 import { dataLocalBrasil } from "@/lib/tempo";
 import AbaInferior from "@/components/aba-inferior";
 import AnaliseInterativa from "@/components/analise-interativa";
@@ -12,9 +13,11 @@ import CabecalhoPro from "@/components/cabecalho-pro";
 import { t } from "@/lib/texto/i18n";
 
 export default async function PaginaAnalise() {
-  const [perfil, resumo] = await Promise.all([
+  const hoje = dataLocalBrasil();
+  const [perfil, resumo, gruposSemEstimulo] = await Promise.all([
     obterPerfil(),
-    carregarResumoHome(dataLocalBrasil()),
+    carregarResumoHome(hoje),
+    carregarDiasSemEstimuloPorGrupo(hoje),
   ]);
   const idioma = perfil?.idioma ?? "pt-BR";
 
@@ -30,6 +33,7 @@ export default async function PaginaAnalise() {
 
       <AnaliseInterativa
         semanasFechadasComTreino={resumo.semanasFechadasComTreino}
+        gruposSemEstimulo={gruposSemEstimulo}
         idioma={idioma}
       />
 
