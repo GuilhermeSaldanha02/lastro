@@ -1,0 +1,26 @@
+Reprodução: /treino/[id] com 1 série já sincronizada e confirmada no banco
+(select id, reps, peso from serie where treino_id = '...' → 1 linha, criado_em 12:25:34).
+
+12:25:33 — navego para a mesma URL (reload completo, `page.goto`).
+Resultado: tela mostra "Nenhuma série registrada ainda. Comece pela primeira aqui embaixo."
+           (ver print.png) — mesmo com a série já confirmada no Postgres.
+
+Teste de controle no mesmo instante — fetch direto da mesma URL com cache:'no-store'
+feito de dentro do próprio navegador:
+  status: 200
+  temSerieNoHtml: true       (o HTML fresco DO SERVIDOR contém "12"/"60")
+  temMensagemVazia: false
+  cache-control: "no-cache, must-revalidate"
+
+Ou seja: o servidor, quando forçado a responder sem cache, já sabia da série.
+A navegação real do navegador (page.goto) mostrou a versão desatualizada mesmo assim.
+
+12:31:37 — mesma URL, ~6 minutos depois: a série aparece normalmente.
+Autocorrigiu sozinho, sem nenhuma ação do usuário — consistente com uma janela de
+cache (Data Cache / Router Cache do Next.js) que não é invalidada quando a série é
+gravada via chamada direta ao Supabase a partir do cliente (src/lib/dados/treino.ts,
+`criarSerieRemoto`), em vez de uma Server Action com `revalidatePath`.
+
+Nenhum service worker estava mascarando isso: public/sw.js faz
+`fetch(...).catch(() => offline.html)` puro — sem cache de páginas — então a
+inconsistência não vem daí. Confirmado lendo o arquivo antes de reportar.

@@ -1,0 +1,18 @@
+Reprodução: /treino/[id], painel "Adicionar exercício" aberto, viewport 390×500
+(simula celular com teclado virtual aberto — cenário real, não artificial).
+
+Erro do Playwright ao tentar clicar no checkbox "Peito":
+
+TimeoutError: browserBackend.callTool: Timeout 5000ms exceeded.
+  - <label class="chip">…</label> intercepts pointer events
+  - element is outside of the viewport
+  - <header class="topo-pro">…</header> intercepts pointer events
+  (repetido por 5s de retries, nunca resolve)
+
+Causa raiz (src/app/sistema.css):
+  linha 2366: .topo-pro { position: fixed; ... }      ← regra morta, comentário já avisa
+  linha 4968: .topo-pro { position: sticky; top:0; z-index:30; ... }  ← vence a cascata
+
+O header "sticky" cobre os primeiros itens da grade de grupos musculares e o botão
+"Continuar" quando a altura visível do viewport é pequena. Ver print.png: o botão
+"Continuar" está parcialmente escondido atrás da barra de navegação inferior.

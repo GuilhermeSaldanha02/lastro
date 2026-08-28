@@ -1,0 +1,49 @@
+Requisições de rede (Playwright, network log cru):
+
+33. [POST] http://localhost:3000/treino/c7226a05-d101-4ea4-851f-6faa274e75bb => [200] OK   (ação de UI anterior, não a série)
+34. [POST] http://localhost:3000/treino/c7226a05-d101-4ea4-851f-6faa274e75bb => [500] Internal Server Error   (tentativa 1 de sync do outbox, item RIR=99)
+35. [POST] http://localhost:3000/treino/c7226a05-d101-4ea4-851f-6faa274e75bb => [500] Internal Server Error   (tentativa 2, mesma série, disparada pelo listener `online`/retry)
+
+Estado da fila local (IndexedDB "lastro" > object store "outbox") logo após a falha,
+lido via `indexedDB` diretamente no navegador:
+
+[
+  {
+    "tipo": "criar_serie",
+    "payload": {
+      "id": "0abf171f-7471-45ea-ae05-6ace9e482267",
+      "treinoId": "c7226a05-d101-4ea4-851f-6faa274e75bb",
+      "exercicioId": "339a305e-4c52-4744-86c5-6b830b707032",
+      "ordem": 1,
+      "tipo": "valendo",
+      "reps": 10,
+      "peso": 80,
+      "rir": 99,
+      "pesoPorLado": false
+    },
+    "criadoEm": 1787919695823,
+    "tentativas": 2,
+    "id": 4
+  }
+]
+
+Adicionei uma SEGUNDA série, totalmente válida (reps=12, peso=60, rir=null), logo depois.
+Ela entrou no outbox atrás da primeira (fila FIFO) e ficou com "tentativas": 0 — nunca
+chegou a ser tentada, porque `sincronizar()` (src/lib/offline/outbox.ts) para no primeiro
+item que falha e preserva a ordem:
+
+[
+  { "id": 4, "payload": { "rir": 99, ... }, "tentativas": 4 },
+  { "id": 5, "payload": { "reps": 12, "peso": 60, "rir": null, ... }, "tentativas": 0 }
+]
+
+Confirmação no banco (Supabase, tabela `serie`, treino_id = c7226a05-d101-4ea4-851f-6faa274e75bb),
+consultada enquanto os dois itens ainda estavam na fila:
+  → 0 linhas. Nenhuma das duas séries existia no servidor, embora a UI mostrasse as duas
+    como "registradas" e "salvo no aparelho".
+
+Depois de eu apagar manualmente o item id=4 (rir=99) do IndexedDB pelo devtools — algo que
+um usuário real não sabe fazer — o item id=5 sincronizou sozinho na próxima carga de página.
+Sem essa intervenção manual, ele ficaria preso atrás do item 4 indefinidamente: não existe
+limite de tentativas nem fila morta (`tentativas` é gravado mas nunca lido em nenhum lugar
+do código-fonte, confirmado por busca em src/).

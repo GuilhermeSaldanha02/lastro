@@ -1,0 +1,54 @@
+- generic [active] [ref=f4e1]:
+  - main [ref=f4e2]:
+    - generic [ref=f4e3]:
+      - generic [ref=f4e4]:
+        - link "Voltar" [ref=f4e5] [cursor=pointer]:
+          - /url: /treino
+        - generic [ref=f4e8]: sexta · 28 ago · Bancada
+      - link "Perfil do atleta" [ref=f4e9] [cursor=pointer]:
+        - /url: /perfil
+        - generic [ref=f4e10]: Q
+    - generic [ref=f4e12]:
+      - generic "Tempo total da sessão de treino" [ref=f4e13]:
+        - generic [ref=f4e18]:
+          - generic [ref=f4e19]: Treino
+          - generic [ref=f4e20]: 00:00
+      - button "Descanso 01:30" [ref=f4e22] [cursor=pointer]:
+        - generic [ref=f4e23]: Descanso
+        - generic [ref=f4e27]: 01:30
+    - generic [ref=f4e28]:
+      - generic [ref=f4e29]:
+        - heading "Séries" [level=2] [ref=f4e30]
+        - button "Editar" [ref=f4e31] [cursor=pointer]
+      - generic [ref=f4e32]:
+        - generic [ref=f4e33]:
+          - generic [ref=f4e34]:
+            - heading "Supino reto com barra" [level=2] [ref=f4e35]
+            - generic [ref=f4e36]: 1 série valendo
+          - generic [ref=f4e37]: EXERCÍCIO
+        - button "1 12 × 60 kg valendo" [ref=f4e39]:
+          - generic [ref=f4e40]: "1"
+          - generic [ref=f4e41]:
+            - text: "12"
+            - generic [ref=f4e42]: ×
+            - text: "60"
+            - generic [ref=f4e43]: kg
+          - generic [ref=f4e44]: valendo
+    - generic [ref=f4e46]:
+      - generic [ref=f4e47]:
+        - button "Repetir série" [ref=f4e48] [cursor=pointer]
+        - button "Outra série" [ref=f4e49] [cursor=pointer]
+      - button "Finalizar Treino" [ref=f4e50] [cursor=pointer]
+      - paragraph [ref=f4e53]: salvo no aparelho
+    - navigation "Seções do app" [ref=f4e55]:
+      - link "Início" [ref=f4e56] [cursor=pointer]:
+        - /url: /
+      - link "Treinos" [ref=f4e59] [cursor=pointer]:
+        - /url: /treino
+      - link "Análise" [ref=f4e62] [cursor=pointer]:
+        - /url: /analise
+      - link "Catálogo" [ref=f4e65] [cursor=pointer]:
+        - /url: /catalogo
+      - link "Ajustes" [ref=f4e68] [cursor=pointer]:
+        - /url: /ajustes
+  - button "Open Next.js Dev Tools" [ref=f4e76] [cursor=pointer]

@@ -1,0 +1,10 @@
+Fonte: .next/dev/logs/next-development.log (servidor, sessão de QA 2026-08-28)
+
+{"timestamp":"09:05:03.572","source":"Server","level":"ERROR","message":"⨯ Error: Falha ao registrar série: new row for relation \"serie\" violates check constraint \"serie_rir_valido\""}
+{"timestamp":"09:05:04.162","source":"Server","level":"ERROR","message":"⨯ Error: Falha ao registrar série: new row for relation \"serie\" violates check constraint \"serie_rir_valido\""}
+
+Console do navegador (Playwright), no momento do clique em "Registrar série" com RIR=99:
+[ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) @ http://localhost:3000/treino/c7226a05-d101-4ea4-851f-6faa274e75bb:0
+[ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) @ http://localhost:3000/treino/c7226a05-d101-4ea4-851f-6faa274e75bb:0
+
+Nenhum destes erros chega à UI. A tela mostra a série "1 10 × 80 kg valendo" como registrada com sucesso, e o rodapé mostra "salvo no aparelho" — texto idêntico ao de qualquer série pendente normal (offline transitório). Não existe, em nenhum lugar da interface, um terceiro estado para "isto nunca vai sincronizar".
