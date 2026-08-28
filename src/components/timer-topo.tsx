@@ -3,6 +3,7 @@
 import {
   useCallback,
   useEffect,
+  useLayoutEffect,
   useRef,
   useState,
   useSyncExternalStore,
@@ -119,6 +120,39 @@ export default function TimerTopo({
   // Timestamp absoluto para resiliência a bloqueio de tela
   const fimTimestampRef = useRef<number | null>(null);
 
+  // Altura real deste container, publicada como variável CSS pra quem
+  // precisa reservar espaço por baixo dele (`.corpo--treino-detalhe`) ou
+  // dizer ao navegador pra não rolar conteúdo pra debaixo dele
+  // (`scroll-margin-top` em `seletor-grupo-muscular.tsx`) — achado VS-03
+  // (QA.md, 2026-08-28): a altura varia de ~65px (parado) a ~125px
+  // (descanso ativo, cápsula quebra linha em tela estreita), então um
+  // número fixo no CSS sempre fica desatualizado num dos dois estados.
+  // `useLayoutEffect` mede antes da pintura (evita o flash com o valor de
+  // fallback do CSS); `ResizeObserver` mantém atualizado quando o estado
+  // do timer muda a altura depois disso.
+  const containerRef = useRef<HTMLDivElement>(null);
+  useLayoutEffect(() => {
+    const elemento = containerRef.current;
+    if (!elemento) return;
+
+    function publicarAltura(altura: number) {
+      document.documentElement.style.setProperty(
+        "--lastro-timer-topo-altura",
+        `${Math.ceil(altura)}px`,
+      );
+    }
+    publicarAltura(elemento.getBoundingClientRect().height);
+
+    const observador = new ResizeObserver(([entrada]) => {
+      if (entrada) publicarAltura(entrada.contentRect.height);
+    });
+    observador.observe(elemento);
+    return () => {
+      observador.disconnect();
+      document.documentElement.style.removeProperty("--lastro-timer-topo-altura");
+    };
+  }, []);
+
   // Único lado escritor do cronômetro: sincroniza o localStorage com o que
   // o React sabe. É o que efeito deve fazer — atualizar sistema externo.
   useEffect(() => {
@@ -213,7 +247,7 @@ export default function TimerTopo({
     duracaoTotal > 0 ? (segundosRestantes / duracaoTotal) * 100 : 0;
 
   return (
-    <div className="timer-topo-container">
+    <div className="timer-topo-container" ref={containerRef}>
       <div className="barra-status-treino">
         {/* Esquerda: Tempo Total de Treino Decorrido */}
         <div className="status-tempo-treino" title="Tempo total da sessão de treino">
