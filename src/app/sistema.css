@@ -39,6 +39,18 @@
   padding-bottom: calc(var(--lastro-clearance-nav) + var(--lastro-e-6));
 }
 
+/* `.nav` é `fixed` (regra "Aba Inferior Fixa", mais abaixo) — o
+   padding-bottom acima reserva espaço no FLUXO, mas não impede o
+   navegador de rolar um elemento pra ficar flush com o fim do viewport,
+   atrás dela: `scrollIntoView({block:"end"})` e afins ignoram `padding`,
+   só respeitam `scroll-margin`. Mesma classe de bug do VS-03 (QA.md,
+   2026-08-28) — lá era o topo, aqui é o fim. Confirmado com o botão
+   "Continuar" (seletor-grupo-muscular.tsx) ficando ~50px atrás da aba
+   inferior em viewport curto. */
+.corpo--com-nav * {
+  scroll-margin-bottom: calc(var(--lastro-clearance-nav) + var(--lastro-e-4));
+}
+
 .corpo--titulo-conteudo {
   padding-top: var(--lastro-e-3);
 }
@@ -4261,8 +4273,30 @@
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
 }
 
+/* Altura reservada pro que fica fixo no topo desta tela: `.topo-pro`
+   (60px) + `.timer-topo-container` (achado VS-03, QA.md 2026-08-28: varia
+   de ~65px parado a ~125px com descanso ativo — nunca um número fixo só;
+   `--lastro-timer-topo-altura` é medida de verdade em `timer-topo.tsx` via
+   ResizeObserver, o fallback aqui só cobre o instante antes da primeira
+   medição). Uma única fonte (`--lastro-clearance-topo-treino`) pra
+   `padding-top` (reserva o espaço no fluxo) e `scroll-margin-top` (impede
+   o navegador de rolar conteúdo focado pra debaixo do que é fixed, ex.:
+   `tituloRef.current.focus()` em `seletor-grupo-muscular.tsx`) nunca mais
+   divergirem um do outro. */
 .corpo--treino-detalhe {
-  padding-top: calc(60px + 54px + env(safe-area-inset-top, 0px) + var(--lastro-e-3)) !important;
+  --lastro-clearance-topo-treino: calc(
+    60px + var(--lastro-timer-topo-altura, 65px) + env(safe-area-inset-top, 0px) + var(--lastro-e-3)
+  );
+  padding-top: var(--lastro-clearance-topo-treino) !important;
+}
+
+/* Qualquer descendente do card, não só o título — `tituloRef.focus()`
+   (seletor-grupo-muscular.tsx) rola pelo título, mas um clique direto num
+   chip (ou automação dirigindo o navegador) rola por aquele elemento
+   específico, que tem o próprio scroll-margin, não o do título. */
+.corpo--treino-detalhe .card-obsidian__titulo,
+.corpo--treino-detalhe .card-obsidian * {
+  scroll-margin-top: var(--lastro-clearance-topo-treino);
 }
 
 .barra-status-treino {
