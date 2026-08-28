@@ -1,0 +1,50 @@
+Achado durante teste adversarial do fluxo pedido pelo dono: criar modelo
+de treino → iniciar treino a partir do modelo → executar → conferir.
+
+Reprodução (Playwright, dev server real, usuário qa.persona):
+1. Criei o modelo "Peito e Tríceps QA" com 2 exercícios: "Supino reto com
+   barra" (10 reps × 70kg cadastrado) e "Tríceps testa com barra" (reps/
+   peso em branco, de propósito, pra testar o fallback).
+2. /treino → "Iniciar treino de hoje" → escolhi o modelo. A tela mostrou
+   corretamente os 2 cards de atalho: "Supino reto com barra — 10×70kg +"
+   e "Tríceps testa com barra — +".
+3. Cliquei no "+" de Supino, registrei a série (10×70kg, formulário já
+   veio preenchido — funcionou certo).
+4. **Depois desse registro, o card de "Tríceps testa com barra" sumiu
+   inteiro da tela** — confirmado via DOM (só sobrou o h2 "Séries" e
+   "Supino reto com barra"; nenhum vestígio de "Tríceps testa"), mesmo
+   com ZERO séries registradas pra esse exercício ainda (confirmado no
+   banco: só 1 linha em `serie` pro treino nesse momento).
+
+Causa raiz (src/app/treino/[id]/page.tsx, linha 58-61):
+
+  const exerciciosPreSelecionados =
+    modeloId && treino.series.length === 0
+      ? (await buscarModelo(modeloId))?.exercicios
+      : undefined;
+
+O gate é POR TREINO INTEIRO (`treino.series.length === 0`), não por
+exercício. No instante em que a PRIMEIRA série de QUALQUER exercício do
+modelo é registrada, `exerciciosPreSelecionados` vira `undefined` pro
+treino inteiro — mesmo que outros exercícios do modelo ainda não tenham
+nenhuma série. O componente cliente (`treino-detalhe.tsx`,
+`pendentesDoModelo`) já faz o filtro correto POR EXERCÍCIO (via
+`jaTemGrupo`), mas nunca chega a rodar porque o servidor já zerou a lista
+inteira antes de chegar lá.
+
+O comentário do próprio código mostra a suposição errada: "um treino que
+já tem série não tem mais 'exercício ainda não começado' pra oferecer" —
+falso quando o modelo tem MAIS DE UM exercício.
+
+Isso derruba o fluxo inteiro que o modelo existe pra servir: um modelo de
+perna com 5 exercícios, por exemplo, perde os atalhos de preenchimento
+automático (reps/peso pré-cadastrados) pros 4 exercícios restantes assim
+que a primeira série de QUALQUER um deles é registrada. A pessoa tem que
+voltar a navegar o catálogo completo manualmente pro resto do treino — e
+o write-back do plano (ADR-010, "grava de volta a carga que a pessoa
+ajustou") só acontece pelo caminho do "+", que também se perde junto.
+
+Confirmei que o comportamento acontece tanto via Server Action (chamada
+direta que já dispara re-render do Server Component) quanto persistiria
+num reload completo da página, já que a condição é a mesma em ambos os
+casos — não é um artefato só da automação de teste.
