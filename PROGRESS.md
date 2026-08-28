@@ -11,26 +11,24 @@
 
 > Bloco de handoff entre agentes (Antigravity ⇄ Claude). **Sobrescrever a cada sessão**, nunca acumular. Formato e regras: `AGENTS.md` §3.
 
-- **Última sessão:** 2026-08-27 (8) · agente: antigravity · branch: feat/sticker-logo-direita-compacto
-- **Em andamento:** Refinamento do layout do Sticker Story:
-  1. Topo: Logo oficial do LASTRO posicionado no **lado direito**, alinhado horizontalmente na mesma linha com o bloco de `SESSÃO FINALIZADA` e `${tempo} min`.
-  2. Divisor: Linha horizontal em dourado champagne com terminação em seta vetorial (`──────>`).
-  3. Métricas: 3 colunas de dados (`SÉRIES`, `EXERCÍCIOS`, `DIVISÃO / FOCO`).
-  4. Rodapé e espaços excessivos removidos para um design mais limpo, imponente e compacto.
-- **Bloqueado / a decidir:** Nada.
-- **Próximo passo:** Validação pelo dono no aparelho físico.
-- **Para o outro agente saber:**
-  - 28 arquivos de teste, 210/210 testes passando no Vitest.
-  - Build Next.js 16.3.0 sem falhas.
-  - Screenshots de validação disponíveis em `docs/screenshots/verificacao_sticker_story/`.
-- **Próximo passo:** O dono validar no celular. Item aberto que ninguém além dele pode fazer: as 102 dicas de execução (critério A9).
+- **Última sessão:** 2026-08-28 · agente: claude · branch: main (5 PRs mergeados)
+- **Em andamento:** Nada — sessão fechada, todas as 5 entregas mergeadas em `main` (`bdd6e19`), sincronizado com `origin/main`.
+- **O que foi entregue:**
+  1. `fix(relatorio)`: relatório histórico em Ajustes > Relatórios usava fallback fixo de 45min; agora calcula duração real a partir de `serie.criado_em`, igual ao relatório pós-treino ao vivo.
+  2. `feat(ajustes)`: exportar dados em CSV — botão em Ajustes, rota `GET /api/exportar` (`src/lib/dados/exportar.ts` + `src/app/api/exportar/route.ts`).
+  3. `feat(home)`: sub-toggle Séries/Volume na aba Grupos do card de métricas da Home, reaproveitando `volumePorGrupoMuscular` (mesma função da Análise Semanal).
+  4. `feat(analise)`: card "Grupos sem estímulo recente" (`src/components/grupos-sem-estimulo.tsx`, `src/lib/analise/recencia.ts`) — puramente informativo, não prescreve (PRD §5).
+  5. `feat(analise)`: alerta passivo de possível deload por tendência de RIR (`src/components/alerta-deload.tsx`, `src/lib/analise/alerta-deload.ts`) — nunca escreve no modelo de treino sozinho (ADR-010).
+- **Bug achado e corrigido antes do merge:** card de "dias sem estímulo" podia mostrar "-1 dias" por skew de fuso entre a data da série e o "hoje" do servidor. Corrigido com piso em 0 (`Math.max(0, ...)`) em `src/lib/analise/recencia.ts` (commit `bdd6e19`). Achado só na revisão visual manual com Playwright + dado seedado, não pelo Vitest.
+- **Bloqueado / a decidir:** Apple Watch / Wear OS — colide com duas linhas do `PRD.md` congelado (proíbe wearable e proíbe app nativo em loja). Exige Scope Change formal em `DECISIONS.md` antes de qualquer código. **Não iniciar sem o dono decidir.**
+- **Próximo passo:** Nenhum item específico enfileirado; ver dívidas antigas abaixo.
 - **Para o outro agente saber:**
   - **ADR-010 reverteu UMA frase da ADR-009** (a que proibia colunas de reps/peso no modelo). A restrição estrutural continua INTEIRA: `src/lib/analise/` não pode enxergar `modelo_treino`, e agora isso é teste (`sem-modelo-treino.test.ts`), não só prosa. Não derrube essa barreira para "comparar planejado vs executado" — é a razão de existir da ADR-008.
   - `grant update` em `modelo_treino_exercicio` é **por coluna** (só `reps`/`peso`). Reordenar segue impossível pelo banco.
-  - **Dívida:** o histórico de migração divergiu — remoto tem `0001`–`0009` numeradas e cinco com timestamp; o repo tem `0010`–`0014`. São as mesmas migrações. `db push` recusa enquanto isso durar; a `0015` foi aplicada via `db query` e registrada à mão. Não rodei `migration repair` (risco próprio).
-  - **Três pares de regras CSS duplicadas** encontrados hoje (`.topo-pro`, `.chip-filtro`, `.barra-conversa`), dois causando bug visível. Comentei cada um dizendo qual vence. Antes de editar CSS, confira se existe uma segunda regra do mesmo seletor mais abaixo.
-  - `scripts/test-jornada-usuario.mjs` percorre as 3 jornadas do PRD em 13 etapas e audita alvo de toque, overflow, conteúdo cortado e botão inalcançável em modal. **Fechou a sessão com zero achados.**
-  - ⚠️ **Colisão de trabalho real:** minhas mudanças não commitadas foram varridas duas vezes por commits do antigravity (`88f58c0` e `b0a3dcc`) enquanto ele trocava de branch. Nada se perdeu, mas commite cedo e com frequência enquanto os dois estiverem no mesmo repo.
+  - **Dívida:** o histórico de migração divergiu — remoto tem `0001`–`0009` numeradas e cinco com timestamp; o repo tem `0010`–`0014`. São as mesmas migrações. `db push` recusa enquanto isso durar; a `0015` foi aplicada via `db query` e registrada à mão. Ninguém rodou `migration repair` (risco próprio).
+  - 102 exercícios do catálogo sem dica de execução — curadoria humana, não é bug (ADR-007, FF7).
+  - PDF bonito da Análise Semanal — item 5 do backlog do dono, não desenhado ainda.
+  - Antes de mergear PRs que tocam os mesmos arquivos (aconteceu com `i18n.ts` e `analise-interativa.tsx` nesta sessão): integrar localmente numa branch, resolver conflito ali, rodar os 4 comandos + revisão visual, só então replicar nas branches reais.
 
 ---
 
