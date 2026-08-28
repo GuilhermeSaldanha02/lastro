@@ -18,6 +18,7 @@ export default async function PaginaModelos() {
         titulo={t("Ajustes", idioma)}
         destaque={t("Modelos", idioma)}
         voltarHref="/ajustes"
+        perfil={perfil}
         idioma={idioma}
       />
 
