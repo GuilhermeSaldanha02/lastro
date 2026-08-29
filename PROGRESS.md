@@ -11,8 +11,8 @@
 
 > Bloco de handoff entre agentes (Antigravity ⇄ Claude). **Sobrescrever a cada sessão**, nunca acumular. Formato e regras: `AGENTS.md` §3.
 
-- **Última sessão:** 2026-08-28 (10) · agente: claude · branch: main (PR #138, #139, #141, #143, #145, #146, #148, #149, #151, #153, #155 mergeados)
-- **Em andamento:** Nada — sessão fechada. Teste adversarial ("não quero final feliz") + teste do fluxo de modelo de treino, ambos pedidos explícitos do dono. **6 bugs encontrados, corrigidos, e os 6 fecharam `PASSOU` de verdade** — cada um auditado por um agente independente (protocolo `AGENTS.md` §5 — quem implementa não se audita), em 4 rodadas (a 2ª só pro VS-03, que reprovou na 1ª por causa raiz errada; a 3ª só pro TR-04, achado novo que surgiu das próprias auditorias).
+- **Última sessão:** 2026-08-28 (11) · agente: claude · branch: main (PR #138, #139, #141, #143, #145, #146, #148, #149, #151, #153, #155 mergeados)
+- **Em andamento:** Nada — sessão fechada. Teste adversarial ("não quero final feliz") + teste do fluxo de modelo de treino, ambos pedidos explícitos do dono. **6 bugs encontrados, corrigidos, e os 6 fecharam `PASSOU` de verdade** — cada um auditado por um agente independente (protocolo `AGENTS.md` §5 — quem implementa não se audita), em 4 rodadas (a 2ª só pro VS-03, que reprovou na 1ª por causa raiz errada; a 3ª só pro TR-04, achado novo que surgiu das próprias auditorias). Ao final, o dono pediu pra revogar o usuário de QA persistente que tinha pedido pra manter vivo — feito.
 - **Achados, todos `PASSOU`, fechados:**
   1. **OF-02 — CRÍTICO (PR #139).** RIR fora da faixa travava a fila offline pra sempre; corrigido com validação no cliente + `outbox.ts` distinguindo erro permanente de transitório.
   2. **TR-02 (PR #143).** Cache do Next desatualizado após registrar série; corrigido com `revalidatePath`.
@@ -20,7 +20,7 @@
   4. **VS-04 (PR #146).** Avatar mostrava "AT" cravado em 5 páginas sem a prop `perfil`; corrigido.
   5. **VS-03 (PR #141 sintoma + PR #149 causa raiz + PR #151 2ª auditoria confirmando).** 1ª tentativa (scroll-margin) foi reprovada por causa raiz errada; a causa real era `ResizeObserver` medindo `contentRect.height` (content-box) em vez de `getBoundingClientRect()` (border-box) em `timer-topo.tsx`, deixando a altura publicada ~17px curta. Corrigido, 2ª auditoria confirmou nos dois estados do timer.
   6. **TR-04 (PR #153 + PR #155 auditoria confirmando).** Erro de hidratação do React ao recarregar um treino já finalizado numa sessão anterior (achado novo, que surgiu das próprias auditorias dos outros 5) — `treinoConcluido` lia `localStorage` direto dentro de `useState(() => ...)`, divergindo entre servidor (sempre `false`) e cliente (lê o valor real). Mesma classe de bug que `timer-topo.tsx` já tinha corrigido pro cronômetro. Trocado por `useSyncExternalStore`, mesmo padrão. Auditoria confirmou: 3 recargas de treino finalizado + 2 de treino em andamento, 0 erros em todas.
-- **Usuário de QA persistente:** `qa.persona@lastro.test`, documentado em `docs/qa-acesso.md` — senha só em `.qa-credentials.local` (gitignored). Ver esse doc antes de reusar ou revogar.
+- **Usuário de QA:** `qa.persona@lastro.test` foi **revogado** (pedido do dono, 2026-08-28) — apagado via `limpar-usuario`, confirmado por contagem (`sobrou: 0`, cascade levou treinos/séries/modelos junto). Ver `docs/qa-acesso.md` pra recriar se precisar de novo. As evidências em `qa/evidencias/` continuam válidas — só a conta que provou elas é que não existe mais.
 - **Bloqueado / a decidir:** Apple Watch / Wear OS — colide com duas linhas do `PRD.md` congelado. Exige Scope Change formal em `DECISIONS.md`. **Não iniciar sem o dono decidir.**
 - **Próximo passo:** Nenhum item novo enfileirado. Sessão de QA adversarial encerrada — os 6 achados estão fechados de ponta a ponta (achado → corrigido → auditado por agente independente → `PASSOU`).
 - **Para o outro agente saber:**
