@@ -664,6 +664,24 @@ const DICIONARIO: Record<string, { en: string; es: string }> = {
   "Retomar": { en: "Resume", es: "Reanudar" },
   "Pausar": { en: "Pause", es: "Pausar" },
   "Pronto!": { en: "Done!", es: "¡Listo!" },
+
+  // --- components/analise-interativa.tsx / pareceres-salvos.tsx ---
+  // Nota: "Salvando…", "Não foi possível salvar. Tente de novo." e
+  // "Excluindo…" já existem no dicionário (meta-semanal-form.tsx /
+  // excluir-conta.tsx) com o mesmo texto em PT-BR — reaproveitados via
+  // t(), não duplicados aqui (chave é o texto em PT-BR; duplicar quebraria
+  // no-dupe-keys do lint).
+  "Salvar este parecer": { en: "Save this analysis", es: "Guardar este informe" },
+  "Salvo": { en: "Saved", es: "Guardado" },
+  "Pareceres salvos": { en: "Saved analyses", es: "Informes guardados" },
+  "Baixar PDF": { en: "Download PDF", es: "Descargar PDF" },
+  "Ver parecer": { en: "View analysis", es: "Ver informe" },
+  "Voltar à lista": { en: "Back to list", es: "Volver a la lista" },
+  "Excluir parecer salvo": { en: "Delete saved analysis", es: "Eliminar informe guardado" },
+  "Excluir este parecer apaga o registro salvo — não afeta seus treinos nem séries. Não dá para desfazer.": {
+    en: "Deleting this analysis removes the saved record — it doesn't affect your workouts or sets. Can't be undone.",
+    es: "Eliminar este informe borra el registro guardado — no afecta tus entrenamientos ni series. No se puede deshacer.",
+  },
 };
 
 export function t(chavePtBr: string, idioma: Idioma): string {
