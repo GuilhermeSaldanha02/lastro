@@ -38,7 +38,8 @@ export default function Parecer({
    * salvo mostraria a data de HOJE, não a data real do save). */
   emitidoEm?: string;
 }) {
-  const emissao = new Date(emitidoEm ?? Date.now()).toLocaleDateString(idioma, {
+  const dataEmissao = emitidoEm ? new Date(emitidoEm) : new Date();
+  const emissao = dataEmissao.toLocaleDateString(idioma, {
     day: "numeric",
     month: "short",
     year: "numeric",
