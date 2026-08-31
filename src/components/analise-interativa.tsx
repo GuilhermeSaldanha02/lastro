@@ -64,7 +64,8 @@ export default function AnaliseInterativa({
   >("ocioso");
 
   async function salvar() {
-    if (!resultado || perguntaEmitida === null || statusSalvar === "salvando") return;
+    if (!resultado || perguntaEmitida === null) return;
+    if (statusSalvar === "salvando" || statusSalvar === "salvo") return;
     setStatusSalvar("salvando");
     try {
       await salvarParecer({
@@ -246,7 +247,7 @@ export default function AnaliseInterativa({
             type="button"
             className="botao-secundario"
             onClick={salvar}
-            disabled={statusSalvar === "salvando" || statusSalvar === "salvo"}
+            aria-disabled={statusSalvar === "salvando" || statusSalvar === "salvo"}
           >
             {statusSalvar === "salvando" && t("Salvando…", idioma)}
             {statusSalvar === "salvo" && `${t("Salvo", idioma)} ✓`}

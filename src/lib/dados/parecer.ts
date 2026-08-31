@@ -79,6 +79,7 @@ export async function salvarParecer(dados: NovoParecerInput): Promise<void> {
     idioma: dados.idioma,
   });
   if (error) {
+    console.error("[parecer] falha ao salvar:", error.message);
     throw new Error(`Falha ao salvar parecer: ${error.message}`);
   }
 
