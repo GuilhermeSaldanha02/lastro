@@ -213,7 +213,7 @@ const DICIONARIO: Record<string, { en: string; es: string }> = {
   "Selecione o exercício": { en: "Select the exercise", es: "Selecciona el ejercicio" },
   "Unilateral · reps contam por lado": { en: "Unilateral · reps count per side", es: "Unilateral · las repeticiones cuentan por lado" },
   "Última vez:": { en: "Last time:", es: "Última vez:" },
-  "Usar valores": { en: "Use values", es: "Usar valores" },
+  "Usar valores": { en: "Use", es: "Usar" },
   "Tipo de Série": { en: "Set Type", es: "Tipo de Serie" },
   "Selecione o tipo": { en: "Select the type", es: "Selecciona el tipo" },
   "Valendo": { en: "Working", es: "Válida" },
@@ -485,7 +485,7 @@ const DICIONARIO: Record<string, { en: string; es: string }> = {
   // --- components/coach-interativo.tsx ---
   "Sessão expirada. Faça login novamente.": { en: "Session expired. Sign in again.", es: "Sesión expirada. Inicia sesión de nuevo." },
   "Falha ao consultar o coach.": { en: "Failed to reach the coach.", es: "Fallo al consultar al coach." },
-  "Falha de rede. Tente de novo.": { en: "Network failure. Try again.", es: "Fallo de red. Intenta de nuevo." },
+  "Falha de rede. Tente de novo.": { en: "Network error. Try again.", es: "Fallo de red. Intenta de nuevo." },
   "Assistente de Treino 24h": { en: "24h Training Assistant", es: "Asistente de Entrenamiento 24h" },
   "Tire dúvidas sobre periodização, fadiga e progressão com base nas suas métricas reais.": {
     en: "Ask about periodization, fatigue, and progression based on your real metrics.",
@@ -503,7 +503,7 @@ const DICIONARIO: Record<string, { en: string; es: string }> = {
   // --- components/analise-interativa.tsx ---
   "Falha ao gerar o parecer (erro": { en: "Failed to generate the report (error", es: "Fallo al generar el informe (error" },
   "Falha de rede ao gerar o parecer. Tente novamente.": {
-    en: "Network failure generating the report. Try again.",
+    en: "Network error generating the report. Try again.",
     es: "Fallo de red al generar el informe. Intenta de nuevo.",
   },
   "Análise semanal": { en: "Weekly analysis", es: "Análisis semanal" },
@@ -610,6 +610,60 @@ const DICIONARIO: Record<string, { en: string; es: string }> = {
   "Disciplina Semanal": { en: "Weekly Discipline", es: "Disciplina Semanal" },
   "dia seguido": { en: "day streak", es: "día seguido" },
   "dias seguidos": { en: "day streak", es: "días seguidos" },
+
+  // --- app/ajustes/page.tsx (Relatórios & Stickers) / app/ajustes/relatorios/page.tsx ---
+  // F5 do relatório de estado (2026-08-26): 21 strings sem tradução,
+  // concentradas nas features mais novas (Stories, player 3D, timer).
+  "Relatórios & Stickers": { en: "Reports & Stickers", es: "Informes y Stickers" },
+  "Exportar imagem de treino para Stories": {
+    en: "Export a workout image for Stories",
+    es: "Exportar una imagen de entrenamiento para Stories",
+  },
+  "Exportar Meus Dados (CSV)": { en: "Export My Data (CSV)", es: "Exportar Mis Datos (CSV)" },
+  "Histórico e Stories": { en: "History & Stories", es: "Historial y Stories" },
+  "Nenhum treino registrado ainda": { en: "No workouts logged yet", es: "Aún no hay entrenamientos registrados" },
+  "Ir para Treinos": { en: "Go to Workouts", es: "Ir a Entrenamientos" },
+  "Selecione qualquer treino passado para visualizar as estatísticas e exportar o sticker oficial transparente (1080×1080) para Instagram Stories.": {
+    en: "Select any past workout to view the stats and export the official transparent sticker (1080×1080) for Instagram Stories.",
+    es: "Selecciona cualquier entrenamiento pasado para ver las estadísticas y exportar el sticker oficial transparente (1080×1080) para Instagram Stories.",
+  },
+  "Assim que você concluir sua primeira sessão de treino, ela aparecerá aqui com métricas completas e opções de sticker.": {
+    en: "Once you finish your first workout session, it'll show up here with full metrics and sticker options.",
+    es: "En cuanto termines tu primera sesión de entrenamiento, aparecerá aquí con métricas completas y opciones de sticker.",
+  },
+
+  // --- app/catalogo/[id]/page.tsx ---
+  "Biomecânica & Instruções Técnicas": {
+    en: "Biomechanics & Technical Instructions",
+    es: "Biomecánica e Instrucciones Técnicas",
+  },
+  "Músculo Alvo": { en: "Target Muscle", es: "Músculo Objetivo" },
+  "Sinergistas": { en: "Synergists", es: "Sinergistas" },
+  "Mecânica Articular": { en: "Joint Mechanics", es: "Mecánica Articular" },
+  "Histórico de Séries": { en: "Set History", es: "Historial de Series" },
+  // Achado da auditoria independente (PR #160): chamadas t(...) MULTI-LINHA
+  // escapavam do script de varredura (regex de linha única) — ficavam em
+  // português cru mesmo em EN/ES. Corrigido aqui; ver PROGRESS.md.
+  "Execute o movimento com controle articular completo, preservando a estabilidade da coluna e cadência uniforme na fase excêntrica e concêntrica.": {
+    en: "Perform the movement with full joint control, keeping the spine stable and an even tempo through the eccentric and concentric phases.",
+    es: "Ejecuta el movimiento con control articular completo, manteniendo la estabilidad de la columna y un ritmo uniforme en las fases excéntrica y concéntrica.",
+  },
+
+  // --- components/historico-relatorios-pos-treino.tsx ---
+  "VOLUME": { en: "VOLUME", es: "VOLUMEN" },
+  "Carregando...": { en: "Loading...", es: "Cargando..." },
+  "Gerar Imagem / Sticker Story": { en: "Generate Image / Story Sticker", es: "Generar Imagen / Sticker de Historia" },
+
+  // --- components/player-execucao-exercicio.tsx ---
+  "Foco:": { en: "Focus:", es: "Enfoque:" },
+  "Animação Ativa": { en: "Animation Active", es: "Animación Activa" },
+
+  // --- components/timer-topo.tsx ---
+  "Treino": { en: "Workout", es: "Entrenamiento" },
+  "Descanso": { en: "Rest", es: "Descanso" },
+  "Retomar": { en: "Resume", es: "Reanudar" },
+  "Pausar": { en: "Pause", es: "Pausar" },
+  "Pronto!": { en: "Done!", es: "¡Listo!" },
 };
 
 export function t(chavePtBr: string, idioma: Idioma): string {

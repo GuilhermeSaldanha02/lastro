@@ -16,15 +16,16 @@ Regras completas: skill `qa-registro`. Prova crua obrigatória em `qa/evidencias
 |---|---|
 | auth | src/app/login/** src/app/auth/** src/lib/supabase/** |
 | treino | src/app/treino/** src/lib/dados/** src/lib/rota-de-retorno.ts |
-| analise | src/app/analise/** src/lib/analise/** src/lib/texto/** src/app/api/** |
+| analise | src/app/analise/** src/lib/analise/** src/app/api/** |
 | catalogo | src/app/catalogo/** |
 | coach | src/app/coach/** |
 | perfil | src/app/perfil/** |
 | ajustes | src/app/ajustes/** src/lib/anilhas.ts |
 | offline | src/lib/offline/** public/sw.js |
 | visual | src/app/tokens.css src/app/sistema.css src/app/globals.css src/app/layout.tsx |
+| i18n | src/lib/texto/** |
 
-> **`visual` é transversal de propósito.** Mudança de token invalida todo item cuja prova é visual, em qualquer tela — se um item depende de aparência, registre-o na área `visual`, não só na área da rota.
+> **`visual` e `i18n` são transversais de propósito.** Mudança de token invalida todo item cuja prova é visual, em qualquer tela; mudança em `src/lib/texto/i18n.ts` invalida a cobertura de tradução de qualquer tela, não só da área da rota — se um item depende de aparência ou de idioma, registre-o na área correspondente, não só na área da rota. `src/lib/texto/` saiu de `analise` (2026-08-31) — era mapeamento herdado de quando o dicionário nasceu ali, mas cobre o app inteiro.
 
 ---
 
@@ -49,7 +50,9 @@ Regras completas: skill `qa-registro`. Prova crua obrigatória em `qa/evidencias
 | VS-04 | visual | Avatar do cabeçalho mostra a foto/inicial real do usuário em toda página, nunca o placeholder cravado | PASSOU | c334034 | 2026-08-28 | qa/evidencias/VS-04/ |
 | TR-04 | treino | Recarregar um treino já finalizado não gera erro de hidratação do React | PASSOU | fdf7b97 | 2026-08-28 | qa/evidencias/TR-04/auditoria-independente/ |
 | OF-03 | offline | Fila offline drena em qualquer tela do app quando a rede volta, não só dentro de `/treino/[id]`; sem corrida entre o sincronizador global e o local quando os dois coexistem na mesma tela | PASSOU (auditoria independente, 2 rodadas: 1ª reprovou por corrida real entre os dois listeners causando descarte indevido pra `db.falhas`; corrigido com mutex de módulo; 2ª rodada confirmou, mesmo cenário, sem concorrência) | d810293 | 2026-08-30 | qa/evidencias/OF-03/auditoria-independente/ |
-| VS-05 | visual | Barra de envio do Coach (`.barra-conversa`) muda de cor com o tema; sem CSS duplicado; alvo de toque de 48px preservado no input/botão/`.botao-texto` | PASSOU COM RESSALVA (auditoria independente confirmou fundo/cor mudando entre tema Padrão e Claro, `min-height`/`min-width` 48px nos dois; achou legibilidade marginal do input contra o container no tema Claro — mesmo padrão já existente em `.nav`, não é regressão desta PR, mas vale conferência visual do dono) | (branch `fix/barra-coach-tema`, ainda não mergeada) | 2026-08-31 | qa/evidencias/VS-05/auditoria-independente/ |
+| VS-05 | visual | Barra de envio do Coach (`.barra-conversa`) muda de cor com o tema; sem CSS duplicado; alvo de toque de 48px preservado no input/botão/`.botao-texto` | PASSOU COM RESSALVA (auditoria independente confirmou fundo/cor mudando entre tema Padrão e Claro, `min-height`/`min-width` 48px nos dois; achou legibilidade marginal do input contra o container no tema Claro — mesmo padrão já existente em `.nav`, não é regressão desta PR, mas vale conferência visual do dono) | ceac26e | 2026-08-31 | qa/evidencias/VS-05/auditoria-independente/ |
+| IX-01 | i18n | Toda chamada `t(..., idioma)` do app tem entrada no `DICIONARIO`, em EN/ES real de app de treino (não tradução textbook) | PASSOU (auditoria independente achou 3 chamadas multi-linha que o script de cobertura tinha perdido — corrigidas; verificado ao vivo, EN, em `/ajustes/relatorios` e `/catalogo/[id]`, as 3 strings corrigidas e nenhuma outra em português cru) | (branch `fix/i18n-vocabulario-real`, ainda não mergeada) | 2026-08-31 | qa/evidencias/IX-01/auditoria-independente/ |
+| AJ-02 | ajustes | Excluir a própria conta (C5): confirmação inline (nunca `window.confirm`), exclusão real, sessão encerrada, cascade limpo | PASSOU (verificado ao vivo: usuário QA clicou em "Delete account" duas vezes — abrir confirmação, confirmar —, app redirecionou pra `/login`, banco confirmou `sobrou: 0`) | 8b65601 | 2026-08-31 | qa/evidencias/AJ-02/ |
 
 ---
 
