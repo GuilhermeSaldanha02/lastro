@@ -623,6 +623,14 @@ const DICIONARIO: Record<string, { en: string; es: string }> = {
   "Histórico e Stories": { en: "History & Stories", es: "Historial y Stories" },
   "Nenhum treino registrado ainda": { en: "No workouts logged yet", es: "Aún no hay entrenamientos registrados" },
   "Ir para Treinos": { en: "Go to Workouts", es: "Ir a Entrenamientos" },
+  "Selecione qualquer treino passado para visualizar as estatísticas e exportar o sticker oficial transparente (1080×1080) para Instagram Stories.": {
+    en: "Select any past workout to view the stats and export the official transparent sticker (1080×1080) for Instagram Stories.",
+    es: "Selecciona cualquier entrenamiento pasado para ver las estadísticas y exportar el sticker oficial transparente (1080×1080) para Instagram Stories.",
+  },
+  "Assim que você concluir sua primeira sessão de treino, ela aparecerá aqui com métricas completas e opções de sticker.": {
+    en: "Once you finish your first workout session, it'll show up here with full metrics and sticker options.",
+    es: "En cuanto termines tu primera sesión de entrenamiento, aparecerá aquí con métricas completas y opciones de sticker.",
+  },
 
   // --- app/catalogo/[id]/page.tsx ---
   "Biomecânica & Instruções Técnicas": {
@@ -633,6 +641,13 @@ const DICIONARIO: Record<string, { en: string; es: string }> = {
   "Sinergistas": { en: "Synergists", es: "Sinergistas" },
   "Mecânica Articular": { en: "Joint Mechanics", es: "Mecánica Articular" },
   "Histórico de Séries": { en: "Set History", es: "Historial de Series" },
+  // Achado da auditoria independente (PR #160): chamadas t(...) MULTI-LINHA
+  // escapavam do script de varredura (regex de linha única) — ficavam em
+  // português cru mesmo em EN/ES. Corrigido aqui; ver PROGRESS.md.
+  "Execute o movimento com controle articular completo, preservando a estabilidade da coluna e cadência uniforme na fase excêntrica e concêntrica.": {
+    en: "Perform the movement with full joint control, keeping the spine stable and an even tempo through the eccentric and concentric phases.",
+    es: "Ejecuta el movimiento con control articular completo, manteniendo la estabilidad de la columna y un ritmo uniforme en las fases excéntrica y concéntrica.",
+  },
 
   // --- components/historico-relatorios-pos-treino.tsx ---
   "VOLUME": { en: "VOLUME", es: "VOLUMEN" },
