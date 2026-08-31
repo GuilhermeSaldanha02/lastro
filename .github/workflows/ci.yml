@@ -53,3 +53,23 @@ jobs:
 
       - name: Type-check
         run: npx tsc --noEmit
+
+      # Fase 6 (escopo reduzido, 2026-08-31): as 3 jornadas do PRD §6 contra
+      # o Supabase HOSPEDADO de verdade (não há stack local, ver
+      # KNOWLEDGE.md) — cada spec cria e apaga seu próprio usuário QA
+      # descartável (e2e/helpers/usuario-descartavel.ts), então PRECISA de
+      # secrets reais, sem placeholder: sem eles o passo falha alto, não
+      # silenciosamente contra um projeto que não existe. /api/analise e
+      # /api/coach são interceptados no navegador nos specs J2/J3 — a
+      # Gemini real nunca é chamada por este workflow (cota de 20 req/dia,
+      # KNOWLEDGE.md §3.2, não é pra queimar em todo push).
+      - name: Instalar navegador do Playwright
+        run: npx playwright install --with-deps chromium
+
+      - name: E2E (jornadas J1/J2/J3 do PRD §6)
+        run: npm run e2e
+        env:
+          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          CI: true
