@@ -54,22 +54,23 @@ Login e-mail + Google · catálogo de 102 exercícios com 310 GIFs · Coach 24h 
 Isto **já está levantado e priorizado** — não precisa ser redescoberto. As fontes são autocontidas:
 
 - **`docs/BACKLOG-PROXIMA-FASE.md`** — itens A1–A2 (bugs), B1–B2 (achados do dono), C1–C5 (features aprovadas pelo dono), T1–T7 (auditoria pós-Apex Pro). Vários já resolvidos e marcados.
-- **`docs/BACKLOG-REDESENHO.md`** — Trilha B do redesenho: Nível 1 fechado (E1–E4), **Nível 2 (M1–M9) e Nível 3 (H1–H4) não começados**.
-- **`PROGRESS.md` §Fase 6** — integração final: nunca iniciada.
+- **`docs/BACKLOG-REDESENHO.md`** — Trilha B do redesenho: Nível 1 fechado (E1–E4); **Nível 2 (M1–M9) e Nível 3 (H1–H4) estão FEITO ou FEITO EM PARTE — nenhum item "não começado".** Correção de 2026-08-31: esta linha do relatório estava errada; conferido item a item contra o backlog real, cada "em parte" (M6, M7, H1, H3) já tem decisão explícita e datada de não fazer o resto agora — não é trabalho esquecido.
+- **`PROGRESS.md` §Fase 6** — integração final: nunca iniciada; escopo reduzido em 2026-08-31 (ver tabela) pra só os 3 E2E das jornadas do PRD §6, não a fase inteira de uma vez.
 
-### O que sobra, resumido
+### O que sobra, resumido (atualizado 2026-08-31)
 
 | Item | Onde | Estado |
 |---|---|---|
-| **Fase 6 inteira** — review integral, fitness functions automatizadas, E2E das 3 jornadas, gate visual em celular físico | `PROGRESS.md` | ⬜ Não iniciada |
-| **T5** — campo do coach 9px sob a aba inferior (360×640) | Backlog | ⬜ ALTA, medido |
-| **T6** — alvos de toque abaixo de 48px ("Ver Todos" mede 20px) | Backlog | ⬜ Viola D1 |
-| **T7** — 6 achados menores (erro cru em inglês, texto de sucesso com estilo de erro, "abaixo" apontando pra cima…) | Backlog | ⬜ |
-| **T3b parte 1** — remedir os 14 pares de contraste de `DESIGN.md` §4.2 contra o Apex Pro | Backlog | ⬜ Só C3 remedido |
-| **C1/C2/C4** — histórico por exercício + repetir a série *do exercício* + PR na linha | Backlog | ⬜ Uma consulta serve aos 3 |
-| **C5** — excluir a própria conta (cascade já funciona, falta a porta na UI) | Backlog | ⬜ |
-| **Nível 2 e 3 do redesenho** (M1–M9, H1–H4) | Backlog redesenho | ⬜ |
-| **Sync offline em celular real** (modo avião → reconectar) | `PROGRESS.md` | ⬜ Nunca testado em aparelho |
+| **Fase 6, escopo reduzido** — só os 3 E2E das jornadas do PRD §6 no CI (não fitness functions/gate físico ainda) | `PROGRESS.md` | ⬜ Não iniciada |
+| ~~**T5** — campo do coach 9px sob a aba inferior~~ | Backlog | ✅ Corrigido junto com VS-05, PR #159 |
+| ~~**T6** — alvos de toque abaixo de 48px~~ | Backlog | ✅ Fechado — 3 dos 4 já estavam corrigidos numa sessão anterior sem atualizar o backlog; o 4º (`.botao-texto`, "Cadastre-se") corrigido no PR #159 |
+| **T7** — 6 achados menores (erro cru em inglês, texto de sucesso com estilo de erro, "abaixo" apontando pra cima…) | Backlog | ⬜ Não confundir com a auditoria de vocabulário i18n do PR #160 — são achados diferentes, nenhum dos 6 foi tocado |
+| **T3b parte 1** — remedir os 14 pares de contraste de `DESIGN.md` §4.2 contra o Apex Pro | Backlog | ⬜ Avaliado em 2026-08-31: só C3 remedido, resto é hygiene documental de baixo risco (a correção de acessibilidade real já foi feita, parte 2, 21/08) — recomendado adiar, não bloqueante |
+| ~~**C1/C4**~~ — histórico por exercício + PR na linha | Backlog | ✅ Já estavam inteiramente implementados (achado em 2026-08-31 ao investigar) |
+| **C2** — repetir a série *do exercício*, não a última do treino inteiro | Backlog | ⬜ Bug real confirmado 2026-08-31; dono decidiu explicitamente não corrigir agora |
+| **C5** — excluir a própria conta (cascade já funciona, falta a porta na UI) | Backlog | 🔶 Componente já existe e está montado em `/ajustes` (achado 2026-08-31) — falta só verificação de clique real em sessão QA, não construção |
+| ~~**Nível 2 e 3 do redesenho**~~ (M1–M9, H1–H4) | Backlog redesenho | ✅ Todos FEITO ou FEITO EM PARTE com decisão documentada — nada pendente sem registro |
+| **Sync offline em celular real** (modo avião → reconectar) | `PROGRESS.md` | ⬜ Nunca testado em aparelho físico. Não confundir com OF-03 (PR #158) — aquele corrigiu a fila não drenando fora da tela do treino, verificado em navegador; o teste em celular físico continua não feito |
 
 ---
 
