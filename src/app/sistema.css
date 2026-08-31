@@ -1885,7 +1885,13 @@
 
    Centralização por `margin: auto` em vez de `transform`: um deslocamento
    que depende da própria largura é exatamente o que quebrou aqui, e
-   `margin` não deixa resto para outra regra herdar por engano. */
+   `margin` não deixa resto para outra regra herdar por engano.
+
+   Achado do dono (2026-08-30): o `background` estava com obsidiana
+   CRAVADA (`rgba(7, 9, 13, 0.92)`) em vez do token de vidro — por isso a
+   barra não mudava de cor ao trocar de tema. Mesmo par
+   opaco/translúcido-com-blur que `.nav` já usa (P7 — valor de design tem
+   fonte única, nenhum cravado dentro de componente). */
 .barra-conversa {
   position: fixed;
   bottom: calc(var(--lastro-clearance-nav) + var(--lastro-e-2));
@@ -1897,13 +1903,19 @@
   display: flex;
   align-items: center;
   gap: var(--lastro-e-2);
-  background: rgba(7, 9, 13, 0.92);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
+  background: var(--lastro-vidro-nav-opaco);
   border: 1px solid var(--lastro-linha);
   border-radius: var(--lastro-raio-pilula);
   z-index: 35;
   box-sizing: border-box;
+}
+
+@supports (backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px)) {
+  .barra-conversa {
+    background: var(--lastro-vidro-nav);
+    -webkit-backdrop-filter: var(--lastro-vidro-desfoque);
+    backdrop-filter: var(--lastro-vidro-desfoque);
+  }
 }
 
 .barra-conversa__input {
@@ -3117,6 +3129,12 @@
   padding: var(--lastro-e-2);
   text-align: center;
   width: 100%;
+  /* T6 (2026-08-30) — media ~33px, abaixo do piso de 48px (D1). Único uso
+     hoje é "Cadastre-se"/"Fazer login" em /login. */
+  min-height: var(--lastro-alvo-min);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .botao-texto:hover {
@@ -3492,43 +3510,16 @@
    cima (2026-08-27). Ela definia `left`/`right` sem zerar o `transform` e
    o `width` da outra, e a soma das duas jogava a barra para fora da tela.
    Duas regras para o mesmo seletor, em arquivos deste tamanho, é como o
-   bug nasceu — não recriar. */
+   bug nasceu — não recriar.
 
-.barra-conversa__input {
-  flex: 1;
-  background: var(--lastro-sup-1);
-  border: 1px solid var(--lastro-linha);
-  border-radius: var(--lastro-raio-pilula);
-  padding: 12px 18px;
-  font-size: var(--lastro-papel-corpo);
-  color: var(--lastro-txt);
-  backdrop-filter: blur(16px);
-}
-
-.barra-conversa__input:focus {
-  border-color: var(--lastro-ouro);
-  outline: none;
-}
-
-.barra-conversa__botao {
-  width: 48px;
-  height: 48px;
-  border-radius: 50%;
-  background: var(--lastro-grad-acao);
-  color: #07090D;
-  border: none;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  box-shadow: 0 4px 12px var(--lastro-ouro-glow);
-  flex: none;
-}
-
-.barra-conversa__botao:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
+   Achado do dono (2026-08-30): apesar do comentário acima, `__input` e
+   `__botao` continuavam duplicados AQUI EMBAIXO — só o seletor-mãe
+   `.barra-conversa` tinha sido fundido de verdade. Cascata por ordem de
+   fonte (mesma especificidade) fazia ESTA cópia vencer: ela derrubava o
+   `min-height: 48px` do input (regressão de alvo de toque, T6) e cravava
+   `color: #07090D` no botão em vez de `var(--lastro-acao-txt)` (não
+   seguia o tema). Removidas — a versão de cima (linhas ~1909-1955) é a
+   única fonte, e já está correta. */
 
 /* Bento Grid de Ajustes */
 .card-perfil-bento {
