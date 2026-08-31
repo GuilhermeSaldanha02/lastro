@@ -11,6 +11,21 @@
 // ser importável de dois lugares): `treino-detalhe.tsx` continua chamando
 // pra alimentar o indicador visual de sync (D7); `sincronizador-global.tsx`
 // (montado no layout raiz) chama a mesma função em qualquer tela.
+//
+// Achado da auditoria independente (PR #158, 2026-08-30): com os dois
+// listeners coexistindo em `/treino/[id]` (o global e o local), o evento
+// `online` disparava DUAS chamadas concorrentes. `sincronizar()` lê
+// `db.outbox.toArray()` sem lock — as duas leem o mesmo item pendente,
+// as duas tentam `criarSerieRemoto`, uma vence no servidor e a outra
+// recebe "duplicate key" do Postgres. Como esse erro bate no padrão de
+// `ehErroPermanente`, a chamada perdedora descartava para `db.falhas` uma
+// série que JÁ TINHA sido gravada com sucesso pela vencedora — dado
+// íntegro no banco, mas o registro da fila mentia que ela tinha sido
+// perdida. Mutex de módulo: uma segunda chamada enquanto a primeira roda
+// não inicia outra passada — ela recebe a MESMA promise e espera o
+// resultado da que já está em andamento. Isso é o que torna a função
+// genuinamente idempotente sob chamada concorrente (antes só era
+// idempotente em sequência, nunca em paralelo).
 import {
   atualizarSerieRemoto,
   criarSerieRemoto,
@@ -21,7 +36,17 @@ import {
 } from "@/lib/dados/treino";
 import { sincronizar, type ResultadoSincronizacao } from "./outbox";
 
+let emAndamento: Promise<ResultadoSincronizacao> | null = null;
+
 export async function sincronizarPendentes(): Promise<ResultadoSincronizacao> {
+  if (emAndamento) return emAndamento;
+  emAndamento = executarSincronizacao().finally(() => {
+    emAndamento = null;
+  });
+  return emAndamento;
+}
+
+async function executarSincronizacao(): Promise<ResultadoSincronizacao> {
   return sincronizar({
     // Sincronização de treino ainda não existe (só séries, por ora) — a
     // fila nunca recebe "criar_treino" até essa próxima etapa existir.
