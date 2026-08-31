@@ -1288,3 +1288,23 @@ Reverte explicitamente a posição da ADR anterior contra tradução automática
 **Impacto.** Migração `0015`; `ADR.md` (ADR-010); `PRD.md` §9 nota C e critério A14 reescrito; teste novo em `src/lib/analise/`. Nenhuma tela nesta leva — a UI vem em PR própria.
 
 **Como reverter.** `drop column reps, peso` e `revoke update (reps, peso)`. Aditivo e nullable: o caminho do histórico continua existindo como fallback, então nada para de funcionar.
+
+---
+
+## 2026-08-31 — PDF da Análise Semanal: `@react-pdf/renderer`, não Puppeteer nem `window.print()`
+
+**O que mudou.** Nada no código ainda — esta entrada registra a escolha de biblioteca pra `SDD.md` §10 (histórico de pareceres + PDF), item 5 do backlog do dono, pedido depois de uso real do app.
+
+**As 3 alternativas pesquisadas e por que as 2 primeiras caem:**
+
+1. **`window.print()` / CSS de impressão nativa.** Zero dependência, mas `window.print()` **não funciona em navegador mobile** — e o lastro inteiro é "Modo Bancada", pensado pro celular. Eliminatório, não é questão de preferência.
+2. **`jsPDF` + `html2canvas`.** Funciona no celular, mas o resultado é uma **imagem** dentro do PDF, não texto — borra no zoom, arquivo maior, sem texto selecionável/pesquisável. Um app que já trata o sticker do Instagram como pixel-perfect regrediria em qualidade adotando isso pro documento mais formal do produto.
+3. **Puppeteer/headless browser no servidor.** Resultado de melhor qualidade (renderiza HTML/CSS real), mas exige binário de Chromium na function, cold start maior, custo de infraestrutura real — desproporcional pra um app pessoal de 1 usuário. Mesma lógica de custo/benefício que já levou a tratar a cota da Gemini como recurso escasso (`KNOWLEDGE.md` §3.2).
+
+**Escolhida: `@react-pdf/renderer`.** Motor de layout em JS puro (sem navegador headless), compatível com Next.js App Router, gera PDF vetorial de verdade — texto selecionável, arquivo pequeno, roda dentro do limite de uma function serverless da Vercel sem binário extra. Trade-off aceito: não clona pixel a pixel o CSS da tela (usa um modelo de layout flexbox reduzido, próprio da biblioteca) — aceitável porque o PDF é um documento de arquivo/exportação, não precisa ser idêntico à tela.
+
+**Alternativa descartada.** Gerar e guardar um PDF pré-renderizado no Supabase Storage no momento do save. Descartada porque o PDF é idempotente a partir do `texto`/`evidencia` já salvos (`SDD.md` §10.1) — guardar um binário redundante toda vez que salva é custo sem benefício.
+
+**Impacto.** `SDD.md` §10 (nova seção). `package.json` ganha `@react-pdf/renderer` como dependência nova. Nenhum código ainda — é a spec, a implementação vem em PR própria.
+
+**Como reverter.** Não há o que reverter — nenhum código foi escrito ainda. Se a biblioteca decepcionar na implementação, a decisão é revisitável sem custo afundado.
