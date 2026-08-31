@@ -7,6 +7,16 @@
 import { Document, Page, Text, View, StyleSheet } from "@react-pdf/renderer";
 import type { ParecerSalvo } from "@/lib/dados/parecer";
 import { separarVeredito } from "@/lib/texto/separar-veredito";
+import { formatarDataCurta } from "@/lib/tempo";
+import { formatarDelta, formatarPeso } from "@/lib/texto/formatar-delta";
+import { t } from "@/lib/texto/i18n";
+import type { BlocoEvidencia as TipoBlocoEvidencia } from "@/app/api/analise/evidencia";
+
+const ROTULO: Record<TipoBlocoEvidencia["sinal"], string> = {
+  alta: "Alta",
+  plato: "Platô",
+  queda: "Queda",
+};
 
 const estilos = StyleSheet.create({
   pagina: { padding: 40, fontSize: 11, fontFamily: "Helvetica" },
@@ -23,27 +33,34 @@ const estilos = StyleSheet.create({
     borderBottomColor: "#e0e0e0",
     paddingVertical: 6,
   },
+  colunaRotulo: { width: 50, color: "#666" },
   colunaExercicio: { flexGrow: 1, fontWeight: 700 },
-  colunaNumero: { width: 90, textAlign: "right", color: "#444" },
+  colunaNumero: { width: 100, textAlign: "right", color: "#444" },
 });
 
-function formatarData(iso: string): string {
-  const data = new Date(iso);
-  return data.toLocaleDateString("pt-BR", { day: "numeric", month: "short", year: "numeric" });
+/** `criadoEm` é timestamptz completo (não YYYY-MM-DD) — `formatarDataCurta` não serve aqui, mas precisa do mesmo cuidado de timezone e do idioma certo. */
+function formatarDataEmissao(iso: string, idioma: ParecerSalvo["idioma"]): string {
+  return new Date(iso).toLocaleDateString(idioma, {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+    timeZone: "America/Sao_Paulo",
+  });
 }
 
 export default function DocumentoParecer({ parecer }: { parecer: ParecerSalvo }) {
   const { veredito, corpo } = separarVeredito(parecer.texto);
+  const { idioma } = parecer;
 
   return (
     <Document>
       <Page size="A4" style={estilos.pagina}>
-        <Text style={estilos.selo}>Análise Semanal — Lastro</Text>
+        <Text style={estilos.selo}>{t("Análise semanal", idioma)} — Lastro</Text>
         <Text style={estilos.pergunta}>{parecer.perguntaTexto}</Text>
         <Text style={estilos.meta}>
-          Semana de {formatarData(parecer.evidencia.periodo.semana_atual_inicio)} a{" "}
-          {formatarData(parecer.evidencia.periodo.semana_atual_fim)} · Salvo em{" "}
-          {formatarData(parecer.criadoEm)}
+          {t("Semana de", idioma)} {formatarDataCurta(parecer.evidencia.periodo.semana_atual_inicio)}{" "}
+          — {formatarDataCurta(parecer.evidencia.periodo.semana_atual_fim)} ·{" "}
+          {t("Emitido em", idioma)} {formatarDataEmissao(parecer.criadoEm, idioma)}
         </Text>
 
         <Text style={estilos.veredito}>{veredito}</Text>
@@ -54,9 +71,12 @@ export default function DocumentoParecer({ parecer }: { parecer: ParecerSalvo })
             <Text style={estilos.tituloEvidencia}>Evidência</Text>
             {parecer.evidencia.blocos.map((bloco) => (
               <View key={bloco.exercicio} style={estilos.linhaEvidencia}>
+                <Text style={estilos.colunaRotulo}>{t(ROTULO[bloco.sinal], idioma)}</Text>
                 <Text style={estilos.colunaExercicio}>{bloco.exercicio}</Text>
-                <Text style={estilos.colunaNumero}>{bloco.volume} kg volume</Text>
-                <Text style={estilos.colunaNumero}>{bloco.delta_pct}% e1RM</Text>
+                <Text style={estilos.colunaNumero}>{formatarPeso(bloco.volume, idioma)} kg</Text>
+                <Text style={estilos.colunaNumero}>
+                  {formatarDelta(bloco, parecer.evidencia.periodo.janela_semanas, idioma)}
+                </Text>
               </View>
             ))}
           </>
