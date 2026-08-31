@@ -48,6 +48,7 @@ Regras completas: skill `qa-registro`. Prova crua obrigatória em `qa/evidencias
 | TR-03 | treino | Fluxo completo: criar modelo com 2+ exercícios → iniciar treino a partir dele → registrar série de cada exercício, todos com atalho de plano visível até o fim | PASSOU | c334034 | 2026-08-28 | qa/evidencias/TR-03/ |
 | VS-04 | visual | Avatar do cabeçalho mostra a foto/inicial real do usuário em toda página, nunca o placeholder cravado | PASSOU | c334034 | 2026-08-28 | qa/evidencias/VS-04/ |
 | TR-04 | treino | Recarregar um treino já finalizado não gera erro de hidratação do React | PASSOU | fdf7b97 | 2026-08-28 | qa/evidencias/TR-04/auditoria-independente/ |
+| OF-03 | offline | Fila offline drena em qualquer tela do app quando a rede volta, não só dentro de `/treino/[id]`; sem corrida entre o sincronizador global e o local quando os dois coexistem na mesma tela | PASSOU (auditoria independente, 2 rodadas: 1ª reprovou por corrida real entre os dois listeners causando descarte indevido pra `db.falhas`; corrigido com mutex de módulo; 2ª rodada confirmou, mesmo cenário, sem concorrência) | d810293 | 2026-08-30 | qa/evidencias/OF-03/auditoria-independente/ |
 
 ---
 
