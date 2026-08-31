@@ -204,3 +204,45 @@ selecionável, não imagem), exclusão com confirmação inline e cascade
 limpo. O único obstáculo real foi de infraestrutura local (servidor de
 preview do worktree errado), não do código da feature — documentado
 acima com o diagnóstico completo para não repetir em sessões futuras.
+
+## Auditoria independente (2026-08-31, agente separado, worktree próprio `C:\lastro-audit-pdf`)
+
+**Veredito: PASSOU COM RESSALVA.**
+
+Reproduziu os 9 pontos do zero, com usuário QA próprio
+(`qa.pdf.auditoria.<timestamp>@lastro.test`) e histórico semeado
+independentemente — nenhum dado ou sessão reaproveitada da verificação
+original. Seguiu à risca a instrução de evitar a colisão do
+`.claude/launch.json` (subiu o servidor manualmente numa porta exclusiva,
+`4600`, e confirmou por PID via `Get-CimInstance Win32_Process` que o
+processo apontava pro worktree certo antes de prosseguir) — o incidente
+não se repetiu.
+
+**Todos os 9 pontos bateram com o alegado**, com uma diferença de
+cenário que revelou um achado novo: nesta rodada a chamada real à Gemini
+**falhou** (duas tentativas rejeitadas), caindo no fallback
+determinístico (`aviso_falha_interpretativa: true`) — ao contrário da
+verificação original, que pegou o caminho de sucesso da IA. Isso não foi
+um problema em si (o app já trata esse caminho, mostrando um banner de
+aviso na tela), mas expôs uma lacuna real:
+
+**Achado novo: `aviso_falha_interpretativa` não é propagado ao PDF.**
+`src/lib/pdf/documento-parecer.tsx` nunca lê esse campo — o PDF exportado
+de um parecer que caiu no fallback mostra o resumo determinístico como
+se fosse uma interpretação normal da IA, sem o disclaimer que a tela
+sempre exibe em destaque. **Não é quebra da spec** (`SDD.md` §10.4 não
+lista esse campo entre o que o PDF precisa conter), então não bloqueia
+esta PR — mas é uma lacuna de honestidade epistemológica que o próprio
+projeto valoriza em outros lugares (ex.: "Ressalvas do método", sempre
+visíveis, nunca atrás de accordion). Registrado como pendência de
+backlog em `PROGRESS.md`, não corrigido nesta PR.
+
+PDF confirmado de novo, de forma independente: `HTTP 200`,
+`Content-Type: application/pdf`, `%PDF-1.3`, texto extraído via
+`pdftotext` batendo com a tela (agora com o conteúdo do fallback, não da
+prosa da IA — consistente com o cenário desta rodada). Exclusão
+confirmada inline (nunca `window.confirm`). Cascade confirmado
+(`count(*) = 0`). Usuário QA da auditoria apagado, `0` órfãos.
+
+Com este veredito, `PDF-01` passa de `ALEGADO` para `PASSOU COM
+RESSALVA` em `QA.md`.
