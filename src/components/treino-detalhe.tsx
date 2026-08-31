@@ -6,20 +6,10 @@
 // elevador derruba o sinal"), o registro continua funcionando — a série
 // fica na fila até o próximo evento `online`.
 import { useCallback, useEffect, useMemo, useState, useSyncExternalStore } from "react";
-import type {
-  AtualizacaoSerieInput,
-  ExercicioDoCatalogo,
-  NovaSerieInput,
-  Serie,
-} from "@/lib/dados/treino";
-import {
-  atualizarSerieRemoto,
-  criarSerieRemoto,
-  excluirSerieRemoto,
-  excluirTreinoRemoto,
-  historicoDoExercicio,
-} from "@/lib/dados/treino";
-import { enfileirar, sincronizar } from "@/lib/offline/outbox";
+import type { ExercicioDoCatalogo, Serie } from "@/lib/dados/treino";
+import { historicoDoExercicio } from "@/lib/dados/treino";
+import { enfileirar } from "@/lib/offline/outbox";
+import { sincronizarPendentes } from "@/lib/offline/sincronizar-pendentes";
 import {
   ouvirPedidosDeSincronizacao,
   pedirSincronizacaoEmSegundoPlano,
@@ -46,32 +36,6 @@ import type { Idioma } from "@/lib/dados/idioma";
  * disso (o registro em si não se perde, só o selo).
  */
 type SerieUI = Serie & { ehRecordePessoal?: boolean };
-
-async function sincronizarPendentes() {
-  return sincronizar({
-    // Sincronização de treino ainda não existe (só séries, por ora) — a
-    // fila nunca recebe "criar_treino" até essa próxima etapa existir.
-    criar_treino: async () => {},
-    criar_serie: async (payload) => {
-      await criarSerieRemoto(payload as unknown as NovaSerieInput);
-    },
-    atualizar_serie: async (payload) => {
-      await atualizarSerieRemoto(payload as unknown as AtualizacaoSerieInput);
-    },
-    excluir_serie: async (payload) => {
-      await excluirSerieRemoto((payload as { id: string }).id);
-    },
-    // Excluir o TREINO inteiro é ação online-only, disparada da lista
-    // (`/treino`, via `ExcluirTreino`) — decisão consciente, não omissão:
-    // é ação rara, geralmente feita revendo o histórico com calma, não no
-    // meio do treino sem sinal (D6 protege o registro, não a limpeza).
-    // Este handler existe só para a fila nunca ficar com um tipo sem
-    // executor, caso algo venha a enfileirar isto no futuro.
-    excluir_treino: async (payload) => {
-      await excluirTreinoRemoto((payload as { id: string }).id);
-    },
-  });
-}
 
 /**
  * Agrupa as séries por exercício, preservando a ordem de primeira

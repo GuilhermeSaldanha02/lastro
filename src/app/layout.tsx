@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Bricolage_Grotesque, Archivo, Fraunces } from "next/font/google";
 import RegistrarServiceWorker from "@/components/registrar-service-worker";
+import SincronizadorGlobal from "@/components/sincronizador-global";
 import { obterIdioma } from "@/lib/dados/idioma";
 import "./globals.css";
 
@@ -123,6 +124,7 @@ export default async function RootLayout({ children, modal }: LayoutProps<"/">) 
       </head>
       <body>
         <RegistrarServiceWorker />
+        <SincronizadorGlobal />
         {children}
         {modal}
       </body>
