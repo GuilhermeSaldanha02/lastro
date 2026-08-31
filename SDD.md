@@ -1213,7 +1213,7 @@ O route handler: autentica → `buscarParecer(id)` (RLS garante que só resolve 
 
 1. **Migration aplica limpo:** `0016_tabela_parecer.sql` roda sem erro sobre o schema atual.
 2. **RLS + GRANT isolam por usuário (FF5), checado dos dois jeitos** (não só RLS — ver nota do achado em §10.1): usuário QA A salva um parecer; consulta autenticada como usuário QA B em `parecer` retorna 0 linhas.
-3. **`npx vitest run`** cobre `buscarParecer` negando acesso a parecer de outro usuário.
+3. **RLS confirmado com dois usuários reais (não com `service_role`, ver nota do ponto 2), execução registrada em `qa/evidencias/`** — não há teste `vitest` aqui: módulos de I/O deste projeto (`treino.ts`, `exportar.ts`, `conta.ts`) nunca tiveram esse costume, a verificação de isolamento entre usuários sempre foi ao vivo.
 4. **Fluxo ponta a ponta, manual, usuário QA descartável:** gerar um parecer → "Salvar este parecer" → aparece em `/ajustes/relatorios` → abrir → data mostrada é a do save, não a de hoje (prova de que `emitidoEm` funciona) → "Baixar PDF" → arquivo abre, texto selecionável, números da evidência batem com o que a tela mostrou → "Excluir" → some da lista, `select count(*) from parecer where id = ...` = 0.
 5. **Auditoria independente** (agente separado, contexto limpo, mesmo protocolo do `QA.md`) confirma o ponto 4 antes de virar `PASSOU`.
 
