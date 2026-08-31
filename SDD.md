@@ -1096,3 +1096,125 @@ Passagem contínua, sem atalho:
 5. **Offline, negativo (confirma §9.2, não regride D6):** com a rede desligada, "Registrar série" continua funcionando (FF6, já coberto pela Fase 1) e "Treino novo" continua disponível; "Usar um modelo" pode falhar ao carregar a lista — isso é aceitável e esperado, não é uma regressão a corrigir nesta spec.
 
 Dono aprova lendo os 5 pontos acima executados, não a spec em prosa.
+
+---
+
+## 10. Histórico de pareceres + exportação em PDF — spec técnica
+
+> **Autoridade desta seção:** item 5 do backlog do dono (`PROGRESS.md`), fechado em 2026-08-31 depois de uso real do app — "PDF da Análise Semanal" era o que sentia falta. Pesquisa técnica e decisões de escopo debatidas com o dono na mesma sessão (ver transcrição). Igual à seção 9, é uma fatia posterior — não altera nada da Fase 1.
+
+### 10.0 Escopo desta seção — e o que está FORA
+
+**DENTRO:** tabela `parecer` (histórico opt-in), botão "Salvar este parecer" na tela de Análise, lista de pareceres salvos em `/ajustes/relatorios`, abrir um parecer salvo (reusando `Parecer`), baixar como PDF, excluir.
+
+**FORA — declarado explicitamente:**
+
+| Fora | Por quê |
+|---|---|
+| Salvar automaticamente todo parecer gerado | Decisão do dono: histórico fica enxuto, só o que ele mesmo marcar como importante — salvar automático viraria ruído a cada pergunta de curiosidade |
+| Comparativo "o que o parecer disse vs. o que realmente foi feito depois" | Foi a motivação pra pedir esta feature, mas o próprio dono decidiu deixar pra uma tarefa futura, depois que o histórico já existir com dado real — cruzar recomendação em prosa com séries registradas depois é análise não-trivial (provavelmente exige marcar manualmente "o que o parecer recomendou", não é grep de texto) |
+| Editar um parecer salvo | Parecer é um documento emitido (§7.1) — não existe "editar" um documento já emitido, só substituir salvando outro |
+| Gerar PDF automaticamente ao salvar (arquivo pré-gerado guardado no Storage) | O PDF é montado sob demanda a partir do `texto`/`evidencia` já salvos (§10.3) — gerar e guardar um binário toda vez que salva é custo sem benefício: a Página é idempotente, monta o mesmo PDF sempre que pedido |
+| Puppeteer/headless browser no servidor | Pesquisado e descartado (ver transcrição da sessão): pesa infraestrutura real (binário de Chromium, cold start, custo) pra um app pessoal de 1 usuário. `@react-pdf/renderer` (§10.3) resolve sem isso |
+| `window.print()` / CSS de impressão nativa | Pesquisado e descartado: **não funciona em navegador mobile**, e o app inteiro é "Modo Bancada" — pensado pra ser usado no celular |
+
+Se uma implementação desta seção encostar em qualquer linha da coluna "Fora", ela saiu do escopo — pare e replaneje.
+
+### 10.1 Schema, RLS e migration
+
+Próxima migration livre: `0016` (última existente é `0015_modelo_treino_reps_peso.sql`).
+
+```sql
+-- supabase/migrations/0016_tabela_parecer.sql
+
+-- ============ parecer: histórico opt-in de pareceres salvos ============
+-- A Análise Semanal em si (§6-7) é 100% descartável — gera, mostra, some.
+-- Esta tabela existe só para o subconjunto que o dono decide guardar
+-- clicando "Salvar este parecer" (nunca automático, decisão do dono
+-- 2026-08-31: histórico enxuto, não log de toda pergunta por curiosidade).
+create table public.parecer (
+  id                         uuid primary key default gen_random_uuid(),
+  usuario_id                 uuid not null references auth.users(id) on delete cascade,
+  pergunta                   smallint not null,
+  -- Snapshot do texto da pergunta no idioma de quando salvou — as 5
+  -- perguntas (`perguntas.ts`) podem mudar de redação no futuro; o
+  -- histórico não pode reescrever silenciosamente o que já foi salvo.
+  pergunta_texto             text not null,
+  texto                      text not null,
+  aviso_falha_interpretativa boolean not null default false,
+  -- EvidenciaParaTela inteiro (evidencia.ts), já calculado — o PDF (§10.3)
+  -- e o futuro comparativo "dito vs. feito" (§10.0, fora de escopo aqui)
+  -- não precisam recalcular nada a partir do histórico.
+  evidencia                  jsonb not null,
+  idioma                     text not null,
+  criado_em                  timestamptz not null default now()
+);
+create index parecer_usuario_idx on public.parecer (usuario_id, criado_em desc);
+
+alter table public.parecer enable row level security;
+
+create policy parecer_proprio on public.parecer
+  for all to authenticated
+  using (usuario_id = (select auth.uid()))
+  with check (usuario_id = (select auth.uid()));
+
+-- GRANT explícito, não só RLS — achado real desta mesma sessão (Fase 6
+-- E2E, qa/evidencias/E2E-01/correcao.md): RLS filtra LINHA, mas sem GRANT
+-- de base o Postgres nega o OBJETO antes de a RLS ser avaliada (mesma
+-- causa-raiz do achado da tarefa 1.2, §3.2 — "GRANT faltante"). Sem
+-- `update`: editar um parecer salvo é FORA de escopo (§10.0).
+grant select, insert, delete on public.parecer to authenticated;
+```
+
+### 10.2 Decisão sobre offline: online-only
+
+Mesma classe de decisão do §9.2 (`modelo_treino`) e do precedente já estabelecido (`excluirTreino`, `src/lib/dados/treino.ts:346-359`): salvar/listar/baixar/excluir um parecer é ação de bancada calma — a pessoa decide isso lendo o parecer parada, não no meio de uma série sem sinal. D6 protege o registro da série, não esta tela. Nenhum `tipo` novo entra no union de payloads do outbox (`src/lib/offline/outbox.ts`); se a rede cair no meio dessas ações, elas simplesmente falham com o erro genérico de rede que o app já mostra em outras Server Actions online-only, sem tratamento especial.
+
+### 10.3 Fluxo de UI, por arquivo
+
+**Novo módulo de dados**, seguindo o padrão de `src/lib/dados/treino.ts` (Server Actions, `usuarioAutenticadoOuErro`, sem cache):
+
+```
+src/lib/dados/parecer.ts
+```
+`salvarParecer(dados)`, `listarPareceres()`, `buscarParecer(id)`, `excluirParecer(id)`. As quatro são online-only (§10.2).
+
+**Botão de salvar — `src/components/analise-interativa.tsx`:** depois que `resultado` existe (linha ~212, onde `<Parecer>` já é renderizado), um botão secundário "Salvar este parecer" chama `salvarParecer({ pergunta: perguntaEmitida, pergunta_texto: PERGUNTAS[perguntaEmitida], ...resultado, idioma })`. Feedback local (`useState`, "Salvo ✓") — sem navegação, sem recarregar a tela.
+
+**Correção necessária em `src/components/parecer.tsx` antes de reusar para o histórico:** hoje `emissao` é sempre `new Date().toLocaleDateString(...)` (linha 35) — correto para o parecer recém-gerado, mas errado para um parecer salvo (mostraria a data de HOJE, não a data real do save). `Parecer` ganha uma prop nova opcional, `emitidoEm?: string` (ISO); quando presente, usa essa data em vez de `new Date()`. `analise-interativa.tsx` não passa essa prop (comportamento idêntico ao atual); a tela de histórico (abaixo) passa `emitidoEm={parecer.criado_em}`.
+
+**Lista de salvos — `src/app/ajustes/relatorios/page.tsx`:** ganha uma segunda seção, abaixo da de stickers (decisão do dono: reusar o mesmo lugar/padrão visual do histórico de stickers em vez de criar navegação nova) — "Pareceres salvos", usando `listarPareceres()`. Novo componente:
+
+```
+src/components/pareceres-salvos.tsx
+```
+Mesmo padrão visual de `historico-relatorios-pos-treino.tsx` (cartões com `card-relatorio-item`): cada cartão mostra data + primeira linha do parecer como prévia. Clicar abre o parecer completo (`<Parecer>` reusado, com `emitidoEm`) num modal/expansão, igual ao padrão de `metricasAtivas` do componente de sticker. Dentro do parecer aberto: botão "Baixar PDF" (§10.4) e "Excluir" com confirmação inline (mesmo padrão do C5 — nunca `window.confirm`).
+
+**Tela vazia:** se `listarPareceres()` retorna lista vazia, a seção "Pareceres salvos" não aparece (em vez de um estado vazio próprio) — a tela já tem um estado vazio para stickers; duplicar a mensagem para uma feature nova, opt-in, que a pessoa ainda não usou, seria ruído.
+
+### 10.4 Geração do PDF
+
+**Dependência nova:** `@react-pdf/renderer` (`package.json`) — motivo da escolha, comparado com as alternativas pesquisadas, documentado em `DECISIONS.md`. Gera PDF vetorial (texto selecionável, arquivo pequeno) a partir de componentes React, sem navegador headless — roda dentro do limite de uma function serverless da Vercel sem binário extra.
+
+```
+src/app/api/parecer/[id]/pdf/route.ts   ← route handler, não Server Action (download de binário)
+src/lib/pdf/documento-parecer.tsx       ← componente <Document>/<Page>/<Text> do @react-pdf/renderer
+```
+
+O route handler: autentica → `buscarParecer(id)` (RLS garante que só resolve se for do dono da sessão) → monta `<DocumentoParecer parecer={...} />` → `renderToBuffer` → devolve com `Content-Type: application/pdf` e `Content-Disposition: attachment; filename="lastro-analise-{data}.pdf"`. Conteúdo do PDF: cabeçalho (pergunta + data), o texto do parecer (veredito + corpo, mesma separação de `separarVeredito` que a tela usa), os blocos de evidência como tabela simples — sem tentar clonar pixel a pixel o CSS da tela (`.doc`/`.evidencias`), que é território de HTML/CSS, não do modelo de layout do `@react-pdf/renderer` (flexbox reduzido, sem CSS externo).
+
+### 10.5 O que NÃO muda
+
+- A geração do parecer em si (`/api/analise/route.ts`, `agregar.ts`, `prompt.ts`, `validador.ts`) não ganha linha nenhuma — esta seção só adiciona um destino opcional (salvar) para um resultado que já existe.
+- `Parecer` continua renderizando exatamente igual quando `emitidoEm` não é passado — nenhuma tela existente muda de aparência.
+- Nenhum dado de `parecer` é lido por `src/lib/analise/` nem pelo route handler da Gemini — a tabela é só para exibição/exportação do que a Gemini já respondeu, nunca entra de volta em um prompt.
+
+### 10.6 Check executável
+
+1. **Migration aplica limpo:** `0016_tabela_parecer.sql` roda sem erro sobre o schema atual.
+2. **RLS + GRANT isolam por usuário (FF5), checado dos dois jeitos** (não só RLS — ver nota do achado em §10.1): usuário QA A salva um parecer; consulta autenticada como usuário QA B em `parecer` retorna 0 linhas.
+3. **`npx vitest run`** cobre `buscarParecer` negando acesso a parecer de outro usuário.
+4. **Fluxo ponta a ponta, manual, usuário QA descartável:** gerar um parecer → "Salvar este parecer" → aparece em `/ajustes/relatorios` → abrir → data mostrada é a do save, não a de hoje (prova de que `emitidoEm` funciona) → "Baixar PDF" → arquivo abre, texto selecionável, números da evidência batem com o que a tela mostrou → "Excluir" → some da lista, `select count(*) from parecer where id = ...` = 0.
+5. **Auditoria independente** (agente separado, contexto limpo, mesmo protocolo do `QA.md`) confirma o ponto 4 antes de virar `PASSOU`.
+
+Dono aprova lendo o ponto 4 executado, não a spec em prosa.
