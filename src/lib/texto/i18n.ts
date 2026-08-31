@@ -682,6 +682,11 @@ const DICIONARIO: Record<string, { en: string; es: string }> = {
     en: "Deleting this analysis removes the saved record — it doesn't affect your workouts or sets. Can't be undone.",
     es: "Eliminar este informe borra el registro guardado — no afecta tus entrenamientos ni series. No se puede deshacer.",
   },
+  "Falha ao baixar o PDF. Tente de novo.": {
+    en: "Failed to download the PDF. Try again.",
+    es: "Error al descargar el PDF. Intenta de nuevo.",
+  },
+  "Baixando…": { en: "Downloading…", es: "Descargando…" },
 };
 
 export function t(chavePtBr: string, idioma: Idioma): string {

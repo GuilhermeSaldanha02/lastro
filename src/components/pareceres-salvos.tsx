@@ -23,16 +23,43 @@ export default function PareceresSalvos({
   const [excluindoId, setExcluindoId] = useState<string | null>(null);
   const [pendente, iniciar] = useTransition();
   const [listaLocal, setListaLocal] = useState(pareceres);
+  const [erro, setErro] = useState<string | null>(null);
+  const [baixandoPdf, setBaixandoPdf] = useState(false);
 
   const aberto = listaLocal.find((p) => p.id === abertoId) ?? null;
 
   function confirmarExclusao(id: string) {
+    setErro(null);
     iniciar(async () => {
-      await excluirParecer(id);
-      setListaLocal((atual) => atual.filter((p) => p.id !== id));
-      setExcluindoId(null);
-      if (abertoId === id) setAbertoId(null);
+      try {
+        await excluirParecer(id);
+        setListaLocal((atual) => atual.filter((p) => p.id !== id));
+        setExcluindoId(null);
+        if (abertoId === id) setAbertoId(null);
+      } catch {
+        setErro(t("Não foi possível excluir. Tente de novo.", idioma));
+      }
     });
+  }
+
+  async function baixarPdf(id: string, criadoEm: string) {
+    setErro(null);
+    setBaixandoPdf(true);
+    try {
+      const resposta = await fetch(`/api/parecer/${id}/pdf`);
+      if (!resposta.ok) throw new Error("falha");
+      const blob = await resposta.blob();
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `lastro-analise-${criadoEm.slice(0, 10)}.pdf`;
+      link.click();
+      URL.revokeObjectURL(url);
+    } catch {
+      setErro(t("Falha ao baixar o PDF. Tente de novo.", idioma));
+    } finally {
+      setBaixandoPdf(false);
+    }
   }
 
   if (aberto) {
@@ -51,13 +78,20 @@ export default function PareceresSalvos({
           emitidoEm={aberto.criadoEm}
         />
 
-        <a
-          href={`/api/parecer/${aberto.id}/pdf`}
-          download
+        <button
+          type="button"
           className="botao-primario"
+          onClick={() => baixarPdf(aberto.id, aberto.criadoEm)}
+          disabled={baixandoPdf}
         >
-          {t("Baixar PDF", idioma)}
-        </a>
+          {baixandoPdf ? t("Baixando…", idioma) : t("Baixar PDF", idioma)}
+        </button>
+
+        {erro && (
+          <p className="aviso-erro" role="alert">
+            {erro}
+          </p>
+        )}
 
         {excluindoId === aberto.id ? (
           <div className="confirma" role="group" aria-label={t("Excluir parecer salvo", idioma)}>
@@ -101,6 +135,11 @@ export default function PareceresSalvos({
 
   return (
     <div className="pilha">
+      {erro && (
+        <p className="aviso-erro" role="alert">
+          {erro}
+        </p>
+      )}
       {listaLocal.map((parecer) => (
         <div key={parecer.id} className="card-relatorio-item">
           <div className="card-relatorio-item__cabecalho">
