@@ -36,6 +36,13 @@ const estilos = StyleSheet.create({
   colunaRotulo: { width: 50, color: "#666" },
   colunaExercicio: { flexGrow: 1, fontWeight: 700 },
   colunaNumero: { width: 100, textAlign: "right", color: "#444" },
+  aviso: {
+    fontSize: 9,
+    color: "#8a1f1f",
+    backgroundColor: "#fdecec",
+    padding: 8,
+    marginBottom: 12,
+  },
 });
 
 /** `criadoEm` é timestamptz completo (não YYYY-MM-DD) — `formatarDataCurta` não serve aqui, mas precisa do mesmo cuidado de timezone e do idioma certo. */
@@ -62,6 +69,15 @@ export default function DocumentoParecer({ parecer }: { parecer: ParecerSalvo })
           — {formatarDataCurta(parecer.evidencia.periodo.semana_atual_fim)} ·{" "}
           {t("Emitido em", idioma)} {formatarDataEmissao(parecer.criadoEm, idioma)}
         </Text>
+
+        {parecer.avisoFalhaInterpretativa && (
+          <Text style={estilos.aviso}>
+            {t(
+              "A interpretação por IA falhou desta vez (duas tentativas rejeitadas). O texto abaixo é um resumo determinístico dos seus dados, sem prosa gerada — não é o parecer normal.",
+              idioma,
+            )}
+          </Text>
+        )}
 
         <Text style={estilos.veredito}>{veredito}</Text>
         {corpo && <Text style={estilos.corpo}>{corpo}</Text>}
