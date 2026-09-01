@@ -7,7 +7,7 @@
 // séries do usuário no Supabase, chama `montarResumoCompacto` e só então
 // monta o prompt. Isso torna estruturalmente impossível o cliente injetar
 // dado cru no prompt.
-import { NextResponse } from "next/server";
+import { NextResponse, after } from "next/server";
 import { criarClienteServidor } from "@/lib/supabase/cliente-servidor";
 import { montarResumoCompacto } from "@/lib/analise/agregar";
 import { paraDataUTC } from "@/lib/analise/semanas";
@@ -19,12 +19,17 @@ import type {
 import { dataLocalBrasil } from "@/lib/tempo";
 import { ClienteParecerGemini } from "./gemini";
 import { montarEvidenciaParaTela } from "./evidencia";
+import type { EvidenciaParaTela } from "./evidencia";
 import { montarPrompt } from "./prompt";
 import { validarNumeros } from "./validador";
-import { perguntaValida } from "./perguntas";
+import { perguntaValida, perguntasDoIdioma, type NumeroPergunta } from "./perguntas";
 import { obterIdioma, type Idioma } from "@/lib/dados/idioma";
 import { mapaTraducaoExercicios, mapaTraducaoGrupos } from "@/lib/dados/traducao";
 import { formatarGrupoMuscular } from "@/lib/texto/grupo-muscular";
+import {
+  LIMITE_GERACAO_TRAVADA_MINUTOS,
+  EXPIRA_RASCUNHO_HORAS,
+} from "@/lib/dados/parecer";
 
 type ClienteSupabaseServidor = Awaited<ReturnType<typeof criarClienteServidor>>;
 
@@ -273,6 +278,109 @@ const INSTRUCAO_RETRY_SEM_NUMERO_POR_IDIOMA: Record<Idioma, string> = {
   es: "Tu respuesta anterior no citó ningún número específico del JSON. Reescribe citando al menos un número real del JSON.",
 };
 
+async function gerarESalvarParecer({
+  supabase,
+  rascunhoId,
+  pergunta,
+  idioma,
+}: {
+  supabase: ClienteSupabaseServidor;
+  rascunhoId: string;
+  pergunta: NumeroPergunta;
+  idioma: Idioma;
+}): Promise<void> {
+  async function salvar(campos: {
+    texto: string;
+    avisoFalhaInterpretativa: boolean;
+    evidencia: EvidenciaParaTela;
+  }) {
+    const { error } = await supabase
+      .from("parecer")
+      .update({
+        status: "pronto",
+        texto: campos.texto,
+        evidencia: campos.evidencia,
+        aviso_falha_interpretativa: campos.avisoFalhaInterpretativa,
+      })
+      .eq("id", rascunhoId);
+    if (error) {
+      console.error("[analise] falha ao salvar parecer gerado:", error.message);
+    }
+  }
+
+  try {
+    const [treinos, exercicios] = await Promise.all([
+      carregarTreinosDoUsuario(supabase),
+      carregarExercicios(supabase, idioma),
+    ]);
+
+    const agora = paraDataUTC(dataLocalBrasil());
+    const resumo = montarResumoCompacto({ treinos, exercicios, agora });
+
+    if (resumo.versao !== 1) {
+      throw new Error(`resumo em versão inesperada: ${resumo.versao}`);
+    }
+
+    const { sistema, usuario, contexto } = montarPrompt(resumo, pergunta, agora, idioma);
+    const cliente = new ClienteParecerGemini();
+    const evidencia = montarEvidenciaParaTela(resumo);
+
+    let respostaUm: string | null = null;
+    try {
+      respostaUm = await cliente.gerar(sistema, usuario);
+    } catch (erroGiac) {
+      console.error("[analise] falha na chamada inicial da Gemini:", erroGiac);
+    }
+
+    if (respostaUm) {
+      let resultado = validarNumeros(respostaUm, resumo, contexto, idioma);
+      console.log("[analise] tentativa 1", { pergunta, resultado, respostaBruta: respostaUm });
+
+      if (resultado.ok) {
+        await salvar({ texto: respostaUm, avisoFalhaInterpretativa: false, evidencia });
+        return;
+      }
+
+      const instrucaoRetry =
+        resultado.motivo === "intrusos"
+          ? INSTRUCAO_RETRY_INTRUSOS_POR_IDIOMA[idioma](resultado.intrusos)
+          : INSTRUCAO_RETRY_SEM_NUMERO_POR_IDIOMA[idioma];
+      const usuarioRetry = [
+        usuario,
+        "",
+        REJEITADA_POR_IDIOMA[idioma](respostaUm),
+        instrucaoRetry,
+      ].join("\n\n");
+
+      try {
+        const respostaDois = await cliente.gerar(sistema, usuarioRetry);
+        resultado = validarNumeros(respostaDois, resumo, contexto, idioma);
+        console.log("[analise] tentativa 2", { pergunta, resultado, respostaBruta: respostaDois });
+
+        if (resultado.ok) {
+          await salvar({ texto: respostaDois, avisoFalhaInterpretativa: false, evidencia });
+          return;
+        }
+      } catch (erroRetry) {
+        console.error("[analise] falha no retry da Gemini:", erroRetry);
+      }
+    }
+
+    // 2ª falha ou indisponibilidade da API: Fallback determinístico + aviso
+    // (SDD.md §6.4) — a evidência estruturada continua íntegra.
+    await salvar({
+      texto: fallbackDeterministico(resumo, idioma),
+      avisoFalhaInterpretativa: true,
+      evidencia,
+    });
+  } catch (erroGeral) {
+    // Sem HTTP response pra devolver aqui (o cliente já recebeu o 202).
+    // A linha fica em 'gerando' — a trava de LIMITE_GERACAO_TRAVADA_MINUTOS
+    // (SDD.md §11.2) libera sozinha, sem intervenção.
+    console.error("[analise] erro inesperado ao gerar parecer:", erroGeral);
+  }
+}
+
 export async function POST(request: Request) {
   const supabase = await criarClienteServidor();
   const {
@@ -299,97 +407,58 @@ export async function POST(request: Request) {
 
   const idioma = await obterIdioma();
 
-  const [treinos, exercicios] = await Promise.all([
-    carregarTreinosDoUsuario(supabase),
-    carregarExercicios(supabase, idioma),
-  ]);
-
-  // Ancorado no calendário de Brasília (src/lib/tempo.ts), não UTC —
-  // `semanas.ts` trata todo Date recebido como calendário Y-M-D via
-  // getUTC*; sem essa conversão, checar a Análise à noite podia calcular
-  // a semana errada perto da virada do dia.
-  const agora = paraDataUTC(dataLocalBrasil());
-  const resumo = montarResumoCompacto({ treinos, exercicios, agora });
-
-  if (resumo.versao !== 1) {
-    console.error("[analise] resumo em versão inesperada", resumo.versao);
-    return NextResponse.json(
-      { erro: "Resumo em versão inesperada." },
-      { status: 500 },
+  // Limpeza preguiçosa (SDD.md §11.2) antes de checar a trava.
+  const geracaoTravadaDesde = new Date(
+    Date.now() - LIMITE_GERACAO_TRAVADA_MINUTOS * 60_000,
+  ).toISOString();
+  const rascunhoExpiradoDesde = new Date(
+    Date.now() - EXPIRA_RASCUNHO_HORAS * 3_600_000,
+  ).toISOString();
+  await supabase
+    .from("parecer")
+    .delete()
+    .eq("usuario_id", user.id)
+    .or(
+      `and(status.eq.gerando,criado_em.lt.${geracaoTravadaDesde}),and(status.eq.pronto,confirmado.eq.false,criado_em.lt.${rascunhoExpiradoDesde})`,
     );
+
+  const { data: emAndamento } = await supabase
+    .from("parecer")
+    .select("id")
+    .eq("usuario_id", user.id)
+    .eq("status", "gerando")
+    .limit(1)
+    .maybeSingle();
+  if (emAndamento) {
+    return NextResponse.json({ erro: "geracao_em_andamento" }, { status: 409 });
   }
 
-  try {
-    const { sistema, usuario, contexto } = montarPrompt(resumo, pergunta, agora, idioma);
-    const cliente = new ClienteParecerGemini();
-
-    let respostaUm: string | null = null;
-    try {
-      respostaUm = await cliente.gerar(sistema, usuario);
-    } catch (erroGiac) {
-      console.error("[analise] falha na chamada inicial da Gemini:", erroGiac);
-    }
-
-    const evidencia = montarEvidenciaParaTela(resumo);
-
-    if (respostaUm) {
-      let resultado = validarNumeros(respostaUm, resumo, contexto, idioma);
-      console.log("[analise] tentativa 1", {
-        pergunta,
-        resultado,
-        respostaBruta: respostaUm,
-      });
-
-      if (resultado.ok) {
-        return NextResponse.json({ parecer: respostaUm, evidencia });
-      }
-
-      // 1ª falha (SDD §6.4, tabela): uma nova chamada, com o parecer rejeitado
-      // e os intrusos anexados. Instrução de retry também é lida pelo modelo.
-      const instrucaoRetry =
-        resultado.motivo === "intrusos"
-          ? INSTRUCAO_RETRY_INTRUSOS_POR_IDIOMA[idioma](resultado.intrusos)
-          : INSTRUCAO_RETRY_SEM_NUMERO_POR_IDIOMA[idioma];
-      const usuarioRetry = [
-        usuario,
-        "",
-        REJEITADA_POR_IDIOMA[idioma](respostaUm),
-        instrucaoRetry,
-      ].join("\n\n");
-
-      try {
-        const respostaDois = await cliente.gerar(sistema, usuarioRetry);
-        resultado = validarNumeros(respostaDois, resumo, contexto, idioma);
-        console.log("[analise] tentativa 2", {
-          pergunta,
-          resultado,
-          respostaBruta: respostaDois,
-        });
-
-        if (resultado.ok) {
-          return NextResponse.json({ parecer: respostaDois, evidencia });
-        }
-      } catch (erroRetry) {
-        console.error("[analise] falha no retry da Gemini:", erroRetry);
-      }
-    }
-
-    // 2ª falha ou indisponibilidade da API: Fallback determinístico + aviso.
-    // A evidência estruturada do agregador continua íntegra mesmo quando a prosa falha.
-    return NextResponse.json({
-      parecer: fallbackDeterministico(resumo, idioma),
-      avisoFalhaInterpretativa: true,
-      evidencia,
-    });
-  } catch (erroGeral) {
-    console.error("[analise] erro inesperado ao gerar parecer:", erroGeral);
-    return NextResponse.json(
-      {
-        parecer: fallbackDeterministico(resumo, idioma),
-        avisoFalhaInterpretativa: true,
-        evidencia: montarEvidenciaParaTela(resumo),
-      },
-      { status: 200 },
-    );
+  const PERGUNTAS = perguntasDoIdioma(idioma);
+  const { data: rascunho, error: erroInsert } = await supabase
+    .from("parecer")
+    .insert({
+      usuario_id: user.id,
+      pergunta,
+      pergunta_texto: PERGUNTAS[pergunta as NumeroPergunta],
+      idioma,
+      status: "gerando",
+      confirmado: false,
+    })
+    .select("id")
+    .single();
+  if (erroInsert || !rascunho) {
+    console.error("[analise] falha ao criar rascunho:", erroInsert?.message);
+    return NextResponse.json({ erro: "Falha ao iniciar a análise." }, { status: 500 });
   }
+
+  after(() =>
+    gerarESalvarParecer({
+      supabase,
+      rascunhoId: rascunho.id,
+      pergunta: pergunta as NumeroPergunta,
+      idioma,
+    }),
+  );
+
+  return NextResponse.json({ ok: true, rascunhoId: rascunho.id }, { status: 202 });
 }
