@@ -239,6 +239,7 @@ export default function TreinoDetalhe({
       exercicioNome: exercicio.nome,
       exercicioUnilateral: exercicio.unilateral,
       exercicioPesoPorLado: exercicio.pesoPorLado,
+      exercicioGrupoMuscular: exercicio.grupoMuscularPrimario,
       tipo: dados.tipo,
       reps: dados.reps,
       peso: dados.peso,

@@ -34,6 +34,7 @@ export default async function PaginaRelatoriosAjustes() {
       peso: s.peso,
       tipo: s.tipo,
       pesoPorLado: s.pesoPorLado,
+      exercicioGrupoMuscular: s.exercicioGrupoMuscular,
     }));
 
     // Duração real: intervalo entre a primeira e a última série registrada

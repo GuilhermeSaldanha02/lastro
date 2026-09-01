@@ -33,6 +33,11 @@ export type Serie = {
   exercicioUnilateral: boolean;
   /** Valor-padrão do catálogo — pré-marca o interruptor, não decide o volume. */
   exercicioPesoPorLado: boolean;
+  /** Dado curado do catálogo (nunca adivinhado por regex no nome) — fonte
+   * real pra classificar o foco/divisão do treino (achado do dono,
+   * 2026-08-31: sticker de "pernas" saiu rotulado "SUPERIORES" porque o
+   * cálculo antigo só chutava o grupo pelo TEXTO do nome do exercício). */
+  exercicioGrupoMuscular: string;
   tipo: "aquecimento" | "valendo";
   reps: number;
   peso: number;
@@ -156,7 +161,7 @@ export async function buscarTreino(
   const { data: series, error: erroSeries } = await supabase
     .from("serie")
     .select(
-      "id, exercicio_id, tipo, reps, peso, rir, peso_por_lado, criado_em, exercicio:exercicio_id (nome, unilateral, peso_por_lado)",
+      "id, exercicio_id, tipo, reps, peso, rir, peso_por_lado, criado_em, exercicio:exercicio_id (nome, unilateral, peso_por_lado, grupo_muscular_primario)",
     )
     .eq("treino_id", treinoId)
     .order("ordem", { ascending: true });
@@ -176,7 +181,12 @@ export async function buscarTreino(
     rir: number | null;
     peso_por_lado: boolean;
     criado_em: string;
-    exercicio: { nome: string; unilateral: boolean; peso_por_lado: boolean } | null;
+    exercicio: {
+      nome: string;
+      unilateral: boolean;
+      peso_por_lado: boolean;
+      grupo_muscular_primario: string;
+    } | null;
   };
   const linhasSeries = (series ?? []) as unknown as LinhaSerie[];
 
@@ -190,6 +200,7 @@ export async function buscarTreino(
       exercicioNome: traducaoExercicios.get(s.exercicio_id) ?? s.exercicio?.nome ?? "",
       exercicioUnilateral: s.exercicio?.unilateral ?? false,
       exercicioPesoPorLado: s.exercicio?.peso_por_lado ?? false,
+      exercicioGrupoMuscular: s.exercicio?.grupo_muscular_primario ?? "",
       tipo: s.tipo,
       reps: s.reps,
       peso: Number(s.peso),
