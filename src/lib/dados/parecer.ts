@@ -46,13 +46,19 @@ async function limparRascunhosExpirados(
     Date.now() - EXPIRA_RASCUNHO_HORAS * 3_600_000,
   ).toISOString();
 
-  await supabase
+  const { error } = await supabase
     .from("parecer")
     .delete()
     .eq("usuario_id", usuarioId)
     .or(
       `and(status.eq.gerando,criado_em.lt.${geracaoTravadaDesde}),and(status.eq.pronto,confirmado.eq.false,criado_em.lt.${rascunhoExpiradoDesde})`,
     );
+  if (error) {
+    console.error(
+      "[parecer] falha ao limpar rascunhos expirados:",
+      error.message,
+    );
+  }
 }
 
 export type StatusParecer = "gerando" | "pronto";
