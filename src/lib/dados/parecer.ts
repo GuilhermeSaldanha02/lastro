@@ -9,11 +9,12 @@ import { criarClienteServidor } from "@/lib/supabase/cliente-servidor";
 import type { NumeroPergunta } from "@/app/api/analise/perguntas";
 import type { EvidenciaParaTela } from "@/app/api/analise/evidencia";
 import type { Idioma } from "@/lib/dados/idioma";
+import {
+  LIMITE_GERACAO_TRAVADA_MINUTOS,
+  EXPIRA_RASCUNHO_HORAS,
+} from "./parecer-config";
 
-/** Acima disso, uma linha 'gerando' é tratada como abandonada — não trava mais gerações novas (SDD.md §11.2). */
-export const LIMITE_GERACAO_TRAVADA_MINUTOS = 5;
-/** Rascunho pronto (status='pronto', confirmado=false) sem decisão do dono expira sozinho (SDD.md §11.2). */
-export const EXPIRA_RASCUNHO_HORAS = 24;
+export { LIMITE_GERACAO_TRAVADA_MINUTOS, EXPIRA_RASCUNHO_HORAS };
 
 async function usuarioAutenticadoOuErro() {
   const supabase = await criarClienteServidor();
