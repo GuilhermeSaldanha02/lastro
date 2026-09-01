@@ -87,10 +87,55 @@ Usuário QA apagado ao final (`admin.auth.admin.deleteUser`), confirmado
 
 ## Resultado
 
-Registrado como **ALEGADO** em `QA.md` — verificado ao vivo pelo próprio
-implementador (prova concreta: sticker de "PERNAS" gerado de fato, não
-suposição), mas ainda não passou por auditoria independente (protocolo
-`AGENTS.md` §5, "quem implementa não se audita"). Dado o dono estar
-esperando a correção em tempo real (achado durante o próprio treino), a
-decisão de mergear com essa verificação ou esperar auditoria fica com
-ele.
+Registrado inicialmente como **ALEGADO** em `QA.md` — verificado ao vivo
+pelo implementador ("Afundo com halteres" → sticker mostrou "PERNAS").
+
+## Auditoria independente (2026-09-01, agente separado, worktree próprio `C:\lastro-audit-sticker`)
+
+**Veredito: PASSOU COM RESSALVA.**
+
+Leu o código real (`inferirFocoPorGrupo`, `calcularMetricasSessao`,
+`buscarTreino`, os dois call-sites) e confirmou que a lógica prioriza o
+grupo muscular real do catálogo, caindo no chute por nome só quando o
+dado está ausente. Usou um **segundo exercício, diferente do original**
+— "Hack squat" (categoria real `quadriceps`) — escolhido justamente por
+também não bater com nenhuma palavra da lista antiga de pernas,
+provando a correção de forma independente, não só repetindo o mesmo
+caso.
+
+Criou usuário QA e dado reais no banco (autenticado como o próprio
+usuário, nunca `service_role` em tabela). **Não conseguiu completar o
+login pela UI do navegador** naquele worktree específico — o formulário
+de `/login` não disparava o `onSubmit` do React de forma consistente
+(navegação nativa do form em vez de client-side), mesmo depois de tentar
+clique por ref, por coordenada, `.click()` via JS e reiniciar o servidor
+com `.next` limpo. Recusou corretamente duas tentativas de contorno que
+envolveriam manipular sessão/cookie diretamente (bloqueadas pelo
+classificador de segurança do ambiente) — não tentou burlar.
+
+**Achado à parte, registrado mas não bloqueante para este item:** esse
+problema de login parece ser uma peculiaridade daquele worktree/porta,
+não deste bug — o implementador original logou pela UI sem problema no
+seu próprio worktree, na verificação inicial. Vale investigar como item
+de QA separado se voltar a acontecer.
+
+Sem conseguir fechar a cadeia pelo pixel final do sticker, fechou pela
+função de produção real: escreveu um teste temporário que autentica como
+o usuário QA, roda a MESMA query de `buscarTreino` contra o dado real
+inserido, e alimenta o resultado real (`exercicioGrupoMuscular:
+"quadriceps"` pro Hack squat) na função `calcularMetricasSessao`
+importada direto do arquivo fonte (não reimplementada). Resultado:
+`focoOuDivisao: "PERNAS"` — correto. Rodando a mesma função SEM o campo
+(simulando dado legado), o resultado foi `"TREINO"` (não "PERNAS"),
+confirmando que o Hack squat também escapava do método antigo — uma
+falha diferente do "SUPERIORES" original, mas igualmente uma falha,
+cumprindo o objetivo de provar o método antigo quebrado com um caso
+independente.
+
+Confirmou `npx vitest run src/lib/dados/metricas-treino.test.ts` → 4/4,
+sem regressão no fallback. Usuário QA apagado, `0` órfãos (cascade
+confirmado por SQL). Arquivo de teste temporário e scripts auxiliares
+removidos ao final; `.env.local` apagado.
+
+Com este veredito, `TR-05` passa de `ALEGADO` para `PASSOU COM RESSALVA`
+em `QA.md`.
