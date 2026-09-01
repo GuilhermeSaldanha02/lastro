@@ -2,11 +2,13 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { listarTreinos, buscarTreino } from "@/lib/dados/treino";
+import { listarPareceres } from "@/lib/dados/parecer";
 import { obterPerfil } from "@/lib/dados/perfil";
 import { calcularMetricasSessao } from "@/lib/dados/metricas-treino";
 import CabecalhoPro from "@/components/cabecalho-pro";
 import AbaInferior from "@/components/aba-inferior";
 import HistoricoRelatoriosPosTreino from "@/components/historico-relatorios-pos-treino";
+import PareceresSalvos from "@/components/pareceres-salvos";
 import { t } from "@/lib/texto/i18n";
 
 export default async function PaginaRelatoriosAjustes() {
@@ -16,7 +18,7 @@ export default async function PaginaRelatoriosAjustes() {
   }
 
   const idioma = perfil.idioma ?? "pt-BR";
-  const treinos = await listarTreinos();
+  const [treinos, pareceres] = await Promise.all([listarTreinos(), listarPareceres()]);
 
   async function obterMetricasDoTreino(treinoId: string) {
     "use server";
@@ -111,6 +113,13 @@ export default async function PaginaRelatoriosAjustes() {
             <Link href="/treino" className="botao-primario">
               {t("Ir para Treinos", idioma)}
             </Link>
+          </div>
+        )}
+
+        {pareceres.length > 0 && (
+          <div className="pilha" style={{ marginTop: "var(--lastro-e-4)" }}>
+            <h2 className="doc__secao">{t("Pareceres salvos", idioma)}</h2>
+            <PareceresSalvos pareceres={pareceres} idioma={idioma} />
           </div>
         )}
       </div>

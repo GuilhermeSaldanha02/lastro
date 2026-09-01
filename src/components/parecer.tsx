@@ -25,14 +25,21 @@ export default function Parecer({
   avisoFalhaInterpretativa,
   evidencia,
   idioma,
+  emitidoEm,
 }: {
   pergunta: string | null;
   texto: string;
   avisoFalhaInterpretativa?: boolean;
   evidencia?: EvidenciaParaTela;
   idioma: Idioma;
+  /** ISO (timestamptz) de quando o parecer foi realmente emitido/salvo —
+   * ausente = parecer recém-gerado, usa a data de agora (comportamento
+   * original, achado ao escrever SDD.md §10: sem isto, reabrir um parecer
+   * salvo mostraria a data de HOJE, não a data real do save). */
+  emitidoEm?: string;
 }) {
-  const emissao = new Date().toLocaleDateString(idioma, {
+  const dataEmissao = emitidoEm ? new Date(emitidoEm) : new Date();
+  const emissao = dataEmissao.toLocaleDateString(idioma, {
     day: "numeric",
     month: "short",
     year: "numeric",

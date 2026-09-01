@@ -30,6 +30,7 @@ import GraficoProgressao from "@/components/grafico-progressao";
 import GruposSemEstimulo from "@/components/grupos-sem-estimulo";
 import AlertaDeload from "@/components/alerta-deload";
 import { t } from "@/lib/texto/i18n";
+import { salvarParecer } from "@/lib/dados/parecer";
 
 type Resultado = {
   parecer: string;
@@ -58,11 +59,35 @@ export default function AnaliseInterativa({
     null,
   );
 
+  const [statusSalvar, setStatusSalvar] = useState<
+    "ocioso" | "salvando" | "salvo" | "erro"
+  >("ocioso");
+
+  async function salvar() {
+    if (!resultado || perguntaEmitida === null) return;
+    if (statusSalvar === "salvando" || statusSalvar === "salvo") return;
+    setStatusSalvar("salvando");
+    try {
+      await salvarParecer({
+        pergunta: perguntaEmitida,
+        perguntaTexto: PERGUNTAS[perguntaEmitida],
+        texto: resultado.parecer,
+        avisoFalhaInterpretativa: resultado.avisoFalhaInterpretativa ?? false,
+        evidencia: resultado.evidencia,
+        idioma,
+      });
+      setStatusSalvar("salvo");
+    } catch {
+      setStatusSalvar("erro");
+    }
+  }
+
   async function perguntar(numero: NumeroPergunta) {
     setCarregando(numero);
     setPerguntaEmitida(numero);
     setErro(null);
     setResultado(null);
+    setStatusSalvar("ocioso");
 
     try {
       const resposta = await fetch("/api/analise", {
@@ -210,13 +235,31 @@ export default function AnaliseInterativa({
       )}
 
       {resultado && (
-        <Parecer
-          pergunta={perguntaEmitida ? PERGUNTAS[perguntaEmitida] : null}
-          texto={resultado.parecer}
-          avisoFalhaInterpretativa={resultado.avisoFalhaInterpretativa}
-          evidencia={resultado.evidencia}
-          idioma={idioma}
-        />
+        <>
+          <Parecer
+            pergunta={perguntaEmitida ? PERGUNTAS[perguntaEmitida] : null}
+            texto={resultado.parecer}
+            avisoFalhaInterpretativa={resultado.avisoFalhaInterpretativa}
+            evidencia={resultado.evidencia}
+            idioma={idioma}
+          />
+          <button
+            type="button"
+            className="botao-secundario"
+            onClick={salvar}
+            aria-disabled={statusSalvar === "salvando" || statusSalvar === "salvo"}
+          >
+            {statusSalvar === "salvando" && t("Salvando…", idioma)}
+            {statusSalvar === "salvo" && `${t("Salvo", idioma)} ✓`}
+            {(statusSalvar === "ocioso" || statusSalvar === "erro") &&
+              t("Salvar este parecer", idioma)}
+          </button>
+          {statusSalvar === "erro" && (
+            <p className="aviso-erro" role="alert">
+              {t("Não foi possível salvar. Tente de novo.", idioma)}
+            </p>
+          )}
+        </>
       )}
     </div>
   );

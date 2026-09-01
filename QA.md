@@ -16,7 +16,7 @@ Regras completas: skill `qa-registro`. Prova crua obrigatória em `qa/evidencias
 |---|---|
 | auth | src/app/login/** src/app/auth/** src/lib/supabase/** |
 | treino | src/app/treino/** src/lib/dados/** src/lib/rota-de-retorno.ts |
-| analise | src/app/analise/** src/lib/analise/** src/app/api/** |
+| analise | src/app/analise/** src/lib/analise/** src/app/api/** src/lib/dados/parecer.ts src/lib/pdf/** src/app/api/parecer/** src/components/pareceres-salvos.tsx src/components/parecer.tsx |
 | catalogo | src/app/catalogo/** |
 | coach | src/app/coach/** |
 | perfil | src/app/perfil/** |
@@ -57,6 +57,7 @@ Regras completas: skill `qa-registro`. Prova crua obrigatória em `qa/evidencias
 | E2E-01 | e2e | J1-Treino (PRD §6): registrar série, ficar offline, registrar outra, voltar online e confirmar sincronização + persistência real no servidor | PASSOU (`npm run e2e`, 2 rodadas seguidas verdes contra o Supabase hospedado, usuário QA descartável criado e apagado por spec) | 4ad513c | 2026-08-31 | qa/evidencias/E2E-01/ |
 | E2E-02 | e2e | J2-Análise (PRD §6): botão "Solicitar Análise" chama `/api/analise` com a pergunta certa e renderiza o parecer que a rota devolve | PASSOU (`/api/analise` interceptado no navegador — Gemini real nunca chamada; histórico de 4 semanas fechadas semeado via usuário autenticado, não admin — ver achado de infraestrutura na evidência) | 4ad513c | 2026-08-31 | qa/evidencias/E2E-01/ |
 | E2E-03 | e2e | J3-Dúvida (PRD §6): consulta ao catálogo (dado real) + fallback pro coach 24h quando a dúvida não é sobre um exercício específico | PASSOU (`/api/coach` interceptado no navegador — mesma razão do E2E-02) | 4ad513c | 2026-08-31 | qa/evidencias/E2E-01/ |
+| PDF-01 | analise | Salvar parecer (opt-in), listar em /ajustes/relatorios, baixar como PDF (texto selecionável), excluir com confirmação inline | PASSOU COM RESSALVA (auditoria independente, worktree próprio, usuário QA próprio — reproduziu os 9 pontos do zero, por acaso pegou o caminho de FALHA da Gemini, não o de sucesso; achado novo: `aviso_falha_interpretativa` some no PDF exportado — a tela mostra um banner de aviso quando o parecer é o fallback determinístico, o PDF não propaga esse aviso. Não é quebra da spec SDD.md §10.4, que não pede esse campo no PDF — fica registrado como item de backlog, não bloqueia) | 18f8227 | 2026-08-31 | qa/evidencias/PDF-01/ |
 
 ---
 
