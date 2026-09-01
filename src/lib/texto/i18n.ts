@@ -696,6 +696,8 @@ const DICIONARIO: Record<string, { en: string; es: string }> = {
     es: "Error al descargar el PDF. Intenta de nuevo.",
   },
   "Baixando…": { en: "Downloading…", es: "Descargando…" },
+  "Descartar": { en: "Discard", es: "Descartar" },
+  "Gerando…": { en: "Generating…", es: "Generando…" },
 };
 
 export function t(chavePtBr: string, idioma: Idioma): string {

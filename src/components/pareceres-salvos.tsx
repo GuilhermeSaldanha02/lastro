@@ -6,7 +6,7 @@
 // pra outra rota.
 import { useState, useTransition } from "react";
 import type { ParecerSalvo } from "@/lib/dados/parecer";
-import { excluirParecer } from "@/lib/dados/parecer";
+import { confirmarParecer, excluirParecer } from "@/lib/dados/parecer";
 import Parecer from "@/components/parecer";
 import { formatarDataCurta } from "@/lib/tempo";
 import { t } from "@/lib/texto/i18n";
@@ -27,6 +27,26 @@ export default function PareceresSalvos({
   const [baixandoPdf, setBaixandoPdf] = useState(false);
 
   const aberto = listaLocal.find((p) => p.id === abertoId) ?? null;
+  const rascunho = listaLocal.find((p) => !p.confirmado) ?? null;
+  const confirmados = listaLocal.filter((p) => p.confirmado);
+  const [confirmando, setConfirmando] = useState(false);
+
+  function confirmar(id: string) {
+    setErro(null);
+    setConfirmando(true);
+    iniciar(async () => {
+      try {
+        await confirmarParecer(id);
+        setListaLocal((atual) =>
+          atual.map((p) => (p.id === id ? { ...p, confirmado: true } : p)),
+        );
+      } catch {
+        setErro(t("Não foi possível salvar. Tente de novo.", idioma));
+      } finally {
+        setConfirmando(false);
+      }
+    });
+  }
 
   function confirmarExclusao(id: string) {
     setErro(null);
@@ -62,7 +82,9 @@ export default function PareceresSalvos({
     }
   }
 
-  if (aberto) {
+  if (aberto && aberto.texto && aberto.evidencia) {
+    const textoAberto = aberto.texto;
+    const evidenciaAberta = aberto.evidencia;
     return (
       <div className="pilha">
         <button type="button" className="botao-textual" onClick={() => setAbertoId(null)}>
@@ -71,9 +93,9 @@ export default function PareceresSalvos({
 
         <Parecer
           pergunta={aberto.perguntaTexto}
-          texto={aberto.texto}
+          texto={textoAberto}
           avisoFalhaInterpretativa={aberto.avisoFalhaInterpretativa}
-          evidencia={aberto.evidencia}
+          evidencia={evidenciaAberta}
           idioma={aberto.idioma}
           emitidoEm={aberto.criadoEm}
         />
@@ -140,7 +162,46 @@ export default function PareceresSalvos({
           {erro}
         </p>
       )}
-      {listaLocal.map((parecer) => (
+
+      {rascunho && rascunho.status === "gerando" && (
+        <div className="card-relatorio-item">
+          <p className="card-relatorio-item__id-curto">{rascunho.perguntaTexto}</p>
+          <p className="vazio">{t("Gerando…", idioma)}</p>
+        </div>
+      )}
+
+      {rascunho && rascunho.status === "pronto" && rascunho.texto && rascunho.evidencia && (
+        <div className="pilha">
+          <Parecer
+            pergunta={rascunho.perguntaTexto}
+            texto={rascunho.texto}
+            avisoFalhaInterpretativa={rascunho.avisoFalhaInterpretativa}
+            evidencia={rascunho.evidencia}
+            idioma={rascunho.idioma}
+            emitidoEm={rascunho.criadoEm}
+          />
+          <div className="confirma__acoes">
+            <button
+              type="button"
+              className="botao-primario"
+              onClick={() => confirmar(rascunho.id)}
+              disabled={confirmando || pendente}
+            >
+              {t("Salvar", idioma)}
+            </button>
+            <button
+              type="button"
+              className="botao-secundario"
+              onClick={() => confirmarExclusao(rascunho.id)}
+              disabled={confirmando || pendente}
+            >
+              {t("Descartar", idioma)}
+            </button>
+          </div>
+        </div>
+      )}
+
+      {confirmados.map((parecer) => (
         <div key={parecer.id} className="card-relatorio-item">
           <div className="card-relatorio-item__cabecalho">
             <div className="card-relatorio-item__data-bloco">

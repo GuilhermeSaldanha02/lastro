@@ -14,8 +14,6 @@ import {
   EXPIRA_RASCUNHO_HORAS,
 } from "./parecer-config";
 
-export { LIMITE_GERACAO_TRAVADA_MINUTOS, EXPIRA_RASCUNHO_HORAS };
-
 async function usuarioAutenticadoOuErro() {
   const supabase = await criarClienteServidor();
   const {

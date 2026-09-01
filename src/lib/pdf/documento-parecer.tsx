@@ -56,8 +56,15 @@ function formatarDataEmissao(iso: string, idioma: ParecerSalvo["idioma"]): strin
 }
 
 export default function DocumentoParecer({ parecer }: { parecer: ParecerSalvo }) {
+  if (!parecer.texto || !parecer.evidencia) {
+    throw new Error(
+      "PDF pedido para um parecer sem conteúdo (rascunho não confirmado).",
+    );
+  }
+
   const { veredito, corpo } = separarVeredito(parecer.texto);
   const { idioma } = parecer;
+  const evidencia = parecer.evidencia;
 
   return (
     <Document>
@@ -65,8 +72,8 @@ export default function DocumentoParecer({ parecer }: { parecer: ParecerSalvo })
         <Text style={estilos.selo}>{t("Análise semanal", idioma)} — Lastro</Text>
         <Text style={estilos.pergunta}>{parecer.perguntaTexto}</Text>
         <Text style={estilos.meta}>
-          {t("Semana de", idioma)} {formatarDataCurta(parecer.evidencia.periodo.semana_atual_inicio)}{" "}
-          — {formatarDataCurta(parecer.evidencia.periodo.semana_atual_fim)} ·{" "}
+          {t("Semana de", idioma)} {formatarDataCurta(evidencia.periodo.semana_atual_inicio)}{" "}
+          — {formatarDataCurta(evidencia.periodo.semana_atual_fim)} ·{" "}
           {t("Emitido em", idioma)} {formatarDataEmissao(parecer.criadoEm, idioma)}
         </Text>
 
@@ -82,16 +89,16 @@ export default function DocumentoParecer({ parecer }: { parecer: ParecerSalvo })
         <Text style={estilos.veredito}>{veredito}</Text>
         {corpo && <Text style={estilos.corpo}>{corpo}</Text>}
 
-        {parecer.evidencia.blocos.length > 0 && (
+        {evidencia.blocos.length > 0 && (
           <>
             <Text style={estilos.tituloEvidencia}>Evidência</Text>
-            {parecer.evidencia.blocos.map((bloco) => (
+            {evidencia.blocos.map((bloco) => (
               <View key={bloco.exercicio} style={estilos.linhaEvidencia}>
                 <Text style={estilos.colunaRotulo}>{t(ROTULO[bloco.sinal], idioma)}</Text>
                 <Text style={estilos.colunaExercicio}>{bloco.exercicio}</Text>
                 <Text style={estilos.colunaNumero}>{formatarPeso(bloco.volume, idioma)} kg</Text>
                 <Text style={estilos.colunaNumero}>
-                  {formatarDelta(bloco, parecer.evidencia.periodo.janela_semanas, idioma)}
+                  {formatarDelta(bloco, evidencia.periodo.janela_semanas, idioma)}
                 </Text>
               </View>
             ))}
