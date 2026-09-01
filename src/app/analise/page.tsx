@@ -7,6 +7,7 @@ import { obterPerfil } from "@/lib/dados/perfil";
 import { carregarResumoHome } from "@/lib/dados/resumo-home";
 import { carregarDiasSemEstimuloPorGrupo } from "@/lib/dados/recencia-grupos";
 import { carregarSinalDeload } from "@/lib/dados/alerta-deload";
+import { buscarRascunhoEmAndamento } from "@/lib/dados/parecer";
 import { paraDataUTC } from "@/lib/analise/semanas";
 import { dataLocalBrasil } from "@/lib/tempo";
 import AbaInferior from "@/components/aba-inferior";
@@ -16,11 +17,12 @@ import { t } from "@/lib/texto/i18n";
 
 export default async function PaginaAnalise() {
   const hoje = dataLocalBrasil();
-  const [perfil, resumo, gruposSemEstimulo, sinalDeload] = await Promise.all([
+  const [perfil, resumo, gruposSemEstimulo, sinalDeload, rascunhoInicial] = await Promise.all([
     obterPerfil(),
     carregarResumoHome(hoje),
     carregarDiasSemEstimuloPorGrupo(hoje),
     carregarSinalDeload(paraDataUTC(hoje)),
+    buscarRascunhoEmAndamento(),
   ]);
   const idioma = perfil?.idioma ?? "pt-BR";
 
@@ -39,6 +41,7 @@ export default async function PaginaAnalise() {
         gruposSemEstimulo={gruposSemEstimulo}
         sinalDeload={sinalDeload}
         idioma={idioma}
+        rascunhoInicial={rascunhoInicial}
       />
 
       <AbaInferior ativa="analise" idioma={idioma} />
