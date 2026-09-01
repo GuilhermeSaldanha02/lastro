@@ -314,6 +314,10 @@ async function gerarESalvarParecer({
       carregarExercicios(supabase, idioma),
     ]);
 
+    // Ancorado no calendário de Brasília (src/lib/tempo.ts), não UTC —
+    // `semanas.ts` trata todo Date recebido como calendário Y-M-D via
+    // getUTC*; sem essa conversão, checar a Análise à noite podia calcular
+    // a semana errada perto da virada do dia.
     const agora = paraDataUTC(dataLocalBrasil());
     const resumo = montarResumoCompacto({ treinos, exercicios, agora });
 
@@ -341,6 +345,8 @@ async function gerarESalvarParecer({
         return;
       }
 
+      // 1ª falha (SDD §6.4, tabela): uma nova chamada, com o parecer rejeitado
+      // e os intrusos anexados. Instrução de retry também é lida pelo modelo.
       const instrucaoRetry =
         resultado.motivo === "intrusos"
           ? INSTRUCAO_RETRY_INTRUSOS_POR_IDIOMA[idioma](resultado.intrusos)
@@ -414,13 +420,16 @@ export async function POST(request: Request) {
   const rascunhoExpiradoDesde = new Date(
     Date.now() - EXPIRA_RASCUNHO_HORAS * 3_600_000,
   ).toISOString();
-  await supabase
+  const { error: erroLimpeza } = await supabase
     .from("parecer")
     .delete()
     .eq("usuario_id", user.id)
     .or(
       `and(status.eq.gerando,criado_em.lt.${geracaoTravadaDesde}),and(status.eq.pronto,confirmado.eq.false,criado_em.lt.${rascunhoExpiradoDesde})`,
     );
+  if (erroLimpeza) {
+    console.error("[analise] falha ao limpar rascunhos expirados:", erroLimpeza.message);
+  }
 
   const { data: emAndamento } = await supabase
     .from("parecer")
