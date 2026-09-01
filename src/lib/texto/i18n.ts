@@ -527,6 +527,7 @@ const DICIONARIO: Record<string, { en: string; es: string }> = {
     en: "There's already an analysis in progress. Wait for it to finish.",
     es: "Ya hay un análisis en curso. Espera a que termine.",
   },
+  "Análise em andamento": { en: "Analysis in progress", es: "Análisis en curso" },
 
   // --- components/alerta-deload.tsx ---
   "Suas séries valendo estão mais difíceis do que o normal:": {

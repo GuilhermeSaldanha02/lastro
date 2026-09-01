@@ -1,7 +1,7 @@
 // lastro · SDD.md §7.1 — casca de servidor da tela da Análise Semanal.
 // Vira Server Component na pendência 4 (PROGRESS.md) pra poder buscar o
 // perfil (nome/foto) com `cookies()` antes de renderizar a barra de topo;
-// a parte interativa (perguntas, chamada à API, parecer) vive em
+// a parte interativa (perguntas, chamada à API) vive em
 // `components/analise-interativa.tsx`.
 import { obterPerfil } from "@/lib/dados/perfil";
 import { carregarResumoHome } from "@/lib/dados/resumo-home";

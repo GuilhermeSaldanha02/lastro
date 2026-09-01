@@ -66,6 +66,7 @@ export default function AnaliseInterativa({
       }
       if (resposta.status === 409) {
         setErro(t("Já existe uma análise em andamento. Aguarde ela terminar.", idioma));
+        setEmAndamento({ perguntaTexto: t("Análise em andamento", idioma) });
         return;
       }
       if (!resposta.ok) {
