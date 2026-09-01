@@ -26,10 +26,7 @@ import { perguntaValida, perguntasDoIdioma, type NumeroPergunta } from "./pergun
 import { obterIdioma, type Idioma } from "@/lib/dados/idioma";
 import { mapaTraducaoExercicios, mapaTraducaoGrupos } from "@/lib/dados/traducao";
 import { formatarGrupoMuscular } from "@/lib/texto/grupo-muscular";
-import {
-  LIMITE_GERACAO_TRAVADA_MINUTOS,
-  EXPIRA_RASCUNHO_HORAS,
-} from "@/lib/dados/parecer";
+import { limparRascunhosExpirados } from "@/lib/dados/parecer";
 
 type ClienteSupabaseServidor = Awaited<ReturnType<typeof criarClienteServidor>>;
 
@@ -414,30 +411,18 @@ export async function POST(request: Request) {
   const idioma = await obterIdioma();
 
   // Limpeza preguiçosa (SDD.md §11.2) antes de checar a trava.
-  const geracaoTravadaDesde = new Date(
-    Date.now() - LIMITE_GERACAO_TRAVADA_MINUTOS * 60_000,
-  ).toISOString();
-  const rascunhoExpiradoDesde = new Date(
-    Date.now() - EXPIRA_RASCUNHO_HORAS * 3_600_000,
-  ).toISOString();
-  const { error: erroLimpeza } = await supabase
-    .from("parecer")
-    .delete()
-    .eq("usuario_id", user.id)
-    .or(
-      `and(status.eq.gerando,criado_em.lt.${geracaoTravadaDesde}),and(status.eq.pronto,confirmado.eq.false,criado_em.lt.${rascunhoExpiradoDesde})`,
-    );
-  if (erroLimpeza) {
-    console.error("[analise] falha ao limpar rascunhos expirados:", erroLimpeza.message);
-  }
+  await limparRascunhosExpirados(supabase, user.id);
 
-  const { data: emAndamento } = await supabase
+  const { data: emAndamento, error: erroChecagem } = await supabase
     .from("parecer")
     .select("id")
     .eq("usuario_id", user.id)
     .eq("status", "gerando")
     .limit(1)
     .maybeSingle();
+  if (erroChecagem) {
+    console.error("[analise] falha ao checar geração em andamento:", erroChecagem.message);
+  }
   if (emAndamento) {
     return NextResponse.json({ erro: "geracao_em_andamento" }, { status: 409 });
   }

@@ -36,7 +36,7 @@ type ClienteSupabaseServidor = Awaited<ReturnType<typeof criarClienteServidor>>;
  * (presa em 'gerando' além do limite) e rascunho pronto expirado (não
  * confirmado em 24h).
  */
-async function limparRascunhosExpirados(
+export async function limparRascunhosExpirados(
   supabase: ClienteSupabaseServidor,
   usuarioId: string,
 ): Promise<void> {
