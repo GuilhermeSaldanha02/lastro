@@ -1218,3 +1218,216 @@ O route handler: autentica → `buscarParecer(id)` (RLS garante que só resolve 
 5. **Auditoria independente** (agente separado, contexto limpo, mesmo protocolo do `QA.md`) confirma o ponto 4 antes de virar `PASSOU`.
 
 Dono aprova lendo o ponto 4 executado, não a spec em prosa.
+
+---
+
+## 11. Geração assíncrona da Análise Semanal — spec técnica
+
+> **Autoridade desta seção:** achado do dono ao vivo (`PROGRESS.md`, sessão 2026-09-01) — o botão "Solicitar Análise" é síncrono hoje (`src/components/analise-interativa.tsx`), a pessoa fica 30-50s+ numa tela de esqueleto sem saber se travou. Desenho debatido e aprovado em conversa com o dono na sessão anterior; esta seção formaliza o desenho já combinado, no mesmo padrão das seções 9 e 10 (fatia posterior, não reabre a Fase 1).
+
+### 11.0 Escopo desta seção — e o que está FORA
+
+**DENTRO:** a chamada à Gemini passa a rodar depois da resposta HTTP, via `after()` (Next.js/Vercel — sem fila nem infra nova); a tela devolve controle em ~1s e a pessoa pode sair; o resultado pousa como **rascunho** no topo de "Pareceres salvos" (`/ajustes/relatorios`, reusa a tela do histórico da §10) com botões "Salvar" (confirma, vira permanente) ou "Descartar"; rascunho não confirmado expira sozinho em 24h; enquanto uma geração está em andamento, os botões de pergunta ficam desativados — travado no banco, sobrevive a trocar de tela ou recarregar.
+
+**FORA — declarado explicitamente:**
+
+| Fora | Por quê |
+|---|---|
+| Notificação push/e-mail quando o parecer fica pronto | Fora do combinado com o dono nesta rodada — a pessoa revisita a tela quando quiser, sem infra de notificação nova |
+| Barra de progresso com percentual | Não existe sinal de progresso real numa chamada de LLM — fingir um percentual seria E3 (emprestar precisão que não existe) |
+| A tela de Análise ficar aberta esperando e mostrar o parecer inline quando terminar (polling) | Decisão do dono: sair da tela é o comportamento esperado, não uma limitação a disfarçar. O resultado mora só em "Pareceres salvos" |
+| Fila/infra nova (Redis, QStash, cron) | `after()` sozinho resolve — mesma lógica de custo/benefício de §10.0 (Puppeteer descartado pela mesma razão) |
+| Gerar mais de uma Análise em paralelo | A trava (§11.2) é 1 geração em andamento por usuário, de propósito — o produto é de 1 pessoa, não há caso de uso pra concorrência aqui |
+
+Se uma implementação desta seção encostar em qualquer linha da coluna "Fora", ela saiu do escopo — pare e replaneje.
+
+### 11.1 Schema e migration
+
+Próxima migration livre: `0018` (última existente é `0017_parecer_checks_dominio.sql`). A tabela `parecer` (§10.1) deixa de guardar só pareceres já confirmados — passa a guardar também o rascunho em geração/aguardando decisão. `confirmado = true` nas linhas existentes preserva o significado antigo sem migração de dado: tudo que já estava na tabela foi, por definição, explicitamente salvo.
+
+```sql
+-- supabase/migrations/0018_parecer_geracao_assincrona.sql
+
+-- Geração assíncrona da Análise Semanal (PROGRESS.md, achado do dono
+-- 2026-09-01): a tabela `parecer` (0016) guardava só pareceres já
+-- confirmados. Agora também guarda o rascunho enquanto gera e enquanto
+-- aguarda "Salvar"/"Descartar" — daí `status` e `confirmado` novos, e
+-- `texto`/`evidencia` viram nullable (não existem ainda quando
+-- status = 'gerando').
+alter table public.parecer
+  add column status text not null default 'pronto',
+  add column confirmado boolean not null default true,
+  alter column texto drop not null,
+  alter column evidencia drop not null;
+
+alter table public.parecer
+  add constraint parecer_status_valido check (status in ('gerando', 'pronto'));
+
+-- Invariante de conteúdo: 'gerando' é sempre rascunho vazio e não
+-- confirmado; 'pronto' sempre tem o texto e a evidência que a Gemini (ou
+-- o fallback determinístico, route.ts) produziu.
+alter table public.parecer
+  add constraint parecer_conteudo_consistente check (
+    (status = 'gerando' and texto is null and evidencia is null and confirmado = false)
+    or (status = 'pronto' and texto is not null and evidencia is not null)
+  );
+
+-- GRANT de update, ausente desde 0016 ("editar um parecer salvo é fora
+-- de escopo" — continua sendo). Column-level: só as colunas que o ciclo
+-- de vida do rascunho precisa tocar (route handler completando a
+-- geração; "Salvar" confirmando). `pergunta`, `pergunta_texto`, `idioma`,
+-- `usuario_id`, `criado_em` continuam imutáveis pela aplicação — a app
+-- nunca emite UPDATE fora desse ciclo, e o grant é o reforço no banco,
+-- mesmo padrão de `modelo_treino_exercicio` (reps/peso, ADR-010).
+grant update (status, texto, evidencia, aviso_falha_interpretativa, confirmado)
+  on public.parecer to authenticated;
+```
+
+### 11.2 A trava de geração em andamento
+
+**Persistida no banco, não em estado local** — é o requisito explícito do dono: precisa sobreviver a trocar de tela ou recarregar o navegador. Antes de inserir uma linha nova com `status = 'gerando'`, o route handler consulta se já existe uma:
+
+```sql
+select id from parecer
+where usuario_id = :usuario and status = 'gerando'
+order by criado_em desc limit 1;
+```
+
+Se existir **e** for recente, a tentativa é recusada (§11.3, resposta 409). "Recente" precisa de um teto próprio, menor que as 24h do rascunho (§11.1/§10.0): se a function morrer no meio do `after()` (crash, timeout de plataforma — ver nota abaixo) sem nunca chegar a `UPDATE ... status = 'pronto'`, a trava não pode ficar presa por um dia inteiro. Novo limiar, mesmo padrão de `src/lib/analise/limiares.ts` mas fora daquele arquivo (ele é "todo número usado pelo *agregador*" — este é do ciclo de vida do rascunho, não da matemática da Análise): `src/lib/dados/parecer.ts` ganha
+
+```ts
+/** Acima disso, uma linha 'gerando' é tratada como abandonada — não trava mais gerações novas. */
+export const LIMITE_GERACAO_TRAVADA_MINUTOS = 5;
+/** Rascunho pronto (status='pronto', confirmado=false) sem decisão do dono expira sozinho. */
+export const EXPIRA_RASCUNHO_HORAS = 24;
+```
+
+5 minutos é folgado o bastante pra cobrir a chamada real (retry incluso, §6.4) com margem, e curto o bastante pra não travar a pessoa por muito tempo se algo morrer no meio.
+
+**Limpeza preguiçosa (lazy), sem cron** — mesma decisão de §10.0 pro rascunho de 24h, estendida aqui: toda leitura relevante (`listarPareceres`, a checagem de trava dentro do POST) primeiro apaga o que expirou daquele usuário, antes de consultar:
+
+```sql
+delete from parecer
+where usuario_id = :usuario
+  and (
+    (status = 'gerando' and criado_em < now() - interval '5 minutes')
+    or (status = 'pronto' and confirmado = false and criado_em < now() - interval '24 hours')
+  );
+```
+
+**Nota sobre o teto de duração da Vercel:** já pesquisado e confirmado numa sessão anterior (`PROGRESS.md`) que a geração cabe dentro do limite de duração de function mesmo no plano Hobby — `after()` mantém a function viva até o callback terminar ou até esse teto. Os 5 minutos acima são folga de segurança pro caso de falha, não uma expectativa de duração normal.
+
+### 11.3 Fluxo do route handler `/api/analise`
+
+Continua **Route Handler** (não vira Server Action) — decisão deliberada, não default: `e2e/j2-analise.spec.ts` intercepta `**/api/analise` via `page.route` (Playwright não intercepta a codificação interna de Server Actions do jeito limpo que intercepta uma rota HTTP nomeada), e a rota nomeada continua sendo o único lugar do repo que importa `@google/genai` (FF1, comentário já existente no topo do arquivo) — trocar pra Server Action não muda isso, só complicaria o teste de borda que já existe.
+
+**O que muda dentro do handler (`src/app/api/analise/route.ts`):**
+
+1. Tudo que hoje está dentro do `try` do `POST` a partir de `montarPrompt` até os três `return NextResponse.json` (linhas ~322-394 atuais) sai do corpo síncrono e vira uma função nomeada, `gerarESalvarParecer({ supabase, user, pergunta, idioma, rascunhoId })`, que faz o mesmo que já faz hoje (tentativa 1 → validação → retry → validação → fallback determinístico) e termina com um **`UPDATE`** em vez de um `NextResponse.json`:
+
+   ```sql
+   update parecer
+   set status = 'pronto', texto = :texto, evidencia = :evidencia,
+       aviso_falha_interpretativa = :aviso
+   where id = :rascunhoId;
+   ```
+
+   O `try/catch` mais externo (linha ~384 atual, "erro inesperado") também vira `UPDATE` no lugar do `NextResponse.json` de erro — mesmo com erro inesperado, o fallback determinístico não depende de rede (§6.4), então o rascunho quase sempre termina em `'pronto'`. Só uma falha **antes** de `montarResumoCompacto` (ex.: a própria query de treinos falhar) deixaria a linha presa em `'gerando'` — coberto pela trava de 5 minutos (§11.2), não por mais try/catch.
+
+2. O corpo do `POST` propriamente dito fica curto:
+   - autentica (igual a hoje);
+   - lê `pergunta` do corpo (igual a hoje, mesma validação);
+   - roda a limpeza preguiçosa (§11.2) e checa a trava — se existe `gerando` recente, `return NextResponse.json({ erro: "geracao_em_andamento" }, { status: 409 })`;
+   - `INSERT` a linha nova com `status = 'gerando'`, `confirmado = false`, `pergunta`, `pergunta_texto: perguntasDoIdioma(idioma)[pergunta]`, `idioma`, `texto: null`, `evidencia: null` — devolve o `id`;
+   - `after(() => gerarESalvarParecer({ ...ctx, rascunhoId: id }))`;
+   - `return NextResponse.json({ ok: true, rascunhoId: id }, { status: 202 })` — **202 Accepted**, não 200: o corpo HTTP não é mais o resultado, é só a confirmação de que começou.
+
+   `carregarTreinosDoUsuario`/`carregarExercicios`/`montarResumoCompacto` (linhas ~302-320 atuais) migram pra dentro de `gerarESalvarParecer`, junto com o resto — o handler síncrono não precisa mais deles.
+
+3. `pergunta_texto` deixa de vir do cliente (era `salvarParecer`, chamado por `analise-interativa.tsx`, quem mandava — ver §11.4) e passa a ser calculado no servidor a partir de `idioma` + `pergunta`, igual ao resto do handler já faz. Uma fonte a menos pro cliente poder mentir.
+
+### 11.4 Fluxo de UI, por arquivo
+
+**`src/components/analise-interativa.tsx` — simplifica, não cresce.** O botão de "Salvar este parecer" (linhas 62-83 e 246-261 atuais) **é removido inteiro**: não existe mais um `resultado` local pra salvar, porque o parecer nunca mais chega pro navegador que fez a pergunta — ele nasce direto como linha no banco (§11.3) e só aparece depois, em `/ajustes/relatorios` (abaixo). `perguntar(numero)` muda de:
+
+> `fetch` → espera a resposta completa → guarda `resultado` → renderiza `<Parecer>` inline
+
+para:
+
+> `fetch` → espera só o 202 (rápido, ~1s) → mostra uma mensagem de confirmação → fim
+
+```ts
+async function perguntar(numero: NumeroPergunta) {
+  setEnviando(true);
+  setErro(null);
+  try {
+    const resposta = await fetch("/api/analise", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ pergunta: numero }),
+    });
+    if (resposta.status === 409) {
+      setErro(t("Já existe uma análise em andamento. Aguarde ela terminar.", idioma));
+      return;
+    }
+    if (!resposta.ok) { /* mesmo tratamento de erro de hoje */ return; }
+    setEmAndamento(true); // trava local — some ao recarregar, mas o servidor já sabia (prop inicial)
+  } catch { /* mesmo tratamento de rede de hoje */ }
+  finally { setEnviando(false); }
+}
+```
+
+O estado "gerando" (esqueleto, DESIGN.md §3.6.5) **não muda de aparência**, só de duração e de destino: continua aparecendo assim que a pessoa clica, mas agora é permanente até ela sair da tela ou recarregar — não há mais transição pra `<Parecer>` na mesma tela. Uma linha de texto nova abaixo do esqueleto: `t("Confira em Ajustes > Relatórios em instantes.", idioma)`.
+
+**Trava inicial vem do servidor, não só do clique** ("sobrevive a trocar de tela" — requisito explícito): `page.tsx` busca se já existe rascunho em andamento e passa como prop.
+
+```
+src/lib/dados/parecer.ts → buscarRascunhoEmAndamento(): Promise<{ id: string; perguntaTexto: string } | null>
+```
+RLS filtra por dono; a query já faz a limpeza preguiçosa (§11.2) antes de checar. `analise-interativa.tsx` recebe `rascunhoInicial` como prop e inicializa o estado "gerando" com ele — os botões nascem desativados se havia uma geração em voo.
+
+**`src/app/analise/page.tsx`:** um `await buscarRascunhoEmAndamento()` a mais no `Promise.all` já existente, repassado como prop nova pra `AnaliseInterativa`.
+
+**`src/lib/dados/parecer.ts` — funções que mudam:**
+
+| Função | O que muda |
+|---|---|
+| `salvarParecer(dados)` | **Removida.** Inseria um parecer novo, já pronto e confirmado — não existe mais esse caminho; toda linha nasce como rascunho `gerando` (§11.3, dentro do route handler) |
+| `listarPareceres()` | Roda a limpeza preguiçosa (§11.2) antes do `select`; passa a incluir `status`/`confirmado` no retorno (`ParecerSalvo` ganha os dois campos); continua ordenando por `criado_em desc`, então um rascunho recém-criado já aparece no topo sem lógica extra |
+| `buscarRascunhoEmAndamento()` | **Nova.** Mesma limpeza preguiçosa; `select ... where status = 'gerando' order by criado_em desc limit 1` |
+| `confirmarParecer(id)` | **Nova**, substitui o antigo botão "Salvar" que vivia em `analise-interativa.tsx`. `update parecer set confirmado = true where id = :id` (RLS + o novo GRANT column-level, §11.1) |
+| `excluirParecer(id)` | Sem mudança de assinatura — passa a servir dois papéis: "Excluir" de um parecer já confirmado (comportamento de hoje) e "Descartar" de um rascunho pronto não confirmado (mesmo `DELETE`, mesmo dono) |
+
+**`src/components/pareceres-salvos.tsx`:** a lista que `listarPareceres()` devolve agora pode ter no máximo uma linha com `confirmado = false` no topo (a limpeza preguiçosa garante que nunca é uma linha velha) — o componente separa essa linha do resto antes de mapear:
+
+- `status === 'pronto' && !confirmado` → card especial no topo: `<Parecer>` completo (igual à abertura de um parecer salvo, §10.3) + dois botões, `t("Salvar", idioma)` (chama `confirmarParecer`, então a linha vira uma entre as demais, sem "Baixar PDF" nem "Excluir" até estar confirmada — PDF é território de parecer permanente, §10.4) e `t("Descartar", idioma)` (chama `excluirParecer`, mesma confirmação inline do C5 já usada pra "Excluir").
+- Pareceres com `confirmado === true` (todos os que hoje já existem, e os que forem confirmados) renderizam exatamente como em §10.3 — nenhuma mudança visual pra eles.
+- A rota nunca deixa `listarPareceres()` devolver uma linha `status === 'gerando'` viva por muito tempo (§11.2 limpa em até 5 min de abandono), mas enquanto a geração está de fato em voo ela pode aparecer por alguns segundos: card mínimo, sem `<Parecer>` (não há `texto`/`evidencia` ainda), só `t("Gerando…", idioma)` + a pergunta. Sem botões — não há decisão a tomar sobre algo que ainda não existe.
+
+### 11.5 O que muda no E2E (`e2e/j2-analise.spec.ts`)
+
+O teste hoje intercepta `**/api/analise` e verifica que o parecer mocado aparece **na mesma tela**. Isso deixa de ser verdade — o parecer nunca mais chega pro navegador que perguntou. O teste precisa mudar o que verifica, não só o mock:
+
+1. **Interceptação:** o `route.fulfill` passa a devolver o formato novo, `{ status: 202, body: JSON.stringify({ ok: true, rascunhoId: "..." }) }`.
+2. **Asserção:** troca `expect(page.getByText(PARECER_MOCADO)).toBeVisible()` por checar a mensagem de confirmação (`t("Confira em Ajustes > Relatórios em instantes.", idioma)`) e que o botão fica desativado (`aria-disabled`).
+3. **Novo teste** (não substitui o acima, soma): semear diretamente no Postgres (mesmo padrão de `semearHistoricoParaAnalise`) uma linha `parecer` com `status = 'pronto'`, `confirmado = false` pro usuário descartável; visitar `/ajustes/relatorios`; confirmar que o card de rascunho aparece com "Salvar"/"Descartar"; clicar "Salvar"; reconsultar o Postgres e confirmar `confirmado = true`. Isso cobre o que o teste antigo nunca cobriu (a Gemini real nunca é chamada em E2E, igual antes) e fecha o ciclo que passou a existir.
+
+### 11.6 O que NÃO muda
+
+- O núcleo de geração — `agregar.ts`, `prompt.ts`, `validador.ts`, `gemini.ts`, o fallback determinístico, a política de retry (§6.4) — zero linha muda de lógica. Só migra de "corpo síncrono do handler" pra "corpo do callback do `after()`", literalmente um recorte de função.
+- `Parecer` (componente) e o PDF (§10.4) — continuam recebendo os mesmos campos, de uma linha `parecer` confirmada. `buscarParecer(id)` (usado pelo PDF) não muda.
+- RLS e o isolamento por usuário — mesma policy de §10.1 cobre todo `status`, nenhuma policy nova.
+- Nenhum dado de `parecer` volta a entrar em prompt nenhum — mesma garantia de §10.5.
+
+### 11.7 Check executável
+
+1. **Migration `0018` aplica limpo** sobre o schema atual (`0017`).
+2. **Trava bloqueia geração concorrente, persistida no banco:** solicitar Análise → sem esperar terminar, solicitar de novo (ou recarregar a página e clicar de novo) → segunda tentativa recusada (409), mesma mensagem de "já em andamento".
+3. **Sobrevive a trocar de tela:** solicitar Análise → navegar pra outra aba do app → voltar pra `/analise` → botões continuam desativados (prop inicial de `buscarRascunhoEmAndamento`, não só estado local perdido no recarregamento).
+4. **Fluxo ponta a ponta, manual, usuário QA descartável:** solicitar Análise → tela devolve controle em segundos, sem travar → `/ajustes/relatorios` mostra o rascunho pronto (pode levar alguns segundos a mais que a resposta HTTP, é o `after()` terminando) → "Salvar" → linha vira uma entre os pareceres normais, `confirmado = true` no Postgres → em outra rodada, "Descartar" → some, `select count(*)` = 0.
+5. **Expira sozinho:** um rascunho pronto não confirmado com `criado_em` manualmente voltado 25h (QA, `update ... set criado_em = now() - interval '25 hours'`) some da lista na próxima leitura, sem ação nenhuma da pessoa.
+6. **Trava abandonada se solta:** uma linha `gerando` com `criado_em` voltado 6 minutos (QA) deixa de bloquear uma tentativa nova.
+7. **`e2e/j2-analise.spec.ts` atualizado (§11.5) passa**, os dois testes.
+8. **Auditoria independente** (agente separado, contexto limpo, mesmo protocolo do `QA.md`) confirma os pontos 2-6 antes de virar `PASSOU`.
+
+Dono aprova lendo o ponto 4 executado com o próprio treino dele, não a spec em prosa — mesmo padrão de §10, e a razão original desta seção (achado dele ao vivo).
