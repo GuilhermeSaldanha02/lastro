@@ -1308,3 +1308,25 @@ Reverte explicitamente a posição da ADR anterior contra tradução automática
 **Impacto.** `SDD.md` §10 (nova seção). `package.json` ganha `@react-pdf/renderer` como dependência nova. Nenhum código ainda — é a spec, a implementação vem em PR própria.
 
 **Como reverter.** Não há o que reverter — nenhum código foi escrito ainda. Se a biblioteca decepcionar na implementação, a decisão é revisitável sem custo afundado.
+
+---
+
+## 2026-09-01 — Geração assíncrona da Análise Semanal: `after()`, não fila nem polling
+
+**O que mudou.** Nada no código ainda — esta entrada registra a escolha de mecanismo pra `SDD.md` §11, desenho debatido com o dono ao vivo numa sessão anterior e formalizado nesta.
+
+**O pedido, a partir do achado do dono.** O botão "Solicitar Análise" (`analise-interativa.tsx`) é síncrono: a pessoa fica 30-50s+ numa tela de esqueleto sem saber se travou, porque a chamada à Gemini (com retry, §6.4) roda dentro do próprio ciclo de requisição HTTP.
+
+**As alternativas pesquisadas e por que as outras caem:**
+
+1. **Fila gerenciada (Redis/BullMQ, QStash, etc.).** Resolve, mas é infraestrutura nova pra um app pessoal de 1 usuário — mesma classe de custo/benefício que já descartou Puppeteer em §10 e levou a tratar a cota da Gemini como recurso escasso (`KNOWLEDGE.md` §3.2). Eliminatória por desproporção, não por incapacidade técnica.
+2. **Polling do cliente** (a tela continua aberta, consultando periodicamente se terminou). Resolve o problema técnico mas não o de produto: a pessoa continua presa na tela esperando, só que agora com uma barra de "carregando" em vez de esqueleto estático — não é isso que o dono pediu. Ele quer devolver o controle, não só a sensação de progresso.
+3. **`after()` (Next.js/Vercel)** — escolhida. A function continua viva depois da resposta HTTP até o callback terminar (dentro do teto de duração da plataforma), sem fila, sem infra nova, sem o cliente ficar esperando. Pesquisado e confirmado numa sessão anterior que a geração cabe no teto de duração mesmo no plano Hobby.
+
+**O resto do desenho** (rascunho não confirmado no topo de "Pareceres salvos", expira em 24h, trava de geração em andamento persistida no banco) está detalhado em `SDD.md` §11 — esta entrada cobre só a escolha de mecanismo, que é a parte que tinha alternativa de peso.
+
+**Classificação.** **ADIÇÃO** — não muda a tese da Análise Semanal, muda só onde e quando a chamada à Gemini roda.
+
+**Impacto.** `SDD.md` §11 (nova seção). Nenhum código ainda — a implementação vem em PR própria.
+
+**Como reverter.** Não há o que reverter — nenhum código foi escrito ainda.
