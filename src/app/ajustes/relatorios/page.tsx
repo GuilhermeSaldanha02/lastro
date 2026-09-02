@@ -67,6 +67,17 @@ export default async function PaginaRelatoriosAjustes() {
       />
 
       <div className="corpo corpo--com-nav corpo--titulo-conteudo transicao-pilula">
+        {pareceres.length > 0 && (
+          // Antes do histórico de treinos, de propósito (achado do dono,
+          // 2026-09-02): com várias sessões já registradas, um rascunho de
+          // Análise recém-gerado ficava escondido rolando a tela pra baixo,
+          // atrás de todos os cards de sticker.
+          <div className="pilha">
+            <h2 className="doc__secao">{t("Pareceres salvos", idioma)}</h2>
+            <PareceresSalvos pareceres={pareceres} idioma={idioma} />
+          </div>
+        )}
+
         {treinos.length > 0 ? (
           <div className="pilha">
             <p className="subtitulo-secao">
@@ -114,13 +125,6 @@ export default async function PaginaRelatoriosAjustes() {
             <Link href="/treino" className="botao-primario">
               {t("Ir para Treinos", idioma)}
             </Link>
-          </div>
-        )}
-
-        {pareceres.length > 0 && (
-          <div className="pilha" style={{ marginTop: "var(--lastro-e-4)" }}>
-            <h2 className="doc__secao">{t("Pareceres salvos", idioma)}</h2>
-            <PareceresSalvos pareceres={pareceres} idioma={idioma} />
           </div>
         )}
       </div>
