@@ -1,6 +1,7 @@
-// lastro · SDD.md §10.1/10.3 — histórico opt-in de pareceres salvos.
-// Mesmo padrão de src/lib/dados/treino.ts: Server Actions, sem cache,
-// `usuario_id` sempre resolvido do lado do servidor a partir da sessão.
+// lastro · SDD.md §10.1/10.3, §11.1-§11.2 — histórico opt-in de pareceres
+// salvos + rascunho em geração assíncrona. Mesmo padrão de
+// src/lib/dados/treino.ts: Server Actions, sem cache, `usuario_id`
+// sempre resolvido do lado do servidor a partir da sessão.
 "use server";
 
 import { revalidatePath } from "next/cache";
@@ -8,6 +9,10 @@ import { criarClienteServidor } from "@/lib/supabase/cliente-servidor";
 import type { NumeroPergunta } from "@/app/api/analise/perguntas";
 import type { EvidenciaParaTela } from "@/app/api/analise/evidencia";
 import type { Idioma } from "@/lib/dados/idioma";
+import {
+  LIMITE_GERACAO_TRAVADA_MINUTOS,
+  EXPIRA_RASCUNHO_HORAS,
+} from "./parecer-config";
 
 async function usuarioAutenticadoOuErro() {
   const supabase = await criarClienteServidor();
@@ -21,36 +26,70 @@ async function usuarioAutenticadoOuErro() {
   return { supabase, user };
 }
 
-export type NovoParecerInput = {
-  pergunta: NumeroPergunta;
-  perguntaTexto: string;
-  texto: string;
-  avisoFalhaInterpretativa: boolean;
-  evidencia: EvidenciaParaTela;
-  idioma: Idioma;
-};
+type ClienteSupabaseServidor = Awaited<ReturnType<typeof criarClienteServidor>>;
+
+/**
+ * Limpeza preguiçosa (SDD.md §11.2), sem cron: roda antes de qualquer
+ * leitura/decisão sobre o rascunho do usuário. Apaga geração abandonada
+ * (presa em 'gerando' além do limite) e rascunho pronto expirado (não
+ * confirmado em 24h).
+ */
+export async function limparRascunhosExpirados(
+  supabase: ClienteSupabaseServidor,
+  usuarioId: string,
+): Promise<void> {
+  const geracaoTravadaDesde = new Date(
+    Date.now() - LIMITE_GERACAO_TRAVADA_MINUTOS * 60_000,
+  ).toISOString();
+  const rascunhoExpiradoDesde = new Date(
+    Date.now() - EXPIRA_RASCUNHO_HORAS * 3_600_000,
+  ).toISOString();
+
+  const { error } = await supabase
+    .from("parecer")
+    .delete()
+    .eq("usuario_id", usuarioId)
+    .or(
+      `and(status.eq.gerando,criado_em.lt.${geracaoTravadaDesde}),and(status.eq.pronto,confirmado.eq.false,criado_em.lt.${rascunhoExpiradoDesde})`,
+    );
+  if (error) {
+    console.error(
+      "[parecer] falha ao limpar rascunhos expirados:",
+      error.message,
+    );
+  }
+}
+
+export type StatusParecer = "gerando" | "pronto";
 
 export type ParecerSalvo = {
   id: string;
   pergunta: NumeroPergunta;
   perguntaTexto: string;
-  texto: string;
+  texto: string | null;
   avisoFalhaInterpretativa: boolean;
-  evidencia: EvidenciaParaTela;
+  evidencia: EvidenciaParaTela | null;
   idioma: Idioma;
   criadoEm: string;
+  status: StatusParecer;
+  confirmado: boolean;
 };
 
 type LinhaParecer = {
   id: string;
   pergunta: number;
   pergunta_texto: string;
-  texto: string;
+  texto: string | null;
   aviso_falha_interpretativa: boolean;
-  evidencia: EvidenciaParaTela;
+  evidencia: EvidenciaParaTela | null;
   idioma: string;
   criado_em: string;
+  status: StatusParecer;
+  confirmado: boolean;
 };
+
+const COLUNAS_PARECER =
+  "id, pergunta, pergunta_texto, texto, aviso_falha_interpretativa, evidencia, idioma, criado_em, status, confirmado";
 
 function paraParecerSalvo(linha: LinhaParecer): ParecerSalvo {
   return {
@@ -62,39 +101,19 @@ function paraParecerSalvo(linha: LinhaParecer): ParecerSalvo {
     evidencia: linha.evidencia,
     idioma: linha.idioma as Idioma,
     criadoEm: linha.criado_em,
+    status: linha.status,
+    confirmado: linha.confirmado,
   };
 }
 
-/** Salva o parecer que a pessoa acabou de ler — nunca automático (SDD.md §10.0). */
-export async function salvarParecer(dados: NovoParecerInput): Promise<void> {
-  const { supabase, user } = await usuarioAutenticadoOuErro();
-
-  const { error } = await supabase.from("parecer").insert({
-    usuario_id: user.id,
-    pergunta: dados.pergunta,
-    pergunta_texto: dados.perguntaTexto,
-    texto: dados.texto,
-    aviso_falha_interpretativa: dados.avisoFalhaInterpretativa,
-    evidencia: dados.evidencia,
-    idioma: dados.idioma,
-  });
-  if (error) {
-    console.error("[parecer] falha ao salvar:", error.message);
-    throw new Error(`Falha ao salvar parecer: ${error.message}`);
-  }
-
-  revalidatePath("/ajustes/relatorios");
-}
-
-/** Todos os pareceres salvos do usuário logado (RLS filtra), mais recente primeiro. */
+/** Todos os pareceres do usuário logado (RLS filtra) — inclui rascunho em voo/aguardando decisão, se houver, sempre no topo (mais recente primeiro). */
 export async function listarPareceres(): Promise<ParecerSalvo[]> {
-  const { supabase } = await usuarioAutenticadoOuErro();
+  const { supabase, user } = await usuarioAutenticadoOuErro();
+  await limparRascunhosExpirados(supabase, user.id);
 
   const { data, error } = await supabase
     .from("parecer")
-    .select(
-      "id, pergunta, pergunta_texto, texto, aviso_falha_interpretativa, evidencia, idioma, criado_em",
-    )
+    .select(COLUNAS_PARECER)
     .order("criado_em", { ascending: false });
   if (error) {
     throw new Error(`Falha ao listar pareceres: ${error.message}`);
@@ -103,15 +122,36 @@ export async function listarPareceres(): Promise<ParecerSalvo[]> {
   return ((data ?? []) as unknown as LinhaParecer[]).map(paraParecerSalvo);
 }
 
-/** Um parecer salvo específico — RLS garante que só resolve se for do dono da sessão. */
+/** Rascunho em geração do usuário logado, se houver — usado pra travar o botão de pergunta ao carregar a tela (SDD.md §11.4). */
+export async function buscarRascunhoEmAndamento(): Promise<{
+  id: string;
+  perguntaTexto: string;
+} | null> {
+  const { supabase, user } = await usuarioAutenticadoOuErro();
+  await limparRascunhosExpirados(supabase, user.id);
+
+  const { data, error } = await supabase
+    .from("parecer")
+    .select("id, pergunta_texto")
+    .eq("status", "gerando")
+    .order("criado_em", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+  if (error) {
+    throw new Error(`Falha ao buscar rascunho em andamento: ${error.message}`);
+  }
+  if (!data) return null;
+
+  return { id: data.id, perguntaTexto: data.pergunta_texto };
+}
+
+/** Um parecer específico — RLS garante que só resolve se for do dono da sessão. */
 export async function buscarParecer(id: string): Promise<ParecerSalvo | null> {
   const { supabase } = await usuarioAutenticadoOuErro();
 
   const { data, error } = await supabase
     .from("parecer")
-    .select(
-      "id, pergunta, pergunta_texto, texto, aviso_falha_interpretativa, evidencia, idioma, criado_em",
-    )
+    .select(COLUNAS_PARECER)
     .eq("id", id)
     .maybeSingle();
   if (error) {
@@ -122,7 +162,22 @@ export async function buscarParecer(id: string): Promise<ParecerSalvo | null> {
   return paraParecerSalvo(data as unknown as LinhaParecer);
 }
 
-/** Exclui um parecer salvo — ação da própria pessoa, sem cascade especial (não referenciado por nada). */
+/** Confirma um rascunho pronto — vira parecer permanente (SDD.md §11.4). */
+export async function confirmarParecer(id: string): Promise<void> {
+  const { supabase } = await usuarioAutenticadoOuErro();
+
+  const { error } = await supabase
+    .from("parecer")
+    .update({ confirmado: true })
+    .eq("id", id);
+  if (error) {
+    throw new Error(`Falha ao confirmar parecer: ${error.message}`);
+  }
+
+  revalidatePath("/ajustes/relatorios");
+}
+
+/** Exclui um parecer — serve tanto "Excluir" (já confirmado) quanto "Descartar" (rascunho pronto não confirmado). */
 export async function excluirParecer(id: string): Promise<void> {
   const { supabase } = await usuarioAutenticadoOuErro();
 

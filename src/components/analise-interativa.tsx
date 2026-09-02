@@ -1,93 +1,57 @@
 "use client";
 
-// lastro · SDD.md §7.1 — tela da Análise Semanal: lista as 5 perguntas
-// padrão como botões, chama POST /api/analise ao escolher uma, mostra
-// carregamento (chamada real à Gemini, pode levar alguns segundos) e então
-// o parecer.
+// lastro · SDD.md §7.1, §11.4 — tela da Análise Semanal: lista as 5
+// perguntas padrão como botões, dispara POST /api/analise ao escolher
+// uma. A rota devolve controle em ~1s (202, geração roda em segundo
+// plano via after()) — esta tela NUNCA mostra o parecer pronto; ele
+// pousa como rascunho em "Pareceres salvos" (/ajustes/relatorios,
+// pareceres-salvos.tsx), pra a pessoa confirmar ou descartar.
 //
 // Extraído de `app/analise/page.tsx` (PROGRESS.md pendência 4): a barra de
 // topo agora precisa buscar o perfil no servidor (`cookies()`), e um Client
 // Component não pode importar Server Component diretamente — só recebê-lo
 // como children/prop do pai. `page.tsx` virou Server Component; esta parte
-// interativa (estado de pergunta/resultado) continua client.
-//
-// FORA desta tarefa (SDD §7.2, §8): gráficos, histórico de pareceres,
-// compartilhar/exportar, gate visual, e a regra de liberação semanal do
-// botão — o botão fica sempre disponível, sem bloqueio de calendário.
+// interativa (estado de pergunta) continua client.
 import { useState } from "react";
 import {
   perguntasDoIdioma,
   PERGUNTA_PRIMARIA,
   type NumeroPergunta,
 } from "@/app/api/analise/perguntas";
-import type { EvidenciaParaTela } from "@/app/api/analise/evidencia";
 import { MINIMO_SEMANAS_PARECER } from "@/lib/analise/limiares";
 import type { Idioma } from "@/lib/dados/idioma";
 import type { GrupoComRecencia } from "@/lib/analise/recencia";
 import type { SinalDeload } from "@/lib/analise/alerta-deload";
-import Parecer from "@/components/parecer";
 import GraficoProgressao from "@/components/grafico-progressao";
 import GruposSemEstimulo from "@/components/grupos-sem-estimulo";
 import AlertaDeload from "@/components/alerta-deload";
 import { t } from "@/lib/texto/i18n";
-import { salvarParecer } from "@/lib/dados/parecer";
-
-type Resultado = {
-  parecer: string;
-  avisoFalhaInterpretativa?: boolean;
-  evidencia: EvidenciaParaTela;
-};
 
 export default function AnaliseInterativa({
   semanasFechadasComTreino,
   gruposSemEstimulo,
   sinalDeload,
   idioma,
+  rascunhoInicial,
 }: {
   semanasFechadasComTreino: number;
   gruposSemEstimulo: GrupoComRecencia[];
   sinalDeload: SinalDeload | null;
   idioma: Idioma;
+  /** Rascunho já em geração ao carregar a tela — trava o botão mesmo sem
+   * clique nesta sessão (SDD.md §11.4: sobrevive a trocar de tela). */
+  rascunhoInicial: { id: string; perguntaTexto: string } | null;
 }) {
   const PERGUNTAS = perguntasDoIdioma(idioma);
-  const [carregando, setCarregando] = useState<NumeroPergunta | null>(null);
-  const [resultado, setResultado] = useState<Resultado | null>(null);
+  const [enviando, setEnviando] = useState(false);
   const [erro, setErro] = useState<string | null>(null);
-  // A pergunta escolhida é o TÍTULO do documento emitido (DESIGN.md
-  // §3.6.2). Guardada à parte de `carregando`, que zera ao terminar.
-  const [perguntaEmitida, setPerguntaEmitida] = useState<NumeroPergunta | null>(
-    null,
+  const [emAndamento, setEmAndamento] = useState<{ perguntaTexto: string } | null>(
+    rascunhoInicial ? { perguntaTexto: rascunhoInicial.perguntaTexto } : null,
   );
 
-  const [statusSalvar, setStatusSalvar] = useState<
-    "ocioso" | "salvando" | "salvo" | "erro"
-  >("ocioso");
-
-  async function salvar() {
-    if (!resultado || perguntaEmitida === null) return;
-    if (statusSalvar === "salvando" || statusSalvar === "salvo") return;
-    setStatusSalvar("salvando");
-    try {
-      await salvarParecer({
-        pergunta: perguntaEmitida,
-        perguntaTexto: PERGUNTAS[perguntaEmitida],
-        texto: resultado.parecer,
-        avisoFalhaInterpretativa: resultado.avisoFalhaInterpretativa ?? false,
-        evidencia: resultado.evidencia,
-        idioma,
-      });
-      setStatusSalvar("salvo");
-    } catch {
-      setStatusSalvar("erro");
-    }
-  }
-
   async function perguntar(numero: NumeroPergunta) {
-    setCarregando(numero);
-    setPerguntaEmitida(numero);
+    setEnviando(true);
     setErro(null);
-    setResultado(null);
-    setStatusSalvar("ocioso");
 
     try {
       const resposta = await fetch("/api/analise", {
@@ -96,21 +60,25 @@ export default function AnaliseInterativa({
         body: JSON.stringify({ pergunta: numero }),
       });
 
+      if (resposta.status === 401) {
+        setErro(t("Sessão expirada. Faça login novamente.", idioma));
+        return;
+      }
+      if (resposta.status === 409) {
+        setErro(t("Já existe uma análise em andamento. Aguarde ela terminar.", idioma));
+        setEmAndamento({ perguntaTexto: t("Análise em andamento", idioma) });
+        return;
+      }
       if (!resposta.ok) {
-        if (resposta.status === 401) {
-          setErro(t("Sessão expirada. Faça login novamente.", idioma));
-        } else {
-          setErro(`${t("Falha ao gerar o parecer (erro", idioma)} ${resposta.status}).`);
-        }
+        setErro(`${t("Falha ao gerar o parecer (erro", idioma)} ${resposta.status}).`);
         return;
       }
 
-      const dados = (await resposta.json()) as Resultado;
-      setResultado(dados);
+      setEmAndamento({ perguntaTexto: PERGUNTAS[numero] });
     } catch {
       setErro(t("Falha de rede ao gerar o parecer. Tente novamente.", idioma));
     } finally {
-      setCarregando(null);
+      setEnviando(false);
     }
   }
 
@@ -120,11 +88,7 @@ export default function AnaliseInterativa({
   const [graficoTemPainel, setGraficoTemPainel] = useState<boolean | null>(null);
 
   const dadosSuficientes = semanasFechadasComTreino >= MINIMO_SEMANAS_PARECER;
-  // Inativo cobre as duas regras — dados insuficientes (B1) e uma pergunta
-  // já em voo — sem confundir uma com a outra (nota 3 de B1: isto não
-  // reabre a tarefa 1.0d, que é sobre cadência semanal, não sobre
-  // suficiência de dados).
-  const inativo = !dadosSuficientes || carregando !== null;
+  const inativo = !dadosSuficientes || enviando || emAndamento !== null;
   const secundarias = (Object.keys(PERGUNTAS) as unknown as NumeroPergunta[])
     .map(Number)
     .filter((numero) => numero !== PERGUNTA_PRIMARIA) as NumeroPergunta[];
@@ -149,14 +113,6 @@ export default function AnaliseInterativa({
       <h2 className="doc__secao">{t("Análise semanal", idioma)}</h2>
 
       {!dadosSuficientes && (
-        // Estado "sem dados suficientes" (DESIGN.md §3.6.5): diz o que
-        // falta e QUANTO falta, em número — nunca deixa o LLM ser quem
-        // avisa isso. Neutro (--lastro-txt-2), nunca --lastro-erro: não
-        // é erro, é começo.
-        //
-        // Combinado com o aviso do gráfico quando os dois estão vazios
-        // (achado do dono, 2026-08-14: dois avisos de "ainda não há dado"
-        // empilhados liam repetitivo) — um parágrafo só, não dois.
         <p className="vazio" aria-live="polite">
           {graficoTemPainel === false && (
             <>
@@ -169,11 +125,6 @@ export default function AnaliseInterativa({
         </p>
       )}
 
-      {/* Botão + 5 cards de pergunta convivem sempre visíveis, mesma regra
-          de disponibilidade nos dois (B1, 2026-08-13): inativos por
-          aria-disabled — nunca `disabled` puro, senão some da ordem de
-          tabulação — até 3 semanas fecharem. O botão dispara a mesma
-          pergunta que o card primário: um só handler, duas entradas. */}
       <button
         type="button"
         className="botao-primario botao-solicitar-analise"
@@ -210,56 +161,27 @@ export default function AnaliseInterativa({
         ))}
       </ul>
 
-      {/* Estado "gerando" (DESIGN.md §3.6.5): esqueleto na altura das
-          linhas que virão. Sem reticências pulsantes, sem spinner, sem
-          texto letra a letra — qualquer um dos três reprova o gate. */}
-      {carregando !== null && (
+      {/* Estado "gerando" (DESIGN.md §3.6.5): mesmo esqueleto de antes, mas
+          agora fica até a pessoa sair da tela — não vira <Parecer> aqui
+          (SDD.md §11.4). */}
+      {emAndamento && (
         <section className="doc" aria-live="polite">
           <header className="doc__emissao">
             <p className="doc__selo">{t("Parecer em emissão", idioma)}</p>
-            <h2 className="doc__pergunta">{PERGUNTAS[carregando]}</h2>
+            <h2 className="doc__pergunta">{emAndamento.perguntaTexto}</h2>
           </header>
           <p className="doc__secao">{t("escrevendo a leitura", idioma)}</p>
           <div className="esqueleto" />
           <div className="esqueleto" />
           <div className="esqueleto esqueleto--curto" />
+          <p className="vazio">{t("Confira em Ajustes > Relatórios em instantes.", idioma)}</p>
         </section>
       )}
 
-      {/* A prosa é o que falha aqui; nenhum número se perde junto, porque
-          a conta é local e não dependia da rede (DESIGN.md §3.6.5). */}
       {erro && (
         <p className="aviso-erro" role="alert">
           {erro}
         </p>
-      )}
-
-      {resultado && (
-        <>
-          <Parecer
-            pergunta={perguntaEmitida ? PERGUNTAS[perguntaEmitida] : null}
-            texto={resultado.parecer}
-            avisoFalhaInterpretativa={resultado.avisoFalhaInterpretativa}
-            evidencia={resultado.evidencia}
-            idioma={idioma}
-          />
-          <button
-            type="button"
-            className="botao-secundario"
-            onClick={salvar}
-            aria-disabled={statusSalvar === "salvando" || statusSalvar === "salvo"}
-          >
-            {statusSalvar === "salvando" && t("Salvando…", idioma)}
-            {statusSalvar === "salvo" && `${t("Salvo", idioma)} ✓`}
-            {(statusSalvar === "ocioso" || statusSalvar === "erro") &&
-              t("Salvar este parecer", idioma)}
-          </button>
-          {statusSalvar === "erro" && (
-            <p className="aviso-erro" role="alert">
-              {t("Não foi possível salvar. Tente de novo.", idioma)}
-            </p>
-          )}
-        </>
       )}
     </div>
   );

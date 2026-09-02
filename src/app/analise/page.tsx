@@ -1,12 +1,13 @@
 // lastro · SDD.md §7.1 — casca de servidor da tela da Análise Semanal.
 // Vira Server Component na pendência 4 (PROGRESS.md) pra poder buscar o
 // perfil (nome/foto) com `cookies()` antes de renderizar a barra de topo;
-// a parte interativa (perguntas, chamada à API, parecer) vive em
+// a parte interativa (perguntas, chamada à API) vive em
 // `components/analise-interativa.tsx`.
 import { obterPerfil } from "@/lib/dados/perfil";
 import { carregarResumoHome } from "@/lib/dados/resumo-home";
 import { carregarDiasSemEstimuloPorGrupo } from "@/lib/dados/recencia-grupos";
 import { carregarSinalDeload } from "@/lib/dados/alerta-deload";
+import { buscarRascunhoEmAndamento } from "@/lib/dados/parecer";
 import { paraDataUTC } from "@/lib/analise/semanas";
 import { dataLocalBrasil } from "@/lib/tempo";
 import AbaInferior from "@/components/aba-inferior";
@@ -16,11 +17,12 @@ import { t } from "@/lib/texto/i18n";
 
 export default async function PaginaAnalise() {
   const hoje = dataLocalBrasil();
-  const [perfil, resumo, gruposSemEstimulo, sinalDeload] = await Promise.all([
+  const [perfil, resumo, gruposSemEstimulo, sinalDeload, rascunhoInicial] = await Promise.all([
     obterPerfil(),
     carregarResumoHome(hoje),
     carregarDiasSemEstimuloPorGrupo(hoje),
     carregarSinalDeload(paraDataUTC(hoje)),
+    buscarRascunhoEmAndamento(),
   ]);
   const idioma = perfil?.idioma ?? "pt-BR";
 
@@ -39,6 +41,7 @@ export default async function PaginaAnalise() {
         gruposSemEstimulo={gruposSemEstimulo}
         sinalDeload={sinalDeload}
         idioma={idioma}
+        rascunhoInicial={rascunhoInicial}
       />
 
       <AbaInferior ativa="analise" idioma={idioma} />

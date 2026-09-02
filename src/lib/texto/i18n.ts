@@ -519,6 +519,15 @@ const DICIONARIO: Record<string, { en: string; es: string }> = {
   "Solicitar Análise": { en: "Request Analysis", es: "Solicitar Análisis" },
   "Parecer em emissão": { en: "Report in progress", es: "Informe en emisión" },
   "escrevendo a leitura": { en: "writing the readout", es: "escribiendo la lectura" },
+  "Confira em Ajustes > Relatórios em instantes.": {
+    en: "Check Settings > Reports in a few moments.",
+    es: "Consulta Ajustes > Informes en unos instantes.",
+  },
+  "Já existe uma análise em andamento. Aguarde ela terminar.": {
+    en: "There's already an analysis in progress. Wait for it to finish.",
+    es: "Ya hay un análisis en curso. Espera a que termine.",
+  },
+  "Análise em andamento": { en: "Analysis in progress", es: "Análisis en curso" },
 
   // --- components/alerta-deload.tsx ---
   "Suas séries valendo estão mais difíceis do que o normal:": {
@@ -687,6 +696,8 @@ const DICIONARIO: Record<string, { en: string; es: string }> = {
     es: "Error al descargar el PDF. Intenta de nuevo.",
   },
   "Baixando…": { en: "Downloading…", es: "Descargando…" },
+  "Descartar": { en: "Discard", es: "Descartar" },
+  "Gerando…": { en: "Generating…", es: "Generando…" },
 };
 
 export function t(chavePtBr: string, idioma: Idioma): string {
