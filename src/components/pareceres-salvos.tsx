@@ -96,56 +96,82 @@ export default function PareceresSalvos({
           emitidoEm={aberto.criadoEm}
         />
 
-        <button
-          type="button"
-          className="botao-primario"
-          onClick={() => baixarPdf(aberto.id, aberto.criadoEm)}
-          disabled={baixandoPdf}
-        >
-          {baixandoPdf ? t("Baixando…", idioma) : t("Baixar PDF", idioma)}
-        </button>
-
         {erro && (
           <p className="aviso-erro" role="alert">
             {erro}
           </p>
         )}
 
-        {excluindoId === aberto.id ? (
-          <div className="confirma" role="group" aria-label={t("Excluir parecer salvo", idioma)}>
-            <p className="confirma__texto">
-              {t(
-                "Excluir este parecer apaga o registro salvo — não afeta seus treinos nem séries. Não dá para desfazer.",
-                idioma,
-              )}
-            </p>
-            <div className="confirma__acoes">
-              <button
-                type="button"
-                className="botao-secundario"
-                onClick={() => setExcluindoId(null)}
-                disabled={pendente}
-              >
-                {t("Cancelar", idioma)}
-              </button>
-              <button
-                type="button"
-                className="botao-destrutivo"
-                onClick={() => confirmarExclusao(aberto.id)}
-                disabled={pendente}
-              >
-                {pendente ? t("Excluindo…", idioma) : t("Excluir parecer salvo", idioma)}
-              </button>
-            </div>
+        {!aberto.confirmado ? (
+          // Rascunho pronto, ainda não confirmado (SDD.md §11.4): decidir
+          // aqui mesmo, sem download/exclusão-com-confirmação — essas ações
+          // só fazem sentido pra um parecer já permanente.
+          <div className="confirma__acoes">
+            <button
+              type="button"
+              className="botao-primario"
+              onClick={() => confirmar(aberto.id)}
+              disabled={pendente}
+            >
+              {pendente ? t("Salvando…", idioma) : t("Salvar", idioma)}
+            </button>
+            <button
+              type="button"
+              className="botao-secundario"
+              onClick={() => confirmarExclusao(aberto.id)}
+              disabled={pendente}
+            >
+              {t("Descartar", idioma)}
+            </button>
           </div>
         ) : (
-          <button
-            type="button"
-            className="botao-textual-com-icone botao-textual-com-icone--destrutivo"
-            onClick={() => setExcluindoId(aberto.id)}
-          >
-            {t("Excluir parecer salvo", idioma)}
-          </button>
+          <>
+            <button
+              type="button"
+              className="botao-primario"
+              onClick={() => baixarPdf(aberto.id, aberto.criadoEm)}
+              disabled={baixandoPdf}
+            >
+              {baixandoPdf ? t("Baixando…", idioma) : t("Baixar PDF", idioma)}
+            </button>
+
+            {excluindoId === aberto.id ? (
+              <div className="confirma" role="group" aria-label={t("Excluir parecer salvo", idioma)}>
+                <p className="confirma__texto">
+                  {t(
+                    "Excluir este parecer apaga o registro salvo — não afeta seus treinos nem séries. Não dá para desfazer.",
+                    idioma,
+                  )}
+                </p>
+                <div className="confirma__acoes">
+                  <button
+                    type="button"
+                    className="botao-secundario"
+                    onClick={() => setExcluindoId(null)}
+                    disabled={pendente}
+                  >
+                    {t("Cancelar", idioma)}
+                  </button>
+                  <button
+                    type="button"
+                    className="botao-destrutivo"
+                    onClick={() => confirmarExclusao(aberto.id)}
+                    disabled={pendente}
+                  >
+                    {pendente ? t("Excluindo…", idioma) : t("Excluir parecer salvo", idioma)}
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <button
+                type="button"
+                className="botao-textual-com-icone botao-textual-com-icone--destrutivo"
+                onClick={() => setExcluindoId(aberto.id)}
+              >
+                {t("Excluir parecer salvo", idioma)}
+              </button>
+            )}
+          </>
         )}
       </div>
     );
@@ -167,33 +193,29 @@ export default function PareceresSalvos({
       )}
 
       {rascunho && rascunho.status === "pronto" && rascunho.texto && rascunho.evidencia && (
-        <div className="pilha">
-          <Parecer
-            pergunta={rascunho.perguntaTexto}
-            texto={rascunho.texto}
-            avisoFalhaInterpretativa={rascunho.avisoFalhaInterpretativa}
-            evidencia={rascunho.evidencia}
-            idioma={rascunho.idioma}
-            emitidoEm={rascunho.criadoEm}
-          />
-          <div className="confirma__acoes">
-            <button
-              type="button"
-              className="botao-primario"
-              onClick={() => confirmar(rascunho.id)}
-              disabled={pendente}
-            >
-              {pendente ? t("Salvando…", idioma) : t("Salvar", idioma)}
-            </button>
-            <button
-              type="button"
-              className="botao-secundario"
-              onClick={() => confirmarExclusao(rascunho.id)}
-              disabled={pendente}
-            >
-              {t("Descartar", idioma)}
-            </button>
+        // Compacto, mesmo padrão dos pareceres já confirmados abaixo — não
+        // despeja o parecer inteiro na lista (achado do dono: com vários
+        // treinos no histórico, o rascunho sumia rolando a tela pra baixo
+        // dentro de um bloco de texto grande demais).
+        <div className="card-relatorio-item">
+          <div className="card-relatorio-item__cabecalho">
+            <div className="card-relatorio-item__data-bloco">
+              <span
+                className="card-relatorio-item__data-rotulo"
+                style={{ color: "var(--lastro-ouro)" }}
+              >
+                {t("Rascunho", idioma)}
+              </span>
+            </div>
           </div>
+          <p className="card-relatorio-item__id-curto">{rascunho.perguntaTexto}</p>
+          <button
+            type="button"
+            className="botao-acao-relatorio"
+            onClick={() => setAbertoId(rascunho.id)}
+          >
+            {t("Revisar e salvar", idioma)}
+          </button>
         </div>
       )}
 

@@ -698,6 +698,8 @@ const DICIONARIO: Record<string, { en: string; es: string }> = {
   "Baixando…": { en: "Downloading…", es: "Descargando…" },
   "Descartar": { en: "Discard", es: "Descartar" },
   "Gerando…": { en: "Generating…", es: "Generando…" },
+  "Rascunho": { en: "Draft", es: "Borrador" },
+  "Revisar e salvar": { en: "Review and save", es: "Revisar y guardar" },
 };
 
 export function t(chavePtBr: string, idioma: Idioma): string {
