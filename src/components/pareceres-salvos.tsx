@@ -29,11 +29,9 @@ export default function PareceresSalvos({
   const aberto = listaLocal.find((p) => p.id === abertoId) ?? null;
   const rascunho = listaLocal.find((p) => !p.confirmado) ?? null;
   const confirmados = listaLocal.filter((p) => p.confirmado);
-  const [confirmando, setConfirmando] = useState(false);
 
   function confirmar(id: string) {
     setErro(null);
-    setConfirmando(true);
     iniciar(async () => {
       try {
         await confirmarParecer(id);
@@ -42,8 +40,6 @@ export default function PareceresSalvos({
         );
       } catch {
         setErro(t("Não foi possível salvar. Tente de novo.", idioma));
-      } finally {
-        setConfirmando(false);
       }
     });
   }
@@ -185,15 +181,15 @@ export default function PareceresSalvos({
               type="button"
               className="botao-primario"
               onClick={() => confirmar(rascunho.id)}
-              disabled={confirmando || pendente}
+              disabled={pendente}
             >
-              {t("Salvar", idioma)}
+              {pendente ? t("Salvando…", idioma) : t("Salvar", idioma)}
             </button>
             <button
               type="button"
               className="botao-secundario"
               onClick={() => confirmarExclusao(rascunho.id)}
-              disabled={confirmando || pendente}
+              disabled={pendente}
             >
               {t("Descartar", idioma)}
             </button>
