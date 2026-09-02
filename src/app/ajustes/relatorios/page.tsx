@@ -11,7 +11,11 @@ import HistoricoRelatoriosPosTreino from "@/components/historico-relatorios-pos-
 import PareceresSalvos from "@/components/pareceres-salvos";
 import { t } from "@/lib/texto/i18n";
 
-export default async function PaginaRelatoriosAjustes() {
+export default async function PaginaRelatoriosAjustes({
+  searchParams,
+}: {
+  searchParams: Promise<{ parecer?: string }>;
+}) {
   const perfil = await obterPerfil();
   if (!perfil) {
     redirect("/login?proximo=/ajustes/relatorios");
@@ -19,6 +23,12 @@ export default async function PaginaRelatoriosAjustes() {
 
   const idioma = perfil.idioma ?? "pt-BR";
   const [treinos, pareceres] = await Promise.all([listarTreinos(), listarPareceres()]);
+  // Um parecer aberto (?parecer=<id>, controlado por PareceresSalvos via
+  // router) já tem seu próprio "← Voltar à lista" — o back-arrow do
+  // cabeçalho, que navega pra /ajustes, some enquanto isso pra não
+  // empilhar dois controles de "voltar" (achado do dono, 2026-09-02).
+  const { parecer: parecerAbertoId } = await searchParams;
+  const detalheAberto = Boolean(parecerAbertoId);
 
   async function obterMetricasDoTreino(treinoId: string) {
     "use server";
@@ -61,7 +71,8 @@ export default async function PaginaRelatoriosAjustes() {
       <CabecalhoPro
         titulo={t("Relatórios & Stickers", idioma)}
         destaque={t("Histórico e Stories", idioma)}
-        voltarHref="/ajustes"
+        voltarHref={detalheAberto ? undefined : "/ajustes"}
+        mostrarLogo={false}
         perfil={perfil}
         idioma={idioma}
       />

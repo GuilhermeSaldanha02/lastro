@@ -4,7 +4,16 @@
 // /ajustes/relatorios. Abre um parecer inline (sem modal novo — reusa
 // `Parecer`, o mesmo componente da tela de Análise) em vez de navegar
 // pra outra rota.
+//
+// Qual parecer está aberto vive na URL (?parecer=<id>), não em useState
+// local — o cabeçalho da página (Server Component) lê o mesmo parâmetro
+// pra decidir se mostra o back-arrow pra /ajustes ou some, deixando só
+// "← Voltar à lista" abaixo como único controle de voltar enquanto um
+// parecer está aberto (achado do dono, 2026-09-02: dois back-arrows
+// empilhados). Bônus: o botão/gesto nativo de voltar do navegador fecha
+// o parecer de graça, sem código extra.
 import { useState, useTransition } from "react";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import type { ParecerSalvo } from "@/lib/dados/parecer";
 import { confirmarParecer, excluirParecer } from "@/lib/dados/parecer";
 import Parecer from "@/components/parecer";
@@ -19,7 +28,18 @@ export default function PareceresSalvos({
   pareceres: ParecerSalvo[];
   idioma: Idioma;
 }) {
-  const [abertoId, setAbertoId] = useState<string | null>(null);
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const abertoId = searchParams.get("parecer");
+
+  function abrir(id: string) {
+    router.push(`${pathname}?parecer=${id}`);
+  }
+  function fecharDetalhe() {
+    router.push(pathname);
+  }
+
   const [excluindoId, setExcluindoId] = useState<string | null>(null);
   const [pendente, iniciar] = useTransition();
   const [listaLocal, setListaLocal] = useState(pareceres);
@@ -51,7 +71,7 @@ export default function PareceresSalvos({
         await excluirParecer(id);
         setListaLocal((atual) => atual.filter((p) => p.id !== id));
         setExcluindoId(null);
-        if (abertoId === id) setAbertoId(null);
+        if (abertoId === id) fecharDetalhe();
       } catch {
         setErro(t("Não foi possível excluir. Tente de novo.", idioma));
       }
@@ -83,7 +103,7 @@ export default function PareceresSalvos({
     const evidenciaAberta = aberto.evidencia;
     return (
       <div className="pilha">
-        <button type="button" className="botao-textual" onClick={() => setAbertoId(null)}>
+        <button type="button" className="botao-textual" onClick={fecharDetalhe}>
           ← {t("Voltar à lista", idioma)}
         </button>
 
@@ -212,7 +232,7 @@ export default function PareceresSalvos({
           <button
             type="button"
             className="botao-acao-relatorio"
-            onClick={() => setAbertoId(rascunho.id)}
+            onClick={() => abrir(rascunho.id)}
           >
             {t("Revisar e salvar", idioma)}
           </button>
@@ -232,7 +252,7 @@ export default function PareceresSalvos({
           <button
             type="button"
             className="botao-acao-relatorio"
-            onClick={() => setAbertoId(parecer.id)}
+            onClick={() => abrir(parecer.id)}
           >
             {t("Ver parecer", idioma)}
           </button>
