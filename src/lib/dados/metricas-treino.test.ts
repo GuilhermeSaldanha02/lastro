@@ -79,6 +79,44 @@ describe("calcularMetricasSessao", () => {
     expect(metricas.focoOuDivisao).toBe("PERNAS");
   });
 
+  it("infere 'SUPERIORES' pra um dia de empurrar (peito+ombro+tríceps), não 'FULL BODY' (achado do dono, 2026-09-02)", () => {
+    const series: SerieParaMetricas[] = [
+      { id: "1", exercicioId: "supino", exercicioNome: "Supino Reto", reps: 8, peso: 80, tipo: "valendo", exercicioGrupoMuscular: "peito" },
+      { id: "2", exercicioId: "desenvolvimento", exercicioNome: "Desenvolvimento com Halteres", reps: 10, peso: 20, tipo: "valendo", exercicioGrupoMuscular: "ombro" },
+      { id: "3", exercicioId: "triceps-corda", exercicioNome: "Tríceps na Corda", reps: 12, peso: 25, tipo: "valendo", exercicioGrupoMuscular: "triceps" },
+    ];
+    const metricas = calcularMetricasSessao(series, 60 * 60);
+    expect(metricas.focoOuDivisao).toBe("SUPERIORES");
+  });
+
+  it("infere 'SUPERIORES' pelo fallback de nome (sem exercicioGrupoMuscular) pro mesmo dia de empurrar", () => {
+    const series: SerieParaMetricas[] = [
+      { id: "1", exercicioId: "supino", exercicioNome: "Supino Reto", reps: 8, peso: 80, tipo: "valendo" },
+      { id: "2", exercicioId: "desenvolvimento", exercicioNome: "Desenvolvimento com Halteres", reps: 10, peso: 20, tipo: "valendo" },
+      { id: "3", exercicioId: "triceps-corda", exercicioNome: "Tríceps na Corda", reps: 12, peso: 25, tipo: "valendo" },
+    ];
+    const metricas = calcularMetricasSessao(series, 60 * 60);
+    expect(metricas.focoOuDivisao).toBe("SUPERIORES");
+  });
+
+  it("infere 'FULL BODY' só quando pernas E algum grupo superior aparecem juntos", () => {
+    const series: SerieParaMetricas[] = [
+      { id: "1", exercicioId: "agachamento", exercicioNome: "Agachamento Livre", reps: 8, peso: 100, tipo: "valendo", exercicioGrupoMuscular: "quadriceps" },
+      { id: "2", exercicioId: "supino", exercicioNome: "Supino Reto", reps: 8, peso: 80, tipo: "valendo", exercicioGrupoMuscular: "peito" },
+    ];
+    const metricas = calcularMetricasSessao(series, 60 * 60);
+    expect(metricas.focoOuDivisao).toBe("FULL BODY");
+  });
+
+  it("não confunde pernas + abdômen (sem grupo superior) com 'FULL BODY'", () => {
+    const series: SerieParaMetricas[] = [
+      { id: "1", exercicioId: "agachamento", exercicioNome: "Agachamento Livre", reps: 8, peso: 100, tipo: "valendo", exercicioGrupoMuscular: "quadriceps" },
+      { id: "2", exercicioId: "prancha", exercicioNome: "Prancha Abdominal", reps: 1, peso: 0, tipo: "valendo", exercicioGrupoMuscular: "abdomen" },
+    ];
+    const metricas = calcularMetricasSessao(series, 60 * 60);
+    expect(metricas.focoOuDivisao).toBe("PERNAS");
+  });
+
   it("aceita opções personalizadas de foco e identificador", () => {
     const series: SerieParaMetricas[] = [
       { id: "1", exercicioId: "supino", exercicioNome: "Supino", reps: 8, peso: 80, tipo: "valendo" },
