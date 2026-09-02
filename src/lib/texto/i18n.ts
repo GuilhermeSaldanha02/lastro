@@ -516,7 +516,6 @@ const DICIONARIO: Record<string, { en: string; es: string }> = {
   "semanas fechadas": { en: "closed weeks", es: "semanas cerradas" },
   "São necessárias": { en: "You need", es: "Se necesitan" },
   "para calcular a análise semanal.": { en: "to calculate the weekly analysis.", es: "para calcular el análisis semanal." },
-  "Solicitar Análise": { en: "Request Analysis", es: "Solicitar Análisis" },
   "Parecer em emissão": { en: "Report in progress", es: "Informe en emisión" },
   "escrevendo a leitura": { en: "writing the readout", es: "escribiendo la lectura" },
   "Confira em Ajustes > Relatórios em instantes.": {

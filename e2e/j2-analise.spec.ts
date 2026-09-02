@@ -60,15 +60,17 @@ test("pede a Análise Semanal — botão dispara a pergunta certa e a tela devol
 
   await expect(page.getByText(/semanas fechadas/)).toHaveCount(0);
 
-  await page.getByRole("button", { name: "Solicitar Análise" }).click();
+  // Não existe mais um botão "Solicitar Análise" solto (removido em
+  // 2026-09-02: duplicava a mesma ação do card primário — achado do
+  // dono, DESIGN.md §3.5 "redundância zero"). O card primário da lista
+  // de perguntas é quem dispara.
+  const perguntaPrimaria = page.getByRole("button", { name: "O que mudar na próxima semana?" });
+  await perguntaPrimaria.click();
 
   await expect(page.getByText("Confira em Ajustes > Relatórios em instantes.")).toBeVisible();
-  await expect(page.getByRole("button", { name: "Solicitar Análise" })).toHaveAttribute(
-    "aria-disabled",
-    "true",
-  );
+  await expect(perguntaPrimaria).toHaveAttribute("aria-disabled", "true");
   // PERGUNTA_PRIMARIA (src/app/api/analise/perguntas.ts) é 5, não 1 — o
-  // botão "Solicitar Análise" dispara essa pergunta por ser a primária.
+  // card primário dispara essa pergunta por ser a primária.
   expect(corpoRecebido).toEqual({ pergunta: 5 });
 });
 
@@ -98,6 +100,10 @@ test("rascunho pronto aparece em Pareceres salvos com Salvar/Descartar (SDD.md �
   await entrarComoUsuario(page, usuario);
   await page.goto("/ajustes/relatorios");
 
+  // O rascunho pousa como card compacto (achado do dono, 2026-09-02: o
+  // parecer inteiro despejado na lista escondia o rascunho atrás do
+  // histórico de treinos) — precisa abrir pra ver o texto.
+  await page.getByRole("button", { name: "Revisar e salvar" }).click();
   await expect(page.getByText("Rascunho de teste — E2E semeou este parecer direto no banco.")).toBeVisible();
 
   await page.getByRole("button", { name: "Salvar" }).click();

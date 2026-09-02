@@ -125,15 +125,6 @@ export default function AnaliseInterativa({
         </p>
       )}
 
-      <button
-        type="button"
-        className="botao-primario botao-solicitar-analise"
-        aria-disabled={inativo}
-        onClick={() => perguntarSeAtivo(PERGUNTA_PRIMARIA)}
-      >
-        {t("Solicitar Análise", idioma)}
-      </button>
-
       <ul className="perguntas">
         <li>
           <button
