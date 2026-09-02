@@ -41,8 +41,9 @@ export function perguntasDoIdioma(idioma: Idioma): Record<NumeroPergunta, string
 }
 
 /** A única pergunta que produz ação — decidido pelo dono em 2026-08-13
- *  (backlog B1/B2). É a que o botão "Solicitar Análise" dispara e a que
- *  vira o card primário em /analise. */
+ *  (backlog B1/B2). É a que vira o card primário e em destaque em
+ *  /analise (2026-09-02: botão dedicado "Solicitar Análise" removido —
+ *  duplicava a mesma ação do card primário). */
 export const PERGUNTA_PRIMARIA: NumeroPergunta = 5;
 
 export function perguntaValida(valor: unknown): valor is NumeroPergunta {

@@ -333,9 +333,10 @@
   transform: translateY(1px);
 }
 
-/* [aria-disabled] cobre "Solicitar Análise" (B1) — precisa continuar
-   focável e no percurso de Tab, por isso nunca usa o atributo `disabled`
-   nativo, só a mesma pista visual dele (G3.2b). */
+/* [aria-disabled] cobre os botões de ação primária (ex.: a pergunta
+   primária da Análise, B1) — precisam continuar focáveis e no percurso
+   de Tab, por isso nunca usam o atributo `disabled` nativo, só a mesma
+   pista visual dele (G3.2b). */
 .botao-primario:disabled,
 .botao-primario[aria-disabled="true"] {
   opacity: 0.55;
@@ -1967,16 +1968,8 @@
 }
 
 /* =====================================================================
-   ANÁLISE SEMANAL — Hierarquia dos 5 cards e botão de solicitação
+   ANÁLISE SEMANAL — Hierarquia dos 5 cards
    ===================================================================== */
-.botao-solicitar-analise {
-  min-height: 48px;
-  width: 100%;
-  font-weight: 600;
-  letter-spacing: 0.02em;
-  margin-bottom: var(--lastro-e-4);
-}
-
 .perguntas {
   list-style: none;
   display: flex;
@@ -2173,13 +2166,6 @@
   font-variant-numeric: tabular-nums;
   font-size: var(--lastro-papel-rotulo);
   color: var(--lastro-txt-3);
-}
-
-/* Atalho pra pergunta primária, acima da lista (B1). Reaproveita
-   .botao-primario — mesma pista visual de ação principal da tela. */
-.botao-solicitar-analise {
-  margin-top: var(--lastro-e-4);
-  margin-bottom: var(--lastro-e-4);
 }
 
 /* ---------- Escolha da pergunta: hierarquia 1 primária + 4 secundárias
