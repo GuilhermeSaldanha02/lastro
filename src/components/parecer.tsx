@@ -44,7 +44,17 @@ export default function Parecer({
     month: "short",
     year: "numeric",
   });
-  const { veredito, corpo } = separarVeredito(texto);
+  // O corte de "primeira frase = veredito" (DESIGN.md §3.6.2) assume
+  // prosa real do LLM, escrita pra abrir com uma frase de julgamento
+  // curta (prompt.ts). O fallback determinístico (quando a IA falha,
+  // route.ts) é outra coisa — um resumo de dados que às vezes só fecha
+  // a primeira frase depois de várias linhas. Aplicar o corte nele
+  // produzia um "veredito" gigante (Número herói, 48px) com um parágrafo
+  // inteiro dentro — achado do dono ao vivo, 2026-09-02. Sem prosa real,
+  // não há veredito: o texto inteiro vira corpo normal.
+  const { veredito, corpo } = avisoFalhaInterpretativa
+    ? { veredito: "", corpo: texto.trim() }
+    : separarVeredito(texto);
 
   return (
     <article className="doc">
@@ -69,8 +79,10 @@ export default function Parecer({
 
       {/* Veredito: a PRIMEIRA FRASE, destacada acima do título do
           cabeçalho (DESIGN.md §3.6.2/§3.0) — é o julgamento, não a
-          pergunta, que carrega o peso visual da tela. */}
-      <p className="doc__veredito">{veredito}</p>
+          pergunta, que carrega o peso visual da tela. Ausente no
+          fallback determinístico (acima) — não existe julgamento pra
+          destacar quando a prosa real falhou. */}
+      {veredito && <p className="doc__veredito">{veredito}</p>}
 
       {/* Blocos de evidência (§3.6.3) — ANTES da prosa. A ordem conta a
           arquitetura: o agregador já tinha os números prontos antes de o
