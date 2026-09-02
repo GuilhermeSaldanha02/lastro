@@ -58,14 +58,21 @@ function inferirFoco(nomesExercicios: string[]): string {
   const temBracos = /rosca|tr[ií]ceps|b[ií]ceps|antebra[cç]o|testa|corda|martelo|scott|francesa/.test(texto);
 
   const contagemGrupos = [temPernas, temPeito, temCostas, temOmbros, temBracos].filter(Boolean).length;
-  if (contagemGrupos > 2) return "FULL BODY";
+  const temSuperiores = temPeito || temCostas || temOmbros || temBracos;
 
+  // FULL BODY é pernas + qualquer grupo superior na mesma sessão — não
+  // "3 grupos ou mais" (achado do dono, 2026-09-02: peito+ombro+tríceps,
+  // um dia de empurrar clássico com 3 grupos, todos superiores, caía
+  // aqui por engano). Sem pernas, por mais grupos superiores que hajam,
+  // continua sendo um dia de superiores.
+  if (temPernas && temSuperiores) return "FULL BODY";
   if (temPernas && contagemGrupos === 1) return "PERNAS";
-  if (temPeito && !temCostas && !temPernas) return "PEITORAL";
-  if (temCostas && !temPeito && !temPernas) return "COSTAS";
-  if (temOmbros && !temPernas && !temCostas && !temPeito) return "OMBROS";
-  if (temBracos && !temPernas && !temCostas && !temPeito) return "BRAÇOS";
-  if (temPeito || temCostas || temOmbros || temBracos) return "SUPERIORES";
+  if (temPeito && contagemGrupos === 1) return "PEITORAL";
+  if (temCostas && contagemGrupos === 1) return "COSTAS";
+  if (temOmbros && contagemGrupos === 1) return "OMBROS";
+  if (temBracos && contagemGrupos === 1) return "BRAÇOS";
+  if (temSuperiores) return "SUPERIORES";
+  if (temPernas) return "PERNAS";
 
   return "TREINO";
 }
@@ -106,15 +113,25 @@ function inferirFocoPorGrupo(gruposMusculares: string[]): string | null {
   const temBracos = categorias.has("bracos");
   const temAbdomen = categorias.has("abdomen");
 
-  if (categorias.size > 2) return "FULL BODY";
+  const temSuperiores = temPeito || temCostas || temOmbros || temBracos;
 
+  // FULL BODY é pernas + qualquer grupo superior na mesma sessão — não
+  // "mais de 2 categorias" (achado do dono, 2026-09-02: peito+ombro+
+  // tríceps, um dia de empurrar clássico com 3 categorias, todas
+  // superiores, caía aqui por engano; mesma classe do bug de 2026-08-31,
+  // "SUPERIORES" virando "PERNAS"). Sem pernas, por mais categorias
+  // superiores que hajam na sessão, continua sendo um dia de superiores
+  // — abdômen junto não conta como "grupo extra" pra esse cálculo.
+  if (temPernas && temSuperiores) return "FULL BODY";
   if (temPernas && categorias.size === 1) return "PERNAS";
   if (temPeito && categorias.size === 1) return "PEITORAL";
   if (temCostas && categorias.size === 1) return "COSTAS";
   if (temOmbros && categorias.size === 1) return "OMBROS";
   if (temBracos && categorias.size === 1) return "BRAÇOS";
   if (temAbdomen && categorias.size === 1) return "ABDÔMEN";
-  if (temPeito || temCostas || temOmbros || temBracos) return "SUPERIORES";
+  if (temSuperiores) return "SUPERIORES";
+  if (temPernas) return "PERNAS";
+  if (temAbdomen) return "ABDÔMEN";
 
   return "TREINO";
 }
