@@ -1297,12 +1297,12 @@ Se existir **e** for recente, a tentativa é recusada (§11.3, resposta 409). "R
 
 ```ts
 /** Acima disso, uma linha 'gerando' é tratada como abandonada — não trava mais gerações novas. */
-export const LIMITE_GERACAO_TRAVADA_MINUTOS = 5;
+export const LIMITE_GERACAO_TRAVADA_MINUTOS = 10;
 /** Rascunho pronto (status='pronto', confirmado=false) sem decisão do dono expira sozinho. */
 export const EXPIRA_RASCUNHO_HORAS = 24;
 ```
 
-5 minutos é folgado o bastante pra cobrir a chamada real (retry incluso, §6.4) com margem, e curto o bastante pra não travar a pessoa por muito tempo se algo morrer no meio.
+**Valor revisto pela auditoria independente de AA-01** (`qa/evidencias/AA-01/auditoria-independente/correcao.md`, 2026-09-02): o desenho original desta seção estimava 5 minutos como "folgado com margem" pra cobrir a chamada real (retry incluso, §6.4). A auditoria mediu uma chamada real à Gemini levando ~4min32s — a só 28s desse limiar, bem mais apertado do que a estimativa supunha. Subido pra 10 minutos, mantendo o mesmo espírito (curto o bastante pra não travar a pessoa por muito tempo se algo morrer no meio, agora com folga real medida, não só estimada).
 
 **Limpeza preguiçosa (lazy), sem cron** — mesma decisão de §10.0 pro rascunho de 24h, estendida aqui: toda leitura relevante (`listarPareceres`, a checagem de trava dentro do POST) primeiro apaga o que expirou daquele usuário, antes de consultar:
 
