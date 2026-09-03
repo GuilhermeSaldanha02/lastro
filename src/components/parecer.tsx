@@ -100,7 +100,33 @@ export default function Parecer({
         </div>
       )}
 
-      {corpo && <p className="doc__prosa">{corpo}</p>}
+      {/* Prosa real e resumo determinístico são dois GÊNEROS de texto, e
+          tipografá-los igual era o defeito: o fallback (route.ts, quando
+          a Gemini falha) é uma lista de medidas — "Volume total em
+          2026-08-10: 42262." vinte vezes — e sair em `.doc__prosa`
+          (18px, entrelinha de leitura, `pre-wrap`) fazia dela um muro de
+          texto corrido que ninguém varre. Achado do dono, 2026-09-02: é
+          exatamente a tela que ele tinha, porque a Gemini deu 503 o dia
+          inteiro. Como lista de dados, na família de número, cada medida
+          vira uma linha que se acha com o olho. */}
+      {corpo &&
+        (avisoFalhaInterpretativa ? (
+          <ul className="doc__dados">
+            {corpo
+              .split("\n")
+              .map((linha) => linha.trim())
+              .filter(Boolean)
+              // Chave por índice, não por conteúdo: o texto vem de um
+              // gerador de template (route.ts) e nada garante que duas
+              // linhas nunca coincidam. Lista estática, nunca reordenada
+              // — índice é a chave correta aqui.
+              .map((linha, i) => (
+                <li key={i}>{linha}</li>
+              ))}
+          </ul>
+        ) : (
+          <p className="doc__prosa">{corpo}</p>
+        ))}
 
       {/* Rodapé de método: texto fixo, nunca gerado. Procedência se mostra
           com número e com o que foi excluído da conta, não com adesivo. */}
