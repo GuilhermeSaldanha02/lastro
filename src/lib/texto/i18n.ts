@@ -695,6 +695,12 @@ const DICIONARIO: Record<string, { en: string; es: string }> = {
   },
   "Baixando…": { en: "Downloading…", es: "Descargando…" },
   "Descartar": { en: "Discard", es: "Descartar" },
+  "Descartar rascunho": { en: "Discard draft", es: "Descartar borrador" },
+  "Descartando…": { en: "Discarding…", es: "Descartando…" },
+  "Descartar apaga este rascunho — não dá para desfazer. Pedir outro parecer exige uma nova geração, que leva alguns minutos.": {
+    en: "Discarding deletes this draft — it can't be undone. Getting another analysis requires a new generation, which takes a few minutes.",
+    es: "Descartar borra este borrador — no se puede deshacer. Pedir otro informe exige una nueva generación, que tarda algunos minutos.",
+  },
   "Gerando…": { en: "Generating…", es: "Generando…" },
   "Rascunho": { en: "Draft", es: "Borrador" },
   "Revisar e salvar": { en: "Review and save", es: "Revisar y guardar" },
