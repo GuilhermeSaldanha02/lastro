@@ -62,7 +62,16 @@ export default function DocumentoParecer({ parecer }: { parecer: ParecerSalvo })
     );
   }
 
-  const { veredito, corpo } = separarVeredito(parecer.texto);
+  // Mesmo corte que components/parecer.tsx faz na tela, pela mesma
+  // razão: "primeira frase = veredito" só vale para prosa real do LLM,
+  // escrita pra abrir com um julgamento curto. O fallback determinístico
+  // é um resumo de dados que às vezes só fecha a primeira frase depois de
+  // várias linhas — aplicar o corte nele promovia um parágrafo inteiro a
+  // veredito em negrito. A PR #177 corrigiu isso na tela e passou reto
+  // aqui; achado em 2026-09-03, mesmo bug, outro renderizador.
+  const { veredito, corpo } = parecer.avisoFalhaInterpretativa
+    ? { veredito: "", corpo: parecer.texto.trim() }
+    : separarVeredito(parecer.texto);
   const { idioma } = parecer;
   const evidencia = parecer.evidencia;
 
@@ -86,7 +95,7 @@ export default function DocumentoParecer({ parecer }: { parecer: ParecerSalvo })
           </Text>
         )}
 
-        <Text style={estilos.veredito}>{veredito}</Text>
+        {veredito ? <Text style={estilos.veredito}>{veredito}</Text> : null}
         {corpo && <Text style={estilos.corpo}>{corpo}</Text>}
 
         {evidencia.blocos.length > 0 && (

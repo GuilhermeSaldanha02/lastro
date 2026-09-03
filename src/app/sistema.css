@@ -1437,6 +1437,27 @@
   white-space: pre-wrap;
 }
 
+/* Resumo determinístico (avisoFalhaInterpretativa): lista de medidas,
+   não prosa. Família de número e tabular-nums porque cada linha é um
+   dado; a régua entre linhas é o que deixa varrer com o olho em vez de
+   ler do começo ao fim. Ver a nota em components/parecer.tsx. */
+.doc__dados {
+  list-style: none;
+  font-family: var(--lastro-fonte-num);
+  font-variant-numeric: tabular-nums;
+  font-size: var(--lastro-papel-corpo);
+  line-height: 1.45;
+  color: var(--lastro-txt-2);
+}
+
+.doc__dados li {
+  padding: var(--lastro-e-2) 0;
+}
+
+.doc__dados li + li {
+  border-top: 1px solid var(--lastro-linha);
+}
+
 .doc__metodo {
   border-top: 1px solid var(--lastro-linha);
   padding-top: var(--lastro-e-4);
@@ -1478,8 +1499,20 @@
    Peça 09. Cor NUNCA é o único canal (§3.2 nota C): ícone + palavra
    (.evidencia__sinal) e o texto do delta (.evidencia__delta) também
    identificam alta/platô/queda — a cor é redundante, não a única prova. */
+/* Duas linhas no celular, três colunas do tablet pra cima.
+   Medido a 390px (bancada, scripts/preview): as colunas fixas comiam
+   209px dos 270px úteis — 56 do sinal + 16 de padding + 1 de borda + 104
+   do delta + 2 gaps de 16 — e sobravam 73px pro corpo. Com 73px o NÚMERO
+   quebrava em duas linhas ("160 kg ×" / "8"), o nome do exercício em três
+   e a procedência em seis. O número é a âncora da peça (§3.6.3): não pode
+   ser o primeiro a ceder.
+   Sinal e delta viram uma linha de cabeçalho — os dois são curtos e a
+   leitura "↑ Alta … +66,7%" continua pareada; o corpo fica com a largura
+   inteira do cartão. Os três canais de §3.2 nota C seguem intactos:
+   ícone, palavra e texto do delta. */
 .evidencia {
   display: flex;
+  flex-wrap: wrap;
   align-items: flex-start;
   gap: var(--lastro-e-4);
   border: 1px solid var(--lastro-linha);
@@ -1505,14 +1538,12 @@
 /* Coluna de sinal: ícone grande + palavra, na cor do sinal — mesmo par
    ícone+palavra dos cartões "Plateau/Em progresso/Queda" da peça 01. */
 .evidencia__sinal {
+  order: 1;
   flex: 0 0 auto;
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   align-items: center;
-  gap: var(--lastro-e-1);
-  min-width: var(--lastro-evidencia-col-sinal);
-  padding-right: var(--lastro-e-4);
-  border-right: 1px solid var(--lastro-linha);
+  gap: var(--lastro-e-2);
   text-align: center;
 }
 
@@ -1532,7 +1563,8 @@
 .evidencia--queda .evidencia__icone, .evidencia--queda .evidencia__rotulo { color: var(--lastro-queda); }
 
 .evidencia__corpo {
-  flex: 1 1 auto;
+  order: 3;
+  flex: 1 1 100%;
   min-width: 0;
 }
 
@@ -1568,14 +1600,44 @@
    número que o identificam (formatarDelta, src/lib/texto/). Dois blocos
    distinguidos só pela cor reprovam. */
 .evidencia__delta {
+  order: 2;
   flex: 0 0 auto;
-  max-width: var(--lastro-evidencia-col-delta);
+  margin-left: auto;
   font-family: var(--lastro-fonte-num);
   font-variant-numeric: tabular-nums;
   font-size: var(--lastro-papel-rotulo);
   font-weight: var(--lastro-peso-forte);
   text-align: right;
   line-height: 1.4;
+}
+
+/* Do tablet pra cima sobra largura: volta o desenho original de três
+   colunas (sinal | corpo | delta), com a barra vertical separando o
+   sinal. Mesmo ponto de corte que .seletor-temas-grid já usa. */
+@media (min-width: 640px) {
+  .evidencia {
+    flex-wrap: nowrap;
+  }
+
+  .evidencia__sinal {
+    order: 0;
+    flex-direction: column;
+    gap: var(--lastro-e-1);
+    min-width: var(--lastro-evidencia-col-sinal);
+    padding-right: var(--lastro-e-4);
+    border-right: 1px solid var(--lastro-linha);
+  }
+
+  .evidencia__corpo {
+    order: 0;
+    flex: 1 1 auto;
+  }
+
+  .evidencia__delta {
+    order: 0;
+    margin-left: 0;
+    max-width: var(--lastro-evidencia-col-delta);
+  }
 }
 
 .evidencia--alta  .evidencia__delta { color: var(--lastro-alta); }
