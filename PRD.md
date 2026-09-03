@@ -14,6 +14,8 @@ Um app de treino **pessoal** que registra cada série executada e, uma vez por s
 
 **Posicionamento (âncora de toda decisão):** ferramenta séria de dados para uma pessoa que treina sozinho e quer saber se está progredindo de verdade. Não é app social, não é rede de fitness, não é plataforma.
 
+**Nota — "pessoal" é alvo de design, não trava técnica (correção documental, 2026-09-03).** Entre 2026-08 e 2026-09, 6 pessoas (amigos/família do dono) criaram a própria conta e usaram o app sem qualquer convite, tela ou recurso multiusuário construído para isso — a autenticação (Supabase Auth + RLS por usuário, ADR-002) sempre suportou múltiplas contas isoladas; nada foi desenhado para impedir. O documento dizia algo que não era verdade sobre o uso real. **O que não muda:** a persona única do §2, a proibição de decidir por "outros usuários poderiam querer", e o veto a feed/seguir/comparar/ranking/perfil público — a arquitetura permanece single-user por design, e essas contas não trocam dado nem se veem entre si. Detalhe em `DECISIONS.md` 2026-09-03.
+
 **Anti-referência:** apps que entregam o gráfico bonito e param ali, deixando a interpretação por conta de quem não sabe interpretar.
 
 ---
@@ -26,7 +28,7 @@ Um app de treino **pessoal** que registra cada série executada e, uma vez por s
 2. Anotar a série sem atrapalhar o treino.
 3. Tirar dúvida de execução sem se machucar.
 
-**Não existe segunda persona.** Nenhuma decisão deste produto se justifica por "outros usuários poderiam querer". Isso não é limitação: é o que permite profundidade.
+**Não existe segunda persona.** Nenhuma decisão deste produto se justifica por "outros usuários poderiam querer". Isso não é limitação: é o que permite profundidade. (Sobre outras contas reais existirem sem essa persona mudar: nota em §1.)
 
 ---
 

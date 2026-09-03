@@ -1330,3 +1330,21 @@ Reverte explicitamente a posição da ADR anterior contra tradução automática
 **Impacto.** `SDD.md` §11 (nova seção). Nenhum código ainda — a implementação vem em PR própria.
 
 **Como reverter.** Não há o que reverter — nenhum código foi escrito ainda.
+
+---
+
+## 2026-09-03 — Correção documental: PRD §1/§2 passam a descrever o uso real (contas de terceiros existiram)
+
+**O que mudou.** `PRD.md` §1 ganhou uma nota depois do parágrafo de Posicionamento, e §2 ganhou uma referência cruzada de uma linha. Nenhum código muda nesta entrada — o produto já era assim; o que faltava era o documento parar de afirmar algo que os dados do próprio banco contradiziam.
+
+**Por quê agora.** A limpeza de banco de 2026-09-02 (a pedido do dono, ver `PROGRESS.md`) apagou todas as contas exceto a dele e confirmou, ao apagar, que existiam **6 contas de pessoas reais** (amigos/família) além das de QA — cada uma com a própria conta Supabase, criada sem convite nem tela dedicada, simplesmente porque a autenticação nunca impediu. Isso reabriu a pergunta que `PROGRESS.md` já vinha registrando: o §1 do PRD diz "app pessoal" e o §2 diz "não existe segunda persona", e por um tempo isso não bateu com o banco. Perguntado, o dono concordou em emendar a frase para refletir a realidade, **sem** reabrir o debate maior do módulo "Personal" (que ele decidiu deliberadamente adiar — ver `PROGRESS.md`, "Combinado com o dono, não iniciar ainda").
+
+**A distinção que a nota faz.** "Pessoal" no PRD sempre foi sobre **critério de decisão** — não justificar feature por "outros usuários poderiam querer" (§2) — não sobre uma garantia técnica de que só uma conta existe. A arquitetura (Supabase Auth + RLS por usuário, ADR-002) sempre suportou múltiplas contas isoladas; "app pessoal" nunca foi implementado como trava, só como intenção de design. A nota registra isso e é explícita sobre o que **não** muda: a persona única, o veto a decisão por "outros usuários", e a proibição de virar rede social (feed, seguir, comparar, ranking, perfil público) — nenhuma conta vê ou troca dado com outra.
+
+**Alternativa descartada.** Reescrever §1/§2 para admitir multiusuário como objetivo de produto. Descartada porque não é o que o dono decidiu — ele confirmou a persona única e adiou deliberadamente a conversa sobre o módulo "Personal"; mudar o texto além do fato já observado seria inventar escopo que ele não pediu.
+
+**Classificação.** Não é ADIÇÃO nem REMOÇÃO — nenhuma linha de comportamento do produto muda. É **correção factual do documento**, categoria que o protocolo de Scope Change não previu explicitamente (as entradas anteriores neste arquivo são todas ADIÇÃO); registrado aqui porque a alternativa — deixar o documento errado, sem nota — é o que o protocolo existe para impedir.
+
+**Impacto.** `PRD.md` §1 (nota nova após a linha de Posicionamento) e §2 (uma linha de referência cruzada). Nenhum arquivo de `src/` tocado.
+
+**Como reverter.** Remover as duas notas; o PRD volta a afirmar unicidade sem qualificação — e volta a estar factualmente incorreto sobre o período 2026-08–2026-09.
