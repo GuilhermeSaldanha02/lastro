@@ -1,0 +1,12 @@
+/* Só a moldura da bancada — nenhum destes seletores existe no app, e
+   nenhum deles toca as classes reais. */
+body { background: var(--lastro-fundo); }
+.bancada-rotulo {
+  font: 600 12px/1.4 system-ui, sans-serif;
+  letter-spacing: .08em; text-transform: uppercase;
+  color: #07090D; background: #D4AF37; padding: 8px 12px;
+}
+.bancada-rotulo span {
+  display: block; text-transform: none; letter-spacing: 0;
+  font-weight: 400; opacity: .75;
+}

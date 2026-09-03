@@ -2,9 +2,18 @@
 
 // lastro · botões de ação da tela própria do parecer
 // (/ajustes/relatorios/parecer/[id]). Rascunho não confirmado: Salvar/
-// Descartar. Parecer já confirmado: Baixar PDF/Excluir (com confirmação
-// inline, nunca window.confirm — C5). Depois de Salvar/Descartar/Excluir,
-// volta pra lista via navegação real, não estado local.
+// Descartar. Parecer já confirmado: Baixar PDF/Excluir. As DUAS ações
+// destrutivas pedem confirmação inline, nunca window.confirm (C5).
+// Depois de Salvar/Descartar/Excluir, volta pra lista via navegação
+// real, não estado local.
+//
+// "Descartar" nasceu sem confirmação (Task 6 do plano da geração
+// assíncrona) — decisão deliberada na época, revista em 2026-09-03 por
+// decisão do dono. O argumento não é simetria com "Excluir": é custo.
+// Um toque errado não perde só um rascunho que expiraria em 24h
+// (EXPIRA_RASCUNHO_HORAS) — perde a geração inteira, e uma chamada real
+// à Gemini foi medida em ~4min32s (parecer-config.ts). Pedir de novo é
+// caro o bastante para valer um segundo toque.
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import type { ParecerSalvo } from "@/lib/dados/parecer";
@@ -22,6 +31,7 @@ export default function ParecerDetalheAcoes({
   const router = useRouter();
   const [pendente, iniciar] = useTransition();
   const [excluindo, setExcluindo] = useState(false);
+  const [descartando, setDescartando] = useState(false);
   const [baixandoPdf, setBaixandoPdf] = useState(false);
   const [erro, setErro] = useState<string | null>(null);
 
@@ -78,14 +88,43 @@ export default function ParecerDetalheAcoes({
       )}
 
       {!parecer.confirmado ? (
-        <div className="confirma__acoes">
-          <button type="button" className="botao-primario" onClick={confirmar} disabled={pendente}>
-            {pendente ? t("Salvando…", idioma) : t("Salvar", idioma)}
-          </button>
-          <button type="button" className="botao-secundario" onClick={excluir} disabled={pendente}>
-            {t("Descartar", idioma)}
-          </button>
-        </div>
+        descartando ? (
+          <div className="confirma" role="group" aria-label={t("Descartar rascunho", idioma)}>
+            <p className="confirma__texto">
+              {t(
+                "Descartar apaga este rascunho — não dá para desfazer. Pedir outro parecer exige uma nova geração, que leva alguns minutos.",
+                idioma,
+              )}
+            </p>
+            <div className="confirma__acoes">
+              <button
+                type="button"
+                className="botao-secundario"
+                onClick={() => setDescartando(false)}
+                disabled={pendente}
+              >
+                {t("Cancelar", idioma)}
+              </button>
+              <button type="button" className="botao-destrutivo" onClick={excluir} disabled={pendente}>
+                {pendente ? t("Descartando…", idioma) : t("Descartar rascunho", idioma)}
+              </button>
+            </div>
+          </div>
+        ) : (
+          <div className="confirma__acoes">
+            <button type="button" className="botao-primario" onClick={confirmar} disabled={pendente}>
+              {pendente ? t("Salvando…", idioma) : t("Salvar", idioma)}
+            </button>
+            <button
+              type="button"
+              className="botao-secundario"
+              onClick={() => setDescartando(true)}
+              disabled={pendente}
+            >
+              {t("Descartar", idioma)}
+            </button>
+          </div>
+        )
       ) : (
         <>
           <button type="button" className="botao-primario" onClick={baixarPdf} disabled={baixandoPdf}>

@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <title>lastro · bancada — visualizador de PDF</title>
+    <style>
+      body { margin: 0; background: #3a3a3a; font: 13px system-ui, sans-serif; color: #eee; }
+      p { padding: 8px 12px; margin: 0; background: #d4af37; color: #07090d; font-weight: 600; }
+      canvas { display: block; margin: 12px auto; box-shadow: 0 2px 16px rgba(0,0,0,.5); }
+    </style>
+  </head>
+  <body>
+    <p id="rotulo">carregando…</p>
+    <div id="paginas"></div>
+    <!-- pdf.js só para OLHAR o PDF gerado. Não faz parte do app. -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.6.82/pdf.min.mjs" type="module"></script>
+    <script type="module">
+      const { pdfjsLib } = globalThis;
+      pdfjsLib.GlobalWorkerOptions.workerSrc =
+        "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.6.82/pdf.worker.min.mjs";
+
+      const arquivo = new URLSearchParams(location.search).get("arquivo") ?? "pdf-parecer-fallback.pdf";
+      const doc = await pdfjsLib.getDocument(`/qa/evidencias/${arquivo}`).promise;
+      document.getElementById("rotulo").textContent = `${arquivo} — ${doc.numPages} página(s)`;
+
+      for (let n = 1; n <= doc.numPages; n++) {
+        const pagina = await doc.getPage(n);
+        const viewport = pagina.getViewport({ scale: 1.4 });
+        const canvas = document.createElement("canvas");
+        canvas.width = viewport.width;
+        canvas.height = viewport.height;
+        document.getElementById("paginas").append(canvas);
+        await pagina.render({ canvasContext: canvas.getContext("2d"), viewport }).promise;
+      }
+      document.body.dataset.pronto = "sim";
+    </script>
+  </body>
+</html>
