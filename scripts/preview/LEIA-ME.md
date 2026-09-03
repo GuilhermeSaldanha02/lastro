@@ -13,6 +13,22 @@ npx vite --config vite.preview.config.mts
 Cenas: `parecer-prosa`, `parecer-fallback`, `acoes-rascunho`,
 `acoes-salvo`. Sem `?cena=`, mostra todas.
 
+## PDF
+
+O PDF exportado era o único renderizador do projeto que ninguém
+conseguia olhar sem sessão autenticada — foi por isso que a correção da
+PR #177 passou reto por ele (ver `documento-parecer.test.ts`). Para
+gerar os dois PDFs em `qa/evidencias/` (ignorados pelo git, são
+regeneráveis):
+
+```bash
+npx vitest run --config vitest.preview.config.mts
+```
+
+E para OLHAR o resultado, `scripts/preview/pdf.html` rasteriza com
+pdf.js — sirva a raiz do repo por HTTP e abra
+`/scripts/preview/pdf.html?arquivo=pdf-parecer-fallback.pdf`.
+
 ## O que ela garante, e o que não
 
 **Garante:** os componentes são os reais (`@/components/...`), o CSS é o
