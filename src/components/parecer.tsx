@@ -116,8 +116,12 @@ export default function Parecer({
               .split("\n")
               .map((linha) => linha.trim())
               .filter(Boolean)
-              .map((linha) => (
-                <li key={linha}>{linha}</li>
+              // Chave por índice, não por conteúdo: o texto vem de um
+              // gerador de template (route.ts) e nada garante que duas
+              // linhas nunca coincidam. Lista estática, nunca reordenada
+              // — índice é a chave correta aqui.
+              .map((linha, i) => (
+                <li key={i}>{linha}</li>
               ))}
           </ul>
         ) : (
