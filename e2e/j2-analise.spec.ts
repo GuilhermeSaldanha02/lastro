@@ -103,7 +103,13 @@ test("rascunho pronto aparece em Pareceres salvos com Salvar/Descartar (SDD.md �
   // O rascunho pousa como card compacto (achado do dono, 2026-09-02: o
   // parecer inteiro despejado na lista escondia o rascunho atrás do
   // histórico de treinos) — precisa abrir pra ver o texto.
-  await page.getByRole("button", { name: "Revisar e salvar" }).click();
+  // `link`, não `button`: desde a PR #177 (rota própria do parecer) o card
+  // do rascunho abre com um <Link>, não com um <button> de expansão
+  // inline. A spec não acompanhou e a `main` ficou vermelha de 2026-09-02
+  // até 2026-09-03 sem ninguém notar — a E2E não roda sem `.env.local`, e
+  // esta é a segunda coisa que essa cegueira deixou passar (a outra está
+  // em src/lib/pdf/documento-parecer.test.ts).
+  await page.getByRole("link", { name: "Revisar e salvar" }).click();
   await expect(page.getByText("Rascunho de teste — E2E semeou este parecer direto no banco.")).toBeVisible();
 
   await page.getByRole("button", { name: "Salvar" }).click();
