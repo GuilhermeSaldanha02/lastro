@@ -2511,6 +2511,14 @@
   flex-direction: column;
   align-items: center;
   gap: var(--lastro-e-2);
+  /* Sem isto a coluna da grade nunca cede abaixo dos 36px do círculo
+     (min-width:auto é o padrão de item de grade) — a semana inteira
+     vazava a tela em telefone estreito. Medido: 7×36px + 6 gaps de 6px =
+     288px de mínimo, que já não cabe a partir de ~380px de viewport, e a
+     320px (iPhone SE, Android de entrada) o vazamento chegava a empurrar
+     a PÁGINA inteira pra scroll horizontal — domingo saía da tela.
+     Achado do dono, 2026-09-03, medido ao vivo contra a própria conta. */
+  min-width: 0;
 }
 
 .disciplina-dia__nome {
@@ -2521,8 +2529,12 @@
 }
 
 .disciplina-dia__circulo {
-  width: 36px;
-  height: 36px;
+  /* Cede à largura da coluna antes de ceder ao teto de 36px — nunca é
+     alvo de toque (div puro, sem onClick/role), então não há piso de
+     D1/--lastro-alvo-min a respeitar aqui. */
+  width: 100%;
+  max-width: 36px;
+  aspect-ratio: 1;
   border-radius: 50%;
   display: flex;
   align-items: center;
