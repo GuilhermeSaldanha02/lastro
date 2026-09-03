@@ -1348,3 +1348,62 @@ Reverte explicitamente a posição da ADR anterior contra tradução automática
 **Impacto.** `PRD.md` §1 (nota nova após a linha de Posicionamento) e §2 (uma linha de referência cruzada). Nenhum arquivo de `src/` tocado.
 
 **Como reverter.** Remover as duas notas; o PRD volta a afirmar unicidade sem qualificação — e volta a estar factualmente incorreto sobre o período 2026-08–2026-09.
+
+---
+
+## 2026-09-03 (2) — Scope Change: módulo "Personal" — o guarda-chuva aluno↔personal
+
+**Status: DECIDIDO PELO DONO, NÃO VALIDADO NO MERCADO.** Esta entrada registra a decisão de produto e seus limites. **Nenhuma linha de código deve ser escrita antes da validação descrita em "Portão de saída" abaixo.** É o portão que `PROGRESS.md` já previa ("módulo Personal — parar e debater antes quando chegar a hora"); esta entrada é esse portão tendo disparado.
+
+**O que muda.** O `PRD.md` ganha uma **seção nova numerada** (§11, "O modo Personal") — não uma nota emendada no §2. Motivo de forma, não de estilo: o texto do §2 é "Não existe segunda persona" e a cláusula de veto ("nenhuma decisão se justifica por 'outros usuários poderiam querer'") é **estrutural** — sustenta decisões espalhadas por todo o documento. Emendar o §2 desarmaria o veto em silêncio, em todo lugar, sem ninguém ter decidido isso. A seção nova declara a exceção e redeclara o que o veto continua cobrindo.
+
+**A decisão, em uma frase.** Uma conta pode estar vinculada a um **personal**. Enquanto o vínculo existe, a **prescrição** sai do produto e vai para o humano; o **diagnóstico** continua inteiro com o aluno.
+
+**O corte exato — o que o aluno vinculado mantém e o que perde:**
+
+| | Aluno sem vínculo (hoje) | Aluno vinculado |
+|---|---|---|
+| Log, histórico, edição de série | mantém | **mantém** |
+| Gráficos: e1RM, volume, volume por grupo muscular | mantém | **mantém** |
+| Sinais de diagnóstico (empaque, grupo sem estímulo, queda de frequência) | mantém | **mantém** |
+| Coach 24h | mantém | **mantém, com trava** (ver "Buracos" #1) |
+| Seção de prescrição — "o que mudar na próxima semana" (`PRD.md` §3, pergunta 5) | mantém | **não vê** — vai para o personal |
+| Alerta dos sinais de diagnóstico | — | **roteado ao personal**, em formato de chat, onde ele fala com o aluno |
+
+**Por quê essa linha, e não outra.** O corte diagnóstico/prescrição **é a linha que o `PRD.md` §5 já tinha desenhado**: "O app **analisa** o que foi feito; não prescreve programa." Hoje a pergunta 5 do §3 na prática prescreve, o que sempre foi uma tensão interna do documento. Sob vínculo, quem prescreve é o humano contratado para isso — o produto fica **mais** consistente com o §5, não menos. Isso encolhe o Scope Change: não é "segunda persona que quebra o contrato", é "quem ocupa o papel de prescritor quando ele existe".
+
+**Alternativas descartadas.**
+
+1. **O aluno vinculado perde a Análise Semanal inteira** (proposta inicial do dono, debatida e abandonada nesta mesma sessão). Descartada porque entrar num guarda-chuva viraria **rebaixamento de produto**: o plano de graça teria mais que o pago, e o incentivo do aluno seria sair do vínculo. Pior, invertia o dado que sustenta a tese comercial — a pesquisa de churn diz que o aluno abandona porque **ele** não entende o próprio progresso; tirar o diagnóstico do aluno removeria exatamente o mecanismo de retenção que se pretendia vender ao personal.
+2. **O personal vê primeiro e libera o parecer inteiro ao aluno** (o parecer existente, com portão de repasse). Descartada pelo dono: mantém a IA como autora da prescrição, o que não resolve a pergunta que ele quer resolver — "se a IA lê os números pro aluno, pra que serve o personal?".
+3. **Painel de triagem cruzada** (o personal vê um dashboard de N alunos: quem empacou, quem sumiu). Não descartada, **adiada** — é para onde isso vai depois. O alerta escolhido é o mesmo produto chegando como notificação em vez de painel: custa menos e não depende de o personal lembrar de abrir alguma coisa.
+4. **O personal cadastra o e-mail do aluno e passa a ver os dados** (mecânica descrita no pedido original). Descartada por duas razões independentes: quem concederia o acesso seria o personal, não o aluno (não passa em LGPD); e permitiria digitar qualquer e-mail e ler o treino de qualquer pessoa. Substituída por convite → aceite → revogação (ver "Buracos" #3).
+
+**Os quatro buracos que esta decisão abre, e que o desenho tem obrigação de fechar.** Registrados aqui porque nenhum deles é detalhe de implementação — cada um pode invalidar a decisão se ficar em aberto.
+
+1. **O Coach 24h é a porta dos fundos.** Fechar a seção de prescrição e deixar o chat de IA aberto no mesmo app não fecha nada: o aluno pergunta "o que eu mudo essa semana?" e o Coach responde. Sob vínculo, o Coach precisa de trava explícita — responde dúvida de execução e conceito (`PRD.md` §4.4/§4.5), **não** monta a próxima semana, e empurra o pedido ao personal. Sem isso, a decisão inteira é decorativa.
+2. **O buraco visual no lugar da seção de prescrição.** Se a seção sumir, lê como app quebrado. Precisa de estado próprio, que comunique "este espaço é do seu personal" — não ausência. Item de gate visual (`AGENTS.md`), não de implementação silenciosa.
+3. **Consentimento é decisão de schema, não de tela de cobrança.** No instante em que um personal lê os números de um aluno, o dado deixa de ser privado de uma pessoa. No Brasil isso é LGPD. Desenho mínimo: o personal **convida**, o aluno **aceita**, o aluno **revoga** quando quiser com corte imediato de acesso. Vínculo permanente e concessão revogável/auditável são **tabelas diferentes** — errar isso com uma linha no banco é barato, com mil não é. As 6 contas reais que já existem (ver entrada de 2026-09-03 acima) só entram num guarda-chuva se **elas** aceitarem; nunca por ação unilateral do personal. E quando o vínculo termina, a seção de prescrição volta para o aluno.
+4. **O gatilho do alerta é determinístico, não julgamento de LLM.** Mesma regra inegociável do `PRD.md` §3: o sinal sai do código de métricas já testado (`src/lib/analise/`) — empaque de N semanas, grupo sem estímulo, queda de frequência. O alerta **roteia** um sinal que já é calculado hoje; não cria julgamento novo, e o LLM segue sem ver linha crua de série.
+
+**A exceção ao veto anti-social, nomeada de propósito.** O chat personal↔aluno é o **primeiro canal pessoa-a-pessoa** do produto. Não fere o `PRD.md` §5 ao pé da letra (não é feed, seguir, comparar nem ranking), mas é a primeira vez que duas contas se falam num app cuja identidade declarada é "não é rede social". A exceção é **delimitada e fechada**: canal 1:1, apenas dentro de vínculo aceito, sem descoberta de perfil, sem visibilidade entre alunos, sem grupo. Se ficar implícita, "grupo de alunos" aparece daqui a seis meses como extensão natural e o veto terá sido desarmado sem ninguém decidir. **Feed, seguir, comparar, ranking e perfil público continuam mortos.**
+
+**Portão de saída — o que precisa acontecer antes de qualquer código.** A validação mais barata que existe, e ela ainda não foi feita:
+
+1. Ter **um parecer bom de verdade** para mostrar. O banco hoje tem 1 parecer salvo, em fallback determinístico — mostrar isso subvende o produto. Precisa de uma geração real da Gemini, ou um render da bancada (`scripts/preview/`) assumido como demo.
+2. Conversar com **2-3 personal trainers reais**, com três perguntas de resposta falsificável:
+   - "O que você faz hoje quando um aluno pergunta se está progredindo?" — revela se o buraco existe ou se a planilha dele já resolve.
+   - "Se eu te avisar toda segunda que o peito do seu aluno está sem estímulo há 3 semanas, você abre e fala com ele, ou vira mais uma notificação que você ignora?" — **a pergunta que decide se isto tem produto.** O risco central do desenho é o personal virar gargalo obrigatório: sem o vínculo o diagnóstico chegava sozinho; com ele, a retenção do aluno passa a depender da disciplina do personal.
+   - "Quantos alunos você tem, e quantos você perdeu nos últimos 6 meses?" — transforma retenção de discurso em número deles.
+
+**A cunha, quando passar o portão.** Não é o login com dois modos, nem a aba ALUNOS, nem cobrança — isso é o produto completo. A menor coisa testável é: **um personal recebe um alerta real sobre um aluno real e responde ao aluno por ali.** Um convite, um aceite, uma revogação, um sinal roteado, uma mensagem. Esconder a seção de prescrição é barato (condicional sobre o vínculo); o caro e incerto é o alerta+chat, e é isso que a cunha tem que testar.
+
+**Contexto de mercado que motivou a decisão** (pesquisa de sessão anterior, `WebSearch` — não verificada independentemente nesta): software para personal trainer projetado em ~US$ 1,85 bi até 2033; concorrência brasileira densa (MFIT, PersonalGO, Trainer Connect, Mobitrainer, R$ 10,90–200/mês) e global cara (Trainerize, Everfit, TrueCoach). **O gap que sustenta a tese:** nenhum concorrente pesquisado usa IA para **interpretar o log depois de registrado** — usam para gerar treino, para chat/anamnese, para estimar gordura por foto. Ler os números e dizer o que significam continua sendo o território do lastro.
+
+**Classificação.** **ADIÇÃO** — e a de maior alcance registrada neste arquivo até aqui. Não remove nada do produto atual: nenhuma conta existente muda de comportamento sem aceitar um convite.
+
+**Impacto.** `PRD.md` §11 (seção nova, ainda não escrita — companheira desta entrada). `PROGRESS.md` (o item "Combinado com o dono, não iniciar ainda" sai do limbo e vira portão com critério de saída explícito). Nenhum arquivo de `src/` tocado, nenhuma migração, nenhum teste — por decisão, não por falta de tempo.
+
+**Como reverter.** Apagar a seção §11 do PRD e esta entrada perde efeito prático — nada foi construído. Depois que houver código, a reversão deixa de ser documental: o vínculo aluno↔personal é dado de terceiros e a remoção passa a ter obrigação de exclusão, não só de desligamento. **A janela barata de reverter fecha no primeiro vínculo real criado em produção.**
+
+**Observação de processo.** O protocolo de Scope Change citado no cabeçalho do `PRD.md` aponta para `.claude/skills/padrao-documentos/SKILL.md`, que **não existe neste repositório** (existem `portao-visual/`, `projeto-retomada/`, `qa-registro/`). Esta entrada seguiu o formato das entradas anteriores deste arquivo — o que mudou · por quê · alternativa descartada · classificação · impacto · como reverter. O ponteiro quebrado no PRD é dívida documental separada, não corrigida aqui.

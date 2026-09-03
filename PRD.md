@@ -30,6 +30,8 @@ Um app de treino **pessoal** que registra cada série executada e, uma vez por s
 
 **Não existe segunda persona.** Nenhuma decisão deste produto se justifica por "outros usuários poderiam querer". Isso não é limitação: é o que permite profundidade. (Sobre outras contas reais existirem sem essa persona mudar: nota em §1.)
 
+**Exceção única e declarada — §11 (2026-09-03).** O modo Personal adiciona um papel (o personal do aluno) sem revogar nada desta seção: o veto a decidir por "outros usuários poderiam querer" continua valendo para todo o resto deste documento. A exceção mora inteira no §11, de propósito — não leia esta seção sem ler aquela.
+
 ---
 
 ## 3. Peça-assinatura: a Análise Semanal
@@ -85,11 +87,11 @@ Um app de treino **pessoal** que registra cada série executada e, uma vez por s
 
 ## 5. Escopo NEGATIVO (explícito — não entra, e não é esquecimento)
 
-- ❌ Qualquer coisa social: feed, seguir, comparar, ranking. ~~compartilhar~~ → **REVISTO em 2026-08-27, ver nota A abaixo.**
+- ❌ Qualquer coisa social: feed, seguir, comparar, ranking. ~~compartilhar~~ → **REVISTO em 2026-08-27, ver nota A abaixo.** Feed, seguir, comparar e ranking seguem **mortos** também sob o modo Personal — a única brecha é o chat 1:1 dentro de vínculo aceito, delimitada em §11.5.
 - ❌ Planos e periodizações gerados automaticamente. O app **analisa** o que foi feito; não prescreve programa.
 - ❌ Integração com relógio, balança, wearable, Health/Google Fit.
 - ❌ Contagem de calorias, macros, dieta.
-- ❌ Múltiplos usuários, planos pagos, onboarding para estranhos, tela de billing, limite de uso.
+- ❌ Múltiplos usuários, planos pagos, onboarding para estranhos, tela de billing, limite de uso. → **PARCIALMENTE REVISTO em 2026-09-03 pelo §11.** O vínculo aluno↔personal reabre "múltiplos usuários" de forma restrita (convite aceito, 1:1, revogável). **Planos pagos, tela de billing e limite de uso continuam fora** — a monetização é motivação declarada do §11, não escopo aprovado, e entra por Scope Change próprio quando for a hora.
 - ❌ Catálogo gigante de exercícios. ~100 curados vencem 1500 auto-traduzidos.
 - ❌ App nativo em loja.
 - ~~❌ Cronômetro de descanso~~ → **REVISTO em 2026-08-27, ver nota B.** · ❌ vídeo próprio, importação de outros apps — **na v1**. Nenhum está descartado para sempre; estão fora do MVP.
@@ -167,3 +169,68 @@ Isto reabre conscientemente o "Sem tela de configuração de rotina" acima e o A
 - **TODO** — `N` semanas que caracterizam estagnação. Mesma tarefa de pesquisa.
 - ~~TODO — Regra de liberação semanal do botão Análise~~ **RESOLVIDO (2026-08-05).** Botão sempre disponível, sem bloqueio até a semana ISO fechar — ver §3 e `DECISIONS.md` "Tarefa 1.0d".
 - ~~TODO — Quota real da Gemini~~ **RESOLVIDO (2026-08-05), medido em uso real.** 20 requisições/dia no free tier de `gemini-3.6-flash` — ver `KNOWLEDGE.md` §3.2 e `DECISIONS.md` "Quota da Gemini medida".
+
+---
+
+## 11. O modo Personal — exceção declarada à persona única
+
+> **ADIÇÃO ao PRD congelado, 2026-09-03.** Scope Change aprovado pelo dono e registrado em `DECISIONS.md` (entrada "2026-09-03 (2) — Scope Change: módulo Personal"). **Decidido, não validado no mercado** — ver §11.6, o portão que precede qualquer código.
+>
+> Esta seção existe **separada** de propósito. O §2 diz "não existe segunda persona" e o veto que vem junto ("nenhuma decisão se justifica por 'outros usuários poderiam querer'") é estrutural: sustenta decisões espalhadas por todo este documento. Emendar o §2 para acomodar isto desarmaria o veto em silêncio, em todo lugar, sem ninguém ter decidido isso. A exceção fica declarada aqui, com fronteira explícita.
+
+### 11.1 O que muda, em uma frase
+
+Uma conta pode estar **vinculada a um personal**. Enquanto o vínculo existe, a **prescrição** sai do produto e vai para o humano; o **diagnóstico** continua inteiro com o aluno.
+
+### 11.2 O corte exato
+
+| | Aluno sem vínculo | Aluno vinculado |
+|---|---|---|
+| Registro, histórico, editar/excluir série (§4.1) | mantém | **mantém** |
+| Gráficos: e1RM, volume, volume por grupo muscular (§4.2) | mantém | **mantém** |
+| Sinais de diagnóstico: empaque, grupo sem estímulo, queda de frequência (§3, perguntas 1–4) | mantém | **mantém** |
+| Coach 24h (§4.4) | mantém | **mantém, com trava** — §11.4 |
+| Demonstração de execução (§4.5) | mantém | **mantém** |
+| **Prescrição — "o que mudar na próxima semana" (§3, pergunta 5)** | mantém | **não vê** — vai para o personal |
+| **Alerta dos sinais de diagnóstico** | — | **roteado ao personal**, em chat 1:1 com o aluno |
+
+**O aluno vinculado não perde diagnóstico nenhum.** Perde a prescrição — que é exatamente o que ele contratou um humano para fazer.
+
+### 11.3 Por que esta linha, e não outra
+
+O §5 deste documento já dizia: *"O app **analisa** o que foi feito; não prescreve programa."* A pergunta 5 do §3 sempre esteve em tensão com essa frase — na prática, ela prescreve. Sob vínculo, quem prescreve é o profissional contratado para isso, e o produto fica **mais** consistente com o §5, não menos.
+
+Por isso esta seção não é uma segunda persona no sentido que o §2 veta. O §2 proíbe justificar decisão por *"outros usuários poderiam querer"* — decisão especulativa, sobre gente hipotética. Aqui não se está adicionando nada ao produto por hipótese: está se decidindo **quem ocupa o papel de prescritor** quando esse papel já é ocupado por um humano na vida real do aluno. **O veto do §2 continua valendo integralmente para todo o resto do documento.**
+
+### 11.4 Restrições inegociáveis desta seção
+
+Quatro, e nenhuma é detalhe de implementação — cada uma pode invalidar a decisão se ficar em aberto.
+
+1. **O Coach 24h precisa de trava sob vínculo.** Fechar a prescrição e deixar o chat de IA aberto no mesmo app não fecha nada: o aluno pergunta *"o que eu mudo essa semana?"* e o Coach responde. Sob vínculo, o Coach responde dúvida de execução e conceito (§4.4/§4.5) e **não** monta a próxima semana — encaminha o pedido ao personal. Sem essa trava, esta seção inteira é decorativa.
+2. **O lugar da prescrição não pode ficar vazio.** Se a seção simplesmente sumir, lê como app quebrado. Precisa de estado próprio, que comunique que aquele espaço é do personal — ausência não é resposta. **Gate visual** (`AGENTS.md`), não implementação silenciosa.
+3. **Consentimento é do aluno, sempre, e é revogável.** O personal **convida**, o aluno **aceita**, o aluno **revoga** quando quiser, com corte imediato de acesso. Nunca por ação unilateral do personal — cadastrar o e-mail de alguém não concede acesso a nada. Isto é LGPD e é decisão de **schema**, não tela de cobrança: vínculo permanente e concessão revogável/auditável são coisas diferentes no banco. Quando o vínculo termina, a prescrição volta para o aluno.
+4. **O gatilho do alerta é determinístico.** Mesma regra inegociável do §3: o sinal sai do código de métricas já calculado e testado — nunca de a IA "achar" que algo está errado. O alerta **roteia** um sinal que já existe; não cria julgamento novo. O LLM segue sem ver linha crua de série.
+
+### 11.5 A fronteira com o escopo negativo (§5)
+
+O chat personal↔aluno é o **primeiro canal pessoa-a-pessoa** deste produto. Não fere o §5 ao pé da letra — não é feed, seguir, comparar nem ranking —, mas é a primeira vez que duas contas se falam num app cuja identidade declarada é "não é rede social". A exceção é **delimitada e fechada**:
+
+- ✅ Canal **1:1**, apenas dentro de vínculo aceito e vigente.
+- ❌ Sem descoberta de perfil. Sem visibilidade entre alunos do mesmo personal. **Sem grupo.**
+- ❌ **Feed, seguir, comparar, ranking e perfil público continuam mortos**, com ou sem vínculo.
+
+Isto está escrito porque, se ficasse implícito, "grupo de alunos" apareceria como extensão natural e o veto do §5 teria sido desarmado sem ninguém decidir.
+
+### 11.6 Portão — o que precede qualquer código
+
+Esta seção está **aprovada como decisão e bloqueada como implementação**. Duas condições, ambas em aberto:
+
+1. **Ter um parecer bom de verdade para mostrar.** Mostrar um fallback determinístico subvende o produto.
+2. **Conversar com 2–3 personal trainers reais.** Três perguntas de resposta falsificável:
+   - *"O que você faz hoje quando um aluno pergunta se está progredindo?"*
+   - *"Se eu te avisar toda segunda que o peito do seu aluno está sem estímulo há 3 semanas, você abre e fala com ele, ou vira mais uma notificação que você ignora?"*
+   - *"Quantos alunos você tem, e quantos você perdeu nos últimos 6 meses?"*
+
+A segunda é a que decide se isto tem produto. **O risco central do desenho é o personal virar gargalo obrigatório:** sem vínculo, o diagnóstico chega sozinho; com vínculo, a continuidade do aluno passa a depender da disciplina de outra pessoa.
+
+**A primeira coisa a construir, quando o portão abrir,** não é login com dois modos, nem aba de alunos, nem cobrança: é **um personal receber um alerta real sobre um aluno real e responder ao aluno por ali**. Convite, aceite, revogação, um sinal roteado, uma mensagem. Esconder a prescrição é barato; o alerta e o chat são a parte cara e incerta, e são o que precisa ser testado primeiro.
