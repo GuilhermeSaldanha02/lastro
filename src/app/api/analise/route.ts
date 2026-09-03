@@ -16,7 +16,8 @@ import type {
   ResumoCompacto,
   TreinoBruto,
 } from "@/lib/analise/tipos";
-import { dataLocalBrasil } from "@/lib/tempo";
+import { dataLocalBrasil, formatarDataCurta } from "@/lib/tempo";
+import { formatarPercentual, formatarPeso } from "@/lib/texto/formatar-delta";
 import { ClienteParecerGemini } from "./gemini";
 import { montarEvidenciaParaTela } from "./evidencia";
 import type { EvidenciaParaTela } from "./evidencia";
@@ -137,6 +138,15 @@ const POSICAO_FAIXA_POR_IDIOMA: Record<Idioma, Record<ResumoCompacto["volume_por
  * envolvido aqui — precisa do próprio idioma-aware, não só o prompt
  * (achado do dono ao decidir a etapa, 2026-08-24: "tudo", inclusive o
  * caminho que não passa pela Gemini).
+ *
+ * Números reusam `formatarPercentual`/`formatarPeso` (mesmos helpers que
+ * o bloco de evidência já usa) — achado 2026-09-03: saíam com separador
+ * decimal em ponto ("349.4%") mesmo em pt-BR/es, que usam vírgula.
+ * Datas: só o ramo pt-BR troca `semana_inicio` (ISO) por
+ * `formatarDataCurta` ("3 ago"), porque esse formatador é PT-only (meses
+ * abreviados fixos) — reescrevê-lo pra en/es exigiria tabela de meses
+ * nova em dois idiomas que a única conta real deste app nunca usa.
+ * en/es continuam com a data ISO crua; registrado aqui, não escondido.
  */
 function fallbackDeterministico(resumo: ResumoCompacto, idioma: Idioma): string {
   const posicaoFaixa = POSICAO_FAIXA_POR_IDIOMA[idioma];
@@ -179,25 +189,29 @@ function fallbackDeterministico(resumo: ResumoCompacto, idioma: Idioma): string 
       `Semana del ${resumo.periodo.semana_atual_inicio} — ${resumo.periodo.semanas_com_dados} de ${resumo.periodo.janela_semanas} semanas de la ventana con datos.`,
     );
     for (const v of resumo.volume_semanal) {
-      linhas.push(`Volumen total en ${v.semana_inicio}: ${v.volume_total}.`);
+      linhas.push(`Volumen total en ${v.semana_inicio}: ${formatarPeso(v.volume_total, idioma)}.`);
     }
     for (const g of resumo.volume_por_grupo_muscular) {
       const delta =
-        g.delta_volume_pct !== undefined ? ` (${g.delta_volume_pct}% vs. semana anterior)` : "";
+        g.delta_volume_pct !== undefined
+          ? ` (${formatarPercentual(g.delta_volume_pct, idioma)} vs. semana anterior)`
+          : "";
       linhas.push(
-        `${g.grupo_muscular}: ${g.series_valendo} series válidas, volumen ${g.volume}${delta} — ${posicaoFaixa[g.posicao_na_faixa]} rango de referencia.`,
+        `${g.grupo_muscular}: ${g.series_valendo} series válidas, volumen ${formatarPeso(g.volume, idioma)}${delta} — ${posicaoFaixa[g.posicao_na_faixa]} rango de referencia.`,
       );
     }
     for (const t of resumo.tendencia_e1rm) {
       linhas.push(
-        `${t.exercicio}: e1RM de ${t.e1rm_inicial} a ${t.e1rm_atual} (${t.delta_pct}%), en ${t.sessoes} sesiones.`,
+        `${t.exercicio}: e1RM de ${formatarPeso(t.e1rm_inicial, idioma)} a ${formatarPeso(t.e1rm_atual, idioma)} (${formatarPercentual(t.delta_pct, idioma)}), en ${t.sessoes} sesiones.`,
       );
     }
     for (const e of resumo.estagnacoes) {
       linhas.push(`${e.exercicio}: ${e.semanas_sem_progresso} semanas sin progreso.`);
     }
     for (const p of resumo.prs) {
-      linhas.push(`PR en ${p.exercicio} (${p.tipo}): ${p.valor} (anterior ${p.valor_anterior}).`);
+      linhas.push(
+        `PR en ${p.exercicio} (${p.tipo}): ${formatarPeso(p.valor, idioma)} (anterior ${formatarPeso(p.valor_anterior, idioma)}).`,
+      );
     }
     linhas.push(`Frecuencia esta semana: ${resumo.frequencia.treinos_semana_atual} entrenamiento(s).`);
     if (resumo.frequencia.grupos_sem_estimulo.length > 0) {
@@ -207,24 +221,28 @@ function fallbackDeterministico(resumo: ResumoCompacto, idioma: Idioma): string 
   }
 
   linhas.push(
-    `Semana de ${resumo.periodo.semana_atual_inicio} — ${resumo.periodo.semanas_com_dados} de ${resumo.periodo.janela_semanas} semanas da janela com dados.`,
+    `Semana de ${formatarDataCurta(resumo.periodo.semana_atual_inicio)} — ${resumo.periodo.semanas_com_dados} de ${resumo.periodo.janela_semanas} semanas da janela com dados.`,
   );
 
   for (const v of resumo.volume_semanal) {
-    linhas.push(`Volume total em ${v.semana_inicio}: ${v.volume_total}.`);
+    linhas.push(
+      `Volume total em ${formatarDataCurta(v.semana_inicio)}: ${formatarPeso(v.volume_total, idioma)}.`,
+    );
   }
 
   for (const g of resumo.volume_por_grupo_muscular) {
     const delta =
-      g.delta_volume_pct !== undefined ? ` (${g.delta_volume_pct}% vs. semana anterior)` : "";
+      g.delta_volume_pct !== undefined
+        ? ` (${formatarPercentual(g.delta_volume_pct, idioma)} vs. semana anterior)`
+        : "";
     linhas.push(
-      `${g.grupo_muscular}: ${g.series_valendo} séries valendo, volume ${g.volume}${delta} — ${posicaoFaixa[g.posicao_na_faixa]} da faixa de referência.`,
+      `${g.grupo_muscular}: ${g.series_valendo} séries valendo, volume ${formatarPeso(g.volume, idioma)}${delta} — ${posicaoFaixa[g.posicao_na_faixa]} da faixa de referência.`,
     );
   }
 
   for (const t of resumo.tendencia_e1rm) {
     linhas.push(
-      `${t.exercicio}: e1RM de ${t.e1rm_inicial} para ${t.e1rm_atual} (${t.delta_pct}%), em ${t.sessoes} sessões.`,
+      `${t.exercicio}: e1RM de ${formatarPeso(t.e1rm_inicial, idioma)} para ${formatarPeso(t.e1rm_atual, idioma)} (${formatarPercentual(t.delta_pct, idioma)}), em ${t.sessoes} sessões.`,
     );
   }
 
@@ -236,7 +254,7 @@ function fallbackDeterministico(resumo: ResumoCompacto, idioma: Idioma): string 
 
   for (const p of resumo.prs) {
     linhas.push(
-      `PR em ${p.exercicio} (${p.tipo}): ${p.valor} (anterior ${p.valor_anterior}).`,
+      `PR em ${p.exercicio} (${p.tipo}): ${formatarPeso(p.valor, idioma)} (anterior ${formatarPeso(p.valor_anterior, idioma)}).`,
     );
   }
 
