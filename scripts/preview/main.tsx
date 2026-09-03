@@ -14,7 +14,13 @@ import { createRoot } from "react-dom/client";
 import Parecer from "@/components/parecer";
 import ParecerDetalheAcoes from "@/components/parecer-detalhe-acoes";
 import type { ParecerSalvo } from "@/lib/dados/parecer";
-import { evidenciaReal, textoFallbackReal, textoProsaExemplo } from "./dados";
+import {
+  evidenciaReal,
+  textoFallbackReal,
+  textoProsaExemplo,
+  textoProsaExemploCurto,
+  textoProsaExemploLongo,
+} from "./dados";
 import "@/app/globals.css";
 import "./bancada.css";
 
@@ -56,6 +62,16 @@ const CENAS = {
   "parecer-prosa": (
     <Cena id="parecer-prosa" rotulo="Parecer — prosa normal" nota="Números reais; a PROSA é sintética (não há prosa real desta semana no banco).">
       <Parecer {...COMUM} texto={textoProsaExemplo} />
+    </Cena>
+  ),
+  "parecer-veredito-longo": (
+    <Cena id="parecer-veredito-longo" rotulo="Teto de veredito — clamp() real" nota="Veredito sintético estourado (LLM ignorou a instrução de frase curta) — mostra o piso de titulo-tela (30px) do clamp em sistema.css, sem truncar.">
+      <Parecer {...COMUM} texto={textoProsaExemploLongo} />
+    </Cena>
+  ),
+  "parecer-prosa-curta": (
+    <Cena id="parecer-prosa-curta" rotulo="Parecer — veredito curto" nota="Números reais; a PROSA é sintética, veredito encurtado só pra testar a Fraunces numa linha.">
+      <Parecer {...COMUM} texto={textoProsaExemploCurto} />
     </Cena>
   ),
   "parecer-fallback": (

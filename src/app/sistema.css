@@ -1417,10 +1417,28 @@
 /* O veredito é MAIOR que o título do cabeçalho (.doc__pergunta, t-3) —
    é o salto de escala que carrega a restrição de DESIGN.md §3.0: o
    julgamento pesa mais que a pergunta. Corrigido 2026-08-10; antes usava
-   o mesmo t-3 do título, o sintoma que §3.0 descreve. */
+   o mesmo t-3 do título, o sintoma que §3.0 descreve.
+
+   Teto de tamanho (2026-09-03): a Fraunces em numero-heroi (48px) presume
+   uma frase curta de julgamento (prompt.ts pede isso). Quando a primeira
+   frase sai mais longa que o esperado — o LLM ignorou a instrução, ou
+   `separarVeredito` não achou um corte cedo — 48px vira 3+ linhas e
+   empurra o resto do documento pra fora da dobra. Truncar foi testado e
+   descartado: cortar a frase de julgamento no meio (às vezes no meio de
+   uma palavra) contradiz o que o veredito é. Em vez disso, a fonte
+   encolhe suavemente com o comprimento do texto, via --veredito-caracteres
+   (definido inline em parecer.tsx), até o piso de titulo-tela (30px) —
+   ainda maior que o título do cabeçalho, preservando o §3.0. Os números
+   abaixo (20 / 45 caracteres, 0.72px/caractere) são um primeiro ajuste
+   visual, não uma medição exata de quebra de linha — recalibrar se a
+   Fraunces real quebrar diferente do esperado. */
 .doc__veredito {
   font-family: var(--lastro-fonte-serif);
-  font-size: var(--lastro-papel-numero-heroi);
+  font-size: clamp(
+    var(--lastro-papel-titulo-tela),
+    calc(var(--lastro-papel-numero-heroi) - (var(--veredito-caracteres, 0) - 20) * 0.72px),
+    var(--lastro-papel-numero-heroi)
+  );
   font-weight: var(--lastro-peso-forte);
   line-height: var(--lastro-el-titulo);
   color: var(--lastro-txt);
