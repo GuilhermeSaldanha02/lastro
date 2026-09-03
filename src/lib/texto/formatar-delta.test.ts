@@ -26,11 +26,26 @@ describe("formatarPercentual", () => {
   it("inteiro sem casas decimais não ganha vírgula solta", () => {
     expect(formatarPercentual(12)).toBe("+12%");
   });
+  // es também usa vírgula (separadorDecimal) — sem teste até 2026-09-03,
+  // quando o fallback determinístico (route.ts) virou o primeiro
+  // consumidor real do idioma "es" nestes helpers.
+  it("es usa vírgula, igual pt-BR", () => {
+    expect(formatarPercentual(66.7, "es")).toBe("+66,7%");
+  });
+  it("en usa ponto — não deve ganhar vírgula por engano", () => {
+    expect(formatarPercentual(66.7, "en")).toBe("+66.7%");
+  });
 });
 
 describe("formatarPeso", () => {
   it("meio quilo vira vírgula, não ponto — achado real na tela (102.5 -> 102,5)", () => {
     expect(formatarPeso(102.5)).toBe("102,5");
+  });
+  it("es usa vírgula, igual pt-BR", () => {
+    expect(formatarPeso(349.4, "es")).toBe("349,4");
+  });
+  it("en mantém o ponto", () => {
+    expect(formatarPeso(349.4, "en")).toBe("349.4");
   });
   it("peso inteiro não ganha casa decimal artificial", () => {
     expect(formatarPeso(80)).toBe("80");
