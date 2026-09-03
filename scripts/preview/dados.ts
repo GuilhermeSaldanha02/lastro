@@ -35,3 +35,14 @@ Frequência na semana atual: 5 treino(s).`;
  *  banco. Existe só para exercitar a tipografia do veredito (Fraunces
  *  48px) e do corpo. Os números citados são os reais acima. */
 export const textoProsaExemplo = `Seu tríceps carregou a semana. Puxada e tríceps subiram junto — 25% e 66,7% de e1RM na janela de 4 semanas — enquanto Leg press e Rosca concentrada não saíram do lugar em nenhuma das sessões registradas. O supino fechado caiu 29,8%, e é o único movimento em queda real da lista; nas 4 séries valendo dessa semana o peso de referência ficou em 40 kg × 10. Ombro e posterior de coxa seguem abaixo da faixa de referência de volume pela segunda semana.`;
+
+/** SINTÉTICO — mesma ressalva acima, mas com o veredito (primeira frase)
+ *  encurtado ao extremo, pra ver a tipografia Fraunces 48px numa única
+ *  linha curta em vez de 3 linhas. Comparação de gate visual, não dado real. */
+export const textoProsaExemploCurto = `Tudo estável. Puxada e tríceps subiram junto — 25% e 66,7% de e1RM na janela de 4 semanas — enquanto Leg press e Rosca concentrada não saíram do lugar em nenhuma das sessões registradas. O supino fechado caiu 29,8%, e é o único movimento em queda real da lista; nas 4 séries valendo dessa semana o peso de referência ficou em 40 kg × 10. Ombro e posterior de coxa seguem abaixo da faixa de referência de volume pela segunda semana.`;
+
+/** SINTÉTICO — estresse do caso ruim: o LLM ignora a instrução de abrir
+ *  com uma frase curta de julgamento (prompt.ts) e `separarVeredito` não
+ *  acha um ponto final cedo, então o "veredito" vira um parágrafo inteiro.
+ *  Serve só pra verificar o piso do clamp() em .doc__veredito (sistema.css). */
+export const textoProsaExemploLongo = `Olhando pro conjunto da semana, o que mais chama atenção é que tríceps e puxada seguiram subindo enquanto leg press e rosca concentrada ficaram parados nas últimas quatro semanas seguidas. Puxada e tríceps subiram junto — 25% e 66,7% de e1RM na janela de 4 semanas — enquanto Leg press e Rosca concentrada não saíram do lugar em nenhuma das sessões registradas. O supino fechado caiu 29,8%, e é o único movimento em queda real da lista; nas 4 séries valendo dessa semana o peso de referência ficou em 40 kg × 10. Ombro e posterior de coxa seguem abaixo da faixa de referência de volume pela segunda semana.`;

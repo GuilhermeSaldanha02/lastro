@@ -82,7 +82,14 @@ export default function Parecer({
           pergunta, que carrega o peso visual da tela. Ausente no
           fallback determinístico (acima) — não existe julgamento pra
           destacar quando a prosa real falhou. */}
-      {veredito && <p className="doc__veredito">{veredito}</p>}
+      {veredito && (
+        <p
+          className="doc__veredito"
+          style={{ "--veredito-caracteres": veredito.length } as React.CSSProperties}
+        >
+          {veredito}
+        </p>
+      )}
 
       {/* Blocos de evidência (§3.6.3) — ANTES da prosa. A ordem conta a
           arquitetura: o agregador já tinha os números prontos antes de o
