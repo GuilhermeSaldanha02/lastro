@@ -1437,6 +1437,27 @@
   white-space: pre-wrap;
 }
 
+/* Resumo determinístico (avisoFalhaInterpretativa): lista de medidas,
+   não prosa. Família de número e tabular-nums porque cada linha é um
+   dado; a régua entre linhas é o que deixa varrer com o olho em vez de
+   ler do começo ao fim. Ver a nota em components/parecer.tsx. */
+.doc__dados {
+  list-style: none;
+  font-family: var(--lastro-fonte-num);
+  font-variant-numeric: tabular-nums;
+  font-size: var(--lastro-papel-corpo);
+  line-height: 1.45;
+  color: var(--lastro-txt-2);
+}
+
+.doc__dados li {
+  padding: var(--lastro-e-2) 0;
+}
+
+.doc__dados li + li {
+  border-top: 1px solid var(--lastro-linha);
+}
+
 .doc__metodo {
   border-top: 1px solid var(--lastro-linha);
   padding-top: var(--lastro-e-4);
