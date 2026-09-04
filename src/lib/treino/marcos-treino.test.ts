@@ -9,13 +9,14 @@ import {
   chaveFimTreino,
   chaveInicioTreino,
   estaFinalizado,
-  garantirInicio,
+  iniciarSessaoLocal,
   inicioAoReabrir,
   lerMarcos,
   marcarFim,
   reabrir,
   segundosDecorridos,
   segundosEntre,
+  temInicioLocal,
 } from "./marcos-treino";
 
 const H = 60 * 60 * 1000;
@@ -89,14 +90,14 @@ describe("marcos no armazenamento", () => {
   });
 
   it("grava o início uma vez só e não o reescreve", () => {
-    garantirInicio(ID);
+    iniciarSessaoLocal(ID);
     const primeiro = lerMarcos(ID).inicioMs;
-    garantirInicio(ID);
+    iniciarSessaoLocal(ID);
     expect(lerMarcos(ID).inicioMs).toBe(primeiro);
   });
 
   it("marcar fim é idempotente — reapertar Finalizar não move o fim", () => {
-    garantirInicio(ID);
+    iniciarSessaoLocal(ID);
     marcarFim(ID);
     const primeiro = lerMarcos(ID).fimMs;
     marcarFim(ID);
@@ -106,7 +107,7 @@ describe("marcos no armazenamento", () => {
 
   // O caminho que NÃO EXISTIA e produziu o relato de uso real.
   it("reabrir apaga a marca de fim e destrava o cronômetro", () => {
-    garantirInicio(ID);
+    iniciarSessaoLocal(ID);
     marcarFim(ID);
     expect(estaFinalizado(ID)).toBe(true);
 
@@ -135,7 +136,7 @@ describe("marcos no armazenamento", () => {
   });
 
   it("reabrir um treino em andamento não faz nada", () => {
-    garantirInicio(ID);
+    iniciarSessaoLocal(ID);
     const antes = lerMarcos(ID).inicioMs;
     reabrir(ID);
     expect(lerMarcos(ID).inicioMs).toBe(antes);
@@ -150,7 +151,7 @@ describe("marcos no armazenamento", () => {
     const avisos: string[] = [];
     const cancelar = assinarMarcos(() => avisos.push("mudou"));
 
-    garantirInicio(ID);
+    iniciarSessaoLocal(ID);
     expect(avisos).toHaveLength(0); // início não muda "está finalizado?"
 
     marcarFim(ID);
@@ -167,10 +168,30 @@ describe("marcos no armazenamento", () => {
     expect(avisos).toHaveLength(2); // cancelado não recebe mais
   });
 
+  // 2026-09-04, segundo relato de uso real: abrir um treino ANTIGO fazia o
+  // cronômetro contar do zero ao vivo, porque a marca de início era gravada
+  // incondicionalmente ao montar. Quem decide agora é o chamador.
+  it("sem sessão iniciada aqui, não existe marca local", () => {
+    expect(temInicioLocal(ID)).toBe(false);
+    expect(lerMarcos(ID).inicioMs).toBeNull();
+  });
+
+  it("reabrir SEM início local não grava um início novo", () => {
+    // Estado possível: o fim veio de outro aparelho/sessão, o início não.
+    // Gravar `agora` aqui faria o cronômetro recomeçar do zero ao vivo.
+    window.localStorage.setItem(chaveFimTreino(ID), new Date().toISOString());
+    expect(estaFinalizado(ID)).toBe(true);
+
+    reabrir(ID);
+
+    expect(estaFinalizado(ID)).toBe(false);
+    expect(temInicioLocal(ID)).toBe(false);
+  });
+
   it("treino de outro id não é afetado", () => {
-    garantirInicio(ID);
+    iniciarSessaoLocal(ID);
     marcarFim(ID);
-    garantirInicio("treino-2");
+    iniciarSessaoLocal("treino-2");
     reabrir(ID);
     expect(estaFinalizado("treino-2")).toBe(false);
     expect(lerMarcos("treino-2").inicioMs).not.toBeNull();

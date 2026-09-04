@@ -16,14 +16,30 @@ import {
 } from "@/lib/audio/som-timer";
 import type { Idioma } from "@/lib/dados/idioma";
 import { t } from "@/lib/texto/i18n";
-import { garantirInicio, segundosDecorridos } from "@/lib/treino/marcos-treino";
+import {
+  iniciarSessaoLocal,
+  segundosDecorridos,
+  temInicioLocal,
+} from "@/lib/treino/marcos-treino";
 
 type TimerTopoProps = {
   treinoId: string;
   idioma: Idioma;
   duracaoPadraoSegundos?: number;
+  /**
+   * Duração reconstruída do BANCO (`iniciado_em` → última série), usada
+   * quando não há marca de início neste aparelho. É o que impede o
+   * cronômetro de contar do zero ao vivo num treino que não está
+   * acontecendo aqui (relato de uso real, 2026-09-04).
+   */
+  duracaoReconstruidaSegundos: number;
+  /**
+   * O treino ainda não tem série nenhuma — foi criado agora e a sessão
+   * começa aqui. É a ÚNICA condição em que este componente grava a marca
+   * de início local.
+   */
+  sessaoComecaAqui: boolean;
   treinoFinalizado?: boolean;
-  onTempoTreinoAtualizado?: (segundos: number) => void;
 };
 
 /**
@@ -41,8 +57,9 @@ export default function TimerTopo({
   treinoId,
   idioma,
   duracaoPadraoSegundos = 90,
+  duracaoReconstruidaSegundos,
+  sessaoComecaAqui,
   treinoFinalizado = false,
-  onTempoTreinoAtualizado,
 }: TimerTopoProps) {
   // 1. Cronômetro Contínuo da Sessão de Treino (Persistido e Congelável)
   //
@@ -61,11 +78,18 @@ export default function TimerTopo({
   //     passo 13 do teste de jornada, 2026-08-27).
   // Aqui o servidor tem snapshot próprio (0) e o cliente lê o valor real
   // depois da hidratação, sem divergência e sem `setState` em efeito.
-  const segundosTreino = useSyncExternalStore(
+  // Com marca local, o cronômetro é da SESSÃO deste aparelho (ao vivo ou
+  // congelado no fim). Sem marca, o app não tem como saber quando a sessão
+  // acabou — então mostra a duração reconstruída do banco, PARADA, em vez
+  // de fingir que está correndo. Era exatamente isso que abrir um treino
+  // antigo fazia: contava do zero, ao vivo, num treino já encerrado.
+  const segundosLocais = useSyncExternalStore(
     assinarSegundo,
-    () => segundosDecorridos(treinoId),
-    () => 0,
+    () => (temInicioLocal(treinoId) ? segundosDecorridos(treinoId) : null),
+    () => null,
   );
+  const segundosTreino = segundosLocais ?? duracaoReconstruidaSegundos;
+  const cronometroAoVivo = segundosLocais !== null && !treinoFinalizado;
 
   // 2. Timer de Descanso entre Séries
   const [ativo, setAtivo] = useState(false);
@@ -120,20 +144,15 @@ export default function TimerTopo({
     };
   }, []);
 
-  // Este componente só garante o INÍCIO. A marca de fim tem um dono só,
+  // Este componente só marca o INÍCIO, e só quando a sessão começa aqui
+  // (treino recém-criado, sem série). A marca de fim tem um dono só,
   // `treino-detalhe.tsx` (finalizar/reabrir) — antes os dois escreviam a
   // mesma chave, e foi essa duplicação que deixou o treino travado no
-  // relato de uso real de 2026-09-03: cada lado sabia gravar, nenhum sabia
-  // apagar. Ver `src/lib/treino/marcos-treino.ts`.
+  // relato de 2026-09-03. Ver `src/lib/treino/marcos-treino.ts`.
   useEffect(() => {
-    garantirInicio(treinoId);
-  }, [treinoId]);
+    if (sessaoComecaAqui) iniciarSessaoLocal(treinoId);
+  }, [treinoId, sessaoComecaAqui]);
 
-  // Espelha o valor para o pai (que monta o relatório pós-treino). Separado
-  // do efeito acima porque depende do tique, não dos marcos.
-  useEffect(() => {
-    onTempoTreinoAtualizado?.(segundosTreino);
-  }, [segundosTreino, onTempoTreinoAtualizado]);
 
   const iniciarTimer = useCallback((segundos: number) => {
     desbloquearAudio();
@@ -251,7 +270,7 @@ export default function TimerTopo({
               botão que mente é pior que um botão ausente: o dono clicou
               várias vezes achando que era ele. Acabou o treino, some o
               descanso. */}
-          {!treinoFinalizado && !descansoAtivo && !descansoFinalizado && (
+          {cronometroAoVivo && !descansoAtivo && !descansoFinalizado && (
             <button
               type="button"
               className="timer-topo-botao-disparar"

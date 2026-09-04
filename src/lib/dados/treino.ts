@@ -51,6 +51,14 @@ export type Serie = {
 export type Treino = {
   id: string;
   data: string;
+  /**
+   * Quando a sessão foi criada (`treino.iniciado_em`, migration 0001).
+   * Existia no banco desde o schema inicial e **nunca era lido** — por isso
+   * o cronômetro tratava o `localStorage` como fonte da verdade e inventava
+   * um início ao abrir um treino antigo (relato de uso real, 2026-09-04).
+   * É a âncora que faz a tela e `/ajustes/relatorios` medirem a mesma coisa.
+   */
+  iniciadoEm: string;
   /** Quantas séries este treino tem, contando aquecimento. */
   totalSeries: number;
   gruposMusculares?: string[];
@@ -83,7 +91,7 @@ export async function listarTreinos(): Promise<Treino[]> {
     supabase
       .from("treino")
       .select(
-        "id, data, serie (tipo, reps, peso, peso_por_lado, exercicio:exercicio_id (grupo_muscular_primario, unilateral))",
+        "id, data, iniciado_em, serie (tipo, reps, peso, peso_por_lado, exercicio:exercicio_id (grupo_muscular_primario, unilateral))",
       )
       .order("data", { ascending: false }),
     obterIdioma(),
@@ -102,6 +110,7 @@ export async function listarTreinos(): Promise<Treino[]> {
   type Linha = {
     id: string;
     data: string;
+    iniciado_em: string;
     serie: LinhaSerie[] | null;
   };
 
@@ -135,6 +144,7 @@ export async function listarTreinos(): Promise<Treino[]> {
     return {
       id: t.id,
       data: t.data,
+      iniciadoEm: t.iniciado_em,
       totalSeries: series.length,
       gruposMusculares: grupos,
       volumeKg: Math.round(vol),
@@ -150,7 +160,7 @@ export async function buscarTreino(
 
   const { data: treino, error: erroTreino } = await supabase
     .from("treino")
-    .select("id, data")
+    .select("id, data, iniciado_em")
     .eq("id", treinoId)
     .maybeSingle();
   if (erroTreino) {
@@ -193,6 +203,7 @@ export async function buscarTreino(
   return {
     id: treino.id,
     data: treino.data,
+    iniciadoEm: treino.iniciado_em,
     totalSeries: linhasSeries.length,
     series: linhasSeries.map((s) => ({
       id: s.id,

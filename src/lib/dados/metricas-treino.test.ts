@@ -1,5 +1,10 @@
 import { describe, it, expect } from "vitest";
-import { calcularMetricasSessao, type SerieParaMetricas } from "./metricas-treino";
+import {
+  calcularMetricasSessao,
+  duracaoSessaoSegundos,
+  ultimaSerieEm,
+  type SerieParaMetricas,
+} from "./metricas-treino";
 
 describe("calcularMetricasSessao", () => {
   it("calcula corretamente tonelagem, duração, séries e PRs", () => {
@@ -129,5 +134,58 @@ describe("calcularMetricasSessao", () => {
     expect(metricas.focoOuDivisao).toBe("PEITO & TRÍCEPS");
     expect(metricas.identificadorTreino).toBe("TREINO #042");
     expect(metricas.fraseAssinatura).toBe("Foco total.");
+  });
+});
+
+// 2026-09-04, relato de uso real: o relatório da tela de treino e o de
+// /ajustes/relatorios davam números diferentes pro MESMO treino, porque
+// mediam coisas diferentes (cronômetro ao vivo vs. última série − primeira).
+// Esta definição única existe pra eles não poderem mais divergir.
+describe("duracaoSessaoSegundos", () => {
+  it("mede do início da sessão até a última série", () => {
+    expect(
+      duracaoSessaoSegundos("2026-09-04T10:00:00Z", "2026-09-04T11:00:00Z"),
+    ).toBe(3600);
+  });
+
+  it("conta o aquecimento ANTES da primeira série — que era o que o servidor perdia", () => {
+    // Sessão às 10:00, primeira série só às 10:15, última às 11:00.
+    // `última − primeira` daria 2700s; a definição certa dá 3600s.
+    const inicioSessao = "2026-09-04T10:00:00Z";
+    const ultima = "2026-09-04T11:00:00Z";
+    expect(duracaoSessaoSegundos(inicioSessao, ultima)).toBe(3600);
+    expect(
+      duracaoSessaoSegundos("2026-09-04T10:15:00Z", ultima),
+    ).toBe(2700);
+  });
+
+  it("devolve 0 sem série nenhuma, em vez de contar até agora", () => {
+    expect(duracaoSessaoSegundos("2026-09-04T10:00:00Z", undefined)).toBe(0);
+  });
+
+  it("nunca devolve negativo", () => {
+    expect(
+      duracaoSessaoSegundos("2026-09-04T11:00:00Z", "2026-09-04T10:00:00Z"),
+    ).toBe(0);
+  });
+
+  it("ignora data inválida em vez de produzir NaN", () => {
+    expect(duracaoSessaoSegundos("nao-e-data", "2026-09-04T10:00:00Z")).toBe(0);
+  });
+});
+
+describe("ultimaSerieEm", () => {
+  it("devolve o criado_em mais recente, não o último da lista", () => {
+    expect(
+      ultimaSerieEm([
+        { criadoEm: "2026-09-04T10:30:00Z" },
+        { criadoEm: "2026-09-04T11:00:00Z" },
+        { criadoEm: "2026-09-04T10:45:00Z" },
+      ]),
+    ).toBe("2026-09-04T11:00:00Z");
+  });
+
+  it("devolve undefined sem séries", () => {
+    expect(ultimaSerieEm([])).toBeUndefined();
   });
 });

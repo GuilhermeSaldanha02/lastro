@@ -119,8 +119,25 @@ export function estaFinalizado(treinoId: string): boolean {
   return lerMarcos(treinoId).fimMs !== null;
 }
 
-/** Idempotente: só grava o início se ainda não houver um. */
-export function garantirInicio(treinoId: string): void {
+/**
+ * Existe marca de início neste APARELHO? É o que separa "a sessão está
+ * acontecendo aqui" de "estou só olhando um treino".
+ */
+export function temInicioLocal(treinoId: string): boolean {
+  return lerMarcos(treinoId).inicioMs !== null;
+}
+
+/**
+ * Marca que a sessão começou NESTE aparelho. Idempotente.
+ *
+ * Chamar isto incondicionalmente ao abrir qualquer treino era o defeito
+ * relatado em 2026-09-04: abrir um treino de ontem gravava `agora` como
+ * início e o cronômetro saía contando do zero, ao vivo, num treino que já
+ * tinha acabado. Quem decide se a sessão é daqui é o chamador — hoje,
+ * `timer-topo.tsx` só chama quando o treino ainda não tem série nenhuma
+ * (foi criado agora e o dono está prestes a treinar).
+ */
+export function iniciarSessaoLocal(treinoId: string): void {
   const store = armazenamento();
   if (!store) return;
   const chave = chaveInicioTreino(treinoId);
@@ -151,10 +168,17 @@ export function reabrir(treinoId: string): void {
   const marcos = lerMarcos(treinoId);
   if (marcos.fimMs === null) return;
 
-  store.setItem(
-    chaveInicioTreino(treinoId),
-    new Date(inicioAoReabrir(marcos, Date.now())).toISOString(),
-  );
+  // Só desloca o início quando existe um início LOCAL para preservar. Sem
+  // ele não há tempo decorrido neste aparelho, e gravar `agora` faria o
+  // cronômetro recomeçar do zero ao vivo — o mesmo defeito que
+  // `iniciarSessaoLocal` deixou de causar. Nesse caso o treino volta a ser
+  // lido pela duração reconstruída do banco.
+  if (marcos.inicioMs !== null) {
+    store.setItem(
+      chaveInicioTreino(treinoId),
+      new Date(inicioAoReabrir(marcos, Date.now())).toISOString(),
+    );
+  }
   store.removeItem(chaveFimTreino(treinoId));
   notificar();
 }
