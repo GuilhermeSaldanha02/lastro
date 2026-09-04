@@ -62,12 +62,34 @@ export async function limparRascunhosExpirados(
 
 export type StatusParecer = "gerando" | "pronto";
 
+/**
+ * Por que a interpretação por IA não saiu (migration 0019). `null` quando
+ * saiu, e também nos pareceres anteriores à coluna — não dá pra inventar
+ * retroativamente a causa de uma falha que já passou.
+ *
+ * Antes disto, quatro causas muito diferentes viravam o mesmo booleano, e
+ * ninguém conseguia responder "por que meu parecer saiu sem prosa?" depois
+ * do fato: o log da Vercel no plano Hobby retém 1 hora.
+ */
+export type FalhaMotivo =
+  /** 503 e cia. — a API não respondeu. Transitório; já houve retry. */
+  | "api_indisponivel"
+  /** 429 — teto de cota (5 RPM / 20 RPD no nível gratuito). */
+  | "cota_excedida"
+  /** 404 — modelo não encontrado naquela versão da API. */
+  | "modelo_ausente"
+  /** Erro da API que não soubemos classificar. Balde honesto. */
+  | "api_erro"
+  /** Duas tentativas com número intruso (SDD §6.4). */
+  | "validador_rejeitou";
+
 export type ParecerSalvo = {
   id: string;
   pergunta: NumeroPergunta;
   perguntaTexto: string;
   texto: string | null;
   avisoFalhaInterpretativa: boolean;
+  falhaMotivo: FalhaMotivo | null;
   evidencia: EvidenciaParaTela | null;
   idioma: Idioma;
   criadoEm: string;
@@ -81,6 +103,7 @@ type LinhaParecer = {
   pergunta_texto: string;
   texto: string | null;
   aviso_falha_interpretativa: boolean;
+  falha_motivo: FalhaMotivo | null;
   evidencia: EvidenciaParaTela | null;
   idioma: string;
   criado_em: string;
@@ -89,7 +112,7 @@ type LinhaParecer = {
 };
 
 const COLUNAS_PARECER =
-  "id, pergunta, pergunta_texto, texto, aviso_falha_interpretativa, evidencia, idioma, criado_em, status, confirmado";
+  "id, pergunta, pergunta_texto, texto, aviso_falha_interpretativa, falha_motivo, evidencia, idioma, criado_em, status, confirmado";
 
 function paraParecerSalvo(linha: LinhaParecer): ParecerSalvo {
   return {
@@ -98,6 +121,7 @@ function paraParecerSalvo(linha: LinhaParecer): ParecerSalvo {
     perguntaTexto: linha.pergunta_texto,
     texto: linha.texto,
     avisoFalhaInterpretativa: linha.aviso_falha_interpretativa,
+    falhaMotivo: linha.falha_motivo,
     evidencia: linha.evidencia,
     idioma: linha.idioma as Idioma,
     criadoEm: linha.criado_em,

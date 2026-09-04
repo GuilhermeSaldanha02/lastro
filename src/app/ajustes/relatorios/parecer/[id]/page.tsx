@@ -49,6 +49,7 @@ export default async function PaginaParecerDetalhe({
           pergunta={parecer.perguntaTexto}
           texto={parecer.texto}
           avisoFalhaInterpretativa={parecer.avisoFalhaInterpretativa}
+          falhaMotivo={parecer.falhaMotivo}
           evidencia={parecer.evidencia}
           idioma={parecer.idioma}
           emitidoEm={parecer.criadoEm}

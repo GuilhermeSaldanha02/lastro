@@ -23,6 +23,8 @@ import { montarEvidenciaParaTela } from "./evidencia";
 import type { EvidenciaParaTela } from "./evidencia";
 import { montarPrompt } from "./prompt";
 import { validarNumeros } from "./validador";
+import { motivoDoErro } from "./retry-transitorio";
+import type { FalhaMotivo } from "@/lib/dados/parecer";
 import { perguntaValida, perguntasDoIdioma, type NumeroPergunta } from "./perguntas";
 import { obterIdioma, type Idioma } from "@/lib/dados/idioma";
 import { mapaTraducaoExercicios, mapaTraducaoGrupos } from "@/lib/dados/traducao";
@@ -307,6 +309,8 @@ async function gerarESalvarParecer({
   async function salvar(campos: {
     texto: string;
     avisoFalhaInterpretativa: boolean;
+    /** Por que a IA não saiu. `null` quando saiu (migration 0019). */
+    falhaMotivo?: FalhaMotivo | null;
     evidencia: EvidenciaParaTela;
   }) {
     const { error } = await supabase
@@ -316,6 +320,7 @@ async function gerarESalvarParecer({
         texto: campos.texto,
         evidencia: campos.evidencia,
         aviso_falha_interpretativa: campos.avisoFalhaInterpretativa,
+        falha_motivo: campos.falhaMotivo ?? null,
       })
       .eq("id", rascunhoId);
     if (error) {
@@ -344,11 +349,18 @@ async function gerarESalvarParecer({
     const cliente = new ClienteParecerGemini();
     const evidencia = montarEvidenciaParaTela(resumo);
 
+    // Guarda a causa de cada falha para gravar em `falha_motivo` (0019).
+    // Sem isto, 503, 429, 404 e "validador rejeitou" viravam o mesmo
+    // booleano e ninguém conseguia responder, depois do fato, por que o
+    // parecer saiu sem prosa — o log da Vercel dura 1 hora.
+    let motivo: FalhaMotivo = "validador_rejeitou";
+
     let respostaUm: string | null = null;
     try {
       respostaUm = await cliente.gerar(sistema, usuario);
     } catch (erroGiac) {
-      console.error("[analise] falha na chamada inicial da Gemini:", erroGiac);
+      motivo = motivoDoErro(erroGiac);
+      console.error("[analise] falha na chamada inicial da Gemini:", motivo, erroGiac);
     }
 
     if (respostaUm) {
@@ -383,7 +395,8 @@ async function gerarESalvarParecer({
           return;
         }
       } catch (erroRetry) {
-        console.error("[analise] falha no retry da Gemini:", erroRetry);
+        motivo = motivoDoErro(erroRetry);
+        console.error("[analise] falha no retry da Gemini:", motivo, erroRetry);
       }
     }
 
@@ -392,6 +405,7 @@ async function gerarESalvarParecer({
     await salvar({
       texto: fallbackDeterministico(resumo, idioma),
       avisoFalhaInterpretativa: true,
+      falhaMotivo: motivo,
       evidencia,
     });
   } catch (erroGeral) {
@@ -401,6 +415,34 @@ async function gerarESalvarParecer({
     console.error("[analise] erro inesperado ao gerar parecer:", erroGeral);
   }
 }
+
+/**
+ * Teto de gerações por dia, por usuário.
+ *
+ * POR QUE EXISTE. A cota do nível gratuito da Gemini é de **20 requisições
+ * por dia** (`KNOWLEDGE.md` §3.2) e ela é COMPARTILHADA com o Coach 24h —
+ * é o mesmo cliente, a mesma chave. Sem teto, uma tarde de curiosidade
+ * consome a cota inteira e o Coach para junto.
+ *
+ * POR QUE 5, E NÃO UM INTERVALO ENTRE GERAÇÕES. O `PRD.md` §3 define 5
+ * perguntas padrão: sentar e fazer duas ou três numa sessão é o uso
+ * pretendido, e um cooldown de horas puniria exatamente isso. O teto
+ * diário protege a cota sem quebrar a sessão — e 5 é o número que deixa
+ * fazer todas as cinco perguntas no mesmo dia.
+ *
+ * Custo real por geração: 1 chamada quando o validador aprova de primeira,
+ * 2 quando rejeita, 3 no pior caso (retry de 503). Com 5, o pior caso é 15
+ * e sobram 5 para o Coach.
+ *
+ * LIMITE CONHECIDO: a contagem é de linhas em `parecer` criadas hoje, e
+ * descartar um rascunho apaga a linha — quem descartar recupera a vaga sem
+ * recuperar a cota já gasta na Gemini. Aceito por ora (app de um usuário);
+ * fechar isso exigiria uma tabela de log de consumo, que é peso demais
+ * para o problema. Revisitar quando o módulo Personal (PRD §11) colocar
+ * mais gente na MESMA chave — aí o teto por usuário deixa de proteger o
+ * teto global.
+ */
+const LIMITE_GERACOES_POR_DIA = 5;
 
 export async function POST(request: Request) {
   const supabase = await criarClienteServidor();
@@ -443,6 +485,26 @@ export async function POST(request: Request) {
   }
   if (emAndamento) {
     return NextResponse.json({ erro: "geracao_em_andamento" }, { status: 409 });
+  }
+
+  // Teto diário (ver LIMITE_GERACOES_POR_DIA). O corte é o DIA LOCAL do
+  // Brasil, não UTC: às 22h de Brasília já é o dia seguinte em UTC, e o
+  // dono teria a cota renovada três horas antes da meia-noite dele.
+  const inicioDoDiaLocal = `${dataLocalBrasil()}T00:00:00-03:00`;
+  const { count: geracoesHoje, error: erroContagem } = await supabase
+    .from("parecer")
+    .select("id", { count: "exact", head: true })
+    .eq("usuario_id", user.id)
+    .gte("criado_em", inicioDoDiaLocal);
+  if (erroContagem) {
+    // Falha de contagem não bloqueia: negar por causa de um erro nosso é
+    // pior do que deixar passar uma geração a mais.
+    console.error("[analise] falha ao contar gerações do dia:", erroContagem.message);
+  } else if ((geracoesHoje ?? 0) >= LIMITE_GERACOES_POR_DIA) {
+    return NextResponse.json(
+      { erro: "limite_diario", limite: LIMITE_GERACOES_POR_DIA },
+      { status: 429 },
+    );
   }
 
   const PERGUNTAS = perguntasDoIdioma(idioma);

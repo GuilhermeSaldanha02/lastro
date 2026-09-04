@@ -69,6 +69,23 @@ export default function AnaliseInterativa({
         setEmAndamento({ perguntaTexto: t("Análise em andamento", idioma) });
         return;
       }
+      // Teto diário de gerações (route.ts, LIMITE_GERACOES_POR_DIA): a
+      // cota da Gemini é compartilhada com o Coach 24h, então o limite
+      // existe pra uma tarde de curiosidade não derrubar o chat junto.
+      // Mensagem específica, não um "erro 429" cru — o dono não fez nada
+      // errado, só chegou ao fim da cota do dia.
+      if (resposta.status === 429) {
+        const corpo = (await resposta.json().catch(() => null)) as
+          | { limite?: number }
+          | null;
+        setErro(
+          `${t("Você já gerou", idioma)} ${corpo?.limite ?? ""} ${t(
+            "análises hoje — o limite diário existe para não esgotar a cota que o Coach também usa. Amanhã libera.",
+            idioma,
+          )}`.replace(/\s+/g, " "),
+        );
+        return;
+      }
       if (!resposta.ok) {
         setErro(`${t("Falha ao gerar o parecer (erro", idioma)} ${resposta.status}).`);
         return;

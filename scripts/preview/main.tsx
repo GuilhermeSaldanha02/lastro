@@ -37,6 +37,7 @@ const RASCUNHO: ParecerSalvo = {
   perguntaTexto: COMUM.pergunta,
   texto: textoProsaExemplo,
   avisoFalhaInterpretativa: false,
+  falhaMotivo: null,
   evidencia: evidenciaReal,
   idioma: "pt-BR",
   criadoEm: COMUM.emitidoEm,

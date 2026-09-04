@@ -20,6 +20,7 @@ const BASE: ParecerSalvo = {
   perguntaTexto: "O que mudar na próxima semana?",
   texto: textoProsaExemplo,
   avisoFalhaInterpretativa: false,
+  falhaMotivo: null,
   evidencia: evidenciaReal,
   idioma: "pt-BR",
   criadoEm: "2026-09-02T14:36:38.477Z",

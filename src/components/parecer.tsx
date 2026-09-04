@@ -17,12 +17,15 @@ import { formatarDataCurta } from "@/lib/tempo";
 import { separarVeredito } from "@/lib/texto/separar-veredito";
 import type { EvidenciaParaTela } from "@/app/api/analise/evidencia";
 import { t } from "@/lib/texto/i18n";
+import { textoAvisoFalha } from "@/lib/texto/aviso-falha";
+import type { FalhaMotivo } from "@/lib/dados/parecer";
 import type { Idioma } from "@/lib/dados/idioma";
 
 export default function Parecer({
   pergunta,
   texto,
   avisoFalhaInterpretativa,
+  falhaMotivo,
   evidencia,
   idioma,
   emitidoEm,
@@ -30,6 +33,8 @@ export default function Parecer({
   pergunta: string | null;
   texto: string;
   avisoFalhaInterpretativa?: boolean;
+  /** Por que a IA não saiu (migration 0019) — decide QUAL frase o aviso mostra. */
+  falhaMotivo?: FalhaMotivo | null;
   evidencia?: EvidenciaParaTela;
   idioma: Idioma;
   /** ISO (timestamptz) de quando o parecer foi realmente emitido/salvo —
@@ -70,10 +75,7 @@ export default function Parecer({
 
       {avisoFalhaInterpretativa && (
         <p className="aviso-erro" role="alert">
-          {t(
-            "Não foi possível gerar a interpretação por IA desta vez. O texto abaixo é um resumo determinístico dos seus dados, sem prosa gerada — não é o parecer normal.",
-            idioma,
-          )}
+          {textoAvisoFalha(falhaMotivo, idioma)}
         </p>
       )}
 

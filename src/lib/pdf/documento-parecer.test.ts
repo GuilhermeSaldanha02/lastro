@@ -48,6 +48,7 @@ function parecer(sobrescreve: Partial<ParecerSalvo> = {}): ParecerSalvo {
     perguntaTexto: "O que mudar na próxima semana?",
     texto: TEXTO_PROSA,
     avisoFalhaInterpretativa: false,
+  falhaMotivo: null,
     evidencia: EVIDENCIA,
     idioma: "pt-BR",
     criadoEm: "2026-09-02T14:36:38.477Z",

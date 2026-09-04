@@ -722,6 +722,43 @@ const DICIONARIO: Record<string, { en: string; es: string }> = {
     en: "Finish the workout? The timer stops and logging closes — you can reopen it later.",
     es: "¿Finalizar el entrenamiento? El cronómetro se detiene y el registro se cierra — puedes reabrirlo después.",
   },
+
+  // --- lib/texto/aviso-falha.ts (por que a IA não saiu, migration 0019) ---
+  "O texto abaixo é um resumo determinístico dos seus dados, sem prosa gerada — não é o parecer normal.": {
+    en: "The text below is a deterministic summary of your data, no generated prose — this is not the normal report.",
+    es: "El texto de abajo es un resumen determinístico de tus datos, sin prosa generada — no es el informe normal.",
+  },
+  "Não foi possível gerar a interpretação por IA desta vez.": {
+    en: "The AI interpretation could not be generated this time.",
+    es: "No fue posible generar la interpretación por IA esta vez.",
+  },
+  "A IA não respondeu desta vez — o serviço estava indisponível. Tentar de novo em alguns minutos costuma resolver.": {
+    en: "The AI did not respond this time — the service was unavailable. Trying again in a few minutes usually works.",
+    es: "La IA no respondió esta vez — el servicio no estaba disponible. Intentar de nuevo en unos minutos suele resolver.",
+  },
+  "O limite de uso da IA foi atingido por enquanto. Ela volta a funcionar quando a cota renovar.": {
+    en: "The AI usage limit has been reached for now. It works again once the quota resets.",
+    es: "Se alcanzó el límite de uso de la IA por ahora. Vuelve a funcionar cuando la cuota se renueve.",
+  },
+  "A IA não pôde ser consultada: o modelo não estava disponível. Isso é falha nossa, não sua.": {
+    en: "The AI could not be reached: the model was unavailable. That is on us, not on you.",
+    es: "No se pudo consultar la IA: el modelo no estaba disponible. Es fallo nuestro, no tuyo.",
+  },
+  "A IA não respondeu desta vez, por um erro que não soubemos identificar.": {
+    en: "The AI did not respond this time, due to an error we could not identify.",
+    es: "La IA no respondió esta vez, por un error que no supimos identificar.",
+  },
+  "A interpretação gerada citou números que não batem com os seus dados, então foi descartada.": {
+    en: "The generated interpretation cited numbers that do not match your data, so it was discarded.",
+    es: "La interpretación generada citó números que no coinciden con tus datos, así que fue descartada.",
+  },
+
+  // --- components/analise-interativa.tsx (teto diário de gerações) ---
+  "Você já gerou": { en: "You have already generated", es: "Ya generaste" },
+  "análises hoje — o limite diário existe para não esgotar a cota que o Coach também usa. Amanhã libera.": {
+    en: "analyses today — the daily limit exists so the quota the Coach also uses is not drained. It resets tomorrow.",
+    es: "análisis hoy — el límite diario existe para no agotar la cuota que el Coach también usa. Mañana se libera.",
+  },
 };
 
 export function t(chavePtBr: string, idioma: Idioma): string {
