@@ -21,6 +21,7 @@ import { separarVeredito } from "@/lib/texto/separar-veredito";
 import { formatarDataCurta } from "@/lib/tempo";
 import { formatarDelta, formatarPeso } from "@/lib/texto/formatar-delta";
 import { t } from "@/lib/texto/i18n";
+import { textoAvisoFalha } from "@/lib/texto/aviso-falha";
 import type { BlocoEvidencia as TipoBlocoEvidencia } from "@/app/api/analise/evidencia";
 import { ARCHIVO_FORTE, ARCHIVO_MEDIO, BRICOLAGE_NORMAL, FRAUNCES_VEREDITO } from "./fontes";
 
@@ -208,10 +209,7 @@ export default function DocumentoParecer({ parecer }: { parecer: ParecerSalvo })
         {parecer.avisoFalhaInterpretativa && (
           <View style={e.aviso}>
             <Text style={e.avisoTxt}>
-              {t(
-                "Não foi possível gerar a interpretação por IA desta vez. O texto abaixo é um resumo determinístico dos seus dados, sem prosa gerada — não é o parecer normal.",
-                idioma,
-              )}
+              {textoAvisoFalha(parecer.falhaMotivo, idioma)}
             </Text>
           </View>
         )}

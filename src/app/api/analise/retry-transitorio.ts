@@ -17,6 +17,8 @@
 // Fica separado de `gemini.ts` para ser testável sem SDK e sem rede: a
 // operação é uma função qualquer que devolve Promise.
 
+import type { FalhaMotivo } from "@/lib/dados/parecer";
+
 /** Códigos que valem uma segunda tentativa. */
 const TRANSITORIOS = new Set([500, 502, 503, 504]);
 
@@ -72,5 +74,26 @@ export async function comRetryTransitorio<T>(
     if (!ehTransitorio(erro)) throw erro;
     await dormir(esperaMs);
     return operacao();
+  }
+}
+
+/**
+ * Traduz o erro do SDK no motivo que vai para o banco (migration 0019).
+ * Mantido aqui, junto de `statusDoErro`, porque é a mesma leitura de
+ * status — e assim a classificação é testável sem rede.
+ */
+export function motivoDoErro(erro: unknown): FalhaMotivo {
+  switch (statusDoErro(erro)) {
+    case 429:
+      return "cota_excedida";
+    case 404:
+      return "modelo_ausente";
+    case 500:
+    case 502:
+    case 503:
+    case 504:
+      return "api_indisponivel";
+    default:
+      return "api_erro";
   }
 }

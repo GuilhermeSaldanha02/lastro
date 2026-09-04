@@ -5,6 +5,7 @@ import { describe, expect, it, vi } from "vitest";
 import {
   comRetryTransitorio,
   ehTransitorio,
+  motivoDoErro,
   statusDoErro,
 } from "./retry-transitorio";
 
@@ -102,5 +103,29 @@ describe("comRetryTransitorio", () => {
       { dormir, esperaMs: 900 },
     );
     expect(dormir).toHaveBeenCalledWith(900);
+  });
+});
+
+// A classificação alimenta `parecer.falha_motivo` (migration 0019). Antes
+// dela, 503, 429, 404 e "validador rejeitou" viravam o mesmo booleano.
+describe("motivoDoErro", () => {
+  it("503 e cia. são indisponibilidade", () => {
+    for (const s of [500, 502, 503, 504]) {
+      expect(motivoDoErro(erroDaApi(s))).toBe("api_indisponivel");
+    }
+  });
+
+  it("429 é cota, não indisponibilidade — a diferença muda o que dizer ao dono", () => {
+    expect(motivoDoErro(erroDaApi(429))).toBe("cota_excedida");
+  });
+
+  it("404 é modelo ausente", () => {
+    expect(motivoDoErro(erroDaApi(404))).toBe("modelo_ausente");
+  });
+
+  it("status desconhecido cai no balde honesto, não numa causa inventada", () => {
+    expect(motivoDoErro(erroDaApi(418))).toBe("api_erro");
+    expect(motivoDoErro(new Error("timeout"))).toBe("api_erro");
+    expect(motivoDoErro(null)).toBe("api_erro");
   });
 });
