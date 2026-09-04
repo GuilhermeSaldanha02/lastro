@@ -1441,3 +1441,43 @@ Reverte explicitamente a posição da ADR anterior contra tradução automática
 **Buracos do levantamento, declarados.** (1) Nenhum personal trainer **brasileiro** em voz própria sobre análise de dados — as avaliações de loja legíveis eram de alunos; a única voz de personal BR encontrada foi uma reclamação sobre falta de verificação de CREF na MFIT. É o buraco mais relevante, porque é exatamente o público-alvo. (2) Reddit descartado como fonte: as buscas caíram em conteúdo de marketing que afirma resumir o r/personaltraining sem citar um post sequer. (3) Das 254 reclamações da MFIT, 2 foram lidas na íntegra — a distribuição por categoria é dado completo, o conteúdo detalhado não.
 
 **Como reverter.** Apagar esta entrada faz o `DECISIONS.md` voltar a afirmar um gap de mercado mais largo do que as fontes sustentam. Não há código a reverter.
+
+---
+
+## 2026-09-03 (4) — PDF do parecer: direção "papel timbrado", escolhida em portão visual
+
+**O que mudou.** `src/lib/pdf/documento-parecer.tsx` redesenhado. Antes: Helvetica embutida, tamanhos e cinzas arbitrários (`#8a8a8a`, `#e0e0e0`), nenhuma relação com a identidade do app — o PDF era o único renderizador do projeto que nunca passou por decisão de design. Agora é um documento emitido, com as três famílias reais e as cores de `tokens.css`.
+
+**Como a decisão foi tomada.** Pelo protocolo do `portao-visual`: briefing → direções **renderizadas** → o dono escolhe uma. Três direções foram geradas de verdade pelo `@react-pdf`, com as fontes do app e o parecer real da conta do dono (`4dc6bcbf…`), não descritas em prosa:
+
+| Direção | O que era | Por que caiu / venceu |
+|---|---|---|
+| **A — Negativo** | O PDF é a tela: fundo obsidiana, ouro, esmeralda, Fraunces em branco | Bonito, e **ninguém imprime**: página inteira preta, ouro e esmeralda viram lama em impressora comum, Fraunces em negativo fica frágil |
+| **B — Papel timbrado** | Tinta obsidiana sobre papel, fio de ouro na assinatura, Fraunces no veredito | **ESCOLHIDA.** Único que se comporta como documento emitido (`PRD.md` §7.1): imprime, arquiva, anexa |
+| **C — Cabeçalho selado** | Faixa obsidiana no topo, miolo em papel, faixa no rodapé | Melhor primeira dobra das três, mas duas tarjas pretas puxam pra cara de certificado/template — e a de baixo ainda imprime como tarja |
+
+**A restrição que decidiu, e que não tinha saída neutra.** O sistema do app é **escuro** (`tokens.css`, Apex Pro — `--lastro-fundo: #07090D`) e este artefato é **impresso**. Ou o PDF vira uma página preta que ninguém imprime, ou inverte pra papel e a identidade passa a ser carregada por Fraunces + fio de ouro + cores de sinal, sem o fundo que a carrega na tela. Um PDF que dói imprimir é meio PDF — e quem quer o visual da tela já tem a tela, não precisa exportar nada.
+
+**Três achados técnicos do portão, que valem mais que a escolha estética.**
+
+1. **O `@react-pdf` não interpola eixo de fonte variável.** As três famílias do app (Bricolage, Archivo, Fraunces) são variáveis; a biblioteca abre a **instância padrão** do arquivo e pronto. Na Fraunces isso é desastroso: o eixo `wght` dela tem `default 900` e o `opsz` tem `default 9` — registrar o `.ttf` variável direto renderiza **Black em óptica de texto miúdo**, nada parecido com a tela. Foi medido, não suposto (primeiro probe do portão renderizou "peso 400" e "peso 700" idênticos e pesados demais; a inspeção do `fvar` explicou por quê). Solução: `scripts/fontes-pdf/instanciar.py` corta 4 instâncias estáticas com `fontTools`, fiéis aos eixos declarados em `layout.tsx` e ao `--lastro-peso-forte` (600) que `sistema.css` usa no veredito.
+2. **As fontes entram como data URI, não como arquivo em disco.** Caminho local seria mais leve, mas obrigaria o arquivo a ser rastreado pro bundle serverless (`outputFileTracingIncludes`) — e este projeto **não roda o app localmente** (não existe `.env.local` nesta máquina). Uma falha de rastreamento só apareceria **em produção, na peça-assinatura**, que é exatamente o modo de falha que já mordeu este mesmo PDF (bug do veredito corrigido na tela pela PR #177 e invisível aqui por dois dias, até a #181). Custo aceito e declarado: ~190 KB num módulo TS carregado só pela rota do PDF.
+3. **`formatarDelta` não podia ser encurtado, e isso mudou o layout.** O primeiro render espremeu o delta numa coluna de 54pt e a frase "sem mudança há 4 semanas" quebrou em 4 linhas, destruindo a grade. A saída óbvia — cortar pra "0%" — **reprovaria o `DESIGN.md` §3.6.6** ("o delta é o canal de texto obrigatório: cada sinal traz a palavra e o número que o identificam; dois blocos distinguidos só pela cor reprovam o gate"), e no papel isso é ainda mais crítico que na tela, porque uma impressão em preto e branco não tem a cor do sinal. O texto ganhou a largura inteira numa segunda linha em vez de perder conteúdo. Coberto por teste novo.
+
+**A linha de procedência — como o vazio da página foi resolvido.** As três direções tinham o mesmo defeito de composição: com 6 blocos de evidência sobrava ~35% de página morta. Resolvido com **dado que já existia e a tela descarta**: `evidencia.ts` carrega `grupo_muscular`, `series_valendo`, `peso_referencia`, `reps_referencia` e `semanas_sem_progresso` por contrato (Regra da Presença), e o PDF antigo jogava tudo fora. Agora cada evidência tem uma segunda linha com esses campos. Num documento de arquivo é o que responde "de onde saiu esse número?" seis meses depois — enfeite não faria isso.
+
+**Alternativas descartadas.**
+
+- **Mudar `formatarPeso` para agrupar milhar** (`7.280 kg` em vez de `7280 kg`). Descartada **por ora**: é o formatador compartilhado com a tela e com o fallback determinístico (reuso deliberado da PR #184) — mudar pra embelezar um renderizador mexeria nos três em silêncio. Registrado em `SDD.md` §10.4.1 como pergunta aberta pro dono, não como correção pendente.
+- **Manter Helvetica e só ajustar tamanhos.** Descartada porque o pedido era estrutural ("PDF bonito", item 5 do backlog) e o `portao-visual` é explícito: pedido estrutural não vira retoque.
+- **Rasterizar a tela e embutir como imagem.** Nunca esteve em jogo — mataria texto selecionável, que é a razão de `@react-pdf` ter vencido Puppeteer e `jsPDF+html2canvas` na entrada de 2026-08-31.
+
+**Inconsistência documental achada no caminho, NÃO corrigida aqui.** O `DESIGN.md` §3.0 ainda descreve como tese visual aprovada *"Areia & Azul Petróleo"* (areia é a superfície, azul petróleo é a tinta), mas `src/app/tokens.css` — que o próprio §3.1 declara como **fonte única** — é *"Apex Pro: Obsidiana, Dourado Champagne & Esmeralda"*, um tema escuro. Segui os tokens, conforme §3.1. A §3.0 provavelmente é resíduo do redesign Apex Pro (mesma família do achado de seletores duplicados em `sistema.css`, `PROGRESS.md`). Fica registrado como dívida documental separada — corrigir por dentro desta tarefa seria decidir por baixo uma coisa que ninguém debateu.
+
+**Classificação.** **ADIÇÃO** — nenhum contrato muda. `PRD.md`, `ADR.md` e as fitness functions ficam intactos; `SDD.md` §10.4 ganha a subseção 10.4.1 com a direção e o porquê.
+
+**Impacto.** `src/lib/pdf/documento-parecer.tsx` (redesenho), `src/lib/pdf/fontes.ts` (novo, gerado), `scripts/fontes-pdf/{instanciar.py,embutir.mjs}` (novos), `src/lib/pdf/documento-parecer.test.ts` (+4 testes), `src/lib/texto/i18n.ts` (+5 chaves en/es), `.gitignore`, `SDD.md` §10.4/§10.4.1. Nenhuma migração. 252 testes verdes, `tsc` e `next lint` limpos.
+
+**Estado de QA: `ALEGADO`, não `PASSOU`** (`AGENTS.md` §5). Verificado por quem implementou, na bancada, contra o parecer real da conta do dono, nos dois caminhos (prosa e fallback de 2 páginas, com rodapé fixo e paginação). **Falta:** a passada de outro agente, e o dono ver o PDF baixado do app de verdade — a rota `/api/parecer/[id]/pdf` exige sessão e não roda nesta máquina. E vale a ressalva de origem: o único parecer salvo em produção está **em fallback determinístico**; o caminho de prosa foi validado com o `textoProsaExemplo` sintético da bancada.
+
+**Como reverter.** `git revert` do commit de implementação devolve o PDF Helvetica. `src/lib/pdf/fontes.ts` e `scripts/fontes-pdf/` ficam órfãos e podem ser apagados — nada mais no projeto os importa.

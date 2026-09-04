@@ -6,6 +6,12 @@ import { renderToBuffer } from "@react-pdf/renderer";
 import { buscarParecer } from "@/lib/dados/parecer";
 import DocumentoParecer from "@/lib/pdf/documento-parecer";
 
+// Explícito, não herdado do padrão do App Router: desde a direção visual
+// de 2026-09-03 (SDD.md §10.4.1) este módulo registra fontes reais no
+// import, e `fontkit` NÃO roda no runtime edge. Hoje funcionaria pelo
+// default; deixar implícito é apostar que o default nunca muda.
+export const runtime = "nodejs";
+
 export async function GET(
   _request: Request,
   { params }: { params: Promise<{ id: string }> },
@@ -34,7 +40,13 @@ export async function GET(
   let buffer;
   try {
     buffer = await renderToBuffer(<DocumentoParecer parecer={parecer} />);
-  } catch {
+  } catch (erro) {
+    // Logar, não engolir: o componente registra 4 fontes embutidas em
+    // tempo de import (SDD.md §10.4.1) e este é o único ponto do sistema
+    // onde uma falha dessas apareceria — sem a linha, o sintoma em
+    // produção é um 500 mudo na peça-assinatura. Mesmo padrão de
+    // `api/analise/route.ts`.
+    console.error("[pdf] falha ao renderizar o parecer:", erro);
     return NextResponse.json({ erro: "Falha ao gerar o PDF." }, { status: 500 });
   }
 

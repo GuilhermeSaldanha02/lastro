@@ -49,3 +49,10 @@ docs/screenshots/jornada-usuario/
 
 # Saída regenerável da bancada (scripts/preview/pdf.render.tsx).
 qa/evidencias/pdf-parecer-*.pdf
+qa/evidencias/*.png
+qa/evidencias/direcao-*.pdf
+
+# Fontes baixadas e cortes intermediários do PDF (scripts/fontes-pdf).
+# Regeneráveis: instanciar.py baixa e corta; o que VAI pro repo é só o
+# src/lib/pdf/fontes.ts que embutir.mjs produz.
+scripts/fontes-pdf/saida/

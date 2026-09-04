@@ -1199,9 +1199,30 @@ Mesmo padrão visual de `historico-relatorios-pos-treino.tsx` (cartões com `car
 ```
 src/app/api/parecer/[id]/pdf/route.ts   ← route handler, não Server Action (download de binário)
 src/lib/pdf/documento-parecer.tsx       ← componente <Document>/<Page>/<Text> do @react-pdf/renderer
+src/lib/pdf/fontes.ts                   ← GERADO: cortes estáticos em data URI (§10.4.1)
+scripts/fontes-pdf/instanciar.py        ← baixa as variáveis e corta as instâncias (fontTools)
+scripts/fontes-pdf/embutir.mjs          ← TTF → fontes.ts
 ```
 
 O route handler: autentica → `buscarParecer(id)` (RLS garante que só resolve se for do dono da sessão) → monta `<DocumentoParecer parecer={...} />` → `renderToBuffer` → devolve com `Content-Type: application/pdf` e `Content-Disposition: attachment; filename="lastro-analise-{data}.pdf"`. Conteúdo do PDF: cabeçalho (pergunta + data), o texto do parecer (veredito + corpo, mesma separação de `separarVeredito` que a tela usa), os blocos de evidência como tabela simples — sem tentar clonar pixel a pixel o CSS da tela (`.doc`/`.evidencias`), que é território de HTML/CSS, não do modelo de layout do `@react-pdf/renderer` (flexbox reduzido, sem CSS externo).
+
+#### 10.4.1 Direção visual — "papel timbrado" (portão de 2026-09-03)
+
+> Escolhida pelo dono contra duas alternativas **renderizadas** (negativo e cabeçalho selado), `DECISIONS.md` 2026-09-03 (4). O `documento-parecer.tsx` não é "a tela exportada": é o irmão impresso dela.
+
+**A restrição que decidiu.** O sistema do app é **escuro** (`tokens.css`, Apex Pro) e este artefato é **impresso**. Não existe tradução neutra: ou o PDF é uma página preta que ninguém imprime, ou inverte pra papel e a identidade passa a ser carregada por Fraunces + fio de ouro + cores de sinal, sem o fundo que a carrega na tela. É a segunda.
+
+**Cores.** As de sinal e o ouro saem de `tokens.css` **verbatim**. A família de papel (`PAPEL`/`TINTA2`/`FIO`) só existe no PDF, porque a tela não tem superfície clara pra derivar — e `QUEDA` é âmbar queimado, não o vermelho da tela: sobre papel, vermelho saturado grita mais que o veredito e rouba a hierarquia.
+
+**Fontes — e por que existe `scripts/fontes-pdf/`.** As três famílias do app são **variáveis** e o `@react-pdf` **não interpola eixo**: ele abre a instância padrão do arquivo. Na Fraunces isso é desastroso (o `wght` dela tem default **900** e o `opsz` default **9** — registrar o `.ttf` variável direto renderiza Black em óptica de texto miúdo, nada parecido com a tela; medido no portão). Por isso `instanciar.py` corta 4 instâncias estáticas fiéis aos eixos de `layout.tsx` e ao `--lastro-peso-forte` de `tokens.css`, e `embutir.mjs` as embute em `src/lib/pdf/fontes.ts` como **data URI**.
+
+Data URI e não caminho em disco de propósito: caminho exigiria `outputFileTracingIncludes` no bundle serverless, e este projeto **não roda o app localmente** (sem `.env.local`) — uma falha de rastreamento só apareceria em produção, na peça-assinatura, exatamente o modo de falha que já mordeu este PDF antes (bug do veredito, PR #177 → #181, dois dias invisível). Custo aceito: ~190 KB num módulo carregado só por esta rota.
+
+**Linha de procedência.** Cada evidência ganhou uma segunda linha com grupo muscular, séries valendo, peso × reps de referência e — quando existe — semanas sem novo máximo. Tudo campo que `evidencia.ts` já carrega por contrato (Regra da Presença) e que a **tela descarta**. Resolve o vazio da página com dado, não com enfeite, e responde "de onde saiu esse número?" seis meses depois.
+
+**O delta continua em texto, e ganhou largura.** `DESIGN.md` §3.6.6 exige que cada sinal traga a palavra e o número que o identificam — no papel isso é mais crítico que na tela, porque uma impressão em preto e branco não tem a cor do sinal. Por isso `formatarDelta` é verboso ("sem mudança há 4 semanas") e **não pode ser encurtado pra caber numa coluna**: ele mora na segunda linha, com a largura inteira. Coberto por teste.
+
+**Sabido e não resolvido:** `formatarPeso` não agrupa milhar (`7280 kg`, não `7.280 kg`). É o formatador **compartilhado com a tela e com o fallback determinístico** (PR #184) — mudar pra embelezar um renderizador mexeria nos três. Fica como pergunta pro dono, não como correção silenciosa.
 
 ### 10.5 O que NÃO muda
 
