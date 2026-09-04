@@ -97,3 +97,37 @@ export function motivoDoErro(erro: unknown): FalhaMotivo {
       return "api_erro";
   }
 }
+
+/**
+ * Tenta o modelo PRIMÁRIO (com a repetição transitória acima) e, se ele
+ * seguir indisponível, tenta uma vez o ALTERNATIVO.
+ *
+ * POR QUE TROCAR DE MODELO, E NÃO ESPERAR MAIS. Medição em produção de
+ * 2026-09-04: o dono gerou às 10:11:19 (503), de novo às 10:11:48 — **29
+ * segundos depois**, ainda 503 — e só às 10:13:49, dois minutos depois,
+ * funcionou. Um backoff que caiba dentro da function (10-15s) ficaria bem
+ * dentro do pico e falharia igual; atravessá-lo exigiria segurar a função
+ * ociosa por ~2 minutos.
+ *
+ * E a mensagem do Google é literal sobre onde está a fila: "**This model**
+ * is currently experiencing high demand." Não é a API fora do ar — é o
+ * pool daquele modelo. Outro modelo tem pool próprio.
+ *
+ * SÓ TROCA EM ERRO TRANSITÓRIO. `429` é teto de cota do PROJETO: trocar de
+ * modelo não cria cota nova, só gasta mais uma chamada para falhar igual.
+ * `404` é determinístico. Ambos sobem sem tentar o alternativo.
+ */
+export async function comModeloAlternativo<T>(
+  chamar: (modelo: string) => Promise<T>,
+  modelos: { primario: string; alternativo: string },
+  opcoes: OpcoesRetry & { aoTrocar?: (alternativo: string) => void } = {},
+): Promise<T> {
+  const { aoTrocar, ...retry } = opcoes;
+  try {
+    return await comRetryTransitorio(() => chamar(modelos.primario), retry);
+  } catch (erro) {
+    if (!ehTransitorio(erro)) throw erro;
+    aoTrocar?.(modelos.alternativo);
+    return chamar(modelos.alternativo);
+  }
+}

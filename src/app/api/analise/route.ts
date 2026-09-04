@@ -317,6 +317,19 @@ async function gerarESalvarParecer({
  */
 const LIMITE_GERACOES_POR_DIA = 5;
 
+/**
+ * Teto de duração EXPLÍCITO, não herdado do padrão da plataforma.
+ *
+ * A geração roda dentro de `after()` — a function segue viva depois da
+ * resposta HTTP (SDD §11) — e desde 2026-09-04 pode fazer até 3 chamadas à
+ * Gemini num caminho ruim (primária, repetição, modelo alternativo). Uma
+ * geração normal já leva 30-50s. Depender de um default não verificado
+ * significa que, se ele mudar ou for menor do que supomos, a geração é
+ * cortada no meio e o parecer some sem erro nenhum — mesmo raciocínio do
+ * `runtime = nodejs` fixado em /api/parecer/[id]/pdf.
+ */
+export const maxDuration = 60;
+
 export async function POST(request: Request) {
   const supabase = await criarClienteServidor();
   const {
