@@ -16,13 +16,13 @@ import type {
   ResumoCompacto,
   TreinoBruto,
 } from "@/lib/analise/tipos";
-import { dataLocalBrasil, formatarDataCurta } from "@/lib/tempo";
-import { formatarPercentual, formatarPeso } from "@/lib/texto/formatar-delta";
+import { dataLocalBrasil } from "@/lib/tempo";
 import { ClienteParecerGemini } from "./gemini";
 import { montarEvidenciaParaTela } from "./evidencia";
 import type { EvidenciaParaTela } from "./evidencia";
 import { montarPrompt } from "./prompt";
 import { validarNumeros } from "./validador";
+import { leituraDeterministica } from "@/lib/analise/leitura-deterministica";
 import { motivoDoErro } from "./retry-transitorio";
 import type { FalhaMotivo } from "@/lib/dados/parecer";
 import { perguntaValida, perguntasDoIdioma, type NumeroPergunta } from "./perguntas";
@@ -127,149 +127,22 @@ async function carregarExercicios(
   }));
 }
 
-/** Rótulo de `posicao_na_faixa` — enum de contrato em PT-BR (tipos.ts), traduzido só pra exibição. */
-const POSICAO_FAIXA_POR_IDIOMA: Record<Idioma, Record<ResumoCompacto["volume_por_grupo_muscular"][number]["posicao_na_faixa"], string>> = {
-  "pt-BR": { abaixo: "abaixo", dentro: "dentro", acima: "acima" },
-  en: { abaixo: "below", dentro: "within", acima: "above" },
-  es: { abaixo: "por debajo de", dentro: "dentro de", acima: "por encima de" },
-};
 
 /**
- * Fallback determinístico (SDD §6.4, política de retry, 2ª falha):
- * template em código, sem prosa do LLM, montado só do resumo. Sem LLM
- * envolvido aqui — precisa do próprio idioma-aware, não só o prompt
- * (achado do dono ao decidir a etapa, 2026-08-24: "tudo", inclusive o
- * caminho que não passa pela Gemini).
+ * Fallback determinístico (SDD §6.4, política de retry, 2ª falha) — sem LLM.
  *
- * Números reusam `formatarPercentual`/`formatarPeso` (mesmos helpers que
- * o bloco de evidência já usa) — achado 2026-09-03: saíam com separador
- * decimal em ponto ("349.4%") mesmo em pt-BR/es, que usam vírgula.
- * Datas: só o ramo pt-BR troca `semana_inicio` (ISO) por
- * `formatarDataCurta` ("3 ago"), porque esse formatador é PT-only (meses
- * abreviados fixos) — reescrevê-lo pra en/es exigiria tabela de meses
- * nova em dois idiomas que a única conta real deste app nunca usa.
- * en/es continuam com a data ISO crua; registrado aqui, não escondido.
+ * Delegado a `leitura-deterministica.ts` desde 2026-09-04. O template que
+ * vivia aqui era um despejo de fatos, uma linha por número ("Volume total
+ * em 2026-08-24: 60751."). Honesto, e o pior rosto possível para a
+ * peça-assinatura de um produto cuja tese é "o log e o gráfico são
+ * infraestrutura; o produto é a LEITURA" (PRD §1): quando a IA falhava, o
+ * app entregava um extrato bancário.
+ *
+ * E a IA falha com frequência real — 503 em três dias distintos, medição em
+ * DECISIONS.md 2026-09-04. Não é caminho de exceção.
  */
 function fallbackDeterministico(resumo: ResumoCompacto, idioma: Idioma): string {
-  const posicaoFaixa = POSICAO_FAIXA_POR_IDIOMA[idioma];
-  const linhas: string[] = [];
-
-  if (idioma === "en") {
-    linhas.push(
-      `Week of ${resumo.periodo.semana_atual_inicio} — ${resumo.periodo.semanas_com_dados} of ${resumo.periodo.janela_semanas} weeks in the window have data.`,
-    );
-    for (const v of resumo.volume_semanal) {
-      linhas.push(`Total volume on ${v.semana_inicio}: ${v.volume_total}.`);
-    }
-    for (const g of resumo.volume_por_grupo_muscular) {
-      const delta =
-        g.delta_volume_pct !== undefined ? ` (${g.delta_volume_pct}% vs. previous week)` : "";
-      linhas.push(
-        `${g.grupo_muscular}: ${g.series_valendo} working sets, volume ${g.volume}${delta} — ${posicaoFaixa[g.posicao_na_faixa]} the reference range.`,
-      );
-    }
-    for (const t of resumo.tendencia_e1rm) {
-      linhas.push(
-        `${t.exercicio}: e1RM from ${t.e1rm_inicial} to ${t.e1rm_atual} (${t.delta_pct}%), over ${t.sessoes} sessions.`,
-      );
-    }
-    for (const e of resumo.estagnacoes) {
-      linhas.push(`${e.exercicio}: ${e.semanas_sem_progresso} weeks without progress.`);
-    }
-    for (const p of resumo.prs) {
-      linhas.push(`PR in ${p.exercicio} (${p.tipo}): ${p.valor} (previous ${p.valor_anterior}).`);
-    }
-    linhas.push(`Frequency this week: ${resumo.frequencia.treinos_semana_atual} workout(s).`);
-    if (resumo.frequencia.grupos_sem_estimulo.length > 0) {
-      linhas.push(`No stimulus this week: ${resumo.frequencia.grupos_sem_estimulo.join(", ")}.`);
-    }
-    return linhas.join("\n");
-  }
-
-  if (idioma === "es") {
-    linhas.push(
-      `Semana del ${resumo.periodo.semana_atual_inicio} — ${resumo.periodo.semanas_com_dados} de ${resumo.periodo.janela_semanas} semanas de la ventana con datos.`,
-    );
-    for (const v of resumo.volume_semanal) {
-      linhas.push(`Volumen total en ${v.semana_inicio}: ${formatarPeso(v.volume_total, idioma)}.`);
-    }
-    for (const g of resumo.volume_por_grupo_muscular) {
-      const delta =
-        g.delta_volume_pct !== undefined
-          ? ` (${formatarPercentual(g.delta_volume_pct, idioma)} vs. semana anterior)`
-          : "";
-      linhas.push(
-        `${g.grupo_muscular}: ${g.series_valendo} series válidas, volumen ${formatarPeso(g.volume, idioma)}${delta} — ${posicaoFaixa[g.posicao_na_faixa]} rango de referencia.`,
-      );
-    }
-    for (const t of resumo.tendencia_e1rm) {
-      linhas.push(
-        `${t.exercicio}: e1RM de ${formatarPeso(t.e1rm_inicial, idioma)} a ${formatarPeso(t.e1rm_atual, idioma)} (${formatarPercentual(t.delta_pct, idioma)}), en ${t.sessoes} sesiones.`,
-      );
-    }
-    for (const e of resumo.estagnacoes) {
-      linhas.push(`${e.exercicio}: ${e.semanas_sem_progresso} semanas sin progreso.`);
-    }
-    for (const p of resumo.prs) {
-      linhas.push(
-        `PR en ${p.exercicio} (${p.tipo}): ${formatarPeso(p.valor, idioma)} (anterior ${formatarPeso(p.valor_anterior, idioma)}).`,
-      );
-    }
-    linhas.push(`Frecuencia esta semana: ${resumo.frequencia.treinos_semana_atual} entrenamiento(s).`);
-    if (resumo.frequencia.grupos_sem_estimulo.length > 0) {
-      linhas.push(`Sin estímulo esta semana: ${resumo.frequencia.grupos_sem_estimulo.join(", ")}.`);
-    }
-    return linhas.join("\n");
-  }
-
-  linhas.push(
-    `Semana de ${formatarDataCurta(resumo.periodo.semana_atual_inicio)} — ${resumo.periodo.semanas_com_dados} de ${resumo.periodo.janela_semanas} semanas da janela com dados.`,
-  );
-
-  for (const v of resumo.volume_semanal) {
-    linhas.push(
-      `Volume total em ${formatarDataCurta(v.semana_inicio)}: ${formatarPeso(v.volume_total, idioma)}.`,
-    );
-  }
-
-  for (const g of resumo.volume_por_grupo_muscular) {
-    const delta =
-      g.delta_volume_pct !== undefined
-        ? ` (${formatarPercentual(g.delta_volume_pct, idioma)} vs. semana anterior)`
-        : "";
-    linhas.push(
-      `${g.grupo_muscular}: ${g.series_valendo} séries valendo, volume ${formatarPeso(g.volume, idioma)}${delta} — ${posicaoFaixa[g.posicao_na_faixa]} da faixa de referência.`,
-    );
-  }
-
-  for (const t of resumo.tendencia_e1rm) {
-    linhas.push(
-      `${t.exercicio}: e1RM de ${formatarPeso(t.e1rm_inicial, idioma)} para ${formatarPeso(t.e1rm_atual, idioma)} (${formatarPercentual(t.delta_pct, idioma)}), em ${t.sessoes} sessões.`,
-    );
-  }
-
-  if (resumo.estagnacoes.length > 0) {
-    for (const e of resumo.estagnacoes) {
-      linhas.push(`${e.exercicio}: ${e.semanas_sem_progresso} semanas sem progresso.`);
-    }
-  }
-
-  for (const p of resumo.prs) {
-    linhas.push(
-      `PR em ${p.exercicio} (${p.tipo}): ${formatarPeso(p.valor, idioma)} (anterior ${formatarPeso(p.valor_anterior, idioma)}).`,
-    );
-  }
-
-  linhas.push(
-    `Frequência na semana atual: ${resumo.frequencia.treinos_semana_atual} treino(s).`,
-  );
-  if (resumo.frequencia.grupos_sem_estimulo.length > 0) {
-    linhas.push(
-      `Sem estímulo esta semana: ${resumo.frequencia.grupos_sem_estimulo.join(", ")}.`,
-    );
-  }
-
-  return linhas.join("\n");
+  return leituraDeterministica(resumo, idioma);
 }
 
 /** Instruções de retry (SDD §6.4, 1ª falha) — também viram texto que o modelo lê, seguem o idioma da resposta. */
