@@ -262,7 +262,20 @@ export default function DocumentoParecer({ parecer }: { parecer: ParecerSalvo })
         ) : null}
 
         {evidencia.blocos.length > 0 && (
-          <>
+          /* `wrap={false}`: a tabela de evidência não parte no meio.
+             Achado ao olhar o PDF real (2026-09-05): a quebra caía entre a
+             2ª e a 3ª linha, então a página 1 terminava com duas linhas
+             órfãs e a 2 começava no meio da tabela e sobrava ~70% de vão —
+             a quebra parecia acidente, não decisão.
+             Com o bloco inteiro, a quebra passa a cair na FRONTEIRA da
+             seção: página 1 é o documento (cabeçalho, veredito, prosa),
+             página 2 é a tabela completa. Continua havendo espaço em
+             branco — o conteúdo é de 1,3 página e espremer seria maquiar —
+             mas ele passa a parecer intencional.
+             Limite: com muitos exercícios a tabela pode passar de uma
+             página inteira; aí o @react-pdf volta a quebrá-la, que é o
+             comportamento certo. */
+          <View wrap={false}>
             <Text style={e.tituloEv}>{t("Evidência", idioma).toUpperCase()}</Text>
             <View style={e.cab}>
               <Text style={[e.cabTxt, { width: L_SINAL }]}>
@@ -292,7 +305,7 @@ export default function DocumentoParecer({ parecer }: { parecer: ParecerSalvo })
                 </View>
               </View>
             ))}
-          </>
+          </View>
         )}
 
         <View style={e.rodape} fixed>

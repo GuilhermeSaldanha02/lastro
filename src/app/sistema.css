@@ -1434,8 +1434,19 @@
    Fraunces real quebrar diferente do esperado. */
 .doc__veredito {
   font-family: var(--lastro-fonte-serif);
+  /* PISO MOBILE-FIRST. O clamp original (2026-09-03) tinha piso fixo em
+     `titulo-tela` (30px) e foi calibrado por CONTAGEM DE CARACTERES, sem
+     olhar largura de tela. Medido em 2026-09-05 com a primeira prosa real
+     que a Gemini produziu: veredito de 151 caracteres, a 375px de largura,
+     batia o piso e mesmo assim ocupava 11 linhas — 413px, **51% da altura
+     da tela**. O dono não via uma linha de evidência sem rolar.
+     A altura cresce com o QUADRADO do tamanho da fonte (menos fonte = mais
+     caracteres por linha E linha mais baixa), então descer um degrau da
+     escala derruba a altura para ~23% da tela. `secao` (20px) não é número
+     novo: é o degrau que já existe abaixo de `titulo-tela`. */
+  --veredito-piso: var(--lastro-papel-secao);
   font-size: clamp(
-    var(--lastro-papel-titulo-tela),
+    var(--veredito-piso),
     calc(var(--lastro-papel-numero-heroi) - (var(--veredito-caracteres, 0) - 20) * 0.72px),
     var(--lastro-papel-numero-heroi)
   );
@@ -1443,6 +1454,15 @@
   line-height: var(--lastro-el-titulo);
   color: var(--lastro-txt);
   margin-bottom: var(--lastro-e-6);
+}
+
+/* A partir de 640px a largura devolve caracteres por linha, e o veredito
+   volta a poder ser um título de tela. Mesmo corte que `.evidencia` já usa
+   — não inventar um breakpoint novo. */
+@media (min-width: 640px) {
+  .doc__veredito {
+    --veredito-piso: var(--lastro-papel-titulo-tela);
+  }
 }
 
 /* A prosa CONECTA as evidências; os números não moram nela. Número no
