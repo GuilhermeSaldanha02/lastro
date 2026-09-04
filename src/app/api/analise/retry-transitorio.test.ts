@@ -3,6 +3,7 @@
 // testes fixam o que repete e — mais importante — o que NÃO repete.
 import { describe, expect, it, vi } from "vitest";
 import {
+  comModeloAlternativo,
   comRetryTransitorio,
   ehTransitorio,
   motivoDoErro,
@@ -127,5 +128,76 @@ describe("motivoDoErro", () => {
     expect(motivoDoErro(erroDaApi(418))).toBe("api_erro");
     expect(motivoDoErro(new Error("timeout"))).toBe("api_erro");
     expect(motivoDoErro(null)).toBe("api_erro");
+  });
+});
+
+// A troca de modelo nasceu de medição, não de teoria: 503 às 10:11:19,
+// 503 de novo 29s depois, sucesso só 2min depois (DECISIONS 2026-09-04).
+// Backoff que cabe na function não atravessa esse pico; outro modelo tem
+// pool próprio — a mensagem do Google é sobre "this model".
+describe("comModeloAlternativo", () => {
+  const semDormir = { dormir: async () => {} };
+  const MODELOS = { primario: "primario", alternativo: "alternativo" };
+
+  it("nem toca no alternativo quando o primário responde", async () => {
+    const chamar = vi.fn().mockResolvedValue("parecer");
+    await expect(comModeloAlternativo(chamar, MODELOS, semDormir)).resolves.toBe("parecer");
+    expect(chamar).toHaveBeenCalledTimes(1);
+    expect(chamar).toHaveBeenCalledWith("primario");
+  });
+
+  it("troca de modelo depois de DUAS falhas transitórias do primário", async () => {
+    const chamar = vi
+      .fn()
+      .mockImplementation(async (modelo: string) => {
+        if (modelo === "primario") throw erroDaApi(503);
+        return "parecer do alternativo";
+      });
+
+    await expect(comModeloAlternativo(chamar, MODELOS, semDormir)).resolves.toBe(
+      "parecer do alternativo",
+    );
+    // 2 no primário (chamada + retry) e 1 no alternativo.
+    expect(chamar).toHaveBeenCalledTimes(3);
+    expect(chamar).toHaveBeenNthCalledWith(3, "alternativo");
+  });
+
+  it("avisa quando troca — a procedência do parecer muda", async () => {
+    const aoTrocar = vi.fn();
+    await comModeloAlternativo(
+      vi.fn().mockImplementation(async (m: string) => {
+        if (m === "primario") throw erroDaApi(503);
+        return "ok";
+      }),
+      MODELOS,
+      { ...semDormir, aoTrocar },
+    );
+    expect(aoTrocar).toHaveBeenCalledWith("alternativo");
+  });
+
+  // Cota é do PROJETO: trocar de modelo não cria cota nova.
+  it("429 NÃO tenta o alternativo — gastaria uma chamada para falhar igual", async () => {
+    const chamar = vi.fn().mockRejectedValue(erroDaApi(429));
+    await expect(comModeloAlternativo(chamar, MODELOS, semDormir)).rejects.toMatchObject({
+      status: 429,
+    });
+    expect(chamar).toHaveBeenCalledTimes(1);
+    expect(chamar).not.toHaveBeenCalledWith("alternativo");
+  });
+
+  it("404 NÃO tenta o alternativo — é determinístico", async () => {
+    const chamar = vi.fn().mockRejectedValue(erroDaApi(404));
+    await expect(comModeloAlternativo(chamar, MODELOS, semDormir)).rejects.toMatchObject({
+      status: 404,
+    });
+    expect(chamar).toHaveBeenCalledTimes(1);
+  });
+
+  it("se o alternativo também cair, o erro sobe e o fallback assume", async () => {
+    const chamar = vi.fn().mockRejectedValue(erroDaApi(503));
+    await expect(comModeloAlternativo(chamar, MODELOS, semDormir)).rejects.toMatchObject({
+      status: 503,
+    });
+    expect(chamar).toHaveBeenCalledTimes(3);
   });
 });
