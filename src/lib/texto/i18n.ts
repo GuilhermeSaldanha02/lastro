@@ -552,9 +552,9 @@ const DICIONARIO: Record<string, { en: string; es: string }> = {
   // --- components/parecer.tsx ---
   "Semana de": { en: "Week of", es: "Semana del" },
   "Emitido em": { en: "Issued on", es: "Emitido el" },
-  "A interpretação por IA falhou desta vez (duas tentativas rejeitadas). O texto abaixo é um resumo determinístico dos seus dados, sem prosa gerada — não é o parecer normal.": {
-    en: "AI interpretation failed this time (two attempts rejected). The text below is a deterministic summary of your data, no generated prose — this is not the normal report.",
-    es: "La interpretación por IA falló esta vez (dos intentos rechazados). El texto de abajo es un resumen determinístico de tus datos, sin prosa generada — no es el informe normal.",
+  "Não foi possível gerar a interpretação por IA desta vez. O texto abaixo é um resumo determinístico dos seus dados, sem prosa gerada — não é o parecer normal.": {
+    en: "The AI interpretation could not be generated this time. The text below is a deterministic summary of your data, no generated prose — this is not the normal report.",
+    es: "No fue posible generar la interpretación por IA esta vez. El texto de abajo es un resumen determinístico de tus datos, sin prosa generada — no es el informe normal.",
   },
   "Ressalvas do método": { en: "Method caveats", es: "Advertencias del método" },
   "A faixa de referência de volume é uma convenção prática, baseada majoritariamente em homens jovens treinados — não tem teto validado.": {

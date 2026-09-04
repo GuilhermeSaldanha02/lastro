@@ -71,7 +71,7 @@ export default function Parecer({
       {avisoFalhaInterpretativa && (
         <p className="aviso-erro" role="alert">
           {t(
-            "A interpretação por IA falhou desta vez (duas tentativas rejeitadas). O texto abaixo é um resumo determinístico dos seus dados, sem prosa gerada — não é o parecer normal.",
+            "Não foi possível gerar a interpretação por IA desta vez. O texto abaixo é um resumo determinístico dos seus dados, sem prosa gerada — não é o parecer normal.",
             idioma,
           )}
         </p>

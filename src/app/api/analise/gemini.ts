@@ -6,6 +6,7 @@
 // anterior, gemini-2.5-flash, estava desatualizado no ADR e aposenta em
 // 16/out/2026).
 import { GoogleGenAI } from "@google/genai";
+import { comRetryTransitorio } from "./retry-transitorio";
 
 export interface ClienteParecer {
   gerar(sistema: string, usuario: string): Promise<string>;
@@ -32,14 +33,20 @@ export class ClienteParecerGemini implements ClienteParecer {
   }
 
   async gerar(sistema: string, usuario: string): Promise<string> {
-    const response = await this.ai.models.generateContent({
-      model: MODELO,
-      contents: usuario,
-      config: {
-        systemInstruction: sistema,
-        temperature: 0.3,
-      },
-    });
+    // Uma repetição em falha TRANSITÓRIA (503 e cia.), nunca em 429/404 —
+    // ver `retry-transitorio.ts` para a medição que motivou a política.
+    // Sem isso, um 503 perdia o parecer inteiro e ainda queimava a trava de
+    // 10 minutos (SDD §11.2).
+    const response = await comRetryTransitorio(() =>
+      this.ai.models.generateContent({
+        model: MODELO,
+        contents: usuario,
+        config: {
+          systemInstruction: sistema,
+          temperature: 0.3,
+        },
+      }),
+    );
     return response.text ?? "";
   }
 }
