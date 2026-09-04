@@ -11,20 +11,23 @@
 
 > Bloco de handoff entre agentes (Antigravity ⇄ Claude). **Sobrescrever a cada sessão**, nunca acumular. Formato e regras: `AGENTS.md` §3.
 
-- **Última sessão:** 2026-09-03/05 · agente: claude · **`main` em `de80a53`, 321 testes verdes**, `tsc`/lint/build limpos, working tree limpa. **12 PRs mergeados** (#189–#200), nenhum aberto.
+- **Última sessão:** 2026-09-03/05 · agente: claude · **`main` em `65bdfe8`, 333 testes verdes**, `tsc`/lint/build limpos, working tree limpa. **16 PRs mergeados** (#189–#203), nenhum aberto. Deploy de produção `READY`.
 
 ### O que mudou, em ordem de importância
 
 1. **Módulo Personal — DECIDIDO, não iniciado.** Sob vínculo, a **prescrição** vai pro humano; o **diagnóstico** fica com o aluno; os sinais viram **alerta 1:1**. Contrato em `PRD.md` §11, decisão em `DECISIONS.md` `2026-09-03 (2)`. **Portão fechado: nenhuma linha de código antes de (a) parecer bom pra mostrar e (b) 2-3 personais reais.**
-2. **A Análise Semanal ganhou 4 camadas de proteção, todas nascidas de EVIDÊNCIA MEDIDA:** retry em `503` (#196) · número no nome do exercício deixa de ser intruso (#198) · teto de 5 gerações/dia (#199) · fallback que **lê** em vez de despejar fatos (#200). Detalhe em `DECISIONS.md` `2026-09-04` e `2026-09-05`.
+2. **A Análise Semanal ganhou 5 camadas de proteção, todas nascidas de EVIDÊNCIA MEDIDA:** retry em `503` (#196) · número no nome do exercício deixa de ser intruso (#198) · teto de 5 gerações/dia (#199) · fallback que **lê** em vez de despejar fatos (#200) · **troca de modelo** quando o primário está congestionado (#202). Detalhe em `DECISIONS.md` `2026-09-04` e `2026-09-05`.
+3. **O clamp do veredito chegou ao PDF** (#203) — existia só na tela desde 03/set. Achado ao abrir o PDF REAL que o dono baixou; é a **segunda vez** que uma decisão visual ficou num renderizador e não no outro (a primeira foi o guard do fallback, #177 → #181).
 3. **O app passou a saber POR QUE a IA falhou** (migration `0019`, `parecer.falha_motivo`): 503, 429, 404 e rejeição do validador deixaram de virar o mesmo booleano, e o aviso mostrado é específico por causa.
 4. **PDF da Análise redesenhado** (direção "papel timbrado", portão visual) — `SDD.md` §10.4.1.
 5. **Quatro bugs vindos de relato de uso real do dono**, todos corrigidos: finalizar treino sem confirmação e irreversível + botão de descanso no-op (#193); cronômetro contando do zero em treino antigo + relatórios divergentes (#195).
 
 ### Pendências do DONO (nada disso é tarefa de agente)
 
-- **Salvar o rascunho `1a90edc9…`** — primeiro parecer de **prosa real** que existe. Destrava o material pros personais, o QA do veredito e o QA do PDF no caminho de prosa.
-- **QA no aparelho** (tudo acima está `ALEGADO`): PDF baixado do app · finalizar→confirmar→reabrir e ver o cronômetro voltar **de onde parou** · abrir treino **antigo** e ver tempo **parado** · relatório batendo nos **dois** lugares.
+- ~~Salvar o parecer de prosa real~~ **FEITO** — `a7f5fe7c`, salvo em 04/set. É a prosa que substituiu o exemplo sintético da bancada (`scripts/preview/dados.ts`).
+- ~~Baixar o PDF~~ **FEITO**, e foi ele que revelou a falta do clamp (#203). **Baixar de novo depois do deploy** para confirmar o veredito em 4 linhas.
+- **QA no aparelho — só faltam DUAS, e as duas exigem o celular:** (1) finalizar → confirmar → reabrir e ver o cronômetro voltar **de onde parou**, não do zero; (2) abrir um treino **antigo** e ver o tempo **parado**, não 00:00 correndo.
+- **Terceira, com meio caminho andado:** gerar o relatório **nos dois lugares**. Calculado do banco em 04/set: `iniciado_em` 22:06 + última série 23:48 = **1h42**. Se os dois mostrarem isso, o bug dos relatórios divergentes está provado corrigido.
 - **Conversar com 2-3 personais** (abre o portão do §11). **Não abrir pela IA** — abrir pelo resultado ("toda segunda eu te digo qual aluno ligar"); e levar a sério a hipótese de que a dor não existe.
 - **`supabase migration repair`** — ver backlog 1.
 

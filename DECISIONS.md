@@ -1776,3 +1776,86 @@ Honesto, e o **pior rosto possível** para a peça-assinatura de um produto cuja
 **Estado de QA: `ALEGADO`.** A saída foi verificada com os números reais do dono, fora do app. A prova em produção vem na próxima falha real da IA.
 
 **Como reverter.** `git revert`. O extrato volta, e `leitura-deterministica.ts` fica órfão.
+
+---
+
+## 2026-09-05 (3) — Troca de modelo quando o primário está congestionado
+
+**A medição que decidiu, e ela contradiz a recomendação anterior deste mesmo agente.** O dono gerou em produção e o log deu:
+
+| Hora (Brasília) | Espera desde a falha anterior | Resultado |
+|---|---|---|
+| 10:11:19 | — | `503` |
+| 10:11:48 | **+29s** | `503` |
+| 10:13:49 | +2min | ✅ |
+
+Eu havia recomendado **aumentar o backoff** (de 1,2s para 10-15s). Com esse intervalo na mão a recomendação **não se sustenta**: a segunda tentativa do dono foi 29 segundos depois e falhou igual. Um backoff que caiba dentro da function ficaria bem dentro do pico; atravessá-lo exigiria segurar a função ociosa por ~2 minutos, o que não cabe no teto de duração nem faz sentido com alguém esperando na tela.
+
+**Onde a fila estava, segundo o próprio Google:** `"This model is currently experiencing high demand. Spikes in demand are usually temporary."` Não é a API fora do ar — é o pool **daquele modelo**. Outro modelo tem pool próprio, e responde em segundos, não em minutos.
+
+**O fluxo agora:** primário → repetição curta → **modelo alternativo** → fallback determinístico.
+
+**Só troca em erro TRANSITÓRIO, e a assimetria é o ponto.** `429` é teto de cota do **projeto**: trocar de modelo não cria cota nova, só gasta mais uma chamada para falhar igual. `404` é determinístico. Ambos sobem sem tentar o alternativo, e há teste para cada um.
+
+**O nome do modelo foi CONFERIDO, não lembrado.** `gemini-3.5-flash`, verificado na lista oficial de modelos do Gemini em 2026-09-05: mesma família, endpoint **estável** (não é `-preview`, ao contrário do `gemini-3-flash-preview`) e **sem** a data de aposentadoria que o `2.5-flash` já tem (16/out/2026, registrada na entrada de 2026-08-05 deste arquivo). Chutar nome de modelo aqui produziria exatamente os `404 NotFound` que apareceram entre 27 e 29/ago e ninguém explicou.
+
+**A troca vai para o log** porque muda a **procedência** do parecer: dois pareceres do mesmo dono podem ter vindo de modelos diferentes. **Persistir qual modelo respondeu** exigiria mais uma coluna (mesma receita da `0019`) — não feito, fica como pergunta aberta; só passa a importar quando o alternativo entrar em uso de verdade.
+
+**Orçamento de chamadas — o caso que parece pior do que é.** `gerar` pode agora fazer até 3 chamadas, e a rota chama `gerar` duas vezes (tentativa + retry de validação). Mas os caminhos são quase excludentes: se a API está em `503`, `respostaUm` fica nulo e **não existe** retry de validação. Pior caso realista: 3-4 chamadas, não 6.
+
+**`maxDuration = 60`, explícito.** A geração roda dentro de `after()` (a function segue viva depois da resposta HTTP, `SDD` §11) e agora pode fazer até 3 chamadas. Depender de um default de plataforma não verificado significa que, se ele for menor do que supomos, **a geração é cortada no meio e o parecer some sem erro nenhum** — mesmo raciocínio do `runtime = "nodejs"` fixado em `/api/parecer/[id]/pdf`. **Risco declarado antes do merge** (se o plano não aceitasse 60s, o deploy falharia) e **verificado depois**: deploy `READY`.
+
+**Alternativas descartadas.**
+
+1. **Backoff maior.** Descartada pela medição acima — é a correção da minha própria recomendação.
+2. **Segunda chave/projeto.** O dono tem 5 projetos no AI Studio, cada um com cota própria; atacaria o `429`. Descartada por ora: mexe em cota de projetos que servem outras coisas, e o `429` não é a causa dominante (sumiu desde 29/ago).
+3. **Não fazer nada e confiar no fallback.** Legítima e de graça — o fallback agora lê. Descartada porque o dono prefere o parecer real quando ele for possível.
+
+**Classificação.** **ADIÇÃO.** Nenhum contrato muda.
+
+**Impacto.** `retry-transitorio.ts` (+`comModeloAlternativo`), `gemini.ts`, `route.ts` (`maxDuration`). 6 testes novos. PR #202, squash `ab6f16a`.
+
+**Estado de QA: `ALEGADO`.** A troca só se prova no próximo pico real de `503`.
+
+**Como reverter.** `git revert`. Volta a repetir só no mesmo modelo.
+
+---
+
+## 2026-09-05 (4) — O clamp do veredito chega ao PDF (a mesma decisão, o segundo renderizador)
+
+**Achado ao olhar o PDF REAL baixado do app pelo dono**, não em teste nem por leitura de código: um veredito de **151 caracteres** saiu em 27pt fixo, ocupou **cinco linhas**, comeu metade da primeira página e jogou cinco evidências para uma segunda página quase vazia.
+
+**É exatamente o problema que o gate visual de `2026-09-03` descreveu para a tela** — *"frase de julgamento longa vira 3+ linhas em Fraunces 48px e empurra o resto do documento"*. Resolvemos lá com `clamp()` e **passou reto aqui**.
+
+**Segunda vez que uma decisão visual é aplicada num renderizador e não no outro.** A primeira foi o guard do fallback: a PR #177 corrigiu o veredito gigante na tela e o PDF ficou dois dias errado, até a #181. **É o mesmo padrão**, e por isso a fórmula aqui é **derivada** da da tela, não inventada:
+
+```
+tela: clamp(30px, 48px − (n − 20) × 0,72px, 48px)
+PDF:  clamp(20pt, 27pt − (n − 20) × 0,405pt, 27pt)
+```
+
+Mesma proporção, escalada da base de 48px para a de 27pt. O piso de 20pt mantém a mesma relação com o corpo que a tela mantém (≈1,9× o texto de leitura), então o veredito segue dominante sem dominar a página — e há teste conferindo essa proporção, não só o valor.
+
+**Truncar continua descartado** pelo motivo original de 03/set: corta a frase de julgamento no meio, e ela **É** o documento.
+
+**Resultado medido com o parecer real (não estimado):**
+
+| | Antes | Depois |
+|---|---|---|
+| Linhas do veredito | 5 | **4** |
+| Evidências na página 1 | 1 | **2** |
+| Páginas | 2 | 2 |
+
+**Continua em 2 páginas, e isso está certo.** Três parágrafos de prosa (~1.370 caracteres) mais 6 evidências são duas páginas de conteúdo; espremer mais seria maquiar. **O defeito era o veredito DOMINAR, não o número de páginas** — registrado assim para ninguém "corrigir" a paginação depois achando que ficou pela metade.
+
+**A bancada deixou de mentir.** `scripts/preview/dados.ts` marcava `textoProsaExemplo` como **sintético**, porque nenhuma geração da Gemini tinha dado certo. Agora existe prosa real — parecer `a7f5fe7c`, gerado e salvo pelo dono em 2026-09-04 — e é justamente o veredito de 151 caracteres dela que revelou esta falta. Substituído, com nota para não inventar texto ali de novo.
+
+**Lição de processo, e é a mesma que aparece em quase todos os achados desta leva:** o defeito não estava em nenhum teste, em nenhuma revisão de código e em nenhuma leitura estática. Apareceu quando o **artefato real** foi aberto. Suíte verde não é evidência sobre a aparência de um documento.
+
+**Classificação.** **Correção.** Nenhum contrato muda; `SDD` §10.4.1 continua válido e ganha esta regra.
+
+**Impacto.** `src/lib/pdf/documento-parecer.tsx` (+`tamanhoVeredito` exportada e testada), teste (+6), `scripts/preview/dados.ts`. PR #203, squash `65bdfe8`.
+
+**Estado de QA: `PASSOU` na renderização** — o antes/depois foi produzido com o texto real, não com fixture. Falta só o dono baixar o PDF novo do app depois do deploy.
+
+**Como reverter.** `git revert`. O veredito volta a 27pt fixo e o problema volta com ele.
