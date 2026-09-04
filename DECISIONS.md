@@ -1557,3 +1557,99 @@ Ou seja: **a API falhou em 64% e 73% das chamadas nesses dois dias.** Quando a c
 **Como reverter.** Nada a reverter — é registro de medição.
 
 **Método, pra quem repetir.** O console do AI Studio (`/usage`, `/rate-limit`) renderiza tudo em canvas; extração de texto devolve só as legendas de acessibilidade. Os números saem clicando nos botões "Preencher os dados da tabela …" (que ativam as grades acessíveis) e lendo o `<table>` resultante pelo DOM. Screenshot pela extensão do Chrome falhou com timeout de CDP nesta máquina — ler o DOM foi mais confiável e mais barato.
+
+---
+
+## 2026-09-04 (2) — O tempo do treino ganha âncora no banco (`iniciado_em`), e os relatórios param de divergir
+
+**Origem: dois relatos de uso real do dono, no mesmo dia, com a mesma causa-raiz.** (1) Abrir um treino de ontem começava o cronômetro do zero, contando ao vivo. (2) O relatório gerado na tela de treino dava número diferente do gerado em `/ajustes/relatorios` para o **mesmo** treino.
+
+**A causa-raiz, e ela é constrangedora.** `treino.iniciado_em` existe no banco **desde a migration 0001** (`timestamptz not null default now()`) e **nunca foi lido** — `buscarTreino` selecionava só `id, data`. Sem âncora no banco, cada tela inventava a sua medida de tempo.
+
+**Bug 1 — cronômetro contando do zero.** `garantirInicio` gravava `agora` no `localStorage` ao montar o `TimerTopo`, **para qualquer treino**. Abrir um treino antigo criava um início falso e o relógio saía correndo, num treino já encerrado; o botão de descanso aparecia junto, porque o app achava que a sessão estava em andamento.
+
+**Regra adotada, declarada como decisão de produto (e trivialmente reversível):**
+
+> **Um cronômetro que não sabe quando a sessão terminou não deve fingir que está correndo.**
+
+Na prática: a marca de início local só é gravada quando a sessão **começa aqui** (treino recém-criado, sem série nenhuma) — `iniciarSessaoLocal`, nome novo que carrega essa intenção. Sem marca local, o cronômetro mostra a **duração reconstruída do banco, parada**, e o botão de descanso não aparece. `reabrir` também deixou de gravar um início novo quando não há um local para preservar — recriaria o mesmo defeito por outro caminho, e tem teste.
+
+**Bug 2 — relatórios divergentes.** Eram duas definições de duração para o mesmo treino:
+
+| Onde | Fonte | O que contava |
+|---|---|---|
+| Tela de treino | cronômetro ao vivo (`localStorage`) | desde que o treino foi **aberto** no aparelho |
+| `/ajustes/relatorios` | `última série − primeira série` | só o intervalo entre séries |
+
+A segunda sempre dava **menos**: descartava o aquecimento antes da 1ª série e tudo depois da última. Diferença **sistemática**, não arredondamento — e como a duração alimenta métricas derivadas, elas divergiam junto.
+
+Agora existe `duracaoSessaoSegundos()` em `metricas-treino.ts`: **definição única** usada pelos dois, ancorada em `iniciado_em` + `criado_em` da última série. Não depende de `localStorage`, então não muda de aparelho para aparelho.
+
+**Isto já tinha sido reportado uma vez.** O comentário em `ajustes/relatorios/page.tsx` registra o mesmo sintoma em **2026-08-27**; a correção da época trocou um fallback fixo de 45 minutos por essa reconstrução. Trocou um erro grande por um menor **sem atacar a causa** — as duas telas continuaram medindo coisas diferentes. É o segundo caso nesta semana em que uma correção anterior tratou sintoma: o mesmo aconteceu com o veredito do PDF (#177 → #181).
+
+**Alternativas descartadas.**
+
+1. **Manter o cronômetro ao vivo como fonte do relatório e fazer o servidor imitá-lo.** Impossível sem `localStorage` no servidor — e amarraria a métrica de um documento a um aparelho.
+2. **Congelar o cronômetro por regra de data ("treino não é de hoje").** Descartada: introduz regra de fuso horário para resolver o que a ausência de marca local já responde, sem número mágico.
+3. **Adicionar `finalizado_em` agora.** É a solução **completa** (faria a duração ser exata e o cronômetro sobreviver a troca de aparelho), mas é migration, e o histórico está divergente. Adiada por decisão do dono.
+
+**Limite conhecido e aceito, documentado no código:** o tempo **depois da última série** (desmontar, alongar) não entra na duração. Sem `finalizado_em`, ninguém sabe quando a sessão acabou.
+
+**Limpeza que caiu junto.** `duracaoSegundos` (estado) e `onTempoTreinoAtualizado` (prop + `useEffect`) existiam só para levar o cronômetro até o relatório. Sem consumidor, saíram.
+
+**Classificação.** **Correção**, com uma ADIÇÃO de contrato de dados (`Treino.iniciadoEm`). Nenhum documento de contrato muda.
+
+**Impacto.** `src/lib/dados/treino.ts` (tipo + 2 selects), `src/lib/dados/metricas-treino.ts` (2 funções novas), `src/components/{timer-topo,treino-detalhe}.tsx`, `src/app/treino/[id]/page.tsx`, `src/app/ajustes/relatorios/page.tsx`. 10 testes novos. PR #195, squash `3773d80`.
+
+**Estado de QA: `ALEGADO`.** Falta o dono: abrir um treino **antigo** e confirmar que o tempo aparece **parado** (não 00:00 correndo), e gerar o relatório **nos dois lugares** conferindo que o número bate.
+
+**Como reverter.** `git revert` do commit. `iniciado_em` volta a não ser lido e as duas telas voltam a divergir.
+
+---
+
+## 2026-09-04 (3) — Retry em falha transitória da Gemini, e o aviso para de mentir
+
+**Origem: a medição de `2026-09-04`** (entrada acima nesta mesma data), não suposição. **11 das 15 chamadas voltaram `503`** — 26,7% de sucesso.
+
+**Refinamento da medição, e ele CORRIGE a granularidade da entrada anterior.** Aquela entrada apresentou os números como "Dia A" e "Dia B"; na janela de 28 dias o console do AI Studio agrega em **períodos**, não em dias. Reconsultado com janela de **7 dias**, que dá resolução diária:
+
+| Dia | `503` |
+|---|---|
+| 1 set | 2 |
+| 3 set | **11** |
+| **4 set** (o próprio dia desta entrada) | **1** |
+
+Duas consequências. **(1) O `503` é recorrente, não um episódio isolado** — aconteceu em três dias distintos, incluindo o dia em que o retry foi escrito. É validação direta da decisão, não justificativa retroativa. **(2) `404` e `429` não aparecem na janela de 7 dias:** ficaram entre 27 e 29 de agosto e **não voltaram desde**. Isso enfraquece ainda mais a hipótese de o `404` vir do lastro (que tem um único modelo, usado com sucesso o tempo todo) e reforça o combinado de só investigar se reaparecer.
+
+**O que 503 custava.** A chamada lançava, `respostaUm` ficava `null`, o retry de validação nem acontecia e a rota ia direto pro fallback determinístico — perdendo o parecer inteiro **e** queimando a trava de 10 minutos (`SDD.md` §11.2). `503` é sobrecarga do lado do Google: passa sozinha.
+
+**A política, e ela NÃO é simétrica de propósito.**
+
+| Erro | Repete? | Por quê |
+|---|---|---|
+| `503`, `500`, `502`, `504` | **sim, uma vez** | Transitório |
+| `429` | **não** | Teto de cota (5 RPM / 20 RPD, `KNOWLEDGE.md` §3.2). Repetir queima cota e falha de novo |
+| `404` e demais 4xx | **não** | Determinístico; retry só esconderia o defeito |
+| erro sem status legível | **não** | O padrão seguro é **não** repetir |
+
+Uma repetição só, não um laço: o teto de duração da function é curto, e duas falhas seguidas indicam indisponibilidade real, não soluço.
+
+**Onde mora, e por quê.** `src/app/api/analise/retry-transitorio.ts`, **separado do SDK**. É o que torna a política inteira testável sem rede e sem chave — 14 testes, incluindo os dois que travam o comportamento de **não** repetir 429 e 404, e o que garante que não vira laço.
+
+**Correção de uma afirmação registrada nesta sessão.** Eu havia dito que este retry "precisava de um jeito de exercer antes" e o parkei como bloqueado. **Estava errado:** eu confundia *testar a lógica* com *testar a API*. `ApiError` do `@google/genai` expõe `status: number`, e `ClienteParecer` sempre foi uma interface. A lógica era testável desde o começo.
+
+**O aviso que mentia.** O texto dizia *"a interpretação por IA falhou desta vez (duas tentativas rejeitadas)"* — **falso** quando a causa era 503: a API não respondeu, ninguém rejeitou nada. O produto contava uma história errada sobre o próprio defeito, nos três lugares que o renderizam (tela, PDF e dicionário en/es).
+
+A frase nova — *"Não foi possível gerar a interpretação por IA desta vez"* — é verdadeira nos quatro casos (503, 429, 404 e rejeição do validador) e **não precisou de migration**. A separação que faltava: **parar de mentir** é copy; **dizer qual foi a causa** é persistência.
+
+**Alternativa descartada.** Persistir a causa (`falha_motivo`) agora. É migration numa base com histórico divergente (`db push` recusa, a `0015` foi aplicada à mão), e o valor é de **diagnóstico**, não de leitura — o dono aprovou adiar para junto da limpeza do histórico.
+
+**Decisão de custo do dono, registrada:** **continuar no nível gratuito** por ora. É o que torna a assimetria da política acima obrigatória — com 5 RPM, repetir um `429` seria contraproducente.
+
+**Classificação.** **Correção** (aviso) + **ADIÇÃO** (política de retry). Nenhum contrato muda.
+
+**Impacto.** `retry-transitorio.ts` + teste (novos), `gemini.ts`, `parecer.tsx`, `documento-parecer.tsx`, `i18n.ts`. PR #196, squash `004a37b`.
+
+**Estado de QA: `ALEGADO`.** A lógica está coberta por teste; a forma exata do erro do SDK em runtime é a única suposição, mitigada por ler `status` se existir, cair para a mensagem se não, e **não repetir** quando não dá pra saber. Só um 503 real em produção confirma.
+
+**Como reverter.** `git revert` do commit; `retry-transitorio.ts` fica órfão e pode ser apagado.
