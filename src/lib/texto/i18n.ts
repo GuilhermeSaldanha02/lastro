@@ -704,7 +704,6 @@ const DICIONARIO: Record<string, { en: string; es: string }> = {
   "Gerando…": { en: "Generating…", es: "Generando…" },
   "Rascunho": { en: "Draft", es: "Borrador" },
   "Revisar e salvar": { en: "Review and save", es: "Revisar y guardar" },
-
   // --- lib/pdf/documento-parecer.tsx (PDF do parecer, SDD §10.4) ---
   "Evidência": { en: "Evidence", es: "Evidencia" },
   "Sinal": { en: "Signal", es: "Señal" },
@@ -715,6 +714,13 @@ const DICIONARIO: Record<string, { en: string; es: string }> = {
   "Documento emitido pelo lastro · não substitui acompanhamento profissional": {
     en: "Document issued by lastro · does not replace professional guidance",
     es: "Documento emitido por lastro · no sustituye el acompañamiento profesional",
+  },
+
+  // --- components/treino-detalhe.tsx (finalizar / reabrir treino) ---
+  "Reabrir treino": { en: "Reopen workout", es: "Reabrir entrenamiento" },
+  "Finalizar o treino? O cronômetro para e o registro fecha — dá para reabrir depois.": {
+    en: "Finish the workout? The timer stops and logging closes — you can reopen it later.",
+    es: "¿Finalizar el entrenamiento? El cronómetro se detiene y el registro se cierra — puedes reabrirlo después.",
   },
 };
 

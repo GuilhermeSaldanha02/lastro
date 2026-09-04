@@ -16,6 +16,7 @@ import {
 } from "@/lib/audio/som-timer";
 import type { Idioma } from "@/lib/dados/idioma";
 import { t } from "@/lib/texto/i18n";
+import { garantirInicio, segundosDecorridos } from "@/lib/treino/marcos-treino";
 
 type TimerTopoProps = {
   treinoId: string;
@@ -24,31 +25,6 @@ type TimerTopoProps = {
   treinoFinalizado?: boolean;
   onTempoTreinoAtualizado?: (segundos: number) => void;
 };
-
-const chaveInicioTreino = (treinoId: string) => `lastro_inicio_treino_${treinoId}`;
-const chaveFimTreino = (treinoId: string) => `lastro_fim_treino_${treinoId}`;
-
-/**
- * Quantos segundos o treino já durou, **lido** do localStorage — puro, sem
- * escrever nada. Congelado em `fim - início` quando o treino terminou;
- * corrente (`agora - início`) enquanto roda.
- *
- * Separado de `garantirMarcosTreino` de propósito: esta é o `getSnapshot`
- * do `useSyncExternalStore` e roda DURANTE o render, onde escrever é
- * proibido. Devolve 0 no servidor, onde não há localStorage.
- */
-function calcularSegundosTreino(treinoId: string): number {
-  if (typeof window === "undefined") return 0;
-
-  const inicioIso = localStorage.getItem(chaveInicioTreino(treinoId));
-  if (!inicioIso) return 0;
-
-  const inicioMs = new Date(inicioIso).getTime();
-  const fimIso = localStorage.getItem(chaveFimTreino(treinoId));
-  const ateMs = fimIso ? new Date(fimIso).getTime() : Date.now();
-
-  return Math.floor(Math.max(0, ateMs - inicioMs) / 1000);
-}
 
 /**
  * Fonte de mudança do cronômetro: um tique por segundo. `useSyncExternalStore`
@@ -59,25 +35,6 @@ function calcularSegundosTreino(treinoId: string): number {
 function assinarSegundo(aoMudar: () => void): () => void {
   const id = setInterval(aoMudar, 1000);
   return () => clearInterval(id);
-}
-
-/**
- * Grava os marcos do treino no localStorage. É o único lado escritor, e
- * vive dentro de um efeito porque é exatamente o que efeito deve fazer:
- * sincronizar um sistema externo com o estado do React.
- */
-function garantirMarcosTreino(treinoId: string, finalizado: boolean): void {
-  if (typeof window === "undefined") return;
-
-  const chaveInicio = chaveInicioTreino(treinoId);
-  if (!localStorage.getItem(chaveInicio)) {
-    localStorage.setItem(chaveInicio, new Date().toISOString());
-  }
-
-  const chaveFim = chaveFimTreino(treinoId);
-  if (finalizado && !localStorage.getItem(chaveFim)) {
-    localStorage.setItem(chaveFim, new Date().toISOString());
-  }
 }
 
 export default function TimerTopo({
@@ -106,7 +63,7 @@ export default function TimerTopo({
   // depois da hidratação, sem divergência e sem `setState` em efeito.
   const segundosTreino = useSyncExternalStore(
     assinarSegundo,
-    () => calcularSegundosTreino(treinoId),
+    () => segundosDecorridos(treinoId),
     () => 0,
   );
 
@@ -163,11 +120,14 @@ export default function TimerTopo({
     };
   }, []);
 
-  // Único lado escritor do cronômetro: sincroniza o localStorage com o que
-  // o React sabe. É o que efeito deve fazer — atualizar sistema externo.
+  // Este componente só garante o INÍCIO. A marca de fim tem um dono só,
+  // `treino-detalhe.tsx` (finalizar/reabrir) — antes os dois escreviam a
+  // mesma chave, e foi essa duplicação que deixou o treino travado no
+  // relato de uso real de 2026-09-03: cada lado sabia gravar, nenhum sabia
+  // apagar. Ver `src/lib/treino/marcos-treino.ts`.
   useEffect(() => {
-    garantirMarcosTreino(treinoId, treinoFinalizado);
-  }, [treinoId, treinoFinalizado]);
+    garantirInicio(treinoId);
+  }, [treinoId]);
 
   // Espelha o valor para o pai (que monta o relatório pós-treino). Separado
   // do efeito acima porque depende do tique, não dos marcos.
@@ -283,7 +243,15 @@ export default function TimerTopo({
               : "status-descanso-wrapper"
           }
         >
-          {!descansoAtivo && !descansoFinalizado && (
+          {/* `!treinoFinalizado` é o que faltava aqui, e é o defeito exato
+              do relato de uso real (2026-09-03). Sem ele, com o treino
+              finalizado o botão CONTINUAVA visível e clicável — mas
+              `descansoAtivo = ativo && !treinoFinalizado` já nascia false,
+              então `iniciarTimer` rodava e a cápsula nunca aparecia. Um
+              botão que mente é pior que um botão ausente: o dono clicou
+              várias vezes achando que era ele. Acabou o treino, some o
+              descanso. */}
+          {!treinoFinalizado && !descansoAtivo && !descansoFinalizado && (
             <button
               type="button"
               className="timer-topo-botao-disparar"
