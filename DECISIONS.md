@@ -1524,3 +1524,36 @@ Reverte explicitamente a posição da ADR anterior contra tradução automática
 **Pergunta que este achado abre e ninguém respondeu.** `descansoAtivo` foi um caso de **condição de render e condição de efeito discordando** — o botão aparecia por uma regra e funcionava por outra. Não foi feita varredura atrás de outros lugares com o mesmo padrão. Se existirem, há mais botão mentindo no app.
 
 **Como reverter.** `git revert` do commit devolve os três defeitos juntos — inclusive a irreversibilidade. `src/lib/treino/` fica órfão e pode ser apagado.
+
+---
+
+## 2026-09-04 — Correção de diagnóstico: os pareceres em fallback eram ERRO DE API, não rejeição do validador
+
+**O que estava sendo dito, e está errado.** Desde 2026-09-02 o `PROGRESS.md` registra que "a Gemini seguiu rejeitando as duas tentativas de gerar um veredito real", e nesta sessão eu mesmo apresentei ao dono uma leitura de código concluindo que a culpa era do `validarNumeros` (`api/analise/route.ts` rejeita, tenta de novo, cai no fallback determinístico). **A leitura de código estava certa sobre o mecanismo e errada sobre o que aconteceu.**
+
+**A evidência, medida no console do Google AI Studio** (projeto `claudeAcademia`, chave `academia`, nível gratuito, janela de 28 dias — consultada em 2026-09-04):
+
+| Dia | Requisições | Taxa de sucesso | Erros |
+|---|---|---|---|
+| A | 14 | **35,7%** | 5× `404 NotFound` + 4× `429 TooManyRequests` |
+| B | 15 | **26,7%** | 11× `503 ServiceUnavailable` |
+
+Ou seja: **a API falhou em 64% e 73% das chamadas nesses dois dias.** Quando a chamada inicial lança, `respostaUm` fica `null`, o retry nem acontece e o código vai direto pro fallback determinístico. O validador **nunca chegou a rodar** nesses casos.
+
+**Limites do nível gratuito, medidos na mesma consulta** (`gemini-3.6-flash`): pico de **3/5 RPM**, 3,35K/250K TPM, **16/20 RPD**. Confirma o valor de 20 req/dia que `KNOWLEDGE.md` §3.2 já registrava e acrescenta o dado novo que faltava: **o teto de 5 requisições por MINUTO**. O fluxo do parecer consome até 2 chamadas em segundos (tentativa + retry de validação), então duas perguntas seguidas encostam no teto por minuto — o que explica os 429.
+
+**Por que isso passou dias sem diagnóstico, e é a lição que importa.** Três causas com sintomas idênticos:
+
+1. O código funila `404`, `429`, `503` e "validador rejeitou" no **mesmo** caminho: fallback determinístico + `avisoFalhaInterpretativa = true`.
+2. O aviso mostrado ao dono diz literalmente *"a interpretação por IA falhou desta vez (duas tentativas rejeitadas)"* — que é **factualmente falso** quando a causa foi 503: a API não respondeu, ninguém rejeitou nada. O produto conta uma história errada sobre o próprio defeito.
+3. O `console.error` existe, mas a Vercel no plano **Hobby retém runtime log por 1 hora**. Quando o dono percebe o problema, a evidência já evaporou. Confirmado nesta sessão: busca por `[analise]` em 7 dias devolveu vazio por retenção.
+
+**O que a chave NÃO é.** Não está revogada, não é problema de faturamento, não é modelo inexistente no geral — `Gemini 3.6 Flash` aparece com uso bem-sucedido na mesma janela. Os 5× `404` de um único dia continuam sem explicação e ficam como pergunta aberta.
+
+**Classificação.** **Correção factual** de um diagnóstico registrado no `PROGRESS.md` e repetido por mim nesta sessão. Nenhum comportamento de produto muda nesta entrada.
+
+**Impacto.** Muda a prioridade do backlog: "consertar o `validarNumeros`" **sai** da lista como estava formulado. O que entra no lugar está em `PROGRESS.md`.
+
+**Como reverter.** Nada a reverter — é registro de medição.
+
+**Método, pra quem repetir.** O console do AI Studio (`/usage`, `/rate-limit`) renderiza tudo em canvas; extração de texto devolve só as legendas de acessibilidade. Os números saem clicando nos botões "Preencher os dados da tabela …" (que ativam as grades acessíveis) e lendo o `<table>` resultante pelo DOM. Screenshot pela extensão do Chrome falhou com timeout de CDP nesta máquina — ler o DOM foi mais confiável e mais barato.
