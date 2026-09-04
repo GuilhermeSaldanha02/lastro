@@ -280,3 +280,68 @@ describe("validarNumeros — convenção numérica em inglês (idioma = \"en\")"
     }
   });
 });
+
+// FLAGRADO EM PRODUÇÃO em 2026-09-04, no log de uma geração real do dono:
+// `tentativa 1 { resultado: { ok: false, motivo: 'intrusos', intrusos: [45] } }`.
+// O 45 veio de "Leg press 45 graus" — o NOME do exercício, que o próprio
+// resumo entregou ao modelo. O parecer estava certo; o validador é que
+// punia o modelo por usar o vocabulário que nós demos.
+describe("número que faz parte do NOME do exercício", () => {
+  function resumoComNomeNumerado(): ResumoCompacto {
+    const base = resumoBase();
+    return {
+      ...base,
+      volume_por_exercicio: [
+        { ...base.volume_por_exercicio[0], exercicio: "Leg press 45 graus" },
+      ],
+      tendencia_e1rm: [{ ...base.tendencia_e1rm[0], exercicio: "Leg press 45 graus" }],
+    };
+  }
+
+  it("não rejeita o parecer por citar o exercício pelo nome", () => {
+    const resultado = validarNumeros(
+      "O Leg press 45 graus ficou com volume 1300 na semana.",
+      resumoComNomeNumerado(),
+      [],
+    );
+    expect(resultado.ok).toBe(true);
+  });
+
+  it("o número do nome NÃO conta como prova de especificidade", () => {
+    // Só o nome, nenhum número real do dono: continua reprovando, agora
+    // pelo motivo certo. Se o 45 entrasse no conjunto DADOS, este parecer
+    // passaria sem citar nada do dono — que é o que o validador existe
+    // para impedir.
+    const resultado = validarNumeros(
+      "O Leg press 45 graus apareceu na semana.",
+      resumoComNomeNumerado(),
+      [],
+    );
+    expect(resultado).toEqual({ ok: false, motivo: "sem_numero_do_dono" });
+  });
+
+  it("continua pegando intruso de verdade quando o nome tem número", () => {
+    const resultado = validarNumeros(
+      "O Leg press 45 graus subiu 777% na semana, com volume 1300.",
+      resumoComNomeNumerado(),
+      [],
+    );
+    expect(resultado).toEqual({ ok: false, motivo: "intrusos", intrusos: [777] });
+  });
+
+  it("cobre número no nome do GRUPO muscular também", () => {
+    const base = resumoBase();
+    const resumo: ResumoCompacto = {
+      ...base,
+      volume_por_grupo_muscular: [
+        { ...base.volume_por_grupo_muscular[0], grupo_muscular: "grupo 7" },
+      ],
+    };
+    const resultado = validarNumeros(
+      "O grupo 7 fechou a semana com volume 1300.",
+      resumo,
+      [],
+    );
+    expect(resultado.ok).toBe(true);
+  });
+});
