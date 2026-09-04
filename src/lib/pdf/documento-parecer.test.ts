@@ -9,7 +9,7 @@
 // que interessa: existe (ou não) um nó de texto com o veredito.
 import { describe, expect, it } from "vitest";
 import type { ReactElement } from "react";
-import DocumentoParecer from "./documento-parecer";
+import DocumentoParecer, { tamanhoVeredito } from "./documento-parecer";
 import { separarVeredito } from "@/lib/texto/separar-veredito";
 import type { ParecerSalvo } from "@/lib/dados/parecer";
 import type { EvidenciaParaTela } from "@/app/api/analise/evidencia";
@@ -145,5 +145,44 @@ describe("DocumentoParecer", () => {
       DocumentoParecer({ parecer: parecer({ evidencia: comCampo }) }),
     ).join(" ");
     expect(encontrados).toContain("3 semanas sem novo máximo");
+  });
+});
+
+// Achado ao olhar o PDF REAL baixado do app (2026-09-04): o clamp do
+// veredito existia na tela desde 03/set e nunca chegou aqui. Um veredito de
+// 151 caracteres saía em 27pt fixo, ocupava 5 linhas e empurrava metade da
+// evidência para uma segunda página quase vazia.
+describe("tamanhoVeredito", () => {
+  it("usa o teto para frase curta — o veredito precisa dominar", () => {
+    expect(tamanhoVeredito(13)).toBe(27);
+    expect(tamanhoVeredito(20)).toBe(27);
+  });
+
+  it("encolhe progressivamente, não em degrau", () => {
+    const curto = tamanhoVeredito(30);
+    const medio = tamanhoVeredito(45);
+    expect(curto).toBeLessThan(27);
+    expect(medio).toBeLessThan(curto);
+  });
+
+  // Mesma proporção da tela: lá 30 caracteres levam 48px a 40,8px (85%).
+  it("mantém a proporção da fórmula da tela", () => {
+    expect(tamanhoVeredito(30) / 27).toBeCloseTo(40.8 / 48, 2);
+  });
+
+  it("nunca desce abaixo do piso, por mais longo que seja", () => {
+    expect(tamanhoVeredito(151)).toBe(20); // o caso real que originou o fix
+    expect(tamanhoVeredito(500)).toBe(20);
+  });
+
+  it("o piso continua claramente maior que o corpo (11pt)", () => {
+    expect(tamanhoVeredito(1000)).toBeGreaterThan(11 * 1.7);
+  });
+
+  it("é aplicado no documento, não só definido", () => {
+    const longo = `${"a".repeat(150)}. Resto do corpo aqui.`;
+    const encontrados = textos(DocumentoParecer({ parecer: parecer({ texto: longo }) }));
+    // A primeira frase virou veredito e o texto inteiro não ficou no corpo.
+    expect(encontrados.some((t) => t.startsWith("aaa"))).toBe(true);
   });
 });

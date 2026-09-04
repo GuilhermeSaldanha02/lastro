@@ -31,10 +31,17 @@ Panturrilha: 3 séries valendo, volume 1440 — abaixo da faixa de referência.
 Abdômen: 4 séries valendo, volume 576 — abaixo da faixa de referência.
 Frequência na semana atual: 5 treino(s).`;
 
-/** SINTÉTICO — a Gemini deu 503 nesta semana e não há prosa real no
- *  banco. Existe só para exercitar a tipografia do veredito (Fraunces
- *  48px) e do corpo. Os números citados são os reais acima. */
-export const textoProsaExemplo = `Seu tríceps carregou a semana. Puxada e tríceps subiram junto — 25% e 66,7% de e1RM na janela de 4 semanas — enquanto Leg press e Rosca concentrada não saíram do lugar em nenhuma das sessões registradas. O supino fechado caiu 29,8%, e é o único movimento em queda real da lista; nas 4 séries valendo dessa semana o peso de referência ficou em 40 kg × 10. Ombro e posterior de coxa seguem abaixo da faixa de referência de volume pela segunda semana.`;
+/** Prosa REAL da Gemini, parecer `a7f5fe7c…` (pergunta 1, 2026-09-04,
+ *  salvo pelo dono). Substituiu o exemplo sintético que existia aqui
+ *  enquanto nenhuma geração tinha dado certo — o veredito tem 151
+ *  caracteres, que é justamente o caso que revelou a falta do clamp no
+ *  PDF (DECISIONS.md 2026-09-04). Não inventar texto aqui: agora existe
+ *  o de verdade. */
+export const textoProsaExemplo = `Você está progredindo na maioria dos exercícios, registrando por exemplo uma evolução de 66,7% na estimativa de carga máxima no Tríceps pulley (corda). Nesse mesmo exercício, o valor estimado atual atingiu 77, partindo de 46,2, além da conquista de um recorde pessoal de volume com 4080. A evolução de força também é visível no Crucifixo reto com halteres, com alta de 22,1%, e na Puxada pegada supinada, que subiu 25%. No Supino inclinado máquina, foi registrado um recorde de carga estimada de 70.
+
+O volume total semanal apresentou crescimento ao longo das 4 semanas analisadas, subindo de 16662 para 60751 na semana atual. Apesar da tendência geral positiva, o comportamento difere entre os movimentos. No Supino fechado, embora tenha ocorrido um recorde pessoal de volume de 3200, a carga máxima estimada recuou 29,8%, caindo de 76 para 53,3. A Cadeira extensora apresentou diminuição de 9,3% na estimativa de força, enquanto o Leg press 45 graus e a Rosca concentrada mantiveram variação de 0%.
+
+Analisando a distribuição do treino, o grupo de Costas ficou acima da faixa de referência prática com 23 séries válidas. Os grupos Quadríceps com 12, Tríceps com 15, Peito com 14 e Bíceps com 11 mantiveram-se dentro do intervalo de 10 a 20 séries. Ombro com 9, Posterior de coxa com 7, Abdômen com 4 e Panturrilha com 3 séries situaram-se abaixo dessa convenção. Não há dados disponíveis sobre a intensidade relativa por repetições de reserva, pois das 98 séries válidas do período, nenhuma apresentou esse registro.`;
 
 /** SINTÉTICO — mesma ressalva acima, mas com o veredito (primeira frase)
  *  encurtado ao extremo, pra ver a tipografia Fraunces 48px numa única

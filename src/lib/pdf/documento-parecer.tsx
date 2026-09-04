@@ -92,7 +92,8 @@ const e = StyleSheet.create({
   fioOuro: { height: 2, width: 44, backgroundColor: OURO, marginTop: 24, marginBottom: 22 },
 
   pergunta: { fontFamily: "Archivo", fontWeight: 500, fontSize: 10, color: TINTA2, letterSpacing: 1.5, marginBottom: 13 },
-  veredito: { fontFamily: "Fraunces", fontSize: 27, color: TINTA, lineHeight: 1.22 },
+  // `fontSize` sai daqui e vira inline: depende do comprimento do texto (ver `tamanhoVeredito`).
+  veredito: { fontFamily: "Fraunces", color: TINTA, lineHeight: 1.22 },
   corpo: { fontSize: 11, color: TINTA2, lineHeight: 1.65, marginTop: 18 },
 
   aviso: { borderLeftWidth: 2, borderLeftColor: QUEDA, paddingLeft: 10, paddingVertical: 5, marginBottom: 20 },
@@ -135,6 +136,40 @@ const e = StyleSheet.create({
   },
   rodapeTxt: { fontFamily: "Archivo", fontWeight: 500, fontSize: 7.5, color: TINTA3, letterSpacing: 0.4 },
 });
+
+/**
+ * Tamanho do veredito, encolhendo conforme o texto cresce — **a mesma
+ * decisão que `sistema.css` tomou para a tela em 2026-09-03**, agora
+ * aplicada aqui.
+ *
+ * POR QUE PRECISOU EXISTIR. O gate visual do veredito (DECISIONS.md
+ * 2026-09-03) descreveu o problema assim: "frase de julgamento longa vira
+ * 3+ linhas e empurra o resto do documento". Resolvemos na tela com
+ * `clamp()` e **passou reto no PDF**, que ficou com tamanho fixo. Achado ao
+ * olhar o PDF REAL baixado do app em 2026-09-04: um veredito de 151
+ * caracteres ocupou CINCO linhas, comeu metade da primeira página e jogou
+ * cinco evidências para uma segunda página quase vazia.
+ *
+ * É a segunda vez que uma decisão visual é aplicada num renderizador e não
+ * no outro — a primeira foi o guard do fallback (PR #177 → #181, dois dias
+ * invisível). Por isso a fórmula aqui é **derivada** da da tela, não
+ * inventada: mesma proporção, escalada da base de 48px para a de 27pt.
+ *
+ *   tela: clamp(30px, 48px − (n − 20) × 0,72px, 48px)
+ *   aqui: clamp(20pt, 27pt − (n − 20) × 0,405pt, 27pt)
+ *
+ * O piso de 20pt mantém a mesma relação com o corpo que a tela mantém
+ * (≈1,9× o texto de leitura), então o veredito continua dominante sem
+ * dominar a página. Truncar continua descartado pelo motivo original: corta
+ * a frase de julgamento no meio, e ela É o documento.
+ */
+export function tamanhoVeredito(caracteres: number): number {
+  const TETO = 27;
+  const PISO = 20;
+  const LIMIAR = 20;
+  const POR_CARACTERE = 0.405;
+  return Math.max(PISO, Math.min(TETO, TETO - (caracteres - LIMIAR) * POR_CARACTERE));
+}
 
 /** `criadoEm` é timestamptz completo (não YYYY-MM-DD) — `formatarDataCurta` não serve aqui, mas precisa do mesmo cuidado de timezone e do idioma certo. */
 function formatarDataEmissao(iso: string, idioma: ParecerSalvo["idioma"]): string {
@@ -214,7 +249,11 @@ export default function DocumentoParecer({ parecer }: { parecer: ParecerSalvo })
           </View>
         )}
 
-        {veredito ? <Text style={e.veredito}>{veredito}</Text> : null}
+        {veredito ? (
+          <Text style={[e.veredito, { fontSize: tamanhoVeredito(veredito.length) }]}>
+            {veredito}
+          </Text>
+        ) : null}
         {/* Sem veredito (fallback determinístico) a prosa é o primeiro
             elemento do corpo e não precisa do respiro que separa ela do
             veredito — senão soma com a margem do aviso e abre um vão. */}
