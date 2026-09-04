@@ -83,6 +83,8 @@ As fontes públicas se contradizem sobre o free tier (500 RPD vs 1.500 RPD) e me
 
 **Valor medido, com data (2026-08-05):** o projeto real, rodando `gemini-3.6-flash`, bateu em `RESOURCE_EXHAUSTED` (HTTP 429) durante testes do `qa-treino` — mensagem literal: `"Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 20, model: gemini-3.6-flash"`. **Limite real: 20 requisições/dia**, não medido antecipadamente (a tarefa 1.0c ficou pendente até o limite ser batido em uso real, não em teste controlado).
 
+**Segundo teto, medido em 2026-09-04 no console do AI Studio (`/rate-limit`): 5 requisições por MINUTO.** Não estava aqui e é o limite que o fluxo do parecer realmente encosta — as 2 chamadas (tentativa + retry de validação) saem em segundos, então **duas perguntas seguidas já chegam a 4/5 RPM**. Pico observado na janela de 28 dias: 3/5 RPM, 3,35K/250K TPM, 16/20 RPD. Foi assim que apareceram `429` num dia em que o teto DIÁRIO nem tinha sido batido — o erro era por minuto, não por dia. Detalhe e as taxas de erro medidas em `DECISIONS.md` 2026-09-04.
+
 **Isso invalida a premissa do ADR-001** ("o free tier cobre um usuário com folga") — 20 req/dia é **apertado**, não folgado: cada pergunta da Análise pode consumir até 2 chamadas (1ª tentativa + retry de validação), então na prática são **~10 perguntas/dia no máximo**, e isso conta junto com qualquer chamada de desenvolvimento/debug/teste. Decisão de como proceder (aguardar reset diário, trocar de modelo, considerar billing) registrada em `DECISIONS.md` — não é decisão que se toma sozinho, é trade-off de custo/produto do dono.
 
 ### 3.3 Dados de exercício — por que catálogo curado venceu API pronta
