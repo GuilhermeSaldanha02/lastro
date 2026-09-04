@@ -1911,3 +1911,46 @@ Vale registrar por que passou: em 03/set não existia prosa real (a Gemini vinha
 **Observação registrada para não virar bug report depois.** Depois de reabrir, o relógio volta a correr **ao vivo** — o print do dono mostrava um treino de 1h42 marcando 2h30 e subindo. Isso é **o comportamento desenhado** ("reabrir = a sessão está ativa de novo"), foi conferido com o dono, e **não contamina métrica nenhuma**: os dois relatórios usam `duracaoSessaoSegundos()` (banco: `iniciado_em` → última série), nunca o relógio. Se um dia incomodar, a saída é reabrir destravar o registro sem religar o relógio até a próxima série registrada — não feito, porque o dono confirmou que o comportamento atual é o esperado.
 
 **Continua `ALEGADO`:** abrir um treino antigo **em aparelho que nunca o treinou** e ver o tempo reconstruído e parado. Coberto por teste unitário (`marcos-treino.test.ts`) e por construção — `iniciarSessaoLocal` só grava marca em treino sem série —, mas não exercido a mão, porque exige um aparelho sem o `localStorage` daquele treino.
+
+---
+
+## 2026-09-05 (8) — Histórico de migrations reparado: o repo e o banco voltam a falar a mesma língua
+
+**A dívida, e o que ela era de fato.** Desde 2026-08-24 o `PROGRESS.md` registrava que "o histórico de migração divergiu — remoto tem `0001`–`0009` numeradas e cinco com timestamp; o repo tem `0010`–`0014`. São as mesmas migrações. `db push` recusa enquanto isso durar". Consultado o `supabase_migrations.schema_migrations` em 2026-09-05, o diagnóstico se confirmou e **encolheu**: não faltava dado nenhum no banco. Seis migrações do repo estavam aplicadas sob **versão com timestamp** em vez do número:
+
+| Repo | Estava no remoto como |
+|---|---|
+| `0010_peso_por_lado` | `20260824132220 peso_por_lado` |
+| `0011_peso_por_lado_na_serie` | `20260824133544 peso_por_lado_na_serie` |
+| `0012_idiomas` | `20260824150037 idiomas` **+** `20260824151727 idiomas_grants` |
+| `0013_indices_fk_faltantes` | `20260825180357 indices_fk_faltantes` |
+| `0014_revoga_execucao_publica_triggers` | `20260825181416 revoga_execucao_publica_triggers` |
+| `0017_parecer_checks_dominio` | `20260831211511 parecer_checks_dominio` |
+
+Note o `0012`: **um arquivo do repo consolidou DUAS migrações remotas.** Era o caso que faria um reparo mecânico errar.
+
+**Como foi reparado, e por que não pela CLI.** `supabase migration repair` exige a senha do banco, que o agente não tem e não deve pedir. O reparo foi feito por SQL — mesmo caminho que o projeto já tinha usado para registrar a `0015` à mão —, com três cuidados:
+
+1. **Backup completo antes**, dentro do próprio banco: `supabase_migrations.backup_20260905_antes_repair` (20 linhas). Reversível com um `insert ... select`.
+2. **Os `statements` de cada migração foram PRESERVADOS** na renumeração, não descartados — inclusive concatenando os dois do `0012`. Um `repair --status applied` da CLI teria criado linhas vazias.
+3. **Tudo numa transação**: as 6 inserções e as 7 remoções, ou tudo ou nada. Meia renumeração seria pior que a divergência — o `db push` tentaria re-rodar uma migração já aplicada.
+
+**Cosmético, feito junto:** `0016`, `0018` e `0019` tinham o prefixo do arquivo dentro do campo `name` (`0016_tabela_parecer`), diferente das demais. Normalizado. O `db push` casa por `version`, não por `name` — é só uniformidade de `migration list`.
+
+**Verificação.** Repo e remoto comparados **programaticamente** (versão + nome, par a par): 19 e 19, idênticos.
+
+**O que continua `ALEGADO`.** A prova definitiva é `supabase migration list` mostrando `Local` e `Remote` alinhados, e ela exige a senha do banco — é do dono. O que foi provado aqui é que a **tabela de histórico** agora corresponde exatamente aos arquivos do repo, que é a condição que o `db push` checa.
+
+**Consequência prática:** as próximas migrações voltam a ser `supabase db push` normal, sem aplicar à mão e registrar depois — que foi como a `0015` e a `0019` precisaram entrar.
+
+**Como reverter.**
+
+```sql
+begin;
+delete from supabase_migrations.schema_migrations;
+insert into supabase_migrations.schema_migrations
+  select * from supabase_migrations.backup_20260905_antes_repair;
+commit;
+```
+
+A tabela de backup fica no banco de propósito. Apagar só depois de o dono confirmar o `migration list` alinhado — antes disso ela é a única rede.

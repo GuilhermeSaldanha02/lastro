@@ -40,7 +40,7 @@
 
 ### Backlog
 
-1. **Dívida de migration — é NOMENCLATURA, não dado perdido.** Consultado em 2026-09-05: as mesmas migrações existem sob dois esquemas de versão — o repo usa numérico, o remoto gravou **seis** com timestamp (`0010`↔`20260824132220` etc.). Por isso `db push` recusa. `supabase migration repair --status applied` resolve; exige a senha do banco. A `0019` foi registrada com número, sem aumentar a divergência.
+1. ~~**Dívida de migration**~~ **REPARADA em 05/set** — `DECISIONS.md` `2026-09-05 (8)`. Repo e remoto agora são **idênticos: 19 migrações, `0001`–`0019`**, conferido programaticamente (versão + nome, par a par). Feito por SQL, não pela CLI (que exige a senha do banco): com backup completo antes (`supabase_migrations.backup_20260905_antes_repair`, 20 linhas), `statements` preservados na renumeração, e tudo em uma transação. **Falta só o dono rodar `supabase migration list`** e ver `Local`/`Remote` alinhados — aí pode apagar a tabela de backup. As próximas migrações voltam a ser `db push` normal.
 2. **`DESIGN.md` §3.0 contradiz `tokens.css`** — §3.0 diz "Areia & Azul Petróleo"; os tokens são "Apex Pro: Obsidiana/Ouro/Esmeralda", e o §3.1 declara os tokens como fonte única. É o doc que um agente lê antes de escolher cor.
 3. **Ponteiro quebrado no `PRD.md`** — aponta o protocolo de Scope Change para `.claude/skills/padrao-documentos/SKILL.md`, que não existe.
 4. **`formatarPeso` não agrupa milhar** (`7280 kg`). Compartilhado com tela e fallback — mudar mexe nos três. Pergunta pro dono.
