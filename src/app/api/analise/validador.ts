@@ -183,7 +183,45 @@ function coletarContextoEstrutural(resumo: ResumoCompacto): number[] {
     ...resumo.faixa_referencia_series,
     ...componentesData(inicio),
     ...componentesFimDeSemana(inicio),
+    ...numerosDosNomesDeExercicio(resumo),
   ];
+}
+
+/**
+ * Números que fazem parte do NOME de um exercício — "Leg press **45** graus".
+ *
+ * Flagrado em produção em 2026-09-04, no log de uma geração real do dono: a
+ * tentativa 1 foi rejeitada com `intrusos: [45]` porque o parecer escreveu o
+ * nome do exercício. O `45` não é número citado pelo modelo — é parte de um
+ * substantivo próprio que o PRÓPRIO RESUMO entregou a ele. Rejeitar por isso
+ * é punir o modelo por usar o vocabulário que nós demos.
+ *
+ * `extrairTokens` não tinha como saber sozinho: o lookbehind de letra existe
+ * para proteger `e1RM` (dígito colado a letra), e aqui o `45` vem depois de
+ * um ESPAÇO — sintaticamente é um número solto.
+ *
+ * Entra no conjunto CONTEXTO, não no DADOS, e a distinção importa: escrever
+ * "Leg press 45 graus" **não prova** que o parecer é sobre este dono. Só
+ * deixa de ser motivo de rejeição; a prova continua tendo que vir de um
+ * número de verdade.
+ */
+function numerosDosNomesDeExercicio(resumo: ResumoCompacto): number[] {
+  const nomes = new Set<string>();
+  for (const e of resumo.volume_por_exercicio) nomes.add(e.exercicio);
+  for (const t of resumo.tendencia_e1rm) nomes.add(t.exercicio);
+  for (const e of resumo.estagnacoes) nomes.add(e.exercicio);
+  for (const p of resumo.prs) nomes.add(p.exercicio);
+  // Grupo muscular entra pelo mesmo motivo: é vocabulário nosso, não citação.
+  for (const g of resumo.volume_por_grupo_muscular) nomes.add(g.grupo_muscular);
+
+  const numeros: number[] = [];
+  for (const nome of nomes) {
+    for (const bruto of nome.match(/\d+(?:[.,]\d+)?/g) ?? []) {
+      const n = Number(bruto.replace(",", "."));
+      if (Number.isFinite(n)) numeros.push(n);
+    }
+  }
+  return numeros;
 }
 
 /**
