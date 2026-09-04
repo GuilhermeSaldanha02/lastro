@@ -11,7 +11,7 @@
 
 > Bloco de handoff entre agentes (Antigravity ⇄ Claude). **Sobrescrever a cada sessão**, nunca acumular. Formato e regras: `AGENTS.md` §3.
 
-- **Última sessão:** 2026-09-03/05 · agente: claude · **`main` em `65bdfe8`, 333 testes verdes**, `tsc`/lint/build limpos, working tree limpa. **16 PRs mergeados** (#189–#203), nenhum aberto. Deploy de produção `READY`.
+- **Última sessão:** 2026-09-03/05 · agente: claude · **`main` em `e846e7f`, 333 testes verdes**, `tsc`/lint/build limpos, working tree limpa. **18 PRs mergeados** (#189–#205), nenhum aberto. Deploy de produção `READY`.
 
 ### O que mudou, em ordem de importância
 
@@ -26,7 +26,8 @@
 
 - ~~Salvar o parecer de prosa real~~ **FEITO** — `a7f5fe7c`, salvo em 04/set. É a prosa que substituiu o exemplo sintético da bancada (`scripts/preview/dados.ts`).
 - ~~Baixar o PDF~~ **FEITO**, e foi ele que revelou a falta do clamp (#203). **Baixar de novo depois do deploy** para confirmar o veredito em 4 linhas.
-- **QA no aparelho — só faltam DUAS, e as duas exigem o celular:** (1) finalizar → confirmar → reabrir e ver o cronômetro voltar **de onde parou**, não do zero; (2) abrir um treino **antigo** e ver o tempo **parado**, não 00:00 correndo.
+- ~~QA: finalizar → confirmar → reabrir~~ **PASSOU** — confirmado pelo dono no aparelho em 05/set. Primeiro item desta leva a sair de `ALEGADO`. Nota: depois de reabrir o relógio volta a correr ao vivo (desenhado, conferido com o dono, e não contamina métrica — os relatórios usam a duração do banco).
+- **`ALEGADO` que sobrou:** abrir um treino antigo **em aparelho que nunca o treinou** e ver o tempo reconstruído e parado. Coberto por teste e por construção; não exercido à mão porque exige um aparelho sem o `localStorage` daquele treino.
 - **Terceira, com meio caminho andado:** gerar o relatório **nos dois lugares**. Calculado do banco em 04/set: `iniciado_em` 22:06 + última série 23:48 = **1h42**. Se os dois mostrarem isso, o bug dos relatórios divergentes está provado corrigido.
 - **Conversar com 2-3 personais** (abre o portão do §11). **Não abrir pela IA** — abrir pelo resultado ("toda segunda eu te digo qual aluno ligar"); e levar a sério a hipótese de que a dor não existe.
 - **`supabase migration repair`** — ver backlog 1.

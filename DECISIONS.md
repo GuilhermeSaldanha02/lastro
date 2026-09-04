@@ -1859,3 +1859,55 @@ Mesma proporção, escalada da base de 48px para a de 27pt. O piso de 20pt mant�
 **Estado de QA: `PASSOU` na renderização** — o antes/depois foi produzido com o texto real, não com fixture. Falta só o dono baixar o PDF novo do app depois do deploy.
 
 **Como reverter.** `git revert`. O veredito volta a 27pt fixo e o problema volta com ele.
+
+---
+
+## 2026-09-05 (5) — O clamp do veredito era cego para a largura da tela
+
+**Achado pelo dono usando o app no celular**, com a primeira prosa real que a Gemini produziu. Print: o veredito ocupando a tela inteira, sem uma linha de evidência visível sem rolar.
+
+**A causa, e ela é uma limitação da decisão de 03/set, não um bug de implementação.** O `clamp()` do `.doc__veredito` foi calibrado por **contagem de caracteres** — encolhe conforme o texto cresce — mas o **piso era fixo** em `--lastro-papel-titulo-tela` (30px), e a calibragem foi feita sem olhar largura de celular. Medido na bancada a 375px: um veredito de **151 caracteres batia o piso e AINDA assim ocupava 11 linhas, 413px, 51% da altura da tela**.
+
+Vale registrar por que passou: em 03/set não existia prosa real (a Gemini vinha falhando), então o caso de estresse foi um texto **sintético** de 188 caracteres, verificado com `getComputedStyle` — mas a verificação olhou o **tamanho da fonte**, não a **altura resultante em viewport estreito**. A medição estava certa; a pergunta é que estava incompleta.
+
+**A correção.** O piso vira **mobile-first**: `--lastro-papel-secao` (20px), degrau que **já existe** na escala — não é número novo —, com `titulo-tela` voltando a partir de **640px**, o mesmo corte que `.evidencia` já usa. Um degrau basta porque **a altura cresce com o quadrado do tamanho da fonte** (fonte menor = mais caracteres por linha E linha mais baixa).
+
+**Medido depois, nos três casos:**
+
+| Caso | Antes | Depois |
+|---|---|---|
+| Longo (151) em 375px | 30px · 11 linhas · **51% da tela** | **20px · 6 linhas · 18%** |
+| Longo em 1024px | 30px · 3 linhas | inalterado |
+| Curto (13) em 375px | 48px | inalterado |
+
+**Alternativa descartada:** encurtar o veredito no prompt (pedir frase mais curta ao modelo). Continua sendo uma alavanca legítima e complementar, mas é a **alavanca fraca** (`SDD` §6.4 usa esse mesmo vocabulário para instrução de prompt vs. validador): o layout não pode depender de o modelo obedecer. Fica anotada, não feita.
+
+**Classificação.** **Correção.** Nenhum contrato muda; o `DESIGN` §3.6.2 continua valendo.
+
+**Impacto.** `src/app/sistema.css`. PR #205, squash `e846e7f`.
+
+---
+
+## 2026-09-05 (6) — A quebra do PDF passa a cair na fronteira da seção
+
+**Achado pelo dono ao abrir o PDF real:** *"olha o vão em branco que tá ficando"*.
+
+**A causa.** A quebra de página caía **entre a 2ª e a 3ª linha da evidência**: a página 1 terminava com duas linhas órfãs e a 2 começava no meio da tabela, deixando ~70% de vão. A quebra **parecia acidente**.
+
+**A correção.** `wrap={false}` no bloco de evidência inteiro. A quebra passa a cair na **fronteira da seção**: página 1 é o documento (cabeçalho, veredito, prosa), página 2 é a **tabela completa**.
+
+**O que NÃO foi feito, e está escrito no código para ninguém "terminar" depois:** o documento **continua em 2 páginas com espaço em branco**. O conteúdo é de ~1,3 página (3 parágrafos de prosa + 6 evidências); medi o que seria preciso economizar para caber em uma — cerca de 380pt — contra o máximo que densificação agressiva renderia (~136pt). **Não cabe.** Espremer seria maquiar. O defeito era a quebra parecer acidental, e isso acabou.
+
+**Limite documentado:** com muitos exercícios a tabela pode passar de uma página inteira; aí o `@react-pdf` volta a quebrá-la, que é o comportamento certo.
+
+**Classificação.** **Correção.** Impacto: `src/lib/pdf/documento-parecer.tsx`. PR #205, squash `e846e7f`.
+
+---
+
+## 2026-09-05 (7) — QA: "finalizar e reabrir" saiu de ALEGADO para PASSOU
+
+**Confirmado pelo dono no aparelho dele**, que é a única prova que valia: finalizar → confirmar → reabrir devolve o cronômetro **de onde parou**, e finalizar volta a congelá-lo. É o percurso que a entrada `2026-09-03 (5)` deixou explicitamente pendente porque nenhum teste substitui — depende do relógio real entre duas sessões.
+
+**Observação registrada para não virar bug report depois.** Depois de reabrir, o relógio volta a correr **ao vivo** — o print do dono mostrava um treino de 1h42 marcando 2h30 e subindo. Isso é **o comportamento desenhado** ("reabrir = a sessão está ativa de novo"), foi conferido com o dono, e **não contamina métrica nenhuma**: os dois relatórios usam `duracaoSessaoSegundos()` (banco: `iniciado_em` → última série), nunca o relógio. Se um dia incomodar, a saída é reabrir destravar o registro sem religar o relógio até a próxima série registrada — não feito, porque o dono confirmou que o comportamento atual é o esperado.
+
+**Continua `ALEGADO`:** abrir um treino antigo **em aparelho que nunca o treinou** e ver o tempo reconstruído e parado. Coberto por teste unitário (`marcos-treino.test.ts`) e por construção — `iniciarSessaoLocal` só grava marca em treino sem série —, mas não exercido a mão, porque exige um aparelho sem o `localStorage` daquele treino.
