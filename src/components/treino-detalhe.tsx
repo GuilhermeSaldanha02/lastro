@@ -20,6 +20,7 @@ import SeletorGrupoMuscular, { type OpcaoGrupo } from "./seletor-grupo-muscular"
 import EtiquetaRecorde from "./etiqueta-recorde";
 import TimerTopo from "./timer-topo";
 import RelatorioPosTreino from "./relatorio-pos-treino";
+import { assinarMarcos, estaFinalizado, marcarFim, reabrir } from "@/lib/treino/marcos-treino";
 import { calcularMetricasSessao } from "@/lib/dados/metricas-treino";
 import { gruposConhecidos } from "@/lib/dados/grupos-conhecidos";
 import {
@@ -77,20 +78,7 @@ function agruparPorExercicio(series: SerieUI[]) {
  * no próximo render depois disso, sem inicializador divergente.
  */
 function treinoFoiFinalizado(treinoId: string): boolean {
-  if (typeof window === "undefined") return false;
-  return Boolean(localStorage.getItem(`lastro_fim_treino_${treinoId}`));
-}
-
-/**
- * Este valor não muda por conta própria (não é um relógio) — muda só
- * quando o próprio clique em "Finalizar Treino" grava o `localStorage` E
- * dispara outros `setState` no mesmo handler (`setMostrarRelatorio`), o
- * que já força o próximo render a rechamar `getSnapshot` e pegar o valor
- * novo. Por isso não precisa de assinatura de verdade — só satisfaz a
- * API do `useSyncExternalStore`.
- */
-function semAssinaturaExterna(): () => void {
-  return () => {};
+  return estaFinalizado(treinoId);
 }
 
 export default function TreinoDetalhe({
@@ -150,9 +138,21 @@ export default function TreinoDetalhe({
   } | null>(null);
   const [mostrarRelatorio, setMostrarRelatorio] = useState(false);
   const [duracaoSegundos, setDuracaoSegundos] = useState(0);
+  // Confirmação inline de "Finalizar Treino". Nasceu de relato de uso real
+  // (2026-09-03): o dono encostou no botão sem querer, o cronômetro
+  // congelou e não havia volta. O custo é real — mesma lógica do PRD §4.1
+  // ("toda exclusão pede confirmação inline") e do "Descartar" rascunho da
+  // PR #181, que também não era só simetria.
+  const [confirmandoFim, setConfirmandoFim] = useState(false);
+  // Assinatura de VERDADE agora (`assinarMarcos`): `marcarFim` e `reabrir`
+  // notificam, então a releitura é consequência da escrita. Antes era uma
+  // assinatura vazia que dependia de algum outro setState do mesmo handler
+  // forçar o render — funcionava por sorte, e "reabrir" não teria essa
+  // sorte, porque o clique dele mexe só no localStorage.
+  const lerConcluido = useCallback(() => treinoFoiFinalizado(treinoId), [treinoId]);
   const treinoConcluido = useSyncExternalStore(
-    semAssinaturaExterna,
-    () => treinoFoiFinalizado(treinoId),
+    assinarMarcos,
+    lerConcluido,
     () => false,
   );
   const grupos = useMemo(() => agruparPorExercicio(series), [series]);
@@ -614,52 +614,109 @@ export default function TreinoDetalhe({
 
       {/* Área de Ações do Treino Refinada: Pílulas Compactas Lado a Lado + Finalizar Treino */}
       <div className="acao-area">
-        {ultima ? (
-          <div className="acao-area-grid">
-            <button
-              type="button"
-              className="botao-primario botao-acao-duplo"
-              onClick={repetirUltimaSerie}
-            >
-              {t("Repetir série", idioma)}
-            </button>
+        {/* Treino concluído fecha o registro. Antes nada aqui olhava
+            `treinoConcluido` — só o rótulo do botão de baixo mudava —, então
+            dava pra seguir registrando série num treino "finalizado" com o
+            cronômetro congelado. O app dizia uma coisa e fazia outra
+            (relato de uso real, 2026-09-03). Pra voltar a registrar existe
+            "Reabrir treino", que é explícito. */}
+        {!treinoConcluido &&
+          (ultima ? (
+            <div className="acao-area-grid">
+              <button
+                type="button"
+                className="botao-primario botao-acao-duplo"
+                onClick={repetirUltimaSerie}
+              >
+                {t("Repetir série", idioma)}
+              </button>
 
+              <button
+                type="button"
+                className="botao-secundario botao-acao-duplo"
+                aria-expanded={formularioAberto}
+                onClick={() => setFormularioAberto((aberto) => !aberto)}
+              >
+                {t(formularioAberto ? "Fechar" : "Outra série", idioma)}
+              </button>
+            </div>
+          ) : (
             <button
               type="button"
               className="botao-secundario botao-acao-duplo"
               aria-expanded={formularioAberto}
               onClick={() => setFormularioAberto((aberto) => !aberto)}
             >
-              {t(formularioAberto ? "Fechar" : "Outra série", idioma)}
+              {t(formularioAberto ? "Fechar" : "Adicionar exercício", idioma)}
+            </button>
+          ))}
+
+        {series.length > 0 && treinoConcluido && (
+          <div className="acao-area-grid">
+            <button
+              type="button"
+              className="botao-finalizar-treino"
+              onClick={() => setMostrarRelatorio(true)}
+            >
+              <span>{t("Ver Relatório do Treino", idioma)}</span>
+            </button>
+
+            {/* A saída que não existia. Reabrir devolve o registro E
+                destrava o cronômetro preservando o decorrido — sem isso,
+                um treino de 1h reaberto 4h depois marcaria 5h
+                (`inicioAoReabrir`, marcos-treino.ts). */}
+            <button
+              type="button"
+              className="botao-secundario botao-acao-duplo"
+              onClick={() => {
+                reabrir(treinoId);
+                setMostrarRelatorio(false);
+              }}
+            >
+              {t("Reabrir treino", idioma)}
             </button>
           </div>
-        ) : (
-          <button
-            type="button"
-            className="botao-secundario botao-acao-duplo"
-            aria-expanded={formularioAberto}
-            onClick={() => setFormularioAberto((aberto) => !aberto)}
-          >
-            {t(formularioAberto ? "Fechar" : "Adicionar exercício", idioma)}
-          </button>
         )}
 
-        {series.length > 0 && (
+        {series.length > 0 && !treinoConcluido && !confirmandoFim && (
           <button
             type="button"
             className="botao-finalizar-treino"
-            onClick={() => {
-              if (typeof window !== "undefined") {
-                const chaveFim = `lastro_fim_treino_${treinoId}`;
-                if (!localStorage.getItem(chaveFim)) {
-                  localStorage.setItem(chaveFim, new Date().toISOString());
-                }
-              }
-              setMostrarRelatorio(true);
-            }}
+            onClick={() => setConfirmandoFim(true)}
           >
-            <span>{t(treinoConcluido ? "Ver Relatório do Treino" : "Finalizar Treino", idioma)}</span>
+            <span>{t("Finalizar Treino", idioma)}</span>
           </button>
+        )}
+
+        {series.length > 0 && !treinoConcluido && confirmandoFim && (
+          <div className="confirma">
+            <p className="confirma__texto">
+              {t(
+                "Finalizar o treino? O cronômetro para e o registro fecha — dá para reabrir depois.",
+                idioma,
+              )}
+            </p>
+            <div className="confirma__acoes">
+              <button
+                type="button"
+                className="botao-secundario"
+                onClick={() => setConfirmandoFim(false)}
+              >
+                {t("Cancelar", idioma)}
+              </button>
+              <button
+                type="button"
+                className="botao-finalizar-treino"
+                onClick={() => {
+                  marcarFim(treinoId);
+                  setConfirmandoFim(false);
+                  setMostrarRelatorio(true);
+                }}
+              >
+                {t("Finalizar Treino", idioma)}
+              </button>
+            </div>
+          </div>
         )}
 
         {/* D7 — estado de sincronização sempre visível, nunca alarmante. */}

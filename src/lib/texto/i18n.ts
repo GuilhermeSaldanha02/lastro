@@ -704,6 +704,12 @@ const DICIONARIO: Record<string, { en: string; es: string }> = {
   "Gerando…": { en: "Generating…", es: "Generando…" },
   "Rascunho": { en: "Draft", es: "Borrador" },
   "Revisar e salvar": { en: "Review and save", es: "Revisar y guardar" },
+  // --- components/treino-detalhe.tsx (finalizar / reabrir treino) ---
+  "Reabrir treino": { en: "Reopen workout", es: "Reabrir entrenamiento" },
+  "Finalizar o treino? O cronômetro para e o registro fecha — dá para reabrir depois.": {
+    en: "Finish the workout? The timer stops and logging closes — you can reopen it later.",
+    es: "¿Finalizar el entrenamiento? El cronómetro se detiene y el registro se cierra — puedes reabrirlo después.",
+  },
 };
 
 export function t(chavePtBr: string, idioma: Idioma): string {
