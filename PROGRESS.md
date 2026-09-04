@@ -11,7 +11,7 @@
 
 > Bloco de handoff entre agentes (Antigravity ⇄ Claude). **Sobrescrever a cada sessão**, nunca acumular. Formato e regras: `AGENTS.md` §3.
 
-- **Última sessão:** 2026-09-03/05 · agente: claude · **`main` em `e846e7f`, 333 testes verdes**, `tsc`/lint/build limpos, working tree limpa. **18 PRs mergeados** (#189–#205), nenhum aberto. Deploy de produção `READY`.
+- **Última sessão:** 2026-09-03/05 · agente: claude · **`main` em `037061d`, 333 testes verdes**, `tsc`/lint/build limpos, working tree limpa. **20 PRs mergeados** (#189–#206), nenhum aberto. Deploy de produção `READY`.
 
 ### O que mudou, em ordem de importância
 
@@ -24,11 +24,17 @@
 
 ### Pendências do DONO (nada disso é tarefa de agente)
 
-- ~~Salvar o parecer de prosa real~~ **FEITO** — `a7f5fe7c`, salvo em 04/set. É a prosa que substituiu o exemplo sintético da bancada (`scripts/preview/dados.ts`).
-- ~~Baixar o PDF~~ **FEITO**, e foi ele que revelou a falta do clamp (#203). **Baixar de novo depois do deploy** para confirmar o veredito em 4 linhas.
-- ~~QA: finalizar → confirmar → reabrir~~ **PASSOU** — confirmado pelo dono no aparelho em 05/set. Primeiro item desta leva a sair de `ALEGADO`. Nota: depois de reabrir o relógio volta a correr ao vivo (desenhado, conferido com o dono, e não contamina métrica — os relatórios usam a duração do banco).
-- **`ALEGADO` que sobrou:** abrir um treino antigo **em aparelho que nunca o treinou** e ver o tempo reconstruído e parado. Coberto por teste e por construção; não exercido à mão porque exige um aparelho sem o `localStorage` daquele treino.
-- **Terceira, com meio caminho andado:** gerar o relatório **nos dois lugares**. Calculado do banco em 04/set: `iniciado_em` 22:06 + última série 23:48 = **1h42**. Se os dois mostrarem isso, o bug dos relatórios divergentes está provado corrigido.
+**TRÊS QAs saíram de `ALEGADO` em 05/set**, todos confirmados pelo dono no aparelho e no arquivo real — nenhum por agente declarando que funcionou:
+
+- ~~Salvar o parecer de prosa real~~ **FEITO** — `a7f5fe7c`. Substituiu o exemplo sintético da bancada (`scripts/preview/dados.ts`).
+- ~~QA: finalizar → confirmar → reabrir~~ **PASSOU.** Nota que evita bug report futuro: depois de reabrir o relógio volta a correr **ao vivo** (desenhado, conferido com o dono) e **não contamina métrica** — os relatórios usam a duração do banco, nunca o relógio.
+- ~~QA: veredito no celular~~ **PASSOU.** Print do dono em produção: veredito em ~1/5 da tela e o primeiro cartão de evidência visível **sem rolar**. Bate com a medição da bancada (51% → 18%).
+- ~~QA: PDF baixado do app~~ **PASSOU.** Página 2 é a tabela completa (6 evidências), não mais 4 linhas órfãs no meio. O branco que sobra é o limite registrado em `DECISIONS.md` `2026-09-05 (6)` — o conteúdo é de 1,3 página; **não é trabalho pela metade.**
+
+**O que continua `ALEGADO`, e por quê:**
+
+- Abrir um treino antigo **em aparelho que nunca o treinou** e ver o tempo reconstruído e parado. Coberto por teste (`marcos-treino.test.ts`) e por construção; não exercido à mão porque exige um aparelho sem o `localStorage` daquele treino.
+- Gerar o relatório **nos dois lugares** e conferir que batem. Meio caminho andado: calculado do banco em 04/set, `iniciado_em` 22:06 + última série 23:48 = **1h42**. Se os dois mostrarem isso, o bug dos relatórios divergentes está provado.
 - **Conversar com 2-3 personais** (abre o portão do §11). **Não abrir pela IA** — abrir pelo resultado ("toda segunda eu te digo qual aluno ligar"); e levar a sério a hipótese de que a dor não existe.
 - **`supabase migration repair`** — ver backlog 1.
 
