@@ -1481,3 +1481,46 @@ Reverte explicitamente a posição da ADR anterior contra tradução automática
 **Estado de QA: `ALEGADO`, não `PASSOU`** (`AGENTS.md` §5). Verificado por quem implementou, na bancada, contra o parecer real da conta do dono, nos dois caminhos (prosa e fallback de 2 páginas, com rodapé fixo e paginação). **Falta:** a passada de outro agente, e o dono ver o PDF baixado do app de verdade — a rota `/api/parecer/[id]/pdf` exige sessão e não roda nesta máquina. E vale a ressalva de origem: o único parecer salvo em produção está **em fallback determinístico**; o caminho de prosa foi validado com o `textoProsaExemplo` sintético da bancada.
 
 **Como reverter.** `git revert` do commit de implementação devolve o PDF Helvetica. `src/lib/pdf/fontes.ts` e `scripts/fontes-pdf/` ficam órfãos e podem ser apagados — nada mais no projeto os importa.
+
+---
+
+## 2026-09-03 (5) — "Finalizar Treino" encerra a sessão e pode ser desfeito (semântica decidida a partir de relato de uso real)
+
+**Por que esta entrada existe.** Não é bugfix puro. O dono escolheu **o que "finalizar" significa** — e sem registro o próximo agente pode "consertar" de volta pro híbrido acidental que existia antes, achando que a restrição nova é excesso de zelo.
+
+**A origem.** Relato de uso real do dono, usando o app: apertou "Finalizar Treino" sem querer, o cronômetro congelou, ele **conseguia seguir adicionando exercícios**, mas o timer de descanso não acionava mais.
+
+**O que o código fazia — três defeitos encadeados, não um.**
+
+1. **"Finalizar" não pedia confirmação nenhuma.** Um toque em `treino-detalhe.tsx` gravava `lastro_fim_treino_<id>` e acabou. Contrariava o padrão do próprio projeto: o `PRD.md` §4.1 exige confirmação inline onde a ação tem custo real, e a PR #181 aplicou a mesma regra ao "Descartar" rascunho pelo mesmo raciocínio. Num app que o `DESIGN.md` D4 descreve como usado **suado, com uma mão, entre séries**, toque acidental não é hipótese.
+2. **Era irreversível.** A chave era **escrita por DOIS componentes** — `timer-topo.tsx` (`garantirMarcosTreino`) e `treino-detalhe.tsx` (no `onClick`), cada um com sua própria cópia do nome — e **apagada por nenhum**. `calcularSegundosTreino` congela em `fim - início` quando a chave existe, então o cronômetro daquele treino ficava travado **para sempre**, sem caminho na UI.
+3. **O botão de descanso virava um no-op silencioso** — e é o que o dono sentiu. Com o treino finalizado, `descansoAtivo = ativo && !treinoFinalizado` já nascia `false`, mas a condição de render do botão era `!descansoAtivo && !descansoFinalizado`, que dava **`true`**. O botão continuava visível e clicável, `iniciarTimer` rodava, a cápsula nunca aparecia, e nada avisava. Um botão desabilitado teria dito a verdade; esse mentiu, e o dono clicou várias vezes achando que era ele.
+
+**O estado incoerente por trás dos três.** Nada na área de ações observava `treinoConcluido` — só o rótulo do botão mudava. Ou seja, o app **congelava o tempo como se a sessão tivesse acabado, mas deixava registrar como se não tivesse**. Um híbrido acidental de duas semânticas.
+
+**A decisão do dono.** Perguntado entre três leituras, escolheu: **finalizar encerra a sessão de verdade, com desfazer.**
+
+- Finalizar **pede confirmação inline**, com o custo dito na frase.
+- Enquanto finalizado: o cronômetro para, **o descanso some** (não fica de enfeite clicável) e **o registro fecha**.
+- Existe **"Reabrir treino"**, que devolve tudo.
+
+**Alternativas descartadas.**
+
+1. **"Finalizar" é só um marco; o treino segue editável e registrar uma série reabre sozinho.** Menos atrito e sem botão de desfazer, mas o treino nunca fica realmente fechado — e o relatório pós-treino poderia mudar depois de emitido, o que colide com a ideia de documento emitido que o produto já usa no parecer (§7.1).
+2. **Só consertar o botão morto.** Corrigiria o sintoma e deixaria o dono sem saída no próximo toque acidental — que é a parte do relato que mais custou.
+
+**A armadilha do "desfazer", registrada porque quase passou.** Reabrir **não pode** só apagar a marca de fim. O decorrido é `agora − início`, então um treino de 1h finalizado às 10h e reaberto às 14h passaria a marcar **5 horas** — o desfazer mentiria pior que o bug original. `inicioAoReabrir` (`src/lib/treino/marcos-treino.ts`) desloca o início para preservar o que já correu. Tem teste dedicado.
+
+**Consequência estrutural: as duas chaves ganharam um dono só.** `src/lib/treino/marcos-treino.ts` passa a ser o único lugar que lê e escreve `lastro_inicio_treino_` e `lastro_fim_treino_`. `timer-topo.tsx` só garante o **início**; `treino-detalhe.tsx` é quem finaliza e reabre. **A duplicação era a causa-raiz** — cada lado sabia gravar e nenhum sabia apagar.
+
+**Achado de brinde, corrigido no caminho.** O `useSyncExternalStore` que deriva "concluído" em `treino-detalhe.tsx` tinha **assinatura vazia**: o próprio comentário do arquivo dizia que dependia de algum outro `setState` do mesmo handler forçar o render. Funcionava por sorte — e "Reabrir" não teria essa sorte, porque o clique dele mexe **só** no `localStorage`. `marcarFim`/`reabrir` agora notificam de verdade (`assinarMarcos`), então a releitura é consequência da escrita, não coincidência.
+
+**Classificação.** **ADIÇÃO** de comportamento (confirmação + reabrir) e **correção** de três defeitos. Nenhum contrato de documento muda: `PRD.md`, `ADR.md` e as fitness functions ficam intactos — a confirmação inline, aliás, passa a **cumprir** o §4.1 onde antes não cumpria.
+
+**Impacto.** `src/lib/treino/marcos-treino.ts` + teste (novos), `src/components/treino-detalhe.tsx`, `src/components/timer-topo.tsx`, `src/lib/texto/i18n.ts` (+2 chaves en/es). 13 testes novos, 265 no total; `tsc`, lint e build de produção limpos. PR #193, squash `3d2a76d`.
+
+**Estado de QA: `ALEGADO`, não `PASSOU`** (`AGENTS.md` §5). Não há como rodar o app nesta máquina (sem `.env.local`) e a bancada visual não monta `treino-detalhe`. **Falta o dono repetir o percurso no aparelho dele:** finalizar → confirmar → ver o descanso sumir → reabrir → **conferir que o cronômetro voltou de onde parou**, não do zero nem inflado. Esse último passo é o único que os testes não substituem, porque depende do relógio real entre duas sessões.
+
+**Pergunta que este achado abre e ninguém respondeu.** `descansoAtivo` foi um caso de **condição de render e condição de efeito discordando** — o botão aparecia por uma regra e funcionava por outra. Não foi feita varredura atrás de outros lugares com o mesmo padrão. Se existirem, há mais botão mentindo no app.
+
+**Como reverter.** `git revert` do commit devolve os três defeitos juntos — inclusive a irreversibilidade. `src/lib/treino/` fica órfão e pode ser apagado.
