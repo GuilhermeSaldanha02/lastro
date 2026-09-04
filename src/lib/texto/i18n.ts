@@ -704,6 +704,18 @@ const DICIONARIO: Record<string, { en: string; es: string }> = {
   "Gerando…": { en: "Generating…", es: "Generando…" },
   "Rascunho": { en: "Draft", es: "Borrador" },
   "Revisar e salvar": { en: "Review and save", es: "Revisar y guardar" },
+
+  // --- lib/pdf/documento-parecer.tsx (PDF do parecer, SDD §10.4) ---
+  "Evidência": { en: "Evidence", es: "Evidencia" },
+  "Sinal": { en: "Signal", es: "Señal" },
+  // Abreviação de "semanas" no cabeçalho da tabela — precede o número da
+  // janela ("4 SEM"). Chave curta de propósito: a coluna é estreita.
+  "sem": { en: "wks", es: "sem" },
+  "semanas sem novo máximo": { en: "weeks without a new max", es: "semanas sin nuevo máximo" },
+  "Documento emitido pelo lastro · não substitui acompanhamento profissional": {
+    en: "Document issued by lastro · does not replace professional guidance",
+    es: "Documento emitido por lastro · no sustituye el acompañamiento profesional",
+  },
 };
 
 export function t(chavePtBr: string, idioma: Idioma): string {

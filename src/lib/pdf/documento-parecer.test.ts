@@ -92,4 +92,57 @@ describe("DocumentoParecer", () => {
     expect(encontrados).not.toContain(veredito);
     expect(encontrados).toContain(TEXTO_FALLBACK.trim());
   });
+
+  // A linha de procedência nasceu no portão visual de 2026-09-03: era o
+  // que tirava a página do vazio SEM inventar enfeite, usando campo que a
+  // evidência já carrega por contrato (evidencia.ts, Regra da Presença) e
+  // que a tela não mostra.
+  it("imprime a procedência de cada evidência — grupo, séries valendo e referência", () => {
+    const encontrados = textos(DocumentoParecer({ parecer: parecer() })).join(" ");
+    expect(encontrados).toContain("Tríceps");
+    expect(encontrados).toContain("8 séries valendo");
+    expect(encontrados).toContain("55 kg × 12");
+  });
+
+  it("usa singular quando é uma série só", () => {
+    const uma = {
+      ...EVIDENCIA,
+      blocos: [{ ...EVIDENCIA.blocos[0], series_valendo: 1 }],
+    } as EvidenciaParaTela;
+    const encontrados = textos(
+      DocumentoParecer({ parecer: parecer({ evidencia: uma }) }),
+    ).join(" ");
+    expect(encontrados).toContain("1 série valendo");
+    expect(encontrados).not.toContain("1 séries valendo");
+  });
+
+  // DESIGN.md §3.6.6: "o delta é o CANAL DE TEXTO obrigatório — cada sinal
+  // traz a palavra e o número que o identificam; dois blocos distinguidos
+  // só pela cor reprovam o gate". No PDF isso é ainda mais crítico que na
+  // tela: o documento pode ser impresso em preto e branco, onde a cor do
+  // sinal simplesmente não existe.
+  it("traz o delta em TEXTO, não só na cor do sinal", () => {
+    const plato = {
+      ...EVIDENCIA,
+      blocos: [{ ...EVIDENCIA.blocos[0], sinal: "plato", delta_pct: 0 }],
+    } as unknown as EvidenciaParaTela;
+    const encontrados = textos(
+      DocumentoParecer({ parecer: parecer({ evidencia: plato }) }),
+    ).join(" ");
+    expect(encontrados).toContain("sem mudança há 4 semanas");
+  });
+
+  it("só cita semanas sem novo máximo quando o campo opcional existe", () => {
+    const semCampo = textos(DocumentoParecer({ parecer: parecer() })).join(" ");
+    expect(semCampo).not.toContain("sem novo máximo");
+
+    const comCampo = {
+      ...EVIDENCIA,
+      blocos: [{ ...EVIDENCIA.blocos[0], semanas_sem_progresso: 3 }],
+    } as EvidenciaParaTela;
+    const encontrados = textos(
+      DocumentoParecer({ parecer: parecer({ evidencia: comCampo }) }),
+    ).join(" ");
+    expect(encontrados).toContain("3 semanas sem novo máximo");
+  });
 });
