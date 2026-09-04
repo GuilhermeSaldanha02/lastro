@@ -1224,6 +1224,12 @@ Data URI e não caminho em disco de propósito: caminho exigiria `outputFileTrac
 
 **Sabido e não resolvido:** `formatarPeso` não agrupa milhar (`7280 kg`, não `7.280 kg`). É o formatador **compartilhado com a tela e com o fallback determinístico** (PR #184) — mudar pra embelezar um renderizador mexeria nos três. Fica como pergunta pro dono, não como correção silenciosa.
 
+#### 10.4.2 Nota de 2026-09-05 — o fallback do parecer mudou de natureza
+
+O texto que este PDF renderiza quando `avisoFalhaInterpretativa` é `true` deixou de ser um despejo de fatos e passou a ser uma **leitura** (`src/lib/analise/leitura-deterministica.ts`, `DECISIONS.md` 2026-09-05 (2)). O guard que impede `separarVeredito` de promover a primeira frase **continua obrigatório** — e agora por uma razão a mais: o texto novo é prosa de verdade, então a primeira frase *pareceria* um veredito legítimo. Ler melhor não pode virar passar-se por.
+
+O aviso impresso também deixou de ser uma frase só: `textoAvisoFalha` escolhe a frase pela causa gravada em `parecer.falha_motivo` (migration 0019).
+
 ### 10.5 O que NÃO muda
 
 - A geração do parecer em si (`/api/analise/route.ts`, `agregar.ts`, `prompt.ts`, `validador.ts`) não ganha linha nenhuma — esta seção só adiciona um destino opcional (salvar) para um resultado que já existe.

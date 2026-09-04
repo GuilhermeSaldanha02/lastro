@@ -1653,3 +1653,126 @@ A frase nova — *"Não foi possível gerar a interpretação por IA desta vez"*
 **Estado de QA: `ALEGADO`.** A lógica está coberta por teste; a forma exata do erro do SDK em runtime é a única suposição, mitigada por ler `status` se existir, cair para a mensagem se não, e **não repetir** quando não dá pra saber. Só um 503 real em produção confirma.
 
 **Como reverter.** `git revert` do commit; `retry-transitorio.ts` fica órfão e pode ser apagado.
+
+---
+
+## 2026-09-04 (4) — Número no NOME do exercício deixava de ser nome e virava intruso
+
+**Flagrado em produção**, no runtime log de uma geração real do dono às 09:12 (12:12 UTC) — não por leitura de código, não em teste:
+
+```
+[analise] tentativa 1 { resultado: { ok: false, motivo: 'intrusos', intrusos: [ 45 ] } }
+[analise] tentativa 2 { resultado: { ok: true, ... } }
+```
+
+**O `45` vinha de "Leg press 45 graus"** — o **nome** do exercício, que o PRÓPRIO RESUMO entregou ao modelo. O parecer estava correto; o validador é que **punia o modelo por usar o vocabulário que nós demos**.
+
+`extrairTokens` não tinha como saber sozinho: o lookbehind negativo de letra existe para proteger `e1RM` (dígito **colado** a letra, correção de 2026-08-05), e ali o `45` vem depois de um **espaço** — sintaticamente, um número solto como qualquer outro.
+
+**A correção, e a distinção que a torna segura.** Os números extraídos dos nomes de exercício e de grupo muscular entram no conjunto **CONTEXTO**, nunca no **DADOS**:
+
+- escrever "Leg press 45 graus" **deixa de ser motivo de rejeição**;
+- mas **não passa a provar** que o parecer é sobre este dono — a prova continua tendo que vir de um número de verdade.
+
+Três testes fixam isso: não rejeita mais; não conta como especificidade; e intruso real continua sendo pego mesmo quando o nome tem número.
+
+**Alcance, consultado no catálogo real:** **um** exercício com número solto no nome ("Leg press 45 graus"). Baixa incidência no catálogo, **alta na prática** — é um que o dono treina toda semana e que aparece na evidência dele.
+
+**Isto corrige a entrada `2026-09-04` desta mesma data.** Lá eu registrei que "não era o validador, era a API". **Estava meio certo:** são **duas causas independentes com o mesmo sintoma**, e as duas são reais — a API deu 503 recorrente entre 1 e 4 de setembro, **e** o validador rejeita por conta própria. Naquele dia, os dois pareceres em fallback vieram de erro de API; hoje, a rejeição veio do validador.
+
+**Custo concreto do defeito:** a geração de hoje passou só na 2ª tentativa, gastando **uma chamada a mais** de uma cota de 20/dia.
+
+**Classificação.** **Correção.** Nenhum contrato muda.
+
+**Impacto.** `src/app/api/analise/validador.ts` + 4 testes. PR #198, squash `8e2648b`.
+
+**Como reverter.** `git revert`. O validador volta a rejeitar todo parecer que cite o Leg press pelo nome.
+
+---
+
+## 2026-09-05 — Causa da falha persistida (migration 0019) e teto diário de gerações
+
+> Duas mudanças aprovadas pelo dono depois do diagnóstico de `2026-09-04`.
+
+### Parte 1 — `parecer.falha_motivo`
+
+**O problema.** `aviso_falha_interpretativa` era um **booleano**. Quatro causas completamente diferentes viravam o mesmo `true`, e o app contava a mesma história para todas: 503 (API não respondeu), 429 (teto de cota), 404 (modelo ausente) e rejeição do validador. Ninguém conseguia responder, **depois do fato**, por que um parecer saiu sem prosa — o runtime log da Vercel no plano **Hobby retém 1 hora**. O diagnóstico de 2026-09-04 só foi possível porque o dono gerou e avisou dentro de 3 minutos. **Isso é sorte, não processo.**
+
+**A migration.** `0019_parecer_falha_motivo` adiciona `falha_motivo text` anulável, com domínio fechado (`api_indisponivel`, `cota_excedida`, `modelo_ausente`, `api_erro`, `validador_rejeitou`), um check de coerência com o booleano e o `grant update` de coluna (mesmo padrão da `0018`). **Nula para todo parecer anterior**, de propósito: não dá pra inventar retroativamente a causa de uma falha que já passou.
+
+**O aviso deixou de ser uma frase só.** Cada causa recebe um texto verdadeiro **e** acionável, porque a ação é diferente em cada caso: indisponibilidade pede minutos; cota explica que renova; modelo ausente **assume a culpa** ("é falha nossa, não sua"); e a rejeição do validador — **o único caso em que o sistema funcionou como devia** — explica a proteção em vez de pedir paciência. `null` cai numa frase genérica que continua verdadeira, para os pareceres antigos.
+
+**Alternativa descartada.** Guardar a causa dentro do `evidencia` jsonb para fugir da migration. Descartada: `evidencia` é um contrato tipado (`EvidenciaParaTela`), e enfiar campo alheio ali é exatamente o puxadinho que este projeto documenta contra.
+
+### Parte 2 — teto de 5 gerações por dia, por usuário
+
+**O dado que ninguém tinha somado:** a cota de **20 requisições/dia** é **compartilhada com o Coach 24h** — mesmo cliente, mesma chave (`api/coach/route.ts` importa `ClienteParecerGemini`). Sem teto, uma tarde de curiosidade consome tudo e **o chat para junto**.
+
+**Escolhido teto diário, NÃO o intervalo entre gerações que o dono sugeriu.** O `PRD.md` §3 define **5 perguntas padrão**: sentar e fazer duas ou três numa sessão é o uso pretendido, e um cooldown de horas puniria exatamente isso. 5 é o número que permite fazer todas as cinco no mesmo dia. Custo por geração: 1 chamada quando o validador aprova de primeira, 2 quando rejeita, 3 no pior caso (retry de 503) — com 5, o pior caso é 15 e sobram 5 para o Coach.
+
+O corte é o **dia LOCAL do Brasil**, não UTC: às 22h de Brasília já é o dia seguinte em UTC, e a cota renovaria três horas antes da meia-noite do dono.
+
+**Limite conhecido, documentado no código:** a contagem é de linhas em `parecer` criadas hoje, e **descartar um rascunho apaga a linha** — quem descartar recupera a vaga sem recuperar a cota já gasta na Gemini. Aceito num app de um usuário; fechar exigiria tabela de log de consumo, peso demais para o problema. **Revisitar quando o módulo Personal (`PRD` §11) puser mais gente na MESMA chave** — aí o teto por usuário deixa de proteger o teto global.
+
+### Achado sobre a dívida de migrations — ela é menor do que o `PROGRESS` dizia
+
+Consultando `supabase_migrations.schema_migrations`: **nada está faltando no banco.** As mesmas migrações existem sob **dois esquemas de versão** — o repo usa numérico (`0010_peso_por_lado`), o remoto gravou seis delas com timestamp (`20260824132220 peso_por_lado`, `20260824133544`, `20260824150037` + `20260824151727`, `20260825180357`, `20260825181416`, `20260831211511`). É por isso que `db push` acha que `0010`–`0014` e `0017` nunca rodaram.
+
+**Não é dado perdido, é nomenclatura** — reparável com `supabase migration repair --status applied`, que exige a senha do banco e é decisão do dono. A `0019` foi aplicada e registrada com **versão numérica**, seguindo a convenção do repo, para não aumentar a divergência.
+
+**Classificação.** **ADIÇÃO.** `PRD`, `ADR` e fitness functions intactos.
+
+**Impacto.** Migration `0019` (aplicada e conferida em produção: coluna, 2 checks, grant, registro), `src/lib/dados/parecer.ts`, `src/lib/texto/aviso-falha.ts` (novo) + teste, `src/app/api/analise/{route,retry-transitorio}.ts`, `parecer.tsx`, `documento-parecer.tsx`, `analise-interativa.tsx`, `i18n.ts`. PR #199, squash `1e68836`.
+
+**Estado de QA: `ALEGADO`.** Nem o caminho do teto nem o de cada causa foram exercidos em produção — a prova vem na próxima falha real, que agora vai dizer qual foi.
+
+**Erro de processo desta PR, registrado.** A CI reprovou na primeira tentativa porque usei `git add -A src supabase` e **dois arquivos modificados em `scripts/preview/` ficaram de fora do commit**. Passava local (corrigidos no disco) e quebrava no ambiente limpo. **Lição:** `git add` com caminhos silenciosamente exclui o que está fora deles; conferir `git status --short` **depois** de estagiar, não antes.
+
+**Como reverter.** `git revert` do commit devolve o comportamento antigo. A coluna pode ficar no banco sem dano (é anulável e ninguém a lê); removê-la exige migration própria.
+
+---
+
+## 2026-09-05 (2) — O fallback determinístico deixa de ser extrato e passa a ser leitura
+
+**O problema, e ele era de identidade do produto.** Quando a IA não respondia, o dono via um despejo de fatos, uma linha por número:
+
+```
+Volume total em 2026-08-24: 60751.
+Costas: 23 séries valendo, volume 15685 (349,4% vs. semana anterior) — acima da faixa.
+```
+
+Honesto, e o **pior rosto possível** para a peça-assinatura de um produto cuja tese é *"o log e o gráfico são infraestrutura; o produto é a **leitura**"* (`PRD.md` §1). Quando a IA falhava, o app entregava um extrato bancário.
+
+**E não é caminho de exceção:** `503` em três dias distintos (medição de `2026-09-04`), mais a rejeição do validador flagrada ao vivo.
+
+**O que passa a sair, com os números reais da conta do dono:**
+
+> Semana de 24 ago, com 4 de 4 semanas da janela com dados. 3 dos 7 exercícios acompanhados subiram, e o Tríceps pulley (corda) liderou com +66,7% de e1RM. Em queda real: Supino fechado (-29,8%) e Cadeira extensora (-9,3%). Parados sem novo máximo: Leg press 45 graus (há 4 semanas) e Rosca concentrada (há 4 semanas).
+>
+> Acima da faixa de referência de séries: Costas (23). Abaixo da faixa: Ombro (9), Posterior de coxa (7), Panturrilha (3) e Abdômen (4).
+>
+> Foram 5 treinos na semana, contra média de 3,7 nas anteriores.
+
+**Nenhuma conta nova.** É ordenação e comparação sobre métricas que `agregar.ts` já calcula. **Sem LLM, então nunca falha** — é o único caminho que funciona com o Google inteiro fora do ar.
+
+**O que NÃO faz, e a razão é de contrato.** Cobre o **diagnóstico** (perguntas 1 a 4 do §3). **Não** cobre a pergunta 5 ("o que mudar na próxima semana"): prescrição por regra viraria o **plano gerado automaticamente que o `PRD` §5 proíbe**, e é a mesma linha que o §11 traça entre o que fica com o aluno e o que vai para o personal. Há teste procurando verbo de comando no texto ("aumente", "reduza", "troque"…).
+
+**A fronteira com o parecer real continua intacta.** O aviso de falha fica em cima, e o texto **não tem veredito destacado** — o guard de `avisoFalhaInterpretativa` impede que `separarVeredito` promova a primeira frase (PR #177/#181). **Ler melhor não pode virar passar-se por.**
+
+**Regra da Presença.** Nenhuma frase aparece sem o dado que a sustenta: nada de "0 exercícios em queda". Coberto por teste.
+
+**Achado que veio de OLHAR, não de escrever.** As quedas saíam ordenadas por delta decrescente — a mesma ordem que serve para achar o líder de alta —, listando `-9,3%` **antes** de `-29,8%`. Numa lista de quedas, isso lê ao contrário do que importa. Só apareceu ao renderizar a saída com dado real; ganhou teste próprio.
+
+**Alternativas descartadas.**
+
+1. **Modelo alternativo quando o principal falha** (tentar `gemini-2.5-flash` no 503). Não descartada, **adiada**: é complemento barato, mas ataca só uma das causas e depende da mesma infraestrutura.
+2. **Segunda chave/projeto.** O dono tem 5 projetos no AI Studio, cada um com cota própria — atacaria o `429`. Descartada por ora: mexe em cota de projetos que servem outras coisas, e o `429` não é a causa dominante (sumiu desde 29/ago).
+3. **Manter o extrato e só formatar melhor.** Descartada: o problema não era formatação, era o texto não ser uma leitura.
+
+**Classificação.** **ADIÇÃO.** O `SDD` §6.4 continua descrevendo o mesmo fluxo (2ª falha → fallback determinístico); o que mudou é o texto que ele produz.
+
+**Impacto.** `src/lib/analise/leitura-deterministica.ts` + teste (novos, 15 testes), `src/app/api/analise/route.ts` (delega e perde o template antigo + código morto que ele deixava). PR #200, squash `de80a53`.
+
+**Estado de QA: `ALEGADO`.** A saída foi verificada com os números reais do dono, fora do app. A prova em produção vem na próxima falha real da IA.
+
+**Como reverter.** `git revert`. O extrato volta, e `leitura-deterministica.ts` fica órfão.
