@@ -5,6 +5,51 @@
  * contagem de séries válidas, detalhamento por exercício e PRs do dia.
  */
 
+/**
+ * Duração da SESSÃO em segundos — **definição única**, usada tanto pelo
+ * relatório da tela de treino quanto pelo de `/ajustes/relatorios`.
+ *
+ * POR QUE ESTA FUNÇÃO EXISTE. Os dois relatórios mediam coisas diferentes e
+ * por isso nunca batiam (relato de uso real, 2026-09-04): a tela usava o
+ * cronômetro ao vivo (`localStorage`, contando desde que o treino foi
+ * ABERTO no aparelho) e o servidor reconstruía `última série − primeira
+ * série` — que descarta o aquecimento antes da 1ª e tudo depois da última.
+ * A diferença era sistemática, não arredondamento.
+ *
+ * A definição escolhida usa as duas âncoras que **existem no banco** e que
+ * os dois lados enxergam igual: `treino.iniciado_em` (migration 0001) e o
+ * `criado_em` da última série. Não depende de `localStorage`, então não
+ * muda de aparelho para aparelho.
+ *
+ * Limite conhecido e aceito: o tempo DEPOIS da última série (desmontar,
+ * alongar) não entra — o banco não guarda um `finalizado_em`. Fechar essa
+ * lacuna é migration, decisão do dono (ver PROGRESS.md).
+ */
+export function duracaoSessaoSegundos(
+  iniciadoEmIso: string,
+  ultimaSerieEmIso?: string,
+): number {
+  const inicio = new Date(iniciadoEmIso).getTime();
+  const fim = ultimaSerieEmIso ? new Date(ultimaSerieEmIso).getTime() : NaN;
+  if (Number.isNaN(inicio) || Number.isNaN(fim)) return 0;
+  return Math.max(0, Math.round((fim - inicio) / 1000));
+}
+
+/** `criado_em` mais recente entre as séries — o fim da sessão, por ora. */
+export function ultimaSerieEm(series: { criadoEm: string }[]): string | undefined {
+  let maior: number | undefined;
+  let iso: string | undefined;
+  for (const s of series) {
+    const t = new Date(s.criadoEm).getTime();
+    if (Number.isNaN(t)) continue;
+    if (maior === undefined || t > maior) {
+      maior = t;
+      iso = s.criadoEm;
+    }
+  }
+  return iso;
+}
+
 export type SerieParaMetricas = {
   id: string;
   exercicioId: string;

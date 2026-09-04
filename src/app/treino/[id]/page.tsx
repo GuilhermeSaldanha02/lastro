@@ -77,6 +77,11 @@ export default async function PaginaTreinoDetalhe({
 
       <TreinoDetalhe
         treinoId={treino.id}
+        /* `treino.iniciado_em` (migration 0001) — a âncora de tempo que o
+           cronômetro e os DOIS relatórios usam. Existia no banco desde
+           sempre e nunca era lida; sem ela o cronômetro inventava um
+           início ao abrir treino antigo (relato de uso real, 2026-09-04). */
+        iniciadoEm={treino.iniciadoEm}
         seriesIniciais={treino.series}
         exercicios={exercicios}
         exerciciosPreSelecionados={exerciciosPreSelecionados}

@@ -4,7 +4,11 @@ import { redirect } from "next/navigation";
 import { listarTreinos, buscarTreino } from "@/lib/dados/treino";
 import { listarPareceres } from "@/lib/dados/parecer";
 import { obterPerfil } from "@/lib/dados/perfil";
-import { calcularMetricasSessao } from "@/lib/dados/metricas-treino";
+import {
+  calcularMetricasSessao,
+  duracaoSessaoSegundos,
+  ultimaSerieEm,
+} from "@/lib/dados/metricas-treino";
 import CabecalhoPro from "@/components/cabecalho-pro";
 import AbaInferior from "@/components/aba-inferior";
 import HistoricoRelatoriosPosTreino from "@/components/historico-relatorios-pos-treino";
@@ -37,19 +41,16 @@ export default async function PaginaRelatoriosAjustes() {
       exercicioGrupoMuscular: s.exercicioGrupoMuscular,
     }));
 
-    // Duração real: intervalo entre a primeira e a última série registrada
-    // (mesma fonte que o relatório gerado na tela de treino usa, só que ali
-    // vem de um cronômetro ao vivo — aqui não existe, então reconstruímos a
-    // partir de `serie.criado_em`). Antes disto o fallback era um valor fixo
-    // de 45 min pra todo treino, por isso o tempo batia diferente do
-    // relatório original (achado do dono, 2026-08-27).
-    const timestamps = treinoComSeries.series
-      .map((s) => new Date(s.criadoEm).getTime())
-      .filter((t) => !Number.isNaN(t));
-    const duracaoSegundos =
-      timestamps.length > 0
-        ? Math.round((Math.max(...timestamps) - Math.min(...timestamps)) / 1000)
-        : 0;
+    // Duração pela DEFINIÇÃO ÚNICA (`duracaoSessaoSegundos`), a mesma que a
+    // tela de treino usa desde 2026-09-04. Antes daqui saía `última série −
+    // primeira série` e de lá saía o cronômetro ao vivo do localStorage:
+    // duas medidas diferentes do mesmo treino, divergindo de forma
+    // sistemática (relato de uso real do dono). A âncora agora é
+    // `treino.iniciado_em`, que os dois lados enxergam igual.
+    const duracaoSegundos = duracaoSessaoSegundos(
+      treinoComSeries.iniciadoEm,
+      ultimaSerieEm(treinoComSeries.series),
+    );
 
     return calcularMetricasSessao(seriesParaMetricas, duracaoSegundos, undefined, {
       identificadorTreino: `TREINO ${treinoId.slice(-4).toUpperCase()}`,

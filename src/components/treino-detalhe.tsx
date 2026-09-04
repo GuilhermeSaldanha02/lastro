@@ -21,7 +21,11 @@ import EtiquetaRecorde from "./etiqueta-recorde";
 import TimerTopo from "./timer-topo";
 import RelatorioPosTreino from "./relatorio-pos-treino";
 import { assinarMarcos, estaFinalizado, marcarFim, reabrir } from "@/lib/treino/marcos-treino";
-import { calcularMetricasSessao } from "@/lib/dados/metricas-treino";
+import {
+  calcularMetricasSessao,
+  duracaoSessaoSegundos,
+  ultimaSerieEm,
+} from "@/lib/dados/metricas-treino";
 import { gruposConhecidos } from "@/lib/dados/grupos-conhecidos";
 import {
   atualizarPlanoDoExercicio,
@@ -83,6 +87,7 @@ function treinoFoiFinalizado(treinoId: string): boolean {
 
 export default function TreinoDetalhe({
   treinoId,
+  iniciadoEm,
   seriesIniciais,
   exercicios,
   exerciciosPreSelecionados,
@@ -90,6 +95,8 @@ export default function TreinoDetalhe({
   idioma,
 }: {
   treinoId: string;
+  /** `treino.iniciado_em` — âncora de tempo comum ao cronômetro e aos dois relatórios. */
+  iniciadoEm: string;
   seriesIniciais: Serie[];
   exercicios: ExercicioDoCatalogo[];
   /** Vem de um modelo escolhido ao iniciar o treino (SDD §9.3) — exercícios
@@ -137,7 +144,6 @@ export default function TreinoDetalhe({
     peso: number;
   } | null>(null);
   const [mostrarRelatorio, setMostrarRelatorio] = useState(false);
-  const [duracaoSegundos, setDuracaoSegundos] = useState(0);
   // Confirmação inline de "Finalizar Treino". Nasceu de relato de uso real
   // (2026-09-03): o dono encostou no botão sem querer, o cronômetro
   // congelou e não havia volta. O custo é real — mesma lógica do PRD §4.1
@@ -398,8 +404,16 @@ export default function TreinoDetalhe({
       <TimerTopo
         treinoId={treinoId}
         idioma={idioma}
+        /* Sem marca local, o cronômetro mostra ISTO, parado — em vez de
+           contar do zero ao vivo num treino que não está acontecendo aqui. */
+        duracaoReconstruidaSegundos={duracaoSessaoSegundos(
+          iniciadoEm,
+          ultimaSerieEm(series),
+        )}
+        /* Treino recém-criado (nenhuma série ainda): a sessão começa aqui e
+           é a única situação em que gravar a marca de início é honesto. */
+        sessaoComecaAqui={seriesIniciais.length === 0}
         treinoFinalizado={treinoConcluido || mostrarRelatorio}
-        onTempoTreinoAtualizado={setDuracaoSegundos}
       />
 
       <div className="corpo corpo--com-nav corpo--titulo-conteudo corpo--treino-detalhe">
@@ -731,7 +745,12 @@ export default function TreinoDetalhe({
       {/* Relatório Pós-Treino Imediato (Sticker Story Minimalista Premium) */}
       {mostrarRelatorio && (
         <RelatorioPosTreino
-          metricas={calcularMetricasSessao(series, duracaoSegundos, undefined, {
+          /* Duração pela DEFINIÇÃO ÚNICA, não pelo cronômetro ao vivo: é o
+               que faz este relatório e o de /ajustes/relatorios darem o MESMO
+               número para o mesmo treino (relato de uso real, 2026-09-04). O
+               cronômetro do topo segue sendo um relógio de sessão — ele não é
+               a métrica do documento. */
+            metricas={calcularMetricasSessao(series, duracaoSessaoSegundos(iniciadoEm, ultimaSerieEm(series)), undefined, {
             identificadorTreino: treinoId ? `TREINO ${treinoId.slice(-4).toUpperCase()}` : "TREINO 404B",
           })}
           idioma={idioma}
