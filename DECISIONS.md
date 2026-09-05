@@ -1954,3 +1954,48 @@ commit;
 ```
 
 A tabela de backup fica no banco de propósito. Apagar só depois de o dono confirmar o `migration list` alinhado — antes disso ela é a única rede.
+
+---
+
+## 2026-09-05 (9) — Teto diário do Coach e tabela `uso_ia`
+
+**Contexto.** A cota gratuita da Gemini é de 20 requisições/dia
+(`KNOWLEDGE.md` §3.2) e é **compartilhada**: Análise Semanal e Coach 24h
+usam o mesmo `ClienteParecerGemini`, a mesma chave, o mesmo projeto. Em
+2026-09-05 o parecer ganhou teto de 5/dia e o Coach ficou sem teto
+nenhum — ele só limitava o **tamanho** da pergunta, nunca a quantidade
+de chamadas. Uma conversa longa no chat esvaziava a cota e jogava a
+peça-assinatura no fallback: exatamente a falha que o dia inteiro foi
+gasto consertando. A assimetria foi criada por nós.
+
+**Decisão.** Teto de **10 perguntas/dia** no Coach (número decidido pelo
+dono), somando 15 dos 20 com o parecer. A folga de 5 é deliberada:
+cobre o retry de 503 (que gasta chamada), a troca de modelo e chamadas
+de desenvolvimento.
+
+**Onde o consumo passa a ser contado.** Numa tabela nova, `uso_ia`
+(migration 0020), e não mais em linhas de `parecer`. Isso fecha um furo
+já documentado: o teto do parecer contava linhas criadas hoje, e
+descartar um rascunho **apagava a linha** — quem descartava recuperava a
+vaga sem recuperar a cota já gasta na Gemini. A tabela não tem `update`
+nem `delete` no grant, de propósito: poder apagar reabriria o furo que
+ela existe para fechar.
+
+**Registra tentativa, não sucesso.** A cota do Google é consumida pela
+chamada mesmo quando ela volta 503. Contar só sucesso deixaria o teto
+mentindo justamente no dia ruim.
+
+**Duas regras de "deixar passar", ambas com teste.** Se a *contagem*
+falha, o uso é liberado — negar por causa de um erro nosso é pior do que
+gastar uma chamada a mais. Se o *registro* falha, a chamada segue mesmo
+assim — perder o parecer porque o log de consumo caiu seria trocar um
+problema de cota por um pior.
+
+**Recorte do dia é Brasília, não UTC.** Às 22h daqui já é o dia seguinte
+em UTC; a cota renovaria três horas antes da meia-noite do dono.
+
+**Alternativa descartada:** intervalo mínimo entre chamadas (o "libera
+outra depois de 3 horas" cogitado pelo dono). Protege a cota do mesmo
+jeito, mas pune o uso legítimo — as perguntas de um treino vêm em
+sequência, não espaçadas. Teto diário permite a rajada e ainda assim
+garante o teto.

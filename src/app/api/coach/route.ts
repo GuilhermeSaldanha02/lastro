@@ -17,6 +17,7 @@ import {
   LIMITE_PERGUNTA,
 } from "./prompt";
 import { detalheParaLog, respostaDeFalha } from "./falha";
+import { registrarUso, tetoAtingido, TETO_DIARIO } from "@/lib/dados/uso-ia";
 
 export async function POST(request: Request) {
   const supabase = await criarClienteServidor();
@@ -42,6 +43,21 @@ export async function POST(request: Request) {
       { status: 400 },
     );
   }
+
+  // Teto diário (migration 0020). O Coach dividia a cota de 20/dia com a
+  // Análise Semanal e não tinha teto nenhum — só limitava o TAMANHO da
+  // pergunta. Uma conversa longa esvaziava a cota e jogava a peça-assinatura
+  // no fallback; a assimetria foi criada quando o parecer ganhou teto e o
+  // chat não (DECISIONS 2026-09-05).
+  if (await tetoAtingido(supabase, user.id, "coach")) {
+    return NextResponse.json(
+      { erro: "limite_diario", limite: TETO_DIARIO.coach },
+      { status: 429 },
+    );
+  }
+  // Antes da chamada: a cota do Google é consumida pela TENTATIVA, mesmo
+  // quando ela volta 503.
+  await registrarUso(supabase, user.id, "coach");
 
   try {
     const cliente = new ClienteParecerGemini();

@@ -51,8 +51,21 @@ export default function CoachInterativo({ idioma }: { idioma: Idioma }) {
 
       if (!resposta.ok) {
         const dados = (await resposta.json().catch(() => null)) as
-          | { erro?: string }
+          | { erro?: string; limite?: number }
           | null;
+        // 429 = teto diário (migration 0020). A rota manda o código
+        // `limite_diario` e o número, não a frase pronta: quem escreve
+        // texto de tela é a tela, e o número vem de `TETO_DIARIO` para
+        // não existir uma segunda cópia dele aqui.
+        if (resposta.status === 429) {
+          setErro(
+            t(
+              "Você usou as {n} perguntas de hoje. O limite existe para sobrar cota da Análise Semanal — ele volta amanhã.",
+              idioma,
+            ).replace("{n}", String(dados?.limite ?? "")),
+          );
+          return;
+        }
         setErro(
           resposta.status === 401
             ? t("Sessão expirada. Faça login novamente.", idioma)
