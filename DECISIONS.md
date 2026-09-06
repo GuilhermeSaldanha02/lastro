@@ -1999,3 +1999,51 @@ outra depois de 3 horas" cogitado pelo dono). Protege a cota do mesmo
 jeito, mas pune o uso legítimo — as perguntas de um treino vêm em
 sequência, não espaçadas. Teto diário permite a rajada e ainda assim
 garante o teto.
+
+---
+
+## 2026-09-05 (10) — Descanso deixa de depender da marca local de início
+
+**Achado da varredura "render vs efeito"** (a única tarefa do backlog que
+podia achar bug vivo — e achou um). Varridos os 33 componentes cliente,
+comparando cada gate de JSX com a guarda do handler ou efeito
+correspondente. O resultado é majoritariamente negativo, e isso é a
+notícia: o defeito de 2026-09-03 foi caso isolado, não padrão. Limpos:
+`timer-topo` deriva os três booleanos do mesmo `treinoFinalizado`;
+`analise-interativa` usa `aria-disabled` com CSS que o acompanha (não é
+botão que mente); `pareceres-salvos` cobre os dois únicos status que
+existem; `temBarras` é fonte única para as duas abas; `folha` mantém ref
+e estado em sincronia. Um ponteiro morto de comentário corrigido.
+
+**O achado.** O botão de descanso era renderizado sob `cronometroAoVivo
+= segundosLocais !== null && !treinoFinalizado`, que exige a **marca
+local de início**. Mas o timer de descanso é estado local puro (`ativo`,
+`fimTimestampRef`) e nunca lê `lastro_inicio_treino_*` — a exigência
+estava errada.
+
+O nome enganava: `cronometroAoVivo` sugeria governar o mostrador do
+tempo de treino, e **não governava**. O mostrador exibe `segundosTreino`
+direto, que já cai sozinho na duração reconstruída quando não há marca.
+O booleano tinha um consumidor só, este botão. Por isso ele foi
+**removido**, não desmembrado: separar em dois deixaria um morto no
+arquivo.
+
+**O sintoma.** A marca de início só é gravada em treino recém-criado
+(`sessaoComecaAqui`, único ponto de escrita no repo — confirmado por
+varredura). Quem recarregou com o storage limpo, ou continuou o treino
+em outro navegador, seguia registrando série normalmente e **o botão de
+descanso sumia**. Mesma família do defeito de 2026-09-03 — o gate do
+render discordando do que a ação de fato exige —, sintoma invertido: lá
+o botão mentia dizendo que funcionava, aqui ele desaparecia sem dizer
+nada.
+
+**Efeito colateral aceito pelo dono.** Um treino deixado em aberto
+semanas atrás passa a mostrar botão de descanso ao ser reaberto. É
+coerente: ele *é* um treino em aberto. Quem finaliza continua sem
+descanso, que é a regra de 2026-09-03.
+
+**Estado de QA: ALEGADO, não PASSOU.** `tsc`, `eslint`, 342 testes e
+`build` passam, mas isso valida a lógica, não o comportamento. Não há
+`.env.local` no repo e o dev local não sobe contra o Supabase, então a
+reprodução do cenário exige a sessão do dono. A verificação pendente
+está na descrição do PR.

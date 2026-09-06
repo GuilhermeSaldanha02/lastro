@@ -89,7 +89,27 @@ export default function TimerTopo({
     () => null,
   );
   const segundosTreino = segundosLocais ?? duracaoReconstruidaSegundos;
-  const cronometroAoVivo = segundosLocais !== null && !treinoFinalizado;
+
+  // Pode DISPARAR o descanso entre séries? Só depende de o treino não ter
+  // acabado. Não precisa de marca local: o timer de descanso é estado
+  // local puro (`ativo`, `fimTimestampRef`) e nunca lê
+  // `lastro_inicio_treino_*`.
+  //
+  // Antes disto (2026-09-05) este gate era `cronometroAoVivo`, que exigia
+  // `segundosLocais !== null` — ou seja, exigia a marca de início. O nome
+  // falava do cronômetro, mas o mostrador do tempo de treino nunca
+  // consultou esse booleano: ele exibe `segundosTreino` direto, que já cai
+  // sozinho na duração reconstruída quando não há marca. O único
+  // consumidor era este botão, e para ele a exigência estava errada.
+  //
+  // O sintoma: a marca de início só é gravada em treino recém-criado
+  // (`sessaoComecaAqui`, único ponto de escrita no repo). Quem recarregou
+  // com o storage limpo, ou continuou o treino em outro navegador, seguia
+  // registrando série normalmente — mas o botão de descanso sumia. Mesma
+  // família do defeito de 2026-09-03 (o gate do render discordando do que
+  // a ação de fato exige), sintoma invertido: lá o botão mentia dizendo
+  // que funcionava, aqui ele desaparecia sem dizer nada.
+  const podeDescansar = !treinoFinalizado;
 
   // 2. Timer de Descanso entre Séries
   const [ativo, setAtivo] = useState(false);
@@ -270,7 +290,7 @@ export default function TimerTopo({
               botão que mente é pior que um botão ausente: o dono clicou
               várias vezes achando que era ele. Acabou o treino, some o
               descanso. */}
-          {cronometroAoVivo && !descansoAtivo && !descansoFinalizado && (
+          {podeDescansar && !descansoAtivo && !descansoFinalizado && (
             <button
               type="button"
               className="timer-topo-botao-disparar"
