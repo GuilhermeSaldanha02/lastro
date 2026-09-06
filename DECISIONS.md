@@ -2042,8 +2042,35 @@ semanas atrás passa a mostrar botão de descanso ao ser reaberto. É
 coerente: ele *é* um treino em aberto. Quem finaliza continua sem
 descanso, que é a regra de 2026-09-03.
 
-**Estado de QA: ALEGADO, não PASSOU.** `tsc`, `eslint`, 342 testes e
-`build` passam, mas isso valida a lógica, não o comportamento. Não há
-`.env.local` no repo e o dev local não sobe contra o Supabase, então a
-reprodução do cenário exige a sessão do dono. A verificação pendente
-está na descrição do PR.
+**Estado de QA: PASSOU.** Verificado em produção
+(`lastro-pi.vercel.app`), na conta real do dono, depois do merge do #210.
+O dev local não serviu — não há `.env.local` no repo e o servidor morre
+no boot sem as chaves do Supabase —, então a checagem foi no app de
+verdade.
+
+O cenário não precisou ser fabricado: dos quatro treinos do histórico,
+três já não tinham marca local nenhuma no `localStorage` (só
+`07ab890d` tinha, e com marca de fim). Nada foi apagado do aparelho do
+dono para montar o teste.
+
+Evidência, no treino de 2 de setembro (sem marca local, com séries):
+
+  · cronômetro em **53:01** e **parado** — reconferido 4s depois, mesmo
+    valor. Confirma `segundosLocais === null`, que é a condição exata em
+    que o botão sumia antes.
+  · botão **"Descanso 01:30" presente** na mesma tela. Essa combinação
+    era impossível no código anterior.
+  · clicado: a cápsula abriu e contou (01:27 três segundos depois), com
+    +30s, Pausar e fechar. Não é botão que mente — a lição de
+    2026-09-03 exige provar o clique, não só a presença.
+  · o cronômetro do treino seguiu em 53:01 durante o descanso, como
+    deve.
+
+Contraprova, no treino finalizado `07ab890d` (com marca de fim):
+**nenhum botão de descanso**, só o cronômetro parado em 151:07 — a
+regra de 2026-09-03 continua valendo.
+
+Console limpo depois de um load completo (sem erro de hidratação, que
+já foi risco real neste componente). O `localStorage` do dono ficou
+idêntico ao de antes: o clique no descanso é estado de React, não
+grava marca.
