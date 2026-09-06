@@ -486,6 +486,10 @@ const DICIONARIO: Record<string, { en: string; es: string }> = {
   "Sessão expirada. Faça login novamente.": { en: "Session expired. Sign in again.", es: "Sesión expirada. Inicia sesión de nuevo." },
   "Falha ao consultar o coach.": { en: "Failed to reach the coach.", es: "Fallo al consultar al coach." },
   "Falha de rede. Tente de novo.": { en: "Network error. Try again.", es: "Fallo de red. Intenta de nuevo." },
+  "Você usou as {n} perguntas de hoje. O limite existe para sobrar cota da Análise Semanal — ele volta amanhã.": {
+    en: "You have used today's {n} questions. The limit exists to leave quota for the Weekly Analysis — it resets tomorrow.",
+    es: "Usaste las {n} preguntas de hoy. El límite existe para dejar cuota al Análisis Semanal — vuelve mañana.",
+  },
   "Assistente de Treino 24h": { en: "24h Training Assistant", es: "Asistente de Entrenamiento 24h" },
   "Tire dúvidas sobre periodização, fadiga e progressão com base nas suas métricas reais.": {
     en: "Ask about periodization, fatigue, and progression based on your real metrics.",

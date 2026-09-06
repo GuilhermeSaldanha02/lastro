@@ -69,7 +69,8 @@ export default function AnaliseInterativa({
         setEmAndamento({ perguntaTexto: t("Análise em andamento", idioma) });
         return;
       }
-      // Teto diário de gerações (route.ts, LIMITE_GERACOES_POR_DIA): a
+      // Teto diário de gerações (`TETO_DIARIO.parecer`, contado na tabela
+      // `uso_ia` desde a migration 0020): a
       // cota da Gemini é compartilhada com o Coach 24h, então o limite
       // existe pra uma tarde de curiosidade não derrubar o chat junto.
       // Mensagem específica, não um "erro 429" cru — o dono não fez nada
