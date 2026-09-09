@@ -310,7 +310,8 @@ create table public.exercicio (
   -- migração era a fonte de verdade (migração 0010) — uma lista fixa de
   -- exercícios não cobre todo uso real de halter.
   peso_por_lado            boolean not null default false,
-  dica_execucao            text,          -- CURADA, nunca gerada (FF7). Fase 4.
+  dica_execucao            text,          -- Origem em dica_execucao_origem (0021).
+  dica_execucao_origem     text,          -- 'claude' | 'humano'. FF7 revogada 2026-09-09.
   criado_em                timestamptz not null default now()
 );
 
@@ -819,7 +820,7 @@ Nunca exibir um parecer que falhou na validação, nem "com aviso". **Um parecer
 
 ### 6.5 FORA
 
-Coach 24h e qualquer endpoint de chat (Fase 5) · streaming da resposta · cache/persistência de pareceres · retry por quota (depende da 1.0c) · qualquer geração de dica de execução (FF7 — proibido para sempre).
+Coach 24h e qualquer endpoint de chat (Fase 5) · streaming da resposta · cache/persistência de pareceres · retry por quota (depende da 1.0c) · qualquer geração de dica de execução EM TEMPO DE EXIBIÇÃO — as dicas são texto fixo no banco, escrito uma vez e revisável, nunca uma chamada de LLM no caminho da tela (a revogação de 2026-09-09 liberou quem escreve, não onde).
 
 ### 6.6 Check executável — FF1 e FF2
 

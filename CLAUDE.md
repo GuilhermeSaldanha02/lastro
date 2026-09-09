@@ -30,7 +30,7 @@ Responda sempre em **pt-BR** e instrua todo subagente a responder em pt-BR — a
 1. **A chave da Gemini nunca toca o cliente.** Toda chamada passa por route handler. (ADR-002, FF1, FF2)
 2. **O agregador calcula; o LLM interpreta.** O modelo nunca recebe linhas cruas de série — só um resumo já calculado. Se ele fizer conta, ele erra a conta. (ADR-003, FF3)
 3. **Aquecimento nunca entra em métrica.** Volume, e1RM e frequência contam apenas séries valendo. (FF4)
-4. **Dica de execução de exercício é curada, nunca gerada.** É assunto de saúde. (ADR-007, FF7)
+4. **Dica de execução tem a origem registrada e declarada.** As 102 atuais foram escritas por LLM — o dono revogou a proibição em 2026-09-09. `dica_execucao_origem` guarda quem escreveu, e a tela avisa quando é IA. Continua sendo assunto de saúde: não escreva dica sem gravar a origem, e não afrouxe o aviso. (ADR-007 + revogação parcial, FF7 reescrita)
 5. **Gravar série não tem `await` de rede no caminho crítico.** O app roda no subsolo da academia — sem sinal é o caso de uso real, não a exceção. (FF6)
 6. **Proibido o uso de emoticons e emojis.** Toda comunicação visual deve ser expressa exclusivamente através de ícones SVG vetorizados, tipografia sóbria e tokens de cor oficiais (decisão do dono 2026-08-26).
 

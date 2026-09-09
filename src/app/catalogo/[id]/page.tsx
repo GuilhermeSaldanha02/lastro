@@ -102,14 +102,20 @@ export default async function PaginaHistoricoExercicio({
                     )}
                   </div>
 
+                  {/* Sem dica, a tela DIZ que não há — não preenche o buraco.
+                      Até 2026-09-09 aqui vinha uma frase genérica ("controle
+                      articular completo, cadência uniforme...") idêntica nos
+                      102 exercícios, ocupando o lugar da dica curada com a
+                      mesma tipografia. Quem lia achava que era instrução
+                      daquele movimento. É o mesmo defeito do botão que
+                      aparecia sem funcionar: a tela afirmando mais do que o
+                      dado sustenta. A tela da lista já falava assim
+                      ("aguardando curadoria"); agora as duas combinam. */}
                   {exercicio.dicaExecucao ? (
                     <p className="dica-texto-principal">{exercicio.dicaExecucao}</p>
                   ) : (
-                    <p className="dica-texto-principal">
-                      {t(
-                        "Execute o movimento com controle articular completo, preservando a estabilidade da coluna e cadência uniforme na fase excêntrica e concêntrica.",
-                        idioma,
-                      )}
+                    <p className="dica-texto-principal dica-texto-principal--vazio">
+                      {t("Dica de execução ainda não escrita para este exercício.", idioma)}
                     </p>
                   )}
                 </div>
@@ -136,6 +142,22 @@ export default async function PaginaHistoricoExercicio({
             {t(
               "Não substitui a orientação de um profissional de educação física. Sentindo dor ou em dúvida sobre a técnica, procure acompanhamento presencial.",
               idioma,
+            )}
+            {/* Procedência dita na cara. A ADR-007 existia porque instrução
+                de forma escrita por IA é conteúdo inventado num domínio onde
+                o erro machuca; o dono reverteu a regra em 2026-09-09 e as
+                dicas atuais são de LLM. Reverter a regra não apaga o motivo
+                dela — então quem lê fica sabendo quem escreveu, e pode pesar
+                o texto de acordo. Some sozinho quando um humano reescrever
+                (`dica_execucao_origem = 'humano'`). */}
+            {exercicio.dicaExecucaoOrigem === "claude" && (
+              <>
+                {" "}
+                {t(
+                  "Esta dica foi escrita por IA e ainda não passou por revisão de um profissional.",
+                  idioma,
+                )}
+              </>
             )}
           </p>
         </div>

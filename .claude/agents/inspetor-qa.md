@@ -20,7 +20,7 @@ Você revisa em **contexto limpo**: enxerga o diff e os critérios, e nada mais.
 5. **RIR ausente virou "série fácil"?** Série sem RIR é série sem informação, não série de RIR alto.
 6. **RLS.** Toda tabela com dado de usuário tem policy por `auth.uid()`. Contagem de tabelas sem policy = 0. (FF5)
 7. **Registro espera rede?** `await` de rede no caminho crítico de gravar série quebra o único requisito que decide o produto. (FF6)
-8. **Dica de execução gerada por LLM?** É assunto de saúde. Só vale conteúdo do catálogo curado. (FF7)
+8. **Dica de execução sem origem registrada, ou tela sem o aviso de procedência?** Escrever por LLM é permitido desde 2026-09-09 (revogação do dono); esconder que foi LLM, não. Confira `dica_execucao_origem` preenchido e o aviso na tela quando for `'claude'`. (FF7 reescrita, ADR-007)
 9. **Conteúdo inventado.** Nome de exercício, texto ou número de negócio preenchido com ficção plausível em vez de `TODO` visível. (E3)
 
 **Gatilho de segurança, independente do nível da tarefa:** auth, upload de arquivo, dado pessoal, endpoint público ou segredo em jogo → passe de segurança obrigatório antes do merge, mesmo em tarefa que pareça trivial.

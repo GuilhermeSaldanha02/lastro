@@ -2074,3 +2074,29 @@ Console limpo depois de um load completo (sem erro de hidratação, que
 já foi risco real neste componente). O `localStorage` do dono ficou
 idêntico ao de antes: o clique no descanso é estado de React, não
 grava marca.
+
+---
+
+## 2026-09-09 (2) — As 102 dicas de execução, e a revogação da FF7
+
+**A restrição, e como ela caiu.** `ADR-007`/`FF7` proibiam dica de execução gerada por LLM: instrução de forma é assunto de saúde e o erro machuca. A alternativa descartada na própria ADR era literalmente *"gerar as dicas com a Gemini — barato, escalável e irresponsável"*, e `DECISIONS.md` 2026-08-07 fechou até a saída de "pesquisar fontes reais", que contava como gerado do mesmo jeito.
+
+Quando o dono pediu as dicas, a restrição foi **apresentada a ele com a citação da ADR**, junto do aviso de que ele podia revogá-la mas que a decisão devia ser tomada de olho aberto. Ele reafirmou o pedido. As dicas foram escritas.
+
+**O que ficou obrigatório mesmo com a regra revogada.** Revogar a regra não apaga o motivo dela:
+
+1. `exercicio.dica_execucao_origem` (`'claude'` | `'humano'`) registra a procedência **na linha**. Sem isso, daqui a um ano ninguém sabe o que foi revisado.
+2. A tela do exercício diz, junto ao aviso de saúde: *"Esta dica foi escrita por IA e ainda não passou por revisão de um profissional."* Some sozinho quando a origem virar `'humano'`.
+3. O aviso de saúde do `PRD.md` §4.5 não foi afrouxado em nada.
+
+**Critério de escrita.** Uma dica por exercício, apontando o erro de forma mais comum **daquele** movimento. Nenhuma prescreve carga, séries ou progressão — isso é treino, não execução. Um script conferiu antes de gerar a migration: os 102 nomes casam exatamente com o banco, nenhuma frase se repete entre exercícios, e a migration tem trava que falha se sobrar linha sem dica.
+
+**A frase genérica que saiu junto — achado do dono.** Ele perguntou *"hoje no app já tem as dicas, você vai removê-las ou reutilizar?"*, e essa pergunta descobriu um defeito que eu não tinha visto. O que ele via era duas coisas: (a) os dados anatômicos do Gym Visual (músculo alvo, sinergistas, mecânica articular), 102/102 preenchidos e reais; e (b) uma frase fixa no código — *"Execute o movimento com controle articular completo..."* — exibida **idêntica nos 102 exercícios** no lugar exato da dica curada, com a mesma tipografia. Quem lia achava que era instrução daquele movimento.
+
+É o mesmo defeito do botão de descanso que aparecia sem funcionar: **a tela afirmando mais do que o dado sustenta**. A tela da lista já era honesta ("aguardando curadoria"); a de detalhe preenchia o buraco. Substituída pelo estado honesto, em texto secundário e itálico para ausência não ter o peso visual de conselho.
+
+**Alternativa descartada.** Reaproveitar os dados anatômicos como dica de execução. Anatomia **descreve**, dica **prescreve** — seria trocar um tipo de conteúdo por outro só para dizer que a coluna foi preenchida, pior que o vazio honesto anterior.
+
+**Caminho de volta, sem nova decisão arquitetural.** Trocar uma dica por texto revisado por profissional é um `update` com `dica_execucao_origem = 'humano'`; o aviso de IA some naquele exercício. Exercício a exercício, no ritmo que der.
+
+**Documentos alinhados junto, para o repositório não se contradizer:** `ADR.md` (FF7 reescrita + seção de revogação parcial), `CLAUDE.md` §4, `ARCHITECTURE.md`, `SDD.md` (schema e escopo da Fase 5) e `.claude/agents/inspetor-qa.md` item 8. O `SDD.md` §768 **não** mudou de propósito: o Coach 24h continua proibido de improvisar técnica no chat — dica é texto fixo, revisável e com origem; resposta de chat não é.
