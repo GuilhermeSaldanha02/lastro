@@ -2139,3 +2139,22 @@ Isso é o mesmo diagnóstico que `docs/BACKLOG-PROXIMA-FASE.md` já tinha feito 
 **Sai junto** `.cartao-exercicio-pro__sem-dica`, que já era CSS morto — resquício da linha antiga, sem uso em lugar nenhum do `src/`.
 
 **O que NÃO sai:** o aviso de curadoria no topo da lista (`semDicaCount > 0`). Hoje ele não aparece porque os 102 têm dica, mas se alguém adicionar exercício novo sem dica ele volta sozinho — continua sendo o lugar certo para comunicar a ausência **uma vez**, em vez de item a item.
+
+---
+
+## 2026-09-10 (3) — O texto de "sem dados" da Análise separa os dois requisitos
+
+**O sintoma**, achado na varredura j4 com conta zerada: sob o título "Análise semanal", um parágrafo só dizia *"Ainda não há pelo menos **2** semanas do mesmo exercício pra desenhar progressão. Você tem 0 semanas fechadas. São necessárias **3** para calcular a análise semanal."*
+
+Dois números diferentes, colados, sem dizer que falavam de coisas diferentes — lê como contradição. E era a primeira coisa que alguém novo via naquela tela.
+
+**Um erro de unidade em cima disso.** O "2" nunca foi de semanas: `agregar.ts` (T-E6) conta **sessões** do mesmo exercício — dois treinos na mesma semana já satisfazem o piso. A frase estava errada, não só confusa.
+
+**A correção.** Duas frases, cada uma nomeando o próprio assunto e a própria unidade:
+
+> O gráfico de progressão precisa de 2 treinos do mesmo exercício.
+> A análise semanal precisa de 3 semanas fechadas — você tem 0.
+
+**O número virou constante.** `MINIMO_SESSOES_TENDENCIA = 2` em `limiares.ts`, usada tanto pelo agregador quanto pela tela. Antes o `2` estava escrito à mão nos dois lugares — texto e regra podiam divergir sem ninguém notar, que é exatamente como a frase errou a unidade e sobreviveu.
+
+**Limpeza junto:** quatro entradas de i18n ficaram órfãs (`"Você tem"`, `"semana fechada"`, `"semanas fechadas"`, `"para calcular a análise semanal."`) e foram removidas. Fragmento de frase no dicionário é dívida: traduz pedaço solto, que só faz sentido montado na ordem do português.

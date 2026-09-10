@@ -505,15 +505,23 @@ const DICIONARIO: Record<string, { en: string; es: string }> = {
     es: "Fallo de red al generar el informe. Intenta de nuevo.",
   },
   "Análise semanal": { en: "Weekly analysis", es: "Análisis semanal" },
-  "Ainda não há pelo menos 2 semanas do mesmo exercício pra desenhar progressão.": {
-    en: "There still aren't at least 2 weeks of the same exercise to chart progress.",
-    es: "Aún no hay al menos 2 semanas del mismo ejercicio para trazar progresión.",
+  // Duas frases, dois assuntos — ver o comentário em analise-interativa.tsx.
+  "O gráfico de progressão precisa de": {
+    en: "The progress chart needs",
+    es: "El gráfico de progresión necesita",
   },
-  "Você tem": { en: "You have", es: "Tienes" },
-  "semana fechada": { en: "closed week", es: "semana cerrada" },
-  "semanas fechadas": { en: "closed weeks", es: "semanas cerradas" },
-  "São necessárias": { en: "You need", es: "Se necesitan" },
-  "para calcular a análise semanal.": { en: "to calculate the weekly analysis.", es: "para calcular el análisis semanal." },
+  "treinos do mesmo exercício.": {
+    en: "sessions of the same exercise.",
+    es: "sesiones del mismo ejercicio.",
+  },
+  "A análise semanal precisa de": {
+    en: "The weekly analysis needs",
+    es: "El análisis semanal necesita",
+  },
+  "semanas fechadas — você tem": {
+    en: "closed weeks — you have",
+    es: "semanas cerradas — tienes",
+  },
   "Parecer em emissão": { en: "Report in progress", es: "Informe en emisión" },
   "escrevendo a leitura": { en: "writing the readout", es: "escribiendo la lectura" },
   "Confira em Ajustes > Relatórios em instantes.": {

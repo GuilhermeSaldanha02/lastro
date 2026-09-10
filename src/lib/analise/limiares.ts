@@ -52,6 +52,16 @@ export const MAX_VOLUME_POR_EXERCICIO = 8;
  */
 export const MINIMO_SEMANAS_PARECER = 3;
 /**
+ * Mínimo de SESSÕES do mesmo exercício para desenhar tendência de e1RM
+ * (T-E6, `agregar.ts`). Unidade diferente de `MINIMO_SEMANAS_PARECER`
+ * acima, e a confusão entre as duas é real: a tela de Análise chegou a
+ * dizer "2 semanas do mesmo exercício" ao lado de "3 semanas fechadas",
+ * como se fossem o mesmo tipo de contagem — dois treinos na MESMA semana
+ * já satisfazem este piso. Nomear o número tira ele do texto e do
+ * agregador ao mesmo tempo, para os dois não divergirem de novo.
+ */
+export const MINIMO_SESSOES_TENDENCIA = 2;
+/**
  * Piso de sessões ANTERIORES daquele exercício pra marcar PR na linha da
  * série (backlog C4, 2026-08-13). Sem isso, com pouco histórico toda série
  * vira "recorde" e o marcador perde o sentido. Decidido com o dono — não é
