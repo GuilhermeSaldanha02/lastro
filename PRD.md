@@ -183,7 +183,7 @@ Isto reabre conscientemente o "Sem tela de configuração de rotina" acima e o A
 
 ## 11. O modo Personal — exceção declarada à persona única
 
-> **ADIÇÃO ao PRD congelado, 2026-09-03.** Scope Change aprovado pelo dono e registrado em `DECISIONS.md` (entrada "2026-09-03 (2) — Scope Change: módulo Personal"). **Decidido, não validado no mercado** — ver §11.6, o portão que precede qualquer código.
+> **ADIÇÃO ao PRD congelado, 2026-09-03. REVISADA em 2026-09-10 pelas entrevistas com dois personais** — Scope Change em `DECISIONS.md` "2026-09-10 (6)". A dor foi **confirmada**; o desenho do alerta foi **refutado e reescrito**. O que mudou está marcado em cada subseção. Implementação segue bloqueada — §11.6.
 >
 > Esta seção existe **separada** de propósito. O §2 diz "não existe segunda persona" e o veto que vem junto ("nenhuma decisão se justifica por 'outros usuários poderiam querer'") é estrutural: sustenta decisões espalhadas por todo este documento. Emendar o §2 para acomodar isto desarmaria o veto em silêncio, em todo lugar, sem ninguém ter decidido isso. A exceção fica declarada aqui, com fronteira explícita.
 
@@ -201,9 +201,13 @@ Uma conta pode estar **vinculada a um personal**. Enquanto o vínculo existe, a 
 | Coach 24h (§4.4) | mantém | **mantém, com trava** — §11.4 |
 | Demonstração de execução (§4.5) | mantém | **mantém** |
 | **Prescrição — "o que mudar na próxima semana" (§3, pergunta 5)** | mantém | **não vê** — vai para o personal |
-| **Alerta dos sinais de diagnóstico** | — | **roteado ao personal**, em chat 1:1 com o aluno |
+| **Alerta dos sinais de diagnóstico** | — | **entra na fila de trabalho do personal** — §11.4.5 |
 
 **O aluno vinculado não perde diagnóstico nenhum.** Perde a prescrição — que é exatamente o que ele contratou um humano para fazer.
+
+> **Revisto em 2026-09-10.** Esta linha dizia *"roteado ao personal, em chat 1:1 com o aluno"*. Os dois personais entrevistados descreveram **exatamente esse formato** como o que ignoram: *"a chance de eu arrastar pra o lado no meio da correria é de 80%"* (P1) e *"depois de algumas semanas eu vou ignorar"* (P2). Alerta que **chega** compete com 500 notificações por dia. Alerta que **espera na fila** é lido no momento em que a pessoa já está decidindo.
+>
+> **Nota sobre a prescrição, para ninguém ler esta tabela com confiança maior que a evidência.** Nenhum dos dois personais pediu para ser dono da prescrição — os dois falaram em querer saber **com quem falar**. A transferência continua no contrato porque a lógica do §5 a sustenta ("o app analisa; não prescreve"), **não porque as entrevistas a confirmaram**. É a metade menos validada desta seção.
 
 ### 11.3 Por que esta linha, e não outra
 
@@ -213,16 +217,21 @@ Por isso esta seção não é uma segunda persona no sentido que o §2 veta. O �
 
 ### 11.4 Restrições inegociáveis desta seção
 
-Quatro, e nenhuma é detalhe de implementação — cada uma pode invalidar a decisão se ficar em aberto.
+**Sete desde 2026-09-10** (eram quatro; as três novas saíram direto das entrevistas). Nenhuma é detalhe de implementação — cada uma pode invalidar a decisão se ficar em aberto.
 
 1. **O Coach 24h precisa de trava sob vínculo.** Fechar a prescrição e deixar o chat de IA aberto no mesmo app não fecha nada: o aluno pergunta *"o que eu mudo essa semana?"* e o Coach responde. Sob vínculo, o Coach responde dúvida de execução e conceito (§4.4/§4.5) e **não** monta a próxima semana — encaminha o pedido ao personal. Sem essa trava, esta seção inteira é decorativa.
 2. **O lugar da prescrição não pode ficar vazio.** Se a seção simplesmente sumir, lê como app quebrado. Precisa de estado próprio, que comunique que aquele espaço é do personal — ausência não é resposta. **Gate visual** (`AGENTS.md`), não implementação silenciosa.
 3. **Consentimento é do aluno, sempre, e é revogável.** O personal **convida**, o aluno **aceita**, o aluno **revoga** quando quiser, com corte imediato de acesso. Nunca por ação unilateral do personal — cadastrar o e-mail de alguém não concede acesso a nada. Isto é LGPD e é decisão de **schema**, não tela de cobrança: vínculo permanente e concessão revogável/auditável são coisas diferentes no banco. Quando o vínculo termina, a prescrição volta para o aluno.
 4. **O gatilho do alerta é determinístico.** Mesma regra inegociável do §3: o sinal sai do código de métricas já calculado e testado — nunca de a IA "achar" que algo está errado. O alerta **roteia** um sinal que já existe; não cria julgamento novo. O LLM segue sem ver linha crua de série.
+5. **O alerta ESPERA na fila; não chega como notificação.** O personal lê no momento em que já está decidindo — a segunda-feira de planejamento —, não no meio do salão entre dois atendimentos. P1: *"Se quando eu for montar ou revisar o treino da semana do aluno o sistema me der uma flag vermelha visual de prioridade com o resumo acionável, eu não só leio, como viro teu fã."* Push genérico é o modo de falha declarado, não uma variação aceitável.
+6. **Seletividade é o produto, não um ajuste fino.** Se o alerta dispara para todo grupo muscular toda semana, ele morre — e leva o módulo junto. P2 nomeou o modo de morte com precisão: *"Peito: atenção / Bíceps: atenção / Costas: atenção / Tríceps: atenção — aí sim, vira notificação que eu começo a ignorar."* Consequências que isto impõe: o sinal precisa representar **tendência** (a régua citada foi 3 semanas), não oscilação de uma sessão; e precisa haver **teto de alertas por aluno por semana**, com priorização — mostrar o que mais importa, não tudo que é verdade.
+7. **Cada alerta carrega uma AÇÃO de um clique.** Ler não é o objetivo; agir é. P1 desenhou a interface na própria resposta — `[Mandar mensagem padrão no WhatsApp]` ou `[Ajustar ficha de treino]` — e explicou o porquê: o valor *"não tá só em gerar o relatório do aluno — tá em economizar o cérebro do personal pra ele parecer um profissional extremamente atencioso sem gastar 20 minutos analisando planilha"*. **Relatório que exige leitura para achar o problema é o modo de falha.** O conteúdo do alerta segue a ordem que P2 pediu: *o que aconteceu → há quanto tempo → qual evidência → o que pode estar causando → o que investigar*.
 
 ### 11.5 A fronteira com o escopo negativo (§5)
 
-O chat personal↔aluno é o **primeiro canal pessoa-a-pessoa** deste produto. Não fere o §5 ao pé da letra — não é feed, seguir, comparar nem ranking —, mas é a primeira vez que duas contas se falam num app cuja identidade declarada é "não é rede social". A exceção é **delimitada e fechada**:
+> **Revisto em 2026-09-10.** Esta subseção pressupunha que o canal pessoa-a-pessoa existiria. Depois das entrevistas isso virou **pergunta em aberto** — ver §11.7. O que segue vale **se** o canal interno for a opção escolhida; se a ação sair para o WhatsApp, esta subseção inteira deixa de ser necessária e o §5 fica intacto sem exceção nenhuma.
+
+O chat personal↔aluno seria o **primeiro canal pessoa-a-pessoa** deste produto. Não fere o §5 ao pé da letra — não é feed, seguir, comparar nem ranking —, mas é a primeira vez que duas contas se falam num app cuja identidade declarada é "não é rede social". A exceção é **delimitada e fechada**:
 
 - ✅ Canal **1:1**, apenas dentro de vínculo aceito e vigente.
 - ❌ Sem descoberta de perfil. Sem visibilidade entre alunos do mesmo personal. **Sem grupo.**
@@ -230,16 +239,32 @@ O chat personal↔aluno é o **primeiro canal pessoa-a-pessoa** deste produto. N
 
 Isto está escrito porque, se ficasse implícito, "grupo de alunos" apareceria como extensão natural e o veto do §5 teria sido desarmado sem ninguém decidir.
 
-### 11.6 Portão — o que precede qualquer código
+### 11.6 Portão — CUMPRIDO em 2026-09-10, e o que ele revelou
 
-Esta seção está **aprovada como decisão e bloqueada como implementação**. Duas condições, ambas em aberto:
+As duas condições que bloqueavam esta seção **foram cumpridas**:
 
-1. **Ter um parecer bom de verdade para mostrar.** Mostrar um fallback determinístico subvende o produto.
-2. **Conversar com 2–3 personal trainers reais.** Três perguntas de resposta falsificável:
-   - *"O que você faz hoje quando um aluno pergunta se está progredindo?"*
-   - *"Se eu te avisar toda segunda que o peito do seu aluno está sem estímulo há 3 semanas, você abre e fala com ele, ou vira mais uma notificação que você ignora?"*
-   - *"Quantos alunos você tem, e quantos você perdeu nos últimos 6 meses?"*
+1. ~~**Ter um parecer bom de verdade para mostrar.**~~ **Feito** em 05/set — parecer de prosa real (`a7f5fe7c`), PDF redesenhado, proteções contra falha da IA.
+2. ~~**Conversar com 2–3 personal trainers reais.**~~ **Feito** — dois responderam por escrito. Transcrição analisada em `DECISIONS.md` "2026-09-10 (6)".
 
-A segunda é a que decide se isto tem produto. **O risco central do desenho é o personal virar gargalo obrigatório:** sem vínculo, o diagnóstico chega sozinho; com vínculo, a continuidade do aluno passa a depender da disciplina de outra pessoa.
+**O que se aprendeu, em uma frase de cada um.** P1: *"personal não tem preguiça de cuidar do aluno; personal tem pouco tempo para processar excesso de dados em texto longo."* P2, que entregou o critério de sucesso do módulo: *"não é conseguir detectar um problema. É conseguir fazer o profissional querer abrir o problema."*
 
-**A primeira coisa a construir, quando o portão abrir,** não é login com dois modos, nem aba de alunos, nem cobrança: é **um personal receber um alerta real sobre um aluno real e responder ao aluno por ali**. Convite, aceite, revogação, um sinal roteado, uma mensagem. Esconder a prescrição é barato; o alerta e o chat são a parte cara e incerta, e são o que precisa ser testado primeiro.
+**O risco central mudou de lugar.** Era *"o personal vira gargalo obrigatório"*. Continua real, mas as entrevistas apontaram um risco anterior a ele: **o alerta nunca ser aberto.** Nenhum dos dois disse que ignoraria por não se importar — os dois disseram que ignorariam por **volume e formato**. É por isso que as restrições 5, 6 e 7 do §11.4 existem.
+
+**O que as entrevistas NÃO estabeleceram, e precisa estar escrito para ninguém confundir dor reconhecida com mercado:**
+
+- **Tamanho da dor em dinheiro.** A terceira pergunta do roteiro — *"quantos alunos você tem, e quantos perdeu nos últimos 6 meses?"* — **não foi respondida por nenhum dos dois**. Segue em aberto.
+- **Disposição a pagar.** Não foi perguntada.
+- **Comportamento.** Os dois responderam por escrito, com tempo para compor: é preferência declarada. O próprio P2 se protegeu — *"se for só mais uma notificação semanal, depois de algumas semanas eu vou ignorar."* A prova é ele abrir na **terceira** segunda-feira.
+- **Representatividade.** n=2, ambos articulados o bastante para escrever respostas longas — provavelmente acima da mediana. A convergência entre eles é sinal forte; a amostra não sustenta generalização.
+
+**O limite do produto, exposto pelas duas respostas.** Para julgar progresso eles usam técnica e amplitude, RPE, fita métrica, fotos em mesma iluminação, sono, disposição, composição corporal e força relativa. **O lastro tem carga, repetição, volume, frequência e RIR** — e não deve fingir que tem o resto. Ele responde a fatia que é cara de calcular na mão e onde a memória falha; foto e técnica o personal já resolve no olho. Prometer *"o app diz se o aluno está progredindo"* é prometer o que o dado não sustenta.
+
+### 11.7 A decisão que ainda bloqueia o código
+
+**Onde a ação de um clique termina?** Duas opções, e a escolha muda o que precisa ser construído:
+
+**(a) Sai para o WhatsApp.** P1 propôs isto sem ser perguntado: `[Mandar mensagem padrão no WhatsApp]`. O lastro **não precisa de canal pessoa-a-pessoa nenhum** — o §5 fica intacto sem exceção, o §11.5 deixa de ser necessário, e a parte mais cara e incerta de construir desaparece. **O custo:** a conversa sai do produto. Sem registro, sem auditoria e — o que mais pesa — **o lastro perde a única medida que provaria que o módulo funciona**: o alerta virou ação, ou não?
+
+**(b) Canal interno 1:1**, como o §11.5 descreve. Mantém a medida e o registro; custa construir chat, e reabre a exceção ao §5.
+
+**Enquanto isto não for decidido, não se escreve código deste módulo** — as duas opções divergem já na primeira tela. **A primeira coisa a construir, quando decidir,** não é login com dois modos, nem aba de alunos, nem cobrança: é **um personal receber um alerta real sobre um aluno real e agir a partir dele.** Convite, aceite, revogação, um sinal priorizado, uma ação. Esconder a prescrição é barato; o alerta que alguém **quer abrir** é a parte cara e incerta, e é o que precisa ser testado primeiro.

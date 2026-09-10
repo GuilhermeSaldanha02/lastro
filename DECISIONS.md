@@ -2196,3 +2196,66 @@ O medo real era o **validador do parecer**: em PT-BR o milhar é ponto, e um par
 **Os outros dois consumidores não têm restrição de largura:** na tela `formatarPeso` formata o **peso da série** (102,5 kg), que nunca chega ao milhar, e em `leitura-deterministica.ts` é prosa corrida.
 
 **Nove testes novos**, incluindo um que trava a convenção: milhar e decimal são sempre caracteres **opostos**, em todo idioma. Se alguém inverter, o validador volta a ler `12.480` como `12,48` — o teste cai antes disso chegar em produção.
+
+---
+
+## 2026-09-10 (6) — Scope Change: a §11 revisada pelas entrevistas com personais
+
+**O portão do `PRD.md` §11.6 abriu.** Condição (a) — parecer bom para mostrar — cumprida desde 05/set. Condição (b) — 2–3 personais reais — cumprida hoje: **dois personais responderam**, por escrito, às perguntas do roteiro.
+
+O resultado **não confirmou o desenho; corrigiu ele.** Esta entrada registra o que mudou e por quê.
+
+### O que as entrevistas provaram
+
+**A dor existe, e não é falta de dado — é custo de processar dado.** Nenhum dos dois respondeu "eu sei de cabeça". Os dois descreveram comparação contra registro passado, e o segundo foi explícito: *"memória engana muito: às vezes a pessoa acha que não mudou nada, mas os números mostram uma evolução enorme."* O primeiro deu a frase que resume o produto: *"personal não tem preguiça de cuidar do aluno; personal tem pouco tempo para processar excesso de dados em texto longo."*
+
+**Os dois desenharam a MESMA condição de fracasso, sem combinar.**
+
+- **P1:** push genérico no meio do salão → *"a chance de eu arrastar pra o lado no meio da correria é de 80%"*. Funciona se for flag no painel **na segunda de planejamento**, com **ação de 1 clique** — ele chegou a desenhar a interface: `[Mandar mensagem padrão no WhatsApp]` ou `[Ajustar ficha de treino]`.
+- **P2:** *"eu não ignoraria — mas também não abriria toda notificação automaticamente."* Abre se o sinal for **tendência** (3 semanas), não oscilação de uma sessão. Ignora se toda segunda chegar *"Peito: atenção / Bíceps: atenção / Costas: atenção / Tríceps: atenção"*.
+
+**O critério de sucesso do produto, dito por P2:** *"não é conseguir detectar um problema. É conseguir fazer o profissional querer abrir o problema."*
+
+### O que isso REFUTA no desenho anterior
+
+**1. O alerta em chat 1:1 está morto.** A §11.2 original roteava o sinal *"ao personal, em chat 1:1 com o aluno"*. Os dois acabaram de descrever exatamente esse formato como o que ignoram. O container certo é **fila de trabalho priorizada, lida no momento do planejamento** — não mensagem que chega.
+
+**2. Ação de um clique deixa de ser enfeite e vira requisito.** P1 foi literal: o valor *"não tá só em gerar o relatório do aluno — tá em economizar o cérebro do personal pra ele parecer um profissional extremamente atencioso sem gastar 20 minutos analisando planilha"*. Relatório que exige leitura para achar o problema é o modo de falha, não o produto.
+
+**3. Seletividade vira restrição inegociável.** Um alerta que dispara para todo grupo muscular toda semana não é um produto ruidoso — é um produto morto. P2 nomeou o número de mortes: algumas semanas.
+
+**4. A transferência da prescrição perdeu apoio empírico.** Nenhum dos dois pediu para ser dono da prescrição. Os dois falaram em querer saber **com quem falar**. A transferência sobrevive pela lógica interna do `PRD.md` §5 ("o app analisa; não prescreve"), que continua válida — mas fica registrado que ela é agora a **metade menos validada** desta seção, e não deve ser tratada como se as entrevistas a tivessem confirmado.
+
+### O limite do lastro, que as duas respostas expuseram
+
+Para julgar progresso, eles usam: técnica e amplitude, RPE, fita métrica, fotos comparativas em mesma iluminação, sono, disposição, composição corporal, força relativa, consistência.
+
+**O lastro tem carga, repetição, volume, frequência e RIR.** Não tem técnica, foto, medida, sono nem composição corporal, e não deve fingir que tem.
+
+Isso não invalida o módulo — delimita a promessa. O lastro responde **uma fatia** da pergunta, justamente a fatia cara de calcular na mão e onde a memória falha. Foto e técnica eles já resolvem no olho. Vender como "responde se o aluno está progredindo" é prometer o que o dado não sustenta.
+
+### Alternativa que as entrevistas ABRIRAM, e que não estava no desenho
+
+P1 propôs, sem ser perguntado, que a ação de um clique fosse **`[Mandar mensagem padrão no WhatsApp]`**. Se a ação sai para o WhatsApp, o lastro **não precisa de canal pessoa-a-pessoa nenhum** — o `PRD.md` §5 fica intacto sem exceção, e a parte mais cara e incerta de construir (chat) desaparece.
+
+**O custo dessa alternativa, e é real:** a conversa sai do produto. Sem registro, sem auditoria, e — o que mais importa — **o lastro perde a única medida que provaria que o módulo funciona**: o alerta virou ação? Fica **em aberto**, decisão do dono, e está escrito na §11.7 revisada.
+
+### O que estas entrevistas NÃO provaram
+
+- **Tamanho da dor em dinheiro.** A terceira pergunta do roteiro (*"quantos alunos você tem, e quantos perdeu nos últimos 6 meses?"*) não foi respondida por nenhum dos dois. A dor é reconhecida; não se sabe se é cara.
+- **Disposição a pagar.** Não foi perguntada a nenhum dos dois.
+- **Comportamento, só preferência declarada.** Os dois responderam por escrito, com tempo para compor. O próprio P2 se protegeu: *"se for só mais uma notificação semanal, depois de algumas semanas eu vou ignorar."* A prova é ele abrir na terceira segunda-feira, não dizer que abriria.
+
+**Amostra: n=2**, ambos articulados e engajados o bastante para escrever respostas longas — provavelmente acima da mediana do ofício. Convergência entre os dois é sinal forte; representatividade não está estabelecida.
+
+### Alternativa descartada
+
+**Ir direto ao código com o §11 original**, já que o portão formalmente abriu (2–3 personais). Descartada: o portão pedia entrevistas para *aprender*, e o que se aprendeu contradiz o desenho. Construir agora seria construir a coisa errada **com validação na mão** — o pior dos dois mundos, porque a evidência daria falsa confiança.
+
+### Impacto
+
+`PRD.md` §11.2, §11.4, §11.5 e §11.6 revisados; §11.7 nova (a decisão em aberto sobre WhatsApp vs. canal interno). Nenhuma linha de código — o portão de implementação **segue fechado**, agora por outro motivo: falta decidir o container da ação.
+
+### Como reverter
+
+Esta entrada é revisão de contrato, não de código. Reverter = restaurar a §11 anterior a partir do histórico do `PRD.md` e registrar nova entrada dizendo por quê. As entrevistas continuam tendo acontecido.
