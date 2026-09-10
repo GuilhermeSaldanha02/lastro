@@ -3628,12 +3628,38 @@
   display: flex;
   align-items: center;
   gap: var(--lastro-e-3);
+  /* `min-width: 0` é o que impede o card inteiro de vazar. Item de flex
+     nasce com `min-width: auto`, ou seja, não encolhe abaixo do próprio
+     conteúdo — e quando o perfil não tem nome, este bloco exibe o E-MAIL,
+     que é uma string sem espaço para quebrar. Achado da varredura j4 em
+     2026-09-10: `/ajustes` a 390px vazava 48-56px, com a seta de navegação
+     cortada na borda. Não aparecia na conta do dono porque o e-mail dele é
+     curto o bastante para caber — só um usuário novo, com e-mail longo,
+     revela. */
+  min-width: 0;
+}
+
+/* O bloco de texto ao lado do avatar precisa da mesma permissão de
+   encolher, senão o `min-width: 0` acima para no primeiro nível. */
+.card-perfil-bento__esquerda > div {
+  min-width: 0;
+}
+
+/* A seta é ponto de toque: encolher ela para caber texto seria trocar um
+   problema visível por um problema de uso. */
+.card-perfil-bento > :last-child {
+  flex-shrink: 0;
 }
 
 .card-perfil-bento__nome {
   font-size: var(--lastro-papel-secao);
   font-weight: var(--lastro-peso-max);
   color: var(--lastro-txt);
+  /* `anywhere` e não `break-word`: e-mail longo não tem oportunidade de
+     quebra nenhuma, e `break-word` só age depois de tentar quebrar em
+     espaço — aqui não há espaço. Quebra em duas linhas é honesto; cortar
+     com reticências esconderia parte da identidade de quem está logado. */
+  overflow-wrap: anywhere;
 }
 
 .card-perfil-bento__status {

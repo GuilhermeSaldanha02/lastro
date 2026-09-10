@@ -2100,3 +2100,28 @@ Quando o dono pediu as dicas, a restrição foi **apresentada a ele com a citaç
 **Caminho de volta, sem nova decisão arquitetural.** Trocar uma dica por texto revisado por profissional é um `update` com `dica_execucao_origem = 'humano'`; o aviso de IA some naquele exercício. Exercício a exercício, no ritmo que der.
 
 **Documentos alinhados junto, para o repositório não se contradizer:** `ADR.md` (FF7 reescrita + seção de revogação parcial), `CLAUDE.md` §4, `ARCHITECTURE.md`, `SDD.md` (schema e escopo da Fase 5) e `.claude/agents/inspetor-qa.md` item 8. O `SDD.md` §768 **não** mudou de propósito: o Coach 24h continua proibido de improvisar técnica no chat — dica é texto fixo, revisável e com origem; resposta de chat não é.
+
+---
+
+## 2026-09-10 — Varredura de navegação, e o vazamento que só um usuário novo revelou
+
+**Pedido do dono:** tirar o aviso de procedência de IA e o card "Referência de execução, não prescrição" da tela do exercício; depois passar o Playwright pelo sistema inteiro, com **usuário novo, não a conta dele**, olhando experiência e responsividade.
+
+**As remoções.** Feitas. Saíram junto as entradas de i18n e o CSS órfãos — e a **segunda definição duplicada** de `.exercicio-hero-card__aviso`, que já estava no backlog como dívida de `sistema.css`.
+
+**Divergência aberta, deixada para o dono decidir.** `PRD.md` §4.5 exige, com estas palavras, *"mais aviso de que não substitui acompanhamento profissional"*. Com a remoção, o app deixa de cumprir essa linha. **Não editei o PRD**: mudar o spec é decisão dele, não consequência automática de uma mudança de tela. Fica registrado como divergência conhecida até ele dizer se emenda ou reverte.
+
+**A varredura (`e2e/j4-varredura.spec.ts`).** Anda pelas 14 telas com usuário criado na hora e apagado no fim, em 390/768/1440px. Reprova em erro de console, exceção, resposta 4xx/5xx, vazamento horizontal ou tela vazia, e imprime a lista antes do assert.
+
+**Um achado, e é exatamente o tipo que só o usuário novo revela.** `/ajustes` a 390px vazava **48–56px** na horizontal, com a seta de navegação cortada na borda. Causa: `.card-perfil-bento__esquerda` é item de flex sem `min-width: 0` — item de flex nasce com `min-width: auto` e não encolhe abaixo do próprio conteúdo. Quando o perfil não tem nome, esse bloco exibe o **e-mail**, que é string sem espaço para quebrar.
+
+**Por que nunca apareceu antes:** o e-mail do dono é curto o bastante para caber. O da conta de teste não é. A conta dele deixou de ser instrumento de medida justamente por já estar "arrumada" — foi ele quem pediu usuário novo, e o pedido pagou.
+
+Corrigido com `min-width: 0` nos dois níveis do flex, `overflow-wrap: anywhere` no nome e `flex-shrink: 0` na seta (encolher um ponto de toque para caber texto seria trocar um problema visível por um de uso).
+
+**As outras 13 telas passaram limpas nas três larguras** — sem erro de console, sem requisição quebrada, sem vazamento. Resultado negativo que vale ser dito.
+
+**Duas observações de experiência, sem correção ainda, aguardando o dono:**
+
+1. **Catálogo no celular tem 11.552px de altura** — cerca de 30 telas de rolagem. É consequência de as 102 dicas aparecerem também nos cards da lista. Para quem procura um exercício em pé na academia, a busca no topo salva, mas a varredura visual piorou muito. A dica pode fazer mais sentido só na tela de detalhe.
+2. **`/analise` com conta zerada mistura dois números**: *"Ainda não há pelo menos **2** semanas do mesmo exercício... São necessárias **3** para calcular a análise semanal."* São dois requisitos diferentes na mesma frase, e lidos juntos parecem contradição.
