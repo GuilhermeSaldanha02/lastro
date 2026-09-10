@@ -44,15 +44,16 @@
 
 1. **Comparativo "parecer disse vs. feito"** — precisa de mais pareceres salvos antes de valer alguma coisa.
 2. **Os 5× `404` da Gemini** seguem sem explicação, mas ficaram entre 27–29/ago e **não voltaram**. Combinado: investigar só se reaparecerem.
-3. **Temas escuros x contraste: medidos só por composição de token, não no app renderizado.** Trocar de tema exigiria mexer na configuração da conta do dono. O botão de ação primária usa gradiente e **não é medível** por composição de cor — a varredura o marca como "não medido" em vez de inventar número.
-4. **Módulo Personal** — decidido e contratado (`PRD.md` §11), **portão fechado**: nenhuma linha antes de (a) parecer bom pra mostrar e (b) 2-3 personais reais.
+3. **Módulo Personal** — o portão do §11 **abriu** (entrevistas feitas, `PRD.md` §11 revisado). Bloqueado agora pela **§11.7**: a ação de um clique termina no WhatsApp ou em canal interno do app? As duas opções divergem já na primeira tela. **Decisão do dono.**
+4. **Quantos alunos os personais têm e quantos perderam em 6 meses** — nenhum dos dois respondeu. É o número que separa "dor reconhecida" de "dor cara". Não bloqueia código; muda o que dá pra afirmar sobre mercado.
 
-**Nada aqui é tarefa de agente sozinho:** 1 espera dado, 2 espera reincidência, 3 esbarra na configuração da conta do dono, 4 espera as entrevistas.
+**Nada aqui é tarefa de agente sozinho:** 1 espera dado, 2 espera reincidência, 3 e 4 esperam o dono.
 
-**Fechados nesta sessão:** teto do Coach · varredura render-vs-efeito · `npm audit fix` (nanoid, 0 vulnerabilidades) · seletores duplicados no `sistema.css` · T3b · 102 dicas · contradição `DESIGN.md` §3.0 vs `tokens.css` · ponteiro quebrado do `PRD.md` · reparo do histórico de migrations · **separador de milhar do `formatarPeso`**.
+**Fechados nesta sessão:** teto do Coach · varredura render-vs-efeito · `npm audit fix` (nanoid, 0 vulnerabilidades) · seletores duplicados no `sistema.css` · T3b · 102 dicas · contradição `DESIGN.md` §3.0 vs `tokens.css` · ponteiro quebrado do `PRD.md` · reparo do histórico de migrations · **separador de milhar do `formatarPeso`** · **contraste dos 7 temas medido no app** (`e2e/j5-contraste.spec.ts`, zero reprovas).
 
 ### Para o outro agente saber
 
+- **Contraste agora é TESTE, não conferência.** `e2e/j5-contraste.spec.ts` troca o tema clicando o card em `/ajustes/temas`, confirma pelo `localStorage` que o app aplicou, e mede 7 temas × 5 telas com as camadas compostas. Zero reprovas em 10/set. **Não meça à mão de novo** — o erro é silencioso, sai número plausível. Fora de cobertura: 21 elementos **sobre gradiente**, que o teste devolve como "não medidos" em vez de chutar.
 - **Medir contraste contra token é ESTIMAR, e estimar erra.** Nesta sessão três medições produziram fantasmas antes de a certa aparecer: (a) token contra token acusou acentos que **nunca são desenhados** naquelas superfícies; (b) trocar `data-tema` por JS acusou 31 falhas porque **isso não re-tematiza o app** — os tokens viram escuros e os cards seguem claros; (c) o número no `DESIGN.md` ("33 elementos, 1,79:1") **antecede** uma correção já feita em 21/ago. O que vale é o pixel renderizado, no tema de fato aplicado, com as camadas translúcidas compostas. `DESIGN.md` §4.2 já dizia isso.
 - **`DESIGN.md` §3.0/§3.1/§3.2/§4.2 estão marcadas como SUPERSEDIDAS no corpo de cada uma.** Descrevem a paleta areia, morta desde o Apex Pro. A fonte de verdade é `src/app/tokens.css`.
 - **A `FF7` não vale mais** (revogada pelo dono em 10/set). Escrever dica por LLM é permitido; **esconder que foi LLM, não** — `dica_execucao_origem` é obrigatório em toda dica nova.

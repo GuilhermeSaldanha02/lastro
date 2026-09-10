@@ -2259,3 +2259,17 @@ P1 propôs, sem ser perguntado, que a ação de um clique fosse **`[Mandar mensa
 ### Como reverter
 
 Esta entrada é revisão de contrato, não de código. Reverter = restaurar a §11 anterior a partir do histórico do `PRD.md` e registrar nova entrada dizendo por quê. As entrevistas continuam tendo acontecido.
+
+---
+
+## 2026-09-10 (7) — Contraste medido nos sete temas, e a correção da minha própria medição
+
+**`e2e/j5-contraste.spec.ts`**: troca o tema **clicando o card** em `/ajustes/temas`, confirma pelo `localStorage` que o app aplicou, e só então mede — 7 temas × 5 telas, com as camadas translúcidas compostas.
+
+**Resultado: zero reprovas.** Nenhum texto abaixo do piso AA em nenhum tema.
+
+**Isso fecha o laço de um erro meu, registrado na entrada `2026-09-10 (4)`.** Lá eu tinha acusado 31 falhas nos temas escuros — inclusive "branco sobre branco" a 1,05:1 — trocando `data-tema` por JS de fora do app. Suspeitei na hora que fossem fantasmas, porque a tela renderizada estava certa, mas **suspeitar não é medir**. Agora está medido: eram fantasmas mesmo. O app não re-tematiza por atributo setado de fora, e a varredura comparava token novo com fundo antigo.
+
+**Por que virou teste em vez de conferência manual.** Medir contraste é fácil de fazer errado e o erro é **silencioso** — sai um número plausível. Naquele dia três medições saíram erradas antes de a certa aparecer (token contra token, atributo trocado por fora, e o número herdado do `DESIGN.md` que antecede uma correção de agosto). Regra que não é executável volta a ser violada; o `DESIGN.md` §4.2 já mandava medir no navegador desde sempre e isso não impediu nenhum dos três erros.
+
+**O que segue sem cobertura, e está dito no log de cada execução:** 21 elementos ficam **sobre gradiente**, onde compor cor não resolve — precisaria amostrar pixel. O teste os devolve como "não medidos" em vez de atribuir um número. O principal é o botão de ação primária.
