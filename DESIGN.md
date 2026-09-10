@@ -53,7 +53,9 @@ Isso não é detalhe de acabamento — é a restrição que decide o layout inte
 
 > **Este bloco `:root` é o único lugar do projeto onde um valor literal de cor, espaço, tamanho ou fonte pode existir.** Qualquer hex, `px`, `rem` ou nome de fonte fora daqui — em componente, em Tailwind config, em CSS de módulo, em prop de Recharts — é violação e reprova no review.
 
-### 3.0 Tese visual — APROVADA em 2026-08-06
+### 3.0 Tese visual — aprovada em 2026-08-06, SUPERSEDIDA em 2026-08-20
+
+> ⛔ **SEÇÃO SUPERSEDIDA — não use número daqui.** O redesenho "Apex Pro" (2026-08-20, `8d30cf0`) trocou a paleta areia por um tema escuro sem atualizar esta seção. Os nomes de token continuam existindo em `src/app/tokens.css`, mas **com outros valores**. A fonte de verdade é o `tokens.css`; remedir contra ele é a tarefa T3b, ainda não feita. Aviso repetido aqui de propósito: quem chega direto nesta seção por busca ou índice não passa pelo banner do topo do arquivo.
 
 **"Areia & Azul Petróleo".** Areia é a superfície, azul petróleo é a tinta, verde é a ação — e só a ação. Número em mono tabular; cor cromática usada só onde ela *significa* alguma coisa.
 
@@ -77,6 +79,8 @@ Dois achados que orientaram a decisão:
 2. A massa da galeria é imersiva/WebGL/luxo — gradiente, vidro, sobreposição de baixo contraste, texto sobre vídeo. **Esse ramo é incompatível com D4 e D8** (celular suado, luz ruim, contraste AA medido). A adjacência que se adota é o outro ramo do mesmo catálogo — **Linear e Stripe**: hierarquia tipográfica, densidade de dado, contenção. Isso é rejeição por restrição funcional, não por gosto.
 
 ### 3.1 Paleta — a fonte única agora é `src/app/tokens.css`
+
+> ⛔ **SEÇÃO SUPERSEDIDA — não use número daqui.** O redesenho "Apex Pro" (2026-08-20, `8d30cf0`) trocou a paleta areia por um tema escuro sem atualizar esta seção. Os nomes de token continuam existindo em `src/app/tokens.css`, mas **com outros valores**. A fonte de verdade é o `tokens.css`; remedir contra ele é a tarefa T3b, ainda não feita. Aviso repetido aqui de propósito: quem chega direto nesta seção por busca ou índice não passa pelo banner do topo do arquivo.
 
 > **Mudança de custódia (2026-08-06).** O bloco `:root` deixou de morar neste documento e passou a morar em **`src/app/tokens.css`**, que é o **único arquivo do projeto onde um valor literal de cor, espaço, tamanho, peso, raio, sombra ou duração pode existir**. Qualquer hex, `px` ou `rem` fora dele — em componente, em CSS de módulo, em prop de Recharts — é violação e reprova no review.
 >
@@ -123,6 +127,8 @@ Preenchimento vivo + tinta escura resolve os dois de uma vez. Consequências obr
 **Espaçamento, alvos, escala de tamanho, peso, raio, duração e matéria** seguem em `tokens.css` com os mesmos nomes usados neste documento. Base 4px; `--lastro-alvo-min` 48px (D1), `--lastro-alvo-acao` 72px (D3); escala de tamanho com piso 14px e corpo em 16px (D4).
 
 ### 3.2 Contraste — medido em navegador, não estimado (D8)
+
+> ⛔ **SEÇÃO SUPERSEDIDA — não use número daqui.** O redesenho "Apex Pro" (2026-08-20, `8d30cf0`) trocou a paleta areia por um tema escuro sem atualizar esta seção. Os nomes de token continuam existindo em `src/app/tokens.css`, mas **com outros valores**. A fonte de verdade é o `tokens.css`; remedir contra ele é a tarefa T3b, ainda não feita. Aviso repetido aqui de propósito: quem chega direto nesta seção por busca ou índice não passa pelo banner do topo do arquivo.
 
 Fórmula WCAG 2.x (linearização sRGB, `L = 0.2126R + 0.7152G + 0.0722B`, `(Lmax+0.05)/(Lmin+0.05)`). **Aferição do método, rodada antes de cada medição:** `#FFFFFF/#000000 = 21.00`, `#777777/#FFFFFF = 4.48`, `#767676/#FFFFFF = 4.54` — batem com os canônicos do WCAG.
 
@@ -450,6 +456,8 @@ Entregável desta seção: o roteiro que o **controller** executa. Cada item tra
 Viewports mínimos: **360×640** (piso realista de celular), **390×844**, **1280×800** (D9: o PC é onde se lê o gráfico com calma).
 
 ### 4.2 Contraste — medir, não confiar na tabela
+
+> ⛔ **SEÇÃO SUPERSEDIDA — não use número daqui.** O redesenho "Apex Pro" (2026-08-20, `8d30cf0`) trocou a paleta areia por um tema escuro sem atualizar esta seção. Os nomes de token continuam existindo em `src/app/tokens.css`, mas **com outros valores**. A fonte de verdade é o `tokens.css`; remedir contra ele é a tarefa T3b, ainda não feita. Aviso repetido aqui de propósito: quem chega direto nesta seção por busca ou índice não passa pelo banner do topo do arquivo.
 
 Medir com conta-gotas sobre a tela **renderizada** (a tabela de §3.2 é a expectativa; o gate confirma que o CSS entregue bate com ela). Pares obrigatórios, com a razão esperada:
 

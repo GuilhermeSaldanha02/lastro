@@ -1,6 +1,8 @@
 # PRD.md — `lastro`
 
-> **Contrato de produto.** Congela após aprovação do dono. Mudança depois disso = protocolo de Scope Change (`.claude/skills/padrao-documentos/SKILL.md`), registrada em `DECISIONS.md`.
+> **Contrato de produto.** Congela após aprovação do dono. Mudança depois disso = **Scope Change registrado em `DECISIONS.md`**, no formato que as entradas de lá já seguem: o que mudou · por quê · alternativa descartada · classificação · impacto · como reverter.
+>
+> *(Até 2026-09-10 esta linha apontava para `.claude/skills/padrao-documentos/SKILL.md`, que nunca existiu neste repositório — as skills presentes são `portao-visual/`, `projeto-retomada/` e `qa-registro/`. O protocolo real sempre foi o formato do próprio `DECISIONS.md`; o ponteiro só nomeava um arquivo que não estava lá.)*
 >
 > **Status: APROVADO pelo dono em 2026-08-04.** Congelado. Mudança daqui em diante = Scope Change registrado em `DECISIONS.md`.
 
@@ -79,7 +81,14 @@ Um app de treino **pessoal** que registra cada série executada e, uma vez por s
 
 **4.4 Coach 24h** — chat de dúvidas sobre treino, alimentado pela mesma chave. **Não improvisa técnica de movimento** (seção 4.5).
 
-**4.5 Demonstração de execução** — catálogo curado de ~100 exercícios em PT-BR real, com dicas de execução escritas e revisadas, mais aviso de que não substitui acompanhamento profissional. **Não é conteúdo gerado por IA** — é assunto de saúde, cai no E3.
+**4.5 Demonstração de execução** — catálogo de 102 exercícios em PT-BR real, cada um com dica de execução, animação do movimento e dados de biomecânica (músculo alvo, sinergistas, mecânica articular).
+
+> **Emendado em 2026-09-10, por decisão do dono.** Este parágrafo exigia duas coisas que o app deixou de fazer, e o documento foi alinhado à realidade em vez de ficar mentindo:
+>
+> · *"dicas escritas e revisadas"* e *"**não é conteúdo gerado por IA** — é assunto de saúde, cai no E3"*. As 102 dicas foram escritas por LLM em 2026-09-09, com a `FF7`/`ADR-007` revogada explicitamente pelo dono. A origem fica registrada em `exercicio.dica_execucao_origem` e vira `'humano'` quando alguém revisar.
+> · *"mais aviso de que não substitui acompanhamento profissional"*. O aviso foi removido da tela em 2026-09-10, também a pedido do dono, junto com a declaração de procedência de IA.
+>
+> Ver `DECISIONS.md` 2026-09-09 (2) e 2026-09-10. A restrição foi apresentada com a citação da ADR antes de cada remoção; as duas decisões são dele, tomadas com a informação na mão.
 
 **4.6 Conta e login** — criar conta com e-mail ou entrar com Google. Serve para backup e para usar no celular e no PC.
 
