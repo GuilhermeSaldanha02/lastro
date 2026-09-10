@@ -66,10 +66,22 @@ jobs:
       - name: Instalar navegador do Playwright
         run: npx playwright install --with-deps chromium
 
-      - name: E2E (jornadas J1/J2/J3 do PRD §6)
+      - name: E2E (jornadas J1/J2/J3 do PRD §6 + varredura de navegação)
         run: npm run e2e
         env:
           NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
           NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
           CI: true
+
+      # As capturas da varredura (j4) sao o unico jeito de OLHAR o app em
+      # tres larguras sem a conta do dono. `if: always()` de proposito: a
+      # execucao que FALHA e justamente a que precisa ser vista.
+      - name: Guardar capturas da varredura
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: varredura-telas
+          path: test-results/
+          retention-days: 7
+          if-no-files-found: ignore
