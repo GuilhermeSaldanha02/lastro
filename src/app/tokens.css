@@ -258,7 +258,15 @@
   --lastro-barra-txt:    #0F172A;
   --lastro-vidro-nav:    rgba(255, 255, 255, 0.96);
   --lastro-vidro-nav-opaco: #FFFFFF;
-  --lastro-nav-txt-fraco: rgba(100, 116, 139, 0.85);
+  /* T3b, medido no app renderizado em 2026-09-10 (não estimado): os
+     rótulos INATIVOS da barra inferior davam 3,55:1 sobre o vidro da nav
+     (`--lastro-vidro-nav` 0,96 branco sobre a página) — piso AA é 4,5 e
+     o texto é 14px/600, longe de "texto grande". É a navegação principal,
+     presente em toda tela, e só neste tema: os seis escuros usam o valor
+     do `:root` e passam em 5,70:1.
+     Escurecido preservando matiz e saturação (HSL), o mínimo que passa:
+     4,64:1. Não é escolha de cor nova, é a mesma cor corrigida. */
+  --lastro-nav-txt-fraco: rgba(80, 93, 112, 0.85);
   --lastro-elev-1:       0 2px 8px rgba(0, 0, 0, 0.05);
   --lastro-elev-2:       0 8px 20px -4px rgba(0, 0, 0, 0.08);
   --lastro-elev-3:       0 16px 32px -6px rgba(0, 0, 0, 0.12);

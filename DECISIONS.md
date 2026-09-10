@@ -2158,3 +2158,23 @@ Dois números diferentes, colados, sem dizer que falavam de coisas diferentes �
 **O número virou constante.** `MINIMO_SESSOES_TENDENCIA = 2` em `limiares.ts`, usada tanto pelo agregador quanto pela tela. Antes o `2` estava escrito à mão nos dois lugares — texto e regra podiam divergir sem ninguém notar, que é exatamente como a frase errou a unidade e sobreviveu.
 
 **Limpeza junto:** quatro entradas de i18n ficaram órfãs (`"Você tem"`, `"semana fechada"`, `"semanas fechadas"`, `"para calcular a análise semanal."`) e foram removidas. Fragmento de frase no dicionário é dívida: traduz pedaço solto, que só faz sentido montado na ordem do português.
+
+---
+
+## 2026-09-10 (4) — T3b: o que a medição real encontrou, e três medições que estavam erradas
+
+**Achado que vale a tarefa inteira:** os rótulos **inativos da barra de navegação** dão **3,55:1** no tema `branco-ouro` — piso AA é 4,5, e o texto é 14px/600, longe de "texto grande". É a navegação principal, em **toda tela**, no tema que o dono usa. Corrigido para **4,64:1** escurecendo a mesma cor em HSL (matiz e saturação preservados): `rgba(100,116,139,0.85)` → `rgba(80,93,112,0.85)`. Não é cor nova, é a mesma corrigida.
+
+Os seis temas escuros usam o valor do `:root` e já passam em **5,70:1** — não foram tocados.
+
+**Três medições erradas no caminho, registradas porque o erro é o aprendizado.**
+
+1. **Varredura token contra token (minha).** Cruzou cada acento contra as quatro superfícies e acusou 4 reprovas — `--lastro-erro`, `--lastro-esmeralda`, `--lastro-ciano`. Todas **fantasma**: esses acentos nunca são desenhados sobre `--lastro-sup-3`. O esmeralda fica sobre `--lastro-esmeralda-fundo`, o ciano sobre `rgba(6,182,212,0.12)` — camadas tingidas. Os comentários do próprio `tokens.css` já diziam isso ("fundo composto real 226,247,240"), e eu li depois de medir.
+
+2. **Varredura no navegador trocando `data-tema` por JS (minha).** Acusou 31 reprovas nos temas escuros, incluindo "branco sobre branco" a 1,05:1. Também fantasma: **trocar o atributo não re-tematiza o app inteiro** — os tokens viravam escuros enquanto o card mantinha o branco do tema claro, e a varredura media uma combinação que não existe na tela. Só o tema efetivamente aplicado dá número confiável.
+
+3. **O número no `DESIGN.md` (herdado).** A seção diz "33 elementos reprovando, pior caso **1,79:1**". Esse número é de 2026-08-20 e **antecede** a correção que o `docs/BACKLOG-PROXIMA-FASE.md` marca como resolvida em 2026-08-21. Medindo hoje, o pior caso real é 3,55:1 e são 4 elementos — todos o mesmo componente.
+
+**A lição, que o `DESIGN.md` já tentava ensinar em §4.2:** medir contra token é estimar. O que vale é o pixel renderizado, no tema que está de fato aplicado, com as camadas translúcidas compostas. Duas das três medições erradas acima aconteceram por pular exatamente esse passo.
+
+**Escopo não coberto, dito sem maquiagem.** Os seis temas escuros só foram medidos por composição de token, não no app renderizado — trocar de tema exigiria mexer na configuração da conta do dono. O botão de ação primária usa gradiente e **não é medível** por composição de cor: ficou de fora, marcado como tal pela varredura em vez de receber um número inventado.
