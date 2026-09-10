@@ -59,6 +59,7 @@
 - **`treino.iniciado_em` é a âncora de tempo do app.** Duração de sessão tem **uma definição só**: `duracaoSessaoSegundos()` em `metricas-treino.ts`. Não recrie uma segunda.
 - **As marcas de tempo no `localStorage` têm dono único:** `src/lib/treino/marcos-treino.ts`. E a marca de início **só é gravada em treino recém-criado** — não assuma que ela existe.
 - **Confira `git status --short` DEPOIS de `git add`, não antes.** Um `git add -A src supabase` já excluiu silenciosamente arquivos de `scripts/` e quebrou o CI passando local.
+- **`npm run dev` reescreve `next-env.d.ts`** apontando os tipos para `.next/dev/` em vez de `.next/`. Commitar isso quebra os paths do build de produção. Aconteceu **duas vezes** em 10/set. Depois de rodar o dev server, `git checkout -- next-env.d.ts` antes de commitar.
 - **`gh run watch --exit-status` sai 0 quando a conexão cai**, e `gh pr merge --auto` já mergeou com CI `IN_PROGRESS`. Faça polling direto de `gh pr view <n> --json statusCheckRollup`.
 
 
