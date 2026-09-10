@@ -8,6 +8,7 @@ import {
   MAX_GRUPOS,
   MAX_TENDENCIA_E1RM,
   MAX_VOLUME_POR_EXERCICIO,
+  MINIMO_SESSOES_TENDENCIA,
 } from "./limiares";
 import { calcularPrs, type EntradaPr } from "./prs";
 import { calcularSeriesDificeis } from "./series-dificeis";
@@ -270,7 +271,7 @@ export function montarResumoCompacto(entrada: {
 
   const tendencia_e1rm: ResumoCompacto["tendencia_e1rm"] = [];
   for (const [exercicioId, sessoes] of sessoesPorExercicio) {
-    if (sessoes.length < 2) continue; // T-E6
+    if (sessoes.length < MINIMO_SESSOES_TENDENCIA) continue; // T-E6
     sessoes.sort((a, b) => (a.data < b.data ? -1 : a.data > b.data ? 1 : 0));
     const inicial = sessoes[0].e1rmMaximo;
     const atual = sessoes[sessoes.length - 1].e1rmMaximo;

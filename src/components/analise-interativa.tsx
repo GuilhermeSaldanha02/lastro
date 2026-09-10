@@ -18,7 +18,7 @@ import {
   PERGUNTA_PRIMARIA,
   type NumeroPergunta,
 } from "@/app/api/analise/perguntas";
-import { MINIMO_SEMANAS_PARECER } from "@/lib/analise/limiares";
+import { MINIMO_SEMANAS_PARECER, MINIMO_SESSOES_TENDENCIA } from "@/lib/analise/limiares";
 import type { Idioma } from "@/lib/dados/idioma";
 import type { GrupoComRecencia } from "@/lib/analise/recencia";
 import type { SinalDeload } from "@/lib/analise/alerta-deload";
@@ -130,17 +130,28 @@ export default function AnaliseInterativa({
 
       <h2 className="doc__secao">{t("Análise semanal", idioma)}</h2>
 
+      {/* DOIS requisitos, DUAS frases — e cada uma diz de que coisa fala.
+          Até 2026-09-10 os dois vinham grudados num parágrafo só, sob o
+          título "Análise semanal": "...pelo menos 2 semanas do mesmo
+          exercício... São necessárias 3 para calcular a análise semanal."
+          Dois números diferentes, sobre coisas diferentes, lidos como
+          contradição — e era a primeira coisa que uma conta nova via aqui
+          (achado da varredura j4). Pior: o "2" era de SESSÕES, não de
+          semanas, então a frase também errava a unidade. */}
       {!dadosSuficientes && (
-        <p className="vazio" aria-live="polite">
+        <div className="vazio" aria-live="polite">
           {graficoTemPainel === false && (
-            <>
-              {t("Ainda não há pelo menos 2 semanas do mesmo exercício pra desenhar progressão.", idioma)}{" "}
-            </>
+            <p>
+              {t("O gráfico de progressão precisa de", idioma)}{" "}
+              {MINIMO_SESSOES_TENDENCIA}{" "}
+              {t("treinos do mesmo exercício.", idioma)}
+            </p>
           )}
-          {t("Você tem", idioma)} {semanasFechadasComTreino}{" "}
-          {t(semanasFechadasComTreino === 1 ? "semana fechada" : "semanas fechadas", idioma)}.{" "}
-          {t("São necessárias", idioma)} {MINIMO_SEMANAS_PARECER} {t("para calcular a análise semanal.", idioma)}
-        </p>
+          <p>
+            {t("A análise semanal precisa de", idioma)} {MINIMO_SEMANAS_PARECER}{" "}
+            {t("semanas fechadas — você tem", idioma)} {semanasFechadasComTreino}.
+          </p>
+        </div>
       )}
 
       <ul className="perguntas">
