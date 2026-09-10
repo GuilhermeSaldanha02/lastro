@@ -49,6 +49,7 @@ docs/screenshots/jornada-usuario/
 
 # Saída regenerável da bancada (scripts/preview/pdf.render.tsx).
 qa/evidencias/pdf-parecer-*.pdf
+qa/evidencias/pdf-milhar.pdf
 qa/evidencias/*.png
 qa/evidencias/direcao-*.pdf
 

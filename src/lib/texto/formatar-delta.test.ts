@@ -50,6 +50,50 @@ describe("formatarPeso", () => {
   it("peso inteiro não ganha casa decimal artificial", () => {
     expect(formatarPeso(80)).toBe("80");
   });
+
+  // Agrupamento de milhar (2026-09-10). O volume semanal passa de 10.000 kg
+  // com facilidade — é o número grande que mais precisa ser lido rápido.
+  it("agrupa milhar com PONTO em pt-BR", () => {
+    expect(formatarPeso(7280)).toBe("7.280");
+  });
+  it("agrupa milhar com PONTO em es", () => {
+    expect(formatarPeso(7280, "es")).toBe("7.280");
+  });
+  it("agrupa milhar com VÍRGULA em en — é o oposto do decimal", () => {
+    expect(formatarPeso(7280, "en")).toBe("7,280");
+  });
+  it("milhar e decimal convivem sem se confundir", () => {
+    expect(formatarPeso(12480.5)).toBe("12.480,5");
+    expect(formatarPeso(12480.5, "en")).toBe("12,480.5");
+  });
+  it("agrupa de três em três acima de um milhão", () => {
+    expect(formatarPeso(1234567)).toBe("1.234.567");
+  });
+  it("não agrupa abaixo de mil — 999 não vira 9.99", () => {
+    expect(formatarPeso(999)).toBe("999");
+    expect(formatarPeso(1000)).toBe("1.000");
+  });
+  it("negativo mantém o sinal colado, sem separador solto", () => {
+    // `\B` não casa entre "-" e o primeiro dígito; sem isso sairia "-.7.280".
+    expect(formatarPeso(-7280)).toBe("-7.280");
+  });
+  it("zero continua zero", () => {
+    expect(formatarPeso(0)).toBe("0");
+  });
+
+  // O validador do parecer desmonta milhar antes de comparar
+  // (api/analise/validador.ts). Este teste trava a convenção nos dois
+  // lados: se alguém inverter os separadores aqui, o validador passa a
+  // ler 12.480 como 12,48 e rejeita parecer correto como intruso.
+  it("milhar e decimal são sempre caracteres OPOSTOS, em todo idioma", () => {
+    for (const [idioma, esperado] of [
+      ["pt-BR", "12.480,5"],
+      ["es", "12.480,5"],
+      ["en", "12,480.5"],
+    ] as const) {
+      expect(formatarPeso(12480.5, idioma)).toBe(esperado);
+    }
+  });
 });
 
 describe("formatarDelta", () => {
