@@ -44,7 +44,9 @@
 
 1. **Comparativo "parecer disse vs. feito"** — precisa de mais pareceres salvos antes de valer alguma coisa.
 2. **Os 5× `404` da Gemini** seguem sem explicação, mas ficaram entre 27–29/ago e **não voltaram**. Combinado: investigar só se reaparecerem.
-3. **Módulo Personal** — o portão do §11 **abriu** (entrevistas feitas, `PRD.md` §11 revisado). Bloqueado agora pela **§11.7**: a ação de um clique termina no WhatsApp ou em canal interno do app? As duas opções divergem já na primeira tela. **Decisão do dono.**
+3. **Módulo Personal — DESBLOQUEADO em 10/set.** Portão cumprido, §11.7 decidida: a ação de um clique abre o **WhatsApp do personal** com a mensagem pronta (link `wa.me`, não a API paga). Sem canal interno, sem exceção ao §5. **Primeira coisa a construir:** um personal receber um alerta real sobre um aluno real e agir a partir dele — convite, aceite, revogação, sinal priorizado, botão. Não é login com dois modos nem aba de alunos.
+   - **Antes da primeira tela:** confirmar com o P1 o que ele quis dizer com "mensagem padrão" (link com texto pronto vs. algo automático). A decisão assumiu a leitura conservadora.
+   - **Decisão de schema pendente:** o telefone do aluno vem dele, com consentimento, e some na revogação (§11.4.3).
 4. **Quantos alunos os personais têm e quantos perderam em 6 meses** — nenhum dos dois respondeu. É o número que separa "dor reconhecida" de "dor cara". Não bloqueia código; muda o que dá pra afirmar sobre mercado.
 
 **Nada aqui é tarefa de agente sozinho:** 1 espera dado, 2 espera reincidência, 3 e 4 esperam o dono.

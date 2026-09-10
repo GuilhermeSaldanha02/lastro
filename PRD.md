@@ -227,17 +227,15 @@ Por isso esta seção não é uma segunda persona no sentido que o §2 veta. O �
 6. **Seletividade é o produto, não um ajuste fino.** Se o alerta dispara para todo grupo muscular toda semana, ele morre — e leva o módulo junto. P2 nomeou o modo de morte com precisão: *"Peito: atenção / Bíceps: atenção / Costas: atenção / Tríceps: atenção — aí sim, vira notificação que eu começo a ignorar."* Consequências que isto impõe: o sinal precisa representar **tendência** (a régua citada foi 3 semanas), não oscilação de uma sessão; e precisa haver **teto de alertas por aluno por semana**, com priorização — mostrar o que mais importa, não tudo que é verdade.
 7. **Cada alerta carrega uma AÇÃO de um clique.** Ler não é o objetivo; agir é. P1 desenhou a interface na própria resposta — `[Mandar mensagem padrão no WhatsApp]` ou `[Ajustar ficha de treino]` — e explicou o porquê: o valor *"não tá só em gerar o relatório do aluno — tá em economizar o cérebro do personal pra ele parecer um profissional extremamente atencioso sem gastar 20 minutos analisando planilha"*. **Relatório que exige leitura para achar o problema é o modo de falha.** O conteúdo do alerta segue a ordem que P2 pediu: *o que aconteceu → há quanto tempo → qual evidência → o que pode estar causando → o que investigar*.
 
-### 11.5 A fronteira com o escopo negativo (§5)
+### 11.5 A fronteira com o escopo negativo (§5) — SEM exceção
 
-> **Revisto em 2026-09-10.** Esta subseção pressupunha que o canal pessoa-a-pessoa existiria. Depois das entrevistas isso virou **pergunta em aberto** — ver §11.7. O que segue vale **se** o canal interno for a opção escolhida; se a ação sair para o WhatsApp, esta subseção inteira deixa de ser necessária e o §5 fica intacto sem exceção nenhuma.
+> **Resolvido em 2026-09-10 pela decisão da §11.7.** Esta subseção existia para delimitar uma exceção ao §5: o chat personal↔aluno seria o primeiro canal pessoa-a-pessoa do produto. **Com a ação saindo para o WhatsApp, esse canal não existe** — e a exceção deixou de ser necessária.
 
-O chat personal↔aluno seria o **primeiro canal pessoa-a-pessoa** deste produto. Não fere o §5 ao pé da letra — não é feed, seguir, comparar nem ranking —, mas é a primeira vez que duas contas se falam num app cuja identidade declarada é "não é rede social". A exceção é **delimitada e fechada**:
+**O §5 continua valendo por inteiro, sem ressalva.** Nenhuma conta fala com outra dentro do lastro. Feed, seguir, comparar, ranking, perfil público e **chat** seguem mortos, com ou sem vínculo.
 
-- ✅ Canal **1:1**, apenas dentro de vínculo aceito e vigente.
-- ❌ Sem descoberta de perfil. Sem visibilidade entre alunos do mesmo personal. **Sem grupo.**
-- ❌ **Feed, seguir, comparar, ranking e perfil público continuam mortos**, com ou sem vínculo.
+O que o vínculo concede é **leitura de dado consentida** (o personal vê os sinais do aluno) e **um botão que abre o WhatsApp do próprio personal** com a mensagem pronta. A conversa acontece onde ela já acontecia; o lastro não vira canal.
 
-Isto está escrito porque, se ficasse implícito, "grupo de alunos" apareceria como extensão natural e o veto do §5 teria sido desarmado sem ninguém decidir.
+Isto fica escrito porque a tentação de "só um chatzinho 1:1" vai voltar — e, se voltar, é **Scope Change novo**, com o §5 sendo desarmado por decisão explícita, não por extensão natural de um botão.
 
 ### 11.6 Portão — CUMPRIDO em 2026-09-10, e o que ele revelou
 
@@ -259,12 +257,26 @@ As duas condições que bloqueavam esta seção **foram cumpridas**:
 
 **O limite do produto, exposto pelas duas respostas.** Para julgar progresso eles usam técnica e amplitude, RPE, fita métrica, fotos em mesma iluminação, sono, disposição, composição corporal e força relativa. **O lastro tem carga, repetição, volume, frequência e RIR** — e não deve fingir que tem o resto. Ele responde a fatia que é cara de calcular na mão e onde a memória falha; foto e técnica o personal já resolve no olho. Prometer *"o app diz se o aluno está progredindo"* é prometer o que o dado não sustenta.
 
-### 11.7 A decisão que ainda bloqueia o código
+### 11.7 A ação de um clique termina no WhatsApp — DECIDIDO em 2026-09-10
 
-**Onde a ação de um clique termina?** Duas opções, e a escolha muda o que precisa ser construído:
+**Decisão do dono**, tomada com pesquisa de concorrência na mão. Registro em `DECISIONS.md` "2026-09-10 (8)".
 
-**(a) Sai para o WhatsApp.** P1 propôs isto sem ser perguntado: `[Mandar mensagem padrão no WhatsApp]`. O lastro **não precisa de canal pessoa-a-pessoa nenhum** — o §5 fica intacto sem exceção, o §11.5 deixa de ser necessário, e a parte mais cara e incerta de construir desaparece. **O custo:** a conversa sai do produto. Sem registro, sem auditoria e — o que mais pesa — **o lastro perde a única medida que provaria que o módulo funciona**: o alerta virou ação, ou não?
+**O que se constrói:** o alerta traz um botão que abre o **WhatsApp do próprio personal**, com a mensagem já escrita e o aluno já selecionado. O personal lê, ajusta se quiser, e envia. Um link `wa.me` com texto pré-preenchido — **não** a API do WhatsApp Business.
 
-**(b) Canal interno 1:1**, como o §11.5 descreve. Mantém a medida e o registro; custa construir chat, e reabre a exceção ao §5.
+**O que NÃO se constrói, e é a metade que importa:**
 
-**Enquanto isto não for decidido, não se escreve código deste módulo** — as duas opções divergem já na primeira tela. **A primeira coisa a construir, quando decidir,** não é login com dois modos, nem aba de alunos, nem cobrança: é **um personal receber um alerta real sobre um aluno real e agir a partir dele.** Convite, aceite, revogação, um sinal priorizado, uma ação. Esconder a prescrição é barato; o alerta que alguém **quer abrir** é a parte cara e incerta, e é o que precisa ser testado primeiro.
+- **Nenhum canal pessoa-a-pessoa dentro do lastro.** O §11.5 deixou de precisar de exceção ao §5.
+- **A API paga do WhatsApp Business.** Ela cobra por mensagem (R$ 0,21–0,35 no Brasil em 2026) e traz aprovação de template, número dedicado e responsabilidade de envio. Nada disso é necessário para um link.
+- **Envio automático.** O lastro **compõe e entrega**; quem aperta enviar é a pessoa. Isso não é limitação técnica — é a regra: o app nunca fala com o aluno se passando pelo personal.
+
+**Por que esta, e não o canal interno.** Chat interno **não é diferencial — é o padrão da categoria**. Trainerize tem o seu; a Vedius vende literalmente *"comunicação centralizada na plataforma"* contra *"comunicação desorganizada"*, que é o WhatsApp. Construir chat seria brigar de frente com o recurso mais maduro e mais investido dos concorrentes, sendo um dev solo — empatar onde eles são fortes, gastando o orçamento de construção que deveria ir para o **único lugar onde eles não estão: a leitura do dado**. A Vedius tem 12.000 vídeos de exercício; ninguém tem *"toda segunda eu te digo qual aluno ligar"*.
+
+**A medida não se perde, ao contrário do que se temia.** O clique acontece **dentro do lastro** e é registrável. E a métrica que decide se o módulo funciona nunca foi "conversaram?" — é **"o grupo muscular alertado recebeu estímulo na semana seguinte?"**, e esse dado está no lastro de qualquer jeito, porque é o aluno que registra o treino. A conversa sair do produto custa muito menos do que a versão anterior desta seção supunha.
+
+**O risco aceito, escrito para não ser esquecido.** WhatsApp é exatamente aquilo contra o que os concorrentes se posicionam, e um personal pode ler a escolha como "menos profissional". A mitigação é de enquadramento, não de feature: **o lastro não é onde se gerencia aluno** — é o que diz com quem falar e entrega a mensagem pronta. Se essa leitura se provar errada em uso real, a reversão está descrita no `DECISIONS.md`.
+
+**Consequência de schema, não de tela:** o link precisa do telefone do aluno. É dado pessoal e cai na restrição §11.4.3 — **o número vem do aluno, com consentimento, e some quando ele revoga**. Nunca cadastrado pelo personal. Um personal digitar o número de alguém não concede acesso a nada.
+
+**Ponto ainda não confirmado com a fonte.** "Mensagem padrão" é interpretação do que P1 escreveu (`[Mandar mensagem padrão no WhatsApp]`); ele não detalhou se imaginava link com texto pronto ou algo automático. A decisão assume a leitura conservadora — a que não envia nada sozinha. Vale confirmar com ele antes da primeira tela.
+
+**A primeira coisa a construir** não é login com dois modos, nem aba de alunos, nem cobrança: é **um personal receber um alerta real sobre um aluno real e agir a partir dele.** Convite, aceite, revogação, um sinal priorizado, o botão. Esconder a prescrição é barato; o alerta que alguém **quer abrir** é a parte cara e incerta, e é o que precisa ser testado primeiro.

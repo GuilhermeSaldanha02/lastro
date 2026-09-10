@@ -2273,3 +2273,55 @@ Esta entrada é revisão de contrato, não de código. Reverter = restaurar a §
 **Por que virou teste em vez de conferência manual.** Medir contraste é fácil de fazer errado e o erro é **silencioso** — sai um número plausível. Naquele dia três medições saíram erradas antes de a certa aparecer (token contra token, atributo trocado por fora, e o número herdado do `DESIGN.md` que antecede uma correção de agosto). Regra que não é executável volta a ser violada; o `DESIGN.md` §4.2 já mandava medir no navegador desde sempre e isso não impediu nenhum dos três erros.
 
 **O que segue sem cobertura, e está dito no log de cada execução:** 21 elementos ficam **sobre gradiente**, onde compor cor não resolve — precisaria amostrar pixel. O teste os devolve como "não medidos" em vez de atribuir um número. O principal é o botão de ação primária.
+
+---
+
+## 2026-09-10 (8) — A ação de um clique termina no WhatsApp
+
+**Decisão do dono**, tomada depois de pesquisa de concorrência. Desbloqueia o código do módulo Personal, que estava parado na `PRD.md` §11.7 desde a revisão pelas entrevistas.
+
+**O que muda:** o alerta traz um botão que abre o **WhatsApp do próprio personal**, com a mensagem escrita e o aluno selecionado — link `wa.me` com texto pré-preenchido. O personal lê, ajusta e envia.
+
+### Por que esta, e não o canal interno
+
+**Chat interno não é diferencial — é o padrão da categoria.** Trainerize tem o seu. A Vedius vende, na própria página, *"comunicação centralizada na plataforma"* em oposição explícita a *"comunicação desorganizada com alunos"* — que é o WhatsApp. O argumento de venda dos concorrentes é justamente *tire seus alunos do WhatsApp e traga para cá*.
+
+Construir chat seria brigar de frente com o recurso mais maduro e mais investido deles, sendo dev solo: **empatar onde eles são fortes**, gastando o orçamento de construção que deveria ir para o único lugar onde eles não estão — a leitura do dado. A Vedius tem 12.000 vídeos de exercício; o lastro não ganha ali, nem em builder de treino, nem em gestão financeira. Ninguém tem *"toda segunda eu te digo qual aluno ligar"*.
+
+### Correção de um argumento meu, que estava superdimensionado
+
+Na revisão anterior (`2026-09-10 (6)`) eu escrevi que o WhatsApp faria *"o lastro perder a única medida que provaria que o módulo funciona"*. **Isso estava errado, ou pelo menos muito exagerado**, e chegou a pesar na apresentação da decisão ao dono:
+
+- O **clique acontece dentro do lastro** e é registrável.
+- A métrica que decide se o módulo funciona nunca foi "conversaram?" — é **"o grupo muscular alertado recebeu estímulo na semana seguinte?"**. Esse dado está no lastro de qualquer jeito, porque quem registra o treino é o aluno.
+
+O que de fato se perde é o conteúdo da conversa e a resposta do aluno. É bem menos do que "a única medida".
+
+### Correção de fato, sobre custo
+
+Ao apresentar a opção eu não tinha separado **link `wa.me`** de **API do WhatsApp Business**. São coisas diferentes e a confusão poderia ter matado a opção por um custo que ela não tem:
+
+- **Link `wa.me`**: grátis, sem aprovação, sem número dedicado. É o que se constrói.
+- **API oficial**: cobra por mensagem (R$ 0,21–0,35 no Brasil em 2026), exige template aprovado e número dedicado. **Não é usada.**
+
+### Restrições que a decisão cria
+
+1. **Envio automático não existe.** O lastro compõe e entrega; quem aperta enviar é a pessoa. Não é limitação técnica — é regra: o app nunca fala com o aluno se passando pelo personal.
+2. **O telefone do aluno é dado pessoal** e cai na §11.4.3: vem do aluno, com consentimento, e some quando ele revoga. Nunca cadastrado pelo personal. Decisão de **schema**, não de tela.
+3. **O §5 fica sem exceção nenhuma.** A §11.5 deixou de precisar delimitar um canal pessoa-a-pessoa, porque ele não existe. "Só um chatzinho 1:1" volta como **Scope Change novo**, não como extensão natural do botão.
+
+### Alternativa descartada
+
+**Canal interno 1:1** (a §11.5 original). Mantém registro e auditoria da conversa; custa construir chat, reabre a exceção ao §5 e coloca o produto para competir na feature mais forte do concorrente. Descartada pelos três motivos juntos, não por um só.
+
+### Risco aceito
+
+WhatsApp é exatamente aquilo contra o que os concorrentes se posicionam. Um personal pode ler a escolha como "menos profissional". A mitigação é de **enquadramento**: o lastro não é onde se gerencia aluno — é o que diz com quem falar e entrega a mensagem pronta.
+
+### O que NÃO foi confirmado
+
+*"Mensagem padrão"* é **interpretação** do que P1 escreveu (`[Mandar mensagem padrão no WhatsApp]`). Ele não detalhou se imaginava link com texto pronto ou algo automático. A decisão assume a leitura conservadora — a que não envia nada sozinha. Confirmar com ele antes da primeira tela.
+
+### Como reverter
+
+Decisão de contrato, não de código — nada foi construído. Reverter = restaurar a §11.5 anterior (canal interno delimitado) e reescrever a §11.7, registrando por quê. Se a reversão vier depois de o botão existir, o custo é maior: passa a haver telefone de aluno no banco, e a revogação precisa apagá-lo.
