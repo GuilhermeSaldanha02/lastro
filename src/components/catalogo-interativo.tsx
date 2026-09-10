@@ -189,9 +189,15 @@ export default function CatalogoInterativo({
                         )}
                       </div>
 
-                      {exercicio.dicaExecucao && (
-                        <p className="cartao-exercicio-pro__dica">{exercicio.dicaExecucao}</p>
-                      )}
+                      {/* A DICA NÃO ENTRA AQUI, e é decisão, não esquecimento.
+                          Quando as 102 dicas foram escritas (2026-09-09) elas
+                          apareceram também neste card, e o catálogo no celular
+                          passou a ter 11.552px de altura — cerca de 30 telas de
+                          rolagem (medido na varredura j4). Quem procura um
+                          exercício em pé na academia passa o olho pela lista;
+                          duas linhas de texto por item multiplicam o caminho
+                          sem ajudar a achar. A dica vive na tela de detalhe,
+                          que é onde ela é procurada de propósito. */}
                     </div>
                     <SetaNavegacao />
                   </Link>
