@@ -11,59 +11,56 @@
 
 > Bloco de handoff entre agentes (Antigravity ⇄ Claude). **Sobrescrever a cada sessão**, nunca acumular. Formato e regras: `AGENTS.md` §3.
 
-- **Última sessão:** 2026-09-03/05 · agente: claude · **`main` em `037061d`, 333 testes verdes**, `tsc`/lint/build limpos, working tree limpa. **20 PRs mergeados** (#189–#206), nenhum aberto. Deploy de produção `READY`.
+- **Última sessão:** 2026-09-05/10 · agente: claude · **`main` em `67ab17b`, 342 testes verdes**, `tsc`/lint/build limpos, working tree limpa. **10 PRs mergeados** (#209–#218), nenhum aberto.
 
 ### O que mudou, em ordem de importância
 
-1. **Módulo Personal — DECIDIDO, não iniciado.** Sob vínculo, a **prescrição** vai pro humano; o **diagnóstico** fica com o aluno; os sinais viram **alerta 1:1**. Contrato em `PRD.md` §11, decisão em `DECISIONS.md` `2026-09-03 (2)`. **Portão fechado: nenhuma linha de código antes de (a) parecer bom pra mostrar e (b) 2-3 personais reais.**
-2. **A Análise Semanal ganhou 5 camadas de proteção, todas nascidas de EVIDÊNCIA MEDIDA:** retry em `503` (#196) · número no nome do exercício deixa de ser intruso (#198) · teto de 5 gerações/dia (#199) · fallback que **lê** em vez de despejar fatos (#200) · **troca de modelo** quando o primário está congestionado (#202). Detalhe em `DECISIONS.md` `2026-09-04` e `2026-09-05`.
-3. **O clamp do veredito chegou ao PDF** (#203) — existia só na tela desde 03/set. Achado ao abrir o PDF REAL que o dono baixou; é a **segunda vez** que uma decisão visual ficou num renderizador e não no outro (a primeira foi o guard do fallback, #177 → #181).
-3. **O app passou a saber POR QUE a IA falhou** (migration `0019`, `parecer.falha_motivo`): 503, 429, 404 e rejeição do validador deixaram de virar o mesmo booleano, e o aviso mostrado é específico por causa.
-4. **PDF da Análise redesenhado** (direção "papel timbrado", portão visual) — `SDD.md` §10.4.1.
-5. **Quatro bugs vindos de relato de uso real do dono**, todos corrigidos: finalizar treino sem confirmação e irreversível + botão de descanso no-op (#193); cronômetro contando do zero em treino antigo + relatórios divergentes (#195).
+1. **As 102 dicas de execução existem — e a `FF7` foi REVOGADA pelo dono para isso.** A restrição foi apresentada a ele citando a própria `ADR-007` ("gerar as dicas com a Gemini — barato, escalável e irresponsável"); ele reafirmou. As dicas foram escritas por LLM, uma por exercício, nenhuma repetida — checado por script antes de gerar a migration. `exercicio.dica_execucao_origem` guarda `'claude'` e vira `'humano'` quando alguém revisar. `ADR.md`, `CLAUDE.md`, `ARCHITECTURE.md`, `SDD.md` e `inspetor-qa.md` foram atualizados juntos: **nenhum documento ainda afirma a regra antiga.**
+2. **Existe uma varredura de navegação permanente** (`e2e/j4-varredura.spec.ts`). Anda pelas 14 telas com **usuário criado na hora e apagado no fim** — não a conta do dono — em 390/768/1440px. Reprova em erro de console, exceção, 4xx/5xx, vazamento horizontal ou tela vazia. As capturas viram artefato do CI com `if: always()`, porque a execução que falha é a que precisa ser vista.
+3. **Ela já pagou: `/ajustes` vazava 48–56px no celular.** `.card-perfil-bento__esquerda` é item de flex sem `min-width: 0`; sem nome no perfil o bloco exibe o **e-mail**, que não tem onde quebrar. **Nunca apareceria na conta do dono** — o e-mail dele é curto o bastante para caber. Foi o pedido dele de usar conta nova que revelou.
+4. **Teto de uso da IA fechado dos dois lados** (migration `0020`, tabela `uso_ia`): Coach 10/dia, parecer 5/dia — 15 dos 20 da cota, folga de 5 para retry de 503 e troca de modelo. Fecha de brinde o **furo do descarte**: contar linhas de `parecer` deixava quem descartava um rascunho recuperar a vaga sem recuperar a cota gasta. A tabela não tem `delete` no grant, de propósito.
+5. **Achado da varredura "render vs efeito" (item que existia para achar bug vivo, e achou um).** O botão de descanso exigia a marca local de início — que só é gravada em treino recém-criado. Quem recarregava com storage limpo ou continuava em outro navegador registrava série normalmente e **o botão sumia**. `cronometroAoVivo` nunca governou o cronômetro: tinha um consumidor só, e para ele a exigência estava errada. Removido, não desmembrado. **Verificado em produção na conta do dono.**
+6. **Contraste T3b: os rótulos da navegação davam 3,55:1** no tema claro (piso 4,5; 14px/600). Navegação principal, em toda tela. Corrigido para **4,64:1** e medido no app publicado — zero falhas restantes na página.
+7. **Duas telas ficaram honestas.** O catálogo no celular caiu de **11.552px para 7.291px** (a dica saiu da lista e ficou só no detalhe). E a Análise com conta zerada parou de misturar dois requisitos numa frase só — o "2" nem era de semanas, era de **sessões**; virou constante para texto e regra não divergirem de novo.
 
-### Pendências do DONO (nada disso é tarefa de agente)
+### O que o DONO decidiu nesta sessão (e não é tarefa de agente)
 
-**TRÊS QAs saíram de `ALEGADO` em 05/set**, todos confirmados pelo dono no aparelho e no arquivo real — nenhum por agente declarando que funcionou:
+- **Revogar a `FF7`** e mandar escrever as 102 dicas por IA.
+- **Tirar da tela** o aviso de procedência de IA e o card "Referência de execução, não prescrição". `PRD.md` §4.5 foi **emendado** para descrever o app real em vez de exigir o que não existe mais.
+- **Tirar a dica da lista** do catálogo, deixando só no detalhe.
 
-- ~~Salvar o parecer de prosa real~~ **FEITO** — `a7f5fe7c`. Substituiu o exemplo sintético da bancada (`scripts/preview/dados.ts`).
-- ~~QA: finalizar → confirmar → reabrir~~ **PASSOU.** Nota que evita bug report futuro: depois de reabrir o relógio volta a correr **ao vivo** (desenhado, conferido com o dono) e **não contamina métrica** — os relatórios usam a duração do banco, nunca o relógio.
-- ~~QA: veredito no celular~~ **PASSOU.** Print do dono em produção: veredito em ~1/5 da tela e o primeiro cartão de evidência visível **sem rolar**. Bate com a medição da bancada (51% → 18%).
-- ~~QA: PDF baixado do app~~ **PASSOU.** Página 2 é a tabela completa (6 evidências), não mais 4 linhas órfãs no meio. O branco que sobra é o limite registrado em `DECISIONS.md` `2026-09-05 (6)` — o conteúdo é de 1,3 página; **não é trabalho pela metade.**
+### Pendências do DONO
 
-**O que continua `ALEGADO`, e por quê:**
+- **Conversar com 2-3 personais** (abre o portão do `PRD.md` §11). **Não abrir pela IA** — abrir pelo resultado ("toda segunda eu te digo qual aluno ligar"); e levar a sério a hipótese de que a dor não existe.
+- **Apagar `supabase_migrations.backup_20260905_antes_repair`** quando quiser — o histórico está alinhado (`migration list` conferido em 10/set, `0001`–`0021`).
+- **Revisar as dicas.** Trocar uma por texto de profissional é `update` da linha com `dica_execucao_origem = 'humano'` — não precisa de nova decisão arquitetural.
 
-- Abrir um treino antigo **em aparelho que nunca o treinou** e ver o tempo reconstruído e parado. Coberto por teste (`marcos-treino.test.ts`) e por construção; não exercido à mão porque exige um aparelho sem o `localStorage` daquele treino.
-- Gerar o relatório **nos dois lugares** e conferir que batem. Meio caminho andado: calculado do banco em 04/set, `iniciado_em` 22:06 + última série 23:48 = **1h42**. Se os dois mostrarem isso, o bug dos relatórios divergentes está provado.
-- **Conversar com 2-3 personais** (abre o portão do §11). **Não abrir pela IA** — abrir pelo resultado ("toda segunda eu te digo qual aluno ligar"); e levar a sério a hipótese de que a dor não existe.
-- **`supabase migration repair`** — ver backlog 1.
+**Ainda `ALEGADO`:** abrir um treino antigo **em aparelho que nunca o treinou** e ver o tempo reconstruído e parado. Coberto por teste (`marcos-treino.test.ts`) e por construção; não exercido à mão porque exige aparelho sem o `localStorage` daquele treino.
 
 ### Backlog
 
-1. ~~**Dívida de migration**~~ **REPARADA em 05/set** — `DECISIONS.md` `2026-09-05 (8)`. Repo e remoto agora são **idênticos: 19 migrações, `0001`–`0019`**, conferido programaticamente (versão + nome, par a par). Feito por SQL, não pela CLI (que exige a senha do banco): com backup completo antes (`supabase_migrations.backup_20260905_antes_repair`, 20 linhas), `statements` preservados na renumeração, e tudo em uma transação. **Falta só o dono rodar `supabase migration list`** e ver `Local`/`Remote` alinhados — aí pode apagar a tabela de backup. As próximas migrações voltam a ser `db push` normal.
-2. **`DESIGN.md` §3.0 contradiz `tokens.css`** — §3.0 diz "Areia & Azul Petróleo"; os tokens são "Apex Pro: Obsidiana/Ouro/Esmeralda", e o §3.1 declara os tokens como fonte única. É o doc que um agente lê antes de escolher cor.
-3. **Ponteiro quebrado no `PRD.md`** — aponta o protocolo de Scope Change para `.claude/skills/padrao-documentos/SKILL.md`, que não existe.
-4. **`formatarPeso` não agrupa milhar** (`7280 kg`). Compartilhado com tela e fallback — mudar mexe nos três. Pergunta pro dono.
-5. **Varredura: "condição de render discordando de condição de efeito".** O botão de descanso morto era isso; ninguém procurou outros casos.
-6. **Modelo alternativo da Gemini** quando o principal falha (adiado, não descartado) · **segunda chave** para o `429` (descartado por ora — mexe em projetos que servem outras coisas).
-7. `nanoid <3.3.18` (high, transitiva; `npm audit fix` resolve) · seletores duplicados no `sistema.css` · T3b contraste · 102 exercícios sem dica · comparativo "parecer disse vs. feito".
-8. **Os 5× `404` da Gemini** seguem sem explicação, mas ficaram entre 27–29/ago e **não voltaram**. Combinado: investigar só se reaparecerem.
+1. **`formatarPeso` não agrupa milhar** (`7280 kg`). Compartilhado com tela e fallback — mudar mexe nos três. **Pergunta pro dono.**
+2. **Comparativo "parecer disse vs. feito"** — precisa de mais pareceres salvos antes de valer alguma coisa.
+3. **Os 5× `404` da Gemini** seguem sem explicação, mas ficaram entre 27–29/ago e **não voltaram**. Combinado: investigar só se reaparecerem.
+4. **Temas escuros x contraste: medidos só por composição de token, não no app renderizado.** Trocar de tema exigiria mexer na configuração da conta do dono. O botão de ação primária usa gradiente e **não é medível** por composição de cor — a varredura o marca como "não medido" em vez de inventar número.
+5. **Módulo Personal** — decidido e contratado (`PRD.md` §11), **portão fechado**: nenhuma linha antes de (a) parecer bom pra mostrar e (b) 2-3 personais reais.
+
+**Fechados nesta sessão:** teto do Coach · varredura render-vs-efeito · `npm audit fix` (nanoid, 0 vulnerabilidades) · seletores duplicados no `sistema.css` · T3b · 102 dicas · contradição `DESIGN.md` §3.0 vs `tokens.css` · ponteiro quebrado do `PRD.md` · reparo do histórico de migrations.
 
 ### Para o outro agente saber
 
-- **Log da Vercel no Hobby retém 1 HORA.** Não serve como diagnóstico a não ser lido logo após a falha. O console do **Google AI Studio** (`/usage`, `/rate-limit`) guarda 28 dias e foi ele que resolveu o diagnóstico — gráficos são canvas; os números saem clicando "Preencher os dados da tabela …" e lendo o `<table>` pelo DOM (screenshot pela extensão do Chrome dá timeout de CDP nesta máquina). **Cuidado com a granularidade:** na janela de 28 dias o console agrega em PERÍODOS, não dias; use 7 dias para resolução diária. **E os horários são UTC** (Brasília = UTC−3).
-- **Nível gratuito da Gemini: 5 RPM além dos 20 RPD** (`KNOWLEDGE.md` §3.2), e a cota é **compartilhada com o Coach 24h**. Decisão do dono: continuar no gratuito.
+- **Medir contraste contra token é ESTIMAR, e estimar erra.** Nesta sessão três medições produziram fantasmas antes de a certa aparecer: (a) token contra token acusou acentos que **nunca são desenhados** naquelas superfícies; (b) trocar `data-tema` por JS acusou 31 falhas porque **isso não re-tematiza o app** — os tokens viram escuros e os cards seguem claros; (c) o número no `DESIGN.md` ("33 elementos, 1,79:1") **antecede** uma correção já feita em 21/ago. O que vale é o pixel renderizado, no tema de fato aplicado, com as camadas translúcidas compostas. `DESIGN.md` §4.2 já dizia isso.
+- **`DESIGN.md` §3.0/§3.1/§3.2/§4.2 estão marcadas como SUPERSEDIDAS no corpo de cada uma.** Descrevem a paleta areia, morta desde o Apex Pro. A fonte de verdade é `src/app/tokens.css`.
+- **A `FF7` não vale mais** (revogada pelo dono em 10/set). Escrever dica por LLM é permitido; **esconder que foi LLM, não** — `dica_execucao_origem` é obrigatório em toda dica nova.
+- **A conta do dono deixou de servir como instrumento de medida.** Ela já está "arrumada": e-mail curto, histórico cheio, temas escolhidos. Bug de tela vazia, de e-mail longo e de primeiro minuto só aparece com **usuário novo** — que é o que a `j4` cria e apaga sozinha.
+- **Log da Vercel no Hobby retém 1 HORA.** Não serve como diagnóstico a não ser lido logo após a falha. O console do **Google AI Studio** (`/usage`, `/rate-limit`) guarda 28 dias — na janela de 28 dias ele agrega em PERÍODOS, não dias; use 7 dias para resolução diária. **Horários são UTC** (Brasília = UTC−3).
+- **Cota da Gemini: 20 RPD e 5 RPM, COMPARTILHADA** entre Análise Semanal e Coach. Desde a migration `0020` o consumo é contado em `uso_ia`, não em linhas de `parecer`. Decisão do dono: continuar no gratuito.
 - **Duas causas independentes produzem o MESMO sintoma** (fallback determinístico): erro de API e rejeição do validador. Não assuma uma sem olhar `parecer.falha_motivo`.
 - **`treino.iniciado_em` é a âncora de tempo do app.** Duração de sessão tem **uma definição só**: `duracaoSessaoSegundos()` em `metricas-treino.ts`. Não recrie uma segunda.
-- **As marcas de tempo no `localStorage` têm dono único:** `src/lib/treino/marcos-treino.ts`.
-- **`@react-pdf` não interpola eixo de fonte variável** — Fraunces tem `wght` default 900 e `opsz` default 9. `scripts/fontes-pdf/` corta instâncias estáticas; entram como **data URI**, não caminho em disco.
-- **`.env.local` não existe nesta máquina** — sem ele não roda `npm run e2e` nem o app local. Bancada visual (`scripts/preview/`, leia o `LEIA-ME.md`) e iframe-sobre-produção são as saídas.
-- **`sistema.css` tem seletores duplicados de blocos inteiros.** A segunda declaração vence só por vir depois. `grep -c` antes de confiar numa leitura única.
-- **ADR-010 reverteu UMA frase da ADR-009.** A restrição estrutural continua: `src/lib/analise/` não pode enxergar `modelo_treino` (tem teste).
-- **Erros de processo desta sessão, pra não repetir:** `gh pr merge --auto` mergeia com CI em curso (confirme `gh run view <id> --json conclusion` antes) · `gh run watch --exit-status` sai com código **0** mesmo perdendo conexão (use consulta direta) · confira `git log --oneline -1` **antes** de `checkout -b` · **`git add` com caminhos exclui silenciosamente o que está fora deles** — confira `git status --short` **depois** de estagiar (foi assim que a CI do #199 quebrou).
-- **`.claude/launch.json` está modificado e não commitado** desde sessão anterior; nunca entrou em commit.
+- **As marcas de tempo no `localStorage` têm dono único:** `src/lib/treino/marcos-treino.ts`. E a marca de início **só é gravada em treino recém-criado** — não assuma que ela existe.
+- **Confira `git status --short` DEPOIS de `git add`, não antes.** Um `git add -A src supabase` já excluiu silenciosamente arquivos de `scripts/` e quebrou o CI passando local.
+- **`gh run watch --exit-status` sai 0 quando a conexão cai**, e `gh pr merge --auto` já mergeou com CI `IN_PROGRESS`. Faça polling direto de `gh pr view <n> --json statusCheckRollup`.
 
----
 
 ## Ordem das fases — e por que esta ordem
 
