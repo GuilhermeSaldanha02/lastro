@@ -2125,3 +2125,17 @@ Corrigido com `min-width: 0` nos dois níveis do flex, `overflow-wrap: anywhere`
 
 1. **Catálogo no celular tem 11.552px de altura** — cerca de 30 telas de rolagem. É consequência de as 102 dicas aparecerem também nos cards da lista. Para quem procura um exercício em pé na academia, a busca no topo salva, mas a varredura visual piorou muito. A dica pode fazer mais sentido só na tela de detalhe.
 2. **`/analise` com conta zerada mistura dois números**: *"Ainda não há pelo menos **2** semanas do mesmo exercício... São necessárias **3** para calcular a análise semanal."* São dois requisitos diferentes na mesma frase, e lidos juntos parecem contradição.
+
+---
+
+## 2026-09-10 (2) — A dica sai da lista do catálogo e fica só no detalhe
+
+**Decisão do dono**, tomada depois de ver o número medido pela varredura j4: com as 102 dicas aparecendo também nos cards da lista, o catálogo no celular passou a ter **11.552px de altura** — cerca de 30 telas de rolagem.
+
+**O raciocínio.** Lista e detalhe respondem a perguntas diferentes. Na lista a pergunta é *"onde está a cadeira extensora?"* — e quem está em pé na academia passa o olho. Duas linhas de texto por item multiplicam o caminho até o nome sem ajudar a encontrá-lo; o nome, única informação que serve ali, fica com metade da densidade. No detalhe a pergunta é *"como se faz este movimento?"*, e é lá que a dica é procurada de propósito.
+
+Isso é o mesmo diagnóstico que `docs/BACKLOG-PROXIMA-FASE.md` já tinha feito sobre a versão anterior deste card, quando a linha repetida dizia "ainda não escrita": **ruído de varredura**. A frase mudou de conteúdo, o problema de densidade não.
+
+**Sai junto** `.cartao-exercicio-pro__sem-dica`, que já era CSS morto — resquício da linha antiga, sem uso em lugar nenhum do `src/`.
+
+**O que NÃO sai:** o aviso de curadoria no topo da lista (`semDicaCount > 0`). Hoje ele não aparece porque os 102 têm dica, mas se alguém adicionar exercício novo sem dica ele volta sozinho — continua sendo o lugar certo para comunicar a ausência **uma vez**, em vez de item a item.
