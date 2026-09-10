@@ -90,7 +90,7 @@ Asserções objetivas, checadas ao fim de cada fase do roadmap. Falhou um eixo �
 | **FF4** | Aquecimento nunca entra em volume, e1RM ou frequência | Teste de fixture com aquecimento + valendo misturados |
 | **FF5** | Toda tabela com dado de usuário tem RLS por `auth.uid()` | Query no catálogo do Postgres; contagem de tabelas sem policy = 0 |
 | **FF6** | Série registrada sem rede persiste e sincroniza sozinha | E2E com rede desligada + verificação no servidor |
-| **FF7** | Nenhuma dica de execução de exercício é gerada por LLM | Toda dica vem do seed curado; revisão do seed |
+| **FF7** | ~~Nenhuma dica de execução de exercício é gerada por LLM~~ — **revogada em 2026-09-09 pelo dono**. Em vigor no lugar dela: toda dica tem origem registrada (`dica_execucao_origem`) e a tela declara quando o texto é de IA | Contagem de `dica_execucao not null and dica_execucao_origem is null` = 0; string do aviso de procedência presente em `catalogo/[id]/page.tsx` |
 
 ---
 
@@ -103,6 +103,22 @@ Asserções objetivas, checadas ao fim de cada fase do roadmap. Falhou um eixo �
 **Consequências.** Vira FF7. O catálogo de ~100 exercícios é trabalho de redação real, não import de API — e é parte do custo do MVP, não acabamento.
 
 **Alternativa descartada.** Gerar as dicas com a Gemini no momento da exibição — barato, escalável e irresponsável.
+
+---
+
+### Revogação parcial — 2026-09-09, decisão do dono
+
+**O que mudou.** As 102 dicas passaram a existir, **escritas por LLM** (Claude Opus 5), não por profissional de educação física. A restrição acima foi apresentada ao dono com a citação desta própria ADR; ele reafirmou o pedido. A decisão é dele e está registrada em `DECISIONS.md` 2026-09-09 (2).
+
+**O que NÃO mudou, e por quê.** O motivo original continua verdadeiro: instrução de forma escrita por IA não tem a autoridade de um profissional, e o erro neste domínio machuca. Revogar a regra não apaga o motivo dela. Então três coisas ficam obrigatórias:
+
+1. **Procedência registrada no dado.** `exercicio.dica_execucao_origem` guarda `'claude'` ou `'humano'`. Não é metadado decorativo — é o que permite, daqui a um ano, saber o que foi revisado e o que não foi sem depender da memória de ninguém.
+2. **Procedência declarada na tela.** Quando a origem é `'claude'`, a tela do exercício diz, junto ao aviso de saúde: *"Esta dica foi escrita por IA e ainda não passou por revisão de um profissional."* Some sozinho quando um humano reescrever.
+3. **O aviso de saúde do PRD §4.5 continua intacto.** Nada nele foi afrouxado para acomodar esta mudança.
+
+**Caminho de volta.** Substituir uma dica por texto revisado por profissional é um `update` da linha com `dica_execucao_origem = 'humano'` — o aviso de IA some sozinho naquele exercício. A migração de volta é gradual, exercício a exercício, sem precisar de nova decisão arquitetural.
+
+**Alternativa descartada nesta revogação.** Reaproveitar os dados anatômicos que já existiam (músculo alvo, sinergistas, mecânica articular, do Gym Visual) como se fossem dica de execução. Descartada porque anatomia **descreve** e dica **prescreve**: seria trocar um tipo de conteúdo por outro para dizer que a coluna foi preenchida, o que é pior do que o vazio honesto que havia antes.
 
 ---
 

@@ -337,11 +337,24 @@ export async function listarExercicios(): Promise<Exercicio[]> {
 export type ExercicioDoCatalogo = Exercicio & {
   grupoMuscularNome: string;
   /**
-   * CURADA por humano, nunca gerada por IA (FF7, PRD §4.5) — é assunto de
-   * saúde. `null` significa "ainda não foi escrita", e a UI diz isso em
-   * vez de esconder: o vazio honesto é melhor que texto inventado.
+   * Dica de execução do movimento. `null` significa "ainda não foi
+   * escrita", e a UI diz isso em vez de esconder: o vazio honesto é
+   * melhor que texto inventado.
+   *
+   * Até 2026-09-09 a FF7/ADR-007 exigia que isto fosse escrito por
+   * humano, nunca por IA. O dono reverteu essa regra explicitamente
+   * (DECISIONS 2026-09-09 (2)) e as 102 dicas atuais foram escritas por
+   * LLM — por isso `dicaExecucaoOrigem` existe: quem lê o dado precisa
+   * saber de onde ele veio sem ter que perguntar.
    */
   dicaExecucao: string | null;
+  /**
+   * Quem escreveu a dica: `"claude"` (LLM) ou `"humano"`. `null` quando
+   * não há dica. A tela usa isto para dizer a procedência em vez de
+   * apresentar todo texto com o mesmo peso — instrução de forma escrita
+   * por IA e por profissional não merecem a mesma confiança do leitor.
+   */
+  dicaExecucaoOrigem: "claude" | "humano" | null;
 };
 
 /** Um exercício específico — cabeçalho da tela de histórico (backlog C4 parte 2). */
@@ -352,7 +365,7 @@ export async function buscarExercicio(
   const { data, error } = await supabase
     .from("exercicio")
     .select(
-      "id, nome, grupo_muscular_primario, unilateral, peso_por_lado, dica_execucao, grupo_muscular (nome)",
+      "id, nome, grupo_muscular_primario, unilateral, peso_por_lado, dica_execucao, dica_execucao_origem, grupo_muscular (nome)",
     )
     .eq("id", id)
     .maybeSingle();
@@ -372,6 +385,7 @@ export async function buscarExercicio(
     unilateral: boolean;
     peso_por_lado: boolean;
     dica_execucao: string | null;
+    dica_execucao_origem: 'claude' | 'humano' | null;
     grupo_muscular: { nome: string } | { nome: string }[] | null;
   };
 
@@ -391,6 +405,7 @@ export async function buscarExercicio(
     unilateral: linha.unilateral,
     pesoPorLado: linha.peso_por_lado,
     dicaExecucao: linha.dica_execucao,
+    dicaExecucaoOrigem: linha.dica_execucao_origem,
   };
 }
 
@@ -400,7 +415,7 @@ export async function listarCatalogo(): Promise<ExercicioDoCatalogo[]> {
   const { data, error } = await supabase
     .from("exercicio")
     .select(
-      "id, nome, grupo_muscular_primario, unilateral, peso_por_lado, dica_execucao, grupo_muscular (nome)",
+      "id, nome, grupo_muscular_primario, unilateral, peso_por_lado, dica_execucao, dica_execucao_origem, grupo_muscular (nome)",
     )
     .order("nome", { ascending: true });
   if (error) throw new Error(`Falha ao listar o catálogo: ${error.message}`);
@@ -418,6 +433,7 @@ export async function listarCatalogo(): Promise<ExercicioDoCatalogo[]> {
     unilateral: boolean;
     peso_por_lado: boolean;
     dica_execucao: string | null;
+    dica_execucao_origem: 'claude' | 'humano' | null;
     grupo_muscular: { nome: string } | { nome: string }[] | null;
   };
 
@@ -436,6 +452,7 @@ export async function listarCatalogo(): Promise<ExercicioDoCatalogo[]> {
       unilateral: e.unilateral,
       pesoPorLado: e.peso_por_lado,
       dicaExecucao: e.dica_execucao,
+      dicaExecucaoOrigem: e.dica_execucao_origem,
     };
   });
 

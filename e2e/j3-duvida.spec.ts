@@ -30,7 +30,15 @@ test("consulta um exercício no catálogo e cai no coach quando o catálogo não
   // Parte 1 — consulta direta ao catálogo, dado real, sem mock.
   await page.goto("/catalogo");
   const primeiroExercicio = page.locator('a[href^="/catalogo/"]').first();
-  const nomeExercicio = (await primeiroExercicio.textContent())?.trim();
+  // O NOME sai do <h3> do card, não do texto do <a> inteiro. O card
+  // também traz a dica de execução, então `textContent()` do link devolvia
+  // "Abdominal infraSuba enrolando a pelve..." — e a busca por esse texto
+  // grudado nunca acha nada na tela de detalhe. Quebrou quando as 102
+  // dicas foram escritas (2026-09-09): o teste dependia, sem dizer, de a
+  // coluna estar vazia.
+  const nomeExercicio = (
+    await primeiroExercicio.locator("h3").first().textContent()
+  )?.trim();
   expect(nomeExercicio).toBeTruthy();
   await primeiroExercicio.click();
 

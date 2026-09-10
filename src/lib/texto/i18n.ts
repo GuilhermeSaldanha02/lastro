@@ -343,6 +343,14 @@ const DICIONARIO: Record<string, { en: string; es: string }> = {
   "Unilateral": { en: "Unilateral", es: "Unilateral" },
   "Peso por lado": { en: "Weight per side", es: "Peso por lado" },
   "Sem dica registrada": { en: "No tip recorded", es: "Sin consejo registrado" },
+  "Dica de execução ainda não escrita para este exercício.": {
+    en: "Execution tip not written yet for this exercise.",
+    es: "Consejo de ejecución aún no escrito para este ejercicio.",
+  },
+  "Esta dica foi escrita por IA e ainda não passou por revisão de um profissional.": {
+    en: "This tip was written by AI and has not yet been reviewed by a professional.",
+    es: "Este consejo fue escrito por IA y aún no ha sido revisado por un profesional.",
+  },
   "As instruções deste catálogo não substituem orientação médica ou fisioterapêutica.": {
     en: "The instructions in this catalog do not replace medical or physical therapy guidance.",
     es: "Las instrucciones de este catálogo no reemplazan la orientación médica o fisioterapéutica.",
@@ -656,10 +664,6 @@ const DICIONARIO: Record<string, { en: string; es: string }> = {
   // Achado da auditoria independente (PR #160): chamadas t(...) MULTI-LINHA
   // escapavam do script de varredura (regex de linha única) — ficavam em
   // português cru mesmo em EN/ES. Corrigido aqui; ver PROGRESS.md.
-  "Execute o movimento com controle articular completo, preservando a estabilidade da coluna e cadência uniforme na fase excêntrica e concêntrica.": {
-    en: "Perform the movement with full joint control, keeping the spine stable and an even tempo through the eccentric and concentric phases.",
-    es: "Ejecuta el movimiento con control articular completo, manteniendo la estabilidad de la columna y un ritmo uniforme en las fases excéntrica y concéntrica.",
-  },
 
   // --- components/historico-relatorios-pos-treino.tsx ---
   "VOLUME": { en: "VOLUME", es: "VOLUMEN" },

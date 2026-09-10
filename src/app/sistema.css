@@ -5471,6 +5471,16 @@
   margin-top: 2px;
 }
 
+/* Ausência de dica não pode ter o mesmo peso visual de uma dica escrita —
+   era exatamente esse o problema da frase genérica que ocupava este lugar
+   até 2026-09-09: mesma tipografia, mesma cor, e parecia instrução. Texto
+   secundário e itálico dizem "isto é um estado, não um conselho", sem
+   virar alarme (DESIGN.md §3.6.6: vermelho aqui diria "você errou"). */
+.dica-texto-principal--vazio {
+  color: var(--lastro-txt-3) !important;
+  font-style: italic;
+}
+
 .exercicio-hero-card__aviso {
   background: var(--lastro-sup-2);
   border: 1px solid var(--lastro-linha);
