@@ -23,9 +23,41 @@ export function formatarPercentual(valor: number, idioma: Idioma = "pt-BR"): str
   return `${sinal}${valor}`.replace(".", separadorDecimal(idioma)) + "%";
 }
 
-/** 102.5 → "102,5" (pt-BR/es) ou "102.5" (en). 80 → "80". Sem casa decimal artificial. */
+/**
+ * Separador de MILHAR por idioma — o inverso do decimal. PT-BR e ES
+ * agrupam com ponto ("12.480"); EN agrupa com vírgula ("12,480"). Mesma
+ * convenção que o validador do parecer já desmonta ao ler a resposta do
+ * LLM (`api/analise/validador.ts`), então os dois lados do sistema
+ * concordam sobre o que é milhar e o que é decimal.
+ */
+function separadorMilhar(idioma: Idioma): "," | "." {
+  return idioma === "en" ? "," : ".";
+}
+
+/**
+ * 102.5 → "102,5" (pt-BR/es) ou "102.5" (en). 80 → "80". Sem casa
+ * decimal artificial.
+ *
+ * Agrupa milhar desde 2026-09-10: 7280 → "7.280". Antes saía "7280 kg",
+ * que num bloco de evidência ao lado de "102,5" obriga a contar dígito.
+ * O volume semanal passa de 10.000 kg com facilidade — é justamente o
+ * número grande que precisa ser lido rápido.
+ *
+ * `Intl.NumberFormat` faria isto em uma linha, e foi descartado de
+ * propósito: ele depende do ICU do runtime, e num Node compilado com
+ * `small-icu` toda localidade que não seja inglês cai para en-US **sem
+ * erro** — "7.280" viraria "7,280" em português, calado. Agrupar à mão
+ * é determinístico e roda igual em qualquer runtime, inclusive dentro do
+ * renderizador de PDF.
+ */
 export function formatarPeso(kg: number, idioma: Idioma = "pt-BR"): string {
-  return String(kg).replace(".", separadorDecimal(idioma));
+  const [inteiro, decimais] = String(kg).split(".");
+  // `\B` não casa entre o sinal e o primeiro dígito, então negativo
+  // (-7280 → "-7.280") sai certo sem tratamento à parte.
+  const agrupado = inteiro.replace(/\B(?=(\d{3})+(?!\d))/g, separadorMilhar(idioma));
+  return decimais === undefined
+    ? agrupado
+    : `${agrupado}${separadorDecimal(idioma)}${decimais}`;
 }
 
 const TEXTO_DELTA_POR_IDIOMA: Record<

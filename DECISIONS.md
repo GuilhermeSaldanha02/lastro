@@ -2178,3 +2178,21 @@ Os seis temas escuros usam o valor do `:root` e já passam em **5,70:1** — nã
 **A lição, que o `DESIGN.md` já tentava ensinar em §4.2:** medir contra token é estimar. O que vale é o pixel renderizado, no tema que está de fato aplicado, com as camadas translúcidas compostas. Duas das três medições erradas acima aconteceram por pular exatamente esse passo.
 
 **Escopo não coberto, dito sem maquiagem.** Os seis temas escuros só foram medidos por composição de token, não no app renderizado — trocar de tema exigiria mexer na configuração da conta do dono. O botão de ação primária usa gradiente e **não é medível** por composição de cor: ficou de fora, marcado como tal pela varredura em vez de receber um número inventado.
+
+---
+
+## 2026-09-10 (5) — `formatarPeso` agrupa milhar
+
+**Decisão do dono**, que estava no backlog aguardando ele desde 04/set. `7280` saía como `"7280 kg"`; num bloco de evidência ao lado de `"102,5"` isso obriga a contar dígito. O volume semanal passa de 10.000 kg com facilidade — é justamente o número grande que precisa ser lido rápido.
+
+**O risco que o backlog apontava ("mexe nos três") foi verificado, não presumido.**
+
+O medo real era o **validador do parecer**: em PT-BR o milhar é ponto, e um parser ingênuo lê `12.480` como `12,48`, rejeitando parecer correto como intruso. Fui olhar: `api/analise/validador.ts` **já desmonta milhar nos dois sentidos** (PT-BR/ES com ponto, EN com vírgula), desde um achado de 2026-08-05. E nenhum dos três consumidores de `formatarPeso` alimenta o validador — ele valida a resposta do LLM, não o texto que nós montamos. Risco inexistente.
+
+**`Intl.NumberFormat` foi descartado de propósito.** Resolveria em uma linha, mas depende do ICU do runtime: num Node com `small-icu` toda localidade que não seja inglês cai para en-US **sem erro** — `"7.280"` viraria `"7,280"` em português, calado. Agrupar à mão é determinístico e roda igual em qualquer runtime, inclusive dentro do renderizador de PDF.
+
+**A largura da coluna do PDF foi MEDIDA, não estimada.** `L_VOLUME` são 78pt fixos, e essa mesma tabela já foi quebrada antes ao espremer `formatarDelta` numa coluna de 54pt. Estimar largura de fonte é chute. Criei `scripts/preview/pdf.milhar.render.tsx`, que gera o PDF com volumes crescentes até `999.999` (mil toneladas numa semana, muito além de qualquer valor real) e renderizei: cabe em **uma linha**, com folga visível até o nome do exercício. O arquivo fica no repo — a próxima mudança de largura pode reconferir do mesmo jeito.
+
+**Os outros dois consumidores não têm restrição de largura:** na tela `formatarPeso` formata o **peso da série** (102,5 kg), que nunca chega ao milhar, e em `leitura-deterministica.ts` é prosa corrida.
+
+**Nove testes novos**, incluindo um que trava a convenção: milhar e decimal são sempre caracteres **opostos**, em todo idioma. Se alguém inverter, o validador volta a ler `12.480` como `12,48` — o teste cai antes disso chegar em produção.
