@@ -11,7 +11,7 @@
 
 > Bloco de handoff entre agentes (Antigravity ⇄ Claude). **Sobrescrever a cada sessão**, nunca acumular. Formato e regras: `AGENTS.md` §3.
 
-- **Última sessão:** 2026-09-05/10 · agente: claude · **`main` em `67ab17b`, 342 testes verdes**, `tsc`/lint/build limpos, working tree limpa. **10 PRs mergeados** (#209–#218), nenhum aberto.
+- **Última sessão:** 2026-09-05/10 · agente: claude · **`main` em `f4b11bf`, 351 testes verdes**, `tsc`/lint/build limpos, working tree limpa. **12 PRs mergeados** (#209–#220), nenhum aberto.
 
 ### O que mudou, em ordem de importância
 
@@ -21,7 +21,8 @@
 4. **Teto de uso da IA fechado dos dois lados** (migration `0020`, tabela `uso_ia`): Coach 10/dia, parecer 5/dia — 15 dos 20 da cota, folga de 5 para retry de 503 e troca de modelo. Fecha de brinde o **furo do descarte**: contar linhas de `parecer` deixava quem descartava um rascunho recuperar a vaga sem recuperar a cota gasta. A tabela não tem `delete` no grant, de propósito.
 5. **Achado da varredura "render vs efeito" (item que existia para achar bug vivo, e achou um).** O botão de descanso exigia a marca local de início — que só é gravada em treino recém-criado. Quem recarregava com storage limpo ou continuava em outro navegador registrava série normalmente e **o botão sumia**. `cronometroAoVivo` nunca governou o cronômetro: tinha um consumidor só, e para ele a exigência estava errada. Removido, não desmembrado. **Verificado em produção na conta do dono.**
 6. **Contraste T3b: os rótulos da navegação davam 3,55:1** no tema claro (piso 4,5; 14px/600). Navegação principal, em toda tela. Corrigido para **4,64:1** e medido no app publicado — zero falhas restantes na página.
-7. **Duas telas ficaram honestas.** O catálogo no celular caiu de **11.552px para 7.291px** (a dica saiu da lista e ficou só no detalhe). E a Análise com conta zerada parou de misturar dois requisitos numa frase só — o "2" nem era de semanas, era de **sessões**; virou constante para texto e regra não divergirem de novo.
+7. **`formatarPeso` agrupa milhar** (`7.280`, não `7280`). O medo do backlog era o validador do parecer — em PT-BR o milhar é ponto e um parser ingênuo lê `12.480` como `12,48`. **Verificado antes de mexer:** o validador já desmonta milhar nos dois sentidos desde 2026-08-05, e nenhum consumidor de `formatarPeso` o alimenta. `Intl.NumberFormat` foi **descartado** — depende do ICU do runtime e com `small-icu` o português cai para en-US **sem erro**.
+8. **Duas telas ficaram honestas.** O catálogo no celular caiu de **11.552px para 7.291px** (a dica saiu da lista e ficou só no detalhe). E a Análise com conta zerada parou de misturar dois requisitos numa frase só — o "2" nem era de semanas, era de **sessões**; virou constante para texto e regra não divergirem de novo.
 
 ### O que o DONO decidiu nesta sessão (e não é tarefa de agente)
 
@@ -39,13 +40,14 @@
 
 ### Backlog
 
-1. **`formatarPeso` não agrupa milhar** (`7280 kg`). Compartilhado com tela e fallback — mudar mexe nos três. **Pergunta pro dono.**
-2. **Comparativo "parecer disse vs. feito"** — precisa de mais pareceres salvos antes de valer alguma coisa.
-3. **Os 5× `404` da Gemini** seguem sem explicação, mas ficaram entre 27–29/ago e **não voltaram**. Combinado: investigar só se reaparecerem.
-4. **Temas escuros x contraste: medidos só por composição de token, não no app renderizado.** Trocar de tema exigiria mexer na configuração da conta do dono. O botão de ação primária usa gradiente e **não é medível** por composição de cor — a varredura o marca como "não medido" em vez de inventar número.
-5. **Módulo Personal** — decidido e contratado (`PRD.md` §11), **portão fechado**: nenhuma linha antes de (a) parecer bom pra mostrar e (b) 2-3 personais reais.
+1. **Comparativo "parecer disse vs. feito"** — precisa de mais pareceres salvos antes de valer alguma coisa.
+2. **Os 5× `404` da Gemini** seguem sem explicação, mas ficaram entre 27–29/ago e **não voltaram**. Combinado: investigar só se reaparecerem.
+3. **Temas escuros x contraste: medidos só por composição de token, não no app renderizado.** Trocar de tema exigiria mexer na configuração da conta do dono. O botão de ação primária usa gradiente e **não é medível** por composição de cor — a varredura o marca como "não medido" em vez de inventar número.
+4. **Módulo Personal** — decidido e contratado (`PRD.md` §11), **portão fechado**: nenhuma linha antes de (a) parecer bom pra mostrar e (b) 2-3 personais reais.
 
-**Fechados nesta sessão:** teto do Coach · varredura render-vs-efeito · `npm audit fix` (nanoid, 0 vulnerabilidades) · seletores duplicados no `sistema.css` · T3b · 102 dicas · contradição `DESIGN.md` §3.0 vs `tokens.css` · ponteiro quebrado do `PRD.md` · reparo do histórico de migrations.
+**Nada aqui é tarefa de agente sozinho:** 1 espera dado, 2 espera reincidência, 3 esbarra na configuração da conta do dono, 4 espera as entrevistas.
+
+**Fechados nesta sessão:** teto do Coach · varredura render-vs-efeito · `npm audit fix` (nanoid, 0 vulnerabilidades) · seletores duplicados no `sistema.css` · T3b · 102 dicas · contradição `DESIGN.md` §3.0 vs `tokens.css` · ponteiro quebrado do `PRD.md` · reparo do histórico de migrations · **separador de milhar do `formatarPeso`**.
 
 ### Para o outro agente saber
 
@@ -59,6 +61,8 @@
 - **`treino.iniciado_em` é a âncora de tempo do app.** Duração de sessão tem **uma definição só**: `duracaoSessaoSegundos()` em `metricas-treino.ts`. Não recrie uma segunda.
 - **As marcas de tempo no `localStorage` têm dono único:** `src/lib/treino/marcos-treino.ts`. E a marca de início **só é gravada em treino recém-criado** — não assuma que ela existe.
 - **Confira `git status --short` DEPOIS de `git add`, não antes.** Um `git add -A src supabase` já excluiu silenciosamente arquivos de `scripts/` e quebrou o CI passando local.
+- **`Intl.NumberFormat` e qualquer API de localidade dependem do ICU do runtime.** Num Node com `small-icu`, toda localidade que não seja inglês cai para **en-US sem lançar erro** — `formatarPeso` devolveria `"7,280"` em português, calado. Por isso o agrupamento de milhar é feito à mão em `formatar-delta.ts`. Vale para qualquer formatação nova: se o resultado muda com a localidade, não dependa do ICU.
+- **Coluna de largura fixa no PDF se mede renderizando, não estimando.** `L_VOLUME` são 78pt, e essa tabela já quebrou uma vez ao espremer `formatarDelta` em 54pt. `scripts/preview/pdf.milhar.render.tsx` gera o PDF com volumes até `999.999` justamente para isso — rode e olhe antes de mudar qualquer coisa que altere a largura de um número.
 - **`npm run dev` reescreve `next-env.d.ts`** apontando os tipos para `.next/dev/` em vez de `.next/`. Commitar isso quebra os paths do build de produção. Aconteceu **duas vezes** em 10/set. Depois de rodar o dev server, `git checkout -- next-env.d.ts` antes de commitar.
 - **`gh run watch --exit-status` sai 0 quando a conexão cai**, e `gh pr merge --auto` já mergeou com CI `IN_PROGRESS`. Faça polling direto de `gh pr view <n> --json statusCheckRollup`.
 
