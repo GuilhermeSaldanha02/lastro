@@ -32,7 +32,9 @@
 
 ### Pendências do DONO
 
-- **Conversar com 2-3 personais** (abre o portão do `PRD.md` §11). **Não abrir pela IA** — abrir pelo resultado ("toda segunda eu te digo qual aluno ligar"); e levar a sério a hipótese de que a dor não existe.
+- ~~**Conversar com 2-3 personais**~~ **FEITO em 10/set** — dois responderam. A dor foi **confirmada**, o desenho do alerta foi **refutado**: chat 1:1 é o formato que os dois ignoram; o que funciona é fila priorizada no planejamento, com ação de 1 clique. `PRD.md` §11 revisado, `DECISIONS.md` "2026-09-10 (6)".
+- **Decidir onde a ação de 1 clique termina** (`PRD.md` §11.7): WhatsApp (barato, mata a exceção ao §5, mas o lastro perde a medida de "o alerta virou ação?") ou canal interno (mantém a medida, custa construir chat). **É isto que bloqueia o código do módulo agora** — as duas opções divergem já na primeira tela.
+- **Perguntar quantos alunos eles têm e quantos perderam em 6 meses.** Nenhum dos dois respondeu essa parte. É o número que diz se a dor é **cara** — sem ele, dor reconhecida ≠ mercado.
 - **Apagar `supabase_migrations.backup_20260905_antes_repair`** quando quiser — o histórico está alinhado (`migration list` conferido em 10/set, `0001`–`0021`).
 - **Revisar as dicas.** Trocar uma por texto de profissional é `update` da linha com `dica_execucao_origem = 'humano'` — não precisa de nova decisão arquitetural.
 
