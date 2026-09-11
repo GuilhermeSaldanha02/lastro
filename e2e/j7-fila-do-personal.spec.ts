@@ -126,11 +126,23 @@ test("o personal recebe um alerta real do aluno e o clique fica registrado", asy
   // paga, o host muda e este teste cai, que é exatamente o desejado.
   expect(new URL(href!).host).toBe("wa.me");
 
-  // Neutraliza a navegação externa: o alvo do teste é o registro, não o
-  // WhatsApp. Tirar o `target` evita a aba nova, e a rota abortada impede
-  // qualquer requisição a terceiro dentro do CI.
-  await telaPersonal.route("**wa.me/**", (rota) => rota.abort());
-  await acao.evaluate((el) => el.removeAttribute("target"));
+  // Neutraliza a navegação externa SEM tocar no mecanismo medido.
+  //
+  // A primeira versão disto removia o `target="_blank"` antes de clicar, e
+  // o teste reprovou aqui. A causa era o próprio teste: sem `target`, o
+  // clique vira navegação na MESMA aba, o documento começa a descarregar e
+  // leva junto o `fetch` do server action que ainda estava no ar. No app
+  // real a âncora abre uma ABA NOVA — a página da fila nunca descarrega, e
+  // o registro chega. O teste tinha alterado exatamente a condição que
+  // dizia estar medindo, e teria feito o dono caçar um bug que não existe.
+  //
+  // Agora: a rota é abortada no CONTEXTO (vale para a aba nova também),
+  // nenhuma requisição a terceiro sai do CI, e a aba que abrir é fechada.
+  // O `target` fica de pé.
+  await contextoPersonal.route("**wa.me/**", (rota) => rota.abort());
+  contextoPersonal.on("page", (nova) => {
+    void nova.close().catch(() => {});
+  });
   await acao.click();
 
   const comoPersonal = await clienteAutenticado(personal);
