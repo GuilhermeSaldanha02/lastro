@@ -6,7 +6,8 @@
 import { Suspense, useState, type FormEvent } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { criarClienteBrowser } from "@/lib/supabase/cliente-browser";
-import { criarContaComEmail, entrarComEmail } from "@/lib/dados/auth";
+import { criarContaComEmail, entrarComEmail, type TipoConta } from "@/lib/dados/auth";
+import { crefValido } from "@/lib/texto/cref";
 import { PARAM_RETORNO, sanitizarRotaDeRetorno } from "@/lib/rota-de-retorno";
 
 function rotaDeRetorno(): string {
@@ -35,6 +36,8 @@ function AvisoDeErroNaUrl() {
 export default function PaginaLogin() {
   const router = useRouter();
   const [modo, setModo] = useState<"entrar" | "criar-conta">("entrar");
+  const [tipoConta, setTipoConta] = useState<TipoConta>("aluno");
+  const [cref, setCref] = useState("");
   const [nome, setNome] = useState("");
   const [telefone, setTelefone] = useState("");
   const [email, setEmail] = useState("");
@@ -50,7 +53,7 @@ export default function PaginaLogin() {
     const resultado =
       modo === "entrar"
         ? await entrarComEmail(email, senha)
-        : await criarContaComEmail(email, senha, nome, telefone);
+        : await criarContaComEmail(email, senha, nome, telefone, tipoConta, cref);
 
     setCarregando(false);
 
@@ -96,6 +99,54 @@ export default function PaginaLogin() {
 
         <div className="cartao cartao--vidro">
           <form className="formulario" onSubmit={aoEnviar}>
+            {/* A ESCOLHA DA CONTA (PRD §11, emenda de 2026-09-11) — direção
+                "Pílula segmentada", escolhida pelo dono no gate visual.
+
+                Só aparece no cadastro: o tipo é decidido na ORIGEM e não
+                se troca depois. Na tela de entrar, uma pílula aqui seria
+                uma pergunta falsa — a conta já sabe o que é.
+
+                A linha de consequência abaixo dela não é enfeite. Sem ela,
+                "PERSONAL" é só o botão mais bonito, e a pessoa descobre
+                que não tem "iniciar treino" depois de criar a conta. */}
+            {modo === "criar-conta" && (
+              <div className="seletor-conta" role="radiogroup" aria-label="Tipo de conta">
+                <button
+                  type="button"
+                  role="radio"
+                  aria-checked={tipoConta === "aluno"}
+                  className={`seletor-conta__opcao${tipoConta === "aluno" ? " seletor-conta__opcao--ativa" : ""}`}
+                  onClick={() => setTipoConta("aluno")}
+                >
+                  <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                    <circle cx="12" cy="7" r="4" />
+                  </svg>
+                  USUÁRIO
+                </button>
+                <button
+                  type="button"
+                  role="radio"
+                  aria-checked={tipoConta === "personal"}
+                  className={`seletor-conta__opcao${tipoConta === "personal" ? " seletor-conta__opcao--ativa" : ""}`}
+                  onClick={() => setTipoConta("personal")}
+                >
+                  <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                    <path d="M6.5 6.5v11M17.5 6.5v11M3 9v6M21 9v6M6.5 12h11" />
+                  </svg>
+                  PERSONAL
+                </button>
+              </div>
+            )}
+
+            {modo === "criar-conta" && (
+              <p className="seletor-conta__nota">
+                {tipoConta === "personal"
+                  ? "Conta de trabalho: acompanha alunos e não registra treino próprio."
+                  : "Registra seus treinos e recebe a análise semanal."}
+              </p>
+            )}
+
             {modo === "criar-conta" && (
               <div className="campo">
                 <label className="campo__rotulo" htmlFor="nome">
@@ -132,6 +183,41 @@ export default function PaginaLogin() {
                   onChange={(e) => setTelefone(e.target.value)}
                   required
                 />
+              </div>
+            )}
+
+            {/* CREF só existe para conta de personal, e é obrigatório nela.
+                A mesma `crefValido` do servidor decide o aviso aqui: duas
+                réguas diferentes dariam um "criou mas o registro sumiu",
+                porque a check do banco é frouxa e o trigger descarta valor
+                malformado em silêncio (migração 0024). */}
+            {modo === "criar-conta" && tipoConta === "personal" && (
+              <div className="campo">
+                <label className="campo__rotulo" htmlFor="cref">
+                  CREF
+                </label>
+                <input
+                  id="cref"
+                  type="text"
+                  autoCapitalize="characters"
+                  autoComplete="off"
+                  spellCheck={false}
+                  placeholder="123456-G/PB"
+                  value={cref}
+                  onChange={(e) => setCref(e.target.value.toUpperCase())}
+                  required
+                />
+                <p className="campo__nota">
+                  Como está na sua carteira. O lastro guarda o número e não
+                  verifica registro no CONFEF — ele aparece como informado
+                  por você.
+                </p>
+                {cref.trim() !== "" && !crefValido(cref) && (
+                  <p className="campo__nota campo__nota--alerta" role="status">
+                    Formato esperado: 123456-G/PB — seis dígitos, categoria G
+                    ou P, e a UF.
+                  </p>
+                )}
               </div>
             )}
 

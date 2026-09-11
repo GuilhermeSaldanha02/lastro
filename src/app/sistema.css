@@ -2363,6 +2363,81 @@
 /* O nome de quem detem a prescricao e o conteudo da linha, nao um enfeite:
    e a unica parte que responde "para onde ela foi". Ouro porque e a cor de
    assinatura do app, o mesmo acento do card em destaque. */
+/* ============================================================
+   Seletor de tipo de conta no cadastro (PRD 11, emenda 2026-09-11)
+   Direcao "Pilula segmentada", escolhida pelo dono no gate visual.
+   ============================================================ */
+
+/* O trilho e uma pilula so; os dois segmentos dividem o espaco em partes
+   iguais para que nenhum dos dois pareca o padrao. `USUARIO` e `PERSONAL`
+   tem larguras de texto diferentes, e deixar o flex decidir faria o botao
+   maior parecer o principal. */
+.seletor-conta {
+  display: flex;
+  gap: 4px;
+  padding: 4px;
+  border: 1px solid var(--lastro-linha);
+  border-radius: 999px;
+  background: var(--lastro-sup-1);
+}
+
+.seletor-conta__opcao {
+  flex: 1 1 0;
+  min-width: 0;
+  /* Alvo de toque: a cena de uso e uma mao so, em pe. O piso vem do token
+     de alvo minimo, nao de um numero escolhido aqui. */
+  min-height: var(--lastro-alvo-min);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  padding: 10px 8px;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--lastro-txt-2);
+  font-size: var(--lastro-papel-rotulo);
+  font-weight: var(--lastro-peso-medio);
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  transition: all var(--lastro-dur-1) ease;
+}
+
+.seletor-conta__opcao:hover {
+  color: var(--lastro-txt);
+}
+
+/* O ativo usa o gradiente de ACAO, o mesmo do botao primario: e a unica
+   cor do app que significa "e isto que vai acontecer". Texto escuro por
+   cima, como no botao primario — ouro sobre ouro reprovaria contraste. */
+.seletor-conta__opcao--ativa {
+  background: linear-gradient(135deg, var(--lastro-acao-a), var(--lastro-acao-b));
+  color: var(--lastro-acao-txt);
+  font-weight: var(--lastro-peso-forte);
+}
+
+.seletor-conta__opcao--ativa:hover {
+  color: var(--lastro-acao-txt);
+}
+
+/* A consequencia da escolha. Sem esta linha, PERSONAL e so o botao mais
+   bonito e a pessoa descobre que nao tem "iniciar treino" depois de criar
+   a conta. Nao e card nem alerta: e legenda do controle acima. */
+.seletor-conta__nota {
+  /* Medido no navegador, 375px: com a margem NEGATIVA que estava aqui, a
+     nota sobrepunha o trilho em 8px — o formulario e `display: block`, nao
+     flex, entao nao havia gap nenhum para compensar. Chute de espacamento
+     contra um layout que nao foi lido. */
+  margin: var(--lastro-e-3) 0 0;
+  color: var(--lastro-txt-2);
+  font-size: var(--lastro-papel-rotulo);
+  line-height: var(--lastro-el-corpo);
+}
+
+.campo__nota--alerta {
+  color: var(--lastro-ouro);
+}
+
 .perguntas__rodape strong {
   color: var(--lastro-ouro);
   font-weight: var(--lastro-peso-forte);

@@ -37,7 +37,7 @@ let aluno: UsuarioDescartavel;
 const NOME_DO_PERSONAL = "Marina Alencar";
 
 test.beforeAll(async () => {
-  personal = await criarUsuarioDescartavel("pe05-personal");
+  personal = await criarUsuarioDescartavel("pe05-personal", "personal");
   aluno = await criarUsuarioDescartavel("pe05-aluno");
 
   // Conta criada pela API de admin não tem `nome` — sem isto o rodapé da

@@ -24,9 +24,29 @@ export function clienteAdmin(): SupabaseClient {
 
 export type UsuarioDescartavel = { id: string; email: string; senha: string };
 
-/** Cria um usuário QA já com e-mail confirmado — pronto pra logar pela UI. */
+/** `personal` exige CREF — ver `src/lib/texto/cref.ts` e a migração 0024. */
+export type TipoConta = "aluno" | "personal";
+
+/** CREF de teste. Forma válida (Resolução CONFEF 053/2003) de registro que não existe. */
+const CREF_QA = "999999-G/PB";
+
+/**
+ * Cria um usuário QA já com e-mail confirmado — pronto pra logar pela UI.
+ *
+ * O `tipo` não é enfeite: desde a migração 0024, só conta `personal` pode
+ * gerar convite (`vinculo_convite_proprio`). Sem este parâmetro, todo
+ * usuário descartável nasceria `aluno` — que é o default correto — e as
+ * quatro specs que montam vínculo (j4, j5, j6, j7) quebrariam juntas, no
+ * passo "Gerar código de convite", longe da causa.
+ *
+ * O valor chega pelo `user_metadata` e é lido pelo trigger
+ * `usuario_cria_perfil`. Qualquer coisa diferente de 'personal' vira
+ * aluno lá dentro: o trigger falha FECHADO, e ninguém é promovido a
+ * profissional por lixo em metadado.
+ */
 export async function criarUsuarioDescartavel(
   prefixo: string,
+  tipo: TipoConta = "aluno",
 ): Promise<UsuarioDescartavel> {
   const admin = clienteAdmin();
   const email = `qa.e2e.${prefixo}.${Date.now()}@lastro.test`;
@@ -36,6 +56,8 @@ export async function criarUsuarioDescartavel(
     email,
     password: senha,
     email_confirm: true,
+    user_metadata:
+      tipo === "personal" ? { tipo_conta: "personal", cref: CREF_QA } : {},
   });
   if (error || !data.user) {
     throw new Error(`Falha ao criar usuário QA descartável: ${error?.message}`);
