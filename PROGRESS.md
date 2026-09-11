@@ -11,13 +11,13 @@
 
 > Bloco de handoff entre agentes (Antigravity ⇄ Claude). **Sobrescrever a cada sessão**, nunca acumular. Formato e regras: `AGENTS.md` §3.
 
-- **Última sessão:** 2026-09-11 · agente: claude · branch **`feat/personal-cobertura-fila`**, PR #229 aberto, **CI verde** (run `34596655814`: 398 testes + **8 e2e**). Working tree limpa.
-- **A `feat/modulo-personal` já tem as DUAS fatias:** o vínculo/fila (#226) e a prescrição escondida (#228, merge commit `5c1934e`, dois pais — confirmado pela API do GitHub; o `git log` local mente sobre isso por causa do wrapper `rtk`). A `main` segue intocada, como manda o `AGENTS.md` §4: ela só recebe o módulo inteiro.
-- **Em andamento:** PR #229 — cobertura de teste da fila (PE-02). **Não muda produto, só mede.**
+- **Última sessão:** 2026-09-11 · agente: claude · branch **`feat/personal-medida-117`**. Working tree limpa.
+- **A `feat/modulo-personal` tem TRÊS fatias:** vínculo/fila (#226), prescrição escondida (#228, `5c1934e`) e cobertura de teste da fila (#229, `51467cb`). A `main` segue intocada — só recebe o módulo inteiro (`AGENTS.md` §4).
+- **Em andamento:** a medida da §11.7 (`scripts/medida-alerta-estimulo.sql`). **Não muda produto: é instrumento do dono**, no molde do `ff5-rls.sql`.
 - **Não commitado:** nada.
-- **Bloqueado / a decidir:** nada.
-- **Próximo passo:** o dono revisar o **PR #229**. Depois dele sobram duas pendências no módulo, nenhuma bloqueante: a **medida da §11.7** ("o grupo alertado recebeu estímulo na semana seguinte?") e `/personal` nas varreduras j4/j5 (PE-04), que exige vínculo nos fixtures daquelas duas specs.
-- **Para o outro agente saber:** três coisas. (1) A `FF5` foi **emendada** — leia a seção abaixo antes de escrever qualquer consulta. (2) **A trava da prescrição não está na tela**: está em `src/app/api/analise/route.ts`, ANTES do gasto de cota, e a posição é parte da decisão, não estilo. (3) **Teste que neutraliza efeito externo não pode mexer no atributo que governa o mecanismo medido** — o j7 reprovou por isso, e a lição está no `QA.md`.
+- **Bloqueado / a decidir:** nada em código. O que falta na medida não é execução, é **USO real** — ela devolve zero linhas até um personal de verdade abrir alertas por algumas semanas.
+- **Próximo passo:** com isto, o módulo tem tudo que o PRD §11 pede, menos `/personal` nas varreduras j4/j5 (PE-04, declarado). A decisão que sobra é do dono: olhar o módulo na conta dele e decidir quando a `feat/modulo-personal` vai para a `main`.
+- **Para o outro agente saber:** quatro coisas. (1) A `FF5` foi **emendada** — leia a seção abaixo antes de escrever consulta. (2) **A trava da prescrição não está na tela**: está em `src/app/api/analise/route.ts`, ANTES do gasto de cota, e a posição é parte da decisão. (3) **Teste que neutraliza efeito externo não pode mexer no atributo que governa o mecanismo medido** — o j7 reprovou por isso; lição no `QA.md`. (4) A medida da §11.7 **não tem gêmea em TypeScript de propósito** — duas cópias da aritmética de semana divergem em silêncio, e a consulta usa a data que o app já gravou em vez de recalcular a semana.
 
 ### A fatia da prescrição, em duas telas
 
