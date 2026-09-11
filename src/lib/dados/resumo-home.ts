@@ -105,6 +105,13 @@ export async function carregarResumoHome(hojeISO: string): Promise<ResumoHome> {
       .select(
         "id, data, serie (tipo, reps, peso, peso_por_lado, exercicio:exercicio_id (grupo_muscular_primario, unilateral))",
       )
+      // ESCOPO EXPLÍCITO, não confie só na RLS. Desde a migração 0022 o
+      // personal com vínculo aceito TAMBÉM enxerga treino e série do aluno
+      // (`treino_visivel_ao_personal`), então consulta sem filtro passou a
+      // devolver as duas pessoas. Sem esta linha, a Home do personal lista
+      // os treinos do ALUNO como se fossem dele — visto no navegador em
+      // 2026-09-11, antes da correção.
+      .eq("usuario_id", user.id)
       .order("data", { ascending: false }),
     obterIdioma(),
   ]);

@@ -2325,3 +2325,114 @@ WhatsApp é exatamente aquilo contra o que os concorrentes se posicionam. Um per
 ### Como reverter
 
 Decisão de contrato, não de código — nada foi construído. Reverter = restaurar a §11.5 anterior (canal interno delimitado) e reescrever a §11.7, registrando por quê. Se a reversão vier depois de o botão existir, o custo é maior: passa a haver telefone de aluno no banco, e a revogação precisa apagá-lo.
+
+---
+
+## 2026-09-11 (1) — O schema do vínculo: telefone no ALUNO, leitura cruzada só de SELECT
+
+**Primeira fatia do módulo Personal construída** (`PRD.md` §11, migrações 0022 e 0023). Três decisões de schema que não estavam na §11 e precisam ficar registradas, porque duas delas divergem do que a §11.7 tinha escrito.
+
+### 1. O telefone mora no aluno, não no vínculo — decisão do dono
+
+A §11.7 escreveu *"o número vem do aluno, com consentimento, e **some** quando ele revoga"*, assumindo o número guardado na concessão. A pergunta foi levada ao dono com essa leitura e a recomendação de gravar na linha do vínculo (revogar apagaria uma linha, e o número ia junto, por construção).
+
+**O dono decidiu diferente:** o contato é **obrigatório no cadastro zero**, para toda conta, com ou sem personal — é dado do próprio usuário.
+
+**Isso muda o significado de "some", e é melhor assim.** O que desaparece na revogação é o **acesso do personal ao número**, não o número. Apagar o telefone do aluno porque ele demitiu o personal seria apagar dado dele. A garantia de consentimento continua **por construção**, só que pela RLS (`usuario_visivel_ao_personal` exige vínculo aceito) em vez do `delete`.
+
+**Verificado no banco em 11/set**, com duas contas descartáveis: vínculo aceito → o personal lê nome e telefone; revogado → a mesma consulta volta vazia, e o telefone continua na linha do aluno.
+
+**A coluna é `nullable` de propósito.** `not null` abortaria a criação de conta por Google, que não entrega telefone: o trigger `usuario_cria_perfil` roda **dentro** do insert em `auth.users`, e exceção ali mata o signup inteiro — o comentário da 0004 já avisava disso sobre o nome. O trigger foi estendido para ler `telefone_whatsapp` do metadado e **descarta em silêncio** o que não bate com o formato, justamente para nunca lançar. Como o trigger não pode reclamar, a validação de verdade acontece na Server Action; sem isso a pessoa cadastraria achando que informou o contato e ele não estaria lá. **Testado**: metadado `"(83) 9 oi"` → conta nasce, telefone `null`.
+
+### 2. A leitura cruzada é `for select`, em policies separadas
+
+As policies de 0001 (`treino_proprio`, `serie_propria`) são `for all`. O caminho óbvio — acrescentar a cláusula do vínculo com `or` dentro delas — daria ao personal **insert, update e delete** nas séries do aluno, em silêncio, porque `for all` cobre tudo. As policies do vínculo são novas e `for select`; as de 0001 ficaram intactas.
+
+**Provado no banco, com vínculo aceito e válido:** `insert` de série no treino do aluno barrado com `42501`; `update` e `delete` não alcançam linha nenhuma.
+
+Consequência registrada na migração: o trigger `serie_herda_usuario` (0001) é **sem** `security definer` justamente para que a RLS de `treino` esconda o treino alheio e o insert falhe ali. Agora que o personal enxerga o treino do aluno, essa premissa mudou — o insert dele passa do trigger e morre no `with check`. Continua barrado, um passo depois. **Isso só permanece verdade enquanto a concessão for SELECT-only.**
+
+### 3. Aceitar e revogar são funções, não policies de update
+
+Não existe policy de `update` em `vinculo_personal`, para ninguém. O motivo é que `with check` valida a **linha final**, não o que mudou: dava para revogar e trocar o `personal_id` no mesmo statement. As duas transições vivem em funções `security definer` com as guardas no corpo — o aluno vem de `auth.uid()` e nunca de parâmetro, o convite precisa estar pendente, e o aluno não pode ter outro personal aceito.
+
+**Provado:** o personal tentando criar o vínculo já `aceito` apontando para a aluna → barrado pela policy de insert; tentando revogar ou apagar vínculo aceito → barrado; código já usado → *"código inválido"*; segundo personal com vínculo vivo → *"já existe vínculo aceito"*.
+
+### Um personal por aluno, ao mesmo tempo
+
+Índice parcial único em `aluno_id where estado = 'aceito'`. A §11.2 fala de "aluno vinculado" no singular e o produto assume isso — a prescrição vai para **um** humano. Convite novo com vínculo vivo é recusado com mensagem, não em silêncio.
+
+### O convite é código, não e-mail — decisão do dono
+
+Com e-mail o app precisaria consultar `auth.users` para saber se aquela pessoa tem conta, e a tela viraria um oráculo de *"este e-mail está cadastrado no lastro?"* — enumeração de usuários de graça, e ainda exigiria o cliente admin. O código não revela nada sobre ninguém, e o canal para entregá-lo já existe: o WhatsApp da §11.7. Alfabeto sem caractere ambíguo (sem I, L, O, 0, 1), 10 caracteres, `crypto.getRandomValues`.
+
+### Alternativa descartada
+
+**Montar a fila com o `cliente-admin.ts`.** Era o atalho óbvio para ler as séries dos alunos e teria funcionado na primeira tentativa — anulando em silêncio toda a RLS desta migração e a `FF5` junto. Descartada: a fila lê sob o JWT do personal, então se as policies estiverem erradas a fila vem **vazia**, que é a falha que se percebe.
+
+### Como reverter
+
+Migração nova que derruba `alerta_personal` e `vinculo_personal`, as quatro policies de leitura cruzada e as funções. `usuario.telefone_whatsapp` fica: o dono o quis independente do módulo. O código das telas sai junto; os filtros explícitos de `usuario_id` da entrada (2) abaixo **ficam**, porque estão certos com ou sem vínculo.
+
+---
+
+## 2026-09-11 (2) — A RLS deixou de significar "só o meu", e 12 consultas não sabiam disso
+
+**O achado mais caro desta sessão**, e ele não apareceu em review nenhum: apareceu na primeira tela aberta no navegador com dado real.
+
+**O sintoma.** A Home do personal listava, em "Treinos Recentes", os treinos **da aluna**. Ele nunca tinha treinado. O gráfico de volume da semana trazia as datas dela.
+
+**A causa é estrutural, não um descuido localizado.** Toda consulta deste app foi escrita confiando que a RLS significava "só o meu" — e era verdade, até a migração 0022. No instante em que o personal passou a enxergar `treino` e `serie` do aluno, **toda leitura sem filtro explícito passou a devolver as duas pessoas**, sem erro, sem log, sem nada.
+
+**Doze pontos, e o que cada um faria:**
+
+| Onde | O que aconteceria |
+|---|---|
+| `api/analise/route.ts` | **A peça-assinatura.** O parecer do personal somaria o treino do aluno ao dele e citaria exercício que ele nunca fez |
+| `exportar.ts` | O CSV de backup levaria as séries do aluno **para fora do app**, num arquivo |
+| `treino.ts` "treino de hoje" (×2) | Com o aluno tendo treinado no mesmo dia, o `maybeSingle()` ou estoura com duas linhas ou devolve o treino **dele** — e o personal é redirecionado para dentro da sessão do aluno |
+| `resumo-home.ts`, `treino.ts` (listar) | Treino do aluno na Home e na lista |
+| `treino.ts` (buscar por id) | O personal abriria a tela de **edição** do treino do aluno por URL |
+| `treino.ts` (séries, histórico do exercício), `progressao.ts`, `recencia-grupos.ts`, `alerta-deload.ts` | Mistura no gráfico, no histórico e nos sinais |
+
+**Escrita nunca esteve exposta** — as policies `for all` de 0001 seguem com `auth.uid()`, e a concessão de 0022 é só `for select`. Confirmado no banco.
+
+**A lição, que vale além deste módulo.** "A RLS filtra" era um comentário literal em `carregarTreinosDoUsuario`, e virou mentira por causa de uma migração escrita em outro arquivo, no mesmo dia. Regra que vive só em comentário não sobrevive a mudança de premissa. A `FF5` foi emendada no `ADR.md` para carregar a consequência: **filtro de dono explícito em toda leitura**, com ou sem vínculo.
+
+**Por que review não pegou.** As 12 consultas continuaram corretas isoladamente; o que mudou foi o significado de uma camada abaixo delas. Só a execução com **duas contas reais** expõe isso — e é o mesmo formato do achado de 10/set, em que o vazamento de `/ajustes` só apareceu com usuário novo em vez da conta do dono.
+
+---
+
+## 2026-09-11 (3) — O app chamou uma aluna de "dele"
+
+Três linhas do texto do alerta cravavam pronome masculino: *"o histórico dele"*, *"a rotina dele"*, *"a ficha dele"*. Passaram por escrita e revisão sem ninguém notar, porque todo teste usava "João". **Apareceram na primeira execução real, quando o nome na tela era "Alice".**
+
+**A regra que passa a valer:** o app não sabe o gênero de ninguém, não tem campo para isso e não deve ter. Todo texto gerado usa **o nome da pessoa ou construção impessoal**. Se a frase precisa de um pronome para fechar, a frase está errada.
+
+Vale para os textos do alerta, para o rascunho do WhatsApp e para as quatro telas do módulo — inclusive nas linhas sobre o personal, que tinham o mesmo problema ao contrário (*"ele vê seus treinos"*).
+
+**Travado por teste**, com fronteira de palavra: sem ela, "janela" e "paralela" contêm "ela" e o teste reprovaria texto correto.
+
+---
+
+## 2026-09-11 (4) — Seletividade: três tipos de sinal, e a ausência do quarto
+
+A §11.4.6 diz que seletividade **é** o produto. Isso virou função pura e testada (`fila-personal.ts`), não regra de UI — regra que não é executável volta a ser violada.
+
+**Três tipos, todos tendência POR CONSTRUÇÃO:** grupo parado há 21+ dias (a régua de 3 semanas do P2), exercício sem progresso há 4+ semanas (`SEMANAS_ESTAGNACAO`, que já existia), e volume em queda nas 3 transições seguidas da janela.
+
+**O quarto foi cortado, e o corte é a decisão.** *"Grupo abaixo da faixa de referência"* dispararia para quase todo grupo de quase todo aluno, toda semana — que é literalmente o modo de morte que o P2 descreveu (*"Peito: atenção / Bíceps: atenção / Costas: atenção / Tríceps: atenção"*). Existe um teste com esse nome: aluno com **todos** os grupos parados devolve **dois** alertas, e os dois piores, na ordem.
+
+**"Queda de frequência" virou "queda de volume", e isso é uma troca declarada.** A §11.2 lista queda de frequência entre os sinais roteados. O resumo traz `treinos_semana_atual` contra a média das anteriores — isso é **uma** semana contra uma média, e uma semana é oscilação: uma viagem dispararia. `volume_semanal` já traz as quatro semanas da janela, e exigir queda nas três transições é tendência literal. A queda de frequência continua inteira na Análise do próprio aluno. **Se o dono quiser frequência ao pé da letra, precisa de contagem semanal de treinos e de uma régua própria** — não está feito.
+
+**Teto de 2 por aluno/semana, decidido pelo dono.** E um segundo mecanismo que o teto sozinho não cobre: **supressão de 3 semanas por (tipo, alvo)**. Sem ela, um exercício empacado há seis semanas gera os mesmos dois alertas em seis segundas seguidas — repetido no eixo do **tempo**, mata igual a repetido no eixo do grupo. A semana corrente não conta na supressão, senão a fila recalculada suprimiria a si mesma e o personal que voltasse à tela à tarde encontraria a tela vazia.
+
+**O texto do alerta é determinístico, sem LLM**, por duas razões independentes: a cota da Gemini é de 20/dia compartilhada com a peça-assinatura, e a §11.4.4 exige **rotear** sinal já calculado em vez de criar julgamento novo — texto de alerta escrito por LLM seria julgamento novo.
+
+### A tabela `alerta_personal` não é histórico por higiene
+
+Ela existe por dois motivos que nenhuma outra parte do sistema cobre: (a) a **medida** da §11.7 — *"o grupo alertado recebeu estímulo na semana seguinte?"* não tem como ser respondida sem registrar qual grupo, de qual aluno, em que semana; e (b) a supressão acima. O clique no botão grava `acionado_em` (§11.7: *"o clique acontece dentro do lastro e é registrável"*), e um trigger impede que qualquer outra coluna mude depois — senão a medida seria reescrevível por quem é medido.
+
+### O que NÃO foi confirmado, e continua em aberto
+
+O **P1 ainda não confirmou** o que quis dizer com "mensagem padrão". Construído na leitura conservadora da §11.7: link `wa.me` com texto pronto, que **não envia nada sozinho**. Se ele quis dizer envio automático, a decisão não muda — envio automático está proibido pela §11.7 —, mas a conversa com ele muda de assunto: passa a ser sobre expectativa, não sobre feature.

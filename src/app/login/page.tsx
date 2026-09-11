@@ -36,6 +36,7 @@ export default function PaginaLogin() {
   const router = useRouter();
   const [modo, setModo] = useState<"entrar" | "criar-conta">("entrar");
   const [nome, setNome] = useState("");
+  const [telefone, setTelefone] = useState("");
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
   const [mensagem, setMensagem] = useState<string | null>(null);
@@ -49,7 +50,7 @@ export default function PaginaLogin() {
     const resultado =
       modo === "entrar"
         ? await entrarComEmail(email, senha)
-        : await criarContaComEmail(email, senha, nome);
+        : await criarContaComEmail(email, senha, nome, telefone);
 
     setCarregando(false);
 
@@ -107,6 +108,28 @@ export default function PaginaLogin() {
                   placeholder="Seu nome"
                   value={nome}
                   onChange={(e) => setNome(e.target.value)}
+                  required
+                />
+              </div>
+            )}
+
+            {modo === "criar-conta" && (
+              /* Contato obrigatório no cadastro — decisão do dono em
+                 2026-09-11. Vale para quem treina sozinho: o número é dado
+                 do próprio usuário. Quem entra com Google não passa por
+                 aqui e informa depois, em Ajustes > Personal. */
+              <div className="campo">
+                <label className="campo__rotulo" htmlFor="telefone">
+                  WhatsApp, com DDD
+                </label>
+                <input
+                  id="telefone"
+                  type="tel"
+                  inputMode="tel"
+                  autoComplete="tel"
+                  placeholder="83 99999-8888"
+                  value={telefone}
+                  onChange={(e) => setTelefone(e.target.value)}
                   required
                 />
               </div>

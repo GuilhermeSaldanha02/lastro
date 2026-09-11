@@ -5629,3 +5629,152 @@
   color: var(--lastro-txt-2);
   font-weight: var(--lastro-peso-medio);
 }
+
+/* ============================================================
+   Módulo Personal — a fila de trabalho (PRD §11.4.5)
+   ============================================================
+   Nenhum valor cravado aqui: cor, espaço, raio e tipografia saem todos de
+   `tokens.css`, que é a fonte única (AGENTS.md §5).
+
+   A BARRA COLORIDA À ESQUERDA é o requisito do P1 dito com as palavras
+   dele: "uma flag vermelha visual de prioridade com o resumo acionável".
+   Ela não é o único canal — o card também ordena por prioridade e escreve
+   "há quanto tempo" em texto, porque cor sozinha não informa quem não
+   distingue cor (mesma regra da aba inferior). */
+.alerta-personal {
+  border: 1px solid var(--lastro-linha);
+  border-left: var(--lastro-barra-evidencia) solid var(--lastro-plato);
+  border-radius: var(--lastro-raio-1);
+  background: var(--lastro-sup-1);
+  padding: var(--lastro-e-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--lastro-e-3);
+  /* `min-width: 0` porque o card é item de flex/grid e o nome do exercício
+     pode ser longo — a lição do vazamento de 48px em /ajustes (2026-09-10),
+     onde faltava exatamente isto. */
+  min-width: 0;
+}
+
+/* Grupo muscular abandonado é o que mais fecha com um clique — é o que
+   ganha a marca mais forte. */
+.alerta-personal--abandono {
+  border-left-color: var(--lastro-queda);
+}
+
+.alerta-personal__topo {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--lastro-e-3);
+  flex-wrap: wrap;
+  min-width: 0;
+}
+
+.alerta-personal__aluno {
+  font-size: var(--lastro-papel-detalhe);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--lastro-txt-3);
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.alerta-personal__tempo {
+  font-family: var(--lastro-fonte-num);
+  font-size: var(--lastro-papel-rotulo);
+  color: var(--lastro-txt-2);
+  white-space: nowrap;
+}
+
+.alerta-personal__titulo {
+  font-size: var(--lastro-papel-secao);
+  color: var(--lastro-txt);
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.alerta-personal__linha {
+  font-size: var(--lastro-papel-rotulo);
+  line-height: 1.5;
+  color: var(--lastro-txt-2);
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.alerta-personal__linha strong {
+  color: var(--lastro-txt);
+  font-weight: 600;
+}
+
+/* "O que investigar" é a linha que o personal lê antes de agir — fica
+   destacada do resto sem virar um segundo card. */
+.alerta-personal__investigar {
+  border-top: 1px solid var(--lastro-linha);
+  padding-top: var(--lastro-e-3);
+  font-size: var(--lastro-papel-rotulo);
+  line-height: 1.5;
+  color: var(--lastro-txt);
+  margin: 0;
+}
+
+.alerta-personal__acao {
+  margin-top: var(--lastro-e-2);
+}
+
+/* O botão de ação é UM alvo, com ícone e rótulo na MESMA linha.
+   `.botao-primario` é `flex-direction: column` na base (linha 313) — quem
+   só troca `display` não conserta nada, e o ícone continua empilhado sobre
+   o rótulo, fazendo o botão parecer dois elementos. Medido no navegador em
+   2026-09-11, depois de uma primeira tentativa que não pegou.
+   É a ação de um clique do §11.4.7: ela não pode parecer ambígua. */
+.alerta-personal__acao .botao-primario {
+  display: inline-flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  align-items: center;
+  justify-content: center;
+  gap: var(--lastro-e-2);
+  text-align: center;
+}
+
+/* `<Link>` com `.botao-secundario` é bloco: sem centrar, o rótulo cola na
+   borda esquerda de uma caixa alta e não lê como botão. */
+.fila-personal-rodape {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+/* Já acionado: o card não sai da tela (o personal pode querer mandar de
+   novo), mas para de competir pela atenção. */
+.alerta-personal__marca-acionado {
+  font-size: var(--lastro-papel-detalhe);
+  color: var(--lastro-esmeralda);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.fila-personal {
+  display: flex;
+  flex-direction: column;
+  gap: var(--lastro-e-4);
+  min-width: 0;
+}
+
+/* O código do convite existe para ser LIDO em voz alta e digitado — fonte
+   de número, espaçamento de letra largo, selecionável. */
+.codigo-convite {
+  font-family: var(--lastro-fonte-num);
+  font-size: var(--lastro-papel-secao);
+  letter-spacing: 0.18em;
+  color: var(--lastro-txt);
+  background: var(--lastro-sup-2);
+  border: 1px solid var(--lastro-controle);
+  border-radius: var(--lastro-raio-1);
+  padding: var(--lastro-e-3) var(--lastro-e-4);
+  display: inline-block;
+  user-select: all;
+  overflow-wrap: anywhere;
+}

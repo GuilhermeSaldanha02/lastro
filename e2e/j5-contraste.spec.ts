@@ -54,8 +54,22 @@ const TEMAS = [
   { id: "oliva", rotulo: "Oliva Tático" },
 ] as const;
 
-/** Telas com densidade de texto e cor suficiente para valer a medição. */
-const ROTAS = ["/", "/treino", "/catalogo", "/analise", "/ajustes"];
+/**
+ * Telas com densidade de texto e cor suficiente para valer a medição.
+ *
+ * `/ajustes/personal` entrou com o módulo Personal (PRD §11): ela é quase
+ * só texto corrido em card, que é o formato onde contraste fraco passa
+ * despercebido. `/personal` fica de fora porque exige vínculo aceito —
+ * declarado como não coberto no `PROGRESS.md`.
+ */
+const ROTAS = [
+  "/",
+  "/treino",
+  "/catalogo",
+  "/analise",
+  "/ajustes",
+  "/ajustes/personal",
+];
 
 type Falha = {
   tema: string;

@@ -96,7 +96,7 @@ Um app de treino **pessoal** que registra cada série executada e, uma vez por s
 
 ## 5. Escopo NEGATIVO (explícito — não entra, e não é esquecimento)
 
-- ❌ Qualquer coisa social: feed, seguir, comparar, ranking. ~~compartilhar~~ → **REVISTO em 2026-08-27, ver nota A abaixo.** Feed, seguir, comparar e ranking seguem **mortos** também sob o modo Personal — a única brecha é o chat 1:1 dentro de vínculo aceito, delimitada em §11.5.
+- ❌ Qualquer coisa social: feed, seguir, comparar, ranking. ~~compartilhar~~ → **REVISTO em 2026-08-27, ver nota A abaixo.** Feed, seguir, comparar, ranking **e chat** seguem **mortos** também sob o modo Personal — **sem brecha nenhuma.** ~~a única brecha é o chat 1:1 dentro de vínculo aceito, delimitada em §11.5~~ → **CORRIGIDO em 2026-09-11.** Esta linha passou um dia contradizendo a própria §11.5: a §11.5 foi reescrita em 10/set justamente para registrar que a exceção **deixou de existir** (a ação de um clique sai para o WhatsApp, §11.7), e esta continuava anunciando uma brecha que o documento já havia fechado. O que o vínculo concede é **leitura consentida**, e só.
 - ❌ Planos e periodizações gerados automaticamente. O app **analisa** o que foi feito; não prescreve programa.
 - ❌ Integração com relógio, balança, wearable, Health/Google Fit.
 - ❌ Contagem de calorias, macros, dieta.
@@ -276,6 +276,12 @@ As duas condições que bloqueavam esta seção **foram cumpridas**:
 **O risco aceito, escrito para não ser esquecido.** WhatsApp é exatamente aquilo contra o que os concorrentes se posicionam, e um personal pode ler a escolha como "menos profissional". A mitigação é de enquadramento, não de feature: **o lastro não é onde se gerencia aluno** — é o que diz com quem falar e entrega a mensagem pronta. Se essa leitura se provar errada em uso real, a reversão está descrita no `DECISIONS.md`.
 
 **Consequência de schema, não de tela:** o link precisa do telefone do aluno. É dado pessoal e cai na restrição §11.4.3 — **o número vem do aluno, com consentimento, e some quando ele revoga**. Nunca cadastrado pelo personal. Um personal digitar o número de alguém não concede acesso a nada.
+
+> **EMENDA em 2026-09-11 — o que "some" significa.** Decisão do dono: o contato é **obrigatório no cadastro de toda conta**, tenha ela personal ou não. O número passa a ser dado do próprio usuário (`usuario.telefone_whatsapp`, migração 0022), e o que desaparece na revogação é o **ACESSO do personal a ele** — a policy `usuario_visivel_ao_personal` exige vínculo aceito, então revogar fecha a leitura no mesmo instante. Apagar o telefone do aluno porque ele demitiu o personal seria apagar dado dele, não proteger consentimento.
+>
+> A garantia continua sendo **por construção**, só que pela RLS em vez do `delete`: verificado no banco em 11/set — com vínculo aceito o personal lê nome e telefone; um segundo depois da revogação, a mesma consulta volta vazia.
+>
+> A coluna é **nullable no banco de propósito**, e isto não afrouxa a regra: `not null` abortaria a criação de conta por Google (que não entrega telefone), porque o trigger de perfil roda dentro do insert em `auth.users`. A obrigatoriedade é do app — cadastro por e-mail, aceite do convite e Ajustes.
 
 **Ponto ainda não confirmado com a fonte.** "Mensagem padrão" é interpretação do que P1 escreveu (`[Mandar mensagem padrão no WhatsApp]`); ele não detalhou se imaginava link com texto pronto ou algo automático. A decisão assume a leitura conservadora — a que não envia nada sozinha. Vale confirmar com ele antes da primeira tela.
 
