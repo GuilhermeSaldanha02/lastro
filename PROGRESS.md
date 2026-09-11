@@ -11,23 +11,17 @@
 
 > Bloco de handoff entre agentes (Antigravity ⇄ Claude). **Sobrescrever a cada sessão**, nunca acumular. Formato e regras: `AGENTS.md` §3.
 
-- **Última sessão:** 2026-09-11 · agente: claude · branch **`feat/personal-esconde-prescricao`** (tirada de `feat/modulo-personal`), 1 commit: `35e80d9`. 410 testes verdes, `tsc` e lint limpos, working tree limpa.
-- **A ESTRATÉGIA DE BRANCH DESTE MÓDULO** (corrigida pelo dono em 11/set): **`feat/modulo-personal`** é a branch de integração do Personal, tirada da `main`. **Toda fatia sai dela e volta para ela por PR.** A `main` só recebe o módulo quando ele estiver inteiro. Regra escrita no `AGENTS.md` §4. Primeira fatia já **mergeada** na branch do módulo (merge commit `da74833`, PR #226).
-- **Em andamento:** SEGUNDA fatia — esconder a prescrição sob vínculo (PRD §11.4.1 e §11.4.2). A metade de servidor está escrita e commitada, **e NÃO foi medida** (`QA.md` PE-05, com roteiro: esta máquina não tem `.env.local`, então não houve como criar as contas e fazer o POST). A metade de tela está PARADA no gate visual.
+- **Última sessão:** 2026-09-11 · agente: claude · branch **`feat/personal-esconde-prescricao`** (tirada de `feat/modulo-personal`), 4 commits. 420 testes verdes, `tsc` limpo, `npm run build` completo, eslint sem nada em `src/`, working tree limpa.
+- **A ESTRATÉGIA DE BRANCH DESTE MÓDULO** (corrigida pelo dono em 11/set): **`feat/modulo-personal`** é a branch de integração do Personal, tirada da `main`. **Toda fatia sai dela e volta para ela por PR.** A `main` só recebe o módulo quando ele estiver inteiro. Regra no `AGENTS.md` §4. Primeira fatia já mergeada na branch do módulo (`da74833`, PR #226).
+- **Em andamento:** SEGUNDA fatia — esconder a prescrição sob vínculo (PRD §11.4.1 e §11.4.2). **Construída inteira**: trava de servidor, prompt do Coach e a tela. **O gate visual da §11.4.2 foi FECHADO pelo dono na direção "Troca de posto"** — das três renderizadas.
 - **Não commitado:** nada.
-- **Bloqueado / a decidir:** **o gate visual da §11.4.2 está aberto e é do dono.** Três direções foram renderizadas para o lugar da prescrição na `/analise` de um aluno vinculado — A "Placa do profissional", B "Troca de posto" (recomendada), C "Lacre". **Nenhum pixel de tela entra antes da escolha**, por ordem explícita da §11.4.2 ("ausência não é resposta. Gate visual, não implementação silenciosa").
-- **Próximo passo:** o dono escolher uma das três direções. Depois dela: token, tela, e a checagem de `PERGUNTA_PRIMARIA` em `analise-interativa.tsx` (hoje o componente deriva as secundárias excluindo a primária e renderiza o card primário sem condição — a direção escolhida decide se isso muda).
-- **Para o outro agente saber:** a `FF5` foi **emendada** (leia a seção abaixo antes de escrever consulta). E **a trava da prescrição NÃO está na tela**: ela está em `src/app/api/analise/route.ts`, antes do gasto de cota. Se você mexer na ordem daquele handler, leia o comentário no lugar — a posição da recusa é parte da decisão, não estilo.
+- **Bloqueado / a decidir:** nada.
+- **Próximo passo:** o dono abrir a `/analise` **numa conta vinculada** e conferir com o olho. É o único pedaço que não foi exercido no app rodando — esta máquina não tem `.env.local`, então não houve dev server nem conta com vínculo (`QA.md` PE-05 e PE-07 dizem o que falta medir e como).
+- **Para o outro agente saber:** duas coisas. (1) A `FF5` foi **emendada** — leia a seção abaixo antes de escrever consulta. (2) **A trava da prescrição NÃO está na tela**: ela está em `src/app/api/analise/route.ts`, ANTES do gasto de cota, e a posição é parte da decisão, não estilo. Se mexer na ordem daquele handler, leia o comentário no lugar.
 
-### A fatia da prescrição, em uma tela
+### A fatia da prescrição, em duas telas
 
-`/api/analise` recusa a pergunta 5 com 403 `prescricao_do_personal` quando existe vínculo aceito, **antes** de `limparRascunhosExpirados`, do teto e de `registrarUso` — recusar depois cobraria cota de uma pergunta que o app nunca responde e deixaria rascunho órfão. Falha ao ler o vínculo recusa (503), não libera.
-
-O Coach (§11.4.1) ganhou `sistemaCoach(temPersonal)`: duas linhas mudam e só elas. **A premissa da §11.4.1 estava parcialmente satisfeita** — a regra 2 do prompt já proibia prescrever; o que faltava era o DESTINO ("leve o pedido ao personal") e a linha `QUEM PERGUNTA`, que afirmava "sem personal". Detalhe em `DECISIONS.md` "2026-09-11 (5)".
-
-**Buraco conhecido, mantido de propósito:** `listarPareceres()` não filtra por pergunta, então pareceres da pergunta 5 salvos ANTES do vínculo continuam visíveis em `/ajustes/relatorios`. É dado do aluno, gerado quando o app era o prescritor legítimo; apagar histórico é decisão do dono e não é reversível.
-
-### A coisa mais importante desta sessão
+**Servidor.** ### A coisa mais importante desta sessão
 
 **Toda leitura de `treino`, `serie` e `usuario` precisa filtrar o dono EXPLICITAMENTE.** A migração 0022 deu ao personal leitura dos dados do aluno sob vínculo aceito, e isso mudou o significado de toda consulta que confiava só na RLS. Doze pontos estavam errados no instante em que a migração subiu — incluindo o `/api/analise`, que é a peça-assinatura, e o CSV de exportação. Todos corrigidos, cada um com comentário no lugar.
 
