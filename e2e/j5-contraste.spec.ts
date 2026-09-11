@@ -28,19 +28,50 @@
 import { expect, test, type Page } from "@playwright/test";
 import {
   apagarUsuarioDescartavel,
+  clienteAutenticado,
   criarUsuarioDescartavel,
   entrarComoUsuario,
   type UsuarioDescartavel,
 } from "./helpers/usuario-descartavel";
+import { criarVinculoAceito, nomear } from "./helpers/vinculo";
+import { semearGrupoAbandonado } from "./helpers/semear-abandono";
 
 let usuario: UsuarioDescartavel;
+let aluno: UsuarioDescartavel;
 
-test.beforeAll(async () => {
+/**
+ * Mesma montagem da `j4`, pela mesma razão: sem vínculo aceito a
+ * `/personal` redireciona, e medir contraste na tela errada devolve um
+ * número plausível — exatamente o modo de falha que este arquivo existe
+ * para evitar.
+ *
+ * O alerta semeado importa MAIS aqui do que na varredura: o card da fila é
+ * onde o módulo usa cor com significado (a faixa do abandono, o ouro da
+ * ação, os cinzas de metadado). Medir a fila vazia seria medir uma moldura.
+ */
+test.beforeAll(async ({ browser }) => {
   usuario = await criarUsuarioDescartavel("contraste");
+  aluno = await criarUsuarioDescartavel("contraste-aluno");
+
+  const comoPersonal = await clienteAutenticado(usuario);
+  await nomear(comoPersonal, usuario.id, "Marina Alencar");
+
+  const comoAluno = await clienteAutenticado(aluno);
+  await nomear(comoAluno, aluno.id, "Ana Ribeiro");
+  await semearGrupoAbandonado(comoAluno, aluno.id);
+
+  const { contextoPersonal, contextoAluno } = await criarVinculoAceito({
+    browser,
+    personal: usuario,
+    aluno,
+  });
+  await contextoPersonal.close();
+  await contextoAluno.close();
 });
 
 test.afterAll(async () => {
   if (usuario) await apagarUsuarioDescartavel(usuario);
+  if (aluno) await apagarUsuarioDescartavel(aluno);
 });
 
 /** Os sete temas de `seletor-temas.tsx`, pelo rótulo que aparece na tela. */
@@ -59,8 +90,9 @@ const TEMAS = [
  *
  * `/ajustes/personal` entrou com o módulo Personal (PRD §11): ela é quase
  * só texto corrido em card, que é o formato onde contraste fraco passa
- * despercebido. `/personal` fica de fora porque exige vínculo aceito —
- * declarado como não coberto no `PROGRESS.md`.
+ * despercebido. `/personal` entrou depois, quando o `beforeAll` passou a
+ * montar um vínculo de verdade — é a tela com mais cor com SIGNIFICADO do
+ * app, e era a única que faltava (PE-04).
  */
 const ROTAS = [
   "/",
@@ -69,6 +101,7 @@ const ROTAS = [
   "/analise",
   "/ajustes",
   "/ajustes/personal",
+  "/personal",
 ];
 
 type Falha = {

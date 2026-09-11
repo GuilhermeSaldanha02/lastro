@@ -29,6 +29,7 @@ import {
   entrarComoUsuario,
   type UsuarioDescartavel,
 } from "./helpers/usuario-descartavel";
+import { criarVinculoAceito } from "./helpers/vinculo";
 
 let personal: UsuarioDescartavel;
 let aluno: UsuarioDescartavel;
@@ -62,23 +63,10 @@ test("sob vínculo a prescrição some da tela E é recusada no servidor, sem ga
 }) => {
   test.setTimeout(120_000);
 
-  // ---- o personal convida ----
-  const contextoPersonal = await browser.newContext();
-  const telaPersonal = await contextoPersonal.newPage();
-  await entrarComoUsuario(telaPersonal, personal);
-  await telaPersonal.goto("/ajustes/personal");
-  await telaPersonal
-    .getByRole("button", { name: /Gerar código de convite/i })
-    .click();
-
-  const codigo = (
-    await telaPersonal.locator(".codigo-convite").first().textContent({ timeout: 15_000 })
-  )?.trim();
-  expect(codigo, "o convite precisa ter gerado um código").toMatch(
-    /^[A-HJ-NP-Z2-9]{10}$/,
-  );
-
   // ---- o aluno, AINDA SEM VÍNCULO ----
+  // O vínculo é montado só depois do controle abaixo, porque o controle
+  // precisa da pergunta 5 funcionando. Por isso aqui não se usa o
+  // `criarVinculoAceito` completo: o aluno entra sozinho primeiro.
   const contextoAluno = await browser.newContext();
   const telaAluno = await contextoAluno.newPage();
   await entrarComoUsuario(telaAluno, aluno);
@@ -110,12 +98,13 @@ test("sob vínculo a prescrição some da tela E é recusada no servidor, sem ga
   const parecerAntes = await contar("parecer");
 
   // ---- o aluno aceita ----
-  await telaAluno.goto(`/ajustes/personal?codigo=${codigo}`);
-  await telaAluno.locator("#telefone_whatsapp").fill("83 97777-6666");
-  await telaAluno.getByRole("button", { name: /Aceitar convite/i }).click();
-  await expect(telaAluno.getByText(NOME_DO_PERSONAL)).toBeVisible({
-    timeout: 15_000,
-  });
+  // Convite e aceite pelo fixture compartilhado (`helpers/vinculo.ts`) —
+  // o mesmo caminho de tela que a j4, a j5 e a j7 usam. Ele abre a própria
+  // sessão do aluno; a de cima continua valendo e é a que segue no teste,
+  // porque o vínculo é do BANCO, não da aba.
+  const vinculo = await criarVinculoAceito({ browser, personal, aluno });
+  await vinculo.contextoPersonal.close();
+  await vinculo.contextoAluno.close();
 
   // ---- A TRAVA, no servidor ----
   const comVinculo = await telaAluno.request.post("/api/analise", {
