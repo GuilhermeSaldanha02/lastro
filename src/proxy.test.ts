@@ -41,6 +41,7 @@ describe("proxy — PREFIXOS_PRIVADOS", () => {
     "/analise",
     "/catalogo",
     "/coach",
+    "/personal",
   ])("redireciona %s para /login sem sessão", async (caminho) => {
     getUserMock.mockResolvedValue({ data: { user: null } });
     const resposta = await chamarProxy(caminho);
@@ -48,6 +49,30 @@ describe("proxy — PREFIXOS_PRIVADOS", () => {
     const destino = new URL(resposta.headers.get("location")!);
     expect(destino.pathname).toBe("/login");
     expect(destino.searchParams.get("proximo")).toBe(caminho);
+  });
+
+  /**
+   * O convite do personal chega como `/ajustes/personal?codigo=ABC...` por
+   * WhatsApp, onde a pessoa quase sempre está sem sessão no navegador. Se o
+   * retorno guardasse apenas o caminho, o código evaporaria no login e o
+   * aluno cairia numa tela de vínculo vazia — sem erro, sem aviso, sem
+   * nada explicando. É a forma de falha mais barata de introduzir e a mais
+   * cara de diagnosticar.
+   */
+  it("preserva a query no retorno — o código do convite sobrevive ao login", async () => {
+    getUserMock.mockResolvedValue({ data: { user: null } });
+    const resposta = await chamarProxy("/ajustes/personal?codigo=ABCDEFGH23");
+    const destino = new URL(resposta.headers.get("location")!);
+    expect(destino.searchParams.get("proximo")).toBe(
+      "/ajustes/personal?codigo=ABCDEFGH23",
+    );
+  });
+
+  it("rota privada sem query continua sem ganhar um ? vazio", async () => {
+    getUserMock.mockResolvedValue({ data: { user: null } });
+    const resposta = await chamarProxy("/personal");
+    const destino = new URL(resposta.headers.get("location")!);
+    expect(destino.searchParams.get("proximo")).toBe("/personal");
   });
 
   it("carrega os cookies que o SDK atualizou no redirect", async () => {
