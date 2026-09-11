@@ -55,6 +55,14 @@ A última linha é a que faz a orquestração funcionar. Escreva-a pensando em q
 ## 4. Git
 
 - **Nunca commitar direto na `main`.** Sair dela: `feat/`, `fix/`, `chore/`, `refactor/`. Integração por PR.
+- **MÓDULO GRANDE TEM BRANCH DE INTEGRAÇÃO PRÓPRIA** (decisão do dono, registrada em 2026-09-11 depois de a regra ter se perdido entre sessões). Funcionalidade que chega em várias fatias não vai para a `main` uma fatia por vez:
+  1. Cria-se **uma** branch do módulo a partir da `main` — hoje, `feat/modulo-personal`.
+  2. Cada fatia sai **dela**, não da `main`, e volta para **ela** por PR.
+  3. A `main` só recebe o módulo quando ele estiver **inteiro e funcionando**, num PR só.
+
+  **Como saber se é o seu caso:** o trabalho tem mais de uma fatia planejada e as fatias intermediárias não fazem sentido sozinhas para o dono. Fatia isolada que já entrega valor continua indo direto para a `main`, como sempre.
+
+  **O que isto NÃO protege, e precisa ser dito:** o banco é **um só**. Migration aplicada em produção está aplicada, independente de qual branch a contém — a garantia de "só entra na `main` quando estiver pronto" não alcança o schema. Antes de aplicar migration de módulo em andamento, confirmar com o dono e verificar que o código vivo na `main` continua correto sem ela.
 - **Conventional Commits em pt-BR:** `<tipo>: <Descrição imperativa com inicial maiúscula>`, sem ponto final, ≤ 72 caracteres.
 - **Trailer de autoria em todo commit** — é o que faz o `git log` responder "quem fez o quê" a custo zero:
 
