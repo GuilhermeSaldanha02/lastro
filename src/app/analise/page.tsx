@@ -8,6 +8,7 @@ import { carregarResumoHome } from "@/lib/dados/resumo-home";
 import { carregarDiasSemEstimuloPorGrupo } from "@/lib/dados/recencia-grupos";
 import { carregarSinalDeload } from "@/lib/dados/alerta-deload";
 import { buscarRascunhoEmAndamento } from "@/lib/dados/parecer";
+import { carregarVinculoDoAluno } from "@/lib/dados/personal";
 import { paraDataUTC } from "@/lib/analise/semanas";
 import { dataLocalBrasil } from "@/lib/tempo";
 import AbaInferior from "@/components/aba-inferior";
@@ -17,13 +18,18 @@ import { t } from "@/lib/texto/i18n";
 
 export default async function PaginaAnalise() {
   const hoje = dataLocalBrasil();
-  const [perfil, resumo, gruposSemEstimulo, sinalDeload, rascunhoInicial] = await Promise.all([
-    obterPerfil(),
-    carregarResumoHome(hoje),
-    carregarDiasSemEstimuloPorGrupo(hoje),
-    carregarSinalDeload(paraDataUTC(hoje)),
-    buscarRascunhoEmAndamento(),
-  ]);
+  // O vínculo entra no mesmo `Promise.all` de propósito: ele decide QUAL
+  // pergunta fica em destaque (PRD §11.4.2), então buscar em série
+  // adiaria a primeira pintura da peça-assinatura por uma consulta.
+  const [perfil, resumo, gruposSemEstimulo, sinalDeload, rascunhoInicial, vinculo] =
+    await Promise.all([
+      obterPerfil(),
+      carregarResumoHome(hoje),
+      carregarDiasSemEstimuloPorGrupo(hoje),
+      carregarSinalDeload(paraDataUTC(hoje)),
+      buscarRascunhoEmAndamento(),
+      carregarVinculoDoAluno(),
+    ]);
   const idioma = perfil?.idioma ?? "pt-BR";
 
   return (
@@ -42,6 +48,11 @@ export default async function PaginaAnalise() {
         sinalDeload={sinalDeload}
         idioma={idioma}
         rascunhoInicial={rascunhoInicial}
+        vinculo={
+          vinculo
+            ? { nomeDoPersonal: vinculo.nomeDoPersonal, aceitoEm: vinculo.aceitoEm }
+            : null
+        }
       />
 
       <AbaInferior ativa="analise" idioma={idioma} />

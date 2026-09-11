@@ -10,8 +10,9 @@
 import { NextResponse } from "next/server";
 import { criarClienteServidor } from "@/lib/supabase/cliente-servidor";
 import { ClienteParecerGemini } from "../analise/gemini";
+import { carregarVinculoDoAluno } from "@/lib/dados/personal";
 import {
-  SISTEMA_COACH,
+  sistemaCoach,
   montarPerguntaCoach,
   perguntaAceitavel,
   LIMITE_PERGUNTA,
@@ -55,6 +56,25 @@ export async function POST(request: Request) {
       { status: 429 },
     );
   }
+  // Vínculo (PRD §11.4.1) ANTES de registrar uso: se esta leitura falhar, a
+  // requisição morre sem gastar cota. O prompt muda sob vínculo — ver a
+  // explicação em `./prompt.ts`.
+  //
+  // Falha de leitura do vínculo derruba o pedido em vez de seguir com o
+  // prompt de quem treina sozinho. O prompt errado aqui não é um detalhe de
+  // tom: é o app encaminhando para lugar nenhum quem tem personal, ou
+  // citando um personal que não existe.
+  let temPersonal: boolean;
+  try {
+    temPersonal = (await carregarVinculoDoAluno()) !== null;
+  } catch (erro) {
+    console.error("[coach] falha ao ler vínculo", detalheParaLog(erro));
+    return NextResponse.json(
+      { erro: "Não foi possível verificar seu vínculo. Tente de novo." },
+      { status: 503 },
+    );
+  }
+
   // Antes da chamada: a cota do Google é consumida pela TENTATIVA, mesmo
   // quando ela volta 503.
   await registrarUso(supabase, user.id, "coach");
@@ -62,7 +82,7 @@ export async function POST(request: Request) {
   try {
     const cliente = new ClienteParecerGemini();
     const resposta = await cliente.gerar(
-      SISTEMA_COACH,
+      sistemaCoach(temPersonal),
       montarPerguntaCoach(pergunta),
     );
     const texto = resposta.trim();

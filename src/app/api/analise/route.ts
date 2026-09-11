@@ -26,11 +26,17 @@ import { leituraDeterministica } from "@/lib/analise/leitura-deterministica";
 import { motivoDoErro } from "./retry-transitorio";
 import { registrarUso, tetoAtingido, TETO_DIARIO } from "@/lib/dados/uso-ia";
 import type { FalhaMotivo } from "@/lib/dados/parecer";
-import { perguntaValida, perguntasDoIdioma, type NumeroPergunta } from "./perguntas";
+import {
+  perguntaValida,
+  perguntasDoIdioma,
+  PERGUNTA_PRESCRICAO,
+  type NumeroPergunta,
+} from "./perguntas";
 import { obterIdioma, type Idioma } from "@/lib/dados/idioma";
 import { mapaTraducaoExercicios, mapaTraducaoGrupos } from "@/lib/dados/traducao";
 import { formatarGrupoMuscular } from "@/lib/texto/grupo-muscular";
 import { limparRascunhosExpirados } from "@/lib/dados/parecer";
+import { carregarVinculoDoAluno } from "@/lib/dados/personal";
 
 type ClienteSupabaseServidor = Awaited<ReturnType<typeof criarClienteServidor>>;
 
@@ -339,6 +345,45 @@ export async function POST(request: Request) {
       { erro: "pergunta precisa ser 1, 2, 3, 4 ou 5." },
       { status: 400 },
     );
+  }
+
+  // A TRAVA DA PRESCRIÇÃO (PRD §11.2 e §11.4.1), e por que ela mora AQUI.
+  //
+  // Esconder o card da pergunta 5 na tela não fecha nada: este endpoint
+  // aceita `{ pergunta: 5 }` de qualquer cliente autenticado — aba antiga
+  // aberta antes do vínculo, service worker com HTML em cache, ou curl. A
+  // linha "aluno vinculado não vê a prescrição" da §11.2 só é verdade se o
+  // servidor recusar; a tela é a parte decorativa desta dupla.
+  //
+  // POSIÇÃO NÃO É ARBITRÁRIA — três coisas acontecem logo abaixo e nenhuma
+  // pode acontecer num pedido que vai ser recusado:
+  //   1. `registrarUso` grava consumo IMUTÁVEL (a cota de 20/dia é gasta
+  //      pela tentativa, por decisão de 2026-09-05). Recusar depois dele
+  //      cobraria do aluno uma pergunta que o app nunca responde.
+  //   2. o rascunho de `parecer` é inserido com status "gerando" — recusar
+  //      depois deixaria linha órfã presa no teto de geração em andamento.
+  //   3. `limparRascunhosExpirados` escreve no banco; pedido recusado não
+  //      tem por que disparar efeito nenhum.
+  //
+  // Falha na leitura do vínculo RECUSA (fecha), não libera: liberar em erro
+  // transforma instabilidade de rede em vazamento de escopo.
+  if (pergunta === PERGUNTA_PRESCRICAO) {
+    let temPersonal: boolean;
+    try {
+      temPersonal = (await carregarVinculoDoAluno()) !== null;
+    } catch (erro) {
+      console.error(
+        "[analise] falha ao ler vínculo para a trava da prescrição:",
+        erro instanceof Error ? erro.message : erro,
+      );
+      return NextResponse.json(
+        { erro: "Não foi possível verificar seu vínculo. Tente de novo." },
+        { status: 503 },
+      );
+    }
+    if (temPersonal) {
+      return NextResponse.json({ erro: "prescricao_do_personal" }, { status: 403 });
+    }
   }
 
   const idioma = await obterIdioma();
