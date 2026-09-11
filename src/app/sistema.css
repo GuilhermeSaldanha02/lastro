@@ -2337,6 +2337,37 @@
   color: var(--lastro-txt-2);
 }
 
+/* O lugar da prescricao sob vinculo (PRD 11.4.2, direcao "Troca de posto").
+   ENTRA DEPOIS do segundo bloco de `.pergunta` de proposito: este arquivo
+   tem DOIS blocos `.perguntas`/`.pergunta--primaria` (2073 e 2275), e quem
+   editar o primeiro vai jurar que o CSS nao pegou.
+
+   Sem moldura, por regra: borda + raio e vocabulario de CONTROLE, e vestir
+   de card algo que nao responde ao toque apaga a pista de onde se toca. A
+   separacao vem de ritmo (a linha divisoria da lista) e de tipo, nao de
+   caixa. Nenhum valor cravado: todos os quatro sao token. */
+.perguntas__rodape {
+  margin-top: var(--lastro-e-3);
+  padding-top: var(--lastro-e-3);
+  border-top: 1px solid var(--lastro-linha);
+  color: var(--lastro-txt-2);
+  /* `--lastro-papel-corpo` (16px), nao o rotulo de 14: isto e PROSA que o
+     aluno le na peca-assinatura, e a D4 fixa 16px como piso de corpo — "o
+     celular apoiado no banco, lido em pe". Um --lastro-papel-nota chegou a
+     ser escrito aqui e nao existe no tokens.css: era variavel fantasma, o
+     mesmo erro que o comentario do proprio tokens.css registra. */
+  font-size: var(--lastro-papel-corpo);
+  line-height: var(--lastro-el-corpo);
+}
+
+/* O nome de quem detem a prescricao e o conteudo da linha, nao um enfeite:
+   e a unica parte que responde "para onde ela foi". Ouro porque e a cor de
+   assinatura do app, o mesmo acento do card em destaque. */
+.perguntas__rodape strong {
+  color: var(--lastro-ouro);
+  font-weight: var(--lastro-peso-forte);
+}
+
 
 /* Estado "gerando": esqueleto na altura das linhas que virão.
    Sem reticências pulsantes, sem spinner, sem texto letra a letra. */
