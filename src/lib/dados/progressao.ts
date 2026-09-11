@@ -71,7 +71,9 @@ export async function carregarProgressao(): Promise<PainelProgressao[]> {
     .from("treino")
     .select(
       "id, data, serie (tipo, reps, peso, peso_por_lado, exercicio_id, exercicio:exercicio_id (nome, grupo_muscular_primario, unilateral))",
-    );
+    )
+    // Escopo explícito — ver a nota da migração 0022 em `resumo-home.ts`.
+    .eq("usuario_id", user.id);
   if (error) throw new Error(`Falha ao carregar a progressão: ${error.message}`);
 
   const treinos = (data ?? []) as unknown as LinhaTreino[];

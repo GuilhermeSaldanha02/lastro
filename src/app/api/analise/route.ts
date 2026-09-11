@@ -58,15 +58,26 @@ type LinhaExercicio = {
   peso_por_lado: boolean;
 };
 
-/** Todos os treinos do usuário logado (RLS filtra), já com as séries. */
+/**
+ * Todos os treinos do usuário informado, já com as séries.
+ *
+ * O FILTRO É EXPLÍCITO, e o comentário antigo desta função ("RLS filtra")
+ * deixou de ser verdade na migração 0022: um personal com vínculo aceito
+ * enxerga treino e série do aluno, então a consulta sem filtro traria as
+ * duas pessoas — e este é o caminho da PEÇA-ASSINATURA. O parecer do
+ * personal sairia somando o treino do aluno ao dele, citando exercício que
+ * ele nunca fez, sem erro nenhum em lugar nenhum.
+ */
 async function carregarTreinosDoUsuario(
   supabase: ClienteSupabaseServidor,
+  usuarioId: string,
 ): Promise<TreinoBruto[]> {
   const { data, error } = await supabase
     .from("treino")
     .select(
       "id, data, serie (id, exercicio_id, tipo, reps, peso, rir, peso_por_lado)",
-    );
+    )
+    .eq("usuario_id", usuarioId);
   if (error) throw new Error(`Falha ao carregar treinos: ${error.message}`);
 
   return ((data ?? []) as unknown as LinhaTreino[]).map((t) => ({
@@ -171,11 +182,14 @@ const INSTRUCAO_RETRY_SEM_NUMERO_POR_IDIOMA: Record<Idioma, string> = {
 
 async function gerarESalvarParecer({
   supabase,
+  usuarioId,
   rascunhoId,
   pergunta,
   idioma,
 }: {
   supabase: ClienteSupabaseServidor;
+  /** Dono do parecer. Explícito desde a 0022 — ver `carregarTreinosDoUsuario`. */
+  usuarioId: string;
   rascunhoId: string;
   pergunta: NumeroPergunta;
   idioma: Idioma;
@@ -204,7 +218,7 @@ async function gerarESalvarParecer({
 
   try {
     const [treinos, exercicios] = await Promise.all([
-      carregarTreinosDoUsuario(supabase),
+      carregarTreinosDoUsuario(supabase, usuarioId),
       carregarExercicios(supabase, idioma),
     ]);
 
@@ -380,6 +394,7 @@ export async function POST(request: Request) {
   after(() =>
     gerarESalvarParecer({
       supabase,
+      usuarioId: user.id,
       rascunhoId: rascunho.id,
       pergunta: pergunta as NumeroPergunta,
       idioma,
