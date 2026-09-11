@@ -11,65 +11,92 @@
 
 > Bloco de handoff entre agentes (Antigravity ⇄ Claude). **Sobrescrever a cada sessão**, nunca acumular. Formato e regras: `AGENTS.md` §3.
 
-- **Última sessão:** 2026-09-05/10 · agente: claude · **`main` em `f4b11bf`, 351 testes verdes**, `tsc`/lint/build limpos, working tree limpa. **12 PRs mergeados** (#209–#220), nenhum aberto.
+- **Última sessão:** 2026-09-11 · agente: claude · branch **`feat/personal-primeira-fatia`**, 5 commits, **PR aberto**. 398 testes verdes, `tsc`/lint/build limpos, working tree limpa. **Migrações 0022 e 0023 JÁ APLICADAS EM PRODUÇÃO** (`migration list` conferido: 0001–0023, alinhado).
+- **Em andamento:** primeira fatia do módulo Personal — construída e exercida ponta a ponta. Falta o merge.
+- **Não commitado:** nada. `.env.local` foi criado (gitignored) com a URL e a chave publicável do Supabase, para rodar o dev server — **não tem service-role nem chave da Gemini**, então `j4`/`j5` não rodam nesta máquina.
+- **Bloqueado / a decidir:** nada bloqueia código. Duas perguntas ao P1/P2 seguem abertas (abaixo).
+- **Próximo passo:** o dono revisar o PR e olhar `/ajustes/personal` na conta dele. **O CI é quem prova o contraste da tela nova** — `j4` e `j5` ganharam `/ajustes/personal` e não puderam rodar local.
+- **Para o outro agente saber:** a `FF5` foi **emendada**. RLS deixou de significar "só o meu" — leia a primeira linha da seção abaixo antes de escrever qualquer consulta.
 
-### O que mudou, em ordem de importância
+### A coisa mais importante desta sessão
 
-1. **As 102 dicas de execução existem — e a `FF7` foi REVOGADA pelo dono para isso.** A restrição foi apresentada a ele citando a própria `ADR-007` ("gerar as dicas com a Gemini — barato, escalável e irresponsável"); ele reafirmou. As dicas foram escritas por LLM, uma por exercício, nenhuma repetida — checado por script antes de gerar a migration. `exercicio.dica_execucao_origem` guarda `'claude'` e vira `'humano'` quando alguém revisar. `ADR.md`, `CLAUDE.md`, `ARCHITECTURE.md`, `SDD.md` e `inspetor-qa.md` foram atualizados juntos: **nenhum documento ainda afirma a regra antiga.**
-2. **Existe uma varredura de navegação permanente** (`e2e/j4-varredura.spec.ts`). Anda pelas 14 telas com **usuário criado na hora e apagado no fim** — não a conta do dono — em 390/768/1440px. Reprova em erro de console, exceção, 4xx/5xx, vazamento horizontal ou tela vazia. As capturas viram artefato do CI com `if: always()`, porque a execução que falha é a que precisa ser vista.
-3. **Ela já pagou: `/ajustes` vazava 48–56px no celular.** `.card-perfil-bento__esquerda` é item de flex sem `min-width: 0`; sem nome no perfil o bloco exibe o **e-mail**, que não tem onde quebrar. **Nunca apareceria na conta do dono** — o e-mail dele é curto o bastante para caber. Foi o pedido dele de usar conta nova que revelou.
-4. **Teto de uso da IA fechado dos dois lados** (migration `0020`, tabela `uso_ia`): Coach 10/dia, parecer 5/dia — 15 dos 20 da cota, folga de 5 para retry de 503 e troca de modelo. Fecha de brinde o **furo do descarte**: contar linhas de `parecer` deixava quem descartava um rascunho recuperar a vaga sem recuperar a cota gasta. A tabela não tem `delete` no grant, de propósito.
-5. **Achado da varredura "render vs efeito" (item que existia para achar bug vivo, e achou um).** O botão de descanso exigia a marca local de início — que só é gravada em treino recém-criado. Quem recarregava com storage limpo ou continuava em outro navegador registrava série normalmente e **o botão sumia**. `cronometroAoVivo` nunca governou o cronômetro: tinha um consumidor só, e para ele a exigência estava errada. Removido, não desmembrado. **Verificado em produção na conta do dono.**
-6. **Contraste T3b: os rótulos da navegação davam 3,55:1** no tema claro (piso 4,5; 14px/600). Navegação principal, em toda tela. Corrigido para **4,64:1** e medido no app publicado — zero falhas restantes na página.
-7. **`formatarPeso` agrupa milhar** (`7.280`, não `7280`). O medo do backlog era o validador do parecer — em PT-BR o milhar é ponto e um parser ingênuo lê `12.480` como `12,48`. **Verificado antes de mexer:** o validador já desmonta milhar nos dois sentidos desde 2026-08-05, e nenhum consumidor de `formatarPeso` o alimenta. `Intl.NumberFormat` foi **descartado** — depende do ICU do runtime e com `small-icu` o português cai para en-US **sem erro**.
-8. **Duas telas ficaram honestas.** O catálogo no celular caiu de **11.552px para 7.291px** (a dica saiu da lista e ficou só no detalhe). E a Análise com conta zerada parou de misturar dois requisitos numa frase só — o "2" nem era de semanas, era de **sessões**; virou constante para texto e regra não divergirem de novo.
+**Toda leitura de `treino`, `serie` e `usuario` precisa filtrar o dono EXPLICITAMENTE.** A migração 0022 deu ao personal leitura dos dados do aluno sob vínculo aceito, e isso mudou o significado de toda consulta que confiava só na RLS. Doze pontos estavam errados no instante em que a migração subiu — incluindo o `/api/analise`, que é a peça-assinatura, e o CSV de exportação. Todos corrigidos, cada um com comentário no lugar.
 
-### O que o DONO decidiu nesta sessão (e não é tarefa de agente)
+**Não foi review que pegou: foi abrir a tela.** A Home do personal listava os treinos da aluna em "Treinos Recentes". As 12 consultas continuavam corretas isoladamente — o que mudou foi a camada debaixo delas. Detalhe em `DECISIONS.md` "2026-09-11 (2)".
 
-- **Revogar a `FF7`** e mandar escrever as 102 dicas por IA.
-- **Tirar da tela** o aviso de procedência de IA e o card "Referência de execução, não prescrição". `PRD.md` §4.5 foi **emendado** para descrever o app real em vez de exigir o que não existe mais.
-- **Tirar a dica da lista** do catálogo, deixando só no detalhe.
+### O que foi construído
+
+Um personal recebe um alerta real sobre um aluno real e age a partir dele — convite, aceite, revogação, sinal priorizado e o botão. Não é login com dois modos nem aba de alunos.
+
+1. **Migração 0022** — `vinculo_personal`, `alerta_personal`, `usuario.telefone_whatsapp`, as policies de leitura cruzada e as funções de aceite/revogação. Cada policy comentada: é a primeira vez que uma conta lê dado de outra neste banco.
+2. **Migração 0023** — tira os dois helpers da RLS da API pública (achado do linter de segurança do Supabase, lint 0028). O lint 0028 sumiu; o 0029 continua e **é esperado**, com o porquê escrito na migração.
+3. **`fila-personal.ts`** — a seletividade como matemática pura e testada. Três tipos de sinal, todos tendência por construção. Teto de 2/aluno/semana **mais** supressão de 3 semanas por (tipo, alvo), porque o teto sozinho não impede a repetição no eixo do tempo.
+4. **`/personal` e `/ajustes/personal`** — a fila e as duas pontas do vínculo, numa tela só. Não existe conta "de personal": o vínculo é o papel.
+5. **Contato obrigatório no cadastro** (decisão do dono) — e a coluna é `nullable` no banco de propósito, senão o login com Google morre.
+
+### O que foi PROVADO, e como
+
+Duas contas descartáveis criadas e apagadas no banco de produção, com JWT de cada uma:
+
+| O que | Resultado |
+|---|---|
+| Sem vínculo, o personal vê o aluno? | 0 treinos, 0 séries, 0 perfil |
+| Personal tenta criar vínculo já `aceito` apontando para o aluno | Barrado pela policy de insert |
+| Com vínculo aceito, o personal lê? | 5 treinos, 15 séries, nome e telefone |
+| Personal tenta `insert` de série no treino do aluno | Barrado, `42501` |
+| Personal tenta `update` / `delete` no dado do aluno | Não alcança linha nenhuma |
+| Personal tenta revogar ou apagar o vínculo | Barrado — revogar é só do aluno |
+| Aluno revoga | Tudo volta a 0 **na hora**; telefone do aluno intacto; alerta preservado na tabela |
+| Código já usado | "código inválido" |
+| Segundo personal com vínculo vivo | "já existe vínculo aceito" |
+| Adulterar `tipo`/`alvo` de um alerta | Barrado pelo trigger |
+| Abrir a fila 4× na mesma semana | 1 linha por vínculo — idempotente |
+| Telefone malformado no metadado do signup | Conta nasce, telefone `null` — **o signup não morre** |
+
+E no navegador, em 375px: a fila renderizou o alerta certo com dado real ("Costas sem estímulo · 32 dias"), o link `wa.me` saiu com número e mensagem corretos, e o clique gravou `acionado_em`. Console sem erro.
+
+### Três defeitos que só a execução real mostrou
+
+1. **O app chamou a aluna de "dele"** — três linhas com pronome masculino cravado. Todo teste usava "João". Corrigido em todo o módulo e travado por teste. `DECISIONS.md` "2026-09-11 (3)".
+2. **O botão de ação empilhava o ícone sobre o rótulo** — `.botao-primario` é `flex-direction: column` na base, então trocar só o `display` não conserta. Medido no navegador depois de uma primeira tentativa que não pegou.
+3. **O `proxy.ts` perdia a query no login** — o convite chega como `/ajustes/personal?codigo=...` por WhatsApp, onde a pessoa quase sempre está deslogada; o código evaporava e o aluno caía numa tela vazia. Corrigido com dois testes.
 
 ### Pendências do DONO
 
-- ~~**Conversar com 2-3 personais**~~ **FEITO em 10/set** — dois responderam. A dor foi **confirmada**, o desenho do alerta foi **refutado**: chat 1:1 é o formato que os dois ignoram; o que funciona é fila priorizada no planejamento, com ação de 1 clique. `PRD.md` §11 revisado, `DECISIONS.md` "2026-09-10 (6)".
-- **Decidir onde a ação de 1 clique termina** (`PRD.md` §11.7): WhatsApp (barato, mata a exceção ao §5, mas o lastro perde a medida de "o alerta virou ação?") ou canal interno (mantém a medida, custa construir chat). **É isto que bloqueia o código do módulo agora** — as duas opções divergem já na primeira tela.
-- **Perguntar quantos alunos eles têm e quantos perderam em 6 meses.** Nenhum dos dois respondeu essa parte. É o número que diz se a dor é **cara** — sem ele, dor reconhecida ≠ mercado.
-- **Apagar `supabase_migrations.backup_20260905_antes_repair`** quando quiser — o histórico está alinhado (`migration list` conferido em 10/set, `0001`–`0021`).
-- **Revisar as dicas.** Trocar uma por texto de profissional é `update` da linha com `dica_execucao_origem = 'humano'` — não precisa de nova decisão arquitetural.
+- **Confirmar com o P1 o que é "mensagem padrão"** — link com texto pronto (o que foi construído) ou algo automático. Envio automático continua proibido pela §11.7; o que muda é a expectativa dele, não a feature.
+- **Perguntar quantos alunos eles têm e quantos perderam em 6 meses.** Segue sem resposta. É o número que separa "dor reconhecida" de "dor cara".
+- **Apagar `supabase_migrations.backup_20260905_antes_repair`** quando quiser.
+- **Revisar as dicas** — `update` da linha com `dica_execucao_origem = 'humano'`.
 
-**Ainda `ALEGADO`:** abrir um treino antigo **em aparelho que nunca o treinou** e ver o tempo reconstruído e parado. Coberto por teste (`marcos-treino.test.ts`) e por construção; não exercido à mão porque exige aparelho sem o `localStorage` daquele treino.
+### Declarado como NÃO coberto (não é esquecimento)
+
+- **`/personal` não entra na `j4` nem na `j5`.** Ela exige vínculo aceito e redireciona sem ele, então a varredura mediria a tela errada. Cobrir de verdade pede um **segundo** usuário descartável e um aceite no fixture.
+- **`j4` e `j5` não foram executadas nesta máquina** — elas usam o cliente admin e o `.env.local` local não tem service-role. **O contraste de `/ajustes/personal` é ALEGADO até o CI rodar.**
+- **O módulo Personal está só em pt-BR.** As strings novas não entraram no dicionário do `i18n`, então EN/ES caem no pt-BR (o `t()` devolve a chave). Não quebra nada; está declarado.
+- **"Queda de frequência" foi entregue como queda de VOLUME.** A §11.2 lista frequência; uma semana contra a média é oscilação, não tendência, e uma viagem dispararia. Frequência ao pé da letra pede contagem semanal de treinos e régua própria — não está feito. `DECISIONS.md` "2026-09-11 (4)".
 
 ### Backlog
 
-1. **Comparativo "parecer disse vs. feito"** — precisa de mais pareceres salvos antes de valer alguma coisa.
-2. **Os 5× `404` da Gemini** seguem sem explicação, mas ficaram entre 27–29/ago e **não voltaram**. Combinado: investigar só se reaparecerem.
-3. **Módulo Personal — DESBLOQUEADO em 10/set.** Portão cumprido, §11.7 decidida: a ação de um clique abre o **WhatsApp do personal** com a mensagem pronta (link `wa.me`, não a API paga). Sem canal interno, sem exceção ao §5. **Primeira coisa a construir:** um personal receber um alerta real sobre um aluno real e agir a partir dele — convite, aceite, revogação, sinal priorizado, botão. Não é login com dois modos nem aba de alunos.
-   - **Antes da primeira tela:** confirmar com o P1 o que ele quis dizer com "mensagem padrão" (link com texto pronto vs. algo automático). A decisão assumiu a leitura conservadora.
-   - **Decisão de schema pendente:** o telefone do aluno vem dele, com consentimento, e some na revogação (§11.4.3).
-4. **Quantos alunos os personais têm e quantos perderam em 6 meses** — nenhum dos dois respondeu. É o número que separa "dor reconhecida" de "dor cara". Não bloqueia código; muda o que dá pra afirmar sobre mercado.
-
-**Nada aqui é tarefa de agente sozinho:** 1 espera dado, 2 espera reincidência, 3 e 4 esperam o dono.
-
-**Fechados nesta sessão:** teto do Coach · varredura render-vs-efeito · `npm audit fix` (nanoid, 0 vulnerabilidades) · seletores duplicados no `sistema.css` · T3b · 102 dicas · contradição `DESIGN.md` §3.0 vs `tokens.css` · ponteiro quebrado do `PRD.md` · reparo do histórico de migrations · **separador de milhar do `formatarPeso`** · **contraste dos 7 temas medido no app** (`e2e/j5-contraste.spec.ts`, zero reprovas).
+1. **Comparativo "parecer disse vs. feito"** — precisa de mais pareceres salvos.
+2. **Os 5× `404` da Gemini** — entre 27–29/ago, não voltaram. Investigar só se reaparecerem.
+3. **A medida do módulo Personal.** `alerta_personal` já grava o que foi alertado e se o botão foi clicado. A pergunta que decide se o módulo funciona — *"o grupo alertado recebeu estímulo na semana seguinte?"* — ainda **não tem consulta escrita**. Só vale a pena com uso real.
+4. **Esconder a prescrição sob vínculo** (§11.4.2) — ficou fora desta fatia de propósito: é a parte barata, e o estado vazio é **gate visual** com o dono no loop.
+5. **O personal não tem como encerrar um vínculo.** Só o aluno revoga, que é o que a §11.4.3 descreve. "O personal me tirou da lista" não foi pedido por ninguém — inventar agora seria escopo.
 
 ### Para o outro agente saber
 
-- **Contraste agora é TESTE, não conferência.** `e2e/j5-contraste.spec.ts` troca o tema clicando o card em `/ajustes/temas`, confirma pelo `localStorage` que o app aplicou, e mede 7 temas × 5 telas com as camadas compostas. Zero reprovas em 10/set. **Não meça à mão de novo** — o erro é silencioso, sai número plausível. Fora de cobertura: 21 elementos **sobre gradiente**, que o teste devolve como "não medidos" em vez de chutar.
-- **Medir contraste contra token é ESTIMAR, e estimar erra.** Nesta sessão três medições produziram fantasmas antes de a certa aparecer: (a) token contra token acusou acentos que **nunca são desenhados** naquelas superfícies; (b) trocar `data-tema` por JS acusou 31 falhas porque **isso não re-tematiza o app** — os tokens viram escuros e os cards seguem claros; (c) o número no `DESIGN.md` ("33 elementos, 1,79:1") **antecede** uma correção já feita em 21/ago. O que vale é o pixel renderizado, no tema de fato aplicado, com as camadas translúcidas compostas. `DESIGN.md` §4.2 já dizia isso.
-- **`DESIGN.md` §3.0/§3.1/§3.2/§4.2 estão marcadas como SUPERSEDIDAS no corpo de cada uma.** Descrevem a paleta areia, morta desde o Apex Pro. A fonte de verdade é `src/app/tokens.css`.
-- **A `FF7` não vale mais** (revogada pelo dono em 10/set). Escrever dica por LLM é permitido; **esconder que foi LLM, não** — `dica_execucao_origem` é obrigatório em toda dica nova.
-- **A conta do dono deixou de servir como instrumento de medida.** Ela já está "arrumada": e-mail curto, histórico cheio, temas escolhidos. Bug de tela vazia, de e-mail longo e de primeiro minuto só aparece com **usuário novo** — que é o que a `j4` cria e apaga sozinha.
-- **Log da Vercel no Hobby retém 1 HORA.** Não serve como diagnóstico a não ser lido logo após a falha. O console do **Google AI Studio** (`/usage`, `/rate-limit`) guarda 28 dias — na janela de 28 dias ele agrega em PERÍODOS, não dias; use 7 dias para resolução diária. **Horários são UTC** (Brasília = UTC−3).
-- **Cota da Gemini: 20 RPD e 5 RPM, COMPARTILHADA** entre Análise Semanal e Coach. Desde a migration `0020` o consumo é contado em `uso_ia`, não em linhas de `parecer`. Decisão do dono: continuar no gratuito.
-- **Duas causas independentes produzem o MESMO sintoma** (fallback determinístico): erro de API e rejeição do validador. Não assuma uma sem olhar `parecer.falha_motivo`.
-- **`treino.iniciado_em` é a âncora de tempo do app.** Duração de sessão tem **uma definição só**: `duracaoSessaoSegundos()` em `metricas-treino.ts`. Não recrie uma segunda.
-- **As marcas de tempo no `localStorage` têm dono único:** `src/lib/treino/marcos-treino.ts`. E a marca de início **só é gravada em treino recém-criado** — não assuma que ela existe.
-- **Confira `git status --short` DEPOIS de `git add`, não antes.** Um `git add -A src supabase` já excluiu silenciosamente arquivos de `scripts/` e quebrou o CI passando local.
-- **`Intl.NumberFormat` e qualquer API de localidade dependem do ICU do runtime.** Num Node com `small-icu`, toda localidade que não seja inglês cai para **en-US sem lançar erro** — `formatarPeso` devolveria `"7,280"` em português, calado. Por isso o agrupamento de milhar é feito à mão em `formatar-delta.ts`. Vale para qualquer formatação nova: se o resultado muda com a localidade, não dependa do ICU.
-- **Coluna de largura fixa no PDF se mede renderizando, não estimando.** `L_VOLUME` são 78pt, e essa tabela já quebrou uma vez ao espremer `formatarDelta` em 54pt. `scripts/preview/pdf.milhar.render.tsx` gera o PDF com volumes até `999.999` justamente para isso — rode e olhe antes de mudar qualquer coisa que altere a largura de um número.
-- **`npm run dev` reescreve `next-env.d.ts`** apontando os tipos para `.next/dev/` em vez de `.next/`. Commitar isso quebra os paths do build de produção. Aconteceu **duas vezes** em 10/set. Depois de rodar o dev server, `git checkout -- next-env.d.ts` antes de commitar.
-- **`gh run watch --exit-status` sai 0 quando a conexão cai**, e `gh pr merge --auto` já mergeou com CI `IN_PROGRESS`. Faça polling direto de `gh pr view <n> --json statusCheckRollup`.
+- **RLS não significa mais "só o meu".** Já dito acima, e é o item que mais barato quebra: consulta nova de leitura em `treino`/`serie`/`usuario` **sem** `.eq("usuario_id", …)` vaza dado entre contas sem erro nenhum.
+- **Nunca use `cliente-admin.ts` para montar a fila do personal.** Era o atalho óbvio e funcionaria de primeira, anulando em silêncio toda a RLS da 0022. A fila lê sob o JWT do personal de propósito: policy errada → fila **vazia**, que é a falha que se percebe.
+- **O wrapper de shell desta máquina corrompe `\b` em heredoc.** Um regex escrito por script virou **caractere de backspace literal** dentro do arquivo, invisível no editor, e o teste passou por acidente. Conteúdo com barra invertida vai por ferramenta de arquivo, nunca por heredoc.
+- **Código de convite não tem I, L, O, 0 nem 1** (`vinculo_codigo_formato`). Três tentativas minhas de teste falharam por escrever "O" — a trava funciona.
+- **`npm run dev` reescreve `next-env.d.ts`.** Aconteceu de novo em 11/set. `git checkout -- next-env.d.ts` antes de commitar.
+- **Contraste é TESTE, não conferência** (`e2e/j5-contraste.spec.ts`). Não meça à mão — o erro é silencioso.
+- **A conta do dono não serve como instrumento de medida.** Reconfirmado: o vazamento da Home só aparece com **duas** contas, e o de `/ajustes` só apareceu com conta nova.
+- **A `FF7` não vale mais** (revogada em 10/set). `dica_execucao_origem` é obrigatório em toda dica nova.
+- **Cota da Gemini: 20 RPD, compartilhada** entre Análise e Coach, contada em `uso_ia`. O módulo Personal **não consome cota** — todo texto dele é determinístico.
+- **`treino.iniciado_em` é a âncora de tempo do app**; duração de sessão tem uma definição só (`duracaoSessaoSegundos()`).
+- **Confira `git status --short` DEPOIS de `git add`.**
+- **`gh run watch --exit-status` sai 0 quando a conexão cai.** Faça polling de `gh pr view <n> --json statusCheckRollup`.
 
 
 ## Ordem das fases — e por que esta ordem
