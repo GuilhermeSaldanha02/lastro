@@ -41,6 +41,8 @@ export default async function PaginaPersonalAjustes({
   const perfil = await obterPerfil();
   if (!perfil) redirect("/login");
 
+  const ehPersonal = perfil.tipoConta === "personal";
+
   const [{ codigo }, vinculo, convites, alunos, telefone, cabecalhos] =
     await Promise.all([
       searchParams.then((p) => ({ codigo: codigoDaQuery(p.codigo) })),
@@ -65,23 +67,32 @@ export default async function PaginaPersonalAjustes({
 
       <div className="corpo corpo--com-nav corpo--titulo-conteudo transicao-pilula">
         <div className="pilha">
-          {alunos.length > 0 && (
-            <Link href="/personal" className="botao-primario">
-              Abrir a fila da semana
-            </Link>
+          {/* UMA TELA, DOIS LADOS — e a partir de 2026-09-11 cada conta vê
+              só o seu. Antes da conta de personal existir, mostrar os dois
+              era a única opção: qualquer pessoa podia convidar e qualquer
+              pessoa podia aceitar. Com a escolha no cadastro, o aluno que
+              visse "gerar código de convite" veria uma porta que a policy
+              do banco fecharia na cara dele (migração 0024), e o personal
+              que visse "colar código" veria um caminho que a função de
+              aceite recusa. */}
+          {ehPersonal ? (
+            <>
+              <Link href="/personal" className="botao-primario">
+                Abrir a fila da semana
+              </Link>
+              <ConvitesPersonal
+                convites={convites}
+                alunos={alunos}
+                origem={origem}
+              />
+            </>
+          ) : (
+            <VinculoAluno
+              vinculo={vinculo}
+              telefoneAtual={telefone}
+              codigoDoLink={codigo}
+            />
           )}
-
-          <VinculoAluno
-            vinculo={vinculo}
-            telefoneAtual={telefone}
-            codigoDoLink={codigo}
-          />
-
-          <ConvitesPersonal
-            convites={convites}
-            alunos={alunos}
-            origem={origem}
-          />
 
           <p className="campo__nota">
             Nenhuma conta conversa com outra dentro do lastro. O vínculo dá ao

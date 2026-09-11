@@ -37,33 +37,36 @@ import { criarVinculoAceito, nomear } from "./helpers/vinculo";
 import { semearGrupoAbandonado } from "./helpers/semear-abandono";
 
 let usuario: UsuarioDescartavel;
-let aluno: UsuarioDescartavel;
+let personal: UsuarioDescartavel;
 
 /**
- * Mesma montagem da `j4`, pela mesma razão: sem vínculo aceito a
- * `/personal` redireciona, e medir contraste na tela errada devolve um
- * número plausível — exatamente o modo de falha que este arquivo existe
- * para evitar.
+ * DUAS contas, como na `j4`: a medida roda com um ALUNO vinculado, e a
+ * casca de trabalho é medida numa segunda sessão, com a conta que a tem.
+ *
+ * Medir a `/personal` com a conta errada devolveria um número plausível
+ * sobre a tela errada — o guarda de rota redireciona, e contraste medido
+ * num redirecionamento é exatamente o tipo de erro silencioso que este
+ * arquivo inteiro existe para evitar.
  *
  * O alerta semeado importa MAIS aqui do que na varredura: o card da fila é
  * onde o módulo usa cor com significado (a faixa do abandono, o ouro da
  * ação, os cinzas de metadado). Medir a fila vazia seria medir uma moldura.
  */
 test.beforeAll(async ({ browser }) => {
-  usuario = await criarUsuarioDescartavel("contraste", "personal");
-  aluno = await criarUsuarioDescartavel("contraste-aluno");
+  usuario = await criarUsuarioDescartavel("contraste");
+  personal = await criarUsuarioDescartavel("contraste-personal", "personal");
 
-  const comoPersonal = await clienteAutenticado(usuario);
-  await nomear(comoPersonal, usuario.id, "Marina Alencar");
+  const comoPersonal = await clienteAutenticado(personal);
+  await nomear(comoPersonal, personal.id, "Marina Alencar");
 
-  const comoAluno = await clienteAutenticado(aluno);
-  await nomear(comoAluno, aluno.id, "Ana Ribeiro");
-  await semearGrupoAbandonado(comoAluno, aluno.id);
+  const comoAluno = await clienteAutenticado(usuario);
+  await nomear(comoAluno, usuario.id, "Ana Ribeiro");
+  await semearGrupoAbandonado(comoAluno, usuario.id);
 
   const { contextoPersonal, contextoAluno } = await criarVinculoAceito({
     browser,
-    personal: usuario,
-    aluno,
+    personal,
+    aluno: usuario,
   });
   await contextoPersonal.close();
   await contextoAluno.close();
@@ -71,7 +74,7 @@ test.beforeAll(async ({ browser }) => {
 
 test.afterAll(async () => {
   if (usuario) await apagarUsuarioDescartavel(usuario);
-  if (aluno) await apagarUsuarioDescartavel(aluno);
+  if (personal) await apagarUsuarioDescartavel(personal);
 });
 
 /** Os sete temas de `seletor-temas.tsx`, pelo rótulo que aparece na tela. */
@@ -101,8 +104,10 @@ const ROTAS = [
   "/analise",
   "/ajustes",
   "/ajustes/personal",
-  "/personal",
 ];
+
+/** Medidas na sessão do personal — ver o comentário do `beforeAll`. */
+const ROTAS_PERSONAL = ["/personal", "/personal/alunos"];
 
 type Falha = {
   tema: string;
@@ -224,7 +229,7 @@ async function medirPagina(page: Page) {
   });
 }
 
-test("nenhum texto reprova AA, em nenhum dos sete temas", async ({ page }) => {
+test("nenhum texto reprova AA, em nenhum dos sete temas", async ({ page, browser }) => {
   test.setTimeout(300_000);
 
   await entrarComoUsuario(page, usuario);
@@ -237,6 +242,14 @@ test("nenhum texto reprova AA, em nenhum dos sete temas", async ({ page }) => {
 
   const falhas: Falha[] = [];
   let naoMedidosTotal = 0;
+
+  // A segunda casca precisa da própria sessão — e do próprio tema: o tema
+  // mora no `localStorage`, que é por CONTEXTO. Sem trocar o tema aqui
+  // também, a `/personal` seria medida sete vezes no tema padrão e o
+  // relatório diria "sete temas" sobre uma medição só.
+  const contextoTrabalho = await browser.newContext();
+  const telaTrabalho = await contextoTrabalho.newPage();
+  await entrarComoUsuario(telaTrabalho, personal);
 
   for (const tema of TEMAS) {
     await page.goto("/ajustes/temas");
@@ -259,7 +272,35 @@ test("nenhum texto reprova AA, em nenhum dos sete temas", async ({ page }) => {
       naoMedidosTotal += naoMedidos;
       for (const x of f) falhas.push({ ...x, tema: tema.id, rota });
     }
+
+    // ---- a casca de trabalho, no MESMO tema ----
+    await telaTrabalho.goto("/ajustes/temas");
+    await telaTrabalho
+      .getByRole("button", { name: new RegExp(tema.rotulo, "i") })
+      .first()
+      .click();
+    await expect
+      .poll(async () =>
+        telaTrabalho.evaluate(() => localStorage.getItem("lastro_tema")),
+      )
+      .toBe(tema.id);
+
+    for (const rota of ROTAS_PERSONAL) {
+      await telaTrabalho.goto(rota, { waitUntil: "domcontentloaded" });
+      await telaTrabalho
+        .waitForLoadState("networkidle", { timeout: 30_000 })
+        .catch(() => {});
+      // Mesma trava da `j4`: medir o redirecionamento seria medir a tela
+      // errada com um número que parece certo.
+      expect(new URL(telaTrabalho.url()).pathname).toBe(rota);
+
+      const { falhas: f, naoMedidos } = await medirPagina(telaTrabalho);
+      naoMedidosTotal += naoMedidos;
+      for (const x of f) falhas.push({ ...x, tema: tema.id, rota });
+    }
   }
+
+  await contextoTrabalho.close();
 
   if (falhas.length > 0) {
     console.log("\n=== CONTRASTE ABAIXO DO PISO AA ===");

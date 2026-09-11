@@ -15,7 +15,9 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
 import { criarClienteServidor } from "@/lib/supabase/cliente-servidor";
+import { crefValido, normalizarCref } from "@/lib/texto/cref";
 import { normalizarTelefoneWhatsApp } from "@/lib/texto/whatsapp";
 
 export type Resultado = { ok: true } | { ok: false; erro: string };
@@ -229,4 +231,56 @@ export async function salvarTelefoneWhatsApp(
   revalidatePath("/ajustes/personal");
   revalidatePath("/perfil");
   return { ok: true };
+}
+
+/**
+ * Completa o cadastro de quem criou conta de personal pelo Google: CREF e,
+ * se faltar, o WhatsApp.
+ *
+ * Esta ação existe por causa de uma restrição do banco que não dá para
+ * contornar: o trigger de perfil roda DENTRO do insert em `auth.users`, e
+ * o Google não manda CREF nem telefone. Exigir no schema abortaria o
+ * cadastro inteiro; então `tipo_conta = 'personal'` com `cref` nulo é
+ * estado legítimo, e a obrigatoriedade vive aqui e no guarda de rota
+ * (`casca.ts`), onde a mensagem é visível e acionável.
+ */
+export async function completarCadastroPersonal(
+  crefBruto: string,
+  telefoneBruto: string,
+): Promise<Resultado> {
+  const supabase = await criarClienteServidor();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return { ok: false, erro: "Sessão ausente — entre de novo." };
+
+  if (!crefValido(crefBruto)) {
+    return {
+      ok: false,
+      erro: "CREF inválido. Use o formato 123456-G/PB, como está na sua carteira.",
+    };
+  }
+
+  const telefone = normalizarTelefoneWhatsApp(telefoneBruto);
+  if (!telefone) {
+    return {
+      ok: false,
+      erro: "Telefone inválido. Escreva com DDD, por exemplo 83 99999-8888.",
+    };
+  }
+
+  // A conta já é `personal` (veio do cadastro); aqui NÃO se promove
+  // ninguém. Escrever `tipo_conta` nesta ação transformaria a tela de
+  // completar cadastro numa porta para virar profissional sem passar pelo
+  // cadastro — exatamente o que a escolha na origem existe para evitar.
+  const { error } = await supabase
+    .from("usuario")
+    .update({ cref: normalizarCref(crefBruto), telefone_whatsapp: telefone })
+    .eq("id", user.id);
+
+  if (error) return { ok: false, erro: "Não foi possível salvar. Tente de novo." };
+
+  revalidatePath("/personal");
+  revalidatePath("/personal/alunos");
+  redirect("/personal");
 }
