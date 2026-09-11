@@ -7,6 +7,10 @@
 import { redirect } from "next/navigation";
 import { criarClienteServidor } from "@/lib/supabase/cliente-servidor";
 import { normalizarTelefoneWhatsApp } from "@/lib/texto/whatsapp";
+import { crefValido, normalizarCref } from "@/lib/texto/cref";
+
+/** PRD §11, emenda de 2026-09-11: a escolha acontece no cadastro, não no uso. */
+export type TipoConta = "aluno" | "personal";
 
 export type ResultadoAuth =
   | { ok: true; confirmacaoPendente: boolean }
@@ -37,6 +41,8 @@ export async function criarContaComEmail(
   senha: string,
   nome: string,
   telefoneBruto: string,
+  tipoConta: TipoConta = "aluno",
+  crefBruto = "",
 ): Promise<ResultadoAuth> {
   const supabase = await criarClienteServidor();
 
@@ -62,10 +68,41 @@ export async function criarContaComEmail(
   // telefone pra criar a linha de perfil. Sem isto, a conta nasceria sem
   // nome nenhum e o trigger cairia no fallback de e-mail (PROGRESS.md
   // pendência 4).
+  // CREF é obrigatório para conta de personal, e a checagem é AQUI pelo
+  // mesmo motivo do telefone: o banco não pode reclamar. A check de
+  // `usuario_cref_formato` (0024) é frouxa de propósito e o trigger
+  // descarta valor malformado em silêncio — sem esta camada, alguém
+  // criaria conta de profissional achando que informou o registro, e ele
+  // simplesmente não estaria lá.
+  //
+  // A validação estrita (seis dígitos, uma das 27 UFs) vive em
+  // `texto/cref.ts`, testada, e é a mesma que a tela usa para habilitar o
+  // botão. Duas réguas diferentes aqui e lá dariam um "salvou mas sumiu".
+  let cref: string | null = null;
+  if (tipoConta === "personal") {
+    if (!crefValido(crefBruto)) {
+      return {
+        ok: false,
+        erro: "CREF inválido. Use o formato 123456-G/PB, como está na sua carteira.",
+      };
+    }
+    cref = normalizarCref(crefBruto);
+  }
+
   const { data, error } = await supabase.auth.signUp({
     email,
     password: senha,
-    options: { data: { nome, telefone_whatsapp: telefone } },
+    options: {
+      data: {
+        nome,
+        telefone_whatsapp: telefone,
+        // O trigger falha FECHADO: qualquer coisa diferente de 'personal'
+        // vira aluno lá dentro (0024). Mandar o valor explícito aqui é o
+        // que torna a escolha da tela real.
+        tipo_conta: tipoConta,
+        ...(cref ? { cref } : {}),
+      },
+    },
   });
   if (error) return { ok: false, erro: error.message };
   return { ok: true, confirmacaoPendente: !data.session };
