@@ -58,7 +58,7 @@ let aluno: UsuarioDescartavel;
  * (PRD §11.4.2), e essa passa a ser a variante varrida.
  */
 test.beforeAll(async ({ browser }) => {
-  usuario = await criarUsuarioDescartavel("varredura");
+  usuario = await criarUsuarioDescartavel("varredura", "personal");
   aluno = await criarUsuarioDescartavel("varredura-aluno");
 
   const comoPersonal = await clienteAutenticado(usuario);

@@ -2486,3 +2486,31 @@ Também não cobre `estagnacao_exercicio` nem `queda_volume` — a §11.7 define
 ### O estado honesto hoje
 
 As duas partes foram **executadas contra o banco de produção** e devolveram **zero linhas**: sintaxe e joins válidos, nenhum uso real ainda. Consulta construída e devolvendo vazio **não é medida feita** — a primeira leitura que vale é daqui a três ou quatro semanas, na terceira segunda-feira que o P2 nomeou.
+
+---
+
+## 2026-09-11 (7) — Existe conta de personal, e ela exige CREF
+
+**Decisão do dono**, tomada depois de ver o módulo montado. Ela **derruba a premissa** sobre a qual o §11 inteiro foi escrito — *"não existe conta de personal; o vínculo é o papel"* — e por isso entrou primeiro como emenda no `PRD.md`, antes de qualquer linha de código: contradição silenciosa entre código e PRD faz o próximo agente reverter para o desenho documentado, e ele estaria certo em fazer isso.
+
+O que foi decidido, em quatro pontos: a escolha acontece no **cadastro**; conta de personal exige **CREF**; a casca do app **difere** (personal não tem "iniciar treino"); e quem é personal e também treina usa **duas contas**.
+
+### As três perguntas que eu não podia decidir, e as respostas
+
+**1. O que fazer com um CREF que o app não consegue verificar.** Verificar exigiria consultar o CONFEF, que não expõe API pública. **Decidido: guardar, validar a forma, e dizer na tela que foi informado e não verificado.** É a única opção que não mente nem tranca a porta. As outras duas eram pior: tratar como verificado seria o lastro emprestando confiança que não apurou — e alguém um dia escolheria um profissional com base nisso; campo livre sem validação faria o "obrigatório" virar decoração.
+
+**2. O personal que também treina.** **Decidido: duas contas.** Conta de personal é de trabalho. O custo — trocar de conta para treinar — foi aceito com o trade-off na mão. A alternativa (uma conta com o lado de treino escondido) devolveria pela porta dos fundos exatamente a ambiguidade que a separação existe para acabar.
+
+**3. Cadastro por Google, que não entrega CREF nem telefone.** **Decidido: entra, mas completa antes de abrir.** Cai numa tela obrigatória de CREF + WhatsApp; sem completar, a área de personal não abre. Mantém o login de um toque sem afrouxar a obrigatoriedade.
+
+### A consequência que não é óbvia, e que decide o schema
+
+`tipo_conta = 'personal'` com `cref` **nulo é estado legítimo** — é exatamente o Google recém-cadastrado. Por isso a migração 0024 **não** tem constraint "personal implica CREF": ela abortaria o cadastro dentro do insert em `auth.users`, o mesmo modo de falha que a 0022 já documentou com o telefone. A obrigatoriedade é do **app**, onde a mensagem de erro é visível e acionável.
+
+Pelo mesmo raciocínio, a validação é **estrita no formulário e frouxa no banco**: `src/lib/texto/cref.ts` exige os seis dígitos e uma das 27 UFs; a check do banco só barra lixo evidente. Regra apertada no banco vira porta trancada sem mensagem.
+
+### O que quase passou despercebido
+
+A policy nova (`só conta personal convida`) **quebraria as quatro specs que montam vínculo de uma vez** — j4, j5, j6 e j7 —, no passo "Gerar código de convite", longe da causa. `criarUsuarioDescartavel` passou a receber o tipo e mandá-lo pelo `user_metadata`, no MESMO commit da policy.
+
+E `contaEPersonal()`, que era código morto, virou **errada** em vez de inútil: "tem aluno" e "é conta de personal" deixaram de ser a mesma pergunta no instante em que a conta passou a existir. Um personal recém-cadastrado, com zero alunos, continua sendo personal — e precisa alcançar a própria fila vazia. Reescrita para ler a coluna.

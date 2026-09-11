@@ -191,6 +191,23 @@ Isto reabre conscientemente o "Sem tela de configuração de rotina" acima e o A
 
 Uma conta pode estar **vinculada a um personal**. Enquanto o vínculo existe, a **prescrição** sai do produto e vai para o humano; o **diagnóstico** continua inteiro com o aluno.
 
+> **EMENDA em 2026-09-11 (2) — existe CONTA de personal. Decisão do dono.**
+>
+> A frase acima e a §11.4 inteira foram escritas sobre uma premissa: *"não existe conta de personal; o vínculo é o papel"*. **O dono decidiu o contrário**, e está escrito aqui porque contradição silenciosa entre código e PRD faz o próximo agente reverter para o desenho documentado.
+>
+> O que muda:
+>
+> 1. **A escolha acontece no cadastro**, não no uso. Duas contas na origem — `usuario.tipo_conta` é `aluno` ou `personal`.
+> 2. **Conta de personal exige CREF.** É a credencial profissional (Resolução CONFEF 053/2003, formato `000000-G/UF`, categoria `G` graduado ou `P` provisionado, sufixo `-S` para registro secundário).
+> 3. **A casca do app difere.** Conta de personal **não tem "iniciar treino"** — não é uma tela escondida, é ausência.
+> 4. **Quem é personal e também treina usa DUAS contas.** Decidido pelo dono: conta de personal é de trabalho. O custo — trocar de conta para treinar — foi aceito com o trade-off na mão.
+>
+> **O que o app NÃO faz com o CREF, e precisa estar escrito.** Ele valida o formato e guarda; **não verifica se o registro existe**. Verificar exigiria consultar o CONFEF, que não expõe API pública. Toda tela que mostrar o CREF diz *"informado pelo profissional, não verificado pelo lastro"*. Exibir credencial não checada como se fosse checada seria o lastro emprestando confiança que ele não apurou — e um dia alguém escolheria um profissional com base nisso.
+>
+> **Consequência que não é óbvia:** `tipo_conta = 'personal'` com `cref` nulo é estado **legítimo**, não corrompido. O cadastro por Google não entrega CREF (nem telefone), e a decisão foi deixar entrar e **exigir a complementação antes de abrir a área de personal**. Por isso o banco não tem constraint "personal implica CREF": a regra é do app, no lugar onde a mensagem de erro é visível e acionável.
+>
+> **O que NÃO muda:** o §11.2 abaixo continua valendo inteiro para o lado do aluno — ele mantém tudo e perde só a prescrição sob vínculo. E o §5 segue sem exceção: nenhuma conta fala com outra dentro do lastro.
+
 ### 11.2 O corte exato
 
 | | Aluno sem vínculo | Aluno vinculado |

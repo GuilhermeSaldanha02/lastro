@@ -41,7 +41,7 @@ const TELEFONE_DIGITADO = "83 97777-6666";
 const TELEFONE_E164 = "5583977776666";
 
 test.beforeAll(async () => {
-  personal = await criarUsuarioDescartavel("j7-personal");
+  personal = await criarUsuarioDescartavel("j7-personal", "personal");
   aluno = await criarUsuarioDescartavel("j7-aluno");
 
   const comoPersonal = await clienteAutenticado(personal);

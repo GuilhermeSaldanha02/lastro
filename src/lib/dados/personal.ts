@@ -176,17 +176,27 @@ export async function carregarVinculoDoAluno(): Promise<VinculoDoAluno | null> {
   };
 }
 
-/** `true` quando a conta tem pelo menos um aluno — é o que abre `/personal`. */
+/**
+ * `true` quando a conta É de personal (`usuario.tipo_conta`), tenha ela
+ * aluno ou não.
+ *
+ * Até a migração 0024 esta função contava ALUNOS VINCULADOS, porque
+ * "personal" não existia como estado — o vínculo era o papel. Com a conta
+ * própria (PRD §11, emenda de 2026-09-11) as duas perguntas deixaram de
+ * ser a mesma: um personal recém-cadastrado, com zero alunos, continua
+ * sendo personal e precisa alcançar a própria fila vazia. Contar alunos
+ * aqui deixaria essa pessoa numa conta sem casca.
+ */
 export async function contaEPersonal(): Promise<boolean> {
   const supabase = await criarClienteServidor();
   const user = await usuarioAtual(supabase);
-  const { count, error } = await supabase
-    .from("vinculo_personal")
-    .select("id", { count: "exact", head: true })
-    .eq("personal_id", user.id)
-    .eq("estado", "aceito");
-  if (error) throw new Error(`Falha ao verificar vínculos: ${error.message}`);
-  return (count ?? 0) > 0;
+  const { data, error } = await supabase
+    .from("usuario")
+    .select("tipo_conta")
+    .eq("id", user.id)
+    .maybeSingle();
+  if (error) throw new Error(`Falha ao ler o tipo da conta: ${error.message}`);
+  return data?.tipo_conta === "personal";
 }
 
 // ============================================================

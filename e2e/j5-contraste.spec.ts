@@ -50,7 +50,7 @@ let aluno: UsuarioDescartavel;
  * ação, os cinzas de metadado). Medir a fila vazia seria medir uma moldura.
  */
 test.beforeAll(async ({ browser }) => {
-  usuario = await criarUsuarioDescartavel("contraste");
+  usuario = await criarUsuarioDescartavel("contraste", "personal");
   aluno = await criarUsuarioDescartavel("contraste-aluno");
 
   const comoPersonal = await clienteAutenticado(usuario);
