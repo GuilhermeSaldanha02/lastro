@@ -29,6 +29,7 @@ import {
   type UsuarioDescartavel,
 } from "./helpers/usuario-descartavel";
 import { semearGrupoAbandonado } from "./helpers/semear-abandono";
+import { criarVinculoAceito } from "./helpers/vinculo";
 
 let personal: UsuarioDescartavel;
 let aluno: UsuarioDescartavel;
@@ -70,24 +71,16 @@ test("o personal recebe um alerta real do aluno e o clique fica registrado", asy
 }) => {
   test.setTimeout(120_000);
 
-  // ---- convite e aceite ----
-  const contextoPersonal = await browser.newContext();
-  const telaPersonal = await contextoPersonal.newPage();
-  await entrarComoUsuario(telaPersonal, personal);
-  await telaPersonal.goto("/ajustes/personal");
-  await telaPersonal.getByRole("button", { name: /Gerar código de convite/i }).click();
-  const codigo = (
-    await telaPersonal.locator(".codigo-convite").first().textContent({ timeout: 15_000 })
-  )?.trim();
-  expect(codigo).toMatch(/^[A-HJ-NP-Z2-9]{10}$/);
-
-  const contextoAluno = await browser.newContext();
-  const telaAluno = await contextoAluno.newPage();
-  await entrarComoUsuario(telaAluno, aluno);
-  await telaAluno.goto(`/ajustes/personal?codigo=${codigo}`);
-  await telaAluno.locator("#telefone_whatsapp").fill(TELEFONE_DIGITADO);
-  await telaAluno.getByRole("button", { name: /Aceitar convite/i }).click();
-  await expect(telaAluno.getByText(NOME_DO_PERSONAL)).toBeVisible({ timeout: 15_000 });
+  // ---- convite e aceite, pelo fixture compartilhado ----
+  const { contextoPersonal, telaPersonal, contextoAluno } = await criarVinculoAceito({
+    browser,
+    personal,
+    aluno,
+    telefone: TELEFONE_DIGITADO,
+  });
+  // A sessão do aluno não é mais necessária: daqui para baixo quem age é
+  // o personal, e deixar a aba viva só disputa CPU com a fila.
+  await contextoAluno.close();
 
   // ---- a fila ----
   await telaPersonal.goto("/personal");

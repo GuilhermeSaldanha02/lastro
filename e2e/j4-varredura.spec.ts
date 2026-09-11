@@ -29,17 +29,60 @@ import {
   apagarUsuarioDescartavel,
   criarUsuarioDescartavel,
   entrarComoUsuario,
+  clienteAutenticado,
   type UsuarioDescartavel,
 } from "./helpers/usuario-descartavel";
+import { criarVinculoAceito, nomear } from "./helpers/vinculo";
+import { semearGrupoAbandonado } from "./helpers/semear-abandono";
 
 let usuario: UsuarioDescartavel;
+let aluno: UsuarioDescartavel;
 
-test.beforeAll(async () => {
+/**
+ * O usuário varrido é um PERSONAL com um aluno vinculado, e não mais uma
+ * conta solta.
+ *
+ * Entrou em 2026-09-11 para cobrir a `/personal`, que era a única tela do
+ * app fora da varredura (`QA.md` PE-04): ela exige vínculo aceito e
+ * redireciona sem ele, então varrer com conta solta mediria a tela errada
+ * — e passar verde medindo a tela errada é pior do que não medir.
+ *
+ * O aluno recebe um grupo abandonado semeado de propósito: no estado
+ * vazio a `/personal` não tem texto nem cor suficientes para a varredura
+ * (e menos ainda para a medição de contraste da `j5`, que usa a mesma
+ * montagem).
+ *
+ * O que isto NÃO muda: as outras rotas seguem varridas por uma conta
+ * recém-nascida. Ter aluno vinculado não altera o estado de nenhuma delas
+ * — a exceção é a `/analise`, que sob vínculo troca a pergunta em destaque
+ * (PRD §11.4.2), e essa passa a ser a variante varrida.
+ */
+test.beforeAll(async ({ browser }) => {
   usuario = await criarUsuarioDescartavel("varredura");
+  aluno = await criarUsuarioDescartavel("varredura-aluno");
+
+  const comoPersonal = await clienteAutenticado(usuario);
+  await nomear(comoPersonal, usuario.id, "Marina Alencar");
+
+  const comoAluno = await clienteAutenticado(aluno);
+  await nomear(comoAluno, aluno.id, "Ana Ribeiro");
+  await semearGrupoAbandonado(comoAluno, aluno.id);
+
+  const { contextoPersonal, contextoAluno } = await criarVinculoAceito({
+    browser,
+    personal: usuario,
+    aluno,
+  });
+  // A varredura roda na `page` do teste, com login próprio — estas duas
+  // sessões só existiram para o aceite. Fechar evita duas abas vivas à toa
+  // durante os cinco minutos de varredura.
+  await contextoPersonal.close();
+  await contextoAluno.close();
 });
 
 test.afterAll(async () => {
   if (usuario) await apagarUsuarioDescartavel(usuario);
+  if (aluno) await apagarUsuarioDescartavel(aluno);
 });
 
 /** Larguras conferidas. A altura é a real do aparelho, não um número redondo. */
@@ -69,12 +112,11 @@ const ROTAS_FIXAS = [
   "/ajustes/relatorios",
   // Módulo Personal (PRD §11). Renderiza para QUALQUER conta logada — é o
   // lado do aluno ("vincular a um personal") somado ao de convidar.
-  //
-  // `/personal` NÃO entra aqui: ela exige vínculo aceito e redireciona sem
-  // ele, então a varredura mediria a tela errada. Cobrir de verdade pede um
-  // SEGUNDO usuário descartável e um aceite — está declarado como não
-  // coberto no `PROGRESS.md`, não esquecido.
   "/ajustes/personal",
+  // A fila. Exige vínculo aceito — por isso o `beforeAll` acima monta um
+  // personal com aluno e um alerta real, em vez de varrer o redirecionamento
+  // para `/ajustes`. Era o único buraco que sobrava na varredura (PE-04).
+  "/personal",
 ];
 
 type Achado = { rota: string; largura: string; tipo: string; detalhe: string };
