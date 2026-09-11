@@ -11,11 +11,12 @@
 
 > Bloco de handoff entre agentes (Antigravity ⇄ Claude). **Sobrescrever a cada sessão**, nunca acumular. Formato e regras: `AGENTS.md` §3.
 
-- **Última sessão:** 2026-09-11 · agente: claude · branch **`feat/personal-primeira-fatia`**, 6 commits, **PR #226 aberto, CI verde**. 398 testes verdes, `tsc`/lint/build limpos, working tree limpa. **Migrações 0022 e 0023 JÁ APLICADAS EM PRODUÇÃO** (`migration list` conferido: 0001–0023, alinhado).
-- **Em andamento:** primeira fatia do módulo Personal — construída e exercida ponta a ponta. Falta o merge.
-- **Não commitado:** nada. `.env.local` foi criado (gitignored) com a URL e a chave publicável do Supabase, para rodar o dev server — **não tem service-role nem chave da Gemini**, então `j4`/`j5` não rodam nesta máquina.
+- **Última sessão:** 2026-09-11 · agente: claude · branch **`feat/personal-primeira-fatia`**, 6 commits, **PR #226 aberto e CI verde**. 398 testes verdes, `tsc`/lint/build limpos, working tree limpa. **Migrações 0022 e 0023 JÁ APLICADAS EM PRODUÇÃO** (`migration list` conferido: 0001–0023, alinhado).
+- **A ESTRATÉGIA DE BRANCH DESTE MÓDULO** (corrigida pelo dono em 11/set, a regra não estava escrita e por isso se perdeu): **`feat/modulo-personal`** é a branch de integração do Personal, tirada da `main`. **Toda fatia sai dela e volta para ela por PR.** A `main` só recebe o módulo quando ele estiver inteiro. A `feat/personal-primeira-fatia` aponta para `feat/modulo-personal`, não para a `main`. Regra agora escrita no `AGENTS.md` §4 (PR #227, esse sim direto para a `main` — é a regra que governa as outras branches).
+- **Em andamento:** primeira fatia do módulo Personal — construída e exercida ponta a ponta. Falta o merge **na branch do módulo**.
+- **Não commitado:** nada. Um `.env.local` foi criado durante a sessão para rodar o dev server e **apagado no fim** — se você precisar rodar local, crie o seu a partir do `.env.example`.
 - **Bloqueado / a decidir:** nada bloqueia código. Duas perguntas ao P1/P2 seguem abertas (abaixo).
-- **Próximo passo:** o dono revisar o **PR #226** e olhar `/ajustes/personal` na conta dele. CI **verde** (398 testes + 6 e2e, incluindo `j4`/`j5` com a rota nova).
+- **Próximo passo:** o dono revisar o **PR #226** (base `feat/modulo-personal`) e olhar `/ajustes/personal` na conta dele. CI **verde** (398 testes + 6 e2e, incluindo `j4`/`j5` com a rota nova).
 - **Para o outro agente saber:** a `FF5` foi **emendada**. RLS deixou de significar "só o meu" — leia a primeira linha da seção abaixo antes de escrever qualquer consulta.
 
 ### A coisa mais importante desta sessão
@@ -85,6 +86,8 @@ E no navegador, em 375px: a fila renderizou o alerta certo com dado real ("Costa
 
 ### Para o outro agente saber
 
+- **Saia de `feat/modulo-personal`, não da `main`,** para qualquer fatia nova do Personal. `AGENTS.md` §4.
+- **A branch de integração NÃO protege o banco.** As migrações 0022 e 0023 já estão em produção, e estariam em qualquer branch — banco é um só. O app publicado a partir da `main` segue correto porque a mudança é **aditiva**: as tabelas novas nenhum código da `main` lê; a coluna nova ninguém seleciona; as policies novas só liberam quando existe vínculo aceito, e **não existe nenhum** (conferido: 0 vínculos); e o trigger de perfil recriado recebe `null` quando o cadastro não manda telefone, que é exatamente o comportamento antigo. **Antes de aplicar migration de módulo em andamento, confirme com o dono e cheque essa lista.**
 - **RLS não significa mais "só o meu".** Já dito acima, e é o item que mais barato quebra: consulta nova de leitura em `treino`/`serie`/`usuario` **sem** `.eq("usuario_id", …)` vaza dado entre contas sem erro nenhum.
 - **Nunca use `cliente-admin.ts` para montar a fila do personal.** Era o atalho óbvio e funcionaria de primeira, anulando em silêncio toda a RLS da 0022. A fila lê sob o JWT do personal de propósito: policy errada → fila **vazia**, que é a falha que se percebe.
 - **O wrapper de shell desta máquina corrompe `\b` em heredoc.** Um regex escrito por script virou **caractere de backspace literal** dentro do arquivo, invisível no editor, e o teste passou por acidente. Conteúdo com barra invertida vai por ferramenta de arquivo, nunca por heredoc.
