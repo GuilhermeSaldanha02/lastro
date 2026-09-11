@@ -11,11 +11,11 @@
 
 > Bloco de handoff entre agentes (Antigravity ⇄ Claude). **Sobrescrever a cada sessão**, nunca acumular. Formato e regras: `AGENTS.md` §3.
 
-- **Última sessão:** 2026-09-11 · agente: claude · branch **`feat/personal-primeira-fatia`**, 5 commits, **PR aberto**. 398 testes verdes, `tsc`/lint/build limpos, working tree limpa. **Migrações 0022 e 0023 JÁ APLICADAS EM PRODUÇÃO** (`migration list` conferido: 0001–0023, alinhado).
+- **Última sessão:** 2026-09-11 · agente: claude · branch **`feat/personal-primeira-fatia`**, 6 commits, **PR #226 aberto, CI verde**. 398 testes verdes, `tsc`/lint/build limpos, working tree limpa. **Migrações 0022 e 0023 JÁ APLICADAS EM PRODUÇÃO** (`migration list` conferido: 0001–0023, alinhado).
 - **Em andamento:** primeira fatia do módulo Personal — construída e exercida ponta a ponta. Falta o merge.
 - **Não commitado:** nada. `.env.local` foi criado (gitignored) com a URL e a chave publicável do Supabase, para rodar o dev server — **não tem service-role nem chave da Gemini**, então `j4`/`j5` não rodam nesta máquina.
 - **Bloqueado / a decidir:** nada bloqueia código. Duas perguntas ao P1/P2 seguem abertas (abaixo).
-- **Próximo passo:** o dono revisar o PR e olhar `/ajustes/personal` na conta dele. **O CI é quem prova o contraste da tela nova** — `j4` e `j5` ganharam `/ajustes/personal` e não puderam rodar local.
+- **Próximo passo:** o dono revisar o **PR #226** e olhar `/ajustes/personal` na conta dele. CI **verde** (398 testes + 6 e2e, incluindo `j4`/`j5` com a rota nova).
 - **Para o outro agente saber:** a `FF5` foi **emendada**. RLS deixou de significar "só o meu" — leia a primeira linha da seção abaixo antes de escrever qualquer consulta.
 
 ### A coisa mais importante desta sessão
@@ -71,7 +71,7 @@ E no navegador, em 375px: a fila renderizou o alerta certo com dado real ("Costa
 ### Declarado como NÃO coberto (não é esquecimento)
 
 - **`/personal` não entra na `j4` nem na `j5`.** Ela exige vínculo aceito e redireciona sem ele, então a varredura mediria a tela errada. Cobrir de verdade pede um **segundo** usuário descartável e um aceite no fixture.
-- **`j4` e `j5` não foram executadas nesta máquina** — elas usam o cliente admin e o `.env.local` local não tem service-role. **O contraste de `/ajustes/personal` é ALEGADO até o CI rodar.**
+- ~~**`j4` e `j5` não foram executadas nesta máquina**~~ — elas usam o cliente admin e o `.env.local` local não tem service-role. **RESOLVIDO pelo CI do PR #226**: `6 passed (4.5m)` contra o Supabase hospedado, com `/ajustes/personal` dentro da lista dos dois specs. O contraste da tela nova está PROVADO; o que não roda local continua não rodando local.
 - **O módulo Personal está só em pt-BR.** As strings novas não entraram no dicionário do `i18n`, então EN/ES caem no pt-BR (o `t()` devolve a chave). Não quebra nada; está declarado.
 - **"Queda de frequência" foi entregue como queda de VOLUME.** A §11.2 lista frequência; uma semana contra a média é oscilação, não tendência, e uma viagem dispararia. Frequência ao pé da letra pede contagem semanal de treinos e régua própria — não está feito. `DECISIONS.md` "2026-09-11 (4)".
 
