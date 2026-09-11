@@ -46,6 +46,18 @@ export function perguntasDoIdioma(idioma: Idioma): Record<NumeroPergunta, string
  *  duplicava a mesma ação do card primário). */
 export const PERGUNTA_PRIMARIA: NumeroPergunta = 5;
 
+/**
+ * A pergunta que PRESCREVE — a que sai do produto sob vínculo com personal
+ * (PRD §11.2, restrição §11.4.1).
+ *
+ * Hoje é o mesmo 5 de `PERGUNTA_PRIMARIA`, e é DE PROPÓSITO que sejam duas
+ * constantes: os papéis não são o mesmo. `PERGUNTA_PRIMARIA` é de LAYOUT —
+ * qual card fica em destaque. Esta é de ESCOPO — qual pergunta pertence ao
+ * humano contratado. Se um dia o destaque mudar de pergunta, só um dos dois
+ * números muda, e unificá-los agora esconderia isso.
+ */
+export const PERGUNTA_PRESCRICAO: NumeroPergunta = 5;
+
 export function perguntaValida(valor: unknown): valor is NumeroPergunta {
   return valor === 1 || valor === 2 || valor === 3 || valor === 4 || valor === 5;
 }
