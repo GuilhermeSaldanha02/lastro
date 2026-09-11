@@ -11,13 +11,19 @@
 
 > Bloco de handoff entre agentes (Antigravity ⇄ Claude). **Sobrescrever a cada sessão**, nunca acumular. Formato e regras: `AGENTS.md` §3.
 
-- **Última sessão:** 2026-09-11 · agente: claude · branch **`feat/personal-medida-117`**. Working tree limpa.
-- **A `feat/modulo-personal` tem TRÊS fatias:** vínculo/fila (#226), prescrição escondida (#228, `5c1934e`) e cobertura de teste da fila (#229, `51467cb`). A `main` segue intocada — só recebe o módulo inteiro (`AGENTS.md` §4).
-- **Em andamento:** a medida da §11.7 (`scripts/medida-alerta-estimulo.sql`). **Não muda produto: é instrumento do dono**, no molde do `ff5-rls.sql`.
+- **Última sessão:** 2026-09-11 · agente: claude · **módulo Personal fechado na `feat/modulo-personal`** (`ae56b49`). Cinco PRs mergeados na branch do módulo: #226 (vínculo e fila), #228 (prescrição escondida), #229 (cobertura da fila), #230 (a medida da §11.7) e #231 (varreduras). Nenhum PR aberto, working tree limpa.
+- **A `main` segue INTOCADA.** Ela só recebe o módulo inteiro, num PR só — `AGENTS.md` §4. **Essa decisão é do dono e está pendente.**
+- **Em andamento:** nada. O PRD §11 está construído inteiro.
 - **Não commitado:** nada.
-- **Bloqueado / a decidir:** nada em código. O que falta na medida não é execução, é **USO real** — ela devolve zero linhas até um personal de verdade abrir alertas por algumas semanas.
-- **Próximo passo:** com isto, o módulo tem tudo que o PRD §11 pede, menos `/personal` nas varreduras j4/j5 (PE-04, declarado). A decisão que sobra é do dono: olhar o módulo na conta dele e decidir quando a `feat/modulo-personal` vai para a `main`.
-- **Para o outro agente saber:** quatro coisas. (1) A `FF5` foi **emendada** — leia a seção abaixo antes de escrever consulta. (2) **A trava da prescrição não está na tela**: está em `src/app/api/analise/route.ts`, ANTES do gasto de cota, e a posição é parte da decisão. (3) **Teste que neutraliza efeito externo não pode mexer no atributo que governa o mecanismo medido** — o j7 reprovou por isso; lição no `QA.md`. (4) A medida da §11.7 **não tem gêmea em TypeScript de propósito** — duas cópias da aritmética de semana divergem em silêncio, e a consulta usa a data que o app já gravou em vez de recalcular a semana.
+- **Bloqueado / a decidir:** três coisas, todas do dono. (1) Quando o módulo vai para a `main`. (2) O olho na tela — preview do módulo em `https://lastro-git-feat-modulo-personal-audicon.vercel.app`, que aponta para o Supabase de PRODUÇÃO (vínculo aceito ali é vínculo real). (3) Se os PASSOU por determinismo de CI encerram o `AGENTS.md` §5, já que os specs são de quem implementou.
+- **Próximo passo:** o dono olhar o módulo e decidir o PR para a `main`.
+- **Para o outro agente saber:** cinco coisas. (1) A `FF5` foi **emendada** — leia a seção abaixo antes de escrever qualquer consulta. (2) **A trava da prescrição não está na tela**: está em `src/app/api/analise/route.ts`, ANTES do gasto de cota, e a posição é parte da decisão. (3) **Teste que neutraliza efeito externo não pode mexer no atributo que governa o mecanismo medido** — a `j7` reprovou por isso; lição no `QA.md`. (4) A medida da §11.7 **não tem gêmea em TypeScript de propósito**. (5) **`j4` e `j5` agora rodam como PERSONAL com aluno vinculado** — se uma delas falhar numa tela que nada tem a ver com o módulo, olhe o `beforeAll` antes de caçar o bug na tela.
+
+### O módulo, em números medidos
+
+CI run `34603359322`: **8 e2e** e **420 testes de unidade**, com `tsc`, lint e build limpos. Dois specs exercitam o módulo com duas contas e vínculo real (`j6` a prescrição, `j7` a fila), e as duas varreduras agora incluem a `/personal` com alerta de verdade — zero achados de navegação, zero reprovas de AA nos sete temas.
+
+**O que segue NÃO provado, e está declarado:** o olho do dono na tela; a resposta real da Gemini sob vínculo (PE-06, comportamento de modelo); e a medida da §11.7, que está certa e **devolve zero linhas** — só uso real a preenche.
 
 ### A fatia da prescrição, em duas telas
 
