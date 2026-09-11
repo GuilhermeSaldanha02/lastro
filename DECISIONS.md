@@ -2464,3 +2464,25 @@ Isto fica registrado porque é correção ao RACIOCÍNIO do PRD, não detalhe de
 ### O buraco que a §11.2 não cobre, e que NÃO foi fechado por decisão
 
 `listarPareceres()` não filtra por pergunta. Um aluno que salvou pareceres da pergunta 5 **antes** de vincular continua vendo esses pareceres inteiros em `/ajustes/relatorios`, com a prescrição dentro. **Mantidos de propósito:** é dado dele, gerado quando o app era o prescritor legítimo. Apagar ou esconder histórico de ninguém por conta de uma mudança de escopo seria decisão do dono, não de implementação — e apagar registro de parecer não é reversível. Fica escrito para ninguém ler "o aluno vinculado não vê a prescrição" como afirmação sobre o passado.
+
+---
+
+## 2026-09-11 (6) — A medida da §11.7 é uma consulta, não uma tela
+
+**O que é:** `scripts/medida-alerta-estimulo.sql` responde a pergunta que o PRD §11.7 nomeia como a que decide se o módulo Personal funciona — *"o grupo muscular alertado recebeu estímulo na semana seguinte?"*.
+
+**Por que SQL, e não tela.** A medida é uma pergunta sobre HISTÓRICO, feita de vez em quando por uma pessoa: o dono. Tela exigiria decidir quem vê, com que frequência, e o que o número significa para quem está sendo medido — três decisões de produto que ninguém pediu. Segue o precedente do `ff5-rls.sql`: instrumento executável, rodado à mão, versionado junto do código que ele mede.
+
+**Por que NÃO existe uma versão em TypeScript.** Seria a mesma regra em dois lugares, e a aritmética de semana é exatamente onde duas cópias divergem em silêncio. A consulta usa `semana_inicio + 7 dias` até `+ 14 dias`, aritmética sobre a data que o app JÁ gravou — nunca um `date_trunc('week')` recalculado, que arriscaria discordar da fronteira de semana do próprio app. Medida que discorda do que ela mede é pior que medida nenhuma.
+
+**O corte que evita a medida piorar sozinha.** O agregado só conta alerta cuja semana seguinte já terminou. Sem isso, todo alerta da semana corrente entra como "não recebeu estímulo" só porque a semana não acabou, e o número cai toda segunda-feira sem nada ter acontecido.
+
+### O que ela NÃO prova, e está escrito dentro do arquivo
+
+É **correlação de amostra auto-selecionada**. O personal escolhe quais alertas aciona, e provavelmente aciona os dos alunos que cobraria de qualquer jeito; a coluna "acionado" não é braço de experimento, é escolha de quem está sendo medido. Com n≈1 personal e sem randomização, a consulta descreve o que aconteceu — não estabelece causa. Isso fica no cabeçalho do `.sql`, não só aqui: quem lê o número precisa ler a ressalva junto.
+
+Também não cobre `estagnacao_exercicio` nem `queda_volume` — a §11.7 define sucesso só para o abandono de grupo, e inventar definição para os outros dois seria inventar dado de negócio.
+
+### O estado honesto hoje
+
+As duas partes foram **executadas contra o banco de produção** e devolveram **zero linhas**: sintaxe e joins válidos, nenhum uso real ainda. Consulta construída e devolvendo vazio **não é medida feita** — a primeira leitura que vale é daqui a três ou quatro semanas, na terceira segunda-feira que o P2 nomeou.
