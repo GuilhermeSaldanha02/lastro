@@ -11,12 +11,13 @@
 
 > Bloco de handoff entre agentes (Antigravity ⇄ Claude). **Sobrescrever a cada sessão**, nunca acumular. Formato e regras: `AGENTS.md` §3.
 
-- **Última sessão:** 2026-09-11 · agente: claude · branch **`feat/personal-esconde-prescricao`** (tirada de `feat/modulo-personal`), 4 commits. 420 testes verdes, `tsc` limpo, `npm run build` completo, eslint sem nada em `src/`, working tree limpa.
+- **Última sessão:** 2026-09-11 · agente: claude · branch **`feat/personal-esconde-prescricao`** (tirada de `feat/modulo-personal`), 5 commits, **PR #228 aberto e CI VERDE** (run `34588453405`: 420 testes + **7 e2e**, `tsc`, lint e build). Working tree limpa.
 - **A ESTRATÉGIA DE BRANCH DESTE MÓDULO** (corrigida pelo dono em 11/set): **`feat/modulo-personal`** é a branch de integração do Personal, tirada da `main`. **Toda fatia sai dela e volta para ela por PR.** A `main` só recebe o módulo quando ele estiver inteiro. Regra no `AGENTS.md` §4. Primeira fatia já mergeada na branch do módulo (`da74833`, PR #226).
 - **Em andamento:** SEGUNDA fatia — esconder a prescrição sob vínculo (PRD §11.4.1 e §11.4.2). **Construída inteira**: trava de servidor, prompt do Coach e a tela. **O gate visual da §11.4.2 foi FECHADO pelo dono na direção "Troca de posto"** — das três renderizadas.
 - **Não commitado:** nada.
 - **Bloqueado / a decidir:** nada.
-- **Próximo passo:** o dono abrir a `/analise` **numa conta vinculada** e conferir com o olho. É o único pedaço que não foi exercido no app rodando — esta máquina não tem `.env.local`, então não houve dev server nem conta com vínculo (`QA.md` PE-05 e PE-07 dizem o que falta medir e como).
+- **Próximo passo:** o dono revisar o **PR #228** (base `feat/modulo-personal`). O que falta é só o olho dele na tela — a estrutura já está medida.
+- **A MEDIÇÃO FOI FEITA, e no CI:** `e2e/j6-prescricao-sob-vinculo.spec.ts` é o **primeiro spec com dois usuários e vínculo aceito** (estava no backlog deste arquivo). Prova o 403, as contagens de `uso_ia`/`parecer` intocadas na recusa, o controle sem vínculo, o controle na pergunta 2, a tela e a volta da prescrição na revogação. **Não houve como medir nesta máquina:** o cadastro público por e-mail é recusado pelo Supabase deste projeto, e escrever em `auth.users` de produção foi barrado — o CI tem a `service_role`, esta máquina não.
 - **Para o outro agente saber:** duas coisas. (1) A `FF5` foi **emendada** — leia a seção abaixo antes de escrever consulta. (2) **A trava da prescrição NÃO está na tela**: ela está em `src/app/api/analise/route.ts`, ANTES do gasto de cota, e a posição é parte da decisão, não estilo. Se mexer na ordem daquele handler, leia o comentário no lugar.
 
 ### A fatia da prescrição, em duas telas
