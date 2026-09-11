@@ -103,6 +103,24 @@ export default async function PaginaAjustes() {
                 <SetaNavegacao />
               </Link>
 
+              {/* PRD §11 — uma entrada só, para os dois lados do vínculo.
+                  Não existe "modo personal": quem tem aluno vinculado
+                  alcança a fila a partir daqui. */}
+              <Link href="/ajustes/personal" className="bento-menu-item">
+                <div className="bento-menu-item__icone bento-menu-item__icone--ciano">
+                  <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="var(--lastro-ciano)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+                    <circle cx="9" cy="7" r="4" />
+                    <path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75" />
+                  </svg>
+                </div>
+                <div className="bento-menu-item__info">
+                  <h3 className="bento-menu-item__titulo">{t("Personal", idioma)}</h3>
+                  <p className="bento-menu-item__desc">{t("Vínculo, convites e fila de alunos", idioma)}</p>
+                </div>
+                <SetaNavegacao />
+              </Link>
+
               <Link href="/ajustes/relatorios" className="bento-menu-item">
                 <div className="bento-menu-item__icone bento-menu-item__icone--verde">
                   <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="var(--lastro-esmeralda)" strokeWidth="2">

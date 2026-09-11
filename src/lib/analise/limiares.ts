@@ -75,3 +75,54 @@ export const MAX_PRS = 5;
 export const MAX_GRUPOS = 12;
 /** Somado contra os tetos acima em SDD §D2/C1 — não é número redondo arbitrário. */
 export const MAX_BYTES_RESUMO = 6144;
+
+// ============================================================
+// Módulo Personal — os números da SELETIVIDADE (PRD §11.4.6)
+// ============================================================
+// Estes quatro não são ajuste fino: a §11.4.6 diz que seletividade É o
+// produto, e que um alerta disparando para todo grupo toda semana mata o
+// módulo. São os números que decidem isso, e vêm das entrevistas
+// (DECISIONS.md "2026-09-10 (6)"), não de estatística.
+
+/**
+ * Teto de alertas por aluno, por semana. DECIDIDO PELO DONO em 2026-09-11.
+ *
+ * O P2 nomeou o modo de morte com quatro linhas numa tela: "Peito:
+ * atenção / Bíceps: atenção / Costas: atenção / Tríceps: atenção — aí sim
+ * vira notificação que eu começo a ignorar." Dois cabe no olho e força a
+ * priorização a escolher de verdade. Não é limiar estatístico.
+ */
+export const TETO_ALERTAS_ALUNO_SEMANA = 2;
+
+/**
+ * Dias sem série valendo num grupo para ele virar alerta.
+ *
+ * 21 = a régua de 3 SEMANAS que o P2 deu ao dizer que abre o alerta se o
+ * sinal for tendência, e não oscilação de uma sessão. DIFERENTE de
+ * `SEMANAS_ESTAGNACAO` (4), que é sobre progresso de carga num exercício
+ * que CONTINUA sendo treinado — aqui o grupo não está sendo treinado.
+ *
+ * Não confundir com o TODO aberto do `PRD.md` §10 ("N semanas que
+ * caracterizam estagnação", que exige fonte primária): este número não
+ * afirma nada clínico, só decide o que é barulho na fila de trabalho de
+ * um profissional.
+ */
+export const DIAS_SEM_ESTIMULO_PARA_ALERTA = 21;
+
+/**
+ * Semanas sem re-emitir o MESMO (tipo, alvo) para o mesmo aluno.
+ *
+ * O teto de 2/semana sozinho NÃO impede a morte do módulo: um exercício
+ * empacado há seis semanas gera os mesmos dois alertas em seis segundas
+ * seguidas. Repetido no eixo do TEMPO mata igual a repetido no eixo do
+ * grupo. 3 semanas lembra sem amolar — e é a mesma régua de tendência
+ * acima, de propósito: o alerta volta quando o problema já é novo de novo.
+ */
+export const SEMANAS_SUPRESSAO_ALERTA = 3;
+
+/**
+ * Quedas consecutivas de volume semanal para virar alerta. Três quedas
+ * exigem quatro semanas de dado — cabe exatamente na `JANELA_SEMANAS` (4)
+ * que o `volume_semanal` do resumo já traz, sem agregação nova.
+ */
+export const QUEDAS_VOLUME_PARA_ALERTA = 3;
