@@ -11,13 +11,21 @@
 
 > Bloco de handoff entre agentes (Antigravity ⇄ Claude). **Sobrescrever a cada sessão**, nunca acumular. Formato e regras: `AGENTS.md` §3.
 
-- **Última sessão:** 2026-09-11 · agente: claude · branch **`feat/personal-primeira-fatia`**, 6 commits, **PR #226 aberto e CI verde**. 398 testes verdes, `tsc`/lint/build limpos, working tree limpa. **Migrações 0022 e 0023 JÁ APLICADAS EM PRODUÇÃO** (`migration list` conferido: 0001–0023, alinhado).
-- **A ESTRATÉGIA DE BRANCH DESTE MÓDULO** (corrigida pelo dono em 11/set, a regra não estava escrita e por isso se perdeu): **`feat/modulo-personal`** é a branch de integração do Personal, tirada da `main`. **Toda fatia sai dela e volta para ela por PR.** A `main` só recebe o módulo quando ele estiver inteiro. A `feat/personal-primeira-fatia` aponta para `feat/modulo-personal`, não para a `main`. Regra agora escrita no `AGENTS.md` §4 (PR #227, esse sim direto para a `main` — é a regra que governa as outras branches).
-- **Em andamento:** primeira fatia do módulo Personal — construída e exercida ponta a ponta. Falta o merge **na branch do módulo**.
-- **Não commitado:** nada. Um `.env.local` foi criado durante a sessão para rodar o dev server e **apagado no fim** — se você precisar rodar local, crie o seu a partir do `.env.example`.
-- **Bloqueado / a decidir:** nada bloqueia código. Duas perguntas ao P1/P2 seguem abertas (abaixo).
-- **Próximo passo:** o dono revisar o **PR #226** (base `feat/modulo-personal`) e olhar `/ajustes/personal` na conta dele. CI **verde** (398 testes + 6 e2e, incluindo `j4`/`j5` com a rota nova).
-- **Para o outro agente saber:** a `FF5` foi **emendada**. RLS deixou de significar "só o meu" — leia a primeira linha da seção abaixo antes de escrever qualquer consulta.
+- **Última sessão:** 2026-09-11 · agente: claude · branch **`feat/personal-esconde-prescricao`** (tirada de `feat/modulo-personal`), 1 commit: `35e80d9`. 410 testes verdes, `tsc` e lint limpos, working tree limpa.
+- **A ESTRATÉGIA DE BRANCH DESTE MÓDULO** (corrigida pelo dono em 11/set): **`feat/modulo-personal`** é a branch de integração do Personal, tirada da `main`. **Toda fatia sai dela e volta para ela por PR.** A `main` só recebe o módulo quando ele estiver inteiro. Regra escrita no `AGENTS.md` §4. Primeira fatia já **mergeada** na branch do módulo (merge commit `da74833`, PR #226).
+- **Em andamento:** SEGUNDA fatia — esconder a prescrição sob vínculo (PRD §11.4.1 e §11.4.2). **A metade de servidor está pronta e commitada**; a metade de tela está PARADA no gate visual.
+- **Não commitado:** nada.
+- **Bloqueado / a decidir:** **o gate visual da §11.4.2 está aberto e é do dono.** Três direções foram renderizadas para o lugar da prescrição na `/analise` de um aluno vinculado — A "Placa do profissional", B "Troca de posto" (recomendada), C "Lacre". **Nenhum pixel de tela entra antes da escolha**, por ordem explícita da §11.4.2 ("ausência não é resposta. Gate visual, não implementação silenciosa").
+- **Próximo passo:** o dono escolher uma das três direções. Depois dela: token, tela, e a checagem de `PERGUNTA_PRIMARIA` em `analise-interativa.tsx` (hoje o componente deriva as secundárias excluindo a primária e renderiza o card primário sem condição — a direção escolhida decide se isso muda).
+- **Para o outro agente saber:** a `FF5` foi **emendada** (leia a seção abaixo antes de escrever consulta). E **a trava da prescrição NÃO está na tela**: ela está em `src/app/api/analise/route.ts`, antes do gasto de cota. Se você mexer na ordem daquele handler, leia o comentário no lugar — a posição da recusa é parte da decisão, não estilo.
+
+### A fatia da prescrição, em uma tela
+
+`/api/analise` recusa a pergunta 5 com 403 `prescricao_do_personal` quando existe vínculo aceito, **antes** de `limparRascunhosExpirados`, do teto e de `registrarUso` — recusar depois cobraria cota de uma pergunta que o app nunca responde e deixaria rascunho órfão. Falha ao ler o vínculo recusa (503), não libera.
+
+O Coach (§11.4.1) ganhou `sistemaCoach(temPersonal)`: duas linhas mudam e só elas. **A premissa da §11.4.1 estava parcialmente satisfeita** — a regra 2 do prompt já proibia prescrever; o que faltava era o DESTINO ("leve o pedido ao personal") e a linha `QUEM PERGUNTA`, que afirmava "sem personal". Detalhe em `DECISIONS.md` "2026-09-11 (5)".
+
+**Buraco conhecido, mantido de propósito:** `listarPareceres()` não filtra por pergunta, então pareceres da pergunta 5 salvos ANTES do vínculo continuam visíveis em `/ajustes/relatorios`. É dado do aluno, gerado quando o app era o prescritor legítimo; apagar histórico é decisão do dono e não é reversível.
 
 ### A coisa mais importante desta sessão
 
