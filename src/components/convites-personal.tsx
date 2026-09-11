@@ -63,8 +63,9 @@ export default function ConvitesPersonal({
       <section className="card-obsidian">
         <span className="card-obsidian__titulo">Convidar um aluno</span>
         <p className="campo__nota">
-          Gere um código e mande para o aluno. Ele aceita dentro do app dele —
-          só aí você passa a ver os treinos, e só até ele revogar.
+          Gere um código e mande para o aluno. O aceite acontece no app do
+          aluno — só aí você passa a ver os treinos, e só até o vínculo ser
+          revogado por quem o aceitou.
         </p>
 
         {erro && (
@@ -124,14 +125,14 @@ export default function ConvitesPersonal({
                 <p className="campo__nota">
                   {aluno.telefoneWhatsApp
                     ? formatarTelefoneBrasil(aluno.telefoneWhatsApp)
-                    : "Sem telefone salvo — a mensagem pronta não aparece até ele informar."}
+                    : "Sem telefone salvo — a mensagem pronta não aparece até o aluno informar."}
                 </p>
               </li>
             ))}
           </ul>
           <p className="campo__nota">
-            Quem encerra o vínculo é o aluno, na tela dele. Você não tem esse
-            botão de propósito.
+            Quem encerra o vínculo é o aluno, na própria tela de Ajustes.
+            Você não tem esse botão de propósito.
           </p>
         </section>
       )}

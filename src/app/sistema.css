@@ -5722,6 +5722,31 @@
   margin-top: var(--lastro-e-2);
 }
 
+/* O botão de ação é UM alvo, com ícone e rótulo na MESMA linha.
+   `.botao-primario` é `flex-direction: column` na base (linha 313) — quem
+   só troca `display` não conserta nada, e o ícone continua empilhado sobre
+   o rótulo, fazendo o botão parecer dois elementos. Medido no navegador em
+   2026-09-11, depois de uma primeira tentativa que não pegou.
+   É a ação de um clique do §11.4.7: ela não pode parecer ambígua. */
+.alerta-personal__acao .botao-primario {
+  display: inline-flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  align-items: center;
+  justify-content: center;
+  gap: var(--lastro-e-2);
+  text-align: center;
+}
+
+/* `<Link>` com `.botao-secundario` é bloco: sem centrar, o rótulo cola na
+   borda esquerda de uma caixa alta e não lê como botão. */
+.fila-personal-rodape {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
 /* Já acionado: o card não sai da tela (o personal pode querer mandar de
    novo), mas para de competir pela atenção. */
 .alerta-personal__marca-acionado {

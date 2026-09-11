@@ -54,9 +54,10 @@ export default function VinculoAluno({
         <span className="card-obsidian__titulo">Seu personal</span>
         <p className="alerta-personal__titulo">{vinculo.nomeDoPersonal}</p>
         <p className="campo__nota">
-          Ele vê seus treinos, suas séries e seu contato de WhatsApp. Ele não
-          pode registrar, editar nem apagar nada no seu histórico. A
-          prescrição da próxima semana passa a ser dele.
+          Quem você autorizou vê seus treinos, suas séries e seu contato de
+          WhatsApp — só leitura. Não dá para registrar, editar nem apagar
+          nada no seu histórico. A prescrição da próxima semana passa a ser
+          responsabilidade do profissional.
         </p>
 
         {erro && (
@@ -68,8 +69,9 @@ export default function VinculoAluno({
         {confirmandoRevogacao ? (
           <div className="grupo__confirmacao">
             <p className="campo__nota">
-              Revogar corta o acesso dele na hora. Seu histórico continua
-              inteiro, e seu telefone continua sendo seu — ele só deixa de ver.
+              Revogar corta o acesso na hora. Seu histórico continua inteiro,
+              e seu telefone continua sendo seu — o que acaba é a permissão
+              de ver.
             </p>
             <button
               type="button"
@@ -141,8 +143,9 @@ export default function VinculoAluno({
           onChange={(e) => setTelefone(e.target.value)}
         />
         <p className="campo__nota">
-          É por aqui que ele te chama quando vê algo no seu treino. O lastro
-          nunca manda mensagem no seu lugar nem no dele.
+          É por aqui que o seu personal te chama ao ver algo no seu treino.
+          O lastro nunca manda mensagem sozinho — nem por você, nem pelo seu
+          personal.
         </p>
       </div>
 

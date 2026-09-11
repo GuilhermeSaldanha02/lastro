@@ -79,11 +79,9 @@ export default function FilaPersonal({ itens }: { itens: ItemDaFila[] }) {
                   >
                     <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z" />
                   </svg>
-                  <span>
-                    {acionado
-                      ? "Abrir a mensagem de novo"
-                      : "Mandar mensagem no WhatsApp"}
-                  </span>
+                  {/* Rótulo curto de propósito: o botão precisa caber numa
+                      linha ao lado do ícone em 375px. */}
+                  <span>{acionado ? "Abrir de novo" : "Mandar no WhatsApp"}</span>
                 </a>
               ) : (
                 // Sem telefone não há ação de um clique, e a tela precisa
@@ -91,7 +89,8 @@ export default function FilaPersonal({ itens }: { itens: ItemDaFila[] }) {
                 // é do aluno e só ele pode informar (§11.4.3).
                 <p className="alerta-personal__linha">
                   Sem telefone no perfil de {item.aluno.nome.split(" ")[0]} — a
-                  mensagem pronta só aparece depois que ele salvar o contato.
+                  mensagem pronta só aparece depois que o contato for
+                  informado, e só o aluno pode informar.
                 </p>
               )}
               {acionado && (

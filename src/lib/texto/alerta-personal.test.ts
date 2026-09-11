@@ -125,6 +125,32 @@ describe("conteudoDoAlerta — a ordem que o P2 pediu", () => {
     };
     expect(conteudoDoAlerta(umaSemana, "João").haQuantoTempo).toBe("1 semana.");
   });
+
+  /**
+   * O app não sabe o gênero de ninguém, e não existe campo para isso.
+   *
+   * A primeira execução real (2026-09-11) chamou uma ALUNA de "dele" em
+   * três linhas — "o histórico dele", "a rotina dele", "a ficha dele".
+   * Passou por revisão de código e só apareceu quando um nome de mulher
+   * entrou na tela. Este teste é o que impede a volta: toda linha usa o
+   * nome da pessoa ou construção impessoal.
+   *
+   * A fronteira de palavra não é enfeite: sem ela, "janela" e "paralela"
+   * casariam com "ela" e o teste reprovaria texto correto.
+   */
+  it("nenhum texto usa pronome de pessoa (ele/ela/dele/dela)", () => {
+    const PRONOME = /\b(ele|ela|dele|dela|eles|elas|deles|delas)\b/i;
+    for (const alerta of TODOS) {
+      const conteudo = conteudoDoAlerta(alerta, "Alice Aluna");
+      for (const [campo, texto] of Object.entries(conteudo)) {
+        expect(
+          PRONOME.test(texto),
+          `${alerta.tipo}.${campo} usa pronome de pessoa: "${texto}"`,
+        ).toBe(false);
+      }
+      expect(PRONOME.test(rascunhoWhatsApp(alerta, "Alice Aluna"))).toBe(false);
+    }
+  });
 });
 
 describe("rascunhoWhatsApp", () => {
@@ -155,8 +181,8 @@ describe("rascunhoWhatsApp", () => {
   });
 
   /**
-   * Regra 6 do CLAUDE.md. Vale para a mensagem do WhatsApp porque quem
-   * a compõe é o app — é o lugar mais tentador do projeto para um emoji
+   * Regra 6 do CLAUDE.md. Vale para a mensagem do WhatsApp porque quem a
+   * compõe é o app — é o lugar mais tentador do projeto para um emoji
    * aparecer "para ficar simpático".
    */
   it("zero emoji e zero emoticon", () => {

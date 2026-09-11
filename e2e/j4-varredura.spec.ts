@@ -67,6 +67,14 @@ const ROTAS_FIXAS = [
   "/ajustes/modelos",
   "/ajustes/modelos/novo",
   "/ajustes/relatorios",
+  // Módulo Personal (PRD §11). Renderiza para QUALQUER conta logada — é o
+  // lado do aluno ("vincular a um personal") somado ao de convidar.
+  //
+  // `/personal` NÃO entra aqui: ela exige vínculo aceito e redireciona sem
+  // ele, então a varredura mediria a tela errada. Cobrir de verdade pede um
+  // SEGUNDO usuário descartável e um aceite — está declarado como não
+  // coberto no `PROGRESS.md`, não esquecido.
+  "/ajustes/personal",
 ];
 
 type Achado = { rota: string; largura: string; tipo: string; detalhe: string };

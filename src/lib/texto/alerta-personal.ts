@@ -10,6 +10,12 @@
  * Sem emoji e sem emoticon (regra 6 do `CLAUDE.md`) — vale inclusive para
  * a mensagem que vai para o WhatsApp, porque quem a compõe é o app.
  *
+ * SEM PRONOME DE PESSOA. O app não sabe o gênero de ninguém — não há
+ * campo para isso e não deve haver. "A ficha dele" chamou uma aluna de
+ * "dele" na primeira execução real (2026-09-11). Toda linha aqui usa o
+ * nome ou construção impessoal; se você precisar de um pronome para a
+ * frase fechar, a frase está errada.
+ *
  * O QUE ESTE ARQUIVO NÃO FAZ: prescrever. O "o que investigar" é sempre
  * PERGUNTA, nunca instrução de treino. O app analisa; não prescreve
  * (PRD §5), e sob vínculo quem prescreve é o profissional (§11.2).
@@ -58,9 +64,9 @@ export function conteudoDoAlerta(
         // "Já treinou antes" é fato, e é o que separa abandono de escolha
         // de programa: `recencia.ts` só conta grupo que a pessoa já
         // treinou alguma vez.
-        evidencia: `O grupo já apareceu no histórico dele antes — é ausência recente, não um grupo que ele nunca treinou.`,
-        possivelCausa: `O grupo pode ter saído da ficha, ou o dia em que ele cai é justamente o dia em que ${nome} tem faltado.`,
-        oQueInvestigar: `Confirmar com ${nome} se esse dia de treino continua possível na rotina dele.`,
+        evidencia: `O grupo já apareceu no histórico antes — é ausência recente, não um grupo nunca treinado.`,
+        possivelCausa: `O grupo pode ter saído da ficha, ou o dia em que esse treino cai é justamente o dia em que ${nome} tem faltado.`,
+        oQueInvestigar: `Confirmar com ${nome} se esse dia de treino continua cabendo na rotina.`,
       };
     }
 
@@ -83,7 +89,7 @@ export function conteudoDoAlerta(
           ? `${numero}, com o exercício ainda sendo treinado.`
           : `O exercício continua sendo treinado, sem melhora medida.`,
         possivelCausa: `Pode ser carga repetida sem ajuste, execução mudando sem ninguém notar, ou recuperação insuficiente entre as sessões.`,
-        oQueInvestigar: `Perguntar a ${nome} como estão as últimas séries desse exercício e olhar a ficha dele.`,
+        oQueInvestigar: `Perguntar a ${nome} como estão as últimas séries desse exercício e olhar a ficha de treino.`,
       };
     }
 

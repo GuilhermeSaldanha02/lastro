@@ -63,7 +63,10 @@ export default async function PaginaPersonal() {
             tendência ainda, ou já foi dito nas últimas semanas.
           </p>
 
-          <Link href="/ajustes/personal" className="botao-secundario">
+          <Link
+            href="/ajustes/personal"
+            className="botao-secundario fila-personal-rodape"
+          >
             Convites e alunos
           </Link>
         </div>
