@@ -11,15 +11,18 @@
 
 > Bloco de handoff entre agentes (Antigravity ⇄ Claude). **Sobrescrever a cada sessão**, nunca acumular. Formato e regras: `AGENTS.md` §3.
 
-- **Última sessão:** 2026-09-11 · agente: claude · branch **`feat/personal-primeira-fatia`**, 6 commits, **PR #226 aberto e CI verde**. 398 testes verdes, `tsc`/lint/build limpos, working tree limpa. **Migrações 0022 e 0023 JÁ APLICADAS EM PRODUÇÃO** (`migration list` conferido: 0001–0023, alinhado).
-- **A ESTRATÉGIA DE BRANCH DESTE MÓDULO** (corrigida pelo dono em 11/set, a regra não estava escrita e por isso se perdeu): **`feat/modulo-personal`** é a branch de integração do Personal, tirada da `main`. **Toda fatia sai dela e volta para ela por PR.** A `main` só recebe o módulo quando ele estiver inteiro. A `feat/personal-primeira-fatia` aponta para `feat/modulo-personal`, não para a `main`. Regra agora escrita no `AGENTS.md` §4 (PR #227, esse sim direto para a `main` — é a regra que governa as outras branches).
-- **Em andamento:** primeira fatia do módulo Personal — construída e exercida ponta a ponta. Falta o merge **na branch do módulo**.
-- **Não commitado:** nada. Um `.env.local` foi criado durante a sessão para rodar o dev server e **apagado no fim** — se você precisar rodar local, crie o seu a partir do `.env.example`.
-- **Bloqueado / a decidir:** nada bloqueia código. Duas perguntas ao P1/P2 seguem abertas (abaixo).
-- **Próximo passo:** o dono revisar o **PR #226** (base `feat/modulo-personal`) e olhar `/ajustes/personal` na conta dele. CI **verde** (398 testes + 6 e2e, incluindo `j4`/`j5` com a rota nova).
-- **Para o outro agente saber:** a `FF5` foi **emendada**. RLS deixou de significar "só o meu" — leia a primeira linha da seção abaixo antes de escrever qualquer consulta.
+- **Última sessão:** 2026-09-11 · agente: claude · branch **`feat/personal-esconde-prescricao`** (tirada de `feat/modulo-personal`), 5 commits, **PR #228 aberto e CI VERDE** (run `34588453405`: 420 testes + **7 e2e**, `tsc`, lint e build). Working tree limpa.
+- **A ESTRATÉGIA DE BRANCH DESTE MÓDULO** (corrigida pelo dono em 11/set): **`feat/modulo-personal`** é a branch de integração do Personal, tirada da `main`. **Toda fatia sai dela e volta para ela por PR.** A `main` só recebe o módulo quando ele estiver inteiro. Regra no `AGENTS.md` §4. Primeira fatia já mergeada na branch do módulo (`da74833`, PR #226).
+- **Em andamento:** SEGUNDA fatia — esconder a prescrição sob vínculo (PRD §11.4.1 e §11.4.2). **Construída inteira**: trava de servidor, prompt do Coach e a tela. **O gate visual da §11.4.2 foi FECHADO pelo dono na direção "Troca de posto"** — das três renderizadas.
+- **Não commitado:** nada.
+- **Bloqueado / a decidir:** nada.
+- **Próximo passo:** o dono revisar o **PR #228** (base `feat/modulo-personal`). O que falta é só o olho dele na tela — a estrutura já está medida.
+- **A MEDIÇÃO FOI FEITA, e no CI:** `e2e/j6-prescricao-sob-vinculo.spec.ts` é o **primeiro spec com dois usuários e vínculo aceito** (estava no backlog deste arquivo). Prova o 403, as contagens de `uso_ia`/`parecer` intocadas na recusa, o controle sem vínculo, o controle na pergunta 2, a tela e a volta da prescrição na revogação. **Não houve como medir nesta máquina:** o cadastro público por e-mail é recusado pelo Supabase deste projeto, e escrever em `auth.users` de produção foi barrado — o CI tem a `service_role`, esta máquina não.
+- **Para o outro agente saber:** duas coisas. (1) A `FF5` foi **emendada** — leia a seção abaixo antes de escrever consulta. (2) **A trava da prescrição NÃO está na tela**: ela está em `src/app/api/analise/route.ts`, ANTES do gasto de cota, e a posição é parte da decisão, não estilo. Se mexer na ordem daquele handler, leia o comentário no lugar.
 
-### A coisa mais importante desta sessão
+### A fatia da prescrição, em duas telas
+
+**Servidor.** ### A coisa mais importante desta sessão
 
 **Toda leitura de `treino`, `serie` e `usuario` precisa filtrar o dono EXPLICITAMENTE.** A migração 0022 deu ao personal leitura dos dados do aluno sob vínculo aceito, e isso mudou o significado de toda consulta que confiava só na RLS. Doze pontos estavam errados no instante em que a migração subiu — incluindo o `/api/analise`, que é a peça-assinatura, e o CSV de exportação. Todos corrigidos, cada um com comentário no lugar.
 

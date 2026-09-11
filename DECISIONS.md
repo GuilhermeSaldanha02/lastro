@@ -2436,3 +2436,31 @@ Ela existe por dois motivos que nenhuma outra parte do sistema cobre: (a) a **me
 ### O que NÃO foi confirmado, e continua em aberto
 
 O **P1 ainda não confirmou** o que quis dizer com "mensagem padrão". Construído na leitura conservadora da §11.7: link `wa.me` com texto pronto, que **não envia nada sozinho**. Se ele quis dizer envio automático, a decisão não muda — envio automático está proibido pela §11.7 —, mas a conversa com ele muda de assunto: passa a ser sobre expectativa, não sobre feature.
+
+---
+
+## 2026-09-11 (5) — A trava da prescrição mora no servidor, e o Coach já estava meio fechado
+
+**Contexto:** segunda fatia do módulo Personal (PRD §11.4.1 e §11.4.2) — esconder a prescrição sob vínculo.
+
+**Decidido: a recusa é do route handler; a tela é a metade decorativa.** `/api/analise` aceita `{ pergunta: 5 }` de qualquer cliente autenticado. Esconder o card não fecha aba aberta antes do vínculo, HTML em cache do service worker nem `curl`. A linha da §11.2 ("aluno vinculado **não vê**") só é verdade se o servidor recusar.
+
+**Posição da recusa é parte da decisão.** Ela entra antes de `limparRascunhosExpirados`, antes do teto e antes de `registrarUso`. O consumo de cota é imutável por decisão de 2026-09-05: recusar depois cobraria do aluno uma pergunta que o app nunca responde, e o rascunho inserido com status "gerando" ficaria órfão, preso no teto de geração em andamento. Falha ao LER o vínculo recusa (503); liberar em erro transformaria instabilidade de rede em vazamento de escopo.
+
+**`PERGUNTA_PRESCRICAO` entra separada de `PERGUNTA_PRIMARIA`.** Hoje as duas valem 5, e é de propósito que sejam duas constantes: uma é papel de LAYOUT (qual card fica em destaque), a outra é de ESCOPO (qual pergunta pertence ao humano contratado). Unificar esconderia que só uma delas muda quando o destaque mudar.
+
+### A premissa da §11.4.1 estava PARCIALMENTE satisfeita antes de a fatia começar
+
+A restrição foi escrita supondo o Coach aberto — *"fechar a prescrição e deixar o chat de IA aberto no mesmo app não fecha nada"*. Mas a regra 2 do `SISTEMA_COACH` já proibia prescrever programa, periodização, série/repetição e carga desde que o arquivo existe. **O que faltava não era a proibição: era o DESTINO.** Sem vínculo o coach responde "o app analisa; não manda o que fazer", e quem pergunta fica sem para onde ir — correto para quem treina sozinho. Sob vínculo existe alguém contratado exatamente para isso, e encaminhar é diferente de recusar.
+
+A linha `QUEM PERGUNTA` tinha de mudar pelo mesmo motivo: ela **afirma** "sem personal". Sob vínculo isso é um fato falso entregue ao modelo, e é dele que o modelo tira o tom. As duas variações saem do mesmo template (`sistema(temPersonal)`) para não divergirem quando uma for editada.
+
+Isto fica registrado porque é correção ao RACIOCÍNIO do PRD, não detalhe de implementação: quem ler a §11.4.1 depois vai procurar uma trava que já existia pela metade.
+
+### Achado de passagem: a regra 5 do prompt assumia masculino
+
+`"Você não tem acesso aos dados DELE"` — nos dois prompts, desde que o arquivo existe. Mesma classe do bug corrigido no texto dos alertas no dia anterior, e a mesma correção: texto neutro, travado por teste com borda `` (sem a borda, "janela" casa com "ela").
+
+### O buraco que a §11.2 não cobre, e que NÃO foi fechado por decisão
+
+`listarPareceres()` não filtra por pergunta. Um aluno que salvou pareceres da pergunta 5 **antes** de vincular continua vendo esses pareceres inteiros em `/ajustes/relatorios`, com a prescrição dentro. **Mantidos de propósito:** é dado dele, gerado quando o app era o prescritor legítimo. Apagar ou esconder histórico de ninguém por conta de uma mudança de escopo seria decisão do dono, não de implementação — e apagar registro de parecer não é reversível. Fica escrito para ninguém ler "o aluno vinculado não vê a prescrição" como afirmação sobre o passado.
