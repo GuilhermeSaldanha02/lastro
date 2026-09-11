@@ -87,6 +87,29 @@ export default function AnaliseInterativa({
         );
         return;
       }
+      // A prescrição é do personal enquanto o vínculo existir (PRD §11.2).
+      // Sem este ramo a recusa caía no `!resposta.ok` abaixo e virava
+      // "Falha ao gerar o parecer (erro 403)": causa falsa, que convida a
+      // tentar de novo algo que nunca vai funcionar.
+      //
+      // Isto NÃO é o estado definitivo da §11.4.2 — aquele OCUPA o lugar da
+      // prescrição e depende do gate visual com o dono. Este é o piso
+      // honesto enquanto o gate não fecha: a tela para de mentir sem
+      // decidir o desenho por baixo.
+      if (resposta.status === 403) {
+        const corpo = (await resposta.json().catch(() => null)) as
+          | { erro?: string }
+          | null;
+        if (corpo?.erro === "prescricao_do_personal") {
+          setErro(
+            t(
+              "Quem monta a próxima semana é o seu personal. Essa pergunta volta para você se o vínculo terminar.",
+              idioma,
+            ),
+          );
+          return;
+        }
+      }
       if (!resposta.ok) {
         setErro(`${t("Falha ao gerar o parecer (erro", idioma)} ${resposta.status}).`);
         return;

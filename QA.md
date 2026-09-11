@@ -64,6 +64,25 @@ Regras completas: skill `qa-registro`. Prova crua obrigatória em `qa/evidencias
 | PE-02 | personal | A fila ponta a ponta: alerta certo com dado real, link `wa.me` com número e mensagem corretos, clique gravando `acionado_em`, emissão idempotente ao reabrir | **ALEGADO** — prova coletada por quem implementou (navegador em 375px, console sem erro, `acionado_em` conferido no banco, 4 aberturas = 1 linha por vínculo). Vira PASSOU só depois da passada de outro agente em contexto limpo (`AGENTS.md` §5) | 943b6dc | 2026-09-11 | — |
 | PE-03 | personal | `/ajustes/personal` na varredura de navegação (`j4`, usuário novo em 3 larguras) e na medição de contraste AA (`j5`, 7 temas) | **PASSOU** — no CI do PR #226 contra o Supabase hospedado (`6 passed (4.5m)`), não nesta máquina: falta service-role no `.env.local` local. **O log da `j5` não nomeia rota individualmente**, então a evidência de que a rota nova foi de fato medida é o agregado que ele imprime: os elementos sobre gradiente subiram de **21** (medição de 10/set, `DECISIONS.md` "2026-09-10 (7)") para **35**, e a única rota acrescentada à lista foi esta. Zero reprovas de AA | d81dadc | 2026-09-11 | run `34564944308` |
 | PE-04 | personal | `/personal` (a fila) na varredura de navegação e na medição de contraste | **NÃO COBERTO, declarado.** A tela exige vínculo aceito e redireciona sem ele — a varredura mediria a tela errada. Cobrir pede um SEGUNDO usuário descartável e um aceite no fixture | 943b6dc | 2026-09-11 | — |
+| PE-05 | personal | A trava da prescrição no servidor (PRD §11.2/§11.4.1): `POST /api/analise` com `{ pergunta: 5 }` de um aluno COM vínculo aceito devolve **403 `prescricao_do_personal`**, e o pedido recusado **não gasta cota** (nenhuma linha nova em `uso_ia`) **nem cria rascunho** (nenhuma linha nova em `parecer`) | **NÃO MEDIDO.** A trava está escrita e commitada, e a ordem dentro do handler é o argumento inteiro da decisão — mas nada nos 410 testes exercita este caminho, e esta máquina **não tem `.env.local`** (sem service-role não há como criar as duas contas descartáveis nem subir o dev server). Roteiro de medição abaixo | 35e80d9 | 2026-09-11 | `DECISIONS.md` "2026-09-11 (5)" |
+| PE-06 | personal | O prompt do Coach sob vínculo (§11.4.1): uma pergunta do tipo "o que eu mudo essa semana?" feita por aluno vinculado recebe encaminhamento ao personal, não prescrição nem recusa seca | **ALEGADO, e só na metade de texto.** Os 20 testes de `src/app/api/coach/prompt.test.ts` provam que o prompt certo é escolhido e que as travas seguem de pé; **nenhum** exercita a resposta real da Gemini sob vínculo. Isso é comportamento de modelo e só se vê perguntando | 35e80d9 | 2026-09-11 | — |
+| PE-07 | personal | O estado que ocupa o lugar da prescrição na `/analise` (§11.4.2) | **NÃO CONSTRUÍDO, por ordem da §11.4.2** — exige gate visual com o dono, que está aberto (três direções renderizadas). O que existe hoje é o piso honesto: o 403 virou mensagem dizendo de quem é a prescrição, em vez de "erro 403" | — | 2026-09-11 | `PROGRESS.md` ESTADO ATUAL |
+
+
+### Roteiro de PE-05 — o que rodar, e o que conta como reprovação
+
+Precisa de `.env.local` com service-role (o dono tem; a sessão de 11/set não).
+
+1. Criar duas contas descartáveis e aceitar o vínculo (mesma máquina de `e2e/helpers/usuario-descartavel.ts`, mais `aceitar_convite_personal`).
+2. Contar as linhas ANTES, como o aluno: `select count(*) from uso_ia where usuario_id = <aluno>` e `select count(*) from parecer where usuario_id = <aluno>`.
+3. `POST /api/analise` com `{ "pergunta": 5 }` e o cookie do ALUNO.
+4. Contar as mesmas duas linhas DEPOIS.
+
+**Passa** com: status **403**, corpo `{"erro":"prescricao_do_personal"}`, e as duas contagens **idênticas** às do passo 2.
+
+**Reprova** se o status vier 200/202 (a trava não existe), ou se qualquer uma das contagens subir — aí a trava funciona mas cobra do aluno uma pergunta que o app nunca responde, que é exatamente o que a posição da recusa no handler existe para evitar. A contagem de `parecer` é a que ninguém pegaria no olho.
+
+5. Pelo mesmo caminho, com o aluno SEM vínculo, `{ "pergunta": 5 }` precisa seguir funcionando (202). Uma trava que fecha para todo mundo passaria nos passos 1–4.
 
 ---
 
