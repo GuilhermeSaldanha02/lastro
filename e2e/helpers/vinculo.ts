@@ -66,9 +66,23 @@ export async function criarVinculoAceito({
   await telaAluno.goto(`/ajustes/personal?codigo=${codigo}`);
   await telaAluno.locator("#telefone_whatsapp").fill(telefone);
   await telaAluno.getByRole("button", { name: /Aceitar convite/i }).click();
-  // O card "Seu personal" só existe depois do aceite — é o sinal de que o
-  // vínculo está de pé, e não apenas de que o clique aconteceu.
-  await expect(telaAluno.getByText(/Seu personal/i)).toBeVisible({ timeout: 15_000 });
+  // O sinal de aceite CONCLUÍDO é o botão de revogar, que só existe no ramo
+  // `if (vinculo)` do `VinculoAluno`.
+  //
+  // A primeira versão esperava `getByText(/Seu personal/i)`, com um
+  // comentário dizendo que esse texto "só existe depois do aceite". Era
+  // falso: a tela ANTES do aceite já diz "É por aqui que o seu personal te
+  // chama". A espera casava na hora, o helper voltava com o server action
+  // do aceite ainda no ar ("Aceitando…"), e o spec que fechava a sessão do
+  // aluno logo depois MATAVA o aceite. A j7 perdeu essa corrida duas vezes
+  // seguidas no CI da casca (run 34621890356) e vinha ganhando por sorte
+  // desde a extração deste helper.
+  //
+  // Regra que fica: sinal de "terminou" tem de ser algo que NÃO pode existir
+  // antes — nunca um texto que por acaso aparece nos dois estados.
+  await expect(
+    telaAluno.getByRole("button", { name: /Revogar o vínculo/i }),
+  ).toBeVisible({ timeout: 15_000 });
 
   return { contextoPersonal, telaPersonal, contextoAluno, telaAluno, codigo: codigo! };
 }

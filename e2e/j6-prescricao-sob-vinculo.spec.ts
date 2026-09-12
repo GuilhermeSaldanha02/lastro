@@ -165,4 +165,12 @@ test("sob vínculo a prescrição some da tela E é recusada no servidor, sem ga
   await expect(telaAluno.locator(".pergunta--primaria")).toContainText(
     /mudar na próxima semana/i,
   );
+
+  // Este contexto foi aberto à mão no início (o controle sem vínculo
+  // precisava do aluno antes do fixture) e ficava vivo depois do teste. O
+  // navegador é compartilhado entre specs do mesmo worker: a aba vazada
+  // sobreviveu até a j7 e virou o "page snapshot" do erro dela — uma
+  // `/analise` de aluno com parecer em emissão, que não era tela nenhuma da
+  // j7 e desviou a primeira leitura da falha (run 34621890356).
+  await contextoAluno.close();
 });
