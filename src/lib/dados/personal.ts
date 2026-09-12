@@ -176,28 +176,12 @@ export async function carregarVinculoDoAluno(): Promise<VinculoDoAluno | null> {
   };
 }
 
-/**
- * `true` quando a conta É de personal (`usuario.tipo_conta`), tenha ela
- * aluno ou não.
- *
- * Até a migração 0024 esta função contava ALUNOS VINCULADOS, porque
- * "personal" não existia como estado — o vínculo era o papel. Com a conta
- * própria (PRD §11, emenda de 2026-09-11) as duas perguntas deixaram de
- * ser a mesma: um personal recém-cadastrado, com zero alunos, continua
- * sendo personal e precisa alcançar a própria fila vazia. Contar alunos
- * aqui deixaria essa pessoa numa conta sem casca.
- */
-export async function contaEPersonal(): Promise<boolean> {
-  const supabase = await criarClienteServidor();
-  const user = await usuarioAtual(supabase);
-  const { data, error } = await supabase
-    .from("usuario")
-    .select("tipo_conta")
-    .eq("id", user.id)
-    .maybeSingle();
-  if (error) throw new Error(`Falha ao ler o tipo da conta: ${error.message}`);
-  return data?.tipo_conta === "personal";
-}
+// `contaEPersonal()` morou aqui e foi REMOVIDA em 2026-09-12. Ela nasceu
+// contando alunos (quando o vínculo era o papel), foi reescrita para ler
+// `tipo_conta` na migração 0024, e nunca teve um chamador: a casca usa
+// `obterPerfil().tipoConta`, que já vem no mesmo `select` da barra de topo.
+// Duas funções respondendo "esta conta é de personal?" é exatamente onde
+// uma delas fica para trás na próxima mudança — a fonte única é o perfil.
 
 // ============================================================
 // A fila
