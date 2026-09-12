@@ -224,7 +224,7 @@ export default function AnaliseInterativa({
           {t("O que mudar na próxima semana é de", idioma)}{" "}
           <strong>{vinculo.nomeDoPersonal}</strong>
           {vinculo.aceitoEm
-            ? `, ${t("desde", idioma)} ${formatarDataCurta(vinculo.aceitoEm.slice(0, 10))}.`
+            ? `, ${t("desde", idioma)} ${formatarDataCurta(vinculo.aceitoEm.slice(0, 10), idioma)}.`
             : "."}
         </p>
       )}
