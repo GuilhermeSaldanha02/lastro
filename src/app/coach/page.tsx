@@ -3,6 +3,7 @@
 // antes de renderizar a barra de topo; a conversa em si vive em
 // `components/coach-interativo.tsx`.
 import { obterPerfil } from "@/lib/dados/perfil";
+import { exigirCascaDeAluno } from "@/lib/dados/casca";
 import AbaInferior from "@/components/aba-inferior";
 import CabecalhoPro from "@/components/cabecalho-pro";
 import CoachInterativo from "@/components/coach-interativo";
@@ -10,6 +11,7 @@ import { t } from "@/lib/texto/i18n";
 
 export default async function PaginaCoach() {
   const perfil = await obterPerfil();
+  exigirCascaDeAluno(perfil);
   const idioma = perfil?.idioma ?? "pt-BR";
 
   return (
@@ -24,7 +26,7 @@ export default async function PaginaCoach() {
 
       <CoachInterativo idioma={idioma} />
 
-      <AbaInferior ativa="ajustes" idioma={idioma} />
+      <AbaInferior ativa="ajustes" idioma={idioma} tipoConta={perfil?.tipoConta} />
     </main>
   );
 }

@@ -36,16 +36,21 @@ import { criarVinculoAceito, nomear } from "./helpers/vinculo";
 import { semearGrupoAbandonado } from "./helpers/semear-abandono";
 
 let usuario: UsuarioDescartavel;
-let aluno: UsuarioDescartavel;
+let personal: UsuarioDescartavel;
 
 /**
- * O usuário varrido é um PERSONAL com um aluno vinculado, e não mais uma
- * conta solta.
+ * DUAS contas, porque agora existem DUAS CASCAS (PRD §11, emenda de
+ * 2026-09-11): a conta varrida é um ALUNO vinculado, e existe um PERSONAL
+ * separado para varrer a casca de trabalho.
  *
- * Entrou em 2026-09-11 para cobrir a `/personal`, que era a única tela do
- * app fora da varredura (`QA.md` PE-04): ela exige vínculo aceito e
- * redireciona sem ele, então varrer com conta solta mediria a tela errada
- * — e passar verde medindo a tela errada é pior do que não medir.
+ * Foi assim que ficou depois que o guarda de rota entrou. Com uma conta só
+ * de personal — como esta spec chegou a ficar por algumas horas — `/`,
+ * `/treino` e `/analise` passam a redirecionar, e a varredura mediria
+ * três redirecionamentos achando que mediu três telas. Conta errada não
+ * falha alto: ela devolve verde medindo outra coisa.
+ *
+ * A `/personal` entrou aqui em 2026-09-11 (`QA.md` PE-04): ela exige
+ * vínculo aceito, e varrer sem ele mediria o redirecionamento.
  *
  * O aluno recebe um grupo abandonado semeado de propósito: no estado
  * vazio a `/personal` não tem texto nem cor suficientes para a varredura
@@ -58,20 +63,20 @@ let aluno: UsuarioDescartavel;
  * (PRD §11.4.2), e essa passa a ser a variante varrida.
  */
 test.beforeAll(async ({ browser }) => {
-  usuario = await criarUsuarioDescartavel("varredura", "personal");
-  aluno = await criarUsuarioDescartavel("varredura-aluno");
+  usuario = await criarUsuarioDescartavel("varredura");
+  personal = await criarUsuarioDescartavel("varredura-personal", "personal");
 
-  const comoPersonal = await clienteAutenticado(usuario);
-  await nomear(comoPersonal, usuario.id, "Marina Alencar");
+  const comoPersonal = await clienteAutenticado(personal);
+  await nomear(comoPersonal, personal.id, "Marina Alencar");
 
-  const comoAluno = await clienteAutenticado(aluno);
-  await nomear(comoAluno, aluno.id, "Ana Ribeiro");
-  await semearGrupoAbandonado(comoAluno, aluno.id);
+  const comoAluno = await clienteAutenticado(usuario);
+  await nomear(comoAluno, usuario.id, "Ana Ribeiro");
+  await semearGrupoAbandonado(comoAluno, usuario.id);
 
   const { contextoPersonal, contextoAluno } = await criarVinculoAceito({
     browser,
-    personal: usuario,
-    aluno,
+    personal,
+    aluno: usuario,
   });
   // A varredura roda na `page` do teste, com login próprio — estas duas
   // sessões só existiram para o aceite. Fechar evita duas abas vivas à toa
@@ -82,7 +87,7 @@ test.beforeAll(async ({ browser }) => {
 
 test.afterAll(async () => {
   if (usuario) await apagarUsuarioDescartavel(usuario);
-  if (aluno) await apagarUsuarioDescartavel(aluno);
+  if (personal) await apagarUsuarioDescartavel(personal);
 });
 
 /** Larguras conferidas. A altura é a real do aparelho, não um número redondo. */
@@ -113,11 +118,14 @@ const ROTAS_FIXAS = [
   // Módulo Personal (PRD §11). Renderiza para QUALQUER conta logada — é o
   // lado do aluno ("vincular a um personal") somado ao de convidar.
   "/ajustes/personal",
-  // A fila. Exige vínculo aceito — por isso o `beforeAll` acima monta um
-  // personal com aluno e um alerta real, em vez de varrer o redirecionamento
-  // para `/ajustes`. Era o único buraco que sobrava na varredura (PE-04).
-  "/personal",
 ];
+
+/**
+ * As telas que só a CONTA DE PERSONAL alcança. Varridas numa segunda
+ * sessão, porque o guarda de rota (`casca.ts`) devolve o aluno para a Home
+ * — e um redirecionamento varrido é uma tela não varrida.
+ */
+const ROTAS_PERSONAL = ["/personal", "/personal/alunos"];
 
 type Achado = { rota: string; largura: string; tipo: string; detalhe: string };
 
@@ -178,7 +186,7 @@ async function temConteudo(page: Page): Promise<number> {
   return page.evaluate(() => (document.body.innerText ?? "").trim().length);
 }
 
-test("varre todas as telas com usuário novo, em três larguras", async ({ page }) => {
+test("varre todas as telas com usuário novo, em três larguras", async ({ page, browser }) => {
   test.setTimeout(300_000);
 
   const achados: Achado[] = [];
@@ -241,6 +249,62 @@ test("varre todas as telas com usuário novo, em três larguras", async ({ page 
       });
     }
   }
+
+  // ---- a SEGUNDA casca, com a conta que a tem ----
+  // Sessão própria: trocar de conta na mesma aba exigiria logout e
+  // re-login a cada largura, e o cookie de sessão é por contexto.
+  const contextoTrabalho = await browser.newContext();
+  const telaTrabalho = await contextoTrabalho.newPage();
+  coletar(telaTrabalho, achados, () => ({ rota: rotaAtual, largura: larguraAtual }));
+  await entrarComoUsuario(telaTrabalho, personal);
+
+  for (const { nome, largura, altura } of LARGURAS) {
+    larguraAtual = nome;
+    await telaTrabalho.setViewportSize({ width: largura, height: altura });
+
+    for (const rota of ROTAS_PERSONAL) {
+      rotaAtual = rota;
+      await telaTrabalho.goto(rota, { waitUntil: "domcontentloaded" });
+      await telaTrabalho
+        .waitForLoadState("networkidle", { timeout: 30_000 })
+        .catch(() => {});
+
+      // A tela precisa ser a pedida, e não o redirecionamento do guarda:
+      // sem esta asserção, uma casca quebrada devolveria varredura verde
+      // sobre a Home do aluno.
+      expect(
+        new URL(telaTrabalho.url()).pathname,
+        `a conta de personal precisa ALCANÇAR ${rota}`,
+      ).toBe(rota);
+
+      const vazamento = await vazamentoHorizontal(telaTrabalho);
+      if (vazamento > 1) {
+        achados.push({
+          rota,
+          largura: nome,
+          tipo: "vazamento horizontal",
+          detalhe: `${vazamento}px além da largura da viewport (${largura}px)`,
+        });
+      }
+
+      const tamanhoTexto = await temConteudo(telaTrabalho);
+      if (tamanhoTexto < 20) {
+        achados.push({
+          rota,
+          largura: nome,
+          tipo: "tela vazia",
+          detalhe: `só ${tamanhoTexto} caracteres visíveis`,
+        });
+      }
+
+      await telaTrabalho.screenshot({
+        path: `test-results/varredura/${nome}${rota.replace(/\//g, "_")}.png`,
+        fullPage: true,
+      });
+    }
+  }
+
+  await contextoTrabalho.close();
 
   // Relatório legível ANTES do assert: quando falha, o log já diz o quê e
   // onde, sem precisar abrir trace.

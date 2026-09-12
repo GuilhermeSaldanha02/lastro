@@ -6,9 +6,12 @@
 // 80%"); o que funciona é a fila lida no momento do planejamento. Por isso
 // o alerta ESPERA aqui — nada é empurrado para ninguém.
 //
-// Não existe "modo personal" no login, e isso também é desenho: a conta que
-// tem pelo menos um vínculo aceito alcança esta tela, e mais nada muda. O
-// vínculo É o papel.
+// ESTA É A CASA DA CONTA DE PERSONAL (PRD §11, emenda de 2026-09-11).
+// O comentário antigo aqui dizia o contrário — "não existe modo personal
+// no login; o vínculo É o papel" — e era verdade até o dono decidir que
+// existe CONTA de personal, escolhida no cadastro. Ficou escrito o que
+// mudou, em vez de apagado, porque o resto do módulo foi desenhado sobre
+// a premissa antiga e quem ler isto precisa saber disso.
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import CabecalhoPro from "@/components/cabecalho-pro";
@@ -16,16 +19,18 @@ import AbaInferior from "@/components/aba-inferior";
 import FilaPersonal from "@/components/fila-personal";
 import { obterPerfil } from "@/lib/dados/perfil";
 import { carregarFilaDoPersonal } from "@/lib/dados/personal";
+import { exigirCascaDePersonal, precisaCompletarCadastro } from "@/lib/dados/casca";
 
 export default async function PaginaPersonal() {
   const perfil = await obterPerfil();
   if (!perfil) redirect("/login");
+  exigirCascaDePersonal(perfil);
+  // Quem entrou por Google ainda não informou o CREF. A área de trabalho
+  // não abre antes disso — a obrigatoriedade é do app, porque no banco
+  // ela abortaria o cadastro (ver `casca.ts` e a migração 0024).
+  if (precisaCompletarCadastro(perfil)) redirect("/personal/completar");
 
   const { itens, alunos } = await carregarFilaDoPersonal();
-
-  // Conta sem aluno nenhum não tem fila — e não deve ficar olhando uma
-  // tela vazia sem saber o que fazer. Manda para onde se convida.
-  if (alunos.length === 0) redirect("/ajustes/personal");
 
   return (
     <main className="tela">
@@ -38,7 +43,21 @@ export default async function PaginaPersonal() {
 
       <div className="corpo corpo--com-nav corpo--titulo-conteudo transicao-pilula">
         <div className="pilha">
-          {itens.length === 0 ? (
+          {alunos.length === 0 ? (
+            // Personal recém-cadastrado, sem nenhum aluno. Até 2026-09-11
+            // esta tela REDIRECIONAVA para os ajustes, o que fazia sentido
+            // quando o vínculo era o papel: sem aluno, não havia personal.
+            // Com conta própria, redirecionar joga a pessoa para fora da
+            // casa dela no primeiro acesso — a fila vazia é o estado
+            // inicial legítimo, e ela precisa dizer o que fazer.
+            <div className="vazio">
+              <p>Você ainda não tem alunos.</p>
+              <p className="campo__nota">
+                Gere um código de convite e mande para o aluno. O acesso só
+                existe depois que ele aceitar, e acaba quando ele revogar.
+              </p>
+            </div>
+          ) : itens.length === 0 ? (
             // SILÊNCIO É RESPOSTA, e precisa ser dito como resposta.
             // "Nenhum alerta" não é o app quebrado nem o app com pouco
             // dado: é o resultado da seletividade funcionando (§11.4.6).
@@ -67,12 +86,12 @@ export default async function PaginaPersonal() {
             href="/ajustes/personal"
             className="botao-secundario fila-personal-rodape"
           >
-            Convites e alunos
+            {alunos.length === 0 ? "Gerar convite" : "Convites e alunos"}
           </Link>
         </div>
       </div>
 
-      <AbaInferior ativa="ajustes" />
+      <AbaInferior ativa="fila" tipoConta="personal" />
     </main>
   );
 }

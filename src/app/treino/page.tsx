@@ -8,6 +8,7 @@
 import Link from "next/link";
 import { listarTreinos, criarTreino } from "@/lib/dados/treino";
 import { obterPerfil } from "@/lib/dados/perfil";
+import { exigirCascaDeAluno } from "@/lib/dados/casca";
 import { listarModelos } from "@/lib/dados/modelo-treino";
 import { dataLocalBrasil } from "@/lib/tempo";
 import AbaInferior from "@/components/aba-inferior";
@@ -38,6 +39,9 @@ export default async function PaginaTreino() {
     obterPerfil(),
     listarModelos(),
   ]);
+  // A tela de registrar treino é a que mais precisa deste guarda: ela é a
+  // negação direta de "conta de personal não treina".
+  exigirCascaDeAluno(perfil);
   const idioma = perfil?.idioma ?? "pt-BR";
   // Mesma checagem da home (src/app/page.tsx) — sem isto, esta tela sempre
   // oferecia "Iniciar treino de hoje" mesmo com um treino de hoje já em
@@ -88,7 +92,7 @@ export default async function PaginaTreino() {
         />
       </div>
 
-      <AbaInferior ativa="bancada" idioma={idioma} />
+      <AbaInferior ativa="bancada" idioma={idioma} tipoConta={perfil?.tipoConta} />
     </main>
   );
 }
