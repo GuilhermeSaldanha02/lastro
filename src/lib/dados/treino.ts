@@ -86,13 +86,17 @@ async function usuarioAutenticadoOuErro() {
  * contagem de séries, grupos musculares e volume de cada um.
  */
 export async function listarTreinos(): Promise<Treino[]> {
-  const { supabase } = await usuarioAutenticadoOuErro();
+  const { supabase, user } = await usuarioAutenticadoOuErro();
   const [{ data, error }, idioma] = await Promise.all([
     supabase
       .from("treino")
       .select(
         "id, data, iniciado_em, serie (tipo, reps, peso, peso_por_lado, exercicio:exercicio_id (grupo_muscular_primario, unilateral))",
       )
+      // ESCOPO EXPLÍCITO. Desde a migração 0022 a RLS deixou de significar
+      // "só o meu": o personal com vínculo aceito enxerga treino e série
+      // do aluno. Sem esta linha a lista de treinos dele mistura os dois.
+      .eq("usuario_id", user.id)
       .order("data", { ascending: false }),
     obterIdioma(),
   ]);
@@ -156,12 +160,16 @@ export async function listarTreinos(): Promise<Treino[]> {
 export async function buscarTreino(
   treinoId: string,
 ): Promise<TreinoComSeries | null> {
-  const { supabase } = await usuarioAutenticadoOuErro();
+  const { supabase, user } = await usuarioAutenticadoOuErro();
 
   const { data: treino, error: erroTreino } = await supabase
     .from("treino")
     .select("id, data, iniciado_em")
     .eq("id", treinoId)
+    // Escopo explícito (0022): sem isto, o personal abriria a tela de
+    // treino DO ALUNO por URL — tela de edição, com botões que a RLS
+    // depois barra, o que é a pior combinação possível.
+    .eq("usuario_id", user.id)
     .maybeSingle();
   if (erroTreino) {
     throw new Error(`Falha ao buscar treino: ${erroTreino.message}`);
@@ -174,6 +182,7 @@ export async function buscarTreino(
       "id, exercicio_id, tipo, reps, peso, rir, peso_por_lado, criado_em, exercicio:exercicio_id (nome, unilateral, peso_por_lado, grupo_muscular_primario)",
     )
     .eq("treino_id", treinoId)
+    .eq("usuario_id", user.id)
     .order("ordem", { ascending: true });
   if (erroSeries) {
     throw new Error(`Falha ao listar séries: ${erroSeries.message}`);
@@ -253,7 +262,7 @@ export type SerieHistorica = {
 export async function historicoDoExercicio(
   exercicioId: string,
 ): Promise<SerieHistorica[]> {
-  const { supabase } = await usuarioAutenticadoOuErro();
+  const { supabase, user } = await usuarioAutenticadoOuErro();
   // Sem `.order()` na tabela relacionada — PostgREST não ordena as linhas
   // de `serie` por uma coluna da tabela embutida (`treino.data`) de forma
   // confiável (testado: saiu ascendente mesmo pedindo `ascending: false`).
@@ -265,6 +274,7 @@ export async function historicoDoExercicio(
       "reps, peso, rir, peso_por_lado, criado_em, treino_id, treino:treino_id(data)",
     )
     .eq("exercicio_id", exercicioId)
+    .eq("usuario_id", user.id)
     .eq("tipo", "valendo")
     .order("criado_em", { ascending: false })
     .limit(200);
@@ -484,6 +494,11 @@ export async function criarTreino(): Promise<void> {
     .from("treino")
     .select("id")
     .eq("data", hoje)
+    // Escopo explícito (0022). Sem isto, se o ALUNO tivesse treinado hoje,
+    // o `maybeSingle()` do personal ou estouraria com duas linhas ou
+    // devolveria o treino DELE — e o personal seria redirecionado para
+    // dentro da sessão do aluno.
+    .eq("usuario_id", user.id)
     .maybeSingle();
   if (erroConsulta) {
     throw new Error(`Falha ao verificar treino de hoje: ${erroConsulta.message}`);
@@ -519,6 +534,11 @@ export async function criarTreinoComModelo(modeloId: string): Promise<void> {
     .from("treino")
     .select("id")
     .eq("data", hoje)
+    // Escopo explícito (0022). Sem isto, se o ALUNO tivesse treinado hoje,
+    // o `maybeSingle()` do personal ou estouraria com duas linhas ou
+    // devolveria o treino DELE — e o personal seria redirecionado para
+    // dentro da sessão do aluno.
+    .eq("usuario_id", user.id)
     .maybeSingle();
   if (erroConsulta) {
     throw new Error(`Falha ao verificar treino de hoje: ${erroConsulta.message}`);

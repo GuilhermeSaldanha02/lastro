@@ -27,6 +27,9 @@ export async function carregarSinalDeload(agora: Date): Promise<SinalDeload | nu
   const { data, error } = await supabase
     .from("serie")
     .select("rir, data_treino:treino_id (data)")
+    // Escopo explícito — ver a nota da migração 0022 em `resumo-home.ts`:
+    // a RLS deixou de significar "só o meu" quando existe vínculo aceito.
+    .eq("usuario_id", user.id)
     .eq("tipo", "valendo");
   if (error) {
     throw new Error(`Falha ao carregar sinal de deload: ${error.message}`);

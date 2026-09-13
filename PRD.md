@@ -96,7 +96,7 @@ Um app de treino **pessoal** que registra cada série executada e, uma vez por s
 
 ## 5. Escopo NEGATIVO (explícito — não entra, e não é esquecimento)
 
-- ❌ Qualquer coisa social: feed, seguir, comparar, ranking. ~~compartilhar~~ → **REVISTO em 2026-08-27, ver nota A abaixo.** Feed, seguir, comparar e ranking seguem **mortos** também sob o modo Personal — a única brecha é o chat 1:1 dentro de vínculo aceito, delimitada em §11.5.
+- ❌ Qualquer coisa social: feed, seguir, comparar, ranking. ~~compartilhar~~ → **REVISTO em 2026-08-27, ver nota A abaixo.** Feed, seguir, comparar, ranking **e chat** seguem **mortos** também sob o modo Personal — **sem brecha nenhuma.** ~~a única brecha é o chat 1:1 dentro de vínculo aceito, delimitada em §11.5~~ → **CORRIGIDO em 2026-09-11.** Esta linha passou um dia contradizendo a própria §11.5: a §11.5 foi reescrita em 10/set justamente para registrar que a exceção **deixou de existir** (a ação de um clique sai para o WhatsApp, §11.7), e esta continuava anunciando uma brecha que o documento já havia fechado. O que o vínculo concede é **leitura consentida**, e só.
 - ❌ Planos e periodizações gerados automaticamente. O app **analisa** o que foi feito; não prescreve programa.
 - ❌ Integração com relógio, balança, wearable, Health/Google Fit.
 - ❌ Contagem de calorias, macros, dieta.
@@ -191,6 +191,34 @@ Isto reabre conscientemente o "Sem tela de configuração de rotina" acima e o A
 
 Uma conta pode estar **vinculada a um personal**. Enquanto o vínculo existe, a **prescrição** sai do produto e vai para o humano; o **diagnóstico** continua inteiro com o aluno.
 
+> **EMENDA em 2026-09-11 (2) — existe CONTA de personal. Decisão do dono.**
+>
+> A frase acima e a §11.4 inteira foram escritas sobre uma premissa: *"não existe conta de personal; o vínculo é o papel"*. **O dono decidiu o contrário**, e está escrito aqui porque contradição silenciosa entre código e PRD faz o próximo agente reverter para o desenho documentado.
+>
+> O que muda:
+>
+> 1. **A escolha acontece no cadastro**, não no uso. Duas contas na origem — `usuario.tipo_conta` é `aluno` ou `personal`.
+> 2. **Conta de personal exige CREF.** É a credencial profissional (Resolução CONFEF 053/2003, formato `000000-G/UF`, categoria `G` graduado ou `P` provisionado, sufixo `-S` para registro secundário).
+> 3. **A casca do app difere.** Conta de personal **não tem "iniciar treino"** — não é uma tela escondida, é ausência.
+> 4. **Quem é personal e também treina usa DUAS contas.** Decidido pelo dono: conta de personal é de trabalho. O custo — trocar de conta para treinar — foi aceito com o trade-off na mão.
+>
+> **O que o app NÃO faz com o CREF, e precisa estar escrito.** Ele valida o formato e guarda; **não verifica se o registro existe**. Verificar exigiria consultar o CONFEF, que não expõe API pública. Toda tela que mostrar o CREF diz *"informado pelo profissional, não verificado pelo lastro"*. Exibir credencial não checada como se fosse checada seria o lastro emprestando confiança que ele não apurou — e um dia alguém escolheria um profissional com base nisso.
+>
+> **Consequência que não é óbvia:** `tipo_conta = 'personal'` com `cref` nulo é estado **legítimo**, não corrompido. O cadastro por Google não entrega CREF (nem telefone), e a decisão foi deixar entrar e **exigir a complementação antes de abrir a área de personal**. Por isso o banco não tem constraint "personal implica CREF": a regra é do app, no lugar onde a mensagem de erro é visível e acionável.
+>
+> **O que NÃO muda:** o §11.2 abaixo continua valendo inteiro para o lado do aluno — ele mantém tudo e perde só a prescrição sob vínculo. E o §5 segue sem exceção: nenhuma conta fala com outra dentro do lastro.
+
+> **EMENDA em 2026-09-12 (2) — UMA conta, dois modos. Decisão do dono. Derruba o ponto 4 da emenda acima.**
+>
+> O ponto 4 (*"quem é personal e também treina usa DUAS contas"*) **não vale mais.** O dono pediu o estudo de como os apps da categoria resolvem isso antes de decidir, e decidiu depois de ver o resultado (`DECISIONS.md` "2026-09-12 (2)"). Os pontos 1, 2 e 3 continuam, com o ajuste abaixo.
+>
+> 1. **Toda conta treina.** A área de trabalho é uma capacidade que a conta GANHA ao informar o CREF — no cadastro (cápsula PERSONAL) ou depois, em Ajustes. Ninguém perde a própria tela de treino por virar personal.
+> 2. **A conta com área de trabalho alterna entre dois modos:** `treino` (Início, Treinos, Análise) e `trabalho` (Fila, Alunos). O modo ativo decide a casca e é guardado no banco, não no navegador. O ponto 3 acima passa a ler: **o modo trabalho** não tem "iniciar treino".
+> 3. **Ganhar a área de trabalho só acontece por uma porta**, a que valida o CREF. A própria conta não escreve `tipo_conta` nem `cref` por update direto — se escrevesse, a exigência do CREF seria decoração (achado da `j9`, 2026-09-12).
+> 4. **Personal pode ter personal.** Quem treina alunos e também é acompanhado por outro profissional aceita convite normalmente, no modo treino. Continua impossível aceitar o próprio convite.
+>
+> **Por que a mudança agora, e não depois:** nenhum personal real existe ainda no lastro. Com contas duplas em uso, migrar para este modelo exigiria **juntar contas** — histórico, vínculos e alertas. Hoje custa código.
+
 ### 11.2 O corte exato
 
 | | Aluno sem vínculo | Aluno vinculado |
@@ -276,6 +304,12 @@ As duas condições que bloqueavam esta seção **foram cumpridas**:
 **O risco aceito, escrito para não ser esquecido.** WhatsApp é exatamente aquilo contra o que os concorrentes se posicionam, e um personal pode ler a escolha como "menos profissional". A mitigação é de enquadramento, não de feature: **o lastro não é onde se gerencia aluno** — é o que diz com quem falar e entrega a mensagem pronta. Se essa leitura se provar errada em uso real, a reversão está descrita no `DECISIONS.md`.
 
 **Consequência de schema, não de tela:** o link precisa do telefone do aluno. É dado pessoal e cai na restrição §11.4.3 — **o número vem do aluno, com consentimento, e some quando ele revoga**. Nunca cadastrado pelo personal. Um personal digitar o número de alguém não concede acesso a nada.
+
+> **EMENDA em 2026-09-11 — o que "some" significa.** Decisão do dono: o contato é **obrigatório no cadastro de toda conta**, tenha ela personal ou não. O número passa a ser dado do próprio usuário (`usuario.telefone_whatsapp`, migração 0022), e o que desaparece na revogação é o **ACESSO do personal a ele** — a policy `usuario_visivel_ao_personal` exige vínculo aceito, então revogar fecha a leitura no mesmo instante. Apagar o telefone do aluno porque ele demitiu o personal seria apagar dado dele, não proteger consentimento.
+>
+> A garantia continua sendo **por construção**, só que pela RLS em vez do `delete`: verificado no banco em 11/set — com vínculo aceito o personal lê nome e telefone; um segundo depois da revogação, a mesma consulta volta vazia.
+>
+> A coluna é **nullable no banco de propósito**, e isto não afrouxa a regra: `not null` abortaria a criação de conta por Google (que não entrega telefone), porque o trigger de perfil roda dentro do insert em `auth.users`. A obrigatoriedade é do app — cadastro por e-mail, aceite do convite e Ajustes.
 
 **Ponto ainda não confirmado com a fonte.** "Mensagem padrão" é interpretação do que P1 escreveu (`[Mandar mensagem padrão no WhatsApp]`); ele não detalhou se imaginava link com texto pronto ou algo automático. A decisão assume a leitura conservadora — a que não envia nada sozinha. Vale confirmar com ele antes da primeira tela.
 

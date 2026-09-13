@@ -20,6 +20,23 @@ export type Perfil = {
    * entre "nunca escolheu" e "escolheu pt-BR".
    */
   idioma: Idioma | null;
+  /**
+   * `aluno` ou `personal` (migração 0024). Fica no perfil, e não numa
+   * consulta própria, porque TODA tela já chama `obterPerfil()` para a
+   * barra de topo — a casca do personal precisa deste valor em toda tela,
+   * e uma função separada custaria uma consulta a mais por página para
+   * responder algo que já veio no mesmo `select`.
+   */
+  tipoConta: "aluno" | "personal";
+  /** Registro informado, NUNCA verificado (`texto/cref.ts`). `null` é estado legítimo. */
+  cref: string | null;
+  /**
+   * A casca que o app renderiza (migração 0025, PRD §11 emenda
+   * 2026-09-12 (2)). Desde então `tipoConta = "personal"` quer dizer "tem
+   * área de trabalho", não "não treina": a mesma conta alterna entre os
+   * dois modos, e é ESTE campo que os guardas de rota leem.
+   */
+  modo: "treino" | "trabalho";
 };
 
 export async function obterPerfil(): Promise<Perfil | null> {
@@ -31,7 +48,7 @@ export async function obterPerfil(): Promise<Perfil | null> {
 
   const { data } = await supabase
     .from("usuario")
-    .select("nome, avatar_url, meta_treinos_semana, idioma")
+    .select("nome, avatar_url, meta_treinos_semana, idioma, tipo_conta, cref, modo_ativo")
     .eq("id", user.id)
     .maybeSingle();
 
@@ -43,6 +60,18 @@ export async function obterPerfil(): Promise<Perfil | null> {
     avatarUrl: data.avatar_url,
     metaTreinosSemana: data.meta_treinos_semana,
     idioma: data.idioma as Idioma | null,
+    // Falha FECHADA, como o trigger: qualquer coisa que não seja
+    // exatamente 'personal' é aluno. A casca de trabalho não se abre por
+    // valor inesperado vindo do banco.
+    tipoConta: data.tipo_conta === "personal" ? "personal" : "aluno",
+    cref: (data.cref as string | null) ?? null,
+    // Mesma falha fechada: trabalho só com as DUAS condições. O banco já
+    // garante isso por check; repetir aqui impede que um valor inesperado
+    // abra a fila para quem não tem área de trabalho.
+    modo:
+      data.tipo_conta === "personal" && data.modo_ativo === "trabalho"
+        ? "trabalho"
+        : "treino",
   };
 }
 

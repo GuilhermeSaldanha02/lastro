@@ -2325,3 +2325,251 @@ WhatsApp é exatamente aquilo contra o que os concorrentes se posicionam. Um per
 ### Como reverter
 
 Decisão de contrato, não de código — nada foi construído. Reverter = restaurar a §11.5 anterior (canal interno delimitado) e reescrever a §11.7, registrando por quê. Se a reversão vier depois de o botão existir, o custo é maior: passa a haver telefone de aluno no banco, e a revogação precisa apagá-lo.
+
+---
+
+## 2026-09-11 (1) — O schema do vínculo: telefone no ALUNO, leitura cruzada só de SELECT
+
+**Primeira fatia do módulo Personal construída** (`PRD.md` §11, migrações 0022 e 0023). Três decisões de schema que não estavam na §11 e precisam ficar registradas, porque duas delas divergem do que a §11.7 tinha escrito.
+
+### 1. O telefone mora no aluno, não no vínculo — decisão do dono
+
+A §11.7 escreveu *"o número vem do aluno, com consentimento, e **some** quando ele revoga"*, assumindo o número guardado na concessão. A pergunta foi levada ao dono com essa leitura e a recomendação de gravar na linha do vínculo (revogar apagaria uma linha, e o número ia junto, por construção).
+
+**O dono decidiu diferente:** o contato é **obrigatório no cadastro zero**, para toda conta, com ou sem personal — é dado do próprio usuário.
+
+**Isso muda o significado de "some", e é melhor assim.** O que desaparece na revogação é o **acesso do personal ao número**, não o número. Apagar o telefone do aluno porque ele demitiu o personal seria apagar dado dele. A garantia de consentimento continua **por construção**, só que pela RLS (`usuario_visivel_ao_personal` exige vínculo aceito) em vez do `delete`.
+
+**Verificado no banco em 11/set**, com duas contas descartáveis: vínculo aceito → o personal lê nome e telefone; revogado → a mesma consulta volta vazia, e o telefone continua na linha do aluno.
+
+**A coluna é `nullable` de propósito.** `not null` abortaria a criação de conta por Google, que não entrega telefone: o trigger `usuario_cria_perfil` roda **dentro** do insert em `auth.users`, e exceção ali mata o signup inteiro — o comentário da 0004 já avisava disso sobre o nome. O trigger foi estendido para ler `telefone_whatsapp` do metadado e **descarta em silêncio** o que não bate com o formato, justamente para nunca lançar. Como o trigger não pode reclamar, a validação de verdade acontece na Server Action; sem isso a pessoa cadastraria achando que informou o contato e ele não estaria lá. **Testado**: metadado `"(83) 9 oi"` → conta nasce, telefone `null`.
+
+### 2. A leitura cruzada é `for select`, em policies separadas
+
+As policies de 0001 (`treino_proprio`, `serie_propria`) são `for all`. O caminho óbvio — acrescentar a cláusula do vínculo com `or` dentro delas — daria ao personal **insert, update e delete** nas séries do aluno, em silêncio, porque `for all` cobre tudo. As policies do vínculo são novas e `for select`; as de 0001 ficaram intactas.
+
+**Provado no banco, com vínculo aceito e válido:** `insert` de série no treino do aluno barrado com `42501`; `update` e `delete` não alcançam linha nenhuma.
+
+Consequência registrada na migração: o trigger `serie_herda_usuario` (0001) é **sem** `security definer` justamente para que a RLS de `treino` esconda o treino alheio e o insert falhe ali. Agora que o personal enxerga o treino do aluno, essa premissa mudou — o insert dele passa do trigger e morre no `with check`. Continua barrado, um passo depois. **Isso só permanece verdade enquanto a concessão for SELECT-only.**
+
+### 3. Aceitar e revogar são funções, não policies de update
+
+Não existe policy de `update` em `vinculo_personal`, para ninguém. O motivo é que `with check` valida a **linha final**, não o que mudou: dava para revogar e trocar o `personal_id` no mesmo statement. As duas transições vivem em funções `security definer` com as guardas no corpo — o aluno vem de `auth.uid()` e nunca de parâmetro, o convite precisa estar pendente, e o aluno não pode ter outro personal aceito.
+
+**Provado:** o personal tentando criar o vínculo já `aceito` apontando para a aluna → barrado pela policy de insert; tentando revogar ou apagar vínculo aceito → barrado; código já usado → *"código inválido"*; segundo personal com vínculo vivo → *"já existe vínculo aceito"*.
+
+### Um personal por aluno, ao mesmo tempo
+
+Índice parcial único em `aluno_id where estado = 'aceito'`. A §11.2 fala de "aluno vinculado" no singular e o produto assume isso — a prescrição vai para **um** humano. Convite novo com vínculo vivo é recusado com mensagem, não em silêncio.
+
+### O convite é código, não e-mail — decisão do dono
+
+Com e-mail o app precisaria consultar `auth.users` para saber se aquela pessoa tem conta, e a tela viraria um oráculo de *"este e-mail está cadastrado no lastro?"* — enumeração de usuários de graça, e ainda exigiria o cliente admin. O código não revela nada sobre ninguém, e o canal para entregá-lo já existe: o WhatsApp da §11.7. Alfabeto sem caractere ambíguo (sem I, L, O, 0, 1), 10 caracteres, `crypto.getRandomValues`.
+
+### Alternativa descartada
+
+**Montar a fila com o `cliente-admin.ts`.** Era o atalho óbvio para ler as séries dos alunos e teria funcionado na primeira tentativa — anulando em silêncio toda a RLS desta migração e a `FF5` junto. Descartada: a fila lê sob o JWT do personal, então se as policies estiverem erradas a fila vem **vazia**, que é a falha que se percebe.
+
+### Como reverter
+
+Migração nova que derruba `alerta_personal` e `vinculo_personal`, as quatro policies de leitura cruzada e as funções. `usuario.telefone_whatsapp` fica: o dono o quis independente do módulo. O código das telas sai junto; os filtros explícitos de `usuario_id` da entrada (2) abaixo **ficam**, porque estão certos com ou sem vínculo.
+
+---
+
+## 2026-09-11 (2) — A RLS deixou de significar "só o meu", e 12 consultas não sabiam disso
+
+**O achado mais caro desta sessão**, e ele não apareceu em review nenhum: apareceu na primeira tela aberta no navegador com dado real.
+
+**O sintoma.** A Home do personal listava, em "Treinos Recentes", os treinos **da aluna**. Ele nunca tinha treinado. O gráfico de volume da semana trazia as datas dela.
+
+**A causa é estrutural, não um descuido localizado.** Toda consulta deste app foi escrita confiando que a RLS significava "só o meu" — e era verdade, até a migração 0022. No instante em que o personal passou a enxergar `treino` e `serie` do aluno, **toda leitura sem filtro explícito passou a devolver as duas pessoas**, sem erro, sem log, sem nada.
+
+**Doze pontos, e o que cada um faria:**
+
+| Onde | O que aconteceria |
+|---|---|
+| `api/analise/route.ts` | **A peça-assinatura.** O parecer do personal somaria o treino do aluno ao dele e citaria exercício que ele nunca fez |
+| `exportar.ts` | O CSV de backup levaria as séries do aluno **para fora do app**, num arquivo |
+| `treino.ts` "treino de hoje" (×2) | Com o aluno tendo treinado no mesmo dia, o `maybeSingle()` ou estoura com duas linhas ou devolve o treino **dele** — e o personal é redirecionado para dentro da sessão do aluno |
+| `resumo-home.ts`, `treino.ts` (listar) | Treino do aluno na Home e na lista |
+| `treino.ts` (buscar por id) | O personal abriria a tela de **edição** do treino do aluno por URL |
+| `treino.ts` (séries, histórico do exercício), `progressao.ts`, `recencia-grupos.ts`, `alerta-deload.ts` | Mistura no gráfico, no histórico e nos sinais |
+
+**Escrita nunca esteve exposta** — as policies `for all` de 0001 seguem com `auth.uid()`, e a concessão de 0022 é só `for select`. Confirmado no banco.
+
+**A lição, que vale além deste módulo.** "A RLS filtra" era um comentário literal em `carregarTreinosDoUsuario`, e virou mentira por causa de uma migração escrita em outro arquivo, no mesmo dia. Regra que vive só em comentário não sobrevive a mudança de premissa. A `FF5` foi emendada no `ADR.md` para carregar a consequência: **filtro de dono explícito em toda leitura**, com ou sem vínculo.
+
+**Por que review não pegou.** As 12 consultas continuaram corretas isoladamente; o que mudou foi o significado de uma camada abaixo delas. Só a execução com **duas contas reais** expõe isso — e é o mesmo formato do achado de 10/set, em que o vazamento de `/ajustes` só apareceu com usuário novo em vez da conta do dono.
+
+---
+
+## 2026-09-11 (3) — O app chamou uma aluna de "dele"
+
+Três linhas do texto do alerta cravavam pronome masculino: *"o histórico dele"*, *"a rotina dele"*, *"a ficha dele"*. Passaram por escrita e revisão sem ninguém notar, porque todo teste usava "João". **Apareceram na primeira execução real, quando o nome na tela era "Alice".**
+
+**A regra que passa a valer:** o app não sabe o gênero de ninguém, não tem campo para isso e não deve ter. Todo texto gerado usa **o nome da pessoa ou construção impessoal**. Se a frase precisa de um pronome para fechar, a frase está errada.
+
+Vale para os textos do alerta, para o rascunho do WhatsApp e para as quatro telas do módulo — inclusive nas linhas sobre o personal, que tinham o mesmo problema ao contrário (*"ele vê seus treinos"*).
+
+**Travado por teste**, com fronteira de palavra: sem ela, "janela" e "paralela" contêm "ela" e o teste reprovaria texto correto.
+
+---
+
+## 2026-09-11 (4) — Seletividade: três tipos de sinal, e a ausência do quarto
+
+A §11.4.6 diz que seletividade **é** o produto. Isso virou função pura e testada (`fila-personal.ts`), não regra de UI — regra que não é executável volta a ser violada.
+
+**Três tipos, todos tendência POR CONSTRUÇÃO:** grupo parado há 21+ dias (a régua de 3 semanas do P2), exercício sem progresso há 4+ semanas (`SEMANAS_ESTAGNACAO`, que já existia), e volume em queda nas 3 transições seguidas da janela.
+
+**O quarto foi cortado, e o corte é a decisão.** *"Grupo abaixo da faixa de referência"* dispararia para quase todo grupo de quase todo aluno, toda semana — que é literalmente o modo de morte que o P2 descreveu (*"Peito: atenção / Bíceps: atenção / Costas: atenção / Tríceps: atenção"*). Existe um teste com esse nome: aluno com **todos** os grupos parados devolve **dois** alertas, e os dois piores, na ordem.
+
+**"Queda de frequência" virou "queda de volume", e isso é uma troca declarada.** A §11.2 lista queda de frequência entre os sinais roteados. O resumo traz `treinos_semana_atual` contra a média das anteriores — isso é **uma** semana contra uma média, e uma semana é oscilação: uma viagem dispararia. `volume_semanal` já traz as quatro semanas da janela, e exigir queda nas três transições é tendência literal. A queda de frequência continua inteira na Análise do próprio aluno. **Se o dono quiser frequência ao pé da letra, precisa de contagem semanal de treinos e de uma régua própria** — não está feito.
+
+**Teto de 2 por aluno/semana, decidido pelo dono.** E um segundo mecanismo que o teto sozinho não cobre: **supressão de 3 semanas por (tipo, alvo)**. Sem ela, um exercício empacado há seis semanas gera os mesmos dois alertas em seis segundas seguidas — repetido no eixo do **tempo**, mata igual a repetido no eixo do grupo. A semana corrente não conta na supressão, senão a fila recalculada suprimiria a si mesma e o personal que voltasse à tela à tarde encontraria a tela vazia.
+
+**O texto do alerta é determinístico, sem LLM**, por duas razões independentes: a cota da Gemini é de 20/dia compartilhada com a peça-assinatura, e a §11.4.4 exige **rotear** sinal já calculado em vez de criar julgamento novo — texto de alerta escrito por LLM seria julgamento novo.
+
+### A tabela `alerta_personal` não é histórico por higiene
+
+Ela existe por dois motivos que nenhuma outra parte do sistema cobre: (a) a **medida** da §11.7 — *"o grupo alertado recebeu estímulo na semana seguinte?"* não tem como ser respondida sem registrar qual grupo, de qual aluno, em que semana; e (b) a supressão acima. O clique no botão grava `acionado_em` (§11.7: *"o clique acontece dentro do lastro e é registrável"*), e um trigger impede que qualquer outra coluna mude depois — senão a medida seria reescrevível por quem é medido.
+
+### O que NÃO foi confirmado, e continua em aberto
+
+O **P1 ainda não confirmou** o que quis dizer com "mensagem padrão". Construído na leitura conservadora da §11.7: link `wa.me` com texto pronto, que **não envia nada sozinho**. Se ele quis dizer envio automático, a decisão não muda — envio automático está proibido pela §11.7 —, mas a conversa com ele muda de assunto: passa a ser sobre expectativa, não sobre feature.
+
+---
+
+## 2026-09-11 (5) — A trava da prescrição mora no servidor, e o Coach já estava meio fechado
+
+**Contexto:** segunda fatia do módulo Personal (PRD §11.4.1 e §11.4.2) — esconder a prescrição sob vínculo.
+
+**Decidido: a recusa é do route handler; a tela é a metade decorativa.** `/api/analise` aceita `{ pergunta: 5 }` de qualquer cliente autenticado. Esconder o card não fecha aba aberta antes do vínculo, HTML em cache do service worker nem `curl`. A linha da §11.2 ("aluno vinculado **não vê**") só é verdade se o servidor recusar.
+
+**Posição da recusa é parte da decisão.** Ela entra antes de `limparRascunhosExpirados`, antes do teto e antes de `registrarUso`. O consumo de cota é imutável por decisão de 2026-09-05: recusar depois cobraria do aluno uma pergunta que o app nunca responde, e o rascunho inserido com status "gerando" ficaria órfão, preso no teto de geração em andamento. Falha ao LER o vínculo recusa (503); liberar em erro transformaria instabilidade de rede em vazamento de escopo.
+
+**`PERGUNTA_PRESCRICAO` entra separada de `PERGUNTA_PRIMARIA`.** Hoje as duas valem 5, e é de propósito que sejam duas constantes: uma é papel de LAYOUT (qual card fica em destaque), a outra é de ESCOPO (qual pergunta pertence ao humano contratado). Unificar esconderia que só uma delas muda quando o destaque mudar.
+
+### A premissa da §11.4.1 estava PARCIALMENTE satisfeita antes de a fatia começar
+
+A restrição foi escrita supondo o Coach aberto — *"fechar a prescrição e deixar o chat de IA aberto no mesmo app não fecha nada"*. Mas a regra 2 do `SISTEMA_COACH` já proibia prescrever programa, periodização, série/repetição e carga desde que o arquivo existe. **O que faltava não era a proibição: era o DESTINO.** Sem vínculo o coach responde "o app analisa; não manda o que fazer", e quem pergunta fica sem para onde ir — correto para quem treina sozinho. Sob vínculo existe alguém contratado exatamente para isso, e encaminhar é diferente de recusar.
+
+A linha `QUEM PERGUNTA` tinha de mudar pelo mesmo motivo: ela **afirma** "sem personal". Sob vínculo isso é um fato falso entregue ao modelo, e é dele que o modelo tira o tom. As duas variações saem do mesmo template (`sistema(temPersonal)`) para não divergirem quando uma for editada.
+
+Isto fica registrado porque é correção ao RACIOCÍNIO do PRD, não detalhe de implementação: quem ler a §11.4.1 depois vai procurar uma trava que já existia pela metade.
+
+### Achado de passagem: a regra 5 do prompt assumia masculino
+
+`"Você não tem acesso aos dados DELE"` — nos dois prompts, desde que o arquivo existe. Mesma classe do bug corrigido no texto dos alertas no dia anterior, e a mesma correção: texto neutro, travado por teste com borda `` (sem a borda, "janela" casa com "ela").
+
+### O buraco que a §11.2 não cobre, e que NÃO foi fechado por decisão
+
+`listarPareceres()` não filtra por pergunta. Um aluno que salvou pareceres da pergunta 5 **antes** de vincular continua vendo esses pareceres inteiros em `/ajustes/relatorios`, com a prescrição dentro. **Mantidos de propósito:** é dado dele, gerado quando o app era o prescritor legítimo. Apagar ou esconder histórico de ninguém por conta de uma mudança de escopo seria decisão do dono, não de implementação — e apagar registro de parecer não é reversível. Fica escrito para ninguém ler "o aluno vinculado não vê a prescrição" como afirmação sobre o passado.
+
+---
+
+## 2026-09-11 (6) — A medida da §11.7 é uma consulta, não uma tela
+
+**O que é:** `scripts/medida-alerta-estimulo.sql` responde a pergunta que o PRD §11.7 nomeia como a que decide se o módulo Personal funciona — *"o grupo muscular alertado recebeu estímulo na semana seguinte?"*.
+
+**Por que SQL, e não tela.** A medida é uma pergunta sobre HISTÓRICO, feita de vez em quando por uma pessoa: o dono. Tela exigiria decidir quem vê, com que frequência, e o que o número significa para quem está sendo medido — três decisões de produto que ninguém pediu. Segue o precedente do `ff5-rls.sql`: instrumento executável, rodado à mão, versionado junto do código que ele mede.
+
+**Por que NÃO existe uma versão em TypeScript.** Seria a mesma regra em dois lugares, e a aritmética de semana é exatamente onde duas cópias divergem em silêncio. A consulta usa `semana_inicio + 7 dias` até `+ 14 dias`, aritmética sobre a data que o app JÁ gravou — nunca um `date_trunc('week')` recalculado, que arriscaria discordar da fronteira de semana do próprio app. Medida que discorda do que ela mede é pior que medida nenhuma.
+
+**O corte que evita a medida piorar sozinha.** O agregado só conta alerta cuja semana seguinte já terminou. Sem isso, todo alerta da semana corrente entra como "não recebeu estímulo" só porque a semana não acabou, e o número cai toda segunda-feira sem nada ter acontecido.
+
+### O que ela NÃO prova, e está escrito dentro do arquivo
+
+É **correlação de amostra auto-selecionada**. O personal escolhe quais alertas aciona, e provavelmente aciona os dos alunos que cobraria de qualquer jeito; a coluna "acionado" não é braço de experimento, é escolha de quem está sendo medido. Com n≈1 personal e sem randomização, a consulta descreve o que aconteceu — não estabelece causa. Isso fica no cabeçalho do `.sql`, não só aqui: quem lê o número precisa ler a ressalva junto.
+
+Também não cobre `estagnacao_exercicio` nem `queda_volume` — a §11.7 define sucesso só para o abandono de grupo, e inventar definição para os outros dois seria inventar dado de negócio.
+
+### O estado honesto hoje
+
+As duas partes foram **executadas contra o banco de produção** e devolveram **zero linhas**: sintaxe e joins válidos, nenhum uso real ainda. Consulta construída e devolvendo vazio **não é medida feita** — a primeira leitura que vale é daqui a três ou quatro semanas, na terceira segunda-feira que o P2 nomeou.
+
+---
+
+## 2026-09-11 (7) — Existe conta de personal, e ela exige CREF
+
+**Decisão do dono**, tomada depois de ver o módulo montado. Ela **derruba a premissa** sobre a qual o §11 inteiro foi escrito — *"não existe conta de personal; o vínculo é o papel"* — e por isso entrou primeiro como emenda no `PRD.md`, antes de qualquer linha de código: contradição silenciosa entre código e PRD faz o próximo agente reverter para o desenho documentado, e ele estaria certo em fazer isso.
+
+O que foi decidido, em quatro pontos: a escolha acontece no **cadastro**; conta de personal exige **CREF**; a casca do app **difere** (personal não tem "iniciar treino"); e quem é personal e também treina usa **duas contas**.
+
+### As três perguntas que eu não podia decidir, e as respostas
+
+**1. O que fazer com um CREF que o app não consegue verificar.** Verificar exigiria consultar o CONFEF, que não expõe API pública. **Decidido: guardar, validar a forma, e dizer na tela que foi informado e não verificado.** É a única opção que não mente nem tranca a porta. As outras duas eram pior: tratar como verificado seria o lastro emprestando confiança que não apurou — e alguém um dia escolheria um profissional com base nisso; campo livre sem validação faria o "obrigatório" virar decoração.
+
+**2. O personal que também treina.** **Decidido: duas contas.** Conta de personal é de trabalho. O custo — trocar de conta para treinar — foi aceito com o trade-off na mão. A alternativa (uma conta com o lado de treino escondido) devolveria pela porta dos fundos exatamente a ambiguidade que a separação existe para acabar.
+
+**3. Cadastro por Google, que não entrega CREF nem telefone.** **Decidido: entra, mas completa antes de abrir.** Cai numa tela obrigatória de CREF + WhatsApp; sem completar, a área de personal não abre. Mantém o login de um toque sem afrouxar a obrigatoriedade.
+
+### A consequência que não é óbvia, e que decide o schema
+
+`tipo_conta = 'personal'` com `cref` **nulo é estado legítimo** — é exatamente o Google recém-cadastrado. Por isso a migração 0024 **não** tem constraint "personal implica CREF": ela abortaria o cadastro dentro do insert em `auth.users`, o mesmo modo de falha que a 0022 já documentou com o telefone. A obrigatoriedade é do **app**, onde a mensagem de erro é visível e acionável.
+
+Pelo mesmo raciocínio, a validação é **estrita no formulário e frouxa no banco**: `src/lib/texto/cref.ts` exige os seis dígitos e uma das 27 UFs; a check do banco só barra lixo evidente. Regra apertada no banco vira porta trancada sem mensagem.
+
+### O que quase passou despercebido
+
+A policy nova (`só conta personal convida`) **quebraria as quatro specs que montam vínculo de uma vez** — j4, j5, j6 e j7 —, no passo "Gerar código de convite", longe da causa. `criarUsuarioDescartavel` passou a receber o tipo e mandá-lo pelo `user_metadata`, no MESMO commit da policy.
+
+E `contaEPersonal()`, que era código morto, virou **errada** em vez de inútil: "tem aluno" e "é conta de personal" deixaram de ser a mesma pergunta no instante em que a conta passou a existir. Um personal recém-cadastrado, com zero alunos, continua sendo personal — e precisa alcançar a própria fila vazia. Reescrita para ler a coluna.
+
+---
+
+## 2026-09-12 (1) — A casca do personal, e o teste que mentia verde e depois mentia vermelho
+
+**A casca (#234), direção B do gate, escolhida pelo dono em 2026-09-11:** Fila · Alunos · Catálogo · Ajustes. O catálogo fica porque é o único acervo do produto que serve ao profissional sem adaptação — execução curada por pessoa (PRD §4.5). Início, Treinos e Análise não existem nessa casca: as três pressupõem quem treina.
+
+**A barra é pista; a porta é o guarda de rota.** `src/lib/dados/casca.ts`, chamado nas páginas. Sem ele, `/treino` continuaria respondendo por URL digitada, link velho e HTML em cache do service worker, e "conta de personal não treina" seria decorativa — o mesmo raciocínio que pôs a trava da prescrição no route handler.
+
+**Nas páginas, não no `proxy.ts`.** O middleware roda em toda requisição e só chama `getUser()`; ler o perfil ali cobraria uma consulta por request para uma regra de meia dúzia de telas. O tipo da conta entrou no `obterPerfil()`, que toda tela já chama — zero consulta nova. Pelo mesmo motivo `contaEPersonal()` foi removida em seguida: nunca teve chamador, e duas funções respondendo a mesma pergunta é onde uma fica para trás.
+
+### O verde falso que quase entrou
+
+A `j4` e a `j5` varriam como conta de personal desde a cobertura do PE-04. Com o guarda de rota, `/`, `/treino` e `/analise` passariam a redirecionar — e as duas specs **mediriam três redirecionamentos achando que mediram três telas**, e passariam. Conta errada numa varredura não falha alto: devolve verde medindo outra coisa. Reestruturadas para duas contas, com asserção explícita de que a rota alcançada é a pedida. Na `j5`, a segunda sessão troca de tema também: tema mora no `localStorage`, que é por contexto.
+
+### O vermelho falso que veio depois
+
+O primeiro CI da casca (run `34621890356`) falhou na `j7` com a fila vazia. **O app estava certo.** O fixture `criarVinculoAceito` esperava `getByText(/Seu personal/i)` como sinal de aceite concluído, com um comentário dizendo que o texto só existia depois do aceite. Era falso: a tela antes do aceite já diz *"É por aqui que o seu personal te chama"*. A espera casava na hora, o helper voltava com o server action no ar — o screenshot mostra o aluno congelado em "Aceitando…" —, e a `j7` fechava a sessão do aluno em seguida, matando o aceite.
+
+A corrida existia desde a extração do helper e vinha sendo vencida por sorte; com o CI mais carregado, perdeu duas vezes seguidas. O sinal passou a ser o botão "Revogar o vínculo", que só existe com vínculo aceito.
+
+**A regra que fica:** sinal de "terminou" tem de ser algo que **não pode existir antes**. Texto que por acaso aparece nos dois estados não é sinal, é coincidência com timeout.
+
+**E um segundo defeito, achado no mesmo diagnóstico:** a `j6` abria um contexto de aluno à mão e nunca o fechava. O navegador é compartilhado entre specs do worker; a aba vazada sobreviveu até a `j7` e virou o *page snapshot* do erro dela — uma `/analise` que não era tela nenhuma da `j7` e desviou a primeira leitura da falha. Diagnóstico contaminado custa mais que o bug.
+
+
+---
+
+## 2026-09-12 (2) — Uma conta, dois modos: o personal que treina não troca de conta
+
+**Decisão do dono**, que **derruba a resposta à pergunta 2 de "2026-09-11 (7)"** (*"duas contas"*). Entrou primeiro como emenda no `PRD.md` §11, pelo mesmo motivo daquela: código que contradiz o PRD em silêncio é revertido pelo próximo agente, e ele estaria certo.
+
+### Como a decisão foi tomada
+
+O dono perguntou o que acontece quando um usuário comum vira personal. A resposta honesta era "cria outra conta, com outro e-mail" — e quem entra pelo Google não consegue nem isso com o mesmo endereço. Antes de decidir, pediu o estudo de pelo menos quatro apps. Foram seis:
+
+| App | Modelo |
+|---|---|
+| ABC Trainerize | contas separadas; segundo e-mail obrigatório; ocupa vaga paga; recomenda um SEGUNDO app para não sair e entrar |
+| FITR | contas separadas; recomenda o truque do `+` no e-mail; sair e entrar; dois apps |
+| MFIT Personal | "Sou aluno" na entrada; usuário pergunta no FAQ como alternar e fica sem resposta |
+| TrueCoach | mesmo login, "Switch to Client / Switch to Coach" |
+| Hevy + Hevy Coach | quem usa o Hevy entra no Coach com o MESMO login |
+| Everfit | fluxo "Invite Myself" |
+
+**Nenhum converte a conta** (sumir com o treino ao virar personal). Os que separam contas vivem com o atrito que foi previsto. O caso mais parecido com o lastro — o Hevy, app de quem treina sozinho que ganhou a área de coach depois — escolheu o mesmo login.
+
+**O que pesou o momento:** nenhum personal real existe ainda. Migrar depois exigiria juntar contas com histórico, vínculos e alertas.
+
+### O desenho
+
+- `tipo_conta` continua existindo e muda de sentido: deixa de ser "que tipo de pessoa é esta" e passa a ser **"esta conta tem área de trabalho"**. Mantê-lo custa menos que trocá-lo: a policy de convite (`e_conta_personal()`), o trigger e as specs já leem essa coluna.
+- `modo_ativo` (`treino` | `trabalho`) é **o que a casca renderiza**. No banco, e não em cookie: toda tela já chama `obterPerfil()`, e cookie seria uma segunda fonte de verdade que os guardas de rota e o banco poderiam contradizer. Uma check garante que `trabalho` só existe em conta com área de trabalho.
+- **Ganhar a área de trabalho tem uma porta só:** a função `ativar_area_de_trabalho`, que valida o CREF com a MESMA régua estrita de `src/lib/texto/cref.ts`. O update direto em `tipo_conta` e `cref` foi fechado por GRANT de coluna. Isso fecha dois achados da `j9` de uma vez: o aluno que se promovia a personal com um update na própria linha, e o CREF `1-G/ZZ` gravado pela API.
+- **Personal pode ter personal.** A recusa "conta de personal não aceita convite" (0024) existia porque conta de personal não tinha tela de treino. Agora tem. O aceite do próprio convite continua barrado por `personal_id <> v_aluno`.
+
+### O que a `j8` dizia e deixa de dizer
+
+A `j8` afirmava, como comportamento correto, que *"a própria conta pode declarar o tipo — RLS de dono"*. **Isso era o furo registrado como regra.** Ela é reescrita junto: o que ela protege passa a ser "o modo trabalho não alcança as telas de treino", e a conta sem CREF nasce pelo trigger, não por um update que agora é recusado.

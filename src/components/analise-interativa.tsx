@@ -15,9 +15,10 @@
 import { useState } from "react";
 import {
   perguntasDoIdioma,
-  PERGUNTA_PRIMARIA,
+  perguntasDaTela,
   type NumeroPergunta,
 } from "@/app/api/analise/perguntas";
+import { formatarDataCurta } from "@/lib/tempo";
 import { MINIMO_SEMANAS_PARECER, MINIMO_SESSOES_TENDENCIA } from "@/lib/analise/limiares";
 import type { Idioma } from "@/lib/dados/idioma";
 import type { GrupoComRecencia } from "@/lib/analise/recencia";
@@ -33,6 +34,7 @@ export default function AnaliseInterativa({
   sinalDeload,
   idioma,
   rascunhoInicial,
+  vinculo,
 }: {
   semanasFechadasComTreino: number;
   gruposSemEstimulo: GrupoComRecencia[];
@@ -41,6 +43,9 @@ export default function AnaliseInterativa({
   /** Rascunho já em geração ao carregar a tela — trava o botão mesmo sem
    * clique nesta sessão (SDD.md §11.4: sobrevive a trocar de tela). */
   rascunhoInicial: { id: string; perguntaTexto: string } | null;
+  /** Personal com vínculo aceito, se existir (PRD §11.2). `null` = o aluno
+   *  treina sozinho e a tela é a de sempre. */
+  vinculo: { nomeDoPersonal: string; aceitoEm: string | null } | null;
 }) {
   const PERGUNTAS = perguntasDoIdioma(idioma);
   const [enviando, setEnviando] = useState(false);
@@ -87,6 +92,29 @@ export default function AnaliseInterativa({
         );
         return;
       }
+      // A prescrição é do personal enquanto o vínculo existir (PRD §11.2).
+      // Sem este ramo a recusa caía no `!resposta.ok` abaixo e virava
+      // "Falha ao gerar o parecer (erro 403)": causa falsa, que convida a
+      // tentar de novo algo que nunca vai funcionar.
+      //
+      // Isto NÃO é o estado definitivo da §11.4.2 — aquele OCUPA o lugar da
+      // prescrição e depende do gate visual com o dono. Este é o piso
+      // honesto enquanto o gate não fecha: a tela para de mentir sem
+      // decidir o desenho por baixo.
+      if (resposta.status === 403) {
+        const corpo = (await resposta.json().catch(() => null)) as
+          | { erro?: string }
+          | null;
+        if (corpo?.erro === "prescricao_do_personal") {
+          setErro(
+            t(
+              "Quem monta a próxima semana é o seu personal. Essa pergunta volta para você se o vínculo terminar.",
+              idioma,
+            ),
+          );
+          return;
+        }
+      }
       if (!resposta.ok) {
         setErro(`${t("Falha ao gerar o parecer (erro", idioma)} ${resposta.status}).`);
         return;
@@ -107,9 +135,11 @@ export default function AnaliseInterativa({
 
   const dadosSuficientes = semanasFechadasComTreino >= MINIMO_SEMANAS_PARECER;
   const inativo = !dadosSuficientes || enviando || emAndamento !== null;
-  const secundarias = (Object.keys(PERGUNTAS) as unknown as NumeroPergunta[])
-    .map(Number)
-    .filter((numero) => numero !== PERGUNTA_PRIMARIA) as NumeroPergunta[];
+  // Derivação em `perguntas.ts`, não aqui: sob vínculo muda QUAL pergunta
+  // fica em destaque e a prescrição sai da lista (direção "Troca de posto",
+  // gate visual da §11.4.2). Ter isso num `filter` dentro do JSX é o que
+  // deixa uma tela mostrando a pergunta errada sem ninguém notar.
+  const { primaria, secundarias } = perguntasDaTela(vinculo !== null);
 
   function perguntarSeAtivo(numero: NumeroPergunta) {
     if (inativo) return;
@@ -160,9 +190,9 @@ export default function AnaliseInterativa({
             type="button"
             className="pergunta pergunta--primaria"
             aria-disabled={inativo}
-            onClick={() => perguntarSeAtivo(PERGUNTA_PRIMARIA)}
+            onClick={() => perguntarSeAtivo(primaria)}
           >
-            <span>{PERGUNTAS[PERGUNTA_PRIMARIA]}</span>
+            <span>{PERGUNTAS[primaria]}</span>
             <span style={{ color: "var(--lastro-ouro)", fontWeight: "bold" }}>•</span>
           </button>
         </li>
@@ -180,6 +210,24 @@ export default function AnaliseInterativa({
           </li>
         ))}
       </ul>
+
+      {/* O lugar da prescrição (PRD §11.4.2, direção "Troca de posto").
+          NÃO é card, nem moldura, nem alvo de toque: é o rodapé da lista.
+          Moldura é vocabulário de controle — vestir de card algo que não
+          responde ao toque apaga a pista de onde se toca (DESIGN, mesma
+          regra que tirou a borda dos blocos de conteúdo).
+          O nome de quem detém a prescrição é o conteúdo inteiro: "ausência
+          não é resposta", e o que responde à ausência é a identidade de
+          quem ficou com ela, não um aviso de indisponibilidade. */}
+      {vinculo && (
+        <p className="perguntas__rodape">
+          {t("O que mudar na próxima semana é de", idioma)}{" "}
+          <strong>{vinculo.nomeDoPersonal}</strong>
+          {vinculo.aceitoEm
+            ? `, ${t("desde", idioma)} ${formatarDataCurta(vinculo.aceitoEm.slice(0, 10), idioma)}.`
+            : "."}
+        </p>
+      )}
 
       {/* Estado "gerando" (DESIGN.md §3.6.5): mesmo esqueleto de antes, mas
           agora fica até a pessoa sair da tela — não vira <Parecer> aqui

@@ -5,7 +5,16 @@ import Link from "next/link";
 import { t } from "@/lib/texto/i18n";
 import type { Idioma } from "@/lib/dados/idioma";
 
-type Secao = "inicio" | "bancada" | "analise" | "catalogo" | "ajustes";
+type Secao =
+  | "inicio"
+  | "bancada"
+  | "analise"
+  | "catalogo"
+  | "ajustes"
+  // Seções que só existem na casca do personal (PRD §11, direção "Com o
+  // catálogo junto", escolhida pelo dono no gate visual de 2026-09-11).
+  | "fila"
+  | "alunos";
 
 const SECOES: {
   id: Secao;
@@ -49,10 +58,51 @@ const SECOES: {
   },
 ];
 
-export default function AbaInferior({ ativa, idioma = "pt-BR" }: { ativa: Secao; idioma?: Idioma }) {
+/**
+ * A barra do PERSONAL. Não é a de usuário com itens escondidos: é outra
+ * lista, e a diferença é o ponto da decisão do dono — conta de personal
+ * não treina, então "Início", "Treinos" e "Análise" não somem por
+ * discrição, elas não existem. As três pressupõem quem treina.
+ *
+ * O catálogo FICA, e foi a escolha entre as direções A e B do gate: é o
+ * único acervo do produto que serve ao profissional sem adaptação
+ * nenhuma — demonstração de execução curada por pessoa (PRD §4.5). Tirar
+ * seria descartar trabalho curado por simetria, e mandar o personal
+ * procurar execução fora do app.
+ */
+const SECOES_PERSONAL: typeof SECOES = [
+  {
+    id: "fila",
+    href: "/personal",
+    rotulo: "Fila",
+    // Caixa de entrada: o alerta ESPERA (§11.4.5), não chega.
+    caminho: "M4 13h4l2 3h4l2-3h4M4 13l2.5-7h11L20 13v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5z",
+  },
+  {
+    id: "alunos",
+    href: "/personal/alunos",
+    rotulo: "Alunos",
+    caminho:
+      "M16 21v-2a4 4 0 00-4-4H6a4 4 0 00-4 4v2M9 7a4 4 0 108 0 4 4 0 10-8 0M22 21v-2a4 4 0 00-3-3.87",
+  },
+  SECOES[3], // Catálogo — a mesma entrada, não uma cópia que pode divergir.
+  SECOES[4], // Ajustes
+];
+
+export default function AbaInferior({
+  ativa,
+  idioma = "pt-BR",
+  tipoConta = "aluno",
+}: {
+  ativa: Secao;
+  idioma?: Idioma;
+  /** Decide QUAL barra aparece. Vem do perfil, que toda tela já carrega. */
+  tipoConta?: "aluno" | "personal";
+}) {
+  const secoes = tipoConta === "personal" ? SECOES_PERSONAL : SECOES;
   return (
     <nav className="nav" aria-label={t("Seções do app", idioma)}>
-      {SECOES.map((secao) => (
+      {secoes.map((secao) => (
         <Link
           key={secao.id}
           href={secao.href}

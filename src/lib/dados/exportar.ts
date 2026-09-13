@@ -27,13 +27,17 @@ function escaparCsv(valor: string): string {
  * legível em qualquer planilha, sem depender do Lastro pra ler de volta.
  */
 export async function exportarDadosCsv(): Promise<string> {
-  const { supabase } = await usuarioAutenticadoOuErro();
+  const { supabase, user } = await usuarioAutenticadoOuErro();
 
   const { data, error } = await supabase
     .from("serie")
     .select(
       "tipo, reps, peso, rir, peso_por_lado, criado_em, treino:treino_id (data), exercicio:exercicio_id (nome)",
     )
+    // Escopo explícito — ver a nota da migração 0022 em `resumo-home.ts`.
+    // Aqui o vazamento seria o pior de todos: o CSV de backup do personal
+    // levaria as séries do aluno para fora do app, num arquivo.
+    .eq("usuario_id", user.id)
     .order("criado_em", { ascending: true });
   if (error) {
     throw new Error(`Falha ao exportar dados: ${error.message}`);

@@ -281,6 +281,7 @@ supabase/seed.sql                                ← seed mínimo de exercicio (
 src/lib/supabase/cliente-browser.ts              ← cliente de navegador
 src/lib/supabase/cliente-servidor.ts             ← cliente de servidor (route handlers)
 scripts/ff5-rls.sql                              ← o check executável da FF5
+scripts/medida-alerta-estimulo.sql               ← a medida da §11.7 do PRD (módulo Personal)
 ```
 
 > **E12 — ponto a verificar na implementação.** Este documento **não fixa a assinatura** do SDK do Supabase (`@supabase/ssr` / `createServerClient` / manuseio de cookies no App Router). Essa API mudou mais de uma vez e assinatura desatualizada não dá erro de leitura, dá bug plausível. **Consultar a documentação vigente ao escrever `cliente-servidor.ts`.** Todo o resto desta seção é SQL puro, que não envelhece.

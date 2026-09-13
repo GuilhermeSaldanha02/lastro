@@ -25,6 +25,9 @@ const PREFIXOS_PRIVADOS = [
   "/coach",
   "/perfil",
   "/ajustes",
+  // Fila do personal (PRD §11). Lê dado de OUTRA conta sob vínculo aceito
+  // — é a rota que menos pode ficar pública por omissão.
+  "/personal",
 ];
 
 export async function proxy(request: NextRequest) {
@@ -64,7 +67,17 @@ export async function proxy(request: NextRequest) {
     url.pathname = "/login";
     // O nome do parâmetro vem de `@/lib/rota-de-retorno` — quem escreve e
     // quem lê (o `/login` e o `/auth/callback`) importam a mesma constante.
-    url.searchParams.set(PARAM_RETORNO, request.nextUrl.pathname);
+    //
+    // `pathname + search`, não só `pathname`. O convite do personal chega
+    // como `/ajustes/personal?codigo=ABC...` por WhatsApp, onde a pessoa
+    // quase sempre está sem sessão: guardando apenas o caminho, o código
+    // evaporava no login e o aluno caía numa tela de vínculo vazia, sem
+    // nada explicando o que aconteceu. `sanitizarRotaDeRetorno` aceita a
+    // query (ela só barra caminho absoluto e caractere de controle).
+    url.searchParams.set(
+      PARAM_RETORNO,
+      `${request.nextUrl.pathname}${request.nextUrl.search}`,
+    );
     // Carrega os cookies que `setAll` já tenha limpado/atualizado (ex.:
     // refresh token inválido) — sem isso, o navegador manteria um cookie
     // morto e o próximo request repetiria o mesmo erro de refresh

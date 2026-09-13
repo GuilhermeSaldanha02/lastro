@@ -1,6 +1,7 @@
 // lastro · Ajustes consolidados em Bento Grid de alto padrão Apex Pro
 import Link from "next/link";
 import { obterPerfil } from "@/lib/dados/perfil";
+import { cascaDaBarra } from "@/lib/dados/casca";
 import { sair } from "@/lib/dados/auth";
 import AbaInferior from "@/components/aba-inferior";
 import Avatar from "@/components/avatar";
@@ -9,6 +10,7 @@ import SetaNavegacao from "@/components/seta-navegacao";
 import CabecalhoPro from "@/components/cabecalho-pro";
 import MetaSemanalForm from "@/components/meta-semanal-form";
 import IdiomaForm from "@/components/idioma-form";
+import SeletorModo from "@/components/seletor-modo";
 import { t } from "@/lib/texto/i18n";
 
 export default async function PaginaAjustes() {
@@ -39,6 +41,14 @@ export default async function PaginaAjustes() {
               </div>
               <SetaNavegacao />
             </Link>
+
+            {/* O seletor de modo mora aqui, logo abaixo de quem está logado:
+                o modo é da conta, como o nome. Direção A do gate de
+                2026-09-13. */}
+            <SeletorModo
+              modo={perfil.modo}
+              temAreaDeTrabalho={perfil.tipoConta === "personal" && perfil.cref !== null}
+            />
 
             <MetaSemanalForm metaInicial={perfil.metaTreinosSemana} idioma={idioma} />
 
@@ -103,6 +113,24 @@ export default async function PaginaAjustes() {
                 <SetaNavegacao />
               </Link>
 
+              {/* PRD §11 — uma entrada só, para os dois lados do vínculo.
+                  Não existe "modo personal": quem tem aluno vinculado
+                  alcança a fila a partir daqui. */}
+              <Link href="/ajustes/personal" className="bento-menu-item">
+                <div className="bento-menu-item__icone bento-menu-item__icone--ciano">
+                  <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="var(--lastro-ciano)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+                    <circle cx="9" cy="7" r="4" />
+                    <path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75" />
+                  </svg>
+                </div>
+                <div className="bento-menu-item__info">
+                  <h3 className="bento-menu-item__titulo">{t("Personal", idioma)}</h3>
+                  <p className="bento-menu-item__desc">{t("Vínculo, convites e fila de alunos", idioma)}</p>
+                </div>
+                <SetaNavegacao />
+              </Link>
+
               <Link href="/ajustes/relatorios" className="bento-menu-item">
                 <div className="bento-menu-item__icone bento-menu-item__icone--verde">
                   <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="var(--lastro-esmeralda)" strokeWidth="2">
@@ -150,7 +178,7 @@ export default async function PaginaAjustes() {
         )}
       </div>
 
-      <AbaInferior ativa="ajustes" idioma={idioma} />
+      <AbaInferior ativa="ajustes" idioma={idioma} tipoConta={cascaDaBarra(perfil)} />
     </main>
   );
 }

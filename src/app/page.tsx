@@ -6,6 +6,7 @@ import { criarClienteServidor } from "@/lib/supabase/cliente-servidor";
 import { carregarResumoHome } from "@/lib/dados/resumo-home";
 import { criarTreino } from "@/lib/dados/treino";
 import { obterPerfil } from "@/lib/dados/perfil";
+import { cascaDaBarra, exigirCascaDeAluno } from "@/lib/dados/casca";
 import { listarModelos } from "@/lib/dados/modelo-treino";
 import { dataLocalBrasil, formatarDataCurta } from "@/lib/tempo";
 import AbaInferior from "@/components/aba-inferior";
@@ -83,6 +84,10 @@ export default async function PaginaInicial() {
     obterPerfil(),
     listarModelos(),
   ]);
+  // Conta de personal não tem Home de treino — ela cai na própria fila
+  // (PRD §11, casca escolhida no gate visual). Barra trocada é pista; esta
+  // linha é a porta.
+  exigirCascaDeAluno(perfil);
 
   const idioma = perfil?.idioma ?? "pt-BR";
   const { dataTexto, semanaTexto } = formatarCabecalhoData(hoje, idioma);
@@ -241,7 +246,7 @@ export default async function PaginaInicial() {
         )}
       </div>
 
-      <AbaInferior ativa="inicio" idioma={idioma} />
+      <AbaInferior ativa="inicio" idioma={idioma} tipoConta={cascaDaBarra(perfil)} />
     </main>
   );
 }

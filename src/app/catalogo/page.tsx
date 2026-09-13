@@ -1,6 +1,7 @@
 // lastro · PRD §4.5 — catálogo curado de exercícios com busca e filtros musculares.
 import { listarCatalogo } from "@/lib/dados/treino";
 import { obterPerfil } from "@/lib/dados/perfil";
+import { cascaDaBarra } from "@/lib/dados/casca";
 import AbaInferior from "@/components/aba-inferior";
 import CabecalhoPro from "@/components/cabecalho-pro";
 import CatalogoInterativo from "@/components/catalogo-interativo";
@@ -25,7 +26,7 @@ export default async function PaginaCatalogo() {
         <CatalogoInterativo exercicios={exercicios} semDicaCount={semDica} idioma={idioma} />
       </div>
 
-      <AbaInferior ativa="catalogo" idioma={idioma} />
+      <AbaInferior ativa="catalogo" idioma={idioma} tipoConta={cascaDaBarra(perfil)} />
     </main>
   );
 }

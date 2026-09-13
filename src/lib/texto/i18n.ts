@@ -533,6 +533,19 @@ const DICIONARIO: Record<string, { en: string; es: string }> = {
     es: "Ya hay un análisis en curso. Espera a que termine.",
   },
   "Análise em andamento": { en: "Analysis in progress", es: "Análisis en curso" },
+  // Módulo Personal (PRD §11.2 e §11.4.2) — entraram na /analise com a
+  // fatia da prescrição e ficaram sem tradução até 2026-09-12: a tela é
+  // inteiramente traduzida, e estas três eram as únicas em pt-BR no meio
+  // de uma /analise em inglês ou espanhol.
+  "O que mudar na próxima semana é de": {
+    en: "What to change next week is up to",
+    es: "Lo que cambiar la próxima semana le corresponde a",
+  },
+  "desde": { en: "since", es: "desde" },
+  "Quem monta a próxima semana é o seu personal. Essa pergunta volta para você se o vínculo terminar.": {
+    en: "Your personal trainer plans next week. This question comes back to you if the link ends.",
+    es: "Tu entrenador personal arma la próxima semana. Esta pregunta vuelve a ti si el vínculo termina.",
+  },
 
   // --- components/alerta-deload.tsx ---
   "Suas séries valendo estão mais difíceis do que o normal:": {

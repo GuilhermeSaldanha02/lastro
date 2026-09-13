@@ -26,11 +26,17 @@ import { leituraDeterministica } from "@/lib/analise/leitura-deterministica";
 import { motivoDoErro } from "./retry-transitorio";
 import { registrarUso, tetoAtingido, TETO_DIARIO } from "@/lib/dados/uso-ia";
 import type { FalhaMotivo } from "@/lib/dados/parecer";
-import { perguntaValida, perguntasDoIdioma, type NumeroPergunta } from "./perguntas";
+import {
+  perguntaValida,
+  perguntasDoIdioma,
+  PERGUNTA_PRESCRICAO,
+  type NumeroPergunta,
+} from "./perguntas";
 import { obterIdioma, type Idioma } from "@/lib/dados/idioma";
 import { mapaTraducaoExercicios, mapaTraducaoGrupos } from "@/lib/dados/traducao";
 import { formatarGrupoMuscular } from "@/lib/texto/grupo-muscular";
 import { limparRascunhosExpirados } from "@/lib/dados/parecer";
+import { carregarVinculoDoAluno } from "@/lib/dados/personal";
 
 type ClienteSupabaseServidor = Awaited<ReturnType<typeof criarClienteServidor>>;
 
@@ -58,15 +64,26 @@ type LinhaExercicio = {
   peso_por_lado: boolean;
 };
 
-/** Todos os treinos do usuário logado (RLS filtra), já com as séries. */
+/**
+ * Todos os treinos do usuário informado, já com as séries.
+ *
+ * O FILTRO É EXPLÍCITO, e o comentário antigo desta função ("RLS filtra")
+ * deixou de ser verdade na migração 0022: um personal com vínculo aceito
+ * enxerga treino e série do aluno, então a consulta sem filtro traria as
+ * duas pessoas — e este é o caminho da PEÇA-ASSINATURA. O parecer do
+ * personal sairia somando o treino do aluno ao dele, citando exercício que
+ * ele nunca fez, sem erro nenhum em lugar nenhum.
+ */
 async function carregarTreinosDoUsuario(
   supabase: ClienteSupabaseServidor,
+  usuarioId: string,
 ): Promise<TreinoBruto[]> {
   const { data, error } = await supabase
     .from("treino")
     .select(
       "id, data, serie (id, exercicio_id, tipo, reps, peso, rir, peso_por_lado)",
-    );
+    )
+    .eq("usuario_id", usuarioId);
   if (error) throw new Error(`Falha ao carregar treinos: ${error.message}`);
 
   return ((data ?? []) as unknown as LinhaTreino[]).map((t) => ({
@@ -171,11 +188,14 @@ const INSTRUCAO_RETRY_SEM_NUMERO_POR_IDIOMA: Record<Idioma, string> = {
 
 async function gerarESalvarParecer({
   supabase,
+  usuarioId,
   rascunhoId,
   pergunta,
   idioma,
 }: {
   supabase: ClienteSupabaseServidor;
+  /** Dono do parecer. Explícito desde a 0022 — ver `carregarTreinosDoUsuario`. */
+  usuarioId: string;
   rascunhoId: string;
   pergunta: NumeroPergunta;
   idioma: Idioma;
@@ -204,7 +224,7 @@ async function gerarESalvarParecer({
 
   try {
     const [treinos, exercicios] = await Promise.all([
-      carregarTreinosDoUsuario(supabase),
+      carregarTreinosDoUsuario(supabase, usuarioId),
       carregarExercicios(supabase, idioma),
     ]);
 
@@ -327,6 +347,45 @@ export async function POST(request: Request) {
     );
   }
 
+  // A TRAVA DA PRESCRIÇÃO (PRD §11.2 e §11.4.1), e por que ela mora AQUI.
+  //
+  // Esconder o card da pergunta 5 na tela não fecha nada: este endpoint
+  // aceita `{ pergunta: 5 }` de qualquer cliente autenticado — aba antiga
+  // aberta antes do vínculo, service worker com HTML em cache, ou curl. A
+  // linha "aluno vinculado não vê a prescrição" da §11.2 só é verdade se o
+  // servidor recusar; a tela é a parte decorativa desta dupla.
+  //
+  // POSIÇÃO NÃO É ARBITRÁRIA — três coisas acontecem logo abaixo e nenhuma
+  // pode acontecer num pedido que vai ser recusado:
+  //   1. `registrarUso` grava consumo IMUTÁVEL (a cota de 20/dia é gasta
+  //      pela tentativa, por decisão de 2026-09-05). Recusar depois dele
+  //      cobraria do aluno uma pergunta que o app nunca responde.
+  //   2. o rascunho de `parecer` é inserido com status "gerando" — recusar
+  //      depois deixaria linha órfã presa no teto de geração em andamento.
+  //   3. `limparRascunhosExpirados` escreve no banco; pedido recusado não
+  //      tem por que disparar efeito nenhum.
+  //
+  // Falha na leitura do vínculo RECUSA (fecha), não libera: liberar em erro
+  // transforma instabilidade de rede em vazamento de escopo.
+  if (pergunta === PERGUNTA_PRESCRICAO) {
+    let temPersonal: boolean;
+    try {
+      temPersonal = (await carregarVinculoDoAluno()) !== null;
+    } catch (erro) {
+      console.error(
+        "[analise] falha ao ler vínculo para a trava da prescrição:",
+        erro instanceof Error ? erro.message : erro,
+      );
+      return NextResponse.json(
+        { erro: "Não foi possível verificar seu vínculo. Tente de novo." },
+        { status: 503 },
+      );
+    }
+    if (temPersonal) {
+      return NextResponse.json({ erro: "prescricao_do_personal" }, { status: 403 });
+    }
+  }
+
   const idioma = await obterIdioma();
 
   // Limpeza preguiçosa (SDD.md §11.2) antes de checar a trava.
@@ -380,6 +439,7 @@ export async function POST(request: Request) {
   after(() =>
     gerarESalvarParecer({
       supabase,
+      usuarioId: user.id,
       rascunhoId: rascunho.id,
       pergunta: pergunta as NumeroPergunta,
       idioma,

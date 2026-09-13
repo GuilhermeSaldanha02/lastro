@@ -2337,6 +2337,144 @@
   color: var(--lastro-txt-2);
 }
 
+/* O lugar da prescricao sob vinculo (PRD 11.4.2, direcao "Troca de posto").
+   ENTRA DEPOIS do segundo bloco de `.pergunta` de proposito: este arquivo
+   tem DOIS blocos `.perguntas`/`.pergunta--primaria` (2073 e 2275), e quem
+   editar o primeiro vai jurar que o CSS nao pegou.
+
+   Sem moldura, por regra: borda + raio e vocabulario de CONTROLE, e vestir
+   de card algo que nao responde ao toque apaga a pista de onde se toca. A
+   separacao vem de ritmo (a linha divisoria da lista) e de tipo, nao de
+   caixa. Nenhum valor cravado: todos os quatro sao token. */
+.perguntas__rodape {
+  margin-top: var(--lastro-e-3);
+  padding-top: var(--lastro-e-3);
+  border-top: 1px solid var(--lastro-linha);
+  color: var(--lastro-txt-2);
+  /* `--lastro-papel-corpo` (16px), nao o rotulo de 14: isto e PROSA que o
+     aluno le na peca-assinatura, e a D4 fixa 16px como piso de corpo — "o
+     celular apoiado no banco, lido em pe". Um --lastro-papel-nota chegou a
+     ser escrito aqui e nao existe no tokens.css: era variavel fantasma, o
+     mesmo erro que o comentario do proprio tokens.css registra. */
+  font-size: var(--lastro-papel-corpo);
+  line-height: var(--lastro-el-corpo);
+}
+
+/* O nome de quem detem a prescricao e o conteudo da linha, nao um enfeite:
+   e a unica parte que responde "para onde ela foi". Ouro porque e a cor de
+   assinatura do app, o mesmo acento do card em destaque. */
+/* ============================================================
+   Seletor de tipo de conta no cadastro (PRD 11, emenda 2026-09-11)
+   Direcao "Pilula segmentada", escolhida pelo dono no gate visual.
+   ============================================================ */
+
+/* O trilho e uma pilula so; os dois segmentos dividem o espaco em partes
+   iguais para que nenhum dos dois pareca o padrao. `USUARIO` e `PERSONAL`
+   tem larguras de texto diferentes, e deixar o flex decidir faria o botao
+   maior parecer o principal. */
+.seletor-conta {
+  display: flex;
+  gap: var(--lastro-e-1);
+  padding: var(--lastro-e-1);
+  /* `--lastro-controle`, não `--lastro-linha`: a cápsula é controle, e a
+     opção não selecionada não tem borda própria — o trilho é o único
+     limite visível dela. DESIGN.md §3.2 Nota A reprova controle cujo único
+     limite seja `--lastro-linha` (1.45:1). Estava assim desde o #233 e foi
+     repetido no seletor de modo; achado na auditoria contra a main em
+     2026-09-13. */
+  border: 1px solid var(--lastro-controle);
+  border-radius: var(--lastro-raio-pilula);
+  background: var(--lastro-sup-1);
+}
+
+.seletor-conta__opcao {
+  flex: 1 1 0;
+  min-width: 0;
+  /* Alvo de toque: a cena de uso e uma mao so, em pe. O piso vem do token
+     de alvo minimo, nao de um numero escolhido aqui. */
+  min-height: var(--lastro-alvo-min);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--lastro-e-2);
+  /* A altura vem do `min-height` acima; o padding só afasta o texto das
+     bordas. Degrau de token mais próximo do 10px/8px que estava cravado. */
+  padding: var(--lastro-e-2);
+  border: 0;
+  border-radius: var(--lastro-raio-pilula);
+  background: transparent;
+  color: var(--lastro-txt-2);
+  font-size: var(--lastro-papel-rotulo);
+  font-weight: var(--lastro-peso-medio);
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  transition: all var(--lastro-dur-1) ease;
+}
+
+.seletor-conta__opcao:hover {
+  color: var(--lastro-txt);
+}
+
+/* O ativo usa o gradiente de ACAO, o mesmo do botao primario: e a unica
+   cor do app que significa "e isto que vai acontecer". Texto escuro por
+   cima, como no botao primario — ouro sobre ouro reprovaria contraste. */
+.seletor-conta__opcao--ativa {
+  background: linear-gradient(135deg, var(--lastro-acao-a), var(--lastro-acao-b));
+  color: var(--lastro-acao-txt);
+  font-weight: var(--lastro-peso-forte);
+}
+
+.seletor-conta__opcao--ativa:hover {
+  color: var(--lastro-acao-txt);
+}
+
+/* A consequencia da escolha. Sem esta linha, PERSONAL e so o botao mais
+   bonito e a pessoa descobre que nao tem "iniciar treino" depois de criar
+   a conta. Nao e card nem alerta: e legenda do controle acima. */
+.seletor-conta__nota {
+  /* Medido no navegador, 375px: com a margem NEGATIVA que estava aqui, a
+     nota sobrepunha o trilho em 8px — o formulario e `display: block`, nao
+     flex, entao nao havia gap nenhum para compensar. Chute de espacamento
+     contra um layout que nao foi lido. */
+  margin: var(--lastro-e-3) 0 0;
+  color: var(--lastro-txt-2);
+  font-size: var(--lastro-papel-rotulo);
+  line-height: var(--lastro-el-corpo);
+}
+
+/* Seletor de modo (direção A do gate de 2026-09-13): a mesma cápsula, com
+   um terceiro estado. TRABALHO travado é um LINK para a tela do CREF —
+   continua sendo alvo de toque, só leva a outro lugar. O cadeado e o tom
+   apagado dizem "fechado"; a nota abaixo diz como abrir. */
+.seletor-conta__opcao--travada {
+  color: var(--lastro-txt-3);
+  text-decoration: none;
+}
+
+.seletor-conta__opcao:focus-visible {
+  outline: var(--lastro-foco-espessura) solid var(--lastro-foco);
+  outline-offset: var(--lastro-foco-afast);
+}
+
+.seletor-conta__link {
+  color: var(--lastro-ouro);
+  font-weight: var(--lastro-peso-forte);
+  text-decoration: none;
+}
+
+.seletor-conta__link:hover {
+  text-decoration: underline;
+}
+
+.campo__nota--alerta {
+  color: var(--lastro-ouro);
+}
+
+.perguntas__rodape strong {
+  color: var(--lastro-ouro);
+  font-weight: var(--lastro-peso-forte);
+}
+
 
 /* Estado "gerando": esqueleto na altura das linhas que virão.
    Sem reticências pulsantes, sem spinner, sem texto letra a letra. */
@@ -5628,4 +5766,153 @@
   font-variant-numeric: tabular-nums;
   color: var(--lastro-txt-2);
   font-weight: var(--lastro-peso-medio);
+}
+
+/* ============================================================
+   Módulo Personal — a fila de trabalho (PRD §11.4.5)
+   ============================================================
+   Nenhum valor cravado aqui: cor, espaço, raio e tipografia saem todos de
+   `tokens.css`, que é a fonte única (AGENTS.md §5).
+
+   A BARRA COLORIDA À ESQUERDA é o requisito do P1 dito com as palavras
+   dele: "uma flag vermelha visual de prioridade com o resumo acionável".
+   Ela não é o único canal — o card também ordena por prioridade e escreve
+   "há quanto tempo" em texto, porque cor sozinha não informa quem não
+   distingue cor (mesma regra da aba inferior). */
+.alerta-personal {
+  border: 1px solid var(--lastro-linha);
+  border-left: var(--lastro-barra-evidencia) solid var(--lastro-plato);
+  border-radius: var(--lastro-raio-1);
+  background: var(--lastro-sup-1);
+  padding: var(--lastro-e-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--lastro-e-3);
+  /* `min-width: 0` porque o card é item de flex/grid e o nome do exercício
+     pode ser longo — a lição do vazamento de 48px em /ajustes (2026-09-10),
+     onde faltava exatamente isto. */
+  min-width: 0;
+}
+
+/* Grupo muscular abandonado é o que mais fecha com um clique — é o que
+   ganha a marca mais forte. */
+.alerta-personal--abandono {
+  border-left-color: var(--lastro-queda);
+}
+
+.alerta-personal__topo {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--lastro-e-3);
+  flex-wrap: wrap;
+  min-width: 0;
+}
+
+.alerta-personal__aluno {
+  font-size: var(--lastro-papel-detalhe);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--lastro-txt-3);
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.alerta-personal__tempo {
+  font-family: var(--lastro-fonte-num);
+  font-size: var(--lastro-papel-rotulo);
+  color: var(--lastro-txt-2);
+  white-space: nowrap;
+}
+
+.alerta-personal__titulo {
+  font-size: var(--lastro-papel-secao);
+  color: var(--lastro-txt);
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.alerta-personal__linha {
+  font-size: var(--lastro-papel-rotulo);
+  line-height: 1.5;
+  color: var(--lastro-txt-2);
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.alerta-personal__linha strong {
+  color: var(--lastro-txt);
+  font-weight: 600;
+}
+
+/* "O que investigar" é a linha que o personal lê antes de agir — fica
+   destacada do resto sem virar um segundo card. */
+.alerta-personal__investigar {
+  border-top: 1px solid var(--lastro-linha);
+  padding-top: var(--lastro-e-3);
+  font-size: var(--lastro-papel-rotulo);
+  line-height: 1.5;
+  color: var(--lastro-txt);
+  margin: 0;
+}
+
+.alerta-personal__acao {
+  margin-top: var(--lastro-e-2);
+}
+
+/* O botão de ação é UM alvo, com ícone e rótulo na MESMA linha.
+   `.botao-primario` é `flex-direction: column` na base (linha 313) — quem
+   só troca `display` não conserta nada, e o ícone continua empilhado sobre
+   o rótulo, fazendo o botão parecer dois elementos. Medido no navegador em
+   2026-09-11, depois de uma primeira tentativa que não pegou.
+   É a ação de um clique do §11.4.7: ela não pode parecer ambígua. */
+.alerta-personal__acao .botao-primario {
+  display: inline-flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  align-items: center;
+  justify-content: center;
+  gap: var(--lastro-e-2);
+  text-align: center;
+}
+
+/* `<Link>` com `.botao-secundario` é bloco: sem centrar, o rótulo cola na
+   borda esquerda de uma caixa alta e não lê como botão. */
+.fila-personal-rodape {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+/* Já acionado: o card não sai da tela (o personal pode querer mandar de
+   novo), mas para de competir pela atenção. */
+.alerta-personal__marca-acionado {
+  font-size: var(--lastro-papel-detalhe);
+  color: var(--lastro-esmeralda);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.fila-personal {
+  display: flex;
+  flex-direction: column;
+  gap: var(--lastro-e-4);
+  min-width: 0;
+}
+
+/* O código do convite existe para ser LIDO em voz alta e digitado — fonte
+   de número, espaçamento de letra largo, selecionável. */
+.codigo-convite {
+  font-family: var(--lastro-fonte-num);
+  font-size: var(--lastro-papel-secao);
+  letter-spacing: 0.18em;
+  color: var(--lastro-txt);
+  background: var(--lastro-sup-2);
+  border: 1px solid var(--lastro-controle);
+  border-radius: var(--lastro-raio-1);
+  padding: var(--lastro-e-3) var(--lastro-e-4);
+  display: inline-block;
+  user-select: all;
+  overflow-wrap: anywhere;
 }

@@ -30,6 +30,8 @@ export async function carregarDiasSemEstimuloPorGrupo(
     .select(
       "data_treino:treino_id (data), exercicio:exercicio_id (grupo_muscular_primario)",
     )
+    // Escopo explícito — ver a nota da migração 0022 em `resumo-home.ts`.
+    .eq("usuario_id", user.id)
     .eq("tipo", "valendo");
   if (error) {
     throw new Error(`Falha ao carregar recência por grupo: ${error.message}`);
