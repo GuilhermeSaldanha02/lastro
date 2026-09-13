@@ -11,23 +11,32 @@
 
 > Bloco de handoff entre agentes (Antigravity ⇄ Claude). **Sobrescrever a cada sessão**, nunca acumular. Formato e regras: `AGENTS.md` §3.
 
-- **Última sessão:** 2026-09-11 · agente: claude · **módulo Personal fechado na `feat/modulo-personal`** (`ae56b49`). Cinco PRs mergeados na branch do módulo: #226 (vínculo e fila), #228 (prescrição escondida), #229 (cobertura da fila), #230 (a medida da §11.7) e #231 (varreduras). Nenhum PR aberto, working tree limpa.
-- **A `main` segue INTOCADA.** Ela só recebe o módulo inteiro, num PR só — `AGENTS.md` §4. **Essa decisão é do dono e está pendente.**
-- **Em andamento:** nada. O PRD §11 está construído inteiro.
+- **Última sessão:** 2026-09-12 · agente: claude · branch `chore/personal-fecha-casca`, tirada de `feat/modulo-personal` em `dc7300e`. Working tree limpa ao abrir.
+- **A `feat/modulo-personal` tem OITO merges:** #226 vínculo e fila · #228 prescrição escondida · #229 cobertura da fila · #230 medida da §11.7 · #231 varreduras · #232 fechamento de registro · **#233 conta de personal com CREF e a cápsula no cadastro** · **#234 a casca do personal**. A `main` segue **intocada** em `4a4839f` — só recebe o módulo inteiro (`AGENTS.md` §4).
+- **Em andamento:** fechamento de registro da casca e remoção de código morto. Não muda produto.
 - **Não commitado:** nada.
-- **Bloqueado / a decidir:** três coisas, todas do dono. (1) Quando o módulo vai para a `main`. (2) O olho na tela — preview do módulo em `https://lastro-git-feat-modulo-personal-audicon.vercel.app`, que aponta para o Supabase de PRODUÇÃO (vínculo aceito ali é vínculo real). (3) Se os PASSOU por determinismo de CI encerram o `AGENTS.md` §5, já que os specs são de quem implementou.
-- **Próximo passo:** o dono olhar o módulo e decidir o PR para a `main`.
-- **Para o outro agente saber:** cinco coisas. (1) A `FF5` foi **emendada** — leia a seção abaixo antes de escrever qualquer consulta. (2) **A trava da prescrição não está na tela**: está em `src/app/api/analise/route.ts`, ANTES do gasto de cota, e a posição é parte da decisão. (3) **Teste que neutraliza efeito externo não pode mexer no atributo que governa o mecanismo medido** — a `j7` reprovou por isso; lição no `QA.md`. (4) A medida da §11.7 **não tem gêmea em TypeScript de propósito**. (5) **`j4` e `j5` agora rodam como PERSONAL com aluno vinculado** — se uma delas falhar numa tela que nada tem a ver com o módulo, olhe o `beforeAll` antes de caçar o bug na tela.
+- **Bloqueado / a decidir — tudo do dono:** (1) quando o módulo vai para a `main`; (2) o olho na tela, no preview `https://lastro-git-feat-modulo-personal-audicon.vercel.app`, que aponta para o Supabase de PRODUÇÃO (vínculo aceito ali é vínculo real); (3) se PASSOU por determinismo de CI encerra o `AGENTS.md` §5, já que os specs são de quem implementou; (4) PE-06, a resposta real da Gemini sob vínculo.
+- **Próximo passo:** o dono criar uma conta de PERSONAL pela cápsula do cadastro (CREF no formato `123456-G/PB`), olhar as duas cascas e decidir a `main`. Trabalho AFK que sobra: i18n das strings do módulo (declarado abaixo).
+- **Para o outro agente saber:** seis coisas. (1) A `FF5` foi **emendada** — leia a seção abaixo antes de escrever consulta. (2) **A trava da prescrição não está na tela**: está em `src/app/api/analise/route.ts`, ANTES do gasto de cota. (3) **EXISTE CONTA DE PERSONAL** desde a migração 0024 e a emenda (2) do PRD §11 — o §11 inteiro foi escrito sobre a premissa contrária, então leia a emenda antes de confiar no resto. `obterPerfil().tipoConta` é a **única** fonte; os guardas estão em `src/lib/dados/casca.ts`, chamados nas PÁGINAS e não no `proxy.ts`. (4) **`j4` e `j5` varrem com DUAS contas** — aluno vinculado e um personal separado —, com asserção de que a rota alcançada é a pedida. Se uma delas falhar numa tela sem relação com o módulo, olhe o `beforeAll` antes da tela. (5) **Sinal de "terminou" em teste tem de ser algo que não pode existir antes.** O fixture de vínculo esperava um texto presente nos dois estados e a `j7` perdeu a corrida duas vezes (`DECISIONS.md` "2026-09-12 (1)"). (6) A medida da §11.7 não tem gêmea em TypeScript de propósito.
 
-### O módulo, em números medidos
+### A conta de personal e a casca (#233, #234)
 
-CI run `34603359322`: **8 e2e** e **420 testes de unidade**, com `tsc`, lint e build limpos. Dois specs exercitam o módulo com duas contas e vínculo real (`j6` a prescrição, `j7` a fila), e as duas varreduras agora incluem a `/personal` com alerta de verdade — zero achados de navegação, zero reprovas de AA nos sete temas.
+Escolha no **cadastro**, pela cápsula USUÁRIO / PERSONAL (direção A do gate). Conta de personal exige **CREF** — validado estrito no app (seis dígitos, categoria G ou P, uma das 27 UFs; Resolução CONFEF 053/2003) e frouxo no banco, porque regra apertada no insert de `auth.users` tranca a porta sem mensagem. O app **não verifica** o registro no CONFEF, e toda tela que o mostra diz isso.
 
-**O que segue NÃO provado, e está declarado:** o olho do dono na tela; a resposta real da Gemini sob vínculo (PE-06, comportamento de modelo); e a medida da §11.7, que está certa e **devolve zero linhas** — só uso real a preenche.
+A casca do personal é **Fila · Alunos · Catálogo · Ajustes** (direção B). Início, Treinos e Análise não existem nela. A barra é pista; a porta é o guarda de rota. Quem entrou por Google e não tem CREF fica preso em `/personal/completar` até informar.
 
-### A fatia da prescrição, em duas telas
+**Não foi verificada no navegador pelo agente**: o cadastro público por e-mail é recusado pelo Supabase deste projeto, então não houve como logar como personal localmente. A prova é a `j8` no CI. A cápsula do cadastro, essa sim, foi vista e medida a 375px.
 
-**Servidor.** ### A coisa mais importante desta sessão
+### A fatia da prescrição (#228)
+
+**Servidor.** `/api/analise` recusa a pergunta 5 com 403 `prescricao_do_personal` sob vínculo, antes de `limparRascunhosExpirados`, do teto e de `registrarUso` — recusar depois cobraria cota e deixaria rascunho órfão. **Coach:** `sistemaCoach(temPersonal)` troca duas linhas, e só elas. **Tela:** sob vínculo "Onde eu empaquei?" assume o destaque e a pergunta 5 sai da lista; o rodapé diz de quem a prescrição é.
+
+### Declarado como não coberto
+
+- **Strings do módulo em pt-BR.** Nenhum arquivo do módulo usa `t()` ainda, e as duas strings do rodapé da `/analise` que usam não têm entrada no dicionário — EN/ES caem no pt-BR. Não quebra; está declarado.
+- **"Queda de frequência" foi entregue como queda de VOLUME** (`DECISIONS.md` "2026-09-11 (4)").
+
+### A coisa mais importante desta sessão
 
 **Toda leitura de `treino`, `serie` e `usuario` precisa filtrar o dono EXPLICITAMENTE.** A migração 0022 deu ao personal leitura dos dados do aluno sob vínculo aceito, e isso mudou o significado de toda consulta que confiava só na RLS. Doze pontos estavam errados no instante em que a migração subiu — incluindo o `/api/analise`, que é a peça-assinatura, e o CSV de exportação. Todos corrigidos, cada um com comentário no lugar.
 
@@ -40,7 +49,7 @@ Um personal recebe um alerta real sobre um aluno real e age a partir dele — co
 1. **Migração 0022** — `vinculo_personal`, `alerta_personal`, `usuario.telefone_whatsapp`, as policies de leitura cruzada e as funções de aceite/revogação. Cada policy comentada: é a primeira vez que uma conta lê dado de outra neste banco.
 2. **Migração 0023** — tira os dois helpers da RLS da API pública (achado do linter de segurança do Supabase, lint 0028). O lint 0028 sumiu; o 0029 continua e **é esperado**, com o porquê escrito na migração.
 3. **`fila-personal.ts`** — a seletividade como matemática pura e testada. Três tipos de sinal, todos tendência por construção. Teto de 2/aluno/semana **mais** supressão de 3 semanas por (tipo, alvo), porque o teto sozinho não impede a repetição no eixo do tempo.
-4. **`/personal` e `/ajustes/personal`** — a fila e as duas pontas do vínculo, numa tela só. Não existe conta "de personal": o vínculo é o papel.
+4. **`/personal` e `/ajustes/personal`** — a fila e as duas pontas do vínculo, numa tela só. Não existe conta "de personal": o vínculo é o papel. **(Superado em 2026-09-11: a emenda (2) do PRD §11 criou conta de personal. Isto é o histórico da primeira fatia, não o estado.)**
 5. **Contato obrigatório no cadastro** (decisão do dono) — e a coluna é `nullable` no banco de propósito, senão o login com Google morre.
 
 ### O que foi PROVADO, e como

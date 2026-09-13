@@ -2514,3 +2514,28 @@ Pelo mesmo raciocínio, a validação é **estrita no formulário e frouxa no ba
 A policy nova (`só conta personal convida`) **quebraria as quatro specs que montam vínculo de uma vez** — j4, j5, j6 e j7 —, no passo "Gerar código de convite", longe da causa. `criarUsuarioDescartavel` passou a receber o tipo e mandá-lo pelo `user_metadata`, no MESMO commit da policy.
 
 E `contaEPersonal()`, que era código morto, virou **errada** em vez de inútil: "tem aluno" e "é conta de personal" deixaram de ser a mesma pergunta no instante em que a conta passou a existir. Um personal recém-cadastrado, com zero alunos, continua sendo personal — e precisa alcançar a própria fila vazia. Reescrita para ler a coluna.
+
+---
+
+## 2026-09-12 (1) — A casca do personal, e o teste que mentia verde e depois mentia vermelho
+
+**A casca (#234), direção B do gate, escolhida pelo dono em 2026-09-11:** Fila · Alunos · Catálogo · Ajustes. O catálogo fica porque é o único acervo do produto que serve ao profissional sem adaptação — execução curada por pessoa (PRD §4.5). Início, Treinos e Análise não existem nessa casca: as três pressupõem quem treina.
+
+**A barra é pista; a porta é o guarda de rota.** `src/lib/dados/casca.ts`, chamado nas páginas. Sem ele, `/treino` continuaria respondendo por URL digitada, link velho e HTML em cache do service worker, e "conta de personal não treina" seria decorativa — o mesmo raciocínio que pôs a trava da prescrição no route handler.
+
+**Nas páginas, não no `proxy.ts`.** O middleware roda em toda requisição e só chama `getUser()`; ler o perfil ali cobraria uma consulta por request para uma regra de meia dúzia de telas. O tipo da conta entrou no `obterPerfil()`, que toda tela já chama — zero consulta nova. Pelo mesmo motivo `contaEPersonal()` foi removida em seguida: nunca teve chamador, e duas funções respondendo a mesma pergunta é onde uma fica para trás.
+
+### O verde falso que quase entrou
+
+A `j4` e a `j5` varriam como conta de personal desde a cobertura do PE-04. Com o guarda de rota, `/`, `/treino` e `/analise` passariam a redirecionar — e as duas specs **mediriam três redirecionamentos achando que mediram três telas**, e passariam. Conta errada numa varredura não falha alto: devolve verde medindo outra coisa. Reestruturadas para duas contas, com asserção explícita de que a rota alcançada é a pedida. Na `j5`, a segunda sessão troca de tema também: tema mora no `localStorage`, que é por contexto.
+
+### O vermelho falso que veio depois
+
+O primeiro CI da casca (run `34621890356`) falhou na `j7` com a fila vazia. **O app estava certo.** O fixture `criarVinculoAceito` esperava `getByText(/Seu personal/i)` como sinal de aceite concluído, com um comentário dizendo que o texto só existia depois do aceite. Era falso: a tela antes do aceite já diz *"É por aqui que o seu personal te chama"*. A espera casava na hora, o helper voltava com o server action no ar — o screenshot mostra o aluno congelado em "Aceitando…" —, e a `j7` fechava a sessão do aluno em seguida, matando o aceite.
+
+A corrida existia desde a extração do helper e vinha sendo vencida por sorte; com o CI mais carregado, perdeu duas vezes seguidas. O sinal passou a ser o botão "Revogar o vínculo", que só existe com vínculo aceito.
+
+**A regra que fica:** sinal de "terminou" tem de ser algo que **não pode existir antes**. Texto que por acaso aparece nos dois estados não é sinal, é coincidência com timeout.
+
+**E um segundo defeito, achado no mesmo diagnóstico:** a `j6` abria um contexto de aluno à mão e nunca o fechava. O navegador é compartilhado entre specs do worker; a aba vazada sobreviveu até a `j7` e virou o *page snapshot* do erro dela — uma `/analise` que não era tela nenhuma da `j7` e desviou a primeira leitura da falha. Diagnóstico contaminado custa mais que o bug.
+
