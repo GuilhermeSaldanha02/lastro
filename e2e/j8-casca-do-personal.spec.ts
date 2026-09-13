@@ -136,6 +136,46 @@ test("a MESMA conta, em modo treino, alcança o treino e perde a fila", async ({
   }
 });
 
+test("a cápsula de Ajustes troca de modo, e para quem não é personal TRABALHO leva ao CREF", async ({
+  browser,
+}) => {
+  test.setTimeout(90_000);
+  const contextoPersonal = await browser.newContext();
+  const contextoAluno = await browser.newContext();
+  try {
+    // ---- quem tem área de trabalho: ida e volta pela cápsula ----
+    const tela = await contextoPersonal.newPage();
+    await entrarComoUsuario(tela, personal);
+    await tela.goto("/ajustes");
+    const capsula = tela.getByRole("radiogroup", { name: "Modo" });
+    await expect(capsula.getByRole("radio", { name: "TRABALHO" })).toHaveAttribute("aria-checked", "true");
+
+    await capsula.getByRole("radio", { name: "TREINO" }).click();
+    // Sinal que não existe antes: a URL da casa do modo treino.
+    await tela.waitForURL((url) => url.pathname === "/", { timeout: 15_000 });
+    await expect(tela.locator("nav.nav").getByText("Treinos")).toBeVisible();
+
+    await tela.goto("/ajustes");
+    await tela.getByRole("radiogroup", { name: "Modo" }).getByRole("radio", { name: "TRABALHO" }).click();
+    await tela.waitForURL((url) => url.pathname === "/personal", { timeout: 15_000 });
+    await expect(tela.locator("nav.nav").getByText("Fila")).toBeVisible();
+
+    // ---- quem não tem: TRABALHO travado leva à tela do CREF ----
+    const telaAluno = await contextoAluno.newPage();
+    await entrarComoUsuario(telaAluno, aluno);
+    await telaAluno.goto("/ajustes");
+    await expect(telaAluno.getByText("É personal?")).toBeVisible();
+    await telaAluno.getByRole("link", { name: /Trabalho, travado/i }).click();
+    await telaAluno.waitForURL((url) => url.pathname === "/personal/completar", { timeout: 15_000 });
+    await expect(telaAluno.locator("#cref_completar")).toBeVisible();
+  } finally {
+    await contextoPersonal.close();
+    await contextoAluno.close();
+    const cliente = await clienteAutenticado(personal);
+    await cliente.from("usuario").update({ modo_ativo: "trabalho" }).eq("id", personal.id);
+  }
+});
+
 test("conta de personal sem CREF não abre a área de trabalho", async ({ browser }) => {
   // O estado do cadastro por Google: `tipo_conta = 'personal'` com `cref`
   // nulo. É LEGÍTIMO no banco — constraint "personal implica CREF"

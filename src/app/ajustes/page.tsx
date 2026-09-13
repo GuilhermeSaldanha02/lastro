@@ -10,6 +10,7 @@ import SetaNavegacao from "@/components/seta-navegacao";
 import CabecalhoPro from "@/components/cabecalho-pro";
 import MetaSemanalForm from "@/components/meta-semanal-form";
 import IdiomaForm from "@/components/idioma-form";
+import SeletorModo from "@/components/seletor-modo";
 import { t } from "@/lib/texto/i18n";
 
 export default async function PaginaAjustes() {
@@ -40,6 +41,14 @@ export default async function PaginaAjustes() {
               </div>
               <SetaNavegacao />
             </Link>
+
+            {/* O seletor de modo mora aqui, logo abaixo de quem está logado:
+                o modo é da conta, como o nome. Direção A do gate de
+                2026-09-13. */}
+            <SeletorModo
+              modo={perfil.modo}
+              temAreaDeTrabalho={perfil.tipoConta === "personal" && perfil.cref !== null}
+            />
 
             <MetaSemanalForm metaInicial={perfil.metaTreinosSemana} idioma={idioma} />
 
