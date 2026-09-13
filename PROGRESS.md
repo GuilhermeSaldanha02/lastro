@@ -11,12 +11,12 @@
 
 > Bloco de handoff entre agentes (Antigravity ⇄ Claude). **Sobrescrever a cada sessão**, nunca acumular. Formato e regras: `AGENTS.md` §3.
 
-- **Última sessão:** 2026-09-12 · agente: claude · branch `chore/personal-fecha-casca`, tirada de `feat/modulo-personal` em `dc7300e`. Working tree limpa ao abrir.
-- **A `feat/modulo-personal` tem OITO merges:** #226 vínculo e fila · #228 prescrição escondida · #229 cobertura da fila · #230 medida da §11.7 · #231 varreduras · #232 fechamento de registro · **#233 conta de personal com CREF e a cápsula no cadastro** · **#234 a casca do personal**. A `main` segue **intocada** em `4a4839f` — só recebe o módulo inteiro (`AGENTS.md` §4).
-- **Em andamento:** fechamento de registro da casca e remoção de código morto. Não muda produto.
+- **Última sessão:** 2026-09-12 · agente: claude · branch `docs/personal-estado-atual`, tirada de `feat/modulo-personal` em `37df9f5`. Nenhum PR aberto além deste, working tree limpa.
+- **A `feat/modulo-personal` tem DEZ merges:** #226 vínculo e fila · #228 prescrição escondida · #229 cobertura da fila · #230 medida da §11.7 · #231 varreduras · #232 fechamento de registro · **#233 conta de personal com CREF e a cápsula no cadastro** · **#234 a casca do personal** · #235 registro da casca e remoção de `contaEPersonal` · #236 tradução das strings da prescrição na `/analise`. A `main` segue **intocada** em `4a4839f` — só recebe o módulo inteiro (`AGENTS.md` §4).
+- **Em andamento:** nada. O módulo está construído; o que sobra é decisão do dono.
 - **Não commitado:** nada.
 - **Bloqueado / a decidir — tudo do dono:** (1) quando o módulo vai para a `main`; (2) o olho na tela, no preview `https://lastro-git-feat-modulo-personal-audicon.vercel.app`, que aponta para o Supabase de PRODUÇÃO (vínculo aceito ali é vínculo real); (3) se PASSOU por determinismo de CI encerra o `AGENTS.md` §5, já que os specs são de quem implementou; (4) PE-06, a resposta real da Gemini sob vínculo.
-- **Próximo passo:** o dono criar uma conta de PERSONAL pela cápsula do cadastro (CREF no formato `123456-G/PB`), olhar as duas cascas e decidir a `main`. Trabalho AFK que sobra: i18n das strings do módulo (declarado abaixo).
+- **Próximo passo:** o dono criar uma conta de PERSONAL pela cápsula do cadastro (CREF no formato `123456-G/PB`), olhar as duas cascas e decidir a `main`. Não há trabalho AFK pendente: o i18n que sobra depende de uma decisão de produto (declarado abaixo).
 - **Para o outro agente saber:** seis coisas. (1) A `FF5` foi **emendada** — leia a seção abaixo antes de escrever consulta. (2) **A trava da prescrição não está na tela**: está em `src/app/api/analise/route.ts`, ANTES do gasto de cota. (3) **EXISTE CONTA DE PERSONAL** desde a migração 0024 e a emenda (2) do PRD §11 — o §11 inteiro foi escrito sobre a premissa contrária, então leia a emenda antes de confiar no resto. `obterPerfil().tipoConta` é a **única** fonte; os guardas estão em `src/lib/dados/casca.ts`, chamados nas PÁGINAS e não no `proxy.ts`. (4) **`j4` e `j5` varrem com DUAS contas** — aluno vinculado e um personal separado —, com asserção de que a rota alcançada é a pedida. Se uma delas falhar numa tela sem relação com o módulo, olhe o `beforeAll` antes da tela. (5) **Sinal de "terminou" em teste tem de ser algo que não pode existir antes.** O fixture de vínculo esperava um texto presente nos dois estados e a `j7` perdeu a corrida duas vezes (`DECISIONS.md` "2026-09-12 (1)"). (6) A medida da §11.7 não tem gêmea em TypeScript de propósito.
 
 ### A conta de personal e a casca (#233, #234)
@@ -33,7 +33,7 @@ A casca do personal é **Fila · Alunos · Catálogo · Ajustes** (direção B).
 
 ### Declarado como não coberto
 
-- **Strings do módulo em pt-BR.** Nenhum arquivo do módulo usa `t()` ainda, e as duas strings do rodapé da `/analise` que usam não têm entrada no dicionário — EN/ES caem no pt-BR. Não quebra; está declarado.
+- **Strings do módulo em pt-BR, exceto na `/analise`.** As três frases que a prescrição acrescentou à `/analise` (rodapé e mensagem do 403) foram traduzidas no #236, com a data do rodapé localizada. O resto — `VinculoAluno` e as telas da casca do personal — segue sem `t()` e cai no pt-BR. **Traduzir as da casca é decisão do dono, não pendência técnica:** elas giram em torno do CREF, que só existe no Brasil.
 - **"Queda de frequência" foi entregue como queda de VOLUME** (`DECISIONS.md` "2026-09-11 (4)").
 
 ### A coisa mais importante desta sessão
