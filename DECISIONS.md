@@ -2573,3 +2573,26 @@ O dono perguntou o que acontece quando um usuário comum vira personal. A respos
 ### O que a `j8` dizia e deixa de dizer
 
 A `j8` afirmava, como comportamento correto, que *"a própria conta pode declarar o tipo — RLS de dono"*. **Isso era o furo registrado como regra.** Ela é reescrita junto: o que ela protege passa a ser "o modo trabalho não alcança as telas de treino", e a conta sem CREF nasce pelo trigger, não por um update que agora é recusado.
+
+---
+
+## 2026-09-13 (1) — Conta de usuário não vira personal: os dois modos são de quem nasceu personal
+
+**Decisão do dono**, que **estreita "2026-09-12 (2)"**. Veio quando ele perguntou como a própria conta, que é de usuário, trocaria para personal — e a resposta honesta foi que trocava: Ajustes mostrava TRABALHO com cadeado e o aviso "É personal? Informe seu CREF", e `ativar_area_de_trabalho` (0025) aceitava qualquer conta.
+
+**O erro foi de leitura, não de código.** Quando o dono escolheu a opção C ("uma conta, dois modos"), a pergunta em jogo era o personal que também treina. Eu estendi a resposta para "qualquer conta pode ganhar a área de trabalho", e isso nunca foi decidido. A regra do dono, nas palavras dele: *"usuário cadastrado não deve aparecer a opção de virar personal, mas deixe quem criou como personal ter acesso, isso é a grande diferença."*
+
+### O que vale agora
+
+- **O tipo nasce no cadastro e não muda.** O único caminho até `tipo_conta = 'personal'` é o trigger de cadastro. Update direto já estava fechado pelo GRANT de coluna (0025); a 0026 fecha a função.
+- **`ativar_area_de_trabalho` continua existindo**, só para personal com `cref` nulo — estado legítimo, porque o trigger anula CREF fora da régua.
+- **Cápsula TREINO / TRABALHO só para conta de personal.** Usuário não vê cápsula nem aviso (decisão do dono: o aviso "some de vez").
+- **Personal só nasce pelo cadastro com e-mail.** Google nasce usuário. Com PERSONAL selecionado no cadastro, o botão do Google some: sem isso, a pessoa escolheria PERSONAL, tocaria no Google e sairia usuário — em silêncio e, pela regra nova, para sempre. É a mesma classe de defeito da letra O no telefone.
+
+### Ninguém atravessou a porta
+
+Conferido no banco de produção em 2026-09-13: 5 contas de usuário e 2 de personal, e as 2 de personal são contas de teste do CI que **nasceram** personal no cadastro (`raw_user_meta_data.tipo_conta = 'personal'`). Nenhuma conta foi promovida pelo caminho da 0025.
+
+### Os testes que mudam de lado pela segunda vez
+
+A `j9` tinha *"aluno em /personal/completar vê a porta da área de trabalho"* — escrito como comportamento correto no #239. Volta a ser redirecionamento para a Home. É o mesmo padrão da `j8` que afirmava a autopromoção como regra: **teste que descreve uma decisão errada protege a decisão errada**, e precisa ser invertido junto com ela.

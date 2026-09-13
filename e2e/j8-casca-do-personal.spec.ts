@@ -136,7 +136,7 @@ test("a MESMA conta, em modo treino, alcança o treino e perde a fila", async ({
   }
 });
 
-test("a cápsula de Ajustes troca de modo, e para quem não é personal TRABALHO leva ao CREF", async ({
+test("a cápsula de Ajustes troca de modo, e conta de usuário não vê cápsula nem aviso", async ({
   browser,
 }) => {
   test.setTimeout(90_000);
@@ -160,14 +160,19 @@ test("a cápsula de Ajustes troca de modo, e para quem não é personal TRABALHO
     await tela.waitForURL((url) => url.pathname === "/personal", { timeout: 15_000 });
     await expect(tela.locator("nav.nav").getByText("Fila")).toBeVisible();
 
-    // ---- quem não tem: TRABALHO travado leva à tela do CREF ----
+    // ---- conta de usuário: nenhuma porta para virar personal ----
+    // Até 2026-09-13 este bloco afirmava o contrário: TRABALHO travado com
+    // o aviso "É personal?" levando ao CREF. Era a regra errada escrita
+    // como correta (PRD §11, emenda 2026-09-13; DECISIONS 2026-09-13 (1)).
     const telaAluno = await contextoAluno.newPage();
     await entrarComoUsuario(telaAluno, aluno);
     await telaAluno.goto("/ajustes");
-    await expect(telaAluno.getByText("É personal?")).toBeVisible();
-    await telaAluno.getByRole("link", { name: /Trabalho, travado/i }).click();
-    await telaAluno.waitForURL((url) => url.pathname === "/personal/completar", { timeout: 15_000 });
-    await expect(telaAluno.locator("#cref_completar")).toBeVisible();
+    // Sinal de que a tela carregou, e que existe nos dois estados de propósito:
+    // o card do perfil. As ausências abaixo só valem depois dele.
+    await expect(telaAluno.locator(".card-perfil-bento")).toBeVisible();
+    await expect(telaAluno.getByRole("radiogroup", { name: "Modo" })).toHaveCount(0);
+    await expect(telaAluno.getByText("É personal?")).toHaveCount(0);
+    await expect(telaAluno.getByText("TRABALHO", { exact: true })).toHaveCount(0);
   } finally {
     await contextoPersonal.close();
     await contextoAluno.close();

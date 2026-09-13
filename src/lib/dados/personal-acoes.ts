@@ -234,9 +234,10 @@ export async function salvarTelefoneWhatsApp(
 }
 
 /**
- * Abre a área de trabalho: CREF e WhatsApp. Serve aos dois caminhos da
- * emenda de 2026-09-12 (2) — quem treina e decide virar personal, e a
- * conta que nasceu personal sem CREF (Google).
+ * Completa o cadastro da conta que NASCEU personal e ficou sem CREF: CREF
+ * e WhatsApp. Desde a emenda de 2026-09-13 do PRD §11, conta de usuário
+ * não passa por aqui — a função do banco recusa (migração 0026), e a
+ * mensagem abaixo existe só para um cliente adulterado não ver erro cru.
  *
  * A gravação é `rpc` para `ativar_area_de_trabalho` (migração 0025), e não
  * update: desde a 0025 a própria conta não escreve `tipo_conta` nem `cref`
@@ -275,6 +276,9 @@ export async function completarCadastroPersonal(
 
   if (error) {
     const mensagem = error.message ?? "";
+    if (mensagem.includes("conta de usuário não vira personal")) {
+      return { ok: false, erro: "Conta de usuário não vira conta de personal." };
+    }
     if (mensagem.includes("cref inválido")) {
       return {
         ok: false,

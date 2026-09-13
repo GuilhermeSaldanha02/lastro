@@ -44,11 +44,9 @@ export default async function PaginaAjustes() {
 
             {/* O seletor de modo mora aqui, logo abaixo de quem está logado:
                 o modo é da conta, como o nome. Direção A do gate de
-                2026-09-13. */}
-            <SeletorModo
-              modo={perfil.modo}
-              temAreaDeTrabalho={perfil.tipoConta === "personal" && perfil.cref !== null}
-            />
+                2026-09-13. SÓ para quem nasceu personal (PRD §11, emenda
+                2026-09-13): usuário não vê cápsula nem aviso. */}
+            {perfil.tipoConta === "personal" && <SeletorModo modo={perfil.modo} />}
 
             <MetaSemanalForm metaInicial={perfil.metaTreinosSemana} idioma={idioma} />
 

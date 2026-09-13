@@ -2442,28 +2442,12 @@
   line-height: var(--lastro-el-corpo);
 }
 
-/* Seletor de modo (direção A do gate de 2026-09-13): a mesma cápsula, com
-   um terceiro estado. TRABALHO travado é um LINK para a tela do CREF —
-   continua sendo alvo de toque, só leva a outro lugar. O cadeado e o tom
-   apagado dizem "fechado"; a nota abaixo diz como abrir. */
-.seletor-conta__opcao--travada {
-  color: var(--lastro-txt-3);
-  text-decoration: none;
-}
-
+/* Seletor de modo (direção A do gate de 2026-09-13): a mesma cápsula. O
+   estado "TRABALHO travado" que existia aqui saiu com a regra de
+   2026-09-13 — usuário não vê a cápsula. */
 .seletor-conta__opcao:focus-visible {
   outline: var(--lastro-foco-espessura) solid var(--lastro-foco);
   outline-offset: var(--lastro-foco-afast);
-}
-
-.seletor-conta__link {
-  color: var(--lastro-ouro);
-  font-weight: var(--lastro-peso-forte);
-  text-decoration: none;
-}
-
-.seletor-conta__link:hover {
-  text-decoration: underline;
 }
 
 .campo__nota--alerta {

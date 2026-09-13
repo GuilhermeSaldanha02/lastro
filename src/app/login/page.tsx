@@ -269,11 +269,24 @@ export default function PaginaLogin() {
             </button>
           </form>
 
-          <div className="divisor-ou">
-            <span>ou</span>
-          </div>
+          {/* Personal só nasce pelo cadastro com e-mail (PRD §11, emenda
+              2026-09-13). O Google não passa pela cápsula, então a conta
+              sairia USUÁRIO — e usuário não vira personal. Com PERSONAL
+              selecionado, oferecer o Google seria deixar a pessoa escolher
+              uma coisa e receber outra, em silêncio e para sempre. */}
+          {modo === "criar-conta" && tipoConta === "personal" ? (
+            <p className="seletor-conta__nota">
+              Conta de personal é criada com e-mail e senha. Pelo Google, a
+              conta nasce de usuário.
+            </p>
+          ) : (
+            <div className="divisor-ou">
+              <span>ou</span>
+            </div>
+          )}
 
           <div className="pilha">
+            {!(modo === "criar-conta" && tipoConta === "personal") && (
             <button
               type="button"
               className="botao-secundario botao-google"
@@ -299,6 +312,7 @@ export default function PaginaLogin() {
               </svg>
               Entrar com Google
             </button>
+            )}
 
             <button
               type="button"

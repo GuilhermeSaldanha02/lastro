@@ -231,6 +231,21 @@ test("cadastro de personal: CREF vazio não passa (o campo é obrigatório)", as
   expect(new URL(page.url()).pathname).toBe("/login");
 });
 
+test("cadastro: com PERSONAL selecionado, o botão do Google some", async ({ page }) => {
+  // Conta criada pelo Google nasce usuário, e usuário não vira personal
+  // (PRD §11, emenda 2026-09-13). Com o botão à vista, a pessoa escolheria
+  // PERSONAL, tocaria no Google e sairia usuário — em silêncio e para
+  // sempre.
+  await abrirCadastro(page, "PERSONAL");
+  const google = page.getByRole("button", { name: /Entrar com Google/i });
+  await expect(page.getByText(/Conta de personal é criada com e-mail e senha/i)).toBeVisible();
+  await expect(google, "o Google continua oferecido com PERSONAL escolhido").toHaveCount(0);
+
+  // E volta para quem é usuário.
+  await page.getByRole("radio", { name: "USUÁRIO" }).click();
+  await expect(google).toBeVisible();
+});
+
 // ============================================================
 // 2. ACEITE DO CONVITE
 // ============================================================
@@ -418,17 +433,32 @@ test("portas: personal NUNCA aceita o próprio convite", async () => {
   expect(error?.message ?? "", "personal virou aluno de si mesmo").toMatch(/código inválido/i);
 });
 
-test("portas: a área de trabalho não abre com CREF fora da régua, nem pela função do banco", async () => {
+test("portas: conta de usuário não vira personal, nem com CREF válido e pela função do banco", async () => {
+  // A regra do dono (PRD §11, emenda 2026-09-13): o tipo nasce no cadastro
+  // e não muda. Entre a 0025 e a 0026 esta chamada PROMOVIA o aluno.
   const comoB = await clienteAutenticado(alunoB);
+  const { error } = await comoB.rpc("ativar_area_de_trabalho", {
+    p_cref: "123456-G/PB",
+    p_telefone_whatsapp: "5583977776666",
+  });
+  expect(error?.message ?? "", "a conta de usuário virou personal").toMatch(
+    /conta de usuário não vira personal/i,
+  );
+  const { data } = await comoB.from("usuario").select("tipo_conta, cref").eq("id", alunoB.id).maybeSingle();
+  expect(data, "a tentativa recusada mudou a conta").toEqual({ tipo_conta: "aluno", cref: null });
+});
+
+test("portas: personal sem CREF não completa o cadastro com CREF fora da régua, nem pela função do banco", async () => {
+  const comoSemCref = await clienteAutenticado(personalSemCref);
   for (const cref of ["1-G/ZZ", "ABCDEF-G/PB", "123456-E/PB", "123456-G/XX", "", "sou personal"]) {
-    const { error } = await comoB.rpc("ativar_area_de_trabalho", {
+    const { error } = await comoSemCref.rpc("ativar_area_de_trabalho", {
       p_cref: cref,
       p_telefone_whatsapp: "5583977776666",
     });
     expect(error?.message ?? "", `a função aceitou o CREF "${cref}"`).toMatch(/cref inválido/i);
   }
-  const { data } = await comoB.from("usuario").select("tipo_conta, cref").eq("id", alunoB.id).maybeSingle();
-  expect(data, "uma tentativa recusada mudou a conta").toEqual({ tipo_conta: "aluno", cref: null });
+  const { data } = await comoSemCref.from("usuario").select("cref").eq("id", personalSemCref.id).maybeSingle();
+  expect(data?.cref ?? null, "uma tentativa recusada gravou CREF").toBeNull();
 });
 
 test("portas: conta sem área de trabalho não liga o modo trabalho", async ({ page }) => {
@@ -579,14 +609,14 @@ test("rotas: sem sessão, a área do personal manda para o login", async ({ page
   }
 });
 
-test("rotas: aluno em /personal/completar vê a porta da área de trabalho, e não a fila", async ({ page }) => {
-  // Desde a emenda de 2026-09-12 (2) esta é a tela onde quem treina vira
-  // personal. Ela pode abrir para o aluno; a fila, não.
+test("rotas: aluno digitando /personal/completar volta para a Home", async ({ page }) => {
+  // Mudou de lado DUAS vezes, e as duas estão registradas: no #239 este
+  // teste afirmava que o aluno via a tela do CREF, porque ali ele virava
+  // personal. A regra do dono de 2026-09-13 desfez isso — usuário não vira
+  // personal — e o redirecionamento original volta a ser o correto.
   await entrarComoUsuario(page, alunoB);
   await page.goto("/personal/completar", { waitUntil: "domcontentloaded" });
-  expect(new URL(page.url()).pathname).toBe("/personal/completar");
-  await expect(page.locator("#cref_completar")).toBeVisible();
-  await expect(page.locator("nav.nav"), "a casca de trabalho abriu antes do CREF").toHaveCount(0);
+  expect(new URL(page.url()).pathname, "a tela de CREF abriu para conta de usuário").toBe("/");
 });
 
 test("rotas: personal com cadastro completo não reabre a tela de completar", async ({ page }) => {
