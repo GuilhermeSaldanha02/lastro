@@ -299,6 +299,72 @@ export async function completarCadastroPersonal(
 }
 
 /**
+ * A escolha do tipo da conta criada pelo Google, uma vez só (migração 0026,
+ * PRD §11 emenda 2026-09-13). A gravação é `rpc` para
+ * `escolher_tipo_conta`, que recusa conta que já escolheu — é o que impede
+ * esta tela de virar a porta de promoção que a regra proíbe.
+ */
+export async function escolherTipoConta(
+  tipo: "aluno" | "personal",
+  crefBruto: string,
+  telefoneBruto: string,
+): Promise<Resultado> {
+  if (tipo !== "aluno" && tipo !== "personal") {
+    return { ok: false, erro: "Tipo de conta inválido." };
+  }
+  const supabase = await criarClienteServidor();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return { ok: false, erro: "Sessão ausente — entre de novo." };
+
+  let cref: string | null = null;
+  let telefone: string | null = null;
+  if (tipo === "personal") {
+    if (!crefValido(crefBruto)) {
+      return {
+        ok: false,
+        erro: "CREF inválido. Use o formato 123456-G/PB, como está na sua carteira.",
+      };
+    }
+    telefone = normalizarTelefoneWhatsApp(telefoneBruto);
+    if (!telefone) {
+      return {
+        ok: false,
+        erro: "Telefone inválido. Escreva com DDD, por exemplo 83 99999-8888.",
+      };
+    }
+    cref = normalizarCref(crefBruto);
+  }
+
+  const { error } = await supabase.rpc("escolher_tipo_conta", {
+    p_tipo: tipo,
+    p_cref: cref,
+    p_telefone_whatsapp: telefone,
+  });
+
+  if (error) {
+    const mensagem = error.message ?? "";
+    if (mensagem.includes("tipo já escolhido")) {
+      return { ok: false, erro: "O tipo desta conta já foi escolhido." };
+    }
+    if (mensagem.includes("cref inválido")) {
+      return {
+        ok: false,
+        erro: "CREF inválido. Use o formato 123456-G/PB, como está na sua carteira.",
+      };
+    }
+    if (mensagem.includes("telefone inválido")) {
+      return { ok: false, erro: "Telefone inválido. Escreva com DDD." };
+    }
+    return { ok: false, erro: "Não foi possível salvar. Tente de novo." };
+  }
+
+  revalidatePath("/", "layout");
+  redirect(tipo === "personal" ? "/personal" : "/");
+}
+
+/**
  * Troca o modo ativo da conta (emenda 2026-09-12 (2)). O gesto é
  * explícito: abrir um link da fila em modo treino NÃO troca de modo.
  *

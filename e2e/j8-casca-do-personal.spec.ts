@@ -205,3 +205,33 @@ test("conta de personal sem CREF não abre a área de trabalho", async ({ browse
     await apagarUsuarioDescartavel(semCref);
   }
 });
+
+test("conta nascida pelo Google escolhe PERSONAL com os dados e abre direto na fila", async ({ browser }) => {
+  // O caminho do Google para personal (PRD §11, emenda 2026-09-13): a
+  // conta nasce sem tipo, escolhe em /boas-vindas e termina ali, com CREF
+  // e WhatsApp. A conta pendente nasce pelo trigger sem metadado de tipo,
+  // que é o que o Google entrega.
+  const pendente = await criarUsuarioDescartavel("j8-google-personal", "aluno", { semTipo: true });
+  const contexto = await browser.newContext();
+  try {
+    const tela = await contexto.newPage();
+    await entrarComoUsuario(tela, pendente);
+    await tela.goto("/");
+    await tela.waitForURL((url) => url.pathname === "/boas-vindas", { timeout: 15_000 });
+
+    await tela.getByRole("radio", { name: "PERSONAL" }).click();
+    await tela.locator("#cref_escolha").fill("123456-G/PB");
+    await tela.locator("#telefone_escolha").fill("83 97777-6666");
+    await tela.getByRole("button", { name: "Continuar" }).click();
+
+    await tela.waitForURL((url) => url.pathname === "/personal", { timeout: 15_000 });
+    await expect(tela.locator("nav.nav").getByText("Fila")).toBeVisible();
+
+    // E tem os dois modos, como todo personal.
+    await tela.goto("/ajustes");
+    await expect(tela.getByRole("radiogroup", { name: "Modo" })).toBeVisible();
+  } finally {
+    await contexto.close();
+    await apagarUsuarioDescartavel(pendente);
+  }
+});

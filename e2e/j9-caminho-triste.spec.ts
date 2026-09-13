@@ -231,19 +231,112 @@ test("cadastro de personal: CREF vazio não passa (o campo é obrigatório)", as
   expect(new URL(page.url()).pathname).toBe("/login");
 });
 
-test("cadastro: com PERSONAL selecionado, o botão do Google some", async ({ page }) => {
-  // Conta criada pelo Google nasce usuário, e usuário não vira personal
-  // (PRD §11, emenda 2026-09-13). Com o botão à vista, a pessoa escolheria
-  // PERSONAL, tocaria no Google e sairia usuário — em silêncio e para
-  // sempre.
-  await abrirCadastro(page, "PERSONAL");
-  const google = page.getByRole("button", { name: /Entrar com Google/i });
-  await expect(page.getByText(/Conta de personal é criada com e-mail e senha/i)).toBeVisible();
-  await expect(google, "o Google continua oferecido com PERSONAL escolhido").toHaveCount(0);
+// ============================================================
+// 1b. CONTA NASCIDA PELO GOOGLE — a escolha do tipo, uma vez só
+// ============================================================
+// O Google não é automatizável aqui; a conta pendente nasce pelo mesmo
+// trigger, sem metadado de tipo (`semTipo`), que é exatamente o que o
+// Google entrega. Cada teste gasta a própria conta: escolher é irreversível.
 
-  // E volta para quem é usuário.
-  await page.getByRole("radio", { name: "USUÁRIO" }).click();
-  await expect(google).toBeVisible();
+test("google: conta sem tipo escolhido não abre nenhuma tela antes da escolha", async ({ page }) => {
+  const pendente = await criarUsuarioDescartavel("j9-pendente-rotas", "aluno", { semTipo: true });
+  try {
+    await entrarComoUsuario(page, pendente);
+    for (const rota of ["/", "/treino", "/analise", "/personal", "/personal/alunos"]) {
+      await page.goto(rota, { waitUntil: "domcontentloaded" });
+      expect(new URL(page.url()).pathname, `${rota} abriu sem o tipo escolhido`).toBe("/boas-vindas");
+    }
+  } finally {
+    await apagarUsuarioDescartavel(pendente);
+  }
+});
+
+test("google: escolher PERSONAL exige CREF e WhatsApp válidos, na tela e no banco", async ({ page }) => {
+  const pendente = await criarUsuarioDescartavel("j9-pendente-cref", "aluno", { semTipo: true });
+  try {
+    await entrarComoUsuario(page, pendente);
+    await page.goto("/boas-vindas");
+    await page.getByRole("radio", { name: "PERSONAL" }).click();
+    const continuar = page.getByRole("button", { name: "Continuar" });
+
+    await expect(continuar, "PERSONAL sem dados liberou o botão").toBeDisabled();
+    await page.locator("#telefone_escolha").fill("83 97777-6666");
+    await page.locator("#cref_escolha").fill("12345O-G/PB");
+    await expect(page.locator(".campo__nota--alerta")).toBeVisible();
+    await expect(continuar, "CREF com letra O liberou o botão").toBeDisabled();
+
+    // O banco não confia no botão.
+    const comoPendente = await clienteAutenticado(pendente);
+    for (const [cref, telefone, erro] of [
+      ["1-G/ZZ", "5583977776666", /cref inválido/i],
+      ["123456-G/PB", "abc", /telefone inválido/i],
+      ["123456-G/PB", null, /telefone inválido/i],
+    ] as const) {
+      const { error } = await comoPendente.rpc("escolher_tipo_conta", {
+        p_tipo: "personal",
+        p_cref: cref,
+        p_telefone_whatsapp: telefone,
+      });
+      expect(error?.message ?? "", `personal aceito com ${cref} / ${telefone}`).toMatch(erro);
+    }
+    const { error: tipoLixo } = await comoPendente.rpc("escolher_tipo_conta", {
+      p_tipo: "admin",
+      p_cref: null,
+      p_telefone_whatsapp: null,
+    });
+    expect(tipoLixo?.message ?? "", "tipo inventado aceito").toMatch(/tipo inválido/i);
+
+    const { data } = await comoPendente
+      .from("usuario")
+      .select("tipo_conta, tipo_escolhido, cref")
+      .eq("id", pendente.id)
+      .maybeSingle();
+    expect(data, "uma tentativa recusada consumiu a escolha").toEqual({
+      tipo_conta: "aluno",
+      tipo_escolhido: false,
+      cref: null,
+    });
+  } finally {
+    await apagarUsuarioDescartavel(pendente);
+  }
+});
+
+test("google: quem escolheu USUÁRIO não escolhe de novo nem vira personal por outra porta", async ({ page }) => {
+  const pendente = await criarUsuarioDescartavel("j9-pendente-usuario", "aluno", { semTipo: true });
+  try {
+    await entrarComoUsuario(page, pendente);
+    await page.goto("/boas-vindas");
+    await page.getByRole("button", { name: "Continuar" }).click();
+    await page.waitForURL((url) => url.pathname === "/", { timeout: 15_000 });
+
+    // A tela de escolha não reabre.
+    await page.goto("/boas-vindas", { waitUntil: "domcontentloaded" });
+    expect(new URL(page.url()).pathname, "a escolha reabriu depois de feita").toBe("/");
+
+    const comoUsuario = await clienteAutenticado(pendente);
+    const deNovo = await comoUsuario.rpc("escolher_tipo_conta", {
+      p_tipo: "personal",
+      p_cref: "123456-G/PB",
+      p_telefone_whatsapp: "5583977776666",
+    });
+    expect(deNovo.error?.message ?? "", "a conta escolheu o tipo duas vezes").toMatch(/tipo já escolhido/i);
+
+    const ativar = await comoUsuario.rpc("ativar_area_de_trabalho", {
+      p_cref: "123456-G/PB",
+      p_telefone_whatsapp: "5583977776666",
+    });
+    expect(ativar.error?.message ?? "", "usuário virou personal pela porta do CREF").toMatch(
+      /conta de usuário não vira personal/i,
+    );
+
+    const reabrir = await comoUsuario.from("usuario").update({ tipo_escolhido: false }).eq("id", pendente.id);
+    expect(reabrir.error, "a conta reabriu a própria escolha pela API").not.toBeNull();
+
+    const { data } = await comoUsuario.from("usuario").select("tipo_conta").eq("id", pendente.id).maybeSingle();
+    expect(data?.tipo_conta).toBe("aluno");
+  } finally {
+    await apagarUsuarioDescartavel(pendente);
+  }
 });
 
 // ============================================================

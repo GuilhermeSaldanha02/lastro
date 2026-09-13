@@ -2584,10 +2584,11 @@ A `j8` afirmava, como comportamento correto, que *"a própria conta pode declara
 
 ### O que vale agora
 
-- **O tipo nasce no cadastro e não muda.** O único caminho até `tipo_conta = 'personal'` é o trigger de cadastro. Update direto já estava fechado pelo GRANT de coluna (0025); a 0026 fecha a função.
+- **O tipo nasce com a conta e não muda.** Os únicos caminhos até `tipo_conta = 'personal'` são os do nascimento: o trigger do cadastro por e-mail e `escolher_tipo_conta`, que roda uma vez na conta criada pelo Google. Update direto já estava fechado pelo GRANT de coluna (0025); a 0026 fecha a função de CREF para conta de usuário.
 - **`ativar_area_de_trabalho` continua existindo**, só para personal com `cref` nulo — estado legítimo, porque o trigger anula CREF fora da régua.
 - **Cápsula TREINO / TRABALHO só para conta de personal.** Usuário não vê cápsula nem aviso (decisão do dono: o aviso "some de vez").
-- **Personal só nasce pelo cadastro com e-mail.** Google nasce usuário. Com PERSONAL selecionado no cadastro, o botão do Google some: sem isso, a pessoa escolheria PERSONAL, tocaria no Google e sairia usuário — em silêncio e, pela regra nova, para sempre. É a mesma classe de defeito da letra O no telefone.
+- **Personal nasce pelo e-mail OU pelo Google.** O Google não passa pela cápsula, então a conta nasce com `tipo_escolhido = false` e cai em `/boas-vindas` antes de qualquer tela: escolhe USUÁRIO, ou escolhe PERSONAL e preenche CREF e WhatsApp ali mesmo. `escolher_tipo_conta` roda uma vez só, e `tipo_escolhido` está fora do GRANT de update. **Eu primeiro li a resposta do dono como "Google nasce usuário" e escondi o botão do Google com PERSONAL selecionado; ele corrigiu** — essa leitura errada não chegou a sair do branch.
+- **Por que a escolha pendente não é a promoção proibida:** a conta pendente não abre nenhuma tela do app antes de escolher (guarda em `casca.ts` e desvio no `/auth/callback`). Ela nunca foi usuário; está nascendo.
 
 ### Ninguém atravessou a porta
 

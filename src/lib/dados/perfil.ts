@@ -37,6 +37,12 @@ export type Perfil = {
    * dois modos, e é ESTE campo que os guardas de rota leem.
    */
   modo: "treino" | "trabalho";
+  /**
+   * `false` só na conta recém-criada pelo Google, que ainda não escolheu
+   * entre usuário e personal (migração 0026). Enquanto for `false`, os
+   * guardas mandam para `/boas-vindas`.
+   */
+  tipoEscolhido: boolean;
 };
 
 export async function obterPerfil(): Promise<Perfil | null> {
@@ -48,7 +54,7 @@ export async function obterPerfil(): Promise<Perfil | null> {
 
   const { data } = await supabase
     .from("usuario")
-    .select("nome, avatar_url, meta_treinos_semana, idioma, tipo_conta, cref, modo_ativo")
+    .select("nome, avatar_url, meta_treinos_semana, idioma, tipo_conta, cref, modo_ativo, tipo_escolhido")
     .eq("id", user.id)
     .maybeSingle();
 
@@ -72,6 +78,9 @@ export async function obterPerfil(): Promise<Perfil | null> {
       data.tipo_conta === "personal" && data.modo_ativo === "trabalho"
         ? "trabalho"
         : "treino",
+    // Só `false` explícito é pendente. Valor inesperado conta como já
+    // escolhido: a conta segue usuário, e ninguém fica preso na escolha.
+    tipoEscolhido: data.tipo_escolhido !== false,
   };
 }
 

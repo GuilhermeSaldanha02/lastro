@@ -225,7 +225,7 @@ Uma conta pode estar **vinculada a um personal**. Enquanto o vínculo existe, a 
 >
 > 1. **O tipo da conta nasce no cadastro e não muda.** Quem nasce usuário é usuário para sempre; não existe tela, aviso nem função que o transforme em personal.
 > 2. **Os dois modos (treino / trabalho) são só de quem NASCEU personal.** Esse é o ganho da emenda anterior que continua: o personal treina e trabalha na mesma conta.
-> 3. **Personal só nasce pelo cadastro com e-mail**, escolhendo PERSONAL na cápsula e preenchendo os dados obrigatórios (CREF e WhatsApp). Conta criada pelo Google nasce usuário. Por isso, com PERSONAL selecionado no cadastro, o botão do Google não aparece — senão a pessoa escolheria personal e sairia usuário sem perceber, para sempre.
+> 3. **Personal nasce pelo cadastro com e-mail OU pelo Google.** No e-mail, a escolha é a cápsula. No Google, que não passa pela cápsula, a escolha acontece **logo depois do primeiro login** (`/boas-vindas`): nenhuma tela abre antes. Nas palavras do dono: *"logo [no] gmail ele tem que escolher o tipo de conta, aí se escolher personal ele finaliza preenchendo obrigatoriamente os dados que personal precisa."* A escolha é feita uma vez; quem escolheu USUÁRIO é usuário para sempre.
 > 4. Os pontos 2, 3 e 4 da emenda de 2026-09-12 (2) continuam valendo.
 
 ### 11.2 O corte exato
