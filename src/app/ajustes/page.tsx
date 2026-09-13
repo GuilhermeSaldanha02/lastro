@@ -1,7 +1,7 @@
 // lastro · Ajustes consolidados em Bento Grid de alto padrão Apex Pro
 import Link from "next/link";
 import { obterPerfil } from "@/lib/dados/perfil";
-import { exigirCascaDeAluno } from "@/lib/dados/casca";
+import { cascaDaBarra } from "@/lib/dados/casca";
 import { sair } from "@/lib/dados/auth";
 import AbaInferior from "@/components/aba-inferior";
 import Avatar from "@/components/avatar";
@@ -169,7 +169,7 @@ export default async function PaginaAjustes() {
         )}
       </div>
 
-      <AbaInferior ativa="ajustes" idioma={idioma} tipoConta={perfil?.tipoConta} />
+      <AbaInferior ativa="ajustes" idioma={idioma} tipoConta={cascaDaBarra(perfil)} />
     </main>
   );
 }

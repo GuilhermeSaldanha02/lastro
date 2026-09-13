@@ -6,7 +6,7 @@ import { criarClienteServidor } from "@/lib/supabase/cliente-servidor";
 import { carregarResumoHome } from "@/lib/dados/resumo-home";
 import { criarTreino } from "@/lib/dados/treino";
 import { obterPerfil } from "@/lib/dados/perfil";
-import { exigirCascaDeAluno } from "@/lib/dados/casca";
+import { cascaDaBarra, exigirCascaDeAluno } from "@/lib/dados/casca";
 import { listarModelos } from "@/lib/dados/modelo-treino";
 import { dataLocalBrasil, formatarDataCurta } from "@/lib/tempo";
 import AbaInferior from "@/components/aba-inferior";
@@ -246,7 +246,7 @@ export default async function PaginaInicial() {
         )}
       </div>
 
-      <AbaInferior ativa="inicio" idioma={idioma} tipoConta={perfil?.tipoConta} />
+      <AbaInferior ativa="inicio" idioma={idioma} tipoConta={cascaDaBarra(perfil)} />
     </main>
   );
 }

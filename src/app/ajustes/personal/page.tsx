@@ -19,6 +19,7 @@ import VoltarFlutuante from "@/components/voltar-flutuante";
 import VinculoAluno from "@/components/vinculo-aluno";
 import ConvitesPersonal from "@/components/convites-personal";
 import { obterPerfil } from "@/lib/dados/perfil";
+import { cascaDaBarra } from "@/lib/dados/casca";
 import {
   carregarVinculoDoAluno,
   listarAlunosVinculados,
@@ -41,7 +42,10 @@ export default async function PaginaPersonalAjustes({
   const perfil = await obterPerfil();
   if (!perfil) redirect("/login");
 
-  const ehPersonal = perfil.tipoConta === "personal";
+  // O lado exibido segue o MODO, não o tipo da conta (emenda 2026-09-12
+  // (2)): em modo treino, quem tem área de trabalho é aluno como qualquer
+  // outro — pode ter o próprio personal.
+  const ehPersonal = perfil.modo === "trabalho";
 
   const [{ codigo }, vinculo, convites, alunos, telefone, cabecalhos] =
     await Promise.all([
@@ -104,7 +108,7 @@ export default async function PaginaPersonalAjustes({
       </div>
 
       <VoltarFlutuante href="/ajustes" rotulo="Ajustes" />
-      <AbaInferior ativa="ajustes" />
+      <AbaInferior ativa="ajustes" tipoConta={cascaDaBarra(perfil)} />
     </main>
   );
 }

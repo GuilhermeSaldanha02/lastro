@@ -407,15 +407,53 @@ test("vínculo: desistir da revogação no meio mantém o vínculo", async ({ pa
 // 4. PORTAS SEM TELA — o que um cliente adulterado tentaria
 // ============================================================
 
-test("portas: conta de personal não aceita convite", async () => {
+test("portas: personal NUNCA aceita o próprio convite", async () => {
+  // Desde a emenda de 2026-09-12 (2) personal pode ter personal — mas não
+  // pode ser o personal de si mesmo. A trava é `personal_id <> v_aluno`.
   const comoPersonal = await clienteAutenticado(personal);
   const { error } = await comoPersonal.rpc("aceitar_convite_personal", {
     p_codigo: await conviteNovo(),
     p_telefone_whatsapp: "5583977776666",
   });
-  expect(error?.message ?? "", "conta de personal virou aluna de alguém").toMatch(
-    /conta de personal não aceita convite/i,
-  );
+  expect(error?.message ?? "", "personal virou aluno de si mesmo").toMatch(/código inválido/i);
+});
+
+test("portas: a área de trabalho não abre com CREF fora da régua, nem pela função do banco", async () => {
+  const comoB = await clienteAutenticado(alunoB);
+  for (const cref of ["1-G/ZZ", "ABCDEF-G/PB", "123456-E/PB", "123456-G/XX", "", "sou personal"]) {
+    const { error } = await comoB.rpc("ativar_area_de_trabalho", {
+      p_cref: cref,
+      p_telefone_whatsapp: "5583977776666",
+    });
+    expect(error?.message ?? "", `a função aceitou o CREF "${cref}"`).toMatch(/cref inválido/i);
+  }
+  const { data } = await comoB.from("usuario").select("tipo_conta, cref").eq("id", alunoB.id).maybeSingle();
+  expect(data, "uma tentativa recusada mudou a conta").toEqual({ tipo_conta: "aluno", cref: null });
+});
+
+test("portas: conta sem área de trabalho não liga o modo trabalho", async ({ page }) => {
+  const comoB = await clienteAutenticado(alunoB);
+  const { error } = await comoB.from("usuario").update({ modo_ativo: "trabalho" }).eq("id", alunoB.id);
+  expect(error, "aluno ligou o modo trabalho — a check da 0025 não segurou").not.toBeNull();
+
+  await entrarComoUsuario(page, alunoB);
+  await page.goto("/personal", { waitUntil: "domcontentloaded" });
+  expect(new URL(page.url()).pathname).toBe("/");
+});
+
+test("portas: a conta não apaga nem recria a própria linha de perfil", async () => {
+  // Com insert e delete liberados, bastaria apagar a linha e recriá-la com
+  // `tipo_conta = 'personal'` — o GRANT de coluna de update não fecharia
+  // essa volta.
+  const comoB = await clienteAutenticado(alunoB);
+  await comoB.from("usuario").delete().eq("id", alunoB.id);
+  const { data } = await comoB.from("usuario").select("id").eq("id", alunoB.id).maybeSingle();
+  expect(data?.id, "a conta apagou a própria linha de perfil").toBe(alunoB.id);
+
+  const insercao = await comoB
+    .from("usuario")
+    .insert({ id: alunoB.id, nome: "x", tipo_conta: "personal", cref: "123456-G/PB" });
+  expect(insercao.error, "a conta inseriu linha de perfil pela API").not.toBeNull();
 });
 
 test("portas: conta de aluno não gera convite", async () => {
@@ -541,10 +579,14 @@ test("rotas: sem sessão, a área do personal manda para o login", async ({ page
   }
 });
 
-test("rotas: aluno digitando a tela de completar cadastro volta para a Home", async ({ page }) => {
+test("rotas: aluno em /personal/completar vê a porta da área de trabalho, e não a fila", async ({ page }) => {
+  // Desde a emenda de 2026-09-12 (2) esta é a tela onde quem treina vira
+  // personal. Ela pode abrir para o aluno; a fila, não.
   await entrarComoUsuario(page, alunoB);
   await page.goto("/personal/completar", { waitUntil: "domcontentloaded" });
-  expect(new URL(page.url()).pathname).toBe("/");
+  expect(new URL(page.url()).pathname).toBe("/personal/completar");
+  await expect(page.locator("#cref_completar")).toBeVisible();
+  await expect(page.locator("nav.nav"), "a casca de trabalho abriu antes do CREF").toHaveCount(0);
 });
 
 test("rotas: personal com cadastro completo não reabre a tela de completar", async ({ page }) => {

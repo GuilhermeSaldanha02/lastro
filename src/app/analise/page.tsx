@@ -4,7 +4,7 @@
 // a parte interativa (perguntas, chamada à API) vive em
 // `components/analise-interativa.tsx`.
 import { obterPerfil } from "@/lib/dados/perfil";
-import { exigirCascaDeAluno } from "@/lib/dados/casca";
+import { cascaDaBarra, exigirCascaDeAluno } from "@/lib/dados/casca";
 import { carregarResumoHome } from "@/lib/dados/resumo-home";
 import { carregarDiasSemEstimuloPorGrupo } from "@/lib/dados/recencia-grupos";
 import { carregarSinalDeload } from "@/lib/dados/alerta-deload";
@@ -57,7 +57,7 @@ export default async function PaginaAnalise() {
         }
       />
 
-      <AbaInferior ativa="analise" idioma={idioma} tipoConta={perfil?.tipoConta} />
+      <AbaInferior ativa="analise" idioma={idioma} tipoConta={cascaDaBarra(perfil)} />
     </main>
   );
 }

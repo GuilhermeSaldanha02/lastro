@@ -3,7 +3,7 @@
 // antes de renderizar a barra de topo; a conversa em si vive em
 // `components/coach-interativo.tsx`.
 import { obterPerfil } from "@/lib/dados/perfil";
-import { exigirCascaDeAluno } from "@/lib/dados/casca";
+import { cascaDaBarra, exigirCascaDeAluno } from "@/lib/dados/casca";
 import AbaInferior from "@/components/aba-inferior";
 import CabecalhoPro from "@/components/cabecalho-pro";
 import CoachInterativo from "@/components/coach-interativo";
@@ -26,7 +26,7 @@ export default async function PaginaCoach() {
 
       <CoachInterativo idioma={idioma} />
 
-      <AbaInferior ativa="ajustes" idioma={idioma} tipoConta={perfil?.tipoConta} />
+      <AbaInferior ativa="ajustes" idioma={idioma} tipoConta={cascaDaBarra(perfil)} />
     </main>
   );
 }

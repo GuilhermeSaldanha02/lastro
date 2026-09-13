@@ -234,15 +234,14 @@ export async function salvarTelefoneWhatsApp(
 }
 
 /**
- * Completa o cadastro de quem criou conta de personal pelo Google: CREF e,
- * se faltar, o WhatsApp.
+ * Abre a área de trabalho: CREF e WhatsApp. Serve aos dois caminhos da
+ * emenda de 2026-09-12 (2) — quem treina e decide virar personal, e a
+ * conta que nasceu personal sem CREF (Google).
  *
- * Esta ação existe por causa de uma restrição do banco que não dá para
- * contornar: o trigger de perfil roda DENTRO do insert em `auth.users`, e
- * o Google não manda CREF nem telefone. Exigir no schema abortaria o
- * cadastro inteiro; então `tipo_conta = 'personal'` com `cref` nulo é
- * estado legítimo, e a obrigatoriedade vive aqui e no guarda de rota
- * (`casca.ts`), onde a mensagem é visível e acionável.
+ * A gravação é `rpc` para `ativar_area_de_trabalho` (migração 0025), e não
+ * update: desde a 0025 a própria conta não escreve `tipo_conta` nem `cref`
+ * direto. As checagens abaixo existem para a mensagem sair em português
+ * antes da viagem ao banco; a regra que vale é a da função.
  */
 export async function completarCadastroPersonal(
   crefBruto: string,
@@ -269,18 +268,57 @@ export async function completarCadastroPersonal(
     };
   }
 
-  // A conta já é `personal` (veio do cadastro); aqui NÃO se promove
-  // ninguém. Escrever `tipo_conta` nesta ação transformaria a tela de
-  // completar cadastro numa porta para virar profissional sem passar pelo
-  // cadastro — exatamente o que a escolha na origem existe para evitar.
+  const { error } = await supabase.rpc("ativar_area_de_trabalho", {
+    p_cref: normalizarCref(crefBruto),
+    p_telefone_whatsapp: telefone,
+  });
+
+  if (error) {
+    const mensagem = error.message ?? "";
+    if (mensagem.includes("cref inválido")) {
+      return {
+        ok: false,
+        erro: "CREF inválido. Use o formato 123456-G/PB, como está na sua carteira.",
+      };
+    }
+    if (mensagem.includes("cref já informado")) {
+      return { ok: false, erro: "Esta conta já tem CREF informado." };
+    }
+    if (mensagem.includes("telefone inválido")) {
+      return { ok: false, erro: "Telefone inválido. Escreva com DDD." };
+    }
+    return { ok: false, erro: "Não foi possível salvar. Tente de novo." };
+  }
+
+  revalidatePath("/", "layout");
+  redirect("/personal");
+}
+
+/**
+ * Troca o modo ativo da conta (emenda 2026-09-12 (2)). O gesto é
+ * explícito: abrir um link da fila em modo treino NÃO troca de modo.
+ *
+ * `trabalho` em conta sem área de trabalho é recusado pela check
+ * `usuario_modo_trabalho_exige_personal` — o erro volta daqui, e ninguém
+ * se promove pelo seletor de modo.
+ */
+export async function alternarModo(modo: "treino" | "trabalho"): Promise<Resultado> {
+  if (modo !== "treino" && modo !== "trabalho") {
+    return { ok: false, erro: "Modo inválido." };
+  }
+  const supabase = await criarClienteServidor();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return { ok: false, erro: "Sessão ausente — entre de novo." };
+
   const { error } = await supabase
     .from("usuario")
-    .update({ cref: normalizarCref(crefBruto), telefone_whatsapp: telefone })
+    .update({ modo_ativo: modo })
     .eq("id", user.id);
 
-  if (error) return { ok: false, erro: "Não foi possível salvar. Tente de novo." };
+  if (error) return { ok: false, erro: "Não foi possível trocar de modo. Tente de novo." };
 
-  revalidatePath("/personal");
-  revalidatePath("/personal/alunos");
-  redirect("/personal");
+  revalidatePath("/", "layout");
+  redirect(modo === "trabalho" ? "/personal" : "/");
 }

@@ -1,11 +1,12 @@
-// lastro · As DUAS CASCAS (PRD §11, emenda de 2026-09-11) — `QA.md` PE-09.
+// lastro · As DUAS CASCAS (PRD §11, emendas de 2026-09-11 e 2026-09-12 (2))
+// — `QA.md` PE-09.
 //
-// O que este spec protege: a decisão "conta de personal não treina" é
+// O que este spec protege: desde a emenda de 2026-09-12 (2) as cascas são
+// MODOS da mesma conta. "O modo trabalho não alcança as telas de treino" é
 // arquitetura, não estética. Trocar a barra inferior é PISTA; a porta é o
 // guarda de rota (`casca.ts`). Sem ele, `/treino` continua respondendo por
 // URL digitada, por link velho no histórico e pelo HTML que o service
-// worker guardou — e a decisão vira decoração, do mesmo jeito que a trava
-// da prescrição viraria se morasse só na tela.
+// worker guardou.
 //
 // As asserções de REDIRECIONAMENTO são, por isso, mais importantes que as
 // de navegação: uma barra sem "Treinos" com a rota aberta é pior do que
@@ -35,7 +36,7 @@ test.afterAll(async () => {
   if (aluno) await apagarUsuarioDescartavel(aluno);
 });
 
-test("a conta de personal mora na fila e não alcança as telas de quem treina", async ({
+test("em modo trabalho a conta mora na fila e não alcança as telas de quem treina", async ({
   browser,
 }) => {
   test.setTimeout(120_000);
@@ -43,7 +44,7 @@ test("a conta de personal mora na fila e não alcança as telas de quem treina",
   const { contextoPersonal, telaPersonal, contextoAluno, telaAluno } =
     await criarVinculoAceito({ browser, personal, aluno });
 
-  // ---- a casca do personal ----
+  // ---- a casca de trabalho ----
   const nav = telaPersonal.locator("nav.nav");
   await telaPersonal.goto("/personal");
   await expect(nav.getByText("Fila")).toBeVisible();
@@ -61,7 +62,7 @@ test("a conta de personal mora na fila e não alcança as telas de quem treina",
     await telaPersonal.goto(rota, { waitUntil: "domcontentloaded" });
     expect(
       new URL(telaPersonal.url()).pathname,
-      `conta de personal não pode ficar em ${rota}`,
+      `modo trabalho não pode ficar em ${rota}`,
     ).toBe("/personal");
   }
 
@@ -70,8 +71,7 @@ test("a conta de personal mora na fila e não alcança as telas de quem treina",
   await telaPersonal.goto("/personal/alunos");
   await expect(telaPersonal.getByText("Ana Ribeiro")).toBeVisible();
 
-  // Em Ajustes > Personal, a conta de personal vê o lado de convidar e
-  // NÃO vê o campo de colar código — a função de aceite recusaria.
+  // Em Ajustes > Personal, o modo trabalho vê o lado de convidar.
   await telaPersonal.goto("/ajustes/personal");
   await expect(telaPersonal.locator("#codigo_convite")).toHaveCount(0);
   await expect(
@@ -86,7 +86,7 @@ test("a conta de personal mora na fila e não alcança as telas de quem treina",
   await expect(navAluno.getByText("Análise")).toBeVisible();
   await expect(navAluno.getByText("Fila")).toHaveCount(0);
 
-  // E o caminho contrário: aluno não entra na casa de trabalho.
+  // E o caminho contrário: conta sem área de trabalho não entra na fila.
   for (const rota of ["/personal", "/personal/alunos"]) {
     await telaAluno.goto(rota, { waitUntil: "domcontentloaded" });
     expect(
@@ -105,32 +105,58 @@ test("a conta de personal mora na fila e não alcança as telas de quem treina",
   await contextoAluno.close();
 });
 
-test("conta de personal sem CREF não abre a área de trabalho", async ({ browser }) => {
-  // O estado do cadastro por Google: `tipo_conta = 'personal'` com `cref`
-  // nulo. É LEGÍTIMO no banco — não existe constraint "personal implica
-  // CREF", e não pode existir, porque ela abortaria o cadastro dentro do
-  // insert em `auth.users`. A obrigatoriedade é do app, e é isto que o
-  // teste mede.
-  const semCref = await criarUsuarioDescartavel("j8-sem-cref");
+test("a MESMA conta, em modo treino, alcança o treino e perde a fila", async ({ browser }) => {
+  // O ponto da emenda de 2026-09-12 (2): virar personal não custa a tela
+  // de treino. O modo é trocado com o JWT da própria conta — a mesma
+  // escrita que o seletor de Ajustes faz — e desfeito no fim.
+  const cliente = await clienteAutenticado(personal);
+  const contexto = await browser.newContext();
   try {
-    // Promovido sem CREF, exatamente como o Google deixaria a conta.
-    const cliente = await clienteAutenticado(semCref);
     const { error } = await cliente
       .from("usuario")
-      .update({ tipo_conta: "personal" })
-      .eq("id", semCref.id);
-    expect(error, "a própria conta pode declarar o tipo — RLS de dono").toBeNull();
+      .update({ modo_ativo: "treino" })
+      .eq("id", personal.id);
+    expect(error, "a própria conta troca de modo").toBeNull();
 
-    const contexto = await browser.newContext();
+    const tela = await contexto.newPage();
+    await entrarComoUsuario(tela, personal);
+
+    for (const rota of ["/", "/treino", "/analise"]) {
+      await tela.goto(rota, { waitUntil: "domcontentloaded" });
+      expect(new URL(tela.url()).pathname, `modo treino precisa abrir ${rota}`).toBe(rota);
+    }
+    await expect(tela.locator("nav.nav").getByText("Treinos")).toBeVisible();
+
+    // Link da fila em modo treino NÃO troca de modo sozinho.
+    await tela.goto("/personal", { waitUntil: "domcontentloaded" });
+    expect(new URL(tela.url()).pathname).toBe("/");
+  } finally {
+    await contexto.close();
+    await cliente.from("usuario").update({ modo_ativo: "trabalho" }).eq("id", personal.id);
+  }
+});
+
+test("conta de personal sem CREF não abre a área de trabalho", async ({ browser }) => {
+  // O estado do cadastro por Google: `tipo_conta = 'personal'` com `cref`
+  // nulo. É LEGÍTIMO no banco — constraint "personal implica CREF"
+  // abortaria o cadastro dentro do insert em `auth.users`. A
+  // obrigatoriedade é do app, e é isto que o teste mede.
+  //
+  // A conta nasce assim pelo trigger. Até 2026-09-12 este teste a
+  // promovia com um update na própria linha e afirmava que isso era
+  // correto — era o furo registrado como regra (`DECISIONS.md`
+  // "2026-09-12 (2)"). Desde a 0025 esse update é recusado.
+  const semCref = await criarUsuarioDescartavel("j8-sem-cref", "personal", { semCref: true });
+  const contexto = await browser.newContext();
+  try {
     const tela = await contexto.newPage();
     await entrarComoUsuario(tela, semCref);
 
     await tela.goto("/personal", { waitUntil: "domcontentloaded" });
     expect(new URL(tela.url()).pathname).toBe("/personal/completar");
     await expect(tela.locator("#cref_completar")).toBeVisible();
-
-    await contexto.close();
   } finally {
+    await contexto.close();
     await apagarUsuarioDescartavel(semCref);
   }
 });
