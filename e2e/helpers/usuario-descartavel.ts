@@ -47,17 +47,32 @@ const CREF_QA = "999999-G/PB";
 export async function criarUsuarioDescartavel(
   prefixo: string,
   tipo: TipoConta = "aluno",
+  opcoes: {
+    /**
+     * Conta de personal SEM CREF — o estado de quem entrou pelo Google.
+     * Nasce assim pelo trigger, e não por um `update` da própria conta
+     * depois, para não depender de a conta poder mudar o próprio
+     * `tipo_conta` (uma das portas que a j9 testa).
+     */
+    semCref?: boolean;
+  } = {},
 ): Promise<UsuarioDescartavel> {
   const admin = clienteAdmin();
   const email = `qa.e2e.${prefixo}.${Date.now()}@lastro.test`;
   const senha = `Qa!${Math.random().toString(36).slice(2)}A1`;
 
+  const metadado =
+    tipo !== "personal"
+      ? {}
+      : opcoes.semCref
+        ? { tipo_conta: "personal" }
+        : { tipo_conta: "personal", cref: CREF_QA };
+
   const { data, error } = await admin.auth.admin.createUser({
     email,
     password: senha,
     email_confirm: true,
-    user_metadata:
-      tipo === "personal" ? { tipo_conta: "personal", cref: CREF_QA } : {},
+    user_metadata: metadado,
   });
   if (error || !data.user) {
     throw new Error(`Falha ao criar usuário QA descartável: ${error?.message}`);
