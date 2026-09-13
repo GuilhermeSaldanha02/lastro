@@ -208,6 +208,17 @@ Uma conta pode estar **vinculada a um personal**. Enquanto o vínculo existe, a 
 >
 > **O que NÃO muda:** o §11.2 abaixo continua valendo inteiro para o lado do aluno — ele mantém tudo e perde só a prescrição sob vínculo. E o §5 segue sem exceção: nenhuma conta fala com outra dentro do lastro.
 
+> **EMENDA em 2026-09-12 (2) — UMA conta, dois modos. Decisão do dono. Derruba o ponto 4 da emenda acima.**
+>
+> O ponto 4 (*"quem é personal e também treina usa DUAS contas"*) **não vale mais.** O dono pediu o estudo de como os apps da categoria resolvem isso antes de decidir, e decidiu depois de ver o resultado (`DECISIONS.md` "2026-09-12 (2)"). Os pontos 1, 2 e 3 continuam, com o ajuste abaixo.
+>
+> 1. **Toda conta treina.** A área de trabalho é uma capacidade que a conta GANHA ao informar o CREF — no cadastro (cápsula PERSONAL) ou depois, em Ajustes. Ninguém perde a própria tela de treino por virar personal.
+> 2. **A conta com área de trabalho alterna entre dois modos:** `treino` (Início, Treinos, Análise) e `trabalho` (Fila, Alunos). O modo ativo decide a casca e é guardado no banco, não no navegador. O ponto 3 acima passa a ler: **o modo trabalho** não tem "iniciar treino".
+> 3. **Ganhar a área de trabalho só acontece por uma porta**, a que valida o CREF. A própria conta não escreve `tipo_conta` nem `cref` por update direto — se escrevesse, a exigência do CREF seria decoração (achado da `j9`, 2026-09-12).
+> 4. **Personal pode ter personal.** Quem treina alunos e também é acompanhado por outro profissional aceita convite normalmente, no modo treino. Continua impossível aceitar o próprio convite.
+>
+> **Por que a mudança agora, e não depois:** nenhum personal real existe ainda no lastro. Com contas duplas em uso, migrar para este modelo exigiria **juntar contas** — histórico, vínculos e alertas. Hoje custa código.
+
 ### 11.2 O corte exato
 
 | | Aluno sem vínculo | Aluno vinculado |
