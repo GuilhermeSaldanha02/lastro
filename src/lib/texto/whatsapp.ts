@@ -31,9 +31,19 @@ const CODIGO_BRASIL = "55";
  *   reescrever: inventar país para número estrangeiro seria adivinhar.
  * - **Zero à esquerda** é prefixo de operadora ou de DDD digitado com o
  *   zero (`083`), nunca parte do número em E.164 — sai antes de contar.
+ * - **Letra ou qualquer símbolo fora da pontuação de telefone** → `null`.
+ *   Só espaço, parênteses, hífen, ponto e `+` são descartados. Achado da
+ *   `j9` (2026-09-12): `83 9999O-8888`, com a letra O no lugar do zero,
+ *   perdia a letra em silêncio, sobravam 10 dígitos — tamanho válido — e o
+ *   app salvava OUTRO número. O personal chamaria um desconhecido no
+ *   WhatsApp. Apagar só o que é pontuação é o que impede um caractere
+ *   digitado errado de sumir e levar o número junto.
  */
 export function normalizarTelefoneWhatsApp(bruto: string): string | null {
-  const digitos = (bruto ?? "").replace(/\D/g, "").replace(/^0+/, "");
+  const texto = (bruto ?? "").trim();
+  if (!/^[0-9\s().+-]*$/.test(texto)) return null;
+
+  const digitos = texto.replace(/\D/g, "").replace(/^0+/, "");
   if (digitos.length === 0) return null;
 
   if (digitos.length === 10 || digitos.length === 11) {
