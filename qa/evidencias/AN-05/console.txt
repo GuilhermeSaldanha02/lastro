@@ -1,0 +1,1 @@
+Console do navegador: o reporter 'line' do CI não grava console de teste que passa. Onde o spec mede erro de JavaScript (VS-08), a medida está na asserção: pageerror = [].

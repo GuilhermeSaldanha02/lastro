@@ -1,0 +1,12 @@
+AJ-05 · evidência crua — run 34784135645 (commit 57b3172), passo E2E
+PASSOU POR DETERMINISMO DE CI: o spec é do mesmo agente que audita; cada asserção é status HTTP, contagem de linha ou atributo de tela.
+
+== testes executados (progresso do reporter line)
+1892:[31/109] [chromium] › e2e/j11-formularios.spec.ts:77:5 › modelo: nome só de espaços não avança
+1969:[34/109] [chromium] › e2e/j11-formularios.spec.ts:104:5 › modelo: nome com símbolo gráfico é salvo e aparece igual na lista
+1970:[35/109] [chromium] › e2e/j11-formularios.spec.ts:114:5 › modelo: duplo clique em 'Salvar modelo' cria um modelo só
+1971:[36/109] [chromium] › e2e/j11-formularios.spec.ts:130:5 › anilhas: peso da barra zero, negativo ou absurdo não é salvo
+2053:[39/109] [chromium] › e2e/j11-formularios.spec.ts:175:5 › meta: 0, 8, 3,5 e -1 são recusados na tela, e 99 é recusado pelo banco
+
+== nenhum destes aparece na lista de falhas nem de instáveis (linhas 2917-2939 do log):
+ocorrências na lista de falhas: 0

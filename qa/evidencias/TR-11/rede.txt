@@ -1,0 +1,9 @@
+TR-11 · evidência crua — run 34784135645 (commit 57b3172), passo E2E
+PASSOU POR DETERMINISMO DE CI: o spec é do mesmo agente que audita; cada asserção é status HTTP, contagem de linha ou atributo de tela.
+
+== testes executados (progresso do reporter line)
+1343:[14/109] [chromium] › e2e/j10-serie-e-fila.spec.ts:176:5 › série: reps vazio, negativo, zero, com letras e peso negativo são recusados
+1538:[19/109] [chromium] › e2e/j10-serie-e-fila.spec.ts:240:5 › série: dois toques rápidos em 'Repetir série' criam uma série só (achado MÉDIA pelo dono)
+
+== nenhum destes aparece na lista de falhas nem de instáveis (linhas 2917-2939 do log):
+ocorrências na lista de falhas: 0

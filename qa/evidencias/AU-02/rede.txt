@@ -1,0 +1,17 @@
+AU-02 · evidência crua — run 34784135645 (commit 57b3172), passo E2E
+PASSOU POR DETERMINISMO DE CI: o spec é do mesmo agente que audita; cada asserção é status HTTP, contagem de linha ou atributo de tela.
+
+== testes executados (progresso do reporter line)
+2071:[47/109] [chromium] › e2e/j12-isolamento-e-apis.spec.ts:274:5 › APIs: sem sessão, todas respondem 401
+2637:[59/109] [chromium] › e2e/j13-sessao-e-navegacao.spec.ts:47:5 › voltar: depois de sair, o botão voltar não mostra dado da conta
+2638:[60/109] [chromium] › e2e/j13-sessao-e-navegacao.spec.ts:67:5 › voltar: depois de excluir a conta, voltar não mostra nada e a senha antiga não entra
+2639:[61/109] [chromium] › e2e/j13-sessao-e-navegacao.spec.ts:99:5 › sessão expirada: o coach avisa que a sessão acabou
+2640:[62/109] [chromium] › e2e/j13-sessao-e-navegacao.spec.ts:111:5 › sessão expirada: a Análise avisa que a sessão acabou
+2641:[63/109] [chromium] › e2e/j13-sessao-e-navegacao.spec.ts:123:5 › sessão expirada: a meta semanal não diz 'salva' sem ter salvo
+2642:[64/109] [chromium] › e2e/j13-sessao-e-navegacao.spec.ts:137:5 › sessão expirada: salvar modelo não segue como se tivesse salvo
+2734:[67/109] [chromium] › e2e/j13-sessao-e-navegacao.spec.ts:173:7 › login: ?proximo=//evil.example não leva para fora do app
+2735:[68/109] [chromium] › e2e/j13-sessao-e-navegacao.spec.ts:173:7 › login: ?proximo=/\evil.example não leva para fora do app
+2736:[69/109] [chromium] › e2e/j13-sessao-e-navegacao.spec.ts:173:7 › login: ?proximo=https://evil.example/x não leva para fora do app
+
+== nenhum destes aparece na lista de falhas nem de instáveis (linhas 2917-2939 do log):
+ocorrências na lista de falhas: 0

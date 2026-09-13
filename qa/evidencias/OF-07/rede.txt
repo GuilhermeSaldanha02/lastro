@@ -1,0 +1,8 @@
+OF-07 · evidência crua — run 34784135645 (commit 57b3172), passo E2E
+PASSOU POR DETERMINISMO DE CI: o spec é do mesmo agente que audita; cada asserção é status HTTP, contagem de linha ou atributo de tela.
+
+== testes executados (progresso do reporter line)
+1539:[20/109] [chromium] › e2e/j10-serie-e-fila.spec.ts:262:5 › offline: criar, editar e excluir sem rede chega ao banco exatamente assim
+
+== nenhum destes aparece na lista de falhas nem de instáveis (linhas 2917-2939 do log):
+ocorrências na lista de falhas: 0
