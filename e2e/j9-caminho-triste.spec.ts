@@ -75,6 +75,19 @@ test.afterAll(async () => {
 // Ferramentas de estado
 // ============================================================
 
+/**
+ * Registra o achado na anotação do teste E no log do CI — a anotação sozinha
+ * só aparece no relatório HTML, que ninguém abre numa leitura rápida.
+ *
+ * Nota de seletor: erro da tela é `.aviso-erro`, nunca `getByRole("alert")`.
+ * O Next.js injeta `#__next-route-announcer__` com `role="alert"` em toda
+ * página, e a primeira rodada desta spec caiu inteira nesse strict mode.
+ */
+function anotarAchado(achado: { type: string; description: string }) {
+  test.info().annotations.push(achado);
+  console.log(`[achado] ${test.info().title}: ${achado.description}`);
+}
+
 /** Alfabeto do app (`gerarCodigo`): sem I, L, O, 0 e 1. */
 const ALFABETO = "ABCDEFGHJKMNPQRSTUVWXYZ23456789";
 
@@ -149,7 +162,7 @@ async function abrirCadastro(page: Page, tipo: "USUÁRIO" | "PERSONAL") {
 async function abrirVinculo(page: Page) {
   await page.goto("/ajustes/personal");
   await expect(page.locator("#codigo_convite")).toBeVisible();
-  await expect(page.getByRole("alert")).toHaveCount(0);
+  await expect(page.locator(".aviso-erro")).toHaveCount(0);
 }
 
 // ============================================================
@@ -162,7 +175,7 @@ test("cadastro: telefone só com letras é recusado", async ({ page }) => {
   await page.getByRole("button", { name: "Criar minha conta" }).click();
 
   await expect(
-    page.getByRole("alert"),
+    page.locator(".aviso-erro"),
     "a mensagem esperada é a de telefone; qualquer outra (inclusive erro de e-mail) prova que o telefone passou",
   ).toContainText(/Telefone inválido/i, { timeout: 15_000 });
 });
@@ -176,7 +189,7 @@ test("cadastro: telefone com letra O no lugar do zero NÃO pode virar outro núm
   await page.getByRole("button", { name: "Criar minha conta" }).click();
 
   await expect(
-    page.getByRole("alert"),
+    page.locator(".aviso-erro"),
     "ACHADO: a letra O foi descartada em silêncio e o telefone passou como outro número (83 9999-8888)",
   ).toContainText(/Telefone inválido/i, { timeout: 15_000 });
 });
@@ -201,7 +214,7 @@ for (const { valor, porque } of CREFS_INVALIDOS) {
     await expect(page.locator(".campo__nota--alerta"), "aviso de formato ausente").toBeVisible();
 
     await page.getByRole("button", { name: "Criar minha conta" }).click();
-    await expect(page.getByRole("alert"), "o servidor aceitou o CREF").toContainText(/CREF inválido/i, {
+    await expect(page.locator(".aviso-erro"), "o servidor aceitou o CREF").toContainText(/CREF inválido/i, {
       timeout: 15_000,
     });
   });
@@ -253,7 +266,7 @@ test("aceite: código fora do formato é recusado sem criar vínculo", async ({ 
     await page.locator("#codigo_convite").fill(codigo);
     await page.locator("#telefone_whatsapp").fill("83 97777-6666");
     await page.getByRole("button", { name: /Aceitar convite/i }).click();
-    await expect(page.getByRole("alert"), `código "${codigo}" (${porque})`).toContainText(
+    await expect(page.locator(".aviso-erro"), `código "${codigo}" (${porque})`).toContainText(
       /Código inválido/i,
       { timeout: 15_000 },
     );
@@ -270,7 +283,7 @@ test("aceite: código no formato certo que ninguém gerou é recusado", async ({
   await page.locator("#telefone_whatsapp").fill("83 97777-6666");
   await page.getByRole("button", { name: /Aceitar convite/i }).click();
 
-  await expect(page.getByRole("alert")).toContainText(/não existe ou já foi usado/i, { timeout: 15_000 });
+  await expect(page.locator(".aviso-erro")).toContainText(/não existe ou já foi usado/i, { timeout: 15_000 });
   expect(await temVinculoAceito(alunoA)).toBe(false);
 });
 
@@ -287,7 +300,7 @@ for (const telefone of ["abcdefghij", "83 9999", "0000000000000000000"]) {
     await page.locator("#telefone_whatsapp").fill(telefone);
     await page.getByRole("button", { name: /Aceitar convite/i }).click();
 
-    await expect(page.getByRole("alert")).toContainText(/Telefone inválido/i, { timeout: 15_000 });
+    await expect(page.locator(".aviso-erro")).toContainText(/Telefone inválido/i, { timeout: 15_000 });
     expect(await temVinculoAceito(alunoA), "telefone inválido criou vínculo").toBe(false);
   });
 }
@@ -306,7 +319,7 @@ test("aceite: telefone com letra O no lugar do zero não pode vincular com o nú
 
   // Cada desfecho tem sinal próprio e exclusivo: o alerta de erro, ou o
   // botão de revogar, que só existe com vínculo.
-  const recusou = page.getByRole("alert");
+  const recusou = page.locator(".aviso-erro");
   const vinculou = page.getByRole("button", { name: /Revogar o vínculo/i });
   await expect(recusou.or(vinculou)).toBeVisible({ timeout: 15_000 });
 
@@ -318,7 +331,7 @@ test("aceite: telefone com letra O no lugar do zero não pode vincular com o nú
       .select("telefone_whatsapp")
       .eq("id", alunoA.id)
       .maybeSingle();
-    test.info().annotations.push({
+    anotarAchado({
       type: "achado",
       description: `"83 9999O-8888" foi aceito e salvo como ${data?.telefone_whatsapp ?? "?"}`,
     });
@@ -362,7 +375,7 @@ test("vínculo: código já usado por um aluno não serve para outro", async ({ 
   await page.locator("#telefone_whatsapp").fill("83 96666-5555");
   await page.getByRole("button", { name: /Aceitar convite/i }).click();
 
-  await expect(page.getByRole("alert")).toContainText(/não existe ou já foi usado/i, { timeout: 15_000 });
+  await expect(page.locator(".aviso-erro")).toContainText(/não existe ou já foi usado/i, { timeout: 15_000 });
   expect(await temVinculoAceito(alunoB), "o aluno B entrou por um código já consumido").toBe(false);
 });
 
@@ -444,7 +457,7 @@ test("portas: aluno não pode se promover a personal com um update na própria l
       const convite = await comoB
         .from("vinculo_personal")
         .insert({ personal_id: alunoB.id, codigo: codigoAleatorio(), estado: "pendente" });
-      test.info().annotations.push({
+      anotarAchado({
         type: "achado",
         description: `aluno virou personal pela API; gerar convite depois disso: ${convite.error ? "recusado" : "ACEITO"}`,
       });
@@ -471,7 +484,7 @@ test("portas: personal sem CREF não pode gravar um CREF fora da norma direto no
     if (data?.cref) {
       await entrarComoUsuario(page, personalSemCref);
       await page.goto("/personal", { waitUntil: "domcontentloaded" });
-      test.info().annotations.push({
+      anotarAchado({
         type: "achado",
         description: `CREF "1-G/ZZ" gravado pela API; /personal abriu em ${new URL(page.url()).pathname}`,
       });
@@ -572,7 +585,7 @@ test("completar cadastro: CREF válido com telefone só de letras é recusado", 
   await page.locator("#telefone_completar").fill("abcdefghij");
   await page.getByRole("button", { name: /Abrir minha fila/i }).click();
 
-  await expect(page.getByRole("alert")).toContainText(/Telefone inválido/i, { timeout: 15_000 });
+  await expect(page.locator(".aviso-erro")).toContainText(/Telefone inválido/i, { timeout: 15_000 });
   expect(new URL(page.url()).pathname, "cadastro completou com telefone de letras").toBe("/personal/completar");
 });
 
@@ -586,7 +599,7 @@ test("completar cadastro: letra O no telefone não completa com o número errado
     await page.locator("#telefone_completar").fill("83 9999O-8888");
     await page.getByRole("button", { name: /Abrir minha fila/i }).click();
 
-    const recusou = page.getByRole("alert");
+    const recusou = page.locator(".aviso-erro");
     await expect(recusou.or(page.getByText("Você ainda não tem alunos."))).toBeVisible({ timeout: 15_000 });
     await expect(
       recusou,
