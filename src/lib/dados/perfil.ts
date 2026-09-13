@@ -30,6 +30,13 @@ export type Perfil = {
   tipoConta: "aluno" | "personal";
   /** Registro informado, NUNCA verificado (`texto/cref.ts`). `null` é estado legítimo. */
   cref: string | null;
+  /**
+   * A casca que o app renderiza (migração 0025, PRD §11 emenda
+   * 2026-09-12 (2)). Desde então `tipoConta = "personal"` quer dizer "tem
+   * área de trabalho", não "não treina": a mesma conta alterna entre os
+   * dois modos, e é ESTE campo que os guardas de rota leem.
+   */
+  modo: "treino" | "trabalho";
 };
 
 export async function obterPerfil(): Promise<Perfil | null> {
@@ -41,7 +48,7 @@ export async function obterPerfil(): Promise<Perfil | null> {
 
   const { data } = await supabase
     .from("usuario")
-    .select("nome, avatar_url, meta_treinos_semana, idioma, tipo_conta, cref")
+    .select("nome, avatar_url, meta_treinos_semana, idioma, tipo_conta, cref, modo_ativo")
     .eq("id", user.id)
     .maybeSingle();
 
@@ -58,6 +65,13 @@ export async function obterPerfil(): Promise<Perfil | null> {
     // valor inesperado vindo do banco.
     tipoConta: data.tipo_conta === "personal" ? "personal" : "aluno",
     cref: (data.cref as string | null) ?? null,
+    // Mesma falha fechada: trabalho só com as DUAS condições. O banco já
+    // garante isso por check; repetir aqui impede que um valor inesperado
+    // abra a fila para quem não tem área de trabalho.
+    modo:
+      data.tipo_conta === "personal" && data.modo_ativo === "trabalho"
+        ? "trabalho"
+        : "treino",
   };
 }
 

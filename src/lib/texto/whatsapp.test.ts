@@ -39,6 +39,28 @@ describe("normalizarTelefoneWhatsApp", () => {
     expect(normalizarTelefoneWhatsApp("5583999998888123456")).toBeNull();
   });
 
+  it("letra no meio do número recusa, em vez de sumir e virar outro número", () => {
+    // Achado da j9 (2026-09-12): a letra O no lugar do zero perdia a letra
+    // e o app salvava 558399998888 — um número que não é o da pessoa.
+    expect(normalizarTelefoneWhatsApp("83 9999O-8888")).toBeNull();
+    expect(normalizarTelefoneWhatsApp("83 99999-888l")).toBeNull();
+    expect(normalizarTelefoneWhatsApp("(83) 99999-8888 ramal 2")).toBeNull();
+    expect(normalizarTelefoneWhatsApp("abcdefghij")).toBeNull();
+  });
+
+  it("símbolo que não é pontuação de telefone também recusa", () => {
+    expect(normalizarTelefoneWhatsApp("83*99999*8888")).toBeNull();
+    expect(normalizarTelefoneWhatsApp("83/99999/8888")).toBeNull();
+  });
+
+  it("a pontuação comum continua aceita, inclusive o valor que a tela devolve formatado", () => {
+    expect(normalizarTelefoneWhatsApp("83.99999.8888")).toBe("5583999998888");
+    expect(normalizarTelefoneWhatsApp("  (83) 99999-8888  ")).toBe("5583999998888");
+    // `formatarTelefoneBrasil` pré-preenche o campo com isto; reenviar sem
+    // mexer não pode virar erro.
+    expect(normalizarTelefoneWhatsApp("+55 83 99999-8888")).toBe("5583999998888");
+  });
+
   it("o que a função devolve é sempre aceito pelo link e pelo banco", () => {
     for (const bruto of [
       "(83) 99999-8888",

@@ -142,7 +142,7 @@ export default function PaginaLogin() {
             {modo === "criar-conta" && (
               <p className="seletor-conta__nota">
                 {tipoConta === "personal"
-                  ? "Conta de trabalho: acompanha alunos e não registra treino próprio."
+                  ? "Abre na fila de alunos. Seu próprio treino fica na mesma conta, a um toque em Ajustes."
                   : "Registra seus treinos e recebe a análise semanal."}
               </p>
             )}

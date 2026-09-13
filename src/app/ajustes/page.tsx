@@ -1,7 +1,7 @@
 // lastro · Ajustes consolidados em Bento Grid de alto padrão Apex Pro
 import Link from "next/link";
 import { obterPerfil } from "@/lib/dados/perfil";
-import { exigirCascaDeAluno } from "@/lib/dados/casca";
+import { cascaDaBarra } from "@/lib/dados/casca";
 import { sair } from "@/lib/dados/auth";
 import AbaInferior from "@/components/aba-inferior";
 import Avatar from "@/components/avatar";
@@ -10,6 +10,7 @@ import SetaNavegacao from "@/components/seta-navegacao";
 import CabecalhoPro from "@/components/cabecalho-pro";
 import MetaSemanalForm from "@/components/meta-semanal-form";
 import IdiomaForm from "@/components/idioma-form";
+import SeletorModo from "@/components/seletor-modo";
 import { t } from "@/lib/texto/i18n";
 
 export default async function PaginaAjustes() {
@@ -40,6 +41,14 @@ export default async function PaginaAjustes() {
               </div>
               <SetaNavegacao />
             </Link>
+
+            {/* O seletor de modo mora aqui, logo abaixo de quem está logado:
+                o modo é da conta, como o nome. Direção A do gate de
+                2026-09-13. */}
+            <SeletorModo
+              modo={perfil.modo}
+              temAreaDeTrabalho={perfil.tipoConta === "personal" && perfil.cref !== null}
+            />
 
             <MetaSemanalForm metaInicial={perfil.metaTreinosSemana} idioma={idioma} />
 
@@ -169,7 +178,7 @@ export default async function PaginaAjustes() {
         )}
       </div>
 
-      <AbaInferior ativa="ajustes" idioma={idioma} tipoConta={perfil?.tipoConta} />
+      <AbaInferior ativa="ajustes" idioma={idioma} tipoConta={cascaDaBarra(perfil)} />
     </main>
   );
 }

@@ -8,7 +8,7 @@
 import Link from "next/link";
 import { listarTreinos, criarTreino } from "@/lib/dados/treino";
 import { obterPerfil } from "@/lib/dados/perfil";
-import { exigirCascaDeAluno } from "@/lib/dados/casca";
+import { cascaDaBarra, exigirCascaDeAluno } from "@/lib/dados/casca";
 import { listarModelos } from "@/lib/dados/modelo-treino";
 import { dataLocalBrasil } from "@/lib/tempo";
 import AbaInferior from "@/components/aba-inferior";
@@ -92,7 +92,7 @@ export default async function PaginaTreino() {
         />
       </div>
 
-      <AbaInferior ativa="bancada" idioma={idioma} tipoConta={perfil?.tipoConta} />
+      <AbaInferior ativa="bancada" idioma={idioma} tipoConta={cascaDaBarra(perfil)} />
     </main>
   );
 }

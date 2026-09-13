@@ -2374,10 +2374,16 @@
    maior parecer o principal. */
 .seletor-conta {
   display: flex;
-  gap: 4px;
-  padding: 4px;
-  border: 1px solid var(--lastro-linha);
-  border-radius: 999px;
+  gap: var(--lastro-e-1);
+  padding: var(--lastro-e-1);
+  /* `--lastro-controle`, não `--lastro-linha`: a cápsula é controle, e a
+     opção não selecionada não tem borda própria — o trilho é o único
+     limite visível dela. DESIGN.md §3.2 Nota A reprova controle cujo único
+     limite seja `--lastro-linha` (1.45:1). Estava assim desde o #233 e foi
+     repetido no seletor de modo; achado na auditoria contra a main em
+     2026-09-13. */
+  border: 1px solid var(--lastro-controle);
+  border-radius: var(--lastro-raio-pilula);
   background: var(--lastro-sup-1);
 }
 
@@ -2390,10 +2396,12 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 7px;
-  padding: 10px 8px;
+  gap: var(--lastro-e-2);
+  /* A altura vem do `min-height` acima; o padding só afasta o texto das
+     bordas. Degrau de token mais próximo do 10px/8px que estava cravado. */
+  padding: var(--lastro-e-2);
   border: 0;
-  border-radius: 999px;
+  border-radius: var(--lastro-raio-pilula);
   background: transparent;
   color: var(--lastro-txt-2);
   font-size: var(--lastro-papel-rotulo);
@@ -2432,6 +2440,30 @@
   color: var(--lastro-txt-2);
   font-size: var(--lastro-papel-rotulo);
   line-height: var(--lastro-el-corpo);
+}
+
+/* Seletor de modo (direção A do gate de 2026-09-13): a mesma cápsula, com
+   um terceiro estado. TRABALHO travado é um LINK para a tela do CREF —
+   continua sendo alvo de toque, só leva a outro lugar. O cadeado e o tom
+   apagado dizem "fechado"; a nota abaixo diz como abrir. */
+.seletor-conta__opcao--travada {
+  color: var(--lastro-txt-3);
+  text-decoration: none;
+}
+
+.seletor-conta__opcao:focus-visible {
+  outline: var(--lastro-foco-espessura) solid var(--lastro-foco);
+  outline-offset: var(--lastro-foco-afast);
+}
+
+.seletor-conta__link {
+  color: var(--lastro-ouro);
+  font-weight: var(--lastro-peso-forte);
+  text-decoration: none;
+}
+
+.seletor-conta__link:hover {
+  text-decoration: underline;
 }
 
 .campo__nota--alerta {

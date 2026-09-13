@@ -2539,3 +2539,37 @@ A corrida existia desde a extração do helper e vinha sendo vencida por sorte; 
 
 **E um segundo defeito, achado no mesmo diagnóstico:** a `j6` abria um contexto de aluno à mão e nunca o fechava. O navegador é compartilhado entre specs do worker; a aba vazada sobreviveu até a `j7` e virou o *page snapshot* do erro dela — uma `/analise` que não era tela nenhuma da `j7` e desviou a primeira leitura da falha. Diagnóstico contaminado custa mais que o bug.
 
+
+---
+
+## 2026-09-12 (2) — Uma conta, dois modos: o personal que treina não troca de conta
+
+**Decisão do dono**, que **derruba a resposta à pergunta 2 de "2026-09-11 (7)"** (*"duas contas"*). Entrou primeiro como emenda no `PRD.md` §11, pelo mesmo motivo daquela: código que contradiz o PRD em silêncio é revertido pelo próximo agente, e ele estaria certo.
+
+### Como a decisão foi tomada
+
+O dono perguntou o que acontece quando um usuário comum vira personal. A resposta honesta era "cria outra conta, com outro e-mail" — e quem entra pelo Google não consegue nem isso com o mesmo endereço. Antes de decidir, pediu o estudo de pelo menos quatro apps. Foram seis:
+
+| App | Modelo |
+|---|---|
+| ABC Trainerize | contas separadas; segundo e-mail obrigatório; ocupa vaga paga; recomenda um SEGUNDO app para não sair e entrar |
+| FITR | contas separadas; recomenda o truque do `+` no e-mail; sair e entrar; dois apps |
+| MFIT Personal | "Sou aluno" na entrada; usuário pergunta no FAQ como alternar e fica sem resposta |
+| TrueCoach | mesmo login, "Switch to Client / Switch to Coach" |
+| Hevy + Hevy Coach | quem usa o Hevy entra no Coach com o MESMO login |
+| Everfit | fluxo "Invite Myself" |
+
+**Nenhum converte a conta** (sumir com o treino ao virar personal). Os que separam contas vivem com o atrito que foi previsto. O caso mais parecido com o lastro — o Hevy, app de quem treina sozinho que ganhou a área de coach depois — escolheu o mesmo login.
+
+**O que pesou o momento:** nenhum personal real existe ainda. Migrar depois exigiria juntar contas com histórico, vínculos e alertas.
+
+### O desenho
+
+- `tipo_conta` continua existindo e muda de sentido: deixa de ser "que tipo de pessoa é esta" e passa a ser **"esta conta tem área de trabalho"**. Mantê-lo custa menos que trocá-lo: a policy de convite (`e_conta_personal()`), o trigger e as specs já leem essa coluna.
+- `modo_ativo` (`treino` | `trabalho`) é **o que a casca renderiza**. No banco, e não em cookie: toda tela já chama `obterPerfil()`, e cookie seria uma segunda fonte de verdade que os guardas de rota e o banco poderiam contradizer. Uma check garante que `trabalho` só existe em conta com área de trabalho.
+- **Ganhar a área de trabalho tem uma porta só:** a função `ativar_area_de_trabalho`, que valida o CREF com a MESMA régua estrita de `src/lib/texto/cref.ts`. O update direto em `tipo_conta` e `cref` foi fechado por GRANT de coluna. Isso fecha dois achados da `j9` de uma vez: o aluno que se promovia a personal com um update na própria linha, e o CREF `1-G/ZZ` gravado pela API.
+- **Personal pode ter personal.** A recusa "conta de personal não aceita convite" (0024) existia porque conta de personal não tinha tela de treino. Agora tem. O aceite do próprio convite continua barrado por `personal_id <> v_aluno`.
+
+### O que a `j8` dizia e deixa de dizer
+
+A `j8` afirmava, como comportamento correto, que *"a própria conta pode declarar o tipo — RLS de dono"*. **Isso era o furo registrado como regra.** Ela é reescrita junto: o que ela protege passa a ser "o modo trabalho não alcança as telas de treino", e a conta sem CREF nasce pelo trigger, não por um update que agora é recusado.
