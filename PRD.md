@@ -219,6 +219,15 @@ Uma conta pode estar **vinculada a um personal**. Enquanto o vínculo existe, a 
 >
 > **Por que a mudança agora, e não depois:** nenhum personal real existe ainda no lastro. Com contas duplas em uso, migrar para este modelo exigiria **juntar contas** — histórico, vínculos e alertas. Hoje custa código.
 
+> **EMENDA em 2026-09-13 — conta de usuário NÃO vira personal. Decisão do dono. Estreita a emenda acima.**
+>
+> O ponto 1 da emenda de 2026-09-12 (2) dizia que a conta ganha a área de trabalho *"no cadastro (cápsula PERSONAL) ou depois, em Ajustes"*. **O "ou depois, em Ajustes" não vale.** Nas palavras do dono: *"usuário cadastrado não deve aparecer a opção de virar personal, mas deixe quem criou como personal ter acesso, isso é a grande diferença."*
+>
+> 1. **O tipo da conta nasce no cadastro e não muda.** Quem nasce usuário é usuário para sempre; não existe tela, aviso nem função que o transforme em personal.
+> 2. **Os dois modos (treino / trabalho) são só de quem NASCEU personal.** Esse é o ganho da emenda anterior que continua: o personal treina e trabalha na mesma conta.
+> 3. **Personal nasce pelo cadastro com e-mail OU pelo Google.** No e-mail, a escolha é a cápsula. No Google, que não passa pela cápsula, a escolha acontece **logo depois do primeiro login** (`/boas-vindas`): nenhuma tela abre antes. Nas palavras do dono: *"logo [no] gmail ele tem que escolher o tipo de conta, aí se escolher personal ele finaliza preenchendo obrigatoriamente os dados que personal precisa."* A escolha é feita uma vez; quem escolheu USUÁRIO é usuário para sempre.
+> 4. Os pontos 2, 3 e 4 da emenda de 2026-09-12 (2) continuam valendo.
+
 ### 11.2 O corte exato
 
 | | Aluno sem vínculo | Aluno vinculado |

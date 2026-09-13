@@ -55,6 +55,20 @@ export async function GET(request: Request) {
         } catch (erroAvatar) {
           console.error("[auth/callback] falha ao sincronizar avatar", erroAvatar);
         }
+
+        // Conta recém-criada pelo Google ainda não escolheu entre usuário
+        // e personal (migração 0026, PRD §11 emenda 2026-09-13). A escolha
+        // vem ANTES do retorno pedido: é a primeira coisa que a conta faz.
+        // Falha nesta leitura segue o fluxo normal — os guardas das páginas
+        // fazem o mesmo desvio na primeira tela que abrir.
+        const { data: linha } = await supabase
+          .from("usuario")
+          .select("tipo_escolhido")
+          .eq("id", data.user.id)
+          .maybeSingle();
+        if (linha?.tipo_escolhido === false) {
+          return NextResponse.redirect(destino("/boas-vindas"));
+        }
       }
       return NextResponse.redirect(destino(proximo));
     }

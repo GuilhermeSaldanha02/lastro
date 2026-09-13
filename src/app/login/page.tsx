@@ -269,6 +269,9 @@ export default function PaginaLogin() {
             </button>
           </form>
 
+          {/* O Google continua valendo para os dois tipos. A conta nasce sem
+              tipo escolhido e a escolha acontece em `/boas-vindas`, logo
+              depois do primeiro login (PRD §11, emenda 2026-09-13). */}
           <div className="divisor-ou">
             <span>ou</span>
           </div>

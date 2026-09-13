@@ -1,10 +1,14 @@
-// lastro · A porta da área de trabalho: CREF e WhatsApp.
+// lastro · Completar o cadastro da conta de personal: CREF e WhatsApp.
 //
-// Nasceu como "completar cadastro" da conta de personal criada pelo Google
-// (decisão de 2026-09-11: "entra, mas completa antes de abrir"). Desde a
-// emenda de 2026-09-12 (2) é também o caminho de quem já treina no lastro
-// e decide acompanhar alunos — a mesma conta ganha a área de trabalho, sem
-// segundo e-mail.
+// Serve só a quem NASCEU personal e ficou sem CREF — o trigger de cadastro
+// anula CREF fora da régua, e essa conta precisa de uma porta para
+// informar o registro (decisão de 2026-09-11: "entra, mas completa antes
+// de abrir").
+//
+// Entre 2026-09-12 e 2026-09-13 esta tela também abria para conta de
+// usuário, que virava personal por aqui. O dono corrigiu a regra: usuário
+// não vira personal (PRD §11, emenda 2026-09-13). O guarda abaixo manda o
+// usuário para a Home; a trava de verdade é a migração 0026.
 //
 // Não tem barra inferior de propósito: a casca de trabalho ainda não
 // abriu, e barra aqui ofereceria abas que o guarda devolveria para cá.
@@ -16,31 +20,24 @@ import { obterPerfil } from "@/lib/dados/perfil";
 export default async function PaginaCompletarCadastro() {
   const perfil = await obterPerfil();
   if (!perfil) redirect("/login");
+  if (perfil.tipoConta !== "personal") redirect("/");
   // Já tem CREF: esta tela não tem por que existir de novo, e deixá-la
   // acessível seria oferecer um caminho para reescrever o registro. A
   // função do banco recusa isso também (`cref já informado`).
   if (perfil.cref) redirect("/personal");
 
-  const veioComoPersonal = perfil.tipoConta === "personal";
-
   return (
     <main className="tela">
-      <CabecalhoPro
-        titulo={veioComoPersonal ? "Falta pouco" : "Área de trabalho"}
-        destaque={veioComoPersonal ? "Cadastro" : "Personal"}
-        perfil={perfil}
-      />
+      <CabecalhoPro titulo="Falta pouco" destaque="Cadastro" perfil={perfil} />
 
       <div className="corpo corpo--titulo-conteudo transicao-pilula">
         <div className="pilha">
           <section className="card-obsidian">
-            <span className="card-obsidian__titulo">
-              {veioComoPersonal ? "Conta de personal" : "Acompanhar alunos"}
-            </span>
+            <span className="card-obsidian__titulo">Conta de personal</span>
             <p className="campo__nota">
-              {veioComoPersonal
-                ? "Você entrou com o Google, que não informa registro profissional nem telefone. Os dois são obrigatórios para acompanhar aluno: o registro identifica quem você é, e o WhatsApp é por onde a mensagem pronta sai."
-                : "Com o CREF e o WhatsApp, esta mesma conta ganha a fila de alunos. Seu treino, seu histórico e sua análise continuam aqui: você alterna entre os dois modos em Ajustes."}
+              Falta o registro profissional e o telefone. Os dois são
+              obrigatórios para acompanhar aluno: o registro identifica quem
+              você é, e o WhatsApp é por onde a mensagem pronta sai.
             </p>
           </section>
 

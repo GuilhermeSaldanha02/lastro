@@ -234,9 +234,10 @@ export async function salvarTelefoneWhatsApp(
 }
 
 /**
- * Abre a área de trabalho: CREF e WhatsApp. Serve aos dois caminhos da
- * emenda de 2026-09-12 (2) — quem treina e decide virar personal, e a
- * conta que nasceu personal sem CREF (Google).
+ * Completa o cadastro da conta que NASCEU personal e ficou sem CREF: CREF
+ * e WhatsApp. Desde a emenda de 2026-09-13 do PRD §11, conta de usuário
+ * não passa por aqui — a função do banco recusa (migração 0026), e a
+ * mensagem abaixo existe só para um cliente adulterado não ver erro cru.
  *
  * A gravação é `rpc` para `ativar_area_de_trabalho` (migração 0025), e não
  * update: desde a 0025 a própria conta não escreve `tipo_conta` nem `cref`
@@ -275,6 +276,9 @@ export async function completarCadastroPersonal(
 
   if (error) {
     const mensagem = error.message ?? "";
+    if (mensagem.includes("conta de usuário não vira personal")) {
+      return { ok: false, erro: "Conta de usuário não vira conta de personal." };
+    }
     if (mensagem.includes("cref inválido")) {
       return {
         ok: false,
@@ -292,6 +296,72 @@ export async function completarCadastroPersonal(
 
   revalidatePath("/", "layout");
   redirect("/personal");
+}
+
+/**
+ * A escolha do tipo da conta criada pelo Google, uma vez só (migração 0026,
+ * PRD §11 emenda 2026-09-13). A gravação é `rpc` para
+ * `escolher_tipo_conta`, que recusa conta que já escolheu — é o que impede
+ * esta tela de virar a porta de promoção que a regra proíbe.
+ */
+export async function escolherTipoConta(
+  tipo: "aluno" | "personal",
+  crefBruto: string,
+  telefoneBruto: string,
+): Promise<Resultado> {
+  if (tipo !== "aluno" && tipo !== "personal") {
+    return { ok: false, erro: "Tipo de conta inválido." };
+  }
+  const supabase = await criarClienteServidor();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return { ok: false, erro: "Sessão ausente — entre de novo." };
+
+  let cref: string | null = null;
+  let telefone: string | null = null;
+  if (tipo === "personal") {
+    if (!crefValido(crefBruto)) {
+      return {
+        ok: false,
+        erro: "CREF inválido. Use o formato 123456-G/PB, como está na sua carteira.",
+      };
+    }
+    telefone = normalizarTelefoneWhatsApp(telefoneBruto);
+    if (!telefone) {
+      return {
+        ok: false,
+        erro: "Telefone inválido. Escreva com DDD, por exemplo 83 99999-8888.",
+      };
+    }
+    cref = normalizarCref(crefBruto);
+  }
+
+  const { error } = await supabase.rpc("escolher_tipo_conta", {
+    p_tipo: tipo,
+    p_cref: cref,
+    p_telefone_whatsapp: telefone,
+  });
+
+  if (error) {
+    const mensagem = error.message ?? "";
+    if (mensagem.includes("tipo já escolhido")) {
+      return { ok: false, erro: "O tipo desta conta já foi escolhido." };
+    }
+    if (mensagem.includes("cref inválido")) {
+      return {
+        ok: false,
+        erro: "CREF inválido. Use o formato 123456-G/PB, como está na sua carteira.",
+      };
+    }
+    if (mensagem.includes("telefone inválido")) {
+      return { ok: false, erro: "Telefone inválido. Escreva com DDD." };
+    }
+    return { ok: false, erro: "Não foi possível salvar. Tente de novo." };
+  }
+
+  revalidatePath("/", "layout");
+  redirect(tipo === "personal" ? "/personal" : "/");
 }
 
 /**

@@ -1,7 +1,7 @@
 // lastro · Ajustes consolidados em Bento Grid de alto padrão Apex Pro
 import Link from "next/link";
 import { obterPerfil } from "@/lib/dados/perfil";
-import { cascaDaBarra } from "@/lib/dados/casca";
+import { cascaDaBarra, exigirTipoEscolhido } from "@/lib/dados/casca";
 import { sair } from "@/lib/dados/auth";
 import AbaInferior from "@/components/aba-inferior";
 import Avatar from "@/components/avatar";
@@ -15,6 +15,7 @@ import { t } from "@/lib/texto/i18n";
 
 export default async function PaginaAjustes() {
   const perfil = await obterPerfil();
+  exigirTipoEscolhido(perfil);
   const idioma = perfil?.idioma ?? "pt-BR";
 
   return (
@@ -44,11 +45,9 @@ export default async function PaginaAjustes() {
 
             {/* O seletor de modo mora aqui, logo abaixo de quem está logado:
                 o modo é da conta, como o nome. Direção A do gate de
-                2026-09-13. */}
-            <SeletorModo
-              modo={perfil.modo}
-              temAreaDeTrabalho={perfil.tipoConta === "personal" && perfil.cref !== null}
-            />
+                2026-09-13. SÓ para quem nasceu personal (PRD §11, emenda
+                2026-09-13): usuário não vê cápsula nem aviso. */}
+            {perfil.tipoConta === "personal" && <SeletorModo modo={perfil.modo} />}
 
             <MetaSemanalForm metaInicial={perfil.metaTreinosSemana} idioma={idioma} />
 

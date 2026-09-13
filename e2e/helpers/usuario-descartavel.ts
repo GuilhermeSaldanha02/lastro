@@ -55,15 +55,24 @@ export async function criarUsuarioDescartavel(
      * `tipo_conta` (uma das portas que a j9 testa).
      */
     semCref?: boolean;
+    /**
+     * Conta SEM tipo escolhido — o estado de quem acabou de entrar pelo
+     * Google (migração 0026). Sem metadado de tipo, o trigger marca
+     * `tipo_escolhido = false`. Por isso toda outra conta descartável manda
+     * `tipo_conta` explícito: com `{}`, o aluno de qualquer spec cairia na
+     * tela de escolha.
+     */
+    semTipo?: boolean;
   } = {},
 ): Promise<UsuarioDescartavel> {
   const admin = clienteAdmin();
   const email = `qa.e2e.${prefixo}.${Date.now()}@lastro.test`;
   const senha = `Qa!${Math.random().toString(36).slice(2)}A1`;
 
-  const metadado =
-    tipo !== "personal"
-      ? {}
+  const metadado = opcoes.semTipo
+    ? {}
+    : tipo !== "personal"
+      ? { tipo_conta: "aluno" }
       : opcoes.semCref
         ? { tipo_conta: "personal" }
         : { tipo_conta: "personal", cref: CREF_QA };

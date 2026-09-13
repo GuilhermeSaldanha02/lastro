@@ -1,7 +1,7 @@
 // lastro · PRD §4.5 — catálogo curado de exercícios com busca e filtros musculares.
 import { listarCatalogo } from "@/lib/dados/treino";
 import { obterPerfil } from "@/lib/dados/perfil";
-import { cascaDaBarra } from "@/lib/dados/casca";
+import { cascaDaBarra, exigirTipoEscolhido } from "@/lib/dados/casca";
 import AbaInferior from "@/components/aba-inferior";
 import CabecalhoPro from "@/components/cabecalho-pro";
 import CatalogoInterativo from "@/components/catalogo-interativo";
@@ -9,6 +9,7 @@ import { t } from "@/lib/texto/i18n";
 
 export default async function PaginaCatalogo() {
   const [exercicios, perfil] = await Promise.all([listarCatalogo(), obterPerfil()]);
+  exigirTipoEscolhido(perfil);
   const semDica = exercicios.filter((e) => !e.dicaExecucao).length;
   const idioma = perfil?.idioma ?? "pt-BR";
 
