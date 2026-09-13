@@ -322,7 +322,13 @@ test("offline: 'Iniciar treino' sem rede não derruba a tela, e duplo clique com
     await iniciar.click();
     await page.waitForTimeout(5_000);
     await print(page, "iniciar-sem-rede");
-    const quebrou = await page.getByText(/Application error|client-side exception/i).count();
+    // A primeira rodada deste spec procurou só "Application error" e passou
+    // com a tela inteira trocada por "This page couldn’t load" (run
+    // 34784135645). O sinal certo é a TELA DO APP ter sumido, qualquer que
+    // seja o texto da página de erro do Next.
+    const quebrou =
+      (await page.getByText(/Application error|client-side exception|couldn.t load/i).count()) +
+      (await page.getByRole("button", { name: "Iniciar treino de hoje" }).count() === 0 ? 1 : 0);
     if (quebrou) anotarAchado("sem rede, 'Iniciar treino de hoje' trocou a tela pela página de erro do Next");
     expect.soft(quebrou, "ACHADO: sem rede, 'Iniciar treino' derrubou a tela inteira").toBe(0);
 
@@ -340,6 +346,49 @@ test("offline: 'Iniciar treino' sem rede não derruba a tela, e duplo clique com
   } finally {
     await apagarSemErro(conta);
   }
+});
+
+test("fila: uma série recusada pelo banco não pode travar as séries válidas registradas depois", async ({ page }) => {
+  // Consequência medida na primeira rodada (run 34784135645): o erro
+  // permanente chega ao cliente sem o prefixo `[erro-permanente]` (o build de
+  // produção troca a mensagem da server action por um `digest`), e o item
+  // fica PENDENTE na cabeça da fila FIFO em vez de ir para `db.falhas`.
+  test.setTimeout(120_000);
+  await entrarComoUsuario(page, aluno);
+  await abrirFormulario(page);
+  const pesoInvalido = pesoUnico(47);
+  await preencher(page, { reps: "201", peso: pesoInvalido });
+  await registrar(page).click();
+  await expect(page.locator(".aviso-erro").or(linhaCom(page, pesoInvalido)).first()).toBeVisible({ timeout: 15_000 });
+  if (await page.locator(".aviso-erro").isVisible()) {
+    // A tela recusou: nada entrou na fila, não há o que travar.
+    await print(page, "invalida-recusada-na-tela");
+    return;
+  }
+  await esperarFilaAssentar(page, 10_000);
+
+  await page.getByRole("button", { name: "Outra série" }).click();
+  await expect(page.locator("#reps")).toBeVisible();
+  const pesoValido = pesoUnico(48);
+  await preencher(page, { reps: "10", peso: pesoValido });
+  await registrar(page).click();
+  await expect(linhaCom(page, pesoValido)).toBeVisible();
+
+  const fim = Date.now() + 30_000;
+  let chegou = false;
+  while (!chegou && Date.now() < fim) {
+    chegou = (await seriesDoTreino(comoAluno, treinoId)).some((s) => s.peso === Number(pesoValido));
+    if (!chegou) await page.waitForTimeout(1_000);
+  }
+  const fila = await filaLocal(page);
+  const indicador = (await page.locator(".sync").innerText()).trim();
+  await print(page, "valida-depois-da-invalida");
+  if (!chegou) {
+    anotarAchado(
+      `a série VÁLIDA não chegou ao banco: fila local com ${fila.pendentes} pendente(s), ${fila.falhas} descartada(s); indicador: "${indicador}"`,
+    );
+  }
+  expect(chegou, "ACHADO: uma série recusada pelo banco travou a fila, e a série válida seguinte nunca sincroniza").toBe(true);
 });
 
 // ============================================================

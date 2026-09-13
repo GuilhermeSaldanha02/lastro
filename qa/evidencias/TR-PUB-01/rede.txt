@@ -1,0 +1,12 @@
+TR-PUB-01 · caminho triste público da produção, SEM conta
+Alvo: https://lastro-pi.vercel.app (deploy da main 475c774)
+Coletado em 2026-09-13 ~21:35 UTC pelo Playwright MCP, contexto novo sem cookies.
+Saída crua de browser_run_code_unsafe:
+
+{"rotas":[{"rota":"/treino","status":200,"final":"/login?proximo=%2Ftreino"},{"rota":"/treino/abc","status":200,"final":"/login?proximo=%2Ftreino%2Fabc"},{"rota":"/personal","status":200,"final":"/login?proximo=%2Fpersonal"},{"rota":"/ajustes/relatorios/parecer/abc","status":200,"final":"/login?proximo=%2Fajustes%2Frelatorios%2Fparecer%2Fabc"},{"rota":"/catalogo/abc","status":200,"final":"/login?proximo=%2Fcatalogo%2Fabc"},{"rota":"/nao-existe-qa","status":404,"final":"/nao-existe-qa"},{"rota":"/boas-vindas","status":200,"final":"/login"}],"apis":[{"metodo":"GET","rota":"/api/exportar","status":401,"corpo":"{\"erro\":\"sessao\"}"},{"metodo":"GET","rota":"/api/progressao","status":401,"corpo":"{\"erro\":\"sessao\"}"},{"metodo":"GET","rota":"/api/parecer/abc/pdf","status":401,"corpo":"{\"erro\":\"Sessão ausente.\"}"},{"metodo":"GET","rota":"/api/parecer/00000000-0000-0000-0000-000000000000/pdf","status":401,"corpo":"{\"erro\":\"Sessão ausente.\"}"},{"metodo":"POST","rota":"/api/analise","status":401,"corpo":"{\"erro\":\"Sessão ausente.\"}"},{"metodo":"POST","rota":"/api/coach","status":401,"corpo":"{\"erro\":\"Sessão ausente.\"}"},{"metodo":"GET","rota":"/api/analise","status":405,"corpo":""}],"tema":{"erros":[],"dialogo":false,"estado":{"dataTema":"\"><img src=x onerror=alert(1)>","dataTheme":null,"classe":"bricolage_grotesque_da5a6dd2-module__JhNlrq__variable archivo_db5ff306-module__4iY0zq__variable fraunces_345016d4-module__3syoaW__variable","imgInjetada":0,"temFormulario":true}}}
+
+Leitura:
+- 5 rotas privadas sem sessão -> /login com ?proximo= preservado. PASSOU.
+- URL inexistente -> 404. PASSOU no status; ACHADO VISUAL (BAIXA) na tela: print-404.png é a página padrão do Next, branca, em inglês, sem marca e sem link de volta.
+- 6 APIs sem sessão -> 401; GET /api/analise -> 405. PASSOU.
+- lastro_tema corrompido no localStorage: valor vai literal para data-tema, nenhuma img injetada, nenhum dialog, nenhum pageerror; a tela cai no tema padrão (print-login-tema-corrompido.png). PASSOU.

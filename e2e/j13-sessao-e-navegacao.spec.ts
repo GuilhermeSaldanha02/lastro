@@ -154,7 +154,10 @@ test("sessão expirada: salvar modelo não segue como se tivesse salvo", async (
 test("login: e-mail de 5 mil caracteres e senha vazia não quebram a tela", async ({ page }) => {
   await page.goto("/login");
   await page.locator("#email").fill(`${"a".repeat(5_000)}@example.com`);
-  await page.locator("#senha").fill("x");
+  // Oito caracteres de propósito: a primeira rodada usou "x" e o
+  // `minLength` nativo do campo barrou o envio antes de o app ver o
+  // e-mail (run 34784135645) — o teste media a senha, não o e-mail.
+  await page.locator("#senha").fill("xxxxxxxx");
   await page.getByRole("button", { name: "Entrar no Lastro" }).click();
   await expect(page.locator(".aviso-erro"), "e-mail gigante não mostrou erro").toBeVisible({ timeout: 15_000 });
   await print(page, "login-email-gigante");
