@@ -188,7 +188,9 @@ Contexto limpo, 13 achados. Aplicados após verificação individual (E8 — rev
 
 ---
 
-## Fase 1 — PEÇA-ASSINATURA: a Análise, de ponta a ponta · 🔶 Specs escritas, implementação não iniciada
+## Fase 1 — PEÇA-ASSINATURA: a Análise, de ponta a ponta · ✅ Implementada e em uso
+
+> **Status reconciliado em 2026-09-13.** O título dizia "specs escritas, implementação não iniciada" desde 2026-08-04 e nunca foi atualizado. Conferido: `/analise` e `/api/analise` existem, o banco de produção tem **2 pareceres reais prontos e confirmados**, e a jornada J2 roda no CI (`e2e/j2-analise.spec.ts`). O que vem abaixo é o histórico das specs, não o estado.
 
 *Feio é permitido. Incompleto não é. O objetivo é o dono ler um parecer sobre os treinos reais dele.*
 
@@ -1013,7 +1015,9 @@ Isso **reprova de uma vez as duas composições que eu ofereci**: cartão empilh
 
 ---
 
-## Fase 2 — Registro que sobrevive à academia · 🔶 Em andamento (2026-08-05)
+## Fase 2 — Registro que sobrevive à academia · 🔶 Falta um check no celular (2.3)
+
+> **Status reconciliado em 2026-09-13.** 2.1, 2.2, 2.4 e 2.5 estão ✅ na tabela. O único item aberto é o **2.3**: o ciclo completo em celular real — registrar séries em modo avião, reconectar e conferir no PC (FF6/A1). No navegador ele é coberto pela `j1` no CI; no aparelho, só o dono fecha.
 
 | # | Tarefa | Modo | Estado | Check executável |
 |---|---|---|---|---|
@@ -1106,7 +1110,9 @@ Isso **reprova de uma vez as duas composições que eu ofereci**: cartão empilh
 
 ---
 
-## Fase 3 — Identidade visual e telas · 🔶 Reconciliada em 2026-08-06
+## Fase 3 — Identidade visual e telas · ✅ Concluída
+
+> **Status reconciliado em 2026-09-13.** Os dois "NÃO concluído" abaixo foram resolvidos depois de escritos: o **gráfico de progressão existe** (`src/components/grafico-progressao.tsx`, `/api/progressao`) e o **gate G6/C10/C11 rodou contra dado real** em 2026-08-07 (`DECISIONS.md`). E o padrão "Areia & Azul Petróleo" citado abaixo foi **substituído pelo Apex Pro** — a fonte de verdade visual é `src/app/tokens.css`. O bloco a seguir é histórico.
 
 O que este bloco descrevia originalmente ("histórico de treinos · e1RM e volume por exercício no tempo · volume semanal por grupo muscular") **não é o que foi construído.** O que aconteceu de fato, numa sessão longa sem atualizar este arquivo no caminho:
 
@@ -1119,7 +1125,9 @@ O que este bloco descrevia originalmente ("histórico de treinos · e1RM e volum
 - **Gráfico de progressão** (e1RM e volume por exercício no tempo, volume semanal por grupo muscular) — `DESIGN.md` §3.7 já especifica o formato ("a pergunta é 'está subindo?', não 'quanto?'"), mas **nenhum componente de gráfico existe**. Não há `src/**/grafico*`. Fica para abrir a próxima sessão.
 - Gate visual **G6** (`DESIGN.md` §4.1, gráfico com platô) não pode nem começar sem o gráfico existir.
 
-## Fase 4 — Catálogo curado · 🔶 Infra pronta, conteúdo não escrito
+## Fase 4 — Catálogo curado · ✅ Conteúdo escrito, revisão humana pendente
+
+> **Status reconciliado em 2026-09-13.** Conferido no banco de produção: **102 exercícios, 0 dicas nulas** — o critério A9 é atendido. As 102 foram escritas por Claude (`dica_execucao_origem = 'claude'` em todas), depois de o dono revogar a FF7 em 2026-09-09 (`DECISIONS.md` "2026-09-09 (2)", migração 0021). O que falta é o que já está nas pendências do dono: revisar as dicas e marcar `dica_execucao_origem = 'humano'` nas que aprovar. O parágrafo "NÃO concluído" abaixo é anterior a isso.
 
 **Concluído:** a tela `/catalogo` existe, funciona, agrupa por grupo muscular, e **diz honestamente** quando a dica de execução não foi escrita em vez de esconder ou inventar (E3).
 
@@ -1131,9 +1139,13 @@ O que este bloco descrevia originalmente ("histórico de treinos · e1RM e volum
 
 **NÃO verificado:** nenhuma pergunta real foi enviada pelo Coach contra a API da Gemini de verdade — a tela foi validada com marcação injetada (mock), nunca com uma conversa real. Testar isso consome cota (~20 req/dia, `KNOWLEDGE.md` §3.2).
 
+> **Reconfirmado em 2026-09-13:** continua não verificado. `uso_ia` (migração 0020, 2026-09-05) não tem nenhuma chamada registrada de origem `coach`. A `j3` cobre a tela, não a resposta da Gemini.
+
 ## Fase 6 — Integração final · ⬜ Não iniciada
 
 Review integral do Inspetor · todas as fitness functions · E2E das 3 jornadas · gate visual completo em celular físico. Nada disto começou.
+
+> **Atualizado em 2026-09-13:** as **E2E das 3 jornadas já existem e rodam no CI** (`j1`–`j3`, junto com `j4`–`j9`), então esse item está praticamente coberto. O resto segue sem começar: a revisão integral em contexto limpo (que tira o QA de ALEGADO), a verificação de todas as fitness functions de uma vez e o gate visual completo no celular físico.
 
 ---
 
