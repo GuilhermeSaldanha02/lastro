@@ -22,6 +22,7 @@ import { ehRecorde } from "@/lib/analise/recorde-serie";
 import { RIR_MINIMO, RIR_MAXIMO, validarNumerosDaSerie } from "@/lib/dados/limites-serie";
 import { t } from "@/lib/texto/i18n";
 import type { Idioma } from "@/lib/dados/idioma";
+import DicaInfo from "@/components/dica-info";
 
 export type DadosNovaSerie = {
   exercicioId: string;
@@ -286,9 +287,12 @@ export default function FormularioSerie({
 
       {tipo === "valendo" && (
         <div className="campo">
-          <label className="campo__rotulo" htmlFor="rir">
-            {t("RIR (Repetições na Reserva — Opcional)", idioma)}
-          </label>
+          <div className="titulo-com-dica">
+            <label className="campo__rotulo" htmlFor="rir">{t("RIR (opcional)", idioma)}</label>
+            <DicaInfo titulo="RIR" idioma={idioma}>
+              {t("RIR indica quantas repetições você ainda conseguiria fazer antes de chegar à falha.", idioma)}
+            </DicaInfo>
+          </div>
           <input id="rir" name="rir" type="number" inputMode="numeric" placeholder={t("Ex: 2", idioma)} min={RIR_MINIMO} max={RIR_MAXIMO} />
         </div>
       )}

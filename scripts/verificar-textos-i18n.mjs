@@ -9,6 +9,9 @@ const MIGRADOS = [
   /src[\\/]app[\\/]personal[\\/]/,
   /src[\\/]app[\\/]ajustes[\\/]personal[\\/]/,
   /src[\\/]components[\\/](fila-personal|convites-personal|completar-cadastro-personal|vinculo-aluno|seletor-modo|escolha-tipo-conta|voltar-flutuante)\.tsx$/,
+  /src[\\/]app[\\/]page\.tsx$/,
+  /src[\\/]app[\\/]treino[\\/]/,
+  /src[\\/]components[\\/](iniciar-treino|form-iniciar-treino|lista-treinos|treino-detalhe|formulario-serie|timer-topo|excluir-treino|relatorio-pos-treino)\.tsx$/,
 ];
 const DIRETORIOS = ["src/app", "src/components"];
 const EXTENSOES = new Set([".tsx", ".jsx"]);
@@ -54,8 +57,37 @@ function adicionarAchado(achados, arquivo, no, texto) {
   }
 }
 
+function atributoPai(no) {
+  if (ts.isJsxAttribute(no)) return no;
+  return ts.isJsxExpression(no) && ts.isJsxAttribute(no.parent) ? no.parent : undefined;
+}
+
+function valueEhEstrutural(atributo) {
+  const abertura = atributo.parent?.parent;
+  if (!abertura || !ts.isJsxOpeningLikeElement(abertura)) return false;
+
+  const tag = ts.isIdentifier(abertura.tagName) ? abertura.tagName.text.toLowerCase() : "";
+  if (tag === "option") return true;
+  if (tag !== "input") return false;
+
+  const tipo = abertura.attributes.properties.find(
+    (propriedade) =>
+      ts.isJsxAttribute(propriedade) &&
+      propriedade.name.text === "type" &&
+      propriedade.initializer &&
+      ts.isStringLiteral(propriedade.initializer),
+  );
+  const valorDoTipo = tipo && ts.isJsxAttribute(tipo) && ts.isStringLiteral(tipo.initializer)
+    ? tipo.initializer.text
+    : "text";
+  return ["hidden", "checkbox", "radio"].includes(valorDoTipo);
+}
+
 function estaEmPropriedadeNaoVisivel(no) {
-  return ts.isJsxAttribute(no.parent) && PROPRIEDADES_NAO_VISIVEIS.has(no.parent.name.text);
+  const atributo = atributoPai(no);
+  if (!atributo) return false;
+  if (atributo.name.text === "value") return valueEhEstrutural(atributo);
+  return PROPRIEDADES_NAO_VISIVEIS.has(atributo.name.text);
 }
 
 function adicionarExpressaoVisivel(achados, arquivo, expressao) {
@@ -91,7 +123,7 @@ export function encontrarTextosSemI18n(codigo, caminho) {
       ts.isJsxAttribute(no) &&
       no.initializer &&
       ts.isStringLiteral(no.initializer) &&
-      !PROPRIEDADES_NAO_VISIVEIS.has(no.name.text) &&
+      !estaEmPropriedadeNaoVisivel(no) &&
       !estaDentroDeT(no)
     ) {
       adicionarAchado(achados, arquivo, no.initializer, no.initializer.text);

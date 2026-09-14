@@ -27,6 +27,17 @@ describe("i18n", () => {
     "Formato esperado",
     "Salvar e abrir a fila",
     "Informado pelo profissional. O lastro não verifica registro no CONFEF.",
+    "Sem conexão",
+    "Salvo no aparelho",
+    "Falha ao sincronizar",
+    "Treino não encontrado",
+    "Valor fora do limite",
+    "Sessão expirada",
+    "Finalizar treino",
+    "Reabrir treino",
+    "Descartar série",
+    "Treino LASTRO",
+    "TREINO",
   ])("tem cobertura completa para %s", (chave) => {
     expect(possuiTraducao(chave)).toBe(true);
     expect(t(chave, "en")).not.toBe(chave);

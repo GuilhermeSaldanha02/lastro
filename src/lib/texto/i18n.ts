@@ -777,6 +777,28 @@ const DICIONARIO: Record<string, { en: string; es: string }> = {
 
   // --- components/treino-detalhe.tsx (finalizar / reabrir treino) ---
   "Reabrir treino": { en: "Reopen workout", es: "Reabrir entrenamiento" },
+  "Sem conexão": { en: "No connection", es: "Sin conexión" },
+  "Salvo no aparelho": { en: "Saved on device", es: "Guardado en el dispositivo" },
+  "Falha ao sincronizar": { en: "Sync failed", es: "Error al sincronizar" },
+  "Treino não encontrado": { en: "Workout not found", es: "Entrenamiento no encontrado" },
+  "Valor fora do limite": { en: "Value out of range", es: "Valor fuera del límite" },
+  "Sessão expirada": { en: "Session expired", es: "Sesión expirada" },
+  "Finalizar treino": { en: "Finish workout", es: "Finalizar entrenamiento" },
+  "Descartar série": { en: "Discard set", es: "Descartar serie" },
+  "Tempo total da sessão de treino": {
+    en: "Total workout time",
+    es: "Tiempo total de la sesión de entrenamiento",
+  },
+  "Iniciar descanso entre séries": { en: "Start rest between sets", es: "Iniciar descanso entre series" },
+  "Pular descanso": { en: "Skip rest", es: "Omitir descanso" },
+  "Copiar imagem transparente": { en: "Copy transparent image", es: "Copiar imagen transparente" },
+  "Salvar imagem transparente": { en: "Save transparent image", es: "Guardar imagen transparente" },
+  "Mais opções de compartilhamento": { en: "More sharing options", es: "Más opciones para compartir" },
+  "Treino LASTRO": { en: "LASTRO Workout", es: "Entrenamiento LASTRO" },
+  "RIR indica quantas repetições você ainda conseguiria fazer antes de chegar à falha.": {
+    en: "RIR indicates how many more reps you could do before reaching failure.",
+    es: "El RIR indica cuántas repeticiones más podrías hacer antes de llegar al fallo.",
+  },
   "Finalizar o treino? O cronômetro para e o registro fecha — dá para reabrir depois.": {
     en: "Finish the workout? The timer stops and logging closes — you can reopen it later.",
     es: "¿Finalizar el entrenamiento? El cronómetro se detiene y el registro se cierra — puedes reabrirlo después.",

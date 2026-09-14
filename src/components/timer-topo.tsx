@@ -259,7 +259,7 @@ export default function TimerTopo({
     <div className="timer-topo-container" ref={containerRef}>
       <div className="barra-status-treino">
         {/* Esquerda: Tempo Total de Treino Decorrido */}
-        <div className="status-tempo-treino" title="Tempo total da sessão de treino">
+        <div className="status-tempo-treino" title={t("Tempo total da sessão de treino", idioma)}>
           <span className="status-tempo-treino__icone">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
               <circle cx="12" cy="12" r="10" />
@@ -295,7 +295,7 @@ export default function TimerTopo({
               type="button"
               className="timer-topo-botao-disparar"
               onClick={() => iniciarTimer(duracaoPadraoSegundos)}
-              title="Iniciar descanso entre séries"
+              title={t("Iniciar descanso entre séries", idioma)}
             >
               <span className="timer-topo-disparar-rotulo">
                 <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
@@ -339,7 +339,7 @@ export default function TimerTopo({
                     type="button"
                     className="timer-topo-btn-fechar"
                     onClick={fecharTimer}
-                    aria-label="Pular descanso"
+                    aria-label={t("Pular descanso", idioma)}
                   >
                     ✕
                   </button>

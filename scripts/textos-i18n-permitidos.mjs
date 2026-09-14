@@ -8,8 +8,12 @@ export const TEXTOS_PERMITIDOS = new Set([
   "pt-BR",
   "en",
   "es",
-  "TREINO",
   "TRABALHO",
+  "min",
+  "+30s",
+  "kg?",
+  "&ldquo;",
+  "&rdquo;.",
 ]);
 
 export const PROPRIEDADES_NAO_VISIVEIS = new Set([
@@ -37,6 +41,13 @@ export const PROPRIEDADES_NAO_VISIVEIS = new Set([
   "tipoConta",
   "aria-hidden",
   "aria-live",
+  "aria-modal",
+  "src",
+  "width",
+  "height",
+  "points",
+  "classeBotao",
+  "voltarHref",
   "strokeLinecap",
   "strokeLinejoin",
 ]);

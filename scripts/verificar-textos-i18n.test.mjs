@@ -41,6 +41,20 @@ describe("encontrarTextosSemI18n", () => {
     }
   });
 
+  it("reporta value visível de controles de envio", () => {
+    assert.deepEqual(
+      encontrarTextosSemI18n('<input type="submit" value="Salvar" />', CAMINHO),
+      [`${CAMINHO}:1: Salvar`],
+    );
+  });
+
+  it("ignora value estrutural de option cujo rótulo já é localizado", () => {
+    assert.deepEqual(
+      encontrarTextosSemI18n('<option value="valendo">{t("Valendo", idioma)}</option>', CAMINHO),
+      [],
+    );
+  });
+
   it("ignora conteúdo dentro de t", () => {
     const codigo = '<>{t(<span title="Título interno">Texto interno</span>)}</>';
 
