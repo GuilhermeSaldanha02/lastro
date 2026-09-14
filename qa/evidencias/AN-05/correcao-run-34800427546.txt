@@ -1,0 +1,10 @@
+AN-05 · evidência crua da CORREÇÃO (NÃO AUDITADA) — run 34800427546 (PR #255, commit 9190153)
+Correção: migração 0028_consumir_uso_ia (reserva atômica da cota) + POST /api/coach. Escrita pelo mesmo agente que escreveu o spec: não move o item para PASSOU.
+
+== execução do spec no CI (sem retry = passou de primeira)
+656:[38/110] [chromium] › e2e/j12-isolamento-e-apis.spec.ts:350:5 › análise e coach: em andamento responde 409 e teto responde 429, sem gastar cota
+657:[39/110] [chromium] › e2e/j12-isolamento-e-apis.spec.ts:380:5 › coach: pergunta invisível é recusada e pedidos simultâneos não furam o teto de 10
+
+== placar final do run
+773:  110 passed (16.3m)
+anotações [achado] do coach neste run: 0
