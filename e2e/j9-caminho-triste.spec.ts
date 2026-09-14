@@ -155,7 +155,10 @@ async function abrirCadastro(page: Page, tipo: "USUÁRIO" | "PERSONAL") {
   await expect(page.getByRole("radio", { name: tipo })).toHaveAttribute("aria-checked", "true");
   await page.locator("#nome").fill("Teste Triste");
   await page.locator("#email").fill(`${PREFIXO_CADASTRO}${Date.now()}@example.com`);
-  await page.locator("#senha").fill("Senha!123");
+  // Válida pela régua de `src/lib/texto/senha.ts` (10+ caracteres, minúscula,
+  // maiúscula e número). A anterior, "Senha!123", tinha 9 e passaria a ser
+  // recusada antes do telefone e do CREF que estes testes medem.
+  await page.locator("#senha").fill("Senha!1234");
 }
 
 /** Tela de vínculo do aluno, recarregada — sem erro de caso anterior. */
@@ -192,6 +195,21 @@ test("cadastro: telefone com letra O no lugar do zero NÃO pode virar outro núm
     page.locator(".aviso-erro"),
     "ACHADO: a letra O foi descartada em silêncio e o telefone passou como outro número (83 9999-8888)",
   ).toContainText(/Telefone inválido/i, { timeout: 15_000 });
+});
+
+test("cadastro: senha fraca é recusada antes de criar a conta", async ({ page }) => {
+  // O plano gratuito do Supabase não tem a proteção contra senha vazada; a
+  // régua do app é a única defesa (DECISIONS 2026-09-14 (2)).
+  await abrirCadastro(page, "USUÁRIO");
+  await page.locator("#telefone").fill("83 97777-6666");
+  await page.locator("#senha").fill("senhafraca123");
+  await page.getByRole("button", { name: "Criar minha conta" }).click();
+
+  await expect(
+    page.locator(".aviso-erro"),
+    "ACHADO: a senha sem letra maiúscula foi aceita no cadastro",
+  ).toContainText(/letra minúscula, letra maiúscula e número/i, { timeout: 15_000 });
+  expect(new URL(page.url()).pathname, "o cadastro saiu da tela com senha fraca").toBe("/login");
 });
 
 const CREFS_INVALIDOS = [

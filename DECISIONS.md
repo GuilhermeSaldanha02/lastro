@@ -2799,3 +2799,20 @@ A `j9` tinha *"aluno em /personal/completar vê a porta da área de trabalho"* �
 
 - **Proteção contra senha vazada**: é configuração do Auth no painel do Supabase, não esquema. Fica com o dono (Authentication, configurações de senha, "Leaked password protection"); o recurso pode exigir plano pago.
 - **"Várias policies permissivas" por tabela** (aviso de desempenho em `serie`, `treino`, `usuario` e `vinculo_personal`): são policies separadas de dono e de personal de propósito; juntar mudaria a leitura das regras sem ganho medido.
+
+## 2026-09-14 (2) — Senha forte no cadastro, porque o plano gratuito não barra senha vazada
+
+**Pedido do dono:** "valide a senha no próprio app". O verificador de segurança do Supabase aponta a proteção contra senha vazada desligada; ela só existe do plano Pro para cima, e o projeto está no plano gratuito — o dono confirmou que não tem como ligar. Até aqui a única regra de senha era o `minLength={6}` do navegador.
+
+**A régua** (`src/lib/texto/senha.ts`, `validarSenhaNova`): pelo menos 10 caracteres, com letra minúscula, letra maiúscula e número; no máximo 72, o limite do bcrypt do Supabase Auth. Símbolo não é exigido: atrapalha no teclado do celular e rende pouco perto do comprimento. A tela de cadastro checa antes de enviar, e `criarContaComEmail` repete a checagem no servidor — a mesma função nas duas pontas, como já vale para CREF e telefone.
+
+### O que vale agora
+
+- **Só para criar conta.** Quem já tem conta continua entrando com a senha que tem; o modo "entrar" não passa pela régua.
+- **O aviso "Leaked Password Protection Disabled" do Supabase fica aceito** enquanto o projeto estiver no plano gratuito. Não é pendência.
+- **Conta criada pelo helper de admin dos testes** (`criarUsuarioDescartavel`) não passa pela régua do app; o `j9`, que cadastra pela tela, passou a usar senha válida e ganhou o caso "senha fraca é recusada antes de criar a conta".
+
+### O que NÃO foi feito, de propósito
+
+- **A régua do próprio Supabase Auth** (comprimento mínimo e caracteres exigidos no painel) não foi mudada: é configuração de segurança da conta, do dono. Endurecê-la no painel repetiria a régua do app para quem chama a API de Auth direto, sem passar pelo `criarContaComEmail`.
+- **Não há troca nem recuperação de senha no app hoje** — conferido: nenhum `updateUser` nem `resetPasswordForEmail`. Quando existir, precisa usar `validarSenhaNova`.
