@@ -15,15 +15,29 @@
 // dois chamam `sincronizar()`, que já é sequencial e apaga da fila (Dexie)
 // antes de devolver.
 import { useEffect } from "react";
+import { usePathname } from "next/navigation";
 import { sincronizarPendentes } from "@/lib/offline/sincronizar-pendentes";
 import { ouvirPedidosDeSincronizacao } from "@/lib/offline/sincronizacao-em-segundo-plano";
 
 export default function SincronizadorGlobal() {
-  useEffect(() => {
-    // Drena ao montar — cobre o caso de abrir o app já com rede, depois de
-    // ter registrado série offline numa sessão anterior.
-    void sincronizarPendentes();
+  const rota = usePathname();
 
+  // Drena ao montar E a cada troca de rota.
+  //
+  // Achado B7 (QA, 2026-09-13): só drenava ao montar. O login entra com
+  // `router.push` (navegação dentro do app), então este componente, que
+  // mora no layout raiz, NÃO remonta — a série que ficou na fila quando a
+  // sessão expirou esperava até alguém recarregar o app ou abrir o treino.
+  // Com a fila por conta (M1), antes do login nada podia subir; depois
+  // dele, a primeira navegação sobe.
+  //
+  // Barato de propósito: `sincronizarPendentes` tem mutex, e fila vazia não
+  // faz chamada de rede nenhuma.
+  useEffect(() => {
+    void sincronizarPendentes();
+  }, [rota]);
+
+  useEffect(() => {
     const aoVoltarARede = () => {
       void sincronizarPendentes();
     };
