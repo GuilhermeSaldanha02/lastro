@@ -5,6 +5,7 @@
 
 import { revalidatePath } from "next/cache";
 import { criarClienteServidor } from "@/lib/supabase/cliente-servidor";
+import { normalizarPesoKg } from "@/lib/anilhas";
 
 export type ConfigAnilhas = {
   pesoBarra: number;
@@ -31,7 +32,7 @@ export async function obterConfigAnilhas(): Promise<ConfigAnilhas | null> {
   };
 }
 
-/** `anilhasDisponiveis` sem duplicata, sem valor <= 0 — validado aqui e
+/** `anilhasDisponiveis` sem duplicata, sem valor fora da faixa — validado aqui e
  * não confiado à UI, já que é escrita direta na conta do usuário. */
 export async function salvarConfigAnilhas(
   pesoBarra: number,
@@ -43,16 +44,20 @@ export async function salvarConfigAnilhas(
   } = await supabase.auth.getUser();
   if (!user) throw new Error("Sessão ausente — usuário não autenticado.");
 
-  if (!Number.isFinite(pesoBarra) || pesoBarra <= 0) {
-    throw new Error("Peso da barra precisa ser um número positivo.");
+  // Arredondado ANTES de validar, como o `numeric(6,2)` vai guardar (achado
+  // B5): checar `> 0` no número cru deixava 0,001 virar 0 kg no banco.
+  const barra = normalizarPesoKg(pesoBarra);
+  if (barra === null) {
+    throw new Error("Peso da barra fora da faixa de 0,01 a 9999,99 kg.");
   }
-  const anilhasLimpa = Array.from(new Set(anilhasDisponiveis)).filter(
-    (p) => Number.isFinite(p) && p > 0,
+  // Deduplica DEPOIS de arredondar: 1,25 e 1,251 são a mesma anilha no banco.
+  const anilhasLimpa = Array.from(
+    new Set(anilhasDisponiveis.map(normalizarPesoKg).filter((p): p is number => p !== null)),
   );
 
   const { error } = await supabase
     .from("usuario")
-    .update({ peso_barra: pesoBarra, anilhas_disponiveis: anilhasLimpa })
+    .update({ peso_barra: barra, anilhas_disponiveis: anilhasLimpa })
     .eq("id", user.id);
   if (error) throw new Error(`Falha ao salvar configuração: ${error.message}`);
 

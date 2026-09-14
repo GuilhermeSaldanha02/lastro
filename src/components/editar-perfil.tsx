@@ -55,7 +55,7 @@ export default function EditarPerfil({
   return (
     <div className="pilha">
       <Avatar nome={nome} avatarUrl={avatarUrl} />
-      <p>{nome}</p>
+      <p className="perfil-nome">{nome}</p>
 
       <input
         ref={inputRef}

@@ -1,5 +1,38 @@
 import { describe, expect, it } from "vitest";
-import { calcularAnilhas } from "./anilhas";
+import { calcularAnilhas, normalizarPesoKg } from "./anilhas";
+
+describe("normalizarPesoKg (achado B5)", () => {
+  it("mantém pesos comuns", () => {
+    expect(normalizarPesoKg(20)).toBe(20);
+    expect(normalizarPesoKg(1.25)).toBe(1.25);
+    expect(normalizarPesoKg(0.5)).toBe(0.5);
+  });
+
+  it("arredonda para duas casas, como o banco", () => {
+    expect(normalizarPesoKg(2.499)).toBe(2.5);
+    expect(normalizarPesoKg(1.2549)).toBe(1.25);
+  });
+
+  it("recusa o que o banco arredondaria para 0 kg", () => {
+    expect(normalizarPesoKg(0.001)).toBeNull();
+    expect(normalizarPesoKg(0.004)).toBeNull();
+  });
+
+  it("aceita os extremos que a coluna guarda", () => {
+    expect(normalizarPesoKg(0.01)).toBe(0.01);
+    expect(normalizarPesoKg(9999.99)).toBe(9999.99);
+  });
+
+  it.each([
+    ["zero", 0],
+    ["negativo", -5],
+    ["acima da coluna", 99999999],
+    ["não número", Number.NaN],
+    ["infinito", Number.POSITIVE_INFINITY],
+  ])("recusa %s", (_nome, valor) => {
+    expect(normalizarPesoKg(valor)).toBeNull();
+  });
+});
 
 describe("calcularAnilhas", () => {
   it("T-A1: fecha exato com o inventário padrão", () => {

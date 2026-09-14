@@ -2714,3 +2714,22 @@ A `j9` tinha *"aluno em /personal/completar vê a porta da área de trabalho"* �
 
 - A Análise não recebe texto livre (só o número da pergunta), então não precisou da mesma limpeza.
 - **Quem implementou não audita:** `QA.md` mantém AN-03 e AN-04 como REPROVOU até confirmação independente.
+
+## 2026-09-13 (8) — Peso de anilha é validado como o banco guarda, e texto sem espaço quebra na linha
+
+**Pedido do dono:** corrigir os achados B5 e B6 do QA do caminho triste.
+
+**B5 — anilha de 0,001 kg era salva como 0 kg.** `peso_barra` e `anilhas_disponiveis` são `numeric(6,2)` (0008): o banco arredonda para duas casas DEPOIS de a tela e o servidor terem checado `> 0` no número cru. Barra de 0,001 kg tinha o mesmo defeito. Agora `normalizarPesoKg` (`src/lib/anilhas.ts`) arredonda para duas casas e só então exige a faixa de 0,01 a 9999,99 kg (o máximo da coluna). A tela usa o valor já arredondado, e `salvarConfigAnilhas` repete a regra e deduplica depois de arredondar.
+
+**B6 — texto sem espaço estourava a largura no celular:** nome de modelo de 10 mil caracteres (lista de modelos, 109.706 px a 375 px) e nome de conta gigante (`/perfil`, 43.337 px). Na lista, o nome é texto solto dentro de `.item__estatico` (flex): o `min-width: 0` vale para a caixa, não para o texto, cuja largura mínima é a palavra inteira. Agora `.item__estatico` e o novo `.perfil-nome` têm `overflow-wrap: anywhere`, que só quebra no meio da palavra quando ela não cabe.
+
+### O que vale agora
+
+- **Número que vai para coluna `numeric` com casas fixas é arredondado antes de validar.**
+- **Texto digitado por pessoa, exibido em linha estreita, leva `overflow-wrap: anywhere`** — só na classe de quem exibe o texto, não em regra global.
+
+### O que NÃO foi feito, de propósito
+
+- **Sem regra global de quebra.** Home e `/personal/alunos` já aguentavam o nome gigante; outros lugares com texto livre ficam para quando alguém medir.
+- **Sem conferência visual local** (a máquina não tem `.env.local`). A prova visual são os prints do E2E (`lista-com-nome-gigante`, `nome-gigante_perfil`) nos artefatos do CI.
+- **Quem implementou não audita:** `QA.md` mantém AJ-04 e VS-06 como REPROVOU até confirmação independente.

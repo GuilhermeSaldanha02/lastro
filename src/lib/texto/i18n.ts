@@ -194,6 +194,14 @@ const DICIONARIO: Record<string, { en: string; es: string }> = {
   "Iniciar treino de hoje": { en: "Start today's workout", es: "Iniciar entrenamiento de hoy" },
   "Como começar?": { en: "How do you want to start?", es: "¿Cómo empezar?" },
   "Treino novo": { en: "New workout", es: "Entrenamiento nuevo" },
+  "Peso da anilha precisa estar entre 0,01 e 9999,99 kg.": {
+    en: "Plate weight must be between 0.01 and 9999.99 kg.",
+    es: "El peso del disco debe estar entre 0,01 y 9999,99 kg.",
+  },
+  "Peso da barra precisa estar entre 0,01 e 9999,99 kg.": {
+    en: "Bar weight must be between 0.01 and 9999.99 kg.",
+    es: "El peso de la barra debe estar entre 0,01 y 9999,99 kg.",
+  },
   "Reps do plano precisa ser um número inteiro entre 1 e 100.": {
     en: "Planned reps must be a whole number between 1 and 100.",
     es: "Las repeticiones del plan deben ser un número entero entre 1 y 100.",
