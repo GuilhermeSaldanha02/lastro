@@ -1,5 +1,6 @@
 -- ============================================================
--- lastro · 0028 — reservar uma vaga da cota diária de IA de forma atômica
+-- lastro · 20260914024607 (era 0028 antes do alinhamento com o banco) —
+-- reservar uma vaga da cota diária de IA de forma atômica
 -- (achado novo do QA do caminho triste; DECISIONS 2026-09-13 (11))
 -- ============================================================
 -- O coach contava os usos de hoje, lia o vínculo, registrava o uso e só

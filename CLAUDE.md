@@ -67,7 +67,7 @@ npm run dev     # dev server (porta padrão do Next)
 npm run build   # build de produção
 npm run start   # roda o build
 npm run lint    # eslint
-npm run test    # vitest run — 66 testes
+npm run test    # vitest run — 518 testes em 48 arquivos
 ```
 
 Verificação completa antes de commit: `npx tsc --noEmit && npm run test && npm run lint && npm run build`.

@@ -2835,3 +2835,17 @@ A `j9` tinha *"aluno em /personal/completar vê a porta da área de trabalho"* �
 ### Verificação
 
 Sem navegador local (sem `.env.local`). O `j14-dica-info` roda na tela pública de cadastro, sem criar conta: explicação escondida antes do toque, folha abrindo com o texto, foco indo e voltando, Esc e toque fora fechando sem sair de `/login`. Os prints `dica-fechada` e `dica-aberta` ficam nos artefatos do CI.
+
+## 2026-09-14 (4) — As migrações passam a ter no disco o nome que têm no banco, e o `AGENTS.md` para de depender do `CLAUDE.md`
+
+**Contexto.** O dono vai entregar o projeto ao Codex. Ao conferir o estado para o handoff, apareceram duas coisas que só machucariam o agente seguinte.
+
+**A primeira: nome de migração descasado.** As três últimas migrações foram aplicadas em produção pelo MCP do Supabase, não por `supabase db push`. O MCP carimba a versão com timestamp. Resultado: os arquivos se chamavam `0027_*`, `0028_*` e `0029_*`, e no banco estavam como `20260914022051`, `20260914024607` e `20260914034625`. O conteúdo estava aplicado e correto — mas `supabase migration list` mostraria os três como "só local", e um `db push` tentaria reaplicá-los. A antiga `0027` cria índice único: a reaplicação falharia, e falharia contra o **único** banco que este projeto tem.
+
+**A decisão: renomear os arquivos locais**, não usar `migration repair`. Renomear não toca o banco — é a operação mais barata de desfazer e a única que não escreve em produção para consertar um problema de nomenclatura. Os comentários no código que citavam "migração 0027" e "migração 0028" acompanharam, com o número antigo entre parênteses para o histórico continuar legível. O que **não** foi tocado: as referências a "lint 0028/0029" nas migrações `0023` e `0024` — aqueles são códigos de regra do verificador do Supabase, não números de migração, e trocá-los teria sido um erro de leitura.
+
+**A segunda: o `AGENTS.md` delegava demais.** Ele dizia "stack, comandos e contexto do produto: `CLAUDE.md`". Isso funciona entre agentes que leem os dois arquivos. Não funciona para um agente cuja convenção é ler o `AGENTS.md` — ele ficaria sem as seis invariantes do projeto, sem os comandos e, o que é pior, sem saber que **`npm run e2e` roda contra o banco de produção**.
+
+**A decisão: inlinar no `AGENTS.md`** as invariantes (§8) e os comandos com o que cada um prova (§9), em vez de transformar o ponteiro em ordem ("leia também o `CLAUDE.md`"). Ponteiro entre arquivos é obedecido quando o agente tem contexto sobrando; regra que cabe na página é obedecida sempre. As três regras do registro de QA saíram da skill `qa-registro` e entraram na §7 pelo mesmo motivo — skill só carrega no Claude Code, e a regra não é opcional por morar numa skill.
+
+**O que isso não resolve.** O `CLAUDE.md` continua existindo e continua sendo a fonte do produto e da equipe de agentes. A duplicação entre ele e a §8 do `AGENTS.md` é deliberada e tem custo: mudar uma invariante agora exige mudar dois arquivos. O custo foi aceito porque a alternativa medida — confiar no ponteiro — é a que já falhou.

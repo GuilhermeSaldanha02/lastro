@@ -19,7 +19,7 @@ E leia o bloco **ESTADO ATUAL**, no topo do `PROGRESS.md` — é o único lugar 
 
 **Working tree sujo = PARE e pergunte ao dono.** Pode ser trabalho em andamento do outro agente; commitar ou descartar por cima destrói contexto que não é seu.
 
-Stack, comandos e contexto do produto: `CLAUDE.md`.
+Stack, comandos e contexto do produto: `CLAUDE.md`. **As invariantes que não se violam e os comandos de verificação estão inlinados aqui nas §8 e §9** — um agente que só leia este arquivo não fica cego.
 
 ---
 
@@ -103,7 +103,7 @@ A última linha é a que faz a orquestração funcionar. Escreva-a pensando em q
 | Por que uma decisão foi tomada | `DECISIONS.md` (busque a data/seção — nunca o arquivo inteiro) |
 | Regras visuais, tokens, gate visual | `DESIGN.md` · a entrada da decisão em `BRIEFING-VISUAL.md` |
 | Glossário do domínio, pesquisa, lições | `KNOWLEDGE.md` (por seção) |
-| O que já foi verificado e em que commit | `QA.md` — skill `qa-registro` |
+| O que já foi verificado e em que commit | `QA.md` (as regras do registro estão na §7 e na skill `qa-registro`) |
 
 `PROGRESS.md`, `DECISIONS.md`, `DESIGN.md` e `SDD.md` são arquivos grandes de propósito — **busque a seção, nunca leia inteiro.** Carregar um desses por completo estoura contexto e piora o seu próprio trabalho.
 
@@ -115,4 +115,117 @@ A última linha é a que faz a orquestração funcionar. Escreva-a pensando em q
 node scripts/qa-obsoletos.mjs
 ```
 
-Devolve **só os itens do `QA.md` que ficaram obsoletos** desde o commit em que foram verificados. Audite essa fila, não a lista inteira: item cuja área não mudou continua válido, e reauditá-lo não produz informação nenhuma. Regras completas na skill `qa-registro`.
+Devolve **só os itens do `QA.md` que ficaram obsoletos** desde o commit em que foram verificados. Audite essa fila, não a lista inteira: item cuja área não mudou continua válido, e reauditá-lo não produz informação nenhuma.
+
+
+
+O mapa de áreas está na §1 do próprio `QA.md`. As três regras que sustentam o registro:
+
+
+
+1. **Um item verificado num commit continua válido enquanto nenhum arquivo da área dele mudar.**
+
+2. **Prova crua obrigatória** em `qa/evidencias/<ID>/` — `print.png`, `console.txt`, `rede.txt`. Sem os três, o resultado é `ALEGADO`.
+
+3. **`visual` e `i18n` são transversais de propósito**: mexer em token ou no dicionário invalida a prova de qualquer tela, não só a da área da rota.
+
+
+
+> As skills citadas aqui (`qa-registro`, `portao-visual`, `projeto-retomada`) vivem em `.claude/skills/` e só carregam no Claude Code. **Agente sem elas segue as regras inlinadas acima** — não são opcionais por estarem numa skill.
+
+
+
+---
+
+
+
+## 8. As invariantes que este projeto não perdoa
+
+
+
+Copiadas do `CLAUDE.md` para que valham mesmo para quem não o lê. Escreveu código que viola uma destas? Pare — a spec está errada, mesmo que compile.
+
+
+
+1. **A chave da Gemini nunca toca o cliente.** Toda chamada passa por route handler. `@google/genai` só existe sob `src/app/api/`.
+
+2. **O agregador calcula; o LLM interpreta.** O modelo nunca recebe linhas cruas de série, só um resumo já calculado. Se ele fizer conta, ele erra a conta.
+
+3. **Aquecimento nunca entra em métrica.** Toda função de métrica filtra `tipo = valendo` antes de somar. **RIR ausente é ausência de informação, não RIR alto.**
+
+4. **Dica de execução tem a origem registrada e declarada.** `dica_execucao_origem` guarda quem escreveu, e a tela avisa quando é IA. Escrever por LLM é permitido; esconder que foi LLM, não.
+
+5. **Gravar série não tem `await` de rede no caminho crítico.** O app roda no subsolo da academia — sem sinal é o caso de uso real, não a exceção.
+
+6. **Proibido emoji e emoticon** em código de UI, badge, toast e parecer. Comunicação visual é ícone SVG, tipografia e token de cor.
+
+
+
+Mais duas, derivadas: `src/lib/analise/` não importa rede, HTTP nem Supabase (é matemática pura), e **valor de design tem fonte única** — cor, espaçamento e tipografia só no arquivo de token.
+
+
+
+**Segredo nunca entra no diff.** `.env`, chave da Gemini e credencial do Supabase ficam fora do repositório; confira o diff antes de todo push.
+
+
+
+---
+
+
+
+## 9. Comandos, e o que cada um prova
+
+
+
+```bash
+
+npm test                 # vitest
+
+npx tsc --noEmit         # tipos
+
+npx eslint .             # lint (warnings antigos existem; erros, não)
+
+npm run build            # build de produção
+
+npm run dev              # dev server
+
+```
+
+
+
+Verificação antes de commit: `npx tsc --noEmit && npm test && npx eslint . && npm run build`.
+
+
+
+**`npm run e2e` é o comando perigoso deste repositório.** O Playwright roda **contra o banco de produção** — não existe banco de dev —, criando e apagando contas descartáveis. A prova de E2E que vale é o CI do GitHub Actions, que já roda em todo PR:
+
+
+
+```bash
+
+gh pr view <n> --json statusCheckRollup
+
+gh run view <id> --log-failed
+
+```
+
+
+
+Os prints das varreduras saem como artefato `varredura-telas` do run. Cuidado com duas coisas: `gh run watch --exit-status` **sai 0 quando a conexão cai**, e o CI cancela o run anterior a cada push (`concurrency: cancel-in-progress`) — run cancelado logo após um push não é falha.
+
+
+
+**Nunca use a conta pessoal do dono como instrumento de medida**, e nunca apague conta de `auth.users` por conta própria. Conta de teste é criada e apagada pelo próprio spec.
+
+
+
+### Três armadilhas que já custaram caro aqui
+
+
+
+- **`npm run dev` reescreve `next-env.d.ts`** apontando os tipos para `.next/dev/`. Commitar isso quebra o build de produção. Depois do dev server: `git checkout -- next-env.d.ts`.
+
+- **Em produção, erro lançado numa server action chega ao cliente sem a mensagem**, só com `digest`. Lógica de cliente que decide algo por `error.message` funciona no `next dev` e falha no build. Informação que o cliente precisa ler volta como **valor de retorno**, não como exceção.
+
+- **Erro de tela se lê por `.aviso-erro`, nunca por `getByRole("alert")`** — o Next injeta `#__next-route-announcer__` com `role="alert"` em toda página.
+

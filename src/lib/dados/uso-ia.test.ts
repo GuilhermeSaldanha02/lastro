@@ -125,7 +125,7 @@ function supabaseComRpc(resposta: { data?: unknown; error?: { message: string } 
   return { cliente: cliente as unknown as SupabaseClient, chamadas };
 }
 
-describe("consumirUso (reserva atômica, migração 0028)", () => {
+describe("consumirUso (reserva atômica, migração 20260914024607)", () => {
   it("pede ao banco a vaga com o teto da origem", async () => {
     const { cliente, chamadas } = supabaseComRpc({ data: true });
     await consumirUso(cliente, "coach");
