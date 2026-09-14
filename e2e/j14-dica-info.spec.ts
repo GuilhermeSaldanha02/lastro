@@ -34,6 +34,17 @@ test("dica: o i do CREF abre a explicação numa folha e fecha sem sair da tela"
     page.getByRole("button", { name: "Fechar CREF" }),
     "ao abrir, o foco deveria ir para o botão de fechar",
   ).toBeFocused();
+  // O print tem de mostrar a folha PRONTA. A primeira rodada (run
+  // 34805657227) fotografou no meio da entrada: o fundo anima a opacidade
+  // de 0 a 1 e a folha sobe, então tudo saiu semitransparente por cima do
+  // formulário. Espera todas as animações do fundo e da folha terminarem.
+  const fundo = page.locator(".folha-fundo");
+  await fundo.evaluate((el) => Promise.all(el.getAnimations({ subtree: true }).map((a) => a.finished)));
+  await expect
+    .poll(() => fundo.evaluate((el) => getComputedStyle(el).opacity), {
+      message: "o fundo da folha não terminou de aparecer",
+    })
+    .toBe("1");
   await print(page, "dica-aberta");
 
   await page.keyboard.press("Escape");
