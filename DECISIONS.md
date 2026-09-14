@@ -2677,3 +2677,22 @@ A `j9` tinha *"aluno em /personal/completar vê a porta da área de trabalho"* �
 - **Itens gravados antes desta versão não têm dono** e seguem a regra antiga (qualquer sessão os envia). Somem da fila na primeira sincronização de quem os registrou; o caso de aparelho compartilhado com item antigo pendente continua possível até lá.
 - **Nenhuma tela mostra "há séries de outra conta neste aparelho".** A série de A não se perde, mas A só descobre que ela subiu quando voltar.
 - **Quem implementou não audita:** `QA.md` mantém OF-04 como REPROVOU até confirmação independente. O E2E desse caso era intermitente; verde numa execução não prova sozinho — a prova de lógica são os testes de unidade de `outbox.test.ts` e `sincronizar-pendentes.test.ts`.
+
+## 2026-09-13 (6) — Peso em branco não vira 0 kg, e id digitado errado é "não encontrado"
+
+**Pedido do dono:** corrigir os achados B1 e B2 do QA do caminho triste, depois de A1/A2, M1 a M5.
+
+**B1 — peso em branco gravava a série com 0 kg, sem aviso** (severidade BAIXA, decidida pelo dono). `validarNumerosDaSerie` convertia o texto com `Number("")`, que é `0`. Agora peso vazio (ou só espaços) é recusado com "Informe o peso. Use 0 para exercício sem carga." — o zero continua válido, desde que digitado. Vale para registrar e para editar série, que usam a mesma função.
+
+**B2 — id que não é UUID respondia 500**, em `/treino/abc`, `/catalogo/abc`, `/ajustes/relatorios/parecer/abc` e `/api/parecer/abc/pdf`. O texto ia direto ao Postgres, que recusa com erro (`invalid input syntax for type uuid`) em vez de "nenhuma linha". Agora `buscarTreino`, `buscarExercicio`, `historicoDoExercicio` e `buscarParecer` checam o formato com `ehUuid` (`src/lib/dados/id-valido.ts`) e respondem "não encontrado" — as telas já davam `notFound()` e o PDF já dava 404 para `null`.
+
+### O que vale agora
+
+- **Busca por id vindo de URL checa o formato antes de ir ao banco.** A checagem fica DEPOIS da sessão: sem login continua 401, não 404.
+- **`ehUuid` mora num módulo sem "use server"**: arquivo de Server Functions só exporta função assíncrona.
+
+### O que NÃO foi feito, de propósito
+
+- **B3 (PDF de parecer ainda em geração responde 500) não mudou**: é outro achado.
+- **Outras buscas por id** que não aparecem numa rota digitável (ex.: `buscarModelo`, lido por `?modelo=`) não foram tocadas; `?modelo=abc` fica para quando alguém medir.
+- **Quem implementou não audita:** `QA.md` mantém TR-09, TR-10, CT-02 e AN-06 como REPROVOU até confirmação independente.

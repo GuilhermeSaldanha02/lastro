@@ -6,6 +6,7 @@
 
 import { revalidatePath } from "next/cache";
 import { criarClienteServidor } from "@/lib/supabase/cliente-servidor";
+import { ehUuid } from "@/lib/dados/id-valido";
 import type { NumeroPergunta } from "@/app/api/analise/perguntas";
 import type { EvidenciaParaTela } from "@/app/api/analise/evidencia";
 import type { Idioma } from "@/lib/dados/idioma";
@@ -172,6 +173,9 @@ export async function buscarRascunhoEmAndamento(): Promise<{
 /** Um parecer específico — RLS garante que só resolve se for do dono da sessão. */
 export async function buscarParecer(id: string): Promise<ParecerSalvo | null> {
   const { supabase } = await usuarioAutenticadoOuErro();
+  // Id que não é UUID não existe (achado B2): sem isto o Postgres responde
+  // com erro, e a tela e o PDF viravam 500. Depois da sessão: sem login, 401.
+  if (!ehUuid(id)) return null;
 
   const { data, error } = await supabase
     .from("parecer")
