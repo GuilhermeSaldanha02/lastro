@@ -78,16 +78,36 @@ export function sistemaCoach(temPersonal: boolean): string {
 }
 
 export function montarPerguntaCoach(pergunta: string): string {
-  return `Pergunta do dono:\n\n${pergunta.trim()}`;
+  return `Pergunta do dono:\n\n${limparPergunta(pergunta)}`;
 }
 
 /** Piso e teto de tamanho — o corpo vem do cliente e não é confiável. */
 export const LIMITE_PERGUNTA = 500;
 
+/**
+ * Caracteres que não aparecem na tela: formatação Unicode (categoria `Cf` —
+ * espaço de largura zero U+200B, junções U+200C/U+200D, U+2060, BOM U+FEFF,
+ * marcas de direção) e os separadores de linha e parágrafo.
+ */
+const INVISIVEIS = /[\p{Cf}\u2028\u2029]/gu;
+
+/**
+ * A pergunta como ela SE LÊ: sem caracteres invisíveis e sem espaço nas
+ * pontas.
+ *
+ * Achado B4 (QA, 2026-09-13): `trim()` não remove o espaço de largura zero.
+ * Uma pergunta feita só de `\u200B` passava por "não vazia", ia à Gemini e
+ * gastava uma das 10 vagas diárias do coach para responder a nada.
+ *
+ * Pura e sem dependência de servidor: a tela do coach usa a mesma função
+ * para travar o botão.
+ */
+export function limparPergunta(valor: string): string {
+  return valor.replace(INVISIVEIS, "").trim();
+}
+
 export function perguntaAceitavel(valor: unknown): valor is string {
-  return (
-    typeof valor === "string" &&
-    valor.trim().length > 0 &&
-    valor.trim().length <= LIMITE_PERGUNTA
-  );
+  if (typeof valor !== "string") return false;
+  const limpa = limparPergunta(valor);
+  return limpa.length > 0 && limpa.length <= LIMITE_PERGUNTA;
 }

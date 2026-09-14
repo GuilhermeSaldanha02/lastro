@@ -14,6 +14,8 @@ import {
   SISTEMA_COACH_COM_PERSONAL,
   sistemaCoach,
   perguntaAceitavel,
+  limparPergunta,
+  montarPerguntaCoach,
   LIMITE_PERGUNTA,
 } from "./prompt";
 
@@ -93,5 +95,35 @@ describe("perguntaAceitavel", () => {
   it("aceita no limite e recusa um caractere acima", () => {
     expect(perguntaAceitavel("a".repeat(LIMITE_PERGUNTA))).toBe(true);
     expect(perguntaAceitavel("a".repeat(LIMITE_PERGUNTA + 1))).toBe(false);
+  });
+
+  // Achado B4: a pergunta exata do QA foi "\u200B\u200B\u200B".
+  it.each([
+    ["espaço de largura zero", "\u200B\u200B\u200B"],
+    ["BOM", "\uFEFF"],
+    ["junção de palavra", "\u2060\u2060"],
+    ["invisível misturado com espaço e quebra", " \u200B \n\u200C\u200D\t"],
+    ["separador de parágrafo", "\u2029"],
+  ])("recusa pergunta feita só de caractere invisível: %s", (_nome, valor) => {
+    expect(perguntaAceitavel(valor)).toBe(false);
+  });
+
+  it("aceita pergunta com invisível no meio, e o limite conta só o que se lê", () => {
+    expect(perguntaAceitavel("O que\u200B é RIR?")).toBe(true);
+    expect(perguntaAceitavel("a".repeat(LIMITE_PERGUNTA) + "\u200B".repeat(10))).toBe(true);
+  });
+});
+
+describe("limparPergunta", () => {
+  it("tira os invisíveis e o espaço das pontas, e mantém o resto", () => {
+    expect(limparPergunta("\uFEFF  O que\u200B é volume? \u2060")).toBe("O que é volume?");
+  });
+
+  it("não mexe em acento nem em emoji", () => {
+    expect(limparPergunta("Descanso entre séries 💪")).toBe("Descanso entre séries 💪");
+  });
+
+  it("é o texto que vai para o modelo", () => {
+    expect(montarPerguntaCoach("\u200BO que é RIR?\u200B")).toBe("Pergunta do dono:\n\nO que é RIR?");
   });
 });
