@@ -91,6 +91,10 @@ export default async function PaginaTreinoDetalhe({
            gravar de volta. */
         modeloId={exerciciosPreSelecionados ? modeloId : undefined}
         idioma={idioma}
+        /* Dono dos itens da fila offline (achado M1): lido da sessão do
+           servidor, não do navegador, para valer mesmo com o token local
+           vencido no meio do treino. */
+        usuarioId={perfil?.id}
       />
 
       <AbaInferior ativa="bancada" idioma={idioma} />

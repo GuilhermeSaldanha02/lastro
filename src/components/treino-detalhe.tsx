@@ -93,7 +93,10 @@ export default function TreinoDetalhe({
   exerciciosPreSelecionados,
   modeloId,
   idioma,
+  usuarioId,
 }: {
+  /** Conta logada — dona de cada item que esta tela põe na fila (achado M1). */
+  usuarioId?: string;
   treinoId: string;
   /** `treino.iniciado_em` — âncora de tempo comum ao cronômetro e aos dois relatórios. */
   iniciadoEm: string;
@@ -269,7 +272,7 @@ export default function TreinoDetalhe({
       peso: novaSerie.peso,
       rir: novaSerie.rir,
       pesoPorLado: novaSerie.pesoPorLado,
-    });
+    }, usuarioId);
 
     // Melhor esforço — se não houver rede, a série já está na fila.
     // Pede ao navegador (Background Sync) para tentar de novo quando a
@@ -353,7 +356,7 @@ export default function TreinoDetalhe({
       peso: dados.peso,
       rir: dados.rir,
       pesoPorLado: dados.pesoPorLado,
-    });
+    }, usuarioId);
 
     const resultado = await drenar();
     if (resultado.falhou) {
@@ -373,7 +376,7 @@ export default function TreinoDetalhe({
     setSeries((atual) => atual.filter((serie) => serie.id !== id));
     setExcluindoId(null);
 
-    await enfileirar("excluir_serie", { id });
+    await enfileirar("excluir_serie", { id }, usuarioId);
 
     const resultado = await drenar();
     if (resultado.falhou) {

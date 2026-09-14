@@ -23,6 +23,16 @@ export type MutacaoPendente = {
   /** FIFO: uma série não pode sincronizar antes do treino a que pertence. */
   criadoEm: number;
   tentativas: number;
+  /**
+   * Conta que registrou o item (achado M1, QA, 2026-09-13). A fila é uma só
+   * por NAVEGADOR, não por conta: num aparelho compartilhado, a série
+   * pendente da conta A era enviada com a sessão da conta B, o servidor
+   * respondia "treino_id inexistente" (a RLS esconde o treino de A) e a
+   * fila parava ali — com a série de B atrás. Ausente nos itens gravados
+   * antes desta mudança; esses seguem a regra antiga (qualquer sessão).
+   * Campo sem índice: não muda o schema do Dexie.
+   */
+  usuarioId?: string;
 };
 
 /**

@@ -170,4 +170,59 @@ describe("outbox", () => {
       expect(item.tentativas).toBe(5);
     });
   });
+
+  describe("fila por conta num aparelho compartilhado (M1)", () => {
+    const executoresQueAnotam = (enviados: unknown[]) => ({
+      criar_treino: async () => {},
+      criar_serie: async (payload: Record<string, unknown>) => {
+        enviados.push(payload.id);
+      },
+      atualizar_serie: async () => {},
+      excluir_serie: async () => {},
+      excluir_treino: async () => {},
+    });
+
+    it("grava a conta dona junto do item", async () => {
+      await enfileirar("criar_serie", { id: "s1" }, "conta-a");
+      const [item] = await db.outbox.toArray();
+      expect(item.usuarioId).toBe("conta-a");
+    });
+
+    it("envia só os itens da conta logada (e os antigos, sem dono), e deixa os de outra conta na fila", async () => {
+      await enfileirar("criar_serie", { id: "de-a" }, "conta-a");
+      await enfileirar("criar_serie", { id: "antigo" });
+      await enfileirar("criar_serie", { id: "de-b" }, "conta-b");
+
+      const enviados: unknown[] = [];
+      const resultado = await sincronizar(executoresQueAnotam(enviados), { usuarioId: "conta-b" });
+
+      expect(enviados).toEqual(["antigo", "de-b"]);
+      expect(resultado).toEqual({ sincronizados: 2, falhou: false, descartados: 0 });
+      const restantes = await db.outbox.toArray();
+      expect(restantes.map((item) => item.payload.id)).toEqual(["de-a"]);
+      expect(restantes[0].tentativas).toBe(0);
+    });
+
+    it("quando a conta A volta, a série dela sobe", async () => {
+      await enfileirar("criar_serie", { id: "de-a" }, "conta-a");
+      const enviados: unknown[] = [];
+
+      await sincronizar(executoresQueAnotam(enviados), { usuarioId: "conta-b" });
+      await sincronizar(executoresQueAnotam(enviados), { usuarioId: "conta-a" });
+
+      expect(enviados).toEqual(["de-a"]);
+      expect(await contarPendentes()).toBe(0);
+    });
+
+    it("sem sessão nada é enviado, e o item segue pendente", async () => {
+      await enfileirar("criar_serie", { id: "de-a" }, "conta-a");
+      const enviados: unknown[] = [];
+
+      const resultado = await sincronizar(executoresQueAnotam(enviados), { usuarioId: null });
+
+      expect(enviados).toEqual([]);
+      expect(resultado).toEqual({ sincronizados: 0, falhou: false, descartados: 0 });
+      expect(await contarPendentes()).toBe(1);
+    });
+  });
 });

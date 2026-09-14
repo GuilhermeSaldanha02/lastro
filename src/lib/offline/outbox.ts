@@ -3,11 +3,19 @@
 import { db, type MutacaoFalha, type MutacaoPendente, type TipoMutacao } from "./db";
 import { ehErroPermanente } from "./erro-permanente";
 
+/** `usuarioId`: a conta dona do item (ver `MutacaoPendente.usuarioId`). */
 export async function enfileirar(
   tipo: TipoMutacao,
   payload: Record<string, unknown>,
+  usuarioId?: string,
 ): Promise<void> {
-  await db.outbox.add({ tipo, payload, criadoEm: Date.now(), tentativas: 0 });
+  await db.outbox.add({
+    tipo,
+    payload,
+    criadoEm: Date.now(),
+    tentativas: 0,
+    ...(usuarioId ? { usuarioId } : {}),
+  });
 }
 
 export async function contarPendentes(): Promise<number> {
@@ -60,11 +68,24 @@ async function moverParaFalhas(item: MutacaoPendente, erro: unknown): Promise<vo
  * toda série registrada depois dele pra sempre (achado OF-02, QA.md
  * 2026-08-28). Esse item sai para `db.falhas` e o loop CONTINUA para o
  * próximo — a ordem FIFO segue preservada entre os itens que restam.
+ *
+ * `conta` (achado M1, 2026-09-13): quando informada, só entram os itens
+ * DESSA conta (e os antigos, sem dono). Item de outra conta fica na fila,
+ * intocado, para quando ela entrar de novo — nunca é enviado com a sessão
+ * errada, nunca trava a conta atual e nunca conta como falha. `usuarioId:
+ * null` é "sem sessão": nada é enviado. Sem `conta`, a regra antiga (todos).
  */
 export async function sincronizar(
   executores: Executores,
+  conta?: { usuarioId: string | null },
 ): Promise<ResultadoSincronizacao> {
-  const pendentes = await db.outbox.orderBy("criadoEm").toArray();
+  const todos = await db.outbox.orderBy("criadoEm").toArray();
+  const pendentes = conta
+    ? todos.filter((item) => !item.usuarioId || item.usuarioId === conta.usuarioId)
+    : todos;
+  if (conta && conta.usuarioId === null) {
+    return { sincronizados: 0, falhou: pendentes.length > 0, descartados: 0 };
+  }
   let sincronizados = 0;
   let descartados = 0;
 

@@ -40,6 +40,7 @@ import {
   type NovaSerieInput,
   type ResultadoGravacaoSerie,
 } from "@/lib/dados/treino";
+import { contaDaSessao } from "./conta-da-sessao";
 import { marcarComoPermanente } from "./erro-permanente";
 import { sincronizar, type ResultadoSincronizacao } from "./outbox";
 
@@ -59,6 +60,9 @@ export async function sincronizarPendentes(): Promise<ResultadoSincronizacao> {
 }
 
 async function executarSincronizacao(): Promise<ResultadoSincronizacao> {
+  // Só os itens da conta logada agora (achado M1): num aparelho
+  // compartilhado, a série pendente de outra conta espera por ela.
+  const usuarioId = await contaDaSessao();
   return sincronizar({
     // Sincronização de treino ainda não existe (só séries, por ora) — a
     // fila nunca recebe "criar_treino" até essa próxima etapa existir.
@@ -81,5 +85,5 @@ async function executarSincronizacao(): Promise<ResultadoSincronizacao> {
     excluir_treino: async (payload) => {
       await excluirTreinoRemoto((payload as { id: string }).id);
     },
-  });
+  }, { usuarioId });
 }

@@ -43,6 +43,12 @@ export type Perfil = {
    * guardas mandam para `/boas-vindas`.
    */
   tipoEscolhido: boolean;
+  /**
+   * Id da conta (`auth.users.id`). Vem da sessão do SERVIDOR, no render: é
+   * o que marca de quem é cada item da fila offline (achado M1), e segue
+   * valendo mesmo que o token do navegador expire no meio do treino.
+   */
+  id: string;
 };
 
 export async function obterPerfil(): Promise<Perfil | null> {
@@ -81,6 +87,7 @@ export async function obterPerfil(): Promise<Perfil | null> {
     // Só `false` explícito é pendente. Valor inesperado conta como já
     // escolhido: a conta segue usuário, e ninguém fica preso na escolha.
     tipoEscolhido: data.tipo_escolhido !== false,
+    id: user.id,
   };
 }
 
