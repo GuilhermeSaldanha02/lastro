@@ -2779,3 +2779,23 @@ A `j9` tinha *"aluno em /personal/completar vê a porta da área de trabalho"* �
 
 - **A Análise não migrou para `consumirUso`**: coberta pelo índice da 0027. Trocar agora seria mudança sem defeito medido.
 - **`QA.md` AN-05** ("pedidos simultâneos ao coach não furam o teto de 10") segue como estava; o registro precisa ir para REPROVOU com a evidência do #251 e depois ser reauditado. Fica para a auditoria independente.
+
+## 2026-09-14 (1) — Os helpers das policies saem da API; as RPCs do módulo ficam de propósito
+
+**Pedido do dono:** "corrija os avisos de segurança do supabase". O verificador de segurança apontava dois avisos: 7 funções `security definer` executáveis por `authenticated` (lint 0029) e a proteção contra senha vazada desligada.
+
+**As 7 funções não eram do mesmo tipo.** Quatro são a API do módulo personal, chamadas pelo app com `.rpc()` (`src/lib/dados/personal-acoes.ts`): `aceitar_convite_personal`, `revogar_vinculo_personal`, `ativar_area_de_trabalho` e `escolher_tipo_conta`. Precisam ser definer (gravam colunas fora do GRANT da própria conta) e precisam ser chamáveis — o aviso delas é o comportamento pedido, como a 0023 já registrava. As outras três (`tem_vinculo_aceito`, `e_meu_personal`, `e_conta_personal`) existem só para rodar dentro de policies; nada no app, nos testes ou nos scripts as chama, e nenhuma outra função as usa (conferido em `pg_depend` e no corpo das funções).
+
+**A correção.** Migração `0029_helpers_rls_fora_da_api`, **aplicada em produção pelo MCP do Supabase**: cria o schema `private` (fora da API do PostgREST; `usage` só para `authenticated`), recria lá as três funções com o corpo idêntico ao de produção, troca só a expressão das 5 policies com `alter policy` e apaga as versões de `public`, sem `cascade` — tudo numa transação. Na `vinculo_convite_proprio`, `auth.uid()` virou `(select auth.uid())`, mesmo resultado, avaliado uma vez por statement.
+
+**Conferido depois de aplicar:** as 5 policies com o mesmo comando, papéis e permissividade, apontando para `private`; as três funções só em `private`, definer, `search_path=public`, sem execução nem `usage` de schema para `anon`. Verificador de segurança: lint 0029 caiu de 7 para 4 (as RPCs do módulo). Verificador de desempenho: sumiu o aviso de `auth.uid()` reavaliado por linha na `vinculo_convite_proprio`.
+
+### O que vale agora
+
+- **Função que só existe para ser chamada dentro de policy mora em `private`**, não em `public`. Em `public`, toda função vira endpoint em `/rest/v1/rpc/`.
+- **RPC do app que precisa ser definer continua em `public` e continua no aviso 0029.** Não é pendência.
+
+### O que NÃO foi feito, de propósito
+
+- **Proteção contra senha vazada**: é configuração do Auth no painel do Supabase, não esquema. Fica com o dono (Authentication, configurações de senha, "Leaked password protection"); o recurso pode exigir plano pago.
+- **"Várias policies permissivas" por tabela** (aviso de desempenho em `serie`, `treino`, `usuario` e `vinculo_personal`): são policies separadas de dono e de personal de propósito; juntar mudaria a leitura das regras sem ganho medido.
