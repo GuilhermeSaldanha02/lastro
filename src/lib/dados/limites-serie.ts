@@ -41,6 +41,12 @@ export function validarNumerosDaSerie(entrada: {
     return { ok: false, erro: "Reps precisa ser um número inteiro entre 1 e 200." };
   }
 
+  // Achado B1 (QA, 2026-09-13): peso em branco virava `Number("") === 0` e
+  // a série era gravada com 0 kg sem aviso. Zero continua válido (exercício
+  // sem carga), mas precisa ser DIGITADO.
+  if (typeof entrada.peso === "string" && entrada.peso.trim() === "") {
+    return { ok: false, erro: "Informe o peso. Use 0 para exercício sem carga." };
+  }
   const peso = paraNumero(entrada.peso);
   if (!Number.isFinite(peso) || peso < PESO_MINIMO || peso > PESO_MAXIMO) {
     return { ok: false, erro: "Peso precisa estar entre 0 e 1000 kg." };
@@ -58,8 +64,8 @@ export function validarNumerosDaSerie(entrada: {
 }
 
 // Só texto vira número: `Number(null)` daria 0 e passaria por "peso 0".
-// Texto vazio segue virando 0, como antes — peso em branco gravando 0 kg é
-// o achado B1, decisão separada do dono.
+// Texto vazio também daria 0 — por isso o peso vazio é barrado antes (B1),
+// e reps vazio cai no "entre 1 e 200".
 function paraNumero(valor: unknown): number {
   return typeof valor === "string" ? Number(valor) : Number.NaN;
 }

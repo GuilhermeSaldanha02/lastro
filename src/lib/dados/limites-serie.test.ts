@@ -37,6 +37,15 @@ describe("validarNumerosDaSerie", () => {
     expect(valendo(reps, peso).ok).toBe(false);
   });
 
+  it("peso em branco é recusado, não vira 0 kg (B1)", () => {
+    expect(valendo("9", "")).toEqual({ ok: false, erro: "Informe o peso. Use 0 para exercício sem carga." });
+    expect(valendo("9", "   ").ok).toBe(false);
+  });
+
+  it("peso 0 digitado continua valendo (exercício sem carga)", () => {
+    expect(valendo("12", "0")).toMatchObject({ ok: true, peso: 0 });
+  });
+
   it("RIR vazio é ausente (null), não zero", () => {
     expect(valendo("8", "40", "")).toMatchObject({ ok: true, rir: null });
   });

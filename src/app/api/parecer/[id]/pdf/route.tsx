@@ -22,10 +22,10 @@ export async function GET(
   try {
     parecer = await buscarParecer(id);
   } catch (erro) {
-    // Só cai em 401 se for de fato sessão ausente — qualquer outro erro
-    // (ex.: id que não é UUID válido, rejeitado pelo Postgres antes da
-    // RLS) não é problema de autenticação e não deveria dizer que é
-    // (achado real na revisão de qualidade desta task).
+    // Só cai em 401 se for de fato sessão ausente — qualquer outro erro não
+    // é problema de autenticação e não deveria dizer que é (achado real na
+    // revisão de qualidade desta task). Id que não é UUID não chega mais
+    // aqui: `buscarParecer` devolve `null` e a resposta é 404 (achado B2).
     const semSessao = erro instanceof Error && erro.message.includes("Sessão ausente");
     if (semSessao) {
       return NextResponse.json({ erro: "Sessão ausente." }, { status: 401 });

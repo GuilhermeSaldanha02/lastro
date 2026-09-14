@@ -16,6 +16,7 @@ import { obterIdioma } from "@/lib/dados/idioma";
 import { mapaTraducaoExercicios, mapaTraducaoGrupos } from "@/lib/dados/traducao";
 import { formatarGrupoMuscular } from "@/lib/texto/grupo-muscular";
 import { ehErroPermanenteDoPostgres } from "@/lib/offline/erro-permanente";
+import { ehUuid } from "@/lib/dados/id-valido";
 
 export type Exercicio = {
   id: string;
@@ -161,6 +162,9 @@ export async function buscarTreino(
   treinoId: string,
 ): Promise<TreinoComSeries | null> {
   const { supabase, user } = await usuarioAutenticadoOuErro();
+  // Id que não é UUID não existe — sem isto o Postgres responde com erro e
+  // a tela vira 500 (achado B2). Depois da sessão: sem login continua 401.
+  if (!ehUuid(treinoId)) return null;
 
   const { data: treino, error: erroTreino } = await supabase
     .from("treino")
@@ -263,6 +267,8 @@ export async function historicoDoExercicio(
   exercicioId: string,
 ): Promise<SerieHistorica[]> {
   const { supabase, user } = await usuarioAutenticadoOuErro();
+  // Mesmo motivo de `buscarTreino` (achado B2): exercício que não existe não tem histórico.
+  if (!ehUuid(exercicioId)) return [];
   // Sem `.order()` na tabela relacionada — PostgREST não ordena as linhas
   // de `serie` por uma coluna da tabela embutida (`treino.data`) de forma
   // confiável (testado: saiu ascendente mesmo pedindo `ascending: false`).
@@ -372,6 +378,8 @@ export async function buscarExercicio(
   id: string,
 ): Promise<ExercicioDoCatalogo | null> {
   const { supabase } = await usuarioAutenticadoOuErro();
+  // Mesmo motivo de `buscarTreino` (achado B2).
+  if (!ehUuid(id)) return null;
   const { data, error } = await supabase
     .from("exercicio")
     .select(

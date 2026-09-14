@@ -226,6 +226,10 @@ const DICIONARIO: Record<string, { en: string; es: string }> = {
     es: "Las repeticiones deben ser un número entero entre 1 y 200.",
   },
   "Peso precisa estar entre 0 e 1000 kg.": { en: "Weight must be between 0 and 1000 kg.", es: "El peso debe estar entre 0 y 1000 kg." },
+  "Informe o peso. Use 0 para exercício sem carga.": {
+    en: "Enter the weight. Use 0 for an unloaded exercise.",
+    es: "Indica el peso. Usa 0 para un ejercicio sin carga.",
+  },
   "RIR precisa ser um número inteiro entre 0 e 10.": {
     en: "RIR must be a whole number between 0 and 10.",
     es: "El RIR debe ser un número entero entre 0 y 10.",
