@@ -1,0 +1,151 @@
+Trecho cru do log do CI — run 34784135645 (commit 57b3172), passo E2E, códigos ANSI removidos.
+
+== placar
+2917:  19 failed
+2937:  1 flaky
+2939:  89 passed (24.5m)
+
+== testes com falha e instável
+  19 failed
+    [chromium] › e2e/j10-serie-e-fila.spec.ts:102:7 › série: reps 201 não pode aparecer registrada e sumir em silêncio
+    [chromium] › e2e/j10-serie-e-fila.spec.ts:102:7 › série: reps 2,5 não pode aparecer registrada e sumir em silêncio
+    [chromium] › e2e/j10-serie-e-fila.spec.ts:102:7 › série: peso 1000,01 não pode aparecer registrada e sumir em silêncio
+    [chromium] › e2e/j10-serie-e-fila.spec.ts:102:7 › série: peso 99999999 não pode aparecer registrada e sumir em silêncio
+    [chromium] › e2e/j10-serie-e-fila.spec.ts:102:7 › série: RIR 1,5 não pode aparecer registrada e sumir em silêncio
+    [chromium] › e2e/j10-serie-e-fila.spec.ts:140:5 › série: editar para reps 999 não pode mostrar um valor que o banco não guardou
+    [chromium] › e2e/j10-serie-e-fila.spec.ts:202:5 › série: peso vazio não pode gravar 0 kg em silêncio (achado BAIXA pelo dono)
+    [chromium] › e2e/j10-serie-e-fila.spec.ts:221:5 › série: duplo clique em 'Registrar série' grava uma série só
+    [chromium] › e2e/j11-formularios.spec.ts:53:7 › modelo: plano com reps 150 não pode deixar um modelo vazio no banco
+    [chromium] › e2e/j11-formularios.spec.ts:53:7 › modelo: plano com reps 2,5 não pode deixar um modelo vazio no banco
+    [chromium] › e2e/j11-formularios.spec.ts:53:7 › modelo: plano com peso 1000,5 não pode deixar um modelo vazio no banco
+    [chromium] › e2e/j11-formularios.spec.ts:84:5 › modelo: nome de 10 mil caracteres não quebra a lista de modelos no celular
+    [chromium] › e2e/j11-formularios.spec.ts:146:5 › anilhas: anilha de 0,001 kg não pode virar anilha de 0 kg
+    [chromium] › e2e/j12-isolamento-e-apis.spec.ts:289:5 › rotas: id que não é UUID ou que não existe responde 404, não 500
+    [chromium] › e2e/j12-isolamento-e-apis.spec.ts:313:5 › PDF: parecer ainda em geração não derruba o servidor
+    [chromium] › e2e/j12-isolamento-e-apis.spec.ts:330:5 › análise: dois pedidos simultâneos não criam dois rascunhos nem gastam cota dupla
+    [chromium] › e2e/j12-isolamento-e-apis.spec.ts:380:5 › coach: pergunta invisível é recusada e pedidos simultâneos não furam o teto de 10
+    [chromium] › e2e/j13-sessao-e-navegacao.spec.ts:154:5 › login: e-mail de 5 mil caracteres e senha vazia não quebram a tela
+    [chromium] › e2e/j13-sessao-e-navegacao.spec.ts:212:5 › nome com HTML e milhares de caracteres não quebra Home, perfil nem a lista do personal
+  1 flaky
+    [chromium] › e2e/j10-serie-e-fila.spec.ts:384:5 › aparelho compartilhado: série pendente de uma conta não trava a fila da conta seguinte
+  89 passed (24.5m)
+
+== achados anotados pelos specs
+[achado] PDF: parecer ainda em geração não derruba o servidor: PDF de rascunho em geração respondeu 500
+[achado] anilhas: anilha de 0,001 kg não pode virar anilha de 0 kg: inventário salvo: 20, 15, 10, 5, 2.5, 1.25, 0
+[achado] análise: dois pedidos simultâneos não criam dois rascunhos nem gastam cota dupla: status 202 e 202: 2 rascunho(s), 2 uso(s) de cota
+[achado] aparelho compartilhado: série pendente de uma conta não trava a fila da conta seguinte: a série da conta B não chegou ao banco: fila local com 2 pendente(s), 0 descartada(s) — a pendente da conta A está na frente
+[achado] modelo: nome de 10 mil caracteres não quebra a lista de modelos no celular: nome de 10 mil caracteres estourou a lista em 109706px a 375px
+[achado] modelo: plano com peso 1000,5 não pode deixar um modelo vazio no banco: peso 1000,5: 1 modelo(s) criado(s); o mais recente tem 0 exercício(s)
+[achado] modelo: plano com reps 150 não pode deixar um modelo vazio no banco: reps 150: 1 modelo(s) criado(s); o mais recente tem 0 exercício(s)
+[achado] modelo: plano com reps 2,5 não pode deixar um modelo vazio no banco: reps 2,5: 1 modelo(s) criado(s); o mais recente tem 0 exercício(s)
+[achado] nome com HTML e milhares de caracteres não quebra Home, perfil nem a lista do personal: /perfil: o nome gigante estourou 43337px a 375px
+[achado] rotas: id que não é UUID ou que não existe responde 404, não 500: /ajustes/relatorios/parecer/abc respondeu 500
+[achado] rotas: id que não é UUID ou que não existe responde 404, não 500: /api/parecer/abc/pdf respondeu 500
+[achado] rotas: id que não é UUID ou que não existe responde 404, não 500: /catalogo/abc respondeu 500
+[achado] rotas: id que não é UUID ou que não existe responde 404, não 500: /treino/abc respondeu 500
+[achado] sessão: expirar no meio do treino não perde a série — ela chega ao banco depois do novo login: depois do novo login a fila não drenou sozinha; só drena ao recarregar o app ou abrir o treino
+[achado] série: RIR 1,5 não pode aparecer registrada e sumir em silêncio: RIR 1,5: a tela aceitou; no banco: NÃO; fila local: 1 pendente(s), 0 descartada(s); indicador: "salvo no aparelho"; na tela depois de recarregar: 0
+[achado] série: duplo clique em 'Registrar série' grava uma série só: duplo clique: 2 na tela, 2 no banco
+[achado] série: editar para reps 999 não pode mostrar um valor que o banco não guardou: a tela mostrou reps 999; o banco ficou com 8; fila: 0 descartada(s)
+[achado] série: peso 1000,01 não pode aparecer registrada e sumir em silêncio: peso 1000,01: a tela aceitou; no banco: NÃO; fila local: 1 pendente(s), 0 descartada(s); indicador: "salvo no aparelho"; na tela depois de recarregar: 0
+[achado] série: peso 99999999 não pode aparecer registrada e sumir em silêncio: peso 99999999: a tela aceitou; no banco: NÃO; fila local: 1 pendente(s), 0 descartada(s); indicador: "salvo no aparelho"; na tela depois de recarregar: 0
+[achado] série: peso vazio não pode gravar 0 kg em silêncio (achado BAIXA pelo dono): peso vazio virou série de 0 kg sem aviso
+[achado] série: reps 2,5 não pode aparecer registrada e sumir em silêncio: reps 2,5: a tela aceitou; no banco: NÃO; fila local: 1 pendente(s), 0 descartada(s); indicador: "salvo no aparelho"; na tela depois de recarregar: 0
+[achado] série: reps 201 não pode aparecer registrada e sumir em silêncio: reps 201: a tela aceitou; no banco: NÃO; fila local: 1 pendente(s), 0 descartada(s); indicador: "salvo no aparelho"; na tela depois de recarregar: 0
+
+== erros do servidor (WebServer) ligados aos achados
+606:[WebServer] ⨯ Error: [erro-permanente] Falha ao registrar série: new row for relation "serie" violates check constraint "serie_reps_positiva"
+609:[WebServer]   digest: '2357073175'
+614:[WebServer] ⨯ Error: [erro-permanente] Falha ao registrar série: new row for relation "serie" violates check constraint "serie_reps_positiva"
+617:[WebServer]   digest: '2357073175'
+620:[WebServer] ⨯ Error: [erro-permanente] Falha ao registrar série: new row for relation "serie" violates check constraint "serie_reps_positiva"
+623:[WebServer]   digest: '2357073175'
+627:[WebServer] ⨯ Error: [erro-permanente] Falha ao registrar série: new row for relation "serie" violates check constraint "serie_reps_positiva"
+630:[WebServer]   digest: '2357073175'
+734:[WebServer] ⨯ Error: [erro-permanente] Falha ao registrar série: invalid input syntax for type smallint: "2.5"
+737:[WebServer]   digest: '3349444151'
+743:[WebServer] ⨯ Error: [erro-permanente] Falha ao registrar série: invalid input syntax for type smallint: "2.5"
+745:[WebServer]   digest: '3349444151'
+748:[WebServer] ⨯ Error: [erro-permanente] Falha ao registrar série: invalid input syntax for type smallint: "2.5"
+751:[WebServer]   digest: '3349444151'
+755:[WebServer] ⨯ Error: [erro-permanente] Falha ao registrar série: invalid input syntax for type smallint: "2.5"
+757:[WebServer]   digest: '3349444151'
+862:[WebServer] ⨯ Error: [erro-permanente] Falha ao registrar série: new row for relation "serie" violates check constraint "serie_peso_valido"
+865:[WebServer]   digest: '1268336567'
+870:[WebServer] ⨯ Error: [erro-permanente] Falha ao registrar série: new row for relation "serie" violates check constraint "serie_peso_valido"
+873:[WebServer]   digest: '1268336567'
+877:[WebServer] ⨯ Error: [erro-permanente] Falha ao registrar série: new row for relation "serie" violates check constraint "serie_peso_valido"
+879:[WebServer]   digest: '1268336567'
+883:[WebServer] ⨯ Error: [erro-permanente] Falha ao registrar série: new row for relation "serie" violates check constraint "serie_peso_valido"
+886:[WebServer]   digest: '1268336567'
+990:[WebServer] ⨯ Error: [erro-permanente] Falha ao registrar série: numeric field overflow
+993:[WebServer]   digest: '3147330039'
+998:[WebServer] ⨯ Error: [erro-permanente] Falha ao registrar série: numeric field overflow
+1001:[WebServer]   digest: '3147330039'
+1004:[WebServer] ⨯ Error: [erro-permanente] Falha ao registrar série: numeric field overflow
+1007:[WebServer]   digest: '3147330039'
+1011:[WebServer] ⨯ Error: [erro-permanente] Falha ao registrar série: numeric field overflow
+1014:[WebServer]   digest: '3147330039'
+1118:[WebServer] ⨯ Error: [erro-permanente] Falha ao registrar série: invalid input syntax for type smallint: "1.5"
+1121:[WebServer]   digest: '804161655'
+1126:[WebServer] ⨯ Error: [erro-permanente] Falha ao registrar série: invalid input syntax for type smallint: "1.5"
+1129:[WebServer]   digest: '804161655'
+1132:[WebServer] ⨯ Error: [erro-permanente] Falha ao registrar série: invalid input syntax for type smallint: "1.5"
+1135:[WebServer]   digest: '804161655'
+1139:[WebServer] ⨯ Error: [erro-permanente] Falha ao registrar série: invalid input syntax for type smallint: "1.5"
+1142:[WebServer]   digest: '804161655'
+1247:[WebServer] ⨯ Error: [erro-permanente] Falha ao atualizar série: new row for relation "serie" violates check constraint "serie_reps_positiva"
+1249:[WebServer]   digest: '2900627152'
+1254:[WebServer] ⨯ Error: [erro-permanente] Falha ao atualizar série: new row for relation "serie" violates check constraint "serie_reps_positiva"
+1257:[WebServer]   digest: '2900627152'
+1260:[WebServer] ⨯ Error: [erro-permanente] Falha ao atualizar série: new row for relation "serie" violates check constraint "serie_reps_positiva"
+1263:[WebServer]   digest: '2900627152'
+1267:[WebServer] ⨯ Error: Sessão ausente — usuário não autenticado.
+1272:[WebServer]   digest: '2017113559'
+1348:[WebServer] ⨯ Error: The destination stream closed early.
+1351:[WebServer]   digest: '1561150396'
+1356:[WebServer] ⨯ Error: The destination stream closed early.
+1359:[WebServer]   digest: '1561150396'
+1542:[WebServer] ⨯ Error: Sessão ausente — usuário não autenticado.
+1546:[WebServer]   digest: '1895926818'
+1548:[WebServer] ⨯ Error: Sessão ausente — usuário não autenticado.
+1552:[WebServer]   digest: '1895926818'
+1557:[WebServer] ⨯ Error: The destination stream closed early.
+1560:[WebServer]   digest: '1561150396'
+1563:[WebServer] ⨯ Error: Sessão ausente — usuário não autenticado.
+1567:[WebServer]   digest: '1895926818'
+
+== mensagens de expect
+2177:    Error: /ajustes/relatorios/parecer/abc digitada à mão
+2161:    Error: /catalogo/abc digitada à mão
+2145:    Error: /treino/abc digitada à mão
+1363:    Error: ACHADO (BAIXA): peso em branco foi gravado como 0 kg
+2752:    Error: ACHADO: /perfil vazou 43337px com o nome gigante
+2321:    Error: ACHADO: PDF de um parecer ainda sem texto derrubou a rota
+1986:    Error: ACHADO: a anilha de 0,001 kg foi arredondada e salva como 0 kg
+1276:    Error: ACHADO: a edição para reps 999 foi aceita na tela e o banco manteve o valor antigo sem aviso
+1601:    Error: ACHADO: a série da segunda conta ficou presa atrás da série pendente da primeira
+1162:    Error: ACHADO: a tela aceitou RIR 1,5, valor que a tabela serie recusa
+906:    Error: ACHADO: a tela aceitou peso 1000,01, valor que a tabela serie recusa
+1034:    Error: ACHADO: a tela aceitou peso 99999999, valor que a tabela serie recusa
+778:    Error: ACHADO: a tela aceitou reps 2,5, valor que a tabela serie recusa
+650:    Error: ACHADO: a tela aceitou reps 201, valor que a tabela serie recusa
+2417:    Error: ACHADO: dois pedidos simultâneos criaram 2 rascunhos
+2433:    Error: ACHADO: dois pedidos simultâneos gastaram 2 da cota
+1439:    Error: ACHADO: o duplo clique gravou 2 séries iguais
+1455:    Error: ACHADO: o duplo clique mostrou 2 séries iguais
+1902:    Error: ACHADO: o nome gigante empurrou a lista de modelos para fora da tela
+1146:    Error: ACHADO: perda silenciosa — a série com RIR 1,5 apareceu registrada e sumiu ao recarregar
+890:    Error: ACHADO: perda silenciosa — a série com peso 1000,01 apareceu registrada e sumiu ao recarregar
+1018:    Error: ACHADO: perda silenciosa — a série com peso 99999999 apareceu registrada e sumiu ao recarregar
+762:    Error: ACHADO: perda silenciosa — a série com reps 2,5 apareceu registrada e sumiu ao recarregar
+634:    Error: ACHADO: perda silenciosa — a série com reps 201 apareceu registrada e sumiu ao recarregar
+2531:    Error: ACHADO: pergunta feita só de caractere invisível foi aceita
+1825:    Error: ACHADO: peso 1000,5 deixou 1 modelo(s) no banco apesar da recusa
+1653:    Error: ACHADO: reps 150 deixou 1 modelo(s) no banco apesar da recusa
+1739:    Error: ACHADO: reps 2,5 deixou 1 modelo(s) no banco apesar da recusa
+2129:    Error: PDF com id que não é UUID
+2653:    Error: e-mail gigante não mostrou erro
+2660:    Error: element(s) not found
+2547:    Error: pergunta invisível gastou cota

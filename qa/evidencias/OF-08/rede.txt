@@ -1,0 +1,57 @@
+OF-08 · evidência crua — run 34785642721 (commit 10f51ba), passo E2E, reporter line
+Spec: e2e/j10-serie-e-fila.spec.ts:351 — 'fila: uma série recusada pelo banco não pode travar as séries válidas registradas depois'
+
+[23/110] [chromium] › e2e/j10-serie-e-fila.spec.ts:351:5 › fila: uma série recusada pelo banco não pode travar as séries válidas registradas depois
+[WebServer] ⨯ Error: [erro-permanente] Falha ao registrar série: new row for relation "serie" violates check constraint "serie_reps_positiva"
+
+[WebServer]     at u (.next/server/chunks/ssr/_0ggxumz._.js:1:8563) {
+[WebServer]   digest: '2357073175'
+[WebServer] }
+[WebServer] ⨯ Error: [erro-permanente] Falha ao registrar série: new row for relation "serie" violates check constraint "serie_reps_positiva"
+
+[WebServer]     at u (.next/server/chunks/ssr/_0ggxumz._.js:1:8563) {
+[WebServer]   digest: '2357073175'
+[WebServer] }
+[chromium] › e2e/j10-serie-e-fila.spec.ts:351:5 › fila: uma série recusada pelo banco não pode travar as séries válidas registradas depois
+[achado] fila: uma série recusada pelo banco não pode travar as séries válidas registradas depois: a série VÁLIDA não chegou ao banco: fila local com 2 pendente(s), 0 descartada(s); indicador: "salvo no aparelho"
+
+[24/110] (retries) [chromium] › e2e/j10-serie-e-fila.spec.ts:351:5 › fila: uma série recusada pelo banco não pode travar as séries válidas registradas depois (retry #1)
+[WebServer] ⨯ Error: [erro-permanente] Falha ao registrar série: new row for relation "serie" violates check constraint "serie_reps_positiva"
+
+[WebServer]     at u (.next/server/chunks/ssr/_0ggxumz._.js:1:8563) {
+[WebServer]   digest: '2357073175'
+[WebServer] }
+[WebServer] ⨯ Error: [erro-permanente] Falha ao registrar série: new row for relation "serie" violates check constraint "serie_reps_positiva"
+[WebServer]     at u (.next/server/chunks/ssr/_0ggxumz._.js:1:8563) {
+
+[WebServer]   digest: '2357073175'
+[WebServer] }
+[achado] fila: uma série recusada pelo banco não pode travar as séries válidas registradas depois: a série VÁLIDA não chegou ao banco: fila local com 2 pendente(s), 0 descartada(s); indicador: "salvo no aparelho"
+
+  10) [chromium] › e2e/j10-serie-e-fila.spec.ts:351:5 › fila: uma série recusada pelo banco não pode travar as séries válidas registradas depois
+
+    Error: ACHADO: uma série recusada pelo banco travou a fila, e a série válida seguinte nunca sincroniza
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: true
+    Received: false
+
+      389 |     );
+      390 |   }
+    > 391 |   expect(chegou, "ACHADO: uma série recusada pelo banco travou a fila, e a série válida seguinte nunca sincroniza").toBe(true);
+          |                                                                                                                     ^
+      392 | });
+      393 |
+      394 | // ============================================================
+        at /home/runner/work/lastro/lastro/e2e/j10-serie-e-fila.spec.ts:391:117
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/j10-serie-e-fila-fila-uma--ea3bf--válidas-registradas-depois-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/j10-serie-e-fila-fila-uma--ea3bf--válidas-registradas-depois-chromium/error-context.md
+
+    Error Context: test-results/j10-serie-e-fila-fila-uma--ea3bf--válidas-registradas-depois-chromium/error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────

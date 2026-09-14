@@ -1,0 +1,1 @@
+Console do navegador não é gravado pelo reporter 'line'. O estado da fila (2 pendentes, 0 descartadas) foi lido do IndexedDB 'lastro' pelo helper filaLocal e está na anotação [achado] do rede.txt.

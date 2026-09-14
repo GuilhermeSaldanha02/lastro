@@ -1,0 +1,16 @@
+IS-01 · evidência crua — run 34784135645 (commit 57b3172), passo E2E
+PASSOU POR DETERMINISMO DE CI: o spec é do mesmo agente que audita; cada asserção é status HTTP, contagem de linha ou atributo de tela.
+
+== testes executados (progresso do reporter line)
+2054:[40/109] [chromium] › e2e/j12-isolamento-e-apis.spec.ts:125:5 › isolamento: conta sem relação não lê, não altera, não apaga e não cria nada em nome de outra
+2060:[41/109] [chromium] › e2e/j12-isolamento-e-apis.spec.ts:189:5 › isolamento: ninguém move a própria série para dentro do treino de outra conta
+2061:[42/109] [chromium] › e2e/j12-isolamento-e-apis.spec.ts:209:5 › isolamento: a conta não apaga o próprio consumo de IA para recuperar cota
+2062:[43/109] [chromium] › e2e/j12-isolamento-e-apis.spec.ts:220:7 › rotas: a conta desconhecida não vê treino, parecer nem PDF da aluna pelo id
+2063:[44/109] [chromium] › e2e/j12-isolamento-e-apis.spec.ts:220:7 › rotas: a conta personal vinculado não vê treino, parecer nem PDF da aluna pelo id
+2069:[45/109] [chromium] › e2e/j12-isolamento-e-apis.spec.ts:242:5 › rotas: ?modelo= com o modelo de outra conta não traz o plano dela
+2070:[46/109] [chromium] › e2e/j12-isolamento-e-apis.spec.ts:255:5 › personal vinculado: CSV e progressão levam só os dados do próprio personal
+2630:[57/109] [chromium] › e2e/j12-isolamento-e-apis.spec.ts:407:5 › conta excluída: a aluna sai e as telas do personal continuam de pé
+2636:[58/109] [chromium] › e2e/j12-isolamento-e-apis.spec.ts:428:5 › conta excluída: o personal sai e a aluna recupera a prescrição sem erro
+
+== nenhum destes aparece na lista de falhas nem de instáveis (linhas 2917-2939 do log):
+ocorrências na lista de falhas: 0
