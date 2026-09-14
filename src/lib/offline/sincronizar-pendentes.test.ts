@@ -10,6 +10,9 @@ vi.mock("@/lib/dados/treino", () => ({
   excluirTreinoRemoto: vi.fn(),
 }));
 
+// A sessão real vem do cliente Supabase de navegador; aqui a conta logada é "b".
+vi.mock("./conta-da-sessao", () => ({ contaDaSessao: vi.fn(async () => "b") }));
+
 import { atualizarSerieRemoto, criarSerieRemoto } from "@/lib/dados/treino";
 import { db } from "./db";
 import { contarFalhas, contarPendentes, enfileirar } from "./outbox";
@@ -56,6 +59,23 @@ describe("sincronizarPendentes (achado A1)", () => {
 
     expect(resultado).toEqual({ sincronizados: 1, falhou: false, descartados: 1 });
     expect(await contarFalhas()).toBe(1);
+  });
+
+  it("aparelho compartilhado (M1): a série pendente da conta A não é enviada com a sessão de B nem trava a de B", async () => {
+    vi.mocked(criarSerieRemoto).mockImplementation(async (serie) => {
+      if (serie.id === "de-a") throw new Error("treino_id inexistente");
+      return { ok: true };
+    });
+    await enfileirar("criar_serie", { id: "de-a", reps: 14 }, "a");
+    await enfileirar("criar_serie", { id: "de-b", reps: 15 }, "b");
+
+    const resultado = await sincronizarPendentes();
+
+    expect(resultado).toEqual({ sincronizados: 1, falhou: false, descartados: 0 });
+    expect(vi.mocked(criarSerieRemoto).mock.calls.map(([serie]) => serie.id)).toEqual(["de-b"]);
+    const [restante] = await db.outbox.toArray();
+    expect(restante.payload).toEqual({ id: "de-a", reps: 14 });
+    expect(await contarFalhas()).toBe(0);
   });
 
   it("erro lançado sem o prefixo (como o `digest` do build de produção) continua sendo transitório", async () => {

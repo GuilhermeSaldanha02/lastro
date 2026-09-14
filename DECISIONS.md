@@ -2658,3 +2658,22 @@ A `j9` tinha *"aluno em /personal/completar vê a porta da área de trabalho"* �
 
 - O coach não mudou: o caso de pedidos simultâneos ao coach passou nas duas rodadas do QA.
 - **Quem implementou não audita:** `QA.md` mantém AJ-03 e AN-02 como REPROVOU até confirmação independente.
+
+## 2026-09-13 (5) — A fila offline é do navegador, mas cada item é de uma conta
+
+**Pedido do dono:** corrigir o achado M1 do QA do caminho triste, depois de A1/A2, M2/M3 e M4/M5.
+
+**O defeito.** A fila Dexie é uma só por navegador, e o item não guardava de quem era. Num aparelho compartilhado, a conta A registrava sem rede e saía; a conta B entrava, e a sincronização mandava a série de A com a sessão de B. O trigger `serie_herda_usuario` não enxerga o treino de A (RLS) e responde `treino_id ... inexistente` — erro sem código `22`/`23`, tratado como transitório. A fila parava nele, e a série de B ficava atrás, sem subir. Intermitente no E2E (1 falha em 3 execuções) só porque dependia de a série de A ainda estar na fila quando B registrava.
+
+### O que vale agora
+
+- **Cada item da fila grava `usuarioId`**, a conta dona. Vem de `obterPerfil().id`, lido da sessão do SERVIDOR no render de `/treino/[id]` — vale mesmo que o token do navegador expire no meio de um treino longo sem rede.
+- **A sincronização só envia os itens da conta logada** (`contaDaSessao()`, da sessão local do navegador) e os itens antigos sem dono. Item de outra conta fica na fila, intocado, sem contar tentativa nem falha, e sobe quando aquela conta entrar de novo.
+- **Sem sessão, nada é enviado.**
+- **`Perfil` ganhou `id`.**
+
+### O que NÃO foi feito, de propósito
+
+- **Itens gravados antes desta versão não têm dono** e seguem a regra antiga (qualquer sessão os envia). Somem da fila na primeira sincronização de quem os registrou; o caso de aparelho compartilhado com item antigo pendente continua possível até lá.
+- **Nenhuma tela mostra "há séries de outra conta neste aparelho".** A série de A não se perde, mas A só descobre que ela subiu quando voltar.
+- **Quem implementou não audita:** `QA.md` mantém OF-04 como REPROVOU até confirmação independente. O E2E desse caso era intermitente; verde numa execução não prova sozinho — a prova de lógica são os testes de unidade de `outbox.test.ts` e `sincronizar-pendentes.test.ts`.
