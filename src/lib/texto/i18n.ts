@@ -194,6 +194,14 @@ const DICIONARIO: Record<string, { en: string; es: string }> = {
   "Iniciar treino de hoje": { en: "Start today's workout", es: "Iniciar entrenamiento de hoy" },
   "Como começar?": { en: "How do you want to start?", es: "¿Cómo empezar?" },
   "Treino novo": { en: "New workout", es: "Entrenamiento nuevo" },
+  "Reps do plano precisa ser um número inteiro entre 1 e 100.": {
+    en: "Planned reps must be a whole number between 1 and 100.",
+    es: "Las repeticiones del plan deben ser un número entero entre 1 y 100.",
+  },
+  "Peso do plano precisa estar entre 0 e 1000 kg.": {
+    en: "Planned weight must be between 0 and 1000 kg.",
+    es: "El peso del plan debe estar entre 0 y 1000 kg.",
+  },
   "Sem conexão. Conecte-se à internet para iniciar o treino.": {
     en: "No connection. Connect to the internet to start the workout.",
     es: "Sin conexión. Conéctate a internet para iniciar el entrenamiento.",
