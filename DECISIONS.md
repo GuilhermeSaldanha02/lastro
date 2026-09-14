@@ -2746,3 +2746,18 @@ A `j9` tinha *"aluno em /personal/completar vê a porta da área de trabalho"* �
 
 - **Sem teste E2E novo para a 404.** O caso de id inválido (`j12`) já mede o status 404; a aparência só foi conferida se houver prévia da Vercel desta branch.
 - **Quem implementou não audita:** `QA.md` mantém OF-06 e o item da 404 de produção (TR-PUB-01) como estavam até confirmação independente.
+
+## 2026-09-13 (10) — Uma geração de parecer por conta, garantida pelo banco
+
+**Pedido do dono:** "aplique o índice único do M5". Aplicado em produção pelo MCP do Supabase como migração `0027_parecer_uma_geracao_por_usuario`, depois de conferir que nenhuma conta tinha mais de um parecer em `gerando` (havia 0 em `gerando` no total).
+
+**O que muda.** `create unique index parecer_uma_geracao_por_usuario on public.parecer (usuario_id) where status = 'gerando'`. O segundo insert em `gerando` da mesma conta falha com `23505`. `POST /api/analise` trata esse código como o mesmo 409 de "geração em andamento", sem rascunho e sem cota. O desempate por leitura da decisão (4) saiu: era a mitigação enquanto o índice não existia.
+
+### Efeito nas versões que ainda não têm esta rota
+
+- **`main` (produção):** checa, registra uso e só então insere. Com o índice, o pedido simultâneo perdedor recebe 500 (não 202) e não cria o segundo rascunho; a vaga de cota dele continua gasta até a pilha do QA chegar à `main`.
+- **Branches da pilha #248 a #253:** inserem antes de registrar uso; o perdedor cai no 500 do insert antes de gastar cota. O E2E de concorrência continua verde nelas.
+
+### Achado novo, fora deste pedido
+
+- **O coach tem a mesma corrida do M5 com a cota.** CI do #251 (run `34797779114`), nas duas tentativas: três pedidos simultâneos com 9 usos terminaram com 12 usos (teto 10), status 502, 502, 502. A rota checa o teto e registra o uso sem atomicidade. O `QA.md` registra AN-05 ("pedidos simultâneos ao coach não furam o teto de 10") como PASSOU — passou por tempo, não por garantia. **Não corrigido: decisão do dono.**
