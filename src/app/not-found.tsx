@@ -25,7 +25,10 @@ export default async function PaginaNaoEncontrada() {
     <main className="tela">
       <CabecalhoPro
         titulo={t("Página não encontrada", idioma)}
-        destaque={t("Endereço inexistente", idioma)}
+        // Curto de propósito: a cápsula do cabeçalho corta com reticências,
+        // e um subtítulo em palavras virava "Ende…" a 375px (conferido na
+        // prévia da Vercel desta branch).
+        destaque="404"
         perfil={perfil}
         idioma={idioma}
       />

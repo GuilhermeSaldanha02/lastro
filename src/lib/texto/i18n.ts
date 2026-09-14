@@ -197,7 +197,6 @@ const DICIONARIO: Record<string, { en: string; es: string }> = {
 
   // --- app/not-found.tsx ---
   "Página não encontrada": { en: "Page not found", es: "Página no encontrada" },
-  "Endereço inexistente": { en: "Unknown address", es: "Dirección inexistente" },
   "Este endereço não existe ou não é da sua conta. Nada foi perdido.": {
     en: "This address doesn't exist or isn't part of your account. Nothing was lost.",
     es: "Esta dirección no existe o no es de tu cuenta. No se perdió nada.",
