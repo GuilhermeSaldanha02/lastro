@@ -817,7 +817,23 @@ const DICIONARIO: Record<string, { en: string; es: string }> = {
     en: "analyses today — the daily limit exists so the quota the Coach also uses is not drained. It resets tomorrow.",
     es: "análisis hoy — el límite diario existe para no agotar la cuota que el Coach también usa. Mañana se libera.",
   },
+  // --- cobertura i18n inicial da área de trabalho ---
+  "Fila": { en: "Queue", es: "Pendientes" },
+  "Alunos": { en: "Clients", es: "Alumnos" },
+  "Modo do app": { en: "App mode", es: "Modo de la aplicación" },
+  "Nada pede atenção nesta semana.": {
+    en: "Nothing needs attention this week.",
+    es: "Nada necesita atención esta semana.",
+  },
+  "Sessão expirada. Entre novamente.": {
+    en: "Your session expired. Sign in again.",
+    es: "Tu sesión venció. Inicia sesión de nuevo.",
+  },
 };
+
+export function possuiTraducao(chavePtBr: string): boolean {
+  return Object.hasOwn(DICIONARIO, chavePtBr);
+}
 
 export function t(chavePtBr: string, idioma: Idioma): string {
   if (idioma === "pt-BR") return chavePtBr;

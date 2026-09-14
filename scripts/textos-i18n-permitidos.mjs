@@ -1,0 +1,30 @@
+export const TEXTOS_PERMITIDOS = new Set([
+  "LASTRO",
+  "WhatsApp",
+  "CREF",
+  "RIR",
+  "e1RM",
+  "kg",
+  "pt-BR",
+  "en",
+  "es",
+  "TREINO",
+  "TRABALHO",
+]);
+
+export const PROPRIEDADES_NAO_VISIVEIS = new Set([
+  "className",
+  "href",
+  "id",
+  "name",
+  "type",
+  "role",
+  "viewBox",
+  "d",
+  "fill",
+  "stroke",
+  "target",
+  "rel",
+  "method",
+  "action",
+]);
