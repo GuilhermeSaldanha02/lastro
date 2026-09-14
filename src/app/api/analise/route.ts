@@ -416,7 +416,6 @@ export async function POST(request: Request) {
       { status: 429 },
     );
   }
-  await registrarUso(supabase, user.id, "parecer");
 
   const PERGUNTAS = perguntasDoIdioma(idioma);
   const { data: rascunho, error: erroInsert } = await supabase
@@ -435,6 +434,45 @@ export async function POST(request: Request) {
     console.error("[analise] falha ao criar rascunho:", erroInsert?.message);
     return NextResponse.json({ erro: "Falha ao iniciar a análise." }, { status: 500 });
   }
+
+  // DESEMPATE entre pedidos simultâneos (achado M5, QA, 2026-09-13).
+  //
+  // A checagem de "geração em andamento" lá em cima não é atômica com o
+  // insert: dois POST ao mesmo tempo passavam os dois por ela, criavam dois
+  // rascunhos e gastavam duas vagas da cota de 5/dia. Agora cada pedido
+  // grava o PRÓPRIO rascunho primeiro e só então olha quem está gerando: o
+  // mais antigo (criado_em, depois id) segue; os outros apagam o rascunho
+  // que criaram e respondem o mesmo 409. Como a ordem é a mesma para todos,
+  // os dois pedidos concordam sobre quem venceu.
+  //
+  // `registrarUso` veio para DEPOIS do desempate: só o vencedor chama a
+  // Gemini, então só ele gasta cota.
+  //
+  // Limite honesto: sem transação, um pedido pode ler antes de o outro
+  // gravar (janela de milissegundos, leitura "read committed"). A garantia
+  // total é um índice único parcial em `parecer (usuario_id) where status =
+  // 'gerando'` — migração, decisão do dono (DECISIONS 2026-09-13 (4)).
+  const { data: primeiro, error: erroDesempate } = await supabase
+    .from("parecer")
+    .select("id")
+    .eq("usuario_id", user.id)
+    .eq("status", "gerando")
+    .order("criado_em", { ascending: true })
+    .order("id", { ascending: true })
+    .limit(1)
+    .maybeSingle();
+  if (erroDesempate) {
+    console.error("[analise] falha no desempate de geração:", erroDesempate.message);
+  }
+  if (primeiro && primeiro.id !== rascunho.id) {
+    const { error: erroDesfazer } = await supabase.from("parecer").delete().eq("id", rascunho.id);
+    if (erroDesfazer) {
+      console.error("[analise] não apagou o rascunho perdedor:", erroDesfazer.message);
+    }
+    return NextResponse.json({ erro: "geracao_em_andamento" }, { status: 409 });
+  }
+
+  await registrarUso(supabase, user.id, "parecer");
 
   after(() =>
     gerarESalvarParecer({

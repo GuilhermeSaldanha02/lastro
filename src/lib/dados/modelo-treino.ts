@@ -134,6 +134,15 @@ export async function criarModelo(
     .from("modelo_treino_exercicio")
     .insert(itens);
   if (erroItens) {
+    // Achado M4 (QA, 2026-09-13): cabeçalho e itens são dois inserts, sem
+    // transação. Se os itens falham, o cabeçalho já existe — sobrava um
+    // modelo com 0 exercícios na lista a cada tentativa. Desfaz aqui; o
+    // `on delete cascade` não tem o que levar, e a RLS só deixa apagar o
+    // próprio modelo.
+    const { error: erroDesfazer } = await supabase.from("modelo_treino").delete().eq("id", modelo.id);
+    if (erroDesfazer) {
+      console.error("[modelo] não desfez o modelo sem exercícios:", erroDesfazer.message);
+    }
     throw new Error(`Falha ao gravar exercícios do modelo: ${erroItens.message}`);
   }
 

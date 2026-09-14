@@ -2635,3 +2635,26 @@ A `j9` tinha *"aluno em /personal/completar vê a porta da área de trabalho"* �
 
 - "Repetir série" não ganhou trava: o caso de dois toques passou nas duas rodadas do QA.
 - **Quem implementou não audita:** os casos da `j10` que ficam verdes foram escritos antes, pelo mesmo agente. `QA.md` mantém TR-08 e OF-05 como REPROVOU até confirmação independente.
+
+## 2026-09-13 (4) — Modelo não fica órfão, e só um pedido de Análise por vez gasta cota
+
+**Pedido do dono:** corrigir os achados M4 e M5 do QA do caminho triste, depois de A1/A2 e M2/M3.
+
+**M4 — modelo com plano fora do limite deixava um modelo vazio no banco a cada tentativa.** Duas metades: (1) o formulário convertia o plano com "positivo e finito" e mandava reps 150, reps 2,5 ou peso 1000,5, que `modelo_treino_exercicio` recusa (0015: reps inteiro até 100, peso até 1000); (2) `criarModelo` grava o cabeçalho e depois os itens, sem transação — falhando os itens, o cabeçalho ficava. Agora `lerPlanoDoModelo` (`src/lib/dados/limites-modelo.ts`) recusa na tela apontando o campo, e `criarModelo` apaga o cabeçalho quando os itens falham.
+
+**M5 — dois POST simultâneos à Análise criavam dois rascunhos e gastavam duas vagas da cota de 5/dia.** A checagem de "geração em andamento" e o insert não eram atômicos. Agora cada pedido grava o próprio rascunho, olha o mais antigo em `gerando` (por `criado_em`, depois `id`) e só o vencedor segue; o perdedor apaga o que criou e responde o mesmo 409. `registrarUso` foi para depois do desempate: só quem chama a Gemini gasta cota.
+
+### O que vale agora
+
+- **Limites do plano do modelo moram em `limites-modelo.ts`**, separados dos da série (plano até 100 reps, série até 200).
+- **Escrita em duas tabelas sem transação desfaz a primeira quando a segunda falha.**
+- **Cota da Análise é registrada depois do desempate, não antes do insert.** O teto diário continua sendo checado antes (sem escrita no 429).
+
+### Decisão que fica com o dono
+
+- **O desempate do M5 não é à prova de tudo.** Sem transação, um pedido pode ler antes de o outro gravar (janela de milissegundos). A garantia total é um índice único parcial, `create unique index ... on parecer (usuario_id) where status = 'gerando'` — **é migração no banco de produção, e não foi aplicada nem escrita**. Com o índice, o insert perdedor falharia com `23505` e o desempate por leitura viraria redundante.
+
+### O que NÃO foi feito, de propósito
+
+- O coach não mudou: o caso de pedidos simultâneos ao coach passou nas duas rodadas do QA.
+- **Quem implementou não audita:** `QA.md` mantém AJ-03 e AN-02 como REPROVOU até confirmação independente.

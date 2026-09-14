@@ -12,7 +12,8 @@
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { ExercicioDoCatalogo } from "@/lib/dados/treino";
-import { criarModelo } from "@/lib/dados/modelo-treino";
+import { criarModelo, type PlanoDoExercicio } from "@/lib/dados/modelo-treino";
+import { lerPlanoDoModelo } from "@/lib/dados/limites-modelo";
 import SeletorGrupoMuscular, { type OpcaoGrupo } from "./seletor-grupo-muscular";
 import { t } from "@/lib/texto/i18n";
 import type { Idioma } from "@/lib/dados/idioma";
@@ -81,14 +82,6 @@ export default function ModeloTreinoForm({
     }));
   }
 
-  /** Texto do campo → número, ou `null` quando vazio/inválido. `null` é o
-   *  estado honesto de "não cadastrado" (ADR-010), nunca 0. */
-  function numeroOuNulo(valor: string | undefined): number | null {
-    if (valor === undefined || valor.trim() === "") return null;
-    const n = Number(valor.replace(",", "."));
-    return Number.isFinite(n) && n > 0 ? n : null;
-  }
-
   async function salvar() {
     setErro(null);
     if (!nome.trim()) {
@@ -99,16 +92,23 @@ export default function ModeloTreinoForm({
       setErro(t("Escolha pelo menos um exercício.", idioma));
       return;
     }
+
+    // Os limites de `modelo_treino_exercicio` (achado M4, 2026-09-13): o
+    // que passar daqui o banco recusa, e a tela só diria "não foi possível
+    // salvar" sem apontar o campo.
+    const plano: PlanoDoExercicio[] = [];
+    for (const exercicioId of exerciciosEscolhidos) {
+      const lido = lerPlanoDoModelo(planos[exercicioId]);
+      if (!lido.ok) {
+        setErro(t(lido.erro, idioma));
+        return;
+      }
+      plano.push({ exercicioId, reps: lido.reps, peso: lido.peso });
+    }
+
     setEnviando(true);
     try {
-      await criarModelo(
-        nome.trim(),
-        exerciciosEscolhidos.map((exercicioId) => ({
-          exercicioId,
-          reps: numeroOuNulo(planos[exercicioId]?.reps),
-          peso: numeroOuNulo(planos[exercicioId]?.peso),
-        })),
-      );
+      await criarModelo(nome.trim(), plano);
       if (naFolha) {
         router.back();
       } else {
