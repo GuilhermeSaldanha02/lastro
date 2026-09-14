@@ -11,6 +11,7 @@ import {
   revogarVinculoPersonal,
 } from "@/lib/dados/personal-acoes";
 import { formatarTelefoneBrasil } from "@/lib/texto/whatsapp";
+import DicaInfo from "./dica-info";
 import type { VinculoDoAluno } from "@/lib/dados/personal";
 
 export default function VinculoAluno({
@@ -105,11 +106,13 @@ export default function VinculoAluno({
 
   return (
     <section className="card-obsidian">
-      <span className="card-obsidian__titulo">Vincular a um personal</span>
-      <p className="campo__nota">
-        Se um personal te passou um código, cole aqui. Nada acontece sem você
-        aceitar, e você pode revogar quando quiser.
-      </p>
+      <div className="titulo-com-dica">
+        <span className="card-obsidian__titulo">Vincular a um personal</span>
+        <DicaInfo titulo="Vincular a um personal">
+          Se um personal te passou um código, cole aqui. Nada acontece sem você
+          aceitar, e você pode revogar quando quiser.
+        </DicaInfo>
+      </div>
 
       <div className="campo">
         <label className="campo__rotulo" htmlFor="codigo_convite">
@@ -130,9 +133,16 @@ export default function VinculoAluno({
       </div>
 
       <div className="campo">
-        <label className="campo__rotulo" htmlFor="telefone_whatsapp">
-          Seu WhatsApp, com DDD
-        </label>
+        <div className="campo__rotulo-linha">
+          <label className="campo__rotulo" htmlFor="telefone_whatsapp">
+            Seu WhatsApp, com DDD
+          </label>
+          <DicaInfo titulo="Seu WhatsApp">
+            É por aqui que o seu personal te chama ao ver algo no seu treino.
+            O lastro nunca manda mensagem sozinho — nem por você, nem pelo seu
+            personal.
+          </DicaInfo>
+        </div>
         <input
           id="telefone_whatsapp"
           type="tel"
@@ -142,11 +152,6 @@ export default function VinculoAluno({
           value={telefone}
           onChange={(e) => setTelefone(e.target.value)}
         />
-        <p className="campo__nota">
-          É por aqui que o seu personal te chama ao ver algo no seu treino.
-          O lastro nunca manda mensagem sozinho — nem por você, nem pelo seu
-          personal.
-        </p>
       </div>
 
       {erro && (

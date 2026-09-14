@@ -17,6 +17,7 @@ import { redirect } from "next/navigation";
 import CabecalhoPro from "@/components/cabecalho-pro";
 import AbaInferior from "@/components/aba-inferior";
 import FilaPersonal from "@/components/fila-personal";
+import DicaInfo from "@/components/dica-info";
 import { obterPerfil } from "@/lib/dados/perfil";
 import { carregarFilaDoPersonal } from "@/lib/dados/personal";
 import { exigirCascaDePersonal, precisaCompletarCadastro } from "@/lib/dados/casca";
@@ -51,10 +52,12 @@ export default async function PaginaPersonal() {
             // casa dela no primeiro acesso — a fila vazia é o estado
             // inicial legítimo, e ela precisa dizer o que fazer.
             <div className="vazio">
-              <p>Você ainda não tem alunos.</p>
-              <p className="campo__nota">
-                Gere um código de convite e mande para o aluno. O acesso só
-                existe depois que ele aceitar, e acaba quando ele revogar.
+              <p className="titulo-com-dica">
+                Você ainda não tem alunos.
+                <DicaInfo titulo="Como convidar um aluno">
+                  Gere um código de convite e mande para o aluno. O acesso só
+                  existe depois que ele aceitar, e acaba quando ele revogar.
+                </DicaInfo>
               </p>
             </div>
           ) : itens.length === 0 ? (
@@ -76,10 +79,13 @@ export default async function PaginaPersonal() {
             <FilaPersonal itens={itens} />
           )}
 
-          <p className="campo__nota">
-            A fila cobre a última semana fechada e mostra no máximo dois
-            alertas por aluno, priorizados. O que não apareceu aqui ou não é
-            tendência ainda, ou já foi dito nas últimas semanas.
+          <p className="campo__nota titulo-com-dica">
+            Como a fila funciona
+            <DicaInfo titulo="Como a fila funciona">
+              A fila cobre a última semana fechada e mostra no máximo dois
+              alertas por aluno, priorizados. O que não apareceu aqui ou não é
+              tendência ainda, ou já foi dito nas últimas semanas.
+            </DicaInfo>
           </p>
 
           <Link

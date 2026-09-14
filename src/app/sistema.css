@@ -2577,6 +2577,74 @@
   font-weight: var(--lastro-peso-forte);
 }
 
+/* ---------- Ícone de informação (DicaInfo, pedido do dono 2026-09-14) ----
+   A explicação de "o que é tal coisa" sai da tela e fica atrás de um "i"
+   ao lado do título ou do rótulo; tocar abre a `Folha` com o texto.
+   O botão tem o alvo inteiro de 48px (D1), mas a margem negativa na
+   vertical impede que ele empurre a altura da linha do título — o ícone
+   visível é de 18px. */
+.dica-info {
+  width: var(--lastro-alvo-min);
+  height: var(--lastro-alvo-min);
+  margin-block: calc((var(--lastro-alvo-min) - 24px) / -2);
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  border-radius: var(--lastro-raio-pilula);
+  background: transparent;
+  color: var(--lastro-txt-2);
+  cursor: pointer;
+  vertical-align: middle;
+  transition: color var(--lastro-dur-1) ease;
+}
+
+.dica-info svg {
+  width: 18px;
+  height: 18px;
+}
+
+.dica-info:hover {
+  color: var(--lastro-txt);
+}
+
+.dica-info:focus-visible {
+  outline: var(--lastro-foco-espessura) solid var(--lastro-foco);
+  outline-offset: var(--lastro-foco-afast);
+}
+
+/* Título (de cartão, de seção ou de estado vazio) com o ícone colado. */
+.titulo-com-dica {
+  display: flex;
+  align-items: center;
+  gap: var(--lastro-e-1);
+}
+
+.vazio .titulo-com-dica {
+  justify-content: center;
+}
+
+/* Rótulo de campo com o ícone: o `label` segue associado ao input pelo
+   `htmlFor`; o botão fica ao lado, nunca dentro do `label` (conteúdo
+   interativo dentro de label roubaria o clique que foca o campo). */
+.campo__rotulo-linha {
+  display: flex;
+  align-items: center;
+  gap: var(--lastro-e-1);
+  margin-bottom: var(--lastro-e-2);
+}
+
+.campo__rotulo-linha .campo__rotulo {
+  margin-bottom: 0;
+}
+
+.dica-info__texto {
+  font-size: var(--lastro-papel-corpo);
+  line-height: var(--lastro-el-corpo);
+  color: var(--lastro-txt-2);
+}
+
 @keyframes lastro-folha-fundo-entra {
   from { opacity: 0; }
   to   { opacity: 1; }

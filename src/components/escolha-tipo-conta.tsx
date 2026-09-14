@@ -11,6 +11,7 @@
 import { useState } from "react";
 import { escolherTipoConta } from "@/lib/dados/personal-acoes";
 import { crefValido, AVISO_CREF_NAO_VERIFICADO } from "@/lib/texto/cref";
+import DicaInfo from "./dica-info";
 
 export default function EscolhaTipoConta() {
   const [tipo, setTipo] = useState<"aluno" | "personal">("aluno");
@@ -64,9 +65,12 @@ export default function EscolhaTipoConta() {
       {personal && (
         <>
           <div className="campo">
-            <label className="campo__rotulo" htmlFor="cref_escolha">
-              CREF
-            </label>
+            <div className="campo__rotulo-linha">
+              <label className="campo__rotulo" htmlFor="cref_escolha">
+                CREF
+              </label>
+              <DicaInfo titulo="CREF">{AVISO_CREF_NAO_VERIFICADO}</DicaInfo>
+            </div>
             <input
               id="cref_escolha"
               type="text"
@@ -77,7 +81,6 @@ export default function EscolhaTipoConta() {
               value={cref}
               onChange={(e) => setCref(e.target.value.toUpperCase())}
             />
-            <p className="campo__nota">{AVISO_CREF_NAO_VERIFICADO}</p>
             {crefIncompleto && (
               <p className="campo__nota campo__nota--alerta" role="status">
                 Formato esperado: 123456-G/PB — seis dígitos, categoria G ou

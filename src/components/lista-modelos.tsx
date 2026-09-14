@@ -18,6 +18,7 @@
 // à mão.
 import { useState } from "react";
 import ExcluirModelo from "@/components/excluir-modelo";
+import DicaInfo from "@/components/dica-info";
 import { t } from "@/lib/texto/i18n";
 import type { Idioma } from "@/lib/dados/idioma";
 
@@ -33,7 +34,15 @@ export default function ListaModelos({
   return (
     <>
       <div className="grupo__cab">
-        <h2 className="grupo__nome">{t("Modelos", idioma)}</h2>
+        <span className="titulo-com-dica">
+          <h2 className="grupo__nome">{t("Modelos", idioma)}</h2>
+          <DicaInfo titulo={t("Modelos", idioma)} idioma={idioma}>
+            {t(
+              "Listas de exercícios pra reaproveitar ao iniciar um treino — sem série, peso ou reps. Isso continua sendo preenchido normalmente no dia.",
+              idioma,
+            )}
+          </DicaInfo>
+        </span>
         {modelos.length > 0 && (
           <button
             type="button"

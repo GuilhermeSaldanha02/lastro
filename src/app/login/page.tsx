@@ -8,6 +8,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { criarClienteBrowser } from "@/lib/supabase/cliente-browser";
 import { criarContaComEmail, entrarComEmail, type TipoConta } from "@/lib/dados/auth";
 import { crefValido } from "@/lib/texto/cref";
+import DicaInfo from "@/components/dica-info";
 import { PARAM_RETORNO, sanitizarRotaDeRetorno } from "@/lib/rota-de-retorno";
 
 function rotaDeRetorno(): string {
@@ -193,9 +194,16 @@ export default function PaginaLogin() {
                 malformado em silêncio (migração 0024). */}
             {modo === "criar-conta" && tipoConta === "personal" && (
               <div className="campo">
-                <label className="campo__rotulo" htmlFor="cref">
-                  CREF
-                </label>
+                <div className="campo__rotulo-linha">
+                  <label className="campo__rotulo" htmlFor="cref">
+                    CREF
+                  </label>
+                  <DicaInfo titulo="CREF">
+                    Como está na sua carteira. O lastro guarda o número e não
+                    verifica registro no CONFEF — ele aparece como informado
+                    por você.
+                  </DicaInfo>
+                </div>
                 <input
                   id="cref"
                   type="text"
@@ -207,11 +215,6 @@ export default function PaginaLogin() {
                   onChange={(e) => setCref(e.target.value.toUpperCase())}
                   required
                 />
-                <p className="campo__nota">
-                  Como está na sua carteira. O lastro guarda o número e não
-                  verifica registro no CONFEF — ele aparece como informado
-                  por você.
-                </p>
                 {cref.trim() !== "" && !crefValido(cref) && (
                   <p className="campo__nota campo__nota--alerta" role="status">
                     Formato esperado: 123456-G/PB — seis dígitos, categoria G

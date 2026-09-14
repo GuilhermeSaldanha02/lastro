@@ -15,6 +15,7 @@ import type { ExercicioDoCatalogo } from "@/lib/dados/treino";
 import { criarModelo, type PlanoDoExercicio } from "@/lib/dados/modelo-treino";
 import { lerPlanoDoModelo } from "@/lib/dados/limites-modelo";
 import SeletorGrupoMuscular, { type OpcaoGrupo } from "./seletor-grupo-muscular";
+import DicaInfo from "./dica-info";
 import { t } from "@/lib/texto/i18n";
 import type { Idioma } from "@/lib/dados/idioma";
 
@@ -125,11 +126,13 @@ export default function ModeloTreinoForm({
     return (
       <section className="grupo">
         <div className="grupo__cab">
-          <h2 className="grupo__nome">{t("Que treino é esse?", idioma)}</h2>
+          <span className="titulo-com-dica">
+            <h2 className="grupo__nome">{t("Que treino é esse?", idioma)}</h2>
+            <DicaInfo titulo={t("Que treino é esse?", idioma)} idioma={idioma}>
+              {t("Dê um nome — os exercícios vêm no passo seguinte.", idioma)}
+            </DicaInfo>
+          </span>
         </div>
-        <p className="campo__nota">
-          {t("Dê um nome — os exercícios vêm no passo seguinte.", idioma)}
-        </p>
 
         <div className="campo">
           <label className="campo__rotulo" htmlFor="nome_modelo">
@@ -179,7 +182,15 @@ export default function ModeloTreinoForm({
       </div>
 
       <div className="grupo__cab">
-        <p className="campo__nota">{t("Exercícios do modelo", idioma)}</p>
+        <span className="titulo-com-dica">
+          <span className="campo__nota">{t("Exercícios do modelo", idioma)}</span>
+          <DicaInfo titulo={t("Exercícios do modelo", idioma)} idioma={idioma}>
+            {t(
+              "Reps e peso são opcionais. Em branco, o app usa a sua última série daquele exercício.",
+              idioma,
+            )}
+          </DicaInfo>
+        </span>
         <button type="button" className="botao-textual" onClick={() => setGruposEscolhidos([])}>
           {t("Trocar grupo", idioma)}
         </button>
@@ -244,13 +255,6 @@ export default function ModeloTreinoForm({
           );
         })}
       </div>
-
-      <p className="campo__nota">
-        {t(
-          "Reps e peso são opcionais. Em branco, o app usa a sua última série daquele exercício.",
-          idioma,
-        )}
-      </p>
 
       {erro && (
         <p className="aviso-erro" role="alert">

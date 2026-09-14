@@ -5,6 +5,10 @@
 // interceptada (`(.)perfil`, parallel route `@modal`): fechar = histórico
 // voltar, então o botão voltar do navegador/Android já funciona de graça,
 // sem lógica própria — é o próprio mecanismo de rota fazendo o trabalho.
+//
+// Fora de rota (2026-09-14): a `DicaInfo` abre esta mesma folha por estado,
+// sem navegar. Aí `onFechar` troca o `router.back()` — voltar no histórico
+// levaria a pessoa para a tela anterior em vez de só fechar a explicação.
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { t } from "@/lib/texto/i18n";
@@ -16,18 +20,33 @@ export default function Folha({
   titulo,
   children,
   idioma = "pt-BR",
+  onFechar,
+  focarAoAbrir = false,
 }: {
   titulo: string;
   children: ReactNode;
   idioma?: Idioma;
+  /** Folha aberta por estado (não por rota): como fechar sem mexer no histórico. */
+  onFechar?: () => void;
+  /** Leva o foco ao botão de fechar ao abrir — quem abriu por teclado segue dentro da folha. */
+  focarAoAbrir?: boolean;
 }) {
   const router = useRouter();
   const arraste = useRef<{ inicioY: number; atual: number } | null>(null);
+  const botaoFechar = useRef<HTMLButtonElement>(null);
   const [deslocamento, setDeslocamento] = useState(0);
 
   function fechar() {
-    router.back();
+    if (onFechar) {
+      onFechar();
+    } else {
+      router.back();
+    }
   }
+
+  useEffect(() => {
+    if (focarAoAbrir) botaoFechar.current?.focus();
+  }, [focarAoAbrir]);
 
   useEffect(() => {
     function aoTeclar(evento: KeyboardEvent) {
@@ -90,6 +109,7 @@ export default function Folha({
         <div className="folha__cabecalho">
           <h2 className="folha__titulo">{titulo}</h2>
           <button
+            ref={botaoFechar}
             type="button"
             className="botao-icone"
             aria-label={`${t("Fechar", idioma)} ${titulo}`}

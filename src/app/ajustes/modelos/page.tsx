@@ -23,13 +23,8 @@ export default async function PaginaModelos() {
       />
 
       <div className="corpo corpo--com-nav corpo--titulo-conteudo">
-        <p className="campo__nota">
-          {t(
-            "Listas de exercícios pra reaproveitar ao iniciar um treino — sem série, peso ou reps. Isso continua sendo preenchido normalmente no dia.",
-            idioma,
-          )}
-        </p>
-
+        {/* A explicação do que é um modelo vive no ícone "i" do título
+            "Modelos", dentro de `ListaModelos` (pedido do dono, 2026-09-14). */}
         <ListaModelos modelos={modelos} idioma={idioma} />
 
         {/* Ação fantasma (DESIGN.md §6.5, peça 8, M6) — "criar modelo" é uma

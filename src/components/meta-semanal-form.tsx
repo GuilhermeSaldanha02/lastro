@@ -6,6 +6,7 @@
 import { useState } from "react";
 import { definirMetaTreinosSemana } from "@/lib/dados/meta-semanal";
 import { t } from "@/lib/texto/i18n";
+import DicaInfo from "./dica-info";
 import type { Idioma } from "@/lib/dados/idioma";
 
 export default function MetaSemanalForm({
@@ -47,10 +48,12 @@ export default function MetaSemanalForm({
 
   return (
     <section className="card-obsidian">
-      <span className="card-obsidian__titulo">{t("Meta Semanal de Treinos", idioma)}</span>
-      <p className="campo__nota">
-        {t("Quantos treinos por semana é a sua meta. Deixe em branco para não mostrar meta nenhuma na Home.", idioma)}
-      </p>
+      <div className="titulo-com-dica">
+        <span className="card-obsidian__titulo">{t("Meta Semanal de Treinos", idioma)}</span>
+        <DicaInfo titulo={t("Meta Semanal de Treinos", idioma)} idioma={idioma}>
+          {t("Quantos treinos por semana é a sua meta. Deixe em branco para não mostrar meta nenhuma na Home.", idioma)}
+        </DicaInfo>
+      </div>
 
       <div className="campo">
         <label className="campo__rotulo" htmlFor="meta_treinos">
