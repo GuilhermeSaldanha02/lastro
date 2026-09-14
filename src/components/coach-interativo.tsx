@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState, type FormEvent } from "react";
-import { LIMITE_PERGUNTA } from "@/app/api/coach/prompt";
+import { LIMITE_PERGUNTA, limparPergunta } from "@/app/api/coach/prompt";
 import { t } from "@/lib/texto/i18n";
 import type { Idioma } from "@/lib/dados/idioma";
 
@@ -34,7 +34,9 @@ export default function CoachInterativo({ idioma }: { idioma: Idioma }) {
   }, [falas, carregando]);
 
   async function enviarPergunta(texto: string) {
-    const textoLimpo = texto.trim();
+    // A mesma limpeza do servidor (achado B4): `trim()` não tira o espaço de
+    // largura zero, e pergunta só de invisível aparecia como balão vazio.
+    const textoLimpo = limparPergunta(texto);
     if (!textoLimpo || carregando) return;
 
     setFalas((atual) => [...atual, { de: "dono", texto: textoLimpo }]);
@@ -165,7 +167,7 @@ export default function CoachInterativo({ idioma }: { idioma: Idioma }) {
         />
         <button
           type="submit"
-          disabled={carregando || !pergunta.trim()}
+          disabled={carregando || !limparPergunta(pergunta)}
           className="barra-conversa__botao"
           aria-label={t("Enviar pergunta", idioma)}
         >

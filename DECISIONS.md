@@ -2696,3 +2696,21 @@ A `j9` tinha *"aluno em /personal/completar vê a porta da área de trabalho"* �
 - **B3 (PDF de parecer ainda em geração responde 500) não mudou**: é outro achado.
 - **Outras buscas por id** que não aparecem numa rota digitável (ex.: `buscarModelo`, lido por `?modelo=`) não foram tocadas; `?modelo=abc` fica para quando alguém medir.
 - **Quem implementou não audita:** `QA.md` mantém TR-09, TR-10, CT-02 e AN-06 como REPROVOU até confirmação independente.
+
+## 2026-09-13 (7) — PDF de rascunho é "não encontrado", e pergunta invisível não gasta cota
+
+**Pedido do dono:** corrigir os achados B3 e B4 do QA do caminho triste.
+
+**B3 — PDF de um parecer ainda em geração respondia 500.** O rascunho em `gerando` não tem texto nem evidência, e o `@react-pdf` estourava ao renderizar. A rota do PDF agora responde 404 nesse caso — a tela do parecer já tratava o mesmo rascunho como `notFound()`.
+
+**B4 — o coach aceitava pergunta feita só de caractere invisível e gastava cota.** `trim()` não remove o espaço de largura zero (U+200B). Agora `limparPergunta` (`src/app/api/coach/prompt.ts`) tira a formatação Unicode (categoria Cf) e os separadores U+2028/U+2029 antes de medir; pergunta que fica vazia é 400, antes do teto e do registro de uso. O modelo recebe o texto limpo, e a tela do coach usa a mesma função.
+
+### O que vale agora
+
+- **Texto livre que vai para a IA é medido depois de limpar o invisível**, não com `trim()`.
+- **Escape de caractere invisível em código se escreve como sequência em texto**, nunca como o caractere: a primeira escrita desta correção pôs U+2028/U+2029 literais dentro da regex, o arquivo não compilava, e o resumo do runner de testes mostrou tudo verde com um arquivo inteiro sem carregar. A contagem de arquivos de teste (`Test Files`) é o que denuncia isso.
+
+### O que NÃO foi feito, de propósito
+
+- A Análise não recebe texto livre (só o número da pergunta), então não precisou da mesma limpeza.
+- **Quem implementou não audita:** `QA.md` mantém AN-03 e AN-04 como REPROVOU até confirmação independente.

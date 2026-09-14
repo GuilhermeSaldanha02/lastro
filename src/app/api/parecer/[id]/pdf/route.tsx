@@ -33,7 +33,11 @@ export async function GET(
     return NextResponse.json({ erro: "Falha ao buscar o parecer." }, { status: 500 });
   }
 
-  if (!parecer) {
+  // Rascunho ainda em geração não tem texto nem evidência, e renderizar o
+  // PDF assim estourava dentro do `@react-pdf` — 500 (achado B3, QA,
+  // 2026-09-13). Mesma resposta da tela do parecer para o mesmo caso: não
+  // há parecer pronto com esse id.
+  if (!parecer || !parecer.texto || !parecer.evidencia) {
     return NextResponse.json({ erro: "Parecer não encontrado." }, { status: 404 });
   }
 
