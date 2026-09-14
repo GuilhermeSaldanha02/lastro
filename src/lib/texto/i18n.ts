@@ -194,6 +194,14 @@ const DICIONARIO: Record<string, { en: string; es: string }> = {
   "Iniciar treino de hoje": { en: "Start today's workout", es: "Iniciar entrenamiento de hoy" },
   "Como começar?": { en: "How do you want to start?", es: "¿Cómo empezar?" },
   "Treino novo": { en: "New workout", es: "Entrenamiento nuevo" },
+
+  // --- app/not-found.tsx ---
+  "Página não encontrada": { en: "Page not found", es: "Página no encontrada" },
+  "Este endereço não existe ou não é da sua conta. Nada foi perdido.": {
+    en: "This address doesn't exist or isn't part of your account. Nothing was lost.",
+    es: "Esta dirección no existe o no es de tu cuenta. No se perdió nada.",
+  },
+  "Voltar ao início": { en: "Back to home", es: "Volver al inicio" },
   "Peso da anilha precisa estar entre 0,01 e 9999,99 kg.": {
     en: "Plate weight must be between 0.01 and 9999.99 kg.",
     es: "El peso del disco debe estar entre 0,01 y 9999,99 kg.",

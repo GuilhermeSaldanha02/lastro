@@ -2733,3 +2733,16 @@ A `j9` tinha *"aluno em /personal/completar vê a porta da área de trabalho"* �
 - **Sem regra global de quebra.** Home e `/personal/alunos` já aguentavam o nome gigante; outros lugares com texto livre ficam para quando alguém medir.
 - **Sem conferência visual local** (a máquina não tem `.env.local`). A prova visual são os prints do E2E (`lista-com-nome-gigante`, `nome-gigante_perfil`) nos artefatos do CI.
 - **Quem implementou não audita:** `QA.md` mantém AJ-04 e VS-06 como REPROVOU até confirmação independente.
+
+## 2026-09-13 (9) — A fila drena ao trocar de tela, e a 404 é do app
+
+**Pedido do dono:** corrigir os achados B7 e B8 do QA do caminho triste.
+
+**B7 — depois de logar de novo, a fila offline não drenava sozinha.** O `SincronizadorGlobal` mora no layout raiz e só drenava ao montar, quando a rede voltava ou quando o service worker avisava. O login entra com `router.push` (navegação dentro do app), então o componente não remonta: a série que ficou na fila com a sessão expirada esperava até alguém recarregar o app ou abrir o treino. Agora ele drena a cada troca de rota (`usePathname`). Barato: `sincronizarPendentes` tem mutex, e fila vazia não chama a rede.
+
+**B8 — a página 404 era a padrão do Next**: branca, em inglês, sem marca e sem caminho de volta, medida em produção. Agora `src/app/not-found.tsx` usa o cabeçalho do app, texto em PT-BR (ou no idioma da conta) e "Voltar ao início" para `/`, que já manda cada conta ao lugar certo. Vale com e sem sessão; falha ao ler o perfil não derruba a própria 404.
+
+### O que NÃO foi feito, de propósito
+
+- **Sem teste E2E novo para a 404.** O caso de id inválido (`j12`) já mede o status 404; a aparência só foi conferida se houver prévia da Vercel desta branch.
+- **Quem implementou não audita:** `QA.md` mantém OF-06 e o item da 404 de produção (TR-PUB-01) como estavam até confirmação independente.
