@@ -2816,3 +2816,22 @@ A `j9` tinha *"aluno em /personal/completar vê a porta da área de trabalho"* �
 
 - **A régua do próprio Supabase Auth** (comprimento mínimo e caracteres exigidos no painel) não foi mudada: é configuração de segurança da conta, do dono. Endurecê-la no painel repetiria a régua do app para quem chama a API de Auth direto, sem passar pelo `criarContaComEmail`.
 - **Não há troca nem recuperação de senha no app hoje** — conferido: nenhum `updateUser` nem `resetPasswordForEmail`. Quando existir, precisa usar `validarSenhaNova`.
+
+## 2026-09-14 (3) — Explicação vira ícone "i"; o que precisa ser lido antes de agir fica à vista
+
+**Pedido do dono:** "tem muitos avisos hoje no lastro sobre o que é tal coisa — se criar um ! e só quando clicar aparecer um popup, igual os outros apps?". Levantados 25 textos explicativos em 15 arquivos; o dono aprovou a divisão proposta.
+
+**Como ficou.** `DicaInfo` (`src/components/dica-info.tsx`): botão com ícone "i" ao lado do título do cartão, do título de seção ou do rótulo do campo; tocar abre a `Folha` que o app já usa (DESIGN.md §6.5, peça 10) com o texto. "i" e não "!": no lastro o "!" já quer dizer alerta e erro. A `Folha` ganhou `onFechar` (fecha por estado, sem `router.back()`) e `focarAoAbrir`; as três rotas interceptadas que já a usavam não mudam. A folha vai para o `body` por portal porque `.card-obsidian` tem `backdrop-filter`, que prende `position: fixed` dentro do cartão. O foco vai para o botão de fechar ao abrir e volta para o ícone ao fechar.
+
+**Viraram ícone** (explicação, não é preciso ler para agir): o que é um modelo; nome e plano opcional do modelo; idioma; meta semanal; como convidar um aluno (fila vazia, lista vazia, tela de convites); como a fila funciona; o que o personal vê e quem encerra o vínculo; CREF não verificado no CONFEF (cadastro, completar cadastro, escolha de tipo); por que CREF e WhatsApp são obrigatórios; como colar o código do convite; para que serve o WhatsApp do aluno.
+
+**Ficaram à vista, de propósito:** confirmação de salvar ("Configuração salva.", "Idioma salvo.", "Meta salva."); dado que muda (telefone do aluno, "Sem telefone salvo…", o status da fila sem alerta); aviso de formato inválido do CREF; consequência de ação sem volta e consentimento ("A escolha é feita uma vez e não muda depois", "Revogar corta o acesso na hora…", "Quem você autorizou vê seus treinos…", "Nenhuma conta conversa com outra…", a linha do cadastro que explica USUÁRIO e PERSONAL); e "Exercícios do modelo", que é rótulo, não aviso.
+
+### O que vale agora
+
+- **Texto novo que explica "o que é" entra por `DicaInfo`**, não como parágrafo fixo. Texto que a pessoa precisa ler ANTES de agir continua como parágrafo.
+- **O botão do "i" nunca vai dentro do `label`**: fica ao lado, em `.campo__rotulo-linha`, para não roubar o clique que foca o campo.
+
+### Verificação
+
+Sem navegador local (sem `.env.local`). O `j14-dica-info` roda na tela pública de cadastro, sem criar conta: explicação escondida antes do toque, folha abrindo com o texto, foco indo e voltando, Esc e toque fora fechando sem sair de `/login`. Os prints `dica-fechada` e `dica-aberta` ficam nos artefatos do CI.

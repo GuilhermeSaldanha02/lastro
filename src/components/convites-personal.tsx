@@ -13,6 +13,7 @@ import {
   gerarConvitePersonal,
 } from "@/lib/dados/personal-acoes";
 import { formatarTelefoneBrasil } from "@/lib/texto/whatsapp";
+import DicaInfo from "./dica-info";
 import type { AlunoVinculado, ConviteDoPersonal } from "@/lib/dados/personal";
 
 export default function ConvitesPersonal({
@@ -61,12 +62,14 @@ export default function ConvitesPersonal({
   return (
     <>
       <section className="card-obsidian">
-        <span className="card-obsidian__titulo">Convidar um aluno</span>
-        <p className="campo__nota">
-          Gere um código e mande para o aluno. O aceite acontece no app do
-          aluno — só aí você passa a ver os treinos, e só até o vínculo ser
-          revogado por quem o aceitou.
-        </p>
+        <div className="titulo-com-dica">
+          <span className="card-obsidian__titulo">Convidar um aluno</span>
+          <DicaInfo titulo="Convidar um aluno">
+            Gere um código e mande para o aluno. O aceite acontece no app do
+            aluno — só aí você passa a ver os treinos, e só até o vínculo ser
+            revogado por quem o aceitou.
+          </DicaInfo>
+        </div>
 
         {erro && (
           <p className="aviso-erro" role="alert">
@@ -113,9 +116,15 @@ export default function ConvitesPersonal({
 
       {alunos.length > 0 && (
         <section className="card-obsidian">
-          <span className="card-obsidian__titulo">
-            {alunos.length === 1 ? "1 aluno vinculado" : `${alunos.length} alunos vinculados`}
-          </span>
+          <div className="titulo-com-dica">
+            <span className="card-obsidian__titulo">
+              {alunos.length === 1 ? "1 aluno vinculado" : `${alunos.length} alunos vinculados`}
+            </span>
+            <DicaInfo titulo="Alunos vinculados">
+              Quem encerra o vínculo é o aluno, na própria tela de Ajustes.
+              Você não tem esse botão de propósito.
+            </DicaInfo>
+          </div>
           <ul className="lista">
             {alunos.map((aluno) => (
               <li key={aluno.vinculoId}>
@@ -130,10 +139,6 @@ export default function ConvitesPersonal({
               </li>
             ))}
           </ul>
-          <p className="campo__nota">
-            Quem encerra o vínculo é o aluno, na própria tela de Ajustes.
-            Você não tem esse botão de propósito.
-          </p>
         </section>
       )}
     </>

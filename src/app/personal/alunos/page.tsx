@@ -15,6 +15,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import CabecalhoPro from "@/components/cabecalho-pro";
 import AbaInferior from "@/components/aba-inferior";
+import DicaInfo from "@/components/dica-info";
 import { obterPerfil } from "@/lib/dados/perfil";
 import { listarAlunosVinculados } from "@/lib/dados/personal";
 import { exigirCascaDePersonal, precisaCompletarCadastro } from "@/lib/dados/casca";
@@ -41,18 +42,26 @@ export default async function PaginaAlunosDoPersonal() {
         <div className="pilha">
           {alunos.length === 0 ? (
             <div className="vazio">
-              <p>Nenhum aluno vinculado.</p>
-              <p className="campo__nota">
-                Gere um código de convite e mande para o aluno. Ele aceita no
-                app dele — cadastrar o contato de alguém não concede acesso a
-                nada.
+              <p className="titulo-com-dica">
+                Nenhum aluno vinculado.
+                <DicaInfo titulo="Como convidar um aluno">
+                  Gere um código de convite e mande para o aluno. Ele aceita no
+                  app dele — cadastrar o contato de alguém não concede acesso a
+                  nada.
+                </DicaInfo>
               </p>
             </div>
           ) : (
             <section className="card-obsidian">
-              <span className="card-obsidian__titulo">
-                {alunos.length === 1 ? "1 aluno" : `${alunos.length} alunos`}
-              </span>
+              <div className="titulo-com-dica">
+                <span className="card-obsidian__titulo">
+                  {alunos.length === 1 ? "1 aluno" : `${alunos.length} alunos`}
+                </span>
+                <DicaInfo titulo="O que você vê">
+                  Você lê treino, série e contato de quem aceitou — só leitura.
+                  Quem encerra o vínculo é o aluno, na tela de Ajustes dele.
+                </DicaInfo>
+              </div>
               <ul className="lista">
                 {alunos.map((aluno) => (
                   <li key={aluno.vinculoId}>
@@ -67,10 +76,6 @@ export default async function PaginaAlunosDoPersonal() {
                   </li>
                 ))}
               </ul>
-              <p className="campo__nota">
-                Você lê treino, série e contato de quem aceitou — só leitura.
-                Quem encerra o vínculo é o aluno, na tela de Ajustes dele.
-              </p>
             </section>
           )}
 

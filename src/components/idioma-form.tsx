@@ -9,6 +9,7 @@
 import { useState } from "react";
 import { definirIdioma, type Idioma } from "@/lib/dados/idioma";
 import { t } from "@/lib/texto/i18n";
+import DicaInfo from "./dica-info";
 
 const OPCOES: { valor: Idioma; rotulo: string }[] = [
   { valor: "pt-BR", rotulo: "Português" },
@@ -35,10 +36,12 @@ export default function IdiomaForm({ idiomaInicial }: { idiomaInicial: Idioma })
 
   return (
     <section className="card-obsidian">
-      <span className="card-obsidian__titulo">{t("Idioma", idioma)}</span>
-      <p className="campo__nota">
-        {t("Catálogo de exercícios e textos do app neste idioma.", idioma)}
-      </p>
+      <div className="titulo-com-dica">
+        <span className="card-obsidian__titulo">{t("Idioma", idioma)}</span>
+        <DicaInfo titulo={t("Idioma", idioma)} idioma={idioma}>
+          {t("Catálogo de exercícios e textos do app neste idioma.", idioma)}
+        </DicaInfo>
+      </div>
 
       <div className="segmentado" role="radiogroup" aria-label={t("Idioma", idioma)}>
         {OPCOES.map((opcao) => (

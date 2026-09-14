@@ -15,6 +15,7 @@
 import { redirect } from "next/navigation";
 import CabecalhoPro from "@/components/cabecalho-pro";
 import CompletarCadastroPersonal from "@/components/completar-cadastro-personal";
+import DicaInfo from "@/components/dica-info";
 import { obterPerfil } from "@/lib/dados/perfil";
 
 export default async function PaginaCompletarCadastro() {
@@ -33,12 +34,14 @@ export default async function PaginaCompletarCadastro() {
       <div className="corpo corpo--titulo-conteudo transicao-pilula">
         <div className="pilha">
           <section className="card-obsidian">
-            <span className="card-obsidian__titulo">Conta de personal</span>
-            <p className="campo__nota">
-              Falta o registro profissional e o telefone. Os dois são
-              obrigatórios para acompanhar aluno: o registro identifica quem
-              você é, e o WhatsApp é por onde a mensagem pronta sai.
-            </p>
+            <div className="titulo-com-dica">
+              <span className="card-obsidian__titulo">Conta de personal</span>
+              <DicaInfo titulo="Por que o CREF e o WhatsApp">
+                Falta o registro profissional e o telefone. Os dois são
+                obrigatórios para acompanhar aluno: o registro identifica quem
+                você é, e o WhatsApp é por onde a mensagem pronta sai.
+              </DicaInfo>
+            </div>
           </section>
 
           <CompletarCadastroPersonal />

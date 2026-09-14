@@ -9,6 +9,7 @@
 import { useState } from "react";
 import { completarCadastroPersonal } from "@/lib/dados/personal-acoes";
 import { crefValido, AVISO_CREF_NAO_VERIFICADO } from "@/lib/texto/cref";
+import DicaInfo from "./dica-info";
 
 export default function CompletarCadastroPersonal() {
   const [cref, setCref] = useState("");
@@ -30,9 +31,12 @@ export default function CompletarCadastroPersonal() {
   return (
     <section className="card-obsidian">
       <div className="campo">
-        <label className="campo__rotulo" htmlFor="cref_completar">
-          CREF
-        </label>
+        <div className="campo__rotulo-linha">
+          <label className="campo__rotulo" htmlFor="cref_completar">
+            CREF
+          </label>
+          <DicaInfo titulo="CREF">{AVISO_CREF_NAO_VERIFICADO}</DicaInfo>
+        </div>
         <input
           id="cref_completar"
           type="text"
@@ -43,7 +47,6 @@ export default function CompletarCadastroPersonal() {
           value={cref}
           onChange={(e) => setCref(e.target.value.toUpperCase())}
         />
-        <p className="campo__nota">{AVISO_CREF_NAO_VERIFICADO}</p>
         {crefIncompleto && (
           <p className="campo__nota campo__nota--alerta" role="status">
             Formato esperado: 123456-G/PB — seis dígitos, categoria G ou P, e

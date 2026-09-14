@@ -128,6 +128,8 @@ const DICIONARIO: Record<string, { en: string; es: string }> = {
   "Trocar grupo": { en: "Change group", es: "Cambiar grupo" },
   "Repetir última série": { en: "Repeat last set", es: "Repetir última serie" },
   "Fechar": { en: "Close", es: "Cerrar" },
+  // --- components/dica-info.tsx ---
+  "Saiba mais sobre": { en: "Learn more about", es: "Más información sobre" },
   "Adicionar exercício": { en: "Add exercise", es: "Agregar ejercicio" },
   "Outra série": { en: "Another set", es: "Otra serie" },
   "sincronizado": { en: "synced", es: "sincronizado" },
