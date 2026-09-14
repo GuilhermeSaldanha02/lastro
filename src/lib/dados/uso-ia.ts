@@ -76,7 +76,7 @@ export async function tetoAtingido(
 
 /**
  * Reserva UMA vaga da cota de hoje, de forma atômica: conta e grava na
- * mesma transação, na função `consumir_uso_ia` do banco (migração 0028).
+ * mesma transação, na função `consumir_uso_ia` do banco (migração 20260914024607, antiga 0028).
  * `true` = vaga reservada e o uso JÁ está gravado; `false` = teto atingido,
  * nada gravado.
  *

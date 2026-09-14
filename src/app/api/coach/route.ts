@@ -69,7 +69,7 @@ export async function POST(request: Request) {
   // pergunta. Uma conversa longa esvaziava a cota e jogava a peça-assinatura
   // no fallback (DECISIONS 2026-09-05).
   //
-  // Reserva ATÔMICA (migração 0028): contar e gravar acontecem numa só
+  // Reserva ATÔMICA (migração 20260914024607, antiga 0028): contar e gravar acontecem numa só
   // transação no banco. Antes eram `tetoAtingido` e depois `registrarUso`,
   // e três pedidos simultâneos com 9 usos passavam os três (12 usos, CI do
   // #251). Antes da chamada, de propósito: a cota do Google é consumida pela

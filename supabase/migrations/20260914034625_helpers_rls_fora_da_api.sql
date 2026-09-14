@@ -1,5 +1,6 @@
 -- ============================================================
--- lastro · 0029 — os helpers das policies saem do schema exposto pela API
+-- lastro · 20260914034625 (era 0029 antes do alinhamento com o banco) — os
+-- helpers das policies saem do schema exposto pela API
 -- (aviso de segurança do Supabase, lint 0029; DECISIONS 2026-09-14 (1))
 -- ============================================================
 -- O linter de segurança aponta função `security definer` executável por

@@ -1,5 +1,6 @@
 -- ============================================================
--- lastro · 0027 — no máximo UMA geração de parecer em andamento por conta
+-- lastro · 20260914022051 (era 0027 antes do alinhamento com o banco) — no
+-- máximo UMA geração de parecer em andamento por conta
 -- (achado M5 do QA do caminho triste; DECISIONS 2026-09-13 (10))
 -- ============================================================
 -- Dois POST simultâneos a /api/analise passavam pela checagem "já existe

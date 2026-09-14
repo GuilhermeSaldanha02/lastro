@@ -436,7 +436,7 @@ export async function POST(request: Request) {
   // insert: dois POST ao mesmo tempo passavam os dois por ela, criavam dois
   // rascunhos e gastavam duas vagas da cota de 5/dia. Quem garante agora é o
   // banco — o índice único parcial `parecer_uma_geracao_por_usuario`
-  // (migração 0027) aceita UMA linha em `gerando` por conta, e o insert do
+  // (migração 20260914022051, antiga 0027) aceita UMA linha em `gerando` por conta, e o insert do
   // pedido que chega depois falha com `23505`. Resposta: o mesmo 409 da
   // checagem, sem rascunho e sem cota.
   //
