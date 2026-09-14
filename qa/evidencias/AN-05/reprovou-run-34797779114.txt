@@ -1,0 +1,60 @@
+AN-05 · evidência crua da REPROVAÇÃO — run 34797779114 (PR #251, commit d97b447), passo E2E, reporter line
+Spec: e2e/j12-isolamento-e-apis.spec.ts:380 — 'coach: pergunta invisível é recusada e pedidos simultâneos não furam o teto de 10'
+Registrado em 2026-09-13. A parte 'pergunta invisível' (B4) passou; a parte de concorrência falhou nas duas tentativas.
+
+== execução e anotações (linhas 824-861 do log limpo)
+[41/110] [chromium] › e2e/j12-isolamento-e-apis.spec.ts:380:5 › coach: pergunta invisível é recusada e pedidos simultâneos não furam o teto de 10
+[WebServer] [coach] falha ao gerar {
+
+[WebServer]   status: undefined,
+[WebServer]   mensagem: 'Variável de ambiente GEMINI_API_KEY ausente — configure .env.local (ver .env.example).'
+[WebServer] }
+[WebServer] [coach] falha ao gerar {
+
+[WebServer]   status: undefined,
+[WebServer]   mensagem: 'Variável de ambiente GEMINI_API_KEY ausente — configure .env.local (ver .env.example).'
+[WebServer] }
+[WebServer] [coach] falha ao gerar {
+[WebServer]   status: undefined,
+
+[WebServer]   mensagem: 'Variável de ambiente GEMINI_API_KEY ausente — configure .env.local (ver .env.example).'
+[WebServer] }
+[chromium] › e2e/j12-isolamento-e-apis.spec.ts:380:5 › coach: pergunta invisível é recusada e pedidos simultâneos não furam o teto de 10
+[achado] coach: pergunta invisível é recusada e pedidos simultâneos não furam o teto de 10: 3 pedidos simultâneos com 9 usos: 12 usos, status 502, 502, 502
+
+[42/110] (retries) [chromium] › e2e/j12-isolamento-e-apis.spec.ts:380:5 › coach: pergunta invisível é recusada e pedidos simultâneos não furam o teto de 10 (retry #1)
+[WebServer] [coach] falha ao gerar {
+[WebServer]   status: undefined,
+
+[WebServer]   mensagem: 'Variável de ambiente GEMINI_API_KEY ausente — configure .env.local (ver .env.example).'
+[WebServer] }
+[WebServer] [coach] falha ao gerar {
+[WebServer]   status: undefined,
+
+[WebServer]   mensagem: 'Variável de ambiente GEMINI_API_KEY ausente — configure .env.local (ver .env.example).'
+[WebServer] }
+[WebServer] [coach] falha ao gerar {
+[WebServer]   status: undefined,
+
+[WebServer]   mensagem: 'Variável de ambiente GEMINI_API_KEY ausente — configure .env.local (ver .env.example).'
+[WebServer] }
+[achado] coach: pergunta invisível é recusada e pedidos simultâneos não furam o teto de 10: 3 pedidos simultâneos com 9 usos: 12 usos, status 502, 502, 502
+
+  3) [chromium] › e2e/j12-isolamento-e-apis.spec.ts:380:5 › coach: pergunta invisível é recusada e pedidos simultâneos não furam o teto de 10
+
+== erro reportado (1ª tentativa)
+  3) [chromium] › e2e/j12-isolamento-e-apis.spec.ts:380:5 › coach: pergunta invisível é recusada e pedidos simultâneos não furam o teto de 10
+
+    Error: ACHADO: pedidos simultâneos levaram o coach a 12 usos, acima do teto de 10
+
+    expect(received).toBeLessThanOrEqual(expected)
+
+    Expected: <= 10
+    Received:    12
+
+      395 |     const total = await usos();
+      396 |     if (total > 10) anotarAchado(`3 pedidos simultâneos com 9 usos: ${total} usos, status ${respostas.map((r) => r.status()).join(", ")}`);
+    > 397 |     expect.soft(total, `ACHADO: pedidos simultâneos levaram o coach a ${total} usos, acima do teto de 10`).toBeLessThanOrEqual(10);
+          |                                                                                                            ^
+      398 |   } finally {
+      399 |     await apagarSemErro(conta);
