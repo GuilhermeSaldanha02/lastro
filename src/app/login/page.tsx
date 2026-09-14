@@ -8,6 +8,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { criarClienteBrowser } from "@/lib/supabase/cliente-browser";
 import { criarContaComEmail, entrarComEmail, type TipoConta } from "@/lib/dados/auth";
 import { crefValido } from "@/lib/texto/cref";
+import { SENHA_MINIMO, validarSenhaNova } from "@/lib/texto/senha";
 import { PARAM_RETORNO, sanitizarRotaDeRetorno } from "@/lib/rota-de-retorno";
 
 function rotaDeRetorno(): string {
@@ -48,6 +49,17 @@ export default function PaginaLogin() {
   async function aoEnviar(evento: FormEvent<HTMLFormElement>) {
     evento.preventDefault();
     setMensagem(null);
+
+    // Só no cadastro: quem já tem conta entra com a senha que tem. A mesma
+    // régua roda de novo no servidor (`criarContaComEmail`).
+    if (modo === "criar-conta") {
+      const senhaValida = validarSenhaNova(senha);
+      if (!senhaValida.ok) {
+        setMensagem(senhaValida.erro);
+        return;
+      }
+    }
+
     setCarregando(true);
 
     const resultado =
@@ -250,7 +262,7 @@ export default function PaginaLogin() {
                 value={senha}
                 onChange={(e) => setSenha(e.target.value)}
                 required
-                minLength={6}
+                minLength={modo === "criar-conta" ? SENHA_MINIMO : 6}
               />
             </div>
 
