@@ -75,6 +75,35 @@ export async function tetoAtingido(
 }
 
 /**
+ * Reserva UMA vaga da cota de hoje, de forma atômica: conta e grava na
+ * mesma transação, na função `consumir_uso_ia` do banco (migração 0028).
+ * `true` = vaga reservada e o uso JÁ está gravado; `false` = teto atingido,
+ * nada gravado.
+ *
+ * Existe porque `tetoAtingido` + `registrarUso` são duas idas ao banco sem
+ * nada entre elas: pedidos simultâneos contavam o mesmo número e passavam
+ * todos (coach com 12 usos para teto de 10, CI do #251).
+ *
+ * Falha da chamada DEIXA PASSAR — mesma regra de produto de `tetoAtingido`:
+ * negar a IA por um erro nosso é pior do que gastar uma chamada a mais. Nesse
+ * caso o uso não fica gravado.
+ */
+export async function consumirUso(
+  supabase: SupabaseClient,
+  origem: OrigemUso,
+): Promise<boolean> {
+  const { data, error } = await supabase.rpc("consumir_uso_ia", {
+    p_origem: origem,
+    p_teto: TETO_DIARIO[origem],
+  });
+  if (error) {
+    console.error(`[uso-ia] falha ao reservar uso de ${origem}:`, error.message);
+    return true;
+  }
+  return data === true;
+}
+
+/**
  * Marca uma chamada consumida. Falha aqui **não** bloqueia a chamada: o
  * dono perder o parecer porque o registro de consumo falhou seria trocar
  * um problema de cota por um problema pior.
