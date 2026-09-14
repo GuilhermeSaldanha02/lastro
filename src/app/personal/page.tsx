@@ -33,7 +33,7 @@ export default async function PaginaPersonal() {
   // ela abortaria o cadastro (ver `casca.ts` e a migração 0024).
   if (precisaCompletarCadastro(perfil)) redirect("/personal/completar");
 
-  const { itens, alunos } = await carregarFilaDoPersonal();
+  const { itens, alunos } = await carregarFilaDoPersonal(idioma);
 
   return (
     <main className="tela">

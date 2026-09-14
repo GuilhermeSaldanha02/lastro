@@ -28,6 +28,7 @@ import {
   somarDias,
 } from "@/lib/analise/semanas";
 import type { ExercicioBruto, TreinoBruto } from "@/lib/analise/tipos";
+import type { Idioma } from "@/lib/dados/idioma";
 import { conteudoDoAlerta, rascunhoWhatsApp, type ConteudoAlerta } from "@/lib/texto/alerta-personal";
 import { linkWhatsApp } from "@/lib/texto/whatsapp";
 
@@ -300,7 +301,10 @@ async function carregarAlertasEmitidos(
  * §11.7 ("o grupo alertado recebeu estímulo na semana seguinte?") e a
  * supressão de repetição entre semanas.
  */
-export async function carregarFilaDoPersonal(agora: Date = new Date()): Promise<{
+export async function carregarFilaDoPersonal(
+  idioma: Idioma,
+  agora: Date = new Date(),
+): Promise<{
   semanaInicio: string;
   itens: ItemDaFila[];
   alunos: AlunoVinculado[];
@@ -411,9 +415,9 @@ export async function carregarFilaDoPersonal(agora: Date = new Date()): Promise<
         alertaId: linha.id,
         aluno: { id: aluno.alunoId, nome: aluno.nome },
         alerta,
-        conteudo: conteudoDoAlerta(alerta, aluno.nome),
+        conteudo: conteudoDoAlerta(alerta, aluno.nome, idioma),
         linkWhatsApp: aluno.telefoneWhatsApp
-          ? linkWhatsApp(aluno.telefoneWhatsApp, rascunhoWhatsApp(alerta, aluno.nome))
+          ? linkWhatsApp(aluno.telefoneWhatsApp, rascunhoWhatsApp(alerta, aluno.nome, idioma))
           : null,
         acionadoEm: linha.acionadoEm,
       });
