@@ -194,6 +194,14 @@ const DICIONARIO: Record<string, { en: string; es: string }> = {
   "Iniciar treino de hoje": { en: "Start today's workout", es: "Iniciar entrenamiento de hoy" },
   "Como começar?": { en: "How do you want to start?", es: "¿Cómo empezar?" },
   "Treino novo": { en: "New workout", es: "Entrenamiento nuevo" },
+  "Sem conexão. Conecte-se à internet para iniciar o treino.": {
+    en: "No connection. Connect to the internet to start the workout.",
+    es: "Sin conexión. Conéctate a internet para iniciar el entrenamiento.",
+  },
+  "Não foi possível iniciar o treino. Verifique a conexão e tente de novo.": {
+    en: "Couldn't start the workout. Check your connection and try again.",
+    es: "No se pudo iniciar el entrenamiento. Revisa la conexión e inténtalo de nuevo.",
+  },
 
   // --- components/formulario-serie.tsx ---
   "Repetir série": { en: "Repeat set", es: "Repetir serie" },

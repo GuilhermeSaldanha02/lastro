@@ -78,6 +78,12 @@ export default function FormularioSerie({
   const [pesoPorLado, setPesoPorLado] = useState(false);
   const repsRef = useRef<HTMLInputElement>(null);
   const pesoRef = useRef<HTMLInputElement>(null);
+  // Achado M2 (QA, 2026-09-13): duplo clique em "Registrar série" gravava
+  // duas séries iguais — o segundo submit entrava antes de o primeiro
+  // limpar o formulário. A ref barra o toque que chega no mesmo quadro; o
+  // estado desabilita o botão até a série estar na fila.
+  const enviandoRef = useRef(false);
+  const [enviando, setEnviando] = useState(false);
 
   const exercicioSelecionado = exercicios.find((e) => e.id === exercicioId);
 
@@ -120,6 +126,7 @@ export default function FormularioSerie({
 
   async function aoEnviar(evento: FormEvent<HTMLFormElement>) {
     evento.preventDefault();
+    if (enviandoRef.current) return;
     setErro(null);
 
     const formulario = evento.currentTarget;
@@ -154,16 +161,23 @@ export default function FormularioSerie({
       tipo === "valendo" &&
       ehRecorde({ reps, peso }, historico ?? []);
 
-    await onRegistrar({
-      exercicioId,
-      tipo: tipo as "aquecimento" | "valendo",
-      reps,
-      peso,
-      rir,
-      pesoPorLado,
-      ehRecordePessoal,
-    });
-    formulario.reset();
+    enviandoRef.current = true;
+    setEnviando(true);
+    try {
+      await onRegistrar({
+        exercicioId,
+        tipo: tipo as "aquecimento" | "valendo",
+        reps,
+        peso,
+        rir,
+        pesoPorLado,
+        ehRecordePessoal,
+      });
+      formulario.reset();
+    } finally {
+      enviandoRef.current = false;
+      setEnviando(false);
+    }
   }
 
   // noValidate: os campos abaixo mantêm required/min/max (semântica pra
@@ -299,7 +313,13 @@ export default function FormularioSerie({
         </p>
       )}
 
-      <button type="submit" className="botao-primario" style={{ marginTop: "var(--lastro-e-2)" }}>
+      <button
+        type="submit"
+        className="botao-primario"
+        style={{ marginTop: "var(--lastro-e-2)" }}
+        disabled={enviando}
+        aria-busy={enviando}
+      >
         {t("Registrar série", idioma)}
       </button>
     </form>
