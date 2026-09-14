@@ -1313,6 +1313,18 @@
   align-items: center;
   min-height: var(--lastro-alvo-min);
   padding: var(--lastro-e-3) var(--lastro-e-4);
+  /* Achado B6 (QA, 2026-09-13): nome de modelo sem espaço (10 mil letras)
+     empurrava a lista 109.706px para fora da tela a 375px. O `min-width: 0`
+     acima vale para a caixa, não para o texto solto dentro dela, que tem
+     como largura mínima a palavra inteira. `anywhere` deixa quebrar no meio
+     da palavra só quando ela não cabe — nome comum não muda. */
+  overflow-wrap: anywhere;
+}
+
+/* Nome da conta em /perfil — mesmo defeito do B6 (43.337px a 375px), mesma
+   regra. Classe própria para não mudar a quebra de toda `.pilha`. */
+.perfil-nome {
+  overflow-wrap: anywhere;
 }
 
 .item__meta {

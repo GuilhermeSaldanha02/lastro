@@ -6,7 +6,7 @@
 // grande.
 import { useState } from "react";
 import { salvarConfigAnilhas, type ConfigAnilhas } from "@/lib/dados/config-anilhas";
-import { calcularAnilhas } from "@/lib/anilhas";
+import { calcularAnilhas, normalizarPesoKg } from "@/lib/anilhas";
 import { t } from "@/lib/texto/i18n";
 import type { Idioma } from "@/lib/dados/idioma";
 
@@ -27,9 +27,10 @@ export default function AnilhasForm({ configInicial, idioma }: { configInicial: 
   const [modoEdicao, setModoEdicao] = useState(false);
 
   function adicionarAnilha() {
-    const peso = Number(novaAnilha.replace(",", "."));
-    if (!Number.isFinite(peso) || peso <= 0) {
-      setErro(t("Peso da anilha precisa ser um número positivo.", idioma));
+    // Arredondado como o banco guarda (achado B5): 0,001 kg virava 0 kg.
+    const peso = normalizarPesoKg(Number(novaAnilha.replace(",", ".")));
+    if (peso === null) {
+      setErro(t("Peso da anilha precisa estar entre 0,01 e 9999,99 kg.", idioma));
       return;
     }
     if (anilhas.includes(peso)) {
@@ -48,9 +49,9 @@ export default function AnilhasForm({ configInicial, idioma }: { configInicial: 
   async function salvar() {
     setErro(null);
     setSalvo(false);
-    const barra = Number(pesoBarra.replace(",", "."));
-    if (!Number.isFinite(barra) || barra <= 0) {
-      setErro(t("Peso da barra precisa ser um número positivo.", idioma));
+    const barra = normalizarPesoKg(Number(pesoBarra.replace(",", ".")));
+    if (barra === null) {
+      setErro(t("Peso da barra precisa estar entre 0,01 e 9999,99 kg.", idioma));
       return;
     }
     setSalvando(true);

@@ -17,6 +17,28 @@ export type ResultadoCalculadoraAnilhas = {
 const TOLERANCIA = 0.001;
 
 /**
+ * O que `numeric(6,2)` (migração 0008: `peso_barra` e
+ * `anilhas_disponiveis`) guarda sem virar 0 nem estourar a coluna.
+ */
+export const PESO_KG_MINIMO = 0.01;
+export const PESO_KG_MAXIMO = 9999.99;
+
+/**
+ * Peso de barra ou de anilha como o BANCO vai guardar: arredondado para
+ * duas casas. `null` quando, arredondado, ele sai da faixa.
+ *
+ * Achado B5 (QA, 2026-09-13): a tela e o servidor checavam `> 0` no número
+ * digitado, e o banco arredondava depois — uma anilha de 0,001 kg era
+ * aceita e salva como 0 kg. Arredondar ANTES de validar faz a checagem ver
+ * o mesmo número que o banco, e a tela mostra o que vai ser salvo.
+ */
+export function normalizarPesoKg(valor: number): number | null {
+  if (!Number.isFinite(valor)) return null;
+  const arredondado = Math.round(valor * 100) / 100;
+  return arredondado >= PESO_KG_MINIMO && arredondado <= PESO_KG_MAXIMO ? arredondado : null;
+}
+
+/**
  * Greedy: da maior anilha pra menor, encaixa o que couber no peso
  * restante de UM lado da barra. Sempre por baixo do alvo — nunca
  * ultrapassa (não faz sentido "quase" o peso pesando mais que o pedido).
