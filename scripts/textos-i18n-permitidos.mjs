@@ -14,6 +14,7 @@ export const TEXTOS_PERMITIDOS = new Set([
   "kg?",
   "&ldquo;",
   "&rdquo;.",
+  "&rdquo;?",
 ]);
 
 export const PROPRIEDADES_NAO_VISIVEIS = new Set([
@@ -50,4 +51,5 @@ export const PROPRIEDADES_NAO_VISIVEIS = new Set([
   "voltarHref",
   "strokeLinecap",
   "strokeLinejoin",
+  "loading",
 ]);

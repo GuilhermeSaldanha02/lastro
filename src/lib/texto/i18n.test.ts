@@ -38,6 +38,21 @@ describe("i18n", () => {
     "Descartar série",
     "Treino LASTRO",
     "TREINO",
+    "Revisão",
+    "Músculos que ajudam",
+    "Movimento das articulações",
+    "Dica de execução",
+    "Conteúdo gerado por IA",
+    "Aviso de saúde",
+    "Exercício não encontrado",
+    "Nenhum modelo criado ainda.",
+    "Nenhuma anilha configurada ainda.",
+    "Dê um nome ao modelo.",
+    "Escolha pelo menos um exercício.",
+    "Reps do plano precisa ser um número inteiro entre 1 e 100.",
+    "Peso do plano precisa estar entre 0 e 1000 kg.",
+    "Peso da anilha precisa estar entre 0,01 e 9999,99 kg.",
+    "Peso da barra precisa estar entre 0,01 e 9999,99 kg.",
   ])("tem cobertura completa para %s", (chave) => {
     expect(possuiTraducao(chave)).toBe(true);
     expect(t(chave, "en")).not.toBe(chave);

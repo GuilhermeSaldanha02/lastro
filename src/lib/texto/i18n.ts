@@ -375,11 +375,14 @@ const DICIONARIO: Record<string, { en: string; es: string }> = {
   "Buscar exercício ou músculo…": { en: "Search exercise or muscle…", es: "Buscar ejercicio o músculo…" },
   "Limpar busca": { en: "Clear search", es: "Limpiar búsqueda" },
   "Grupos musculares": { en: "Muscle groups", es: "Grupos musculares" },
-  "Curadoria": { en: "Curation", es: "Curaduría" },
-  "exercícios estão aguardando curadoria de execução. Dicas técnicas são revisadas por humanos (ADR-007).": {
-    en: "exercises are awaiting execution curation. Technical tips are reviewed by humans (ADR-007).",
-    es: "ejercicios están esperando curaduría de ejecución. Los consejos técnicos son revisados por humanos (ADR-007).",
+  "Revisão": { en: "Review", es: "Revisión" },
+  "exercícios aguardam revisão da dica de execução. As dicas são revisadas por pessoas.": {
+    en: "exercises are waiting for their execution tips to be reviewed. Tips are reviewed by people.",
+    es: "ejercicios esperan la revisión de sus consejos de ejecución. Los consejos son revisados por personas.",
   },
+  "Exercício não encontrado": { en: "Exercise not found", es: "Ejercicio no encontrado" },
+  "Busca:": { en: "Search:", es: "Búsqueda:" },
+  "Aviso de saúde": { en: "Health notice", es: "Aviso de salud" },
   "Nenhum exercício encontrado para": { en: "No exercise found for", es: "Ningún ejercicio encontrado para" },
   "exercício": { en: "exercise", es: "ejercicio" },
   "exercícios": { en: "exercises", es: "ejercicios" },
@@ -704,13 +707,24 @@ const DICIONARIO: Record<string, { en: string; es: string }> = {
   },
 
   // --- app/catalogo/[id]/page.tsx ---
-  "Biomecânica & Instruções Técnicas": {
-    en: "Biomechanics & Technical Instructions",
-    es: "Biomecánica e Instrucciones Técnicas",
+  "Dica de execução": { en: "Execution tip", es: "Consejo de ejecución" },
+  "Veja os músculos envolvidos, o movimento das articulações e a orientação para executar o exercício.": {
+    en: "See the muscles involved, the joint movement, and guidance for doing the exercise.",
+    es: "Consulta los músculos involucrados, el movimiento de las articulaciones y la guía para hacer el ejercicio.",
   },
   "Músculo Alvo": { en: "Target Muscle", es: "Músculo Objetivo" },
-  "Sinergistas": { en: "Synergists", es: "Sinergistas" },
-  "Mecânica Articular": { en: "Joint Mechanics", es: "Mecánica Articular" },
+  "Músculos que ajudam": { en: "Supporting muscles", es: "Músculos que ayudan" },
+  "São músculos que participam do movimento junto com o músculo alvo.": {
+    en: "These muscles work with the target muscle during the movement.",
+    es: "Son músculos que participan en el movimiento junto con el músculo objetivo.",
+  },
+  "Movimento das articulações": { en: "Joint movement", es: "Movimiento de las articulaciones" },
+  "Mostra como as articulações se movem durante o exercício.": {
+    en: "It shows how the joints move during the exercise.",
+    es: "Muestra cómo se mueven las articulaciones durante el ejercicio.",
+  },
+  "Conteúdo gerado por IA": { en: "AI-generated content", es: "Contenido generado por IA" },
+  "Melhor marca:": { en: "Best mark:", es: "Mejor marca:" },
   "Histórico de Séries": { en: "Set History", es: "Historial de Series" },
   // Achado da auditoria independente (PR #160): chamadas t(...) MULTI-LINHA
   // escapavam do script de varredura (regex de linha única) — ficavam em
@@ -723,6 +737,7 @@ const DICIONARIO: Record<string, { en: string; es: string }> = {
 
   // --- components/player-execucao-exercicio.tsx ---
   "Foco:": { en: "Focus:", es: "Enfoque:" },
+  "Mídia de exercício": { en: "Exercise media", es: "Contenido del ejercicio" },
   "Animação Ativa": { en: "Animation Active", es: "Animación Activa" },
 
   // --- components/timer-topo.tsx ---

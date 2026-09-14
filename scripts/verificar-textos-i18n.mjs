@@ -12,6 +12,10 @@ const MIGRADOS = [
   /src[\\/]app[\\/]page\.tsx$/,
   /src[\\/]app[\\/]treino[\\/]/,
   /src[\\/]components[\\/](iniciar-treino|form-iniciar-treino|lista-treinos|treino-detalhe|formulario-serie|timer-topo|excluir-treino|relatorio-pos-treino)\.tsx$/,
+  /src[\\/]app[\\/]catalogo[\\/]/,
+  /src[\\/]app[\\/]ajustes[\\/](modelos|anilhas)[\\/]/,
+  /src[\\/]app[\\/]@modal[\\/].*[\\/](modelos|anilhas)[\\/]/,
+  /src[\\/]components[\\/](catalogo-interativo|lista-modelos|modelo-treino-form|excluir-modelo|anilhas-form|player-execucao-exercicio)\.tsx$/,
 ];
 const DIRETORIOS = ["src/app", "src/components"];
 const EXTENSOES = new Set([".tsx", ".jsx"]);
