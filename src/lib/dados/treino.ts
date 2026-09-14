@@ -15,7 +15,7 @@ import { dataLocalBrasil } from "@/lib/tempo";
 import { obterIdioma } from "@/lib/dados/idioma";
 import { mapaTraducaoExercicios, mapaTraducaoGrupos } from "@/lib/dados/traducao";
 import { formatarGrupoMuscular } from "@/lib/texto/grupo-muscular";
-import { ehErroPermanenteDoPostgres, marcarComoPermanente } from "@/lib/offline/erro-permanente";
+import { ehErroPermanenteDoPostgres } from "@/lib/offline/erro-permanente";
 
 export type Exercicio = {
   id: string;
@@ -558,6 +558,21 @@ export async function criarTreinoComModelo(modeloId: string): Promise<void> {
   redirect(`/treino/${data.id}?modelo=${modeloId}`);
 }
 
+/**
+ * Resultado de gravar ou corrigir uma série.
+ *
+ * Achado A1 (QA, 2026-09-13, run 34784135645): no build de PRODUÇÃO o Next
+ * não entrega ao cliente a mensagem de um erro lançado numa Server
+ * Function — só um `digest`. O prefixo `[erro-permanente]` morria na
+ * travessia, a fila offline tratava a recusa do banco como falha de rede e
+ * travava para sempre (no `next dev` a mensagem atravessa, por isso os
+ * testes de unidade e o dev nunca viram). Valor de retorno atravessa
+ * intacto nos dois modos; quem marca o erro como permanente é o cliente,
+ * em `src/lib/offline/sincronizar-pendentes.ts`. Falha TRANSITÓRIA (rede,
+ * sessão) continua lançando: aí perder a mensagem não muda a decisão.
+ */
+export type ResultadoGravacaoSerie = { ok: true } | { ok: false; permanente: true; mensagem: string };
+
 export type NovaSerieInput = {
   id: string;
   treinoId: string;
@@ -589,8 +604,11 @@ export type NovaSerieInput = {
  *
  * `usuario_id` NÃO entra no insert: o trigger `serie_usuario_id_bi`
  * (SDD §3.2) preenche a partir de `treino_id`.
+ *
+ * Erro PERMANENTE (o banco recusou o dado) volta como VALOR, não como
+ * exceção — ver `ResultadoGravacaoSerie`.
  */
-export async function criarSerieRemoto(input: NovaSerieInput): Promise<void> {
+export async function criarSerieRemoto(input: NovaSerieInput): Promise<ResultadoGravacaoSerie> {
   const { supabase } = await usuarioAutenticadoOuErro();
 
   const { error } = await supabase.from("serie").insert({
@@ -606,10 +624,12 @@ export async function criarSerieRemoto(input: NovaSerieInput): Promise<void> {
   });
   if (error) {
     const mensagem = `Falha ao registrar série: ${error.message}`;
-    throw new Error(ehErroPermanenteDoPostgres(error.code) ? marcarComoPermanente(mensagem) : mensagem);
+    if (ehErroPermanenteDoPostgres(error.code)) return { ok: false, permanente: true, mensagem };
+    throw new Error(mensagem);
   }
   revalidatePath("/treino/[id]", "page");
   revalidatePath("/");
+  return { ok: true };
 }
 
 /* ====================================================================
@@ -649,7 +669,7 @@ export type AtualizacaoSerieInput = {
  */
 export async function atualizarSerieRemoto(
   input: AtualizacaoSerieInput,
-): Promise<void> {
+): Promise<ResultadoGravacaoSerie> {
   const { supabase } = await usuarioAutenticadoOuErro();
 
   const { error } = await supabase
@@ -664,10 +684,12 @@ export async function atualizarSerieRemoto(
     .eq("id", input.id);
   if (error) {
     const mensagem = `Falha ao atualizar série: ${error.message}`;
-    throw new Error(ehErroPermanenteDoPostgres(error.code) ? marcarComoPermanente(mensagem) : mensagem);
+    if (ehErroPermanenteDoPostgres(error.code)) return { ok: false, permanente: true, mensagem };
+    throw new Error(mensagem);
   }
   revalidatePath("/treino/[id]", "page");
   revalidatePath("/");
+  return { ok: true };
 }
 
 /** Exclui uma série. A RLS impede excluir série de outro usuário. */

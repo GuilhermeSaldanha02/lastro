@@ -7,13 +7,14 @@
 // primeiro item que falha (outbox.ts) — retry infinito não resolve erro
 // de validação, só o esconde.
 //
-// O sinal viaja como PREFIXO na mensagem do erro, não como subclasse: as
-// funções que lançam isto (src/lib/dados/treino.ts) rodam atrás de
-// "use server" e são chamadas via Server Function a partir do cliente
-// (outbox.ts, "use client") — o Next serializa o erro na travessia dessa
-// fronteira e reconstrói só um `Error` genérico do lado do cliente, sem
-// preservar a subclasse original. `instanceof` quebraria em silêncio.
-// A mensagem, essa, atravessa intacta.
+// O sinal é um PREFIXO na mensagem do erro, não uma subclasse, e é posto
+// NO CLIENTE (`src/lib/offline/sincronizar-pendentes.ts`), a partir do
+// valor que a Server Function devolve. Erro nenhum atravessa a fronteira
+// de "use server" com a informação de que precisamos: a subclasse vira
+// `Error` genérico, e no build de PRODUÇÃO nem a mensagem atravessa — o
+// Next troca por um `digest`. A versão anterior deste comentário dizia
+// que a mensagem atravessava intacta; valia só no `next dev`, e a fila
+// travava em produção (achado A1, QA, 2026-09-13).
 const PREFIXO = "[erro-permanente] ";
 
 /** Marca uma mensagem de erro como permanente (nunca vai se resolver com retry). */

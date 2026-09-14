@@ -2597,3 +2597,22 @@ Conferido no banco de produção em 2026-09-13: 5 contas de usuário e 2 de pers
 ### Os testes que mudam de lado pela segunda vez
 
 A `j9` tinha *"aluno em /personal/completar vê a porta da área de trabalho"* — escrito como comportamento correto no #239. Volta a ser redirecionamento para a Home. É o mesmo padrão da `j8` que afirmava a autopromoção como regra: **teste que descreve uma decisão errada protege a decisão errada**, e precisa ser invertido junto com ela.
+
+## 2026-09-13 (2) — Recusa do banco volta como valor, não como exceção
+
+**Pedido do dono:** corrigir primeiro os achados A1 e A2 do QA do caminho triste (`qa/relatorio-caminho-triste-2026-09-13.md`).
+
+**O defeito tinha duas metades.** (1) Os formulários de série validavam só "positivo" e "finito", e o banco recusa reps acima de 200 ou fracionado, peso acima de 1000 e RIR fracionado. A série aparecia registrada (D6 confirma na tela antes da rede), nunca subia e sumia ao recarregar; a edição para reps 999 mostrava 999 com o banco guardando o valor antigo. (2) A rede de segurança do OF-02 não funcionava em produção: o servidor lançava o erro com o prefixo `[erro-permanente]`, mas o build de produção do Next entrega ao cliente só um `digest`, sem a mensagem. A fila tratava a recusa como falha de rede e parava nela para sempre — e a série válida registrada depois também nunca sincronizava (OF-08, medido na run `34785642721`). No `next dev` a mensagem atravessa, por isso nem os testes de unidade nem o desenvolvimento local viram.
+
+### O que vale agora
+
+- **Os limites da tabela `serie` moram em `src/lib/dados/limites-serie.ts`** (`validarNumerosDaSerie`), e os dois formulários — registrar e editar — usam a mesma função. Mudou a constraint, muda ali.
+- **`criarSerieRemoto` e `atualizarSerieRemoto` devolvem `ResultadoGravacaoSerie`.** Recusa do banco (classes `22` e `23` do Postgres) volta como `{ ok: false, permanente: true, mensagem }`; falha transitória continua lançando. Valor de retorno atravessa a fronteira de "use server" intacto em qualquer build.
+- **Quem marca o erro como permanente é o cliente**, em `sincronizar-pendentes.ts`. `outbox.ts` não mudou.
+- **Regra para o resto do app:** lógica de cliente que decide algo pela MENSAGEM de um erro lançado numa Server Function funciona no dev e quebra em produção. Informação que o cliente precisa ler volta como valor.
+
+### O que NÃO foi feito, de propósito
+
+- **Peso em branco segue gravando 0 kg** (achado B1): é decisão separada do dono.
+- **Item descartado para `db.falhas` continua sem aviso na tela.** Com a validação na tela, nenhum caminho do app chega lá hoje; se chegar, é outro achado.
+- **Quem implementou não audita:** os casos da `j10` que ficam verdes com esta correção foram escritos ANTES dela, pelo QA, mas pelo mesmo agente. A confirmação independente fica para outra sessão.
