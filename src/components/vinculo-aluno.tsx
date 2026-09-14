@@ -6,6 +6,7 @@
 // tem botão nenhum nesta tela, por desenho — cadastrar o contato de alguém
 // não concede acesso a nada.
 import { useState } from "react";
+import { unstable_rethrow } from "next/navigation";
 import {
   aceitarConvitePersonal,
   revogarVinculoPersonal,
@@ -13,16 +14,21 @@ import {
 import { formatarTelefoneBrasil } from "@/lib/texto/whatsapp";
 import DicaInfo from "./dica-info";
 import type { VinculoDoAluno } from "@/lib/dados/personal";
+import type { Idioma } from "@/lib/dados/idioma";
+import { t } from "@/lib/texto/i18n";
+import { apresentarErroPersonal } from "@/lib/texto/erro-personal";
 
 export default function VinculoAluno({
   vinculo,
   telefoneAtual,
   codigoDoLink,
+  idioma,
 }: {
   vinculo: VinculoDoAluno | null;
   telefoneAtual: string | null;
   /** Código que veio no link do convite (`?codigo=`), já preenchido. */
   codigoDoLink: string;
+  idioma: Idioma;
 }) {
   const [codigo, setCodigo] = useState(codigoDoLink);
   const [telefone, setTelefone] = useState(
@@ -35,30 +41,39 @@ export default function VinculoAluno({
   async function aceitar() {
     setErro(null);
     setEnviando(true);
-    const resultado = await aceitarConvitePersonal(codigo, telefone);
-    setEnviando(false);
-    if (!resultado.ok) setErro(resultado.erro);
+    try {
+      const resultado = await aceitarConvitePersonal(codigo, telefone);
+      if (!resultado.ok) setErro(apresentarErroPersonal(resultado.erro, idioma));
+    } catch (falha) {
+      unstable_rethrow(falha);
+      setErro(apresentarErroPersonal("Não foi possível concluir a ação. Tente de novo.", idioma));
+    } finally {
+      setEnviando(false);
+    }
   }
 
   async function revogar() {
     setErro(null);
     setEnviando(true);
-    const resultado = await revogarVinculoPersonal();
-    setEnviando(false);
-    setConfirmandoRevogacao(false);
-    if (!resultado.ok) setErro(resultado.erro);
+    try {
+      const resultado = await revogarVinculoPersonal();
+      if (!resultado.ok) setErro(apresentarErroPersonal(resultado.erro, idioma));
+    } catch (falha) {
+      unstable_rethrow(falha);
+      setErro(apresentarErroPersonal("Não foi possível concluir a ação. Tente de novo.", idioma));
+    } finally {
+      setEnviando(false);
+      setConfirmandoRevogacao(false);
+    }
   }
 
   if (vinculo) {
     return (
       <section className="card-obsidian">
-        <span className="card-obsidian__titulo">Seu personal</span>
+        <span className="card-obsidian__titulo">{t("Seu personal", idioma)}</span>
         <p className="alerta-personal__titulo">{vinculo.nomeDoPersonal}</p>
         <p className="campo__nota">
-          Quem você autorizou vê seus treinos, suas séries e seu contato de
-          WhatsApp — só leitura. Não dá para registrar, editar nem apagar
-          nada no seu histórico. A prescrição da próxima semana passa a ser
-          responsabilidade do profissional.
+          {t("O personal pode ver seus treinos, séries e contato de WhatsApp, sem editar seu histórico.", idioma)}
         </p>
 
         {erro && (
@@ -70,9 +85,7 @@ export default function VinculoAluno({
         {confirmandoRevogacao ? (
           <div className="grupo__confirmacao">
             <p className="campo__nota">
-              Revogar corta o acesso na hora. Seu histórico continua inteiro,
-              e seu telefone continua sendo seu — o que acaba é a permissão
-              de ver.
+              {t("Encerrar acesso corta a leitura imediatamente. Seu histórico continua inteiro.", idioma)}
             </p>
             <button
               type="button"
@@ -80,7 +93,7 @@ export default function VinculoAluno({
               onClick={revogar}
               disabled={enviando}
             >
-              {enviando ? "Revogando…" : "Confirmar e revogar"}
+              {enviando ? t("Encerrando…", idioma) : t("Encerrar acesso", idioma)}
             </button>
             <button
               type="button"
@@ -88,7 +101,7 @@ export default function VinculoAluno({
               onClick={() => setConfirmandoRevogacao(false)}
               disabled={enviando}
             >
-              Manter o vínculo
+              {t("Manter acesso", idioma)}
             </button>
           </div>
         ) : (
@@ -97,7 +110,7 @@ export default function VinculoAluno({
             className="botao-textual-com-icone botao-textual-com-icone--destrutivo"
             onClick={() => setConfirmandoRevogacao(true)}
           >
-            Revogar o vínculo
+            {t("Encerrar acesso", idioma)}
           </button>
         )}
       </section>
@@ -107,16 +120,15 @@ export default function VinculoAluno({
   return (
     <section className="card-obsidian">
       <div className="titulo-com-dica">
-        <span className="card-obsidian__titulo">Vincular a um personal</span>
-        <DicaInfo titulo="Vincular a um personal">
-          Se um personal te passou um código, cole aqui. Nada acontece sem você
-          aceitar, e você pode revogar quando quiser.
+        <span className="card-obsidian__titulo">{t("Conectar-se a um personal", idioma)}</span>
+        <DicaInfo titulo={t("Conectar-se a um personal", idioma)} idioma={idioma}>
+          {t("Cole o código enviado pelo personal. Nada acontece sem seu aceite.", idioma)}
         </DicaInfo>
       </div>
 
       <div className="campo">
         <label className="campo__rotulo" htmlFor="codigo_convite">
-          Código do convite
+          {t("Código do convite", idioma)}
         </label>
         <input
           id="codigo_convite"
@@ -126,7 +138,7 @@ export default function VinculoAluno({
           autoComplete="off"
           spellCheck={false}
           maxLength={12}
-          placeholder="10 letras e números"
+          placeholder={t("10 letras e números", idioma)}
           value={codigo}
           onChange={(e) => setCodigo(e.target.value.toUpperCase())}
         />
@@ -135,12 +147,10 @@ export default function VinculoAluno({
       <div className="campo">
         <div className="campo__rotulo-linha">
           <label className="campo__rotulo" htmlFor="telefone_whatsapp">
-            Seu WhatsApp, com DDD
+            {t("Seu WhatsApp, com DDD", idioma)}
           </label>
-          <DicaInfo titulo="Seu WhatsApp">
-            É por aqui que o seu personal te chama ao ver algo no seu treino.
-            O lastro nunca manda mensagem sozinho — nem por você, nem pelo seu
-            personal.
+          <DicaInfo titulo={t("Seu WhatsApp", idioma)} idioma={idioma}>
+            {t("O personal usa este telefone para falar com você. O lastro não envia mensagens sozinho.", idioma)}
           </DicaInfo>
         </div>
         <input
@@ -166,7 +176,7 @@ export default function VinculoAluno({
         onClick={aceitar}
         disabled={enviando || codigo.trim() === "" || telefone.trim() === ""}
       >
-        {enviando ? "Aceitando…" : "Aceitar convite"}
+        {enviando ? t("Aceitando…", idioma) : t("Aceitar convite", idioma)}
       </button>
     </section>
   );

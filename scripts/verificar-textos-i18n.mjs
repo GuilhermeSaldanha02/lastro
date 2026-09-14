@@ -5,7 +5,11 @@ import ts from "typescript";
 
 import { PROPRIEDADES_NAO_VISIVEIS, TEXTOS_PERMITIDOS } from "./textos-i18n-permitidos.mjs";
 
-const MIGRADOS = [];
+const MIGRADOS = [
+  /src[\\/]app[\\/]personal[\\/]/,
+  /src[\\/]app[\\/]ajustes[\\/]personal[\\/]/,
+  /src[\\/]components[\\/](fila-personal|convites-personal|completar-cadastro-personal|vinculo-aluno|seletor-modo|escolha-tipo-conta|voltar-flutuante)\.tsx$/,
+];
 const DIRETORIOS = ["src/app", "src/components"];
 const EXTENSOES = new Set([".tsx", ".jsx"]);
 
@@ -105,8 +109,9 @@ export function encontrarTextosSemI18n(codigo, caminho) {
 }
 
 function executar() {
-  const arquivosMigrados = new Set(MIGRADOS.map((arquivo) => path.normalize(arquivo)));
-  const arquivos = DIRETORIOS.flatMap(listarArquivos).filter((arquivo) => arquivosMigrados.has(path.normalize(arquivo)));
+  const arquivos = DIRETORIOS.flatMap(listarArquivos).filter((arquivo) =>
+    MIGRADOS.some((migrado) => migrado.test(path.normalize(arquivo))),
+  );
   const achados = arquivos.flatMap((arquivo) => encontrarTextosSemI18n(fs.readFileSync(arquivo, "utf8"), arquivo));
 
   if (achados.length > 0) {

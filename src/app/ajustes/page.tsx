@@ -47,7 +47,7 @@ export default async function PaginaAjustes() {
                 o modo é da conta, como o nome. Direção A do gate de
                 2026-09-13. SÓ para quem nasceu personal (PRD §11, emenda
                 2026-09-13): usuário não vê cápsula nem aviso. */}
-            {perfil.tipoConta === "personal" && <SeletorModo modo={perfil.modo} />}
+            {perfil.tipoConta === "personal" && <SeletorModo modo={perfil.modo} idioma={idioma} />}
 
             <MetaSemanalForm metaInicial={perfil.metaTreinosSemana} idioma={idioma} />
 

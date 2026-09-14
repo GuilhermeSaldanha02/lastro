@@ -9,16 +9,33 @@
 import { useState } from "react";
 import { registrarAcionamentoAlerta } from "@/lib/dados/personal-acoes";
 import type { ItemDaFila } from "@/lib/dados/personal";
+import type { Idioma } from "@/lib/dados/idioma";
+import { t } from "@/lib/texto/i18n";
+import { apresentarErroPersonal } from "@/lib/texto/erro-personal";
 
-export default function FilaPersonal({ itens }: { itens: ItemDaFila[] }) {
+export default function FilaPersonal({ itens, idioma }: { itens: ItemDaFila[]; idioma: Idioma }) {
   // Marca otimista: o botão é um link de verdade (ver abaixo), então a
   // navegação já aconteceu quando a resposta do servidor chega.
   const [acionados, setAcionados] = useState<Set<string>>(
     new Set(itens.filter((i) => i.acionadoEm).map((i) => i.alertaId)),
   );
+  const [erro, setErro] = useState<string | null>(null);
+
+  function registrarAcionamento(alertaId: string) {
+    void registrarAcionamentoAlerta(alertaId)
+      .then((resultado) => {
+        if (!resultado.ok) setErro(apresentarErroPersonal(resultado.erro, idioma));
+      })
+      .catch(() => setErro(apresentarErroPersonal("Não foi possível registrar o acionamento.", idioma)));
+  }
 
   return (
     <div className="fila-personal">
+      {erro && (
+        <p className="aviso-erro" role="alert">
+          {erro}
+        </p>
+      )}
       {itens.map((item) => {
         const acionado = acionados.has(item.alertaId);
         return (
@@ -63,7 +80,7 @@ export default function FilaPersonal({ itens }: { itens: ItemDaFila[] }) {
                   rel="noopener noreferrer"
                   onClick={() => {
                     setAcionados((atual) => new Set(atual).add(item.alertaId));
-                    void registrarAcionamentoAlerta(item.alertaId);
+                    registrarAcionamento(item.alertaId);
                   }}
                 >
                   <svg
@@ -81,21 +98,19 @@ export default function FilaPersonal({ itens }: { itens: ItemDaFila[] }) {
                   </svg>
                   {/* Rótulo curto de propósito: o botão precisa caber numa
                       linha ao lado do ícone em 375px. */}
-                  <span>{acionado ? "Abrir de novo" : "Mandar no WhatsApp"}</span>
+                  <span>{acionado ? t("Abrir novamente", idioma) : t("Enviar pelo WhatsApp", idioma)}</span>
                 </a>
               ) : (
                 // Sem telefone não há ação de um clique, e a tela precisa
                 // dizer POR QUE em vez de mostrar um botão morto. O número
                 // é do aluno e só ele pode informar (§11.4.3).
                 <p className="alerta-personal__linha">
-                  Sem telefone no perfil de {item.aluno.nome.split(" ")[0]} — a
-                  mensagem pronta só aparece depois que o contato for
-                  informado, e só o aluno pode informar.
+                  {t("Sem telefone cadastrado", idioma)}: {item.aluno.nome.split(" ")[0]}.
                 </p>
               )}
               {acionado && (
                 <p className="alerta-personal__marca-acionado" aria-live="polite">
-                  Mensagem aberta
+                  {t("Mensagem aberta", idioma)}
                 </p>
               )}
             </div>

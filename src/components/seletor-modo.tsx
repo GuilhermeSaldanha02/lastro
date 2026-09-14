@@ -17,9 +17,13 @@
 // mora em Ajustes e não no cabeçalho: um chip no topo de toda tela estaria
 // a um toque errado da tela de registrar série.
 import { useState } from "react";
+import { unstable_rethrow } from "next/navigation";
 import { alternarModo } from "@/lib/dados/personal-acoes";
+import type { Idioma } from "@/lib/dados/idioma";
+import { t } from "@/lib/texto/i18n";
+import { apresentarErroPersonal } from "@/lib/texto/erro-personal";
 
-export default function SeletorModo({ modo }: { modo: "treino" | "trabalho" }) {
+export default function SeletorModo({ modo, idioma }: { modo: "treino" | "trabalho"; idioma: Idioma }) {
   const [trocando, setTrocando] = useState(false);
   const [erro, setErro] = useState<string | null>(null);
 
@@ -27,15 +31,21 @@ export default function SeletorModo({ modo }: { modo: "treino" | "trabalho" }) {
     if (novo === modo || trocando) return;
     setErro(null);
     setTrocando(true);
-    // Sucesso não volta: a ação redireciona para a casa do novo modo.
-    const resultado = await alternarModo(novo);
-    setTrocando(false);
-    if (resultado && !resultado.ok) setErro(resultado.erro);
+    try {
+      // Sucesso não volta: a ação redireciona para a casa do novo modo.
+      const resultado = await alternarModo(novo);
+      if (resultado && !resultado.ok) setErro(apresentarErroPersonal(resultado.erro, idioma));
+    } catch (falha) {
+      unstable_rethrow(falha);
+      setErro(apresentarErroPersonal("Não foi possível concluir a ação. Tente de novo.", idioma));
+    } finally {
+      setTrocando(false);
+    }
   }
 
   return (
-    <section aria-label="Modo do app">
-      <div className="seletor-conta" role="radiogroup" aria-label="Modo">
+    <section aria-label={t("Modo do app", idioma)}>
+      <div className="seletor-conta" role="radiogroup" aria-label={t("Modo", idioma)}>
         {(["treino", "trabalho"] as const).map((opcao) => (
           <button
             key={opcao}
@@ -46,15 +56,15 @@ export default function SeletorModo({ modo }: { modo: "treino" | "trabalho" }) {
             onClick={() => trocar(opcao)}
             disabled={trocando}
           >
-            {opcao === "treino" ? "TREINO" : "TRABALHO"}
+            {opcao === "treino" ? t("TREINO", idioma) : t("TRABALHO", idioma)}
           </button>
         ))}
       </div>
 
       <p className="seletor-conta__nota">
         {modo === "treino"
-          ? "Modo treino: Início, Treinos e Análise. Toque em TRABALHO para abrir a fila de alunos."
-          : "Modo trabalho: Fila e Alunos. Toque em TREINO para registrar seu próprio treino."}
+          ? t("Modo treino: Início, Treinos e Análise. Toque em TRABALHO para abrir a fila de alunos.", idioma)
+          : t("Modo trabalho: Fila e Alunos. Toque em TREINO para registrar seu próprio treino.", idioma)}
       </p>
 
       {erro && (

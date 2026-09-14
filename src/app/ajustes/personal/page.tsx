@@ -20,6 +20,7 @@ import VinculoAluno from "@/components/vinculo-aluno";
 import ConvitesPersonal from "@/components/convites-personal";
 import { obterPerfil } from "@/lib/dados/perfil";
 import { cascaDaBarra, exigirTipoEscolhido } from "@/lib/dados/casca";
+import { t } from "@/lib/texto/i18n";
 import {
   carregarVinculoDoAluno,
   listarAlunosVinculados,
@@ -41,6 +42,7 @@ export default async function PaginaPersonalAjustes({
 }) {
   const perfil = await obterPerfil();
   if (!perfil) redirect("/login");
+  const idioma = perfil.idioma ?? "pt-BR";
   exigirTipoEscolhido(perfil);
 
   // O lado exibido segue o MODO, não o tipo da conta (emenda 2026-09-12
@@ -68,7 +70,7 @@ export default async function PaginaPersonalAjustes({
 
   return (
     <main className="tela">
-      <CabecalhoPro titulo="Personal" destaque="Vínculo" perfil={perfil} />
+      <CabecalhoPro titulo={t("Personal", idioma)} destaque={t("Acesso do personal", idioma)} perfil={perfil} idioma={idioma} />
 
       <div className="corpo corpo--com-nav corpo--titulo-conteudo transicao-pilula">
         <div className="pilha">
@@ -83,12 +85,13 @@ export default async function PaginaPersonalAjustes({
           {ehPersonal ? (
             <>
               <Link href="/personal" className="botao-primario">
-                Abrir a fila da semana
+                {t("Abrir a fila da semana", idioma)}
               </Link>
               <ConvitesPersonal
                 convites={convites}
                 alunos={alunos}
                 origem={origem}
+                idioma={idioma}
               />
             </>
           ) : (
@@ -96,20 +99,18 @@ export default async function PaginaPersonalAjustes({
               vinculo={vinculo}
               telefoneAtual={telefone}
               codigoDoLink={codigo}
+              idioma={idioma}
             />
           )}
 
           <p className="campo__nota">
-            Nenhuma conta conversa com outra dentro do lastro. O vínculo dá ao
-            personal LEITURA dos seus treinos e do seu contato — nunca
-            permissão de escrever no seu histórico, e nunca um canal de
-            mensagem aqui dentro.
+            {t("Nenhuma conta conversa com outra dentro do lastro. O acesso do personal é somente leitura.", idioma)}
           </p>
         </div>
       </div>
 
-      <VoltarFlutuante href="/ajustes" rotulo="Ajustes" />
-      <AbaInferior ativa="ajustes" tipoConta={cascaDaBarra(perfil)} />
+      <VoltarFlutuante href="/ajustes" rotulo={t("Ajustes", idioma)} idioma={idioma} />
+      <AbaInferior ativa="ajustes" tipoConta={cascaDaBarra(perfil)} idioma={idioma} />
     </main>
   );
 }

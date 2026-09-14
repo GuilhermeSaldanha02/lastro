@@ -8,6 +8,7 @@
 // está cadastrado no lastro?". O código não revela nada sobre ninguém, e o
 // canal para entregá-lo — WhatsApp — é o que já existe (§11.7).
 import { useState } from "react";
+import { unstable_rethrow } from "next/navigation";
 import {
   apagarConvitePersonal,
   gerarConvitePersonal,
@@ -15,16 +16,21 @@ import {
 import { formatarTelefoneBrasil } from "@/lib/texto/whatsapp";
 import DicaInfo from "./dica-info";
 import type { AlunoVinculado, ConviteDoPersonal } from "@/lib/dados/personal";
+import type { Idioma } from "@/lib/dados/idioma";
+import { t } from "@/lib/texto/i18n";
+import { apresentarErroPersonal } from "@/lib/texto/erro-personal";
 
 export default function ConvitesPersonal({
   convites,
   alunos,
   origem,
+  idioma,
 }: {
   convites: ConviteDoPersonal[];
   alunos: AlunoVinculado[];
   /** Origem absoluta do app, para montar o link que o aluno abre. */
   origem: string;
+  idioma: Idioma;
 }) {
   const [erro, setErro] = useState<string | null>(null);
   const [ocupado, setOcupado] = useState(false);
@@ -33,17 +39,29 @@ export default function ConvitesPersonal({
   async function gerar() {
     setErro(null);
     setOcupado(true);
-    const resultado = await gerarConvitePersonal();
-    setOcupado(false);
-    if (!resultado.ok) setErro(resultado.erro);
+    try {
+      const resultado = await gerarConvitePersonal();
+      if (!resultado.ok) setErro(apresentarErroPersonal(resultado.erro, idioma));
+    } catch (falha) {
+      unstable_rethrow(falha);
+      setErro(apresentarErroPersonal("Não foi possível concluir a ação. Tente de novo.", idioma));
+    } finally {
+      setOcupado(false);
+    }
   }
 
   async function apagar(id: string) {
     setErro(null);
     setOcupado(true);
-    const resultado = await apagarConvitePersonal(id);
-    setOcupado(false);
-    if (!resultado.ok) setErro(resultado.erro);
+    try {
+      const resultado = await apagarConvitePersonal(id);
+      if (!resultado.ok) setErro(apresentarErroPersonal(resultado.erro, idioma));
+    } catch (falha) {
+      unstable_rethrow(falha);
+      setErro(apresentarErroPersonal("Não foi possível concluir a ação. Tente de novo.", idioma));
+    } finally {
+      setOcupado(false);
+    }
   }
 
   async function copiar(codigo: string) {
@@ -55,7 +73,7 @@ export default function ConvitesPersonal({
       // Navegador sem permissão de área de transferência é caso normal,
       // não erro: o código continua visível e selecionável na tela.
       setCopiado(null);
-      setErro("Não foi possível copiar. O código está aí para selecionar à mão.");
+      setErro(t("Não foi possível copiar. O código está disponível para selecionar manualmente.", idioma));
     }
   }
 
@@ -63,11 +81,9 @@ export default function ConvitesPersonal({
     <>
       <section className="card-obsidian">
         <div className="titulo-com-dica">
-          <span className="card-obsidian__titulo">Convidar um aluno</span>
-          <DicaInfo titulo="Convidar um aluno">
-            Gere um código e mande para o aluno. O aceite acontece no app do
-            aluno — só aí você passa a ver os treinos, e só até o vínculo ser
-            revogado por quem o aceitou.
+          <span className="card-obsidian__titulo">{t("Convidar aluno", idioma)}</span>
+          <DicaInfo titulo={t("Convidar aluno", idioma)} idioma={idioma}>
+            {t("Gere um código e envie ao aluno. O acesso só começa depois do aceite.", idioma)}
           </DicaInfo>
         </div>
 
@@ -83,7 +99,7 @@ export default function ConvitesPersonal({
           onClick={gerar}
           disabled={ocupado}
         >
-          {ocupado ? "Gerando…" : "Gerar código de convite"}
+          {ocupado ? t("Gerando…", idioma) : t("Gerar convite", idioma)}
         </button>
 
         {convites.length > 0 && (
@@ -97,7 +113,7 @@ export default function ConvitesPersonal({
                     className="botao-secundario"
                     onClick={() => copiar(convite.codigo)}
                   >
-                    {copiado === convite.codigo ? "Link copiado" : "Copiar link"}
+                    {copiado === convite.codigo ? t("Link copiado", idioma) : t("Copiar link", idioma)}
                   </button>
                   <button
                     type="button"
@@ -105,7 +121,7 @@ export default function ConvitesPersonal({
                     onClick={() => apagar(convite.id)}
                     disabled={ocupado}
                   >
-                    Apagar
+                    {t("Apagar", idioma)}
                   </button>
                 </div>
               </li>
@@ -118,11 +134,10 @@ export default function ConvitesPersonal({
         <section className="card-obsidian">
           <div className="titulo-com-dica">
             <span className="card-obsidian__titulo">
-              {alunos.length === 1 ? "1 aluno vinculado" : `${alunos.length} alunos vinculados`}
+              {alunos.length === 1 ? `1 ${t("aluno com acesso", idioma)}` : `${alunos.length} ${t("alunos com acesso", idioma)}`}
             </span>
-            <DicaInfo titulo="Alunos vinculados">
-              Quem encerra o vínculo é o aluno, na própria tela de Ajustes.
-              Você não tem esse botão de propósito.
+            <DicaInfo titulo={t("Alunos", idioma)} idioma={idioma}>
+              {t("O aluno controla o acesso na própria tela de Ajustes.", idioma)}
             </DicaInfo>
           </div>
           <ul className="lista">
@@ -134,7 +149,7 @@ export default function ConvitesPersonal({
                 <p className="campo__nota">
                   {aluno.telefoneWhatsApp
                     ? formatarTelefoneBrasil(aluno.telefoneWhatsApp)
-                    : "Sem telefone salvo — a mensagem pronta não aparece até o aluno informar."}
+                    : t("Sem telefone cadastrado", idioma)}
                 </p>
               </li>
             ))}

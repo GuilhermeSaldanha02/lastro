@@ -11,21 +11,23 @@ import { redirect } from "next/navigation";
 import CabecalhoPro from "@/components/cabecalho-pro";
 import EscolhaTipoConta from "@/components/escolha-tipo-conta";
 import { obterPerfil } from "@/lib/dados/perfil";
+import { t } from "@/lib/texto/i18n";
 
 export default async function PaginaBoasVindas() {
   const perfil = await obterPerfil();
   if (!perfil) redirect("/login");
+  const idioma = perfil.idioma ?? "pt-BR";
   // Já escolheu: a escolha não se refaz. A função do banco recusa também
   // (`tipo já escolhido`).
   if (perfil.tipoEscolhido) redirect(perfil.modo === "trabalho" ? "/personal" : "/");
 
   return (
     <main className="tela">
-      <CabecalhoPro titulo="Boas-vindas" destaque="Sua conta" perfil={perfil} />
+      <CabecalhoPro titulo={t("Boas-vindas", idioma)} destaque={t("Sua conta", idioma)} perfil={perfil} idioma={idioma} />
 
       <div className="corpo corpo--titulo-conteudo transicao-pilula">
         <div className="pilha">
-          <EscolhaTipoConta />
+          <EscolhaTipoConta idioma={idioma} />
         </div>
       </div>
     </main>

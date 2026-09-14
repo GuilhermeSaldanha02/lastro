@@ -9,11 +9,15 @@
 // libera com os dois válidos. A validação que vale é a do banco
 // (`escolher_tipo_conta`); esta é cortesia.
 import { useState } from "react";
+import { unstable_rethrow } from "next/navigation";
 import { escolherTipoConta } from "@/lib/dados/personal-acoes";
-import { crefValido, AVISO_CREF_NAO_VERIFICADO } from "@/lib/texto/cref";
+import { crefValido } from "@/lib/texto/cref";
 import DicaInfo from "./dica-info";
+import type { Idioma } from "@/lib/dados/idioma";
+import { t } from "@/lib/texto/i18n";
+import { apresentarErroPersonal } from "@/lib/texto/erro-personal";
 
-export default function EscolhaTipoConta() {
+export default function EscolhaTipoConta({ idioma }: { idioma: Idioma }) {
   const [tipo, setTipo] = useState<"aluno" | "personal">("aluno");
   const [cref, setCref] = useState("");
   const [telefone, setTelefone] = useState("");
@@ -23,10 +27,16 @@ export default function EscolhaTipoConta() {
   async function continuar() {
     setErro(null);
     setEnviando(true);
-    // Sucesso não volta: a ação redireciona para a casa da conta.
-    const resultado = await escolherTipoConta(tipo, cref, telefone);
-    setEnviando(false);
-    if (resultado && !resultado.ok) setErro(resultado.erro);
+    try {
+      // Sucesso não volta: a ação redireciona para a casa da conta.
+      const resultado = await escolherTipoConta(tipo, cref, telefone);
+      if (resultado && !resultado.ok) setErro(apresentarErroPersonal(resultado.erro, idioma));
+    } catch (falha) {
+      unstable_rethrow(falha);
+      setErro(apresentarErroPersonal("Não foi possível concluir a ação. Tente de novo.", idioma));
+    } finally {
+      setEnviando(false);
+    }
   }
 
   const personal = tipo === "personal";
@@ -35,12 +45,12 @@ export default function EscolhaTipoConta() {
 
   return (
     <section className="card-obsidian">
-      <span className="card-obsidian__titulo">Que conta é esta?</span>
+      <span className="card-obsidian__titulo">{t("Que conta é esta?", idioma)}</span>
       <p className="campo__nota">
-        A escolha é feita uma vez e não muda depois.
+        {t("A escolha é feita uma vez e não muda depois.", idioma)}
       </p>
 
-      <div className="seletor-conta" role="radiogroup" aria-label="Tipo de conta">
+      <div className="seletor-conta" role="radiogroup" aria-label={t("Tipo de conta", idioma)}>
         {(["aluno", "personal"] as const).map((opcao) => (
           <button
             key={opcao}
@@ -51,15 +61,15 @@ export default function EscolhaTipoConta() {
             onClick={() => setTipo(opcao)}
             disabled={enviando}
           >
-            {opcao === "aluno" ? "USUÁRIO" : "PERSONAL"}
+            {opcao === "aluno" ? t("USUÁRIO", idioma) : t("PERSONAL", idioma)}
           </button>
         ))}
       </div>
 
       <p className="seletor-conta__nota">
         {personal
-          ? "Abre na fila de alunos. Seu próprio treino fica na mesma conta, a um toque em Ajustes."
-          : "Registra seus treinos e recebe a análise semanal."}
+          ? t("Abre na fila de alunos. Seu próprio treino fica na mesma conta, a um toque em Ajustes.", idioma)
+          : t("Registra seus treinos e recebe a análise semanal.", idioma)}
       </p>
 
       {personal && (
@@ -69,7 +79,9 @@ export default function EscolhaTipoConta() {
               <label className="campo__rotulo" htmlFor="cref_escolha">
                 CREF
               </label>
-              <DicaInfo titulo="CREF">{AVISO_CREF_NAO_VERIFICADO}</DicaInfo>
+              <DicaInfo titulo="CREF" idioma={idioma}>
+                {t("Informado pelo profissional. O lastro não verifica registro no CONFEF.", idioma)}
+              </DicaInfo>
             </div>
             <input
               id="cref_escolha"
@@ -77,21 +89,20 @@ export default function EscolhaTipoConta() {
               autoCapitalize="characters"
               autoComplete="off"
               spellCheck={false}
-              placeholder="123456-G/PB"
+              placeholder={t("123456-G/PB", idioma)}
               value={cref}
               onChange={(e) => setCref(e.target.value.toUpperCase())}
             />
             {crefIncompleto && (
               <p className="campo__nota campo__nota--alerta" role="status">
-                Formato esperado: 123456-G/PB — seis dígitos, categoria G ou
-                P, e a UF.
+                {t("Formato esperado: 123456-G/PB — seis dígitos, categoria G ou P e a UF.", idioma)}
               </p>
             )}
           </div>
 
           <div className="campo">
             <label className="campo__rotulo" htmlFor="telefone_escolha">
-              Seu WhatsApp, com DDD
+              {t("Seu WhatsApp, com DDD", idioma)}
             </label>
             <input
               id="telefone_escolha"
@@ -113,7 +124,7 @@ export default function EscolhaTipoConta() {
       )}
 
       <button type="button" className="botao-primario" onClick={continuar} disabled={bloqueado}>
-        {enviando ? "Salvando…" : "Continuar"}
+        {enviando ? t("Salvando…", idioma) : t("Continuar", idioma)}
       </button>
     </section>
   );
