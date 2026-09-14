@@ -3,11 +3,11 @@
 // lastro · SDD.md §9.3 — quando existe pelo menos um modelo salvo, o botão
 // de 1 toque abre um passo intermediário (Treino novo vs. modelo). Sem
 // modelo nenhum, quem renderiza este componente nem chega a existir — a
-// página usa o <form action={criarTreino}> direto, comportamento idêntico
-// ao de sempre (§9.3, "caso que domina numericamente enquanto a feature é
+// página usa o `FormIniciarTreino` direto, comportamento idêntico ao de
+// sempre (§9.3, "caso que domina numericamente enquanto a feature é
 // nova").
 import { useState } from "react";
-import { criarTreino, criarTreinoComModelo } from "@/lib/dados/treino";
+import FormIniciarTreino from "./form-iniciar-treino";
 import type { Modelo } from "@/lib/dados/modelo-treino";
 import { t } from "@/lib/texto/i18n";
 import type { Idioma } from "@/lib/dados/idioma";
@@ -40,19 +40,15 @@ export default function IniciarTreino({ modelos, idioma }: { modelos: Modelo[]; 
           treino de hoje", só que ramificada — mesmo peso, mesma cor. */}
       <ul className="perguntas">
         <li>
-          <form action={criarTreino}>
-            <button type="submit" className="botao-primario">
-              {t("Treino novo", idioma)}
-            </button>
-          </form>
+          <FormIniciarTreino idioma={idioma} classeBotao="botao-primario">
+            {t("Treino novo", idioma)}
+          </FormIniciarTreino>
         </li>
         {modelos.map((modelo) => (
           <li key={modelo.id}>
-            <form action={criarTreinoComModelo.bind(null, modelo.id)}>
-              <button type="submit" className="botao-primario">
-                {modelo.nome}
-              </button>
-            </form>
+            <FormIniciarTreino modeloId={modelo.id} idioma={idioma} classeBotao="botao-primario">
+              {modelo.nome}
+            </FormIniciarTreino>
           </li>
         ))}
       </ul>

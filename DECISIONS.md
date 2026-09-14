@@ -2616,3 +2616,22 @@ A `j9` tinha *"aluno em /personal/completar vê a porta da área de trabalho"* �
 - **Peso em branco segue gravando 0 kg** (achado B1): é decisão separada do dono.
 - **Item descartado para `db.falhas` continua sem aviso na tela.** Com a validação na tela, nenhum caminho do app chega lá hoje; se chegar, é outro achado.
 - **Quem implementou não audita:** os casos da `j10` que ficam verdes com esta correção foram escritos ANTES dela, pelo QA, mas pelo mesmo agente. A confirmação independente fica para outra sessão.
+
+## 2026-09-13 (3) — Botão que chama o servidor não pode derrubar a tela nem gravar duas vezes
+
+**Pedido do dono:** corrigir os achados M2 e M3 do QA do caminho triste, depois de A1 e A2.
+
+**M2 — duplo clique em "Registrar série" gravava duas séries.** O `aoEnviar` do formulário não tinha trava: o segundo submit entrava antes de o primeiro limpar o formulário, e cada um enfileirava uma série com `id` próprio. Agora uma ref barra o toque que chega no mesmo quadro, e o botão fica desabilitado até a série estar na fila.
+
+**M3 — "Iniciar treino de hoje" sem rede trocava a tela inteira pela página de erro do Next**, em inglês. O botão era `<form action={criarTreino}>` direto: a falha de rede da Server Function subia sem ninguém para pegar. Agora os três pontos que criam treino (Home, `/treino` e o passo "Como começar?" com modelo) usam `FormIniciarTreino`: sem rede, mostra um aviso e não chama o servidor; com rede que falha, pega o erro e mostra o aviso; o `redirect()` segue para o Next por `unstable_rethrow`.
+
+### O que vale agora
+
+- **Botão que chama Server Function por `<form action>` direto não é mais aceito em tela de uso no treino.** A falha de rede tem de virar aviso, não página de erro.
+- **Criar treino continua exigindo rede.** A fila offline cobre séries, não treino; mudar isso é outra decisão.
+- **Trava de duplo toque é ref + estado**, não só estado: dois toques no mesmo quadro chegam antes de o React desabilitar o botão.
+
+### O que NÃO foi feito, de propósito
+
+- "Repetir série" não ganhou trava: o caso de dois toques passou nas duas rodadas do QA.
+- **Quem implementou não audita:** os casos da `j10` que ficam verdes foram escritos antes, pelo mesmo agente. `QA.md` mantém TR-08 e OF-05 como REPROVOU até confirmação independente.

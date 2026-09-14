@@ -4,7 +4,6 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { criarClienteServidor } from "@/lib/supabase/cliente-servidor";
 import { carregarResumoHome } from "@/lib/dados/resumo-home";
-import { criarTreino } from "@/lib/dados/treino";
 import { obterPerfil } from "@/lib/dados/perfil";
 import { cascaDaBarra, exigirCascaDeAluno } from "@/lib/dados/casca";
 import { listarModelos } from "@/lib/dados/modelo-treino";
@@ -12,6 +11,7 @@ import { dataLocalBrasil, formatarDataCurta } from "@/lib/tempo";
 import AbaInferior from "@/components/aba-inferior";
 import Avatar from "@/components/avatar";
 import IniciarTreino from "@/components/iniciar-treino";
+import FormIniciarTreino from "@/components/form-iniciar-treino";
 import SetaNavegacao from "@/components/seta-navegacao";
 import RastreadorDisciplina from "@/components/rastreador-disciplina";
 import SeletorMetricasHome from "@/components/seletor-metricas-home";
@@ -125,14 +125,16 @@ export default async function PaginaInicial() {
           ) : modelos.length > 0 ? (
             <IniciarTreino modelos={modelos} idioma={idioma} />
           ) : (
-            <form action={criarTreino} style={{ width: "100%" }}>
-              <button type="submit" className="botao-primario botao-primario--heroi">
-                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                  <polygon points="5 3 19 12 5 21 5 3"></polygon>
-                </svg>
-                {t("Iniciar Treino de Hoje", idioma)}
-              </button>
-            </form>
+            <FormIniciarTreino
+              idioma={idioma}
+              classeBotao="botao-primario botao-primario--heroi"
+              estilo={{ width: "100%" }}
+            >
+              <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <polygon points="5 3 19 12 5 21 5 3"></polygon>
+              </svg>
+              {t("Iniciar Treino de Hoje", idioma)}
+            </FormIniciarTreino>
           )}
         </section>
 

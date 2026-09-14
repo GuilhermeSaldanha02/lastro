@@ -6,7 +6,7 @@
 // Modo Bancada (DESIGN.md §3.5): poucos elementos, grandes. A ação
 // primária fica na metade inferior, ao alcance do polegar (D2).
 import Link from "next/link";
-import { listarTreinos, criarTreino } from "@/lib/dados/treino";
+import { listarTreinos } from "@/lib/dados/treino";
 import { obterPerfil } from "@/lib/dados/perfil";
 import { cascaDaBarra, exigirCascaDeAluno } from "@/lib/dados/casca";
 import { listarModelos } from "@/lib/dados/modelo-treino";
@@ -14,6 +14,7 @@ import { dataLocalBrasil } from "@/lib/tempo";
 import AbaInferior from "@/components/aba-inferior";
 import ListaTreinos from "@/components/lista-treinos";
 import IniciarTreino from "@/components/iniciar-treino";
+import FormIniciarTreino from "@/components/form-iniciar-treino";
 import CabecalhoPro from "@/components/cabecalho-pro";
 import { t } from "@/lib/texto/i18n";
 import type { Idioma } from "@/lib/dados/idioma";
@@ -71,12 +72,10 @@ export default async function PaginaTreino() {
           ) : modelos.length > 0 ? (
             <IniciarTreino modelos={modelos} idioma={idioma} />
           ) : (
-            <form action={criarTreino}>
-              <button type="submit" className="botao-primario botao-primario--heroi">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-                {t("Iniciar treino de hoje", idioma)}
-              </button>
-            </form>
+            <FormIniciarTreino idioma={idioma} classeBotao="botao-primario botao-primario--heroi">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+              {t("Iniciar treino de hoje", idioma)}
+            </FormIniciarTreino>
           )}
         </section>
 
