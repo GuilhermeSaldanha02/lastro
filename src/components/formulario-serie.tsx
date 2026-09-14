@@ -19,7 +19,7 @@ import { useEffect, useRef, useState, type FormEvent } from "react";
 import type { Exercicio, SerieHistorica } from "@/lib/dados/treino";
 import { historicoDoExercicio } from "@/lib/dados/treino";
 import { ehRecorde } from "@/lib/analise/recorde-serie";
-import { RIR_MINIMO, RIR_MAXIMO } from "@/lib/dados/limites-serie";
+import { RIR_MINIMO, RIR_MAXIMO, validarNumerosDaSerie } from "@/lib/dados/limites-serie";
 import { t } from "@/lib/texto/i18n";
 import type { Idioma } from "@/lib/dados/idioma";
 
@@ -124,9 +124,6 @@ export default function FormularioSerie({
 
     const formulario = evento.currentTarget;
     const formData = new FormData(formulario);
-    const reps = Number(formData.get("reps"));
-    const peso = Number(formData.get("peso"));
-    const rirBruto = formData.get("rir");
 
     if (!exercicioId) {
       setErro(t("Exercício é obrigatório.", idioma));
@@ -136,31 +133,20 @@ export default function FormularioSerie({
       setErro(t("Escolha o tipo: aquecimento ou valendo.", idioma));
       return;
     }
-    if (!Number.isFinite(reps) || reps <= 0) {
-      setErro(t("Reps precisa ser um número positivo.", idioma));
-      return;
-    }
-    if (!Number.isFinite(peso) || peso < 0) {
-      setErro(t("Peso precisa ser um número válido.", idioma));
-      return;
-    }
 
-    // RIR é campo de série valendo (SDD §3.2, constraint serie_rir_so_valendo).
-    // Ausência é `null`, nunca `0` — RIR 0 é valor válido e diferente de
-    // ausente (KNOWLEDGE.md §1). Aquecimento nunca carrega RIR.
-    let rir: number | null = null;
-    if (tipo === "valendo" && rirBruto !== null && rirBruto !== "") {
-      const rirNumero = Number(rirBruto);
-      if (!Number.isFinite(rirNumero)) {
-        setErro(t("RIR precisa ser um número válido.", idioma));
-        return;
-      }
-      if (rirNumero < RIR_MINIMO || rirNumero > RIR_MAXIMO) {
-        setErro(t("RIR precisa estar entre 0 e 10.", idioma));
-        return;
-      }
-      rir = rirNumero;
+    // Os mesmos limites da tabela `serie` (achados A1/OF-08, 2026-09-13):
+    // o que passar daqui aparece registrado antes de a rede confirmar.
+    const numeros = validarNumerosDaSerie({
+      tipo,
+      reps: formData.get("reps"),
+      peso: formData.get("peso"),
+      rir: formData.get("rir"),
+    });
+    if (!numeros.ok) {
+      setErro(t(numeros.erro, idioma));
+      return;
     }
+    const { reps, peso, rir } = numeros;
 
     // PR só existe pra série valendo (FF4) e só compara contra séries
     // elegíveis a e1RM do próprio exercício (backlog C4).

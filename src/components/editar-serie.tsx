@@ -7,7 +7,7 @@
 // nem mostra o seletor de exercício: só o que pode mudar.
 import { useState, type FormEvent } from "react";
 import type { Serie } from "@/lib/dados/treino";
-import { RIR_MINIMO, RIR_MAXIMO } from "@/lib/dados/limites-serie";
+import { RIR_MINIMO, RIR_MAXIMO, validarNumerosDaSerie } from "@/lib/dados/limites-serie";
 import { t } from "@/lib/texto/i18n";
 import type { Idioma } from "@/lib/dados/idioma";
 
@@ -40,32 +40,20 @@ export default function EditarSerie({
     setErro(null);
 
     const formData = new FormData(evento.currentTarget);
-    const reps = Number(formData.get("reps"));
-    const peso = Number(formData.get("peso"));
-    const rirBruto = formData.get("rir");
 
-    if (!Number.isFinite(reps) || reps <= 0) {
-      setErro(t("Reps precisa ser um número positivo.", idioma));
+    // Os mesmos limites do registro (achado A2, 2026-09-13): sem isto,
+    // editar para reps 999 mostrava 999 e o banco guardava o valor antigo.
+    const numeros = validarNumerosDaSerie({
+      tipo,
+      reps: formData.get("reps"),
+      peso: formData.get("peso"),
+      rir: formData.get("rir"),
+    });
+    if (!numeros.ok) {
+      setErro(t(numeros.erro, idioma));
       return;
     }
-    if (!Number.isFinite(peso) || peso < 0) {
-      setErro(t("Peso precisa ser um número válido.", idioma));
-      return;
-    }
-
-    let rir: number | null = null;
-    if (tipo === "valendo" && rirBruto !== null && rirBruto !== "") {
-      const rirNumero = Number(rirBruto);
-      if (!Number.isFinite(rirNumero)) {
-        setErro(t("RIR precisa ser um número válido.", idioma));
-        return;
-      }
-      if (rirNumero < RIR_MINIMO || rirNumero > RIR_MAXIMO) {
-        setErro(t("RIR precisa estar entre 0 e 10.", idioma));
-        return;
-      }
-      rir = rirNumero;
-    }
+    const { reps, peso, rir } = numeros;
 
     setSalvando(true);
     try {

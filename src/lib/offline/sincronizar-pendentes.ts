@@ -26,6 +26,11 @@
 // resultado da que já está em andamento. Isso é o que torna a função
 // genuinamente idempotente sob chamada concorrente (antes só era
 // idempotente em sequência, nunca em paralelo).
+//
+// Achado A1 (QA, 2026-09-13): o erro permanente é marcado AQUI, no
+// cliente, a partir do valor que a Server Function devolve — não mais
+// lançado do servidor com o prefixo, que o build de produção apagava (ver
+// `ResultadoGravacaoSerie` em `src/lib/dados/treino.ts`).
 import {
   atualizarSerieRemoto,
   criarSerieRemoto,
@@ -33,8 +38,15 @@ import {
   excluirTreinoRemoto,
   type AtualizacaoSerieInput,
   type NovaSerieInput,
+  type ResultadoGravacaoSerie,
 } from "@/lib/dados/treino";
+import { marcarComoPermanente } from "./erro-permanente";
 import { sincronizar, type ResultadoSincronizacao } from "./outbox";
+
+/** Recusa do banco vira erro permanente: a fila tira o item e segue. */
+function exigirGravado(resultado: ResultadoGravacaoSerie): void {
+  if (!resultado.ok) throw new Error(marcarComoPermanente(resultado.mensagem));
+}
 
 let emAndamento: Promise<ResultadoSincronizacao> | null = null;
 
@@ -52,10 +64,10 @@ async function executarSincronizacao(): Promise<ResultadoSincronizacao> {
     // fila nunca recebe "criar_treino" até essa próxima etapa existir.
     criar_treino: async () => {},
     criar_serie: async (payload) => {
-      await criarSerieRemoto(payload as unknown as NovaSerieInput);
+      exigirGravado(await criarSerieRemoto(payload as unknown as NovaSerieInput));
     },
     atualizar_serie: async (payload) => {
-      await atualizarSerieRemoto(payload as unknown as AtualizacaoSerieInput);
+      exigirGravado(await atualizarSerieRemoto(payload as unknown as AtualizacaoSerieInput));
     },
     excluir_serie: async (payload) => {
       await excluirSerieRemoto((payload as { id: string }).id);
