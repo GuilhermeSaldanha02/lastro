@@ -12,6 +12,7 @@ import { describe, expect, it, vi } from "vitest";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import {
   TETO_DIARIO,
+  consumirUso,
   contarUsoHoje,
   registrarUso,
   tetoAtingido,
@@ -109,6 +110,44 @@ describe("registrarUso", () => {
     vi.spyOn(console, "error").mockImplementation(() => {});
     const { cliente } = supabaseFalso({ error: { message: "sem rede" } });
     await expect(registrarUso(cliente, "u1", "coach")).resolves.toBeUndefined();
+  });
+});
+
+/** Supabase falso só com `.rpc()`, guardando o que foi pedido. */
+function supabaseComRpc(resposta: { data?: unknown; error?: { message: string } | null }) {
+  const chamadas: { nome: string; args: unknown }[] = [];
+  const cliente = {
+    rpc(nome: string, args: unknown) {
+      chamadas.push({ nome, args });
+      return Promise.resolve({ data: resposta.data ?? null, error: resposta.error ?? null });
+    },
+  };
+  return { cliente: cliente as unknown as SupabaseClient, chamadas };
+}
+
+describe("consumirUso (reserva atômica, migração 0028)", () => {
+  it("pede ao banco a vaga com o teto da origem", async () => {
+    const { cliente, chamadas } = supabaseComRpc({ data: true });
+    await consumirUso(cliente, "coach");
+    expect(chamadas).toEqual([
+      { nome: "consumir_uso_ia", args: { p_origem: "coach", p_teto: TETO_DIARIO.coach } },
+    ]);
+  });
+
+  it("devolve true quando o banco reservou a vaga", async () => {
+    const { cliente } = supabaseComRpc({ data: true });
+    expect(await consumirUso(cliente, "coach")).toBe(true);
+  });
+
+  it("devolve false quando o banco diz que o teto foi atingido", async () => {
+    const { cliente } = supabaseComRpc({ data: false });
+    expect(await consumirUso(cliente, "coach")).toBe(false);
+  });
+
+  it("DEIXA PASSAR quando a chamada ao banco falha", async () => {
+    vi.spyOn(console, "error").mockImplementation(() => {});
+    const { cliente } = supabaseComRpc({ error: { message: "sem rede" } });
+    expect(await consumirUso(cliente, "coach")).toBe(true);
   });
 });
 

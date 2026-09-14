@@ -2761,3 +2761,21 @@ A `j9` tinha *"aluno em /personal/completar vê a porta da área de trabalho"* �
 ### Achado novo, fora deste pedido
 
 - **O coach tem a mesma corrida do M5 com a cota.** CI do #251 (run `34797779114`), nas duas tentativas: três pedidos simultâneos com 9 usos terminaram com 12 usos (teto 10), status 502, 502, 502. A rota checa o teto e registra o uso sem atomicidade. O `QA.md` registra AN-05 ("pedidos simultâneos ao coach não furam o teto de 10") como PASSOU — passou por tempo, não por garantia. **Não corrigido: decisão do dono.**
+
+## 2026-09-13 (11) — A cota do coach é reservada numa transação só
+
+**Pedido do dono:** "corrija o coach concorrente agora". O achado veio do CI do #251 (run `34797779114`, nas duas tentativas): três pedidos simultâneos ao coach numa conta com 9 usos terminaram com 12 usos, acima do teto de 10.
+
+**A causa.** `POST /api/coach` fazia `tetoAtingido` (conta os usos de hoje), lia o vínculo e só então `registrarUso`. Contar e gravar eram duas idas ao banco sem nada entre elas, e os três pedidos contavam "9" ao mesmo tempo. É a mesma corrida do M5, mas um índice único não serve: aqui cabem até 10 linhas por dia.
+
+**A correção.** Migração `0028_consumir_uso_ia`, **aplicada em produção pelo MCP do Supabase**: a função `consumir_uso_ia(p_origem, p_teto)` trava a conta e a origem com `pg_advisory_xact_lock`, conta os usos desde a meia-noite de Brasília e só grava se houver vaga, devolvendo `true`/`false`. `security invoker` (a RLS de `uso_ia` continua valendo), `search_path` fixo, execução revogada de `anon` e concedida a `authenticated` — conferido em `pg_proc` depois de aplicar. No app, `consumirUso` chama a função, e a rota do coach lê o vínculo e depois reserva: sem vaga, 429 sem nada gravado.
+
+### O que vale agora
+
+- **Teto de cota se reserva com `consumirUso`, não com `tetoAtingido` seguido de `registrarUso`.** O par antigo segue exportado porque a Análise ainda o usa: lá o índice único da 0027 já impede duas gerações simultâneas da mesma conta, então a corrida não se forma.
+- **Falha ao chamar a função deixa passar**, mesma regra de produto de `tetoAtingido`; o uso fica sem registro nesse caso.
+
+### O que NÃO foi feito, de propósito
+
+- **A Análise não migrou para `consumirUso`**: coberta pelo índice da 0027. Trocar agora seria mudança sem defeito medido.
+- **`QA.md` AN-05** ("pedidos simultâneos ao coach não furam o teto de 10") segue como estava; o registro precisa ir para REPROVOU com a evidência do #251 e depois ser reauditado. Fica para a auditoria independente.

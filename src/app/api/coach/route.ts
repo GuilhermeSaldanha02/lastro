@@ -18,7 +18,7 @@ import {
   LIMITE_PERGUNTA,
 } from "./prompt";
 import { detalheParaLog, respostaDeFalha } from "./falha";
-import { registrarUso, tetoAtingido, TETO_DIARIO } from "@/lib/dados/uso-ia";
+import { consumirUso, TETO_DIARIO } from "@/lib/dados/uso-ia";
 
 export async function POST(request: Request) {
   const supabase = await criarClienteServidor();
@@ -45,18 +45,7 @@ export async function POST(request: Request) {
     );
   }
 
-  // Teto diário (migration 0020). O Coach dividia a cota de 20/dia com a
-  // Análise Semanal e não tinha teto nenhum — só limitava o TAMANHO da
-  // pergunta. Uma conversa longa esvaziava a cota e jogava a peça-assinatura
-  // no fallback; a assimetria foi criada quando o parecer ganhou teto e o
-  // chat não (DECISIONS 2026-09-05).
-  if (await tetoAtingido(supabase, user.id, "coach")) {
-    return NextResponse.json(
-      { erro: "limite_diario", limite: TETO_DIARIO.coach },
-      { status: 429 },
-    );
-  }
-  // Vínculo (PRD §11.4.1) ANTES de registrar uso: se esta leitura falhar, a
+  // Vínculo (PRD §11.4.1) ANTES de reservar a cota: se esta leitura falhar, a
   // requisição morre sem gastar cota. O prompt muda sob vínculo — ver a
   // explicação em `./prompt.ts`.
   //
@@ -75,9 +64,22 @@ export async function POST(request: Request) {
     );
   }
 
-  // Antes da chamada: a cota do Google é consumida pela TENTATIVA, mesmo
-  // quando ela volta 503.
-  await registrarUso(supabase, user.id, "coach");
+  // Teto diário (migration 0020). O Coach dividia a cota de 20/dia com a
+  // Análise Semanal e não tinha teto nenhum — só limitava o TAMANHO da
+  // pergunta. Uma conversa longa esvaziava a cota e jogava a peça-assinatura
+  // no fallback (DECISIONS 2026-09-05).
+  //
+  // Reserva ATÔMICA (migração 0028): contar e gravar acontecem numa só
+  // transação no banco. Antes eram `tetoAtingido` e depois `registrarUso`,
+  // e três pedidos simultâneos com 9 usos passavam os três (12 usos, CI do
+  // #251). Antes da chamada, de propósito: a cota do Google é consumida pela
+  // TENTATIVA, mesmo quando ela volta 503.
+  if (!(await consumirUso(supabase, "coach"))) {
+    return NextResponse.json(
+      { erro: "limite_diario", limite: TETO_DIARIO.coach },
+      { status: 429 },
+    );
+  }
 
   try {
     const cliente = new ClienteParecerGemini();
