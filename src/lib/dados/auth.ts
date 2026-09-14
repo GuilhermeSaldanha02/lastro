@@ -8,6 +8,7 @@ import { redirect } from "next/navigation";
 import { criarClienteServidor } from "@/lib/supabase/cliente-servidor";
 import { normalizarTelefoneWhatsApp } from "@/lib/texto/whatsapp";
 import { crefValido, normalizarCref } from "@/lib/texto/cref";
+import { validarSenhaNova } from "@/lib/texto/senha";
 
 /** PRD §11, emenda de 2026-09-11: a escolha acontece no cadastro, não no uso. */
 export type TipoConta = "aluno" | "personal";
@@ -45,6 +46,15 @@ export async function criarContaComEmail(
   crefBruto = "",
 ): Promise<ResultadoAuth> {
   const supabase = await criarClienteServidor();
+
+  // Senha forte no cadastro (pedido do dono, 2026-09-14). A proteção contra
+  // senha vazada do Supabase só existe no plano Pro, e este projeto está no
+  // gratuito — a régua do app é a única defesa. A tela checa antes de
+  // enviar; esta repetição é o que vale contra quem chama a função direto.
+  const senhaValida = validarSenhaNova(senha);
+  if (!senhaValida.ok) {
+    return { ok: false, erro: senhaValida.erro };
+  }
 
   // Contato obrigatório no cadastro — decisão do dono em 2026-09-11. Vale
   // para quem treina sozinho também: o número é dado do próprio usuário,
