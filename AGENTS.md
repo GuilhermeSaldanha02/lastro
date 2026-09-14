@@ -228,4 +228,3 @@ Os prints das varreduras saem como artefato `varredura-telas` do run. Cuidado co
 - **Em produção, erro lançado numa server action chega ao cliente sem a mensagem**, só com `digest`. Lógica de cliente que decide algo por `error.message` funciona no `next dev` e falha no build. Informação que o cliente precisa ler volta como **valor de retorno**, não como exceção.
 
 - **Erro de tela se lê por `.aviso-erro`, nunca por `getByRole("alert")`** — o Next injeta `#__next-route-announcer__` com `role="alert"` em toda página.
-
