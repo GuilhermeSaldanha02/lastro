@@ -14,6 +14,64 @@
 import type { Idioma } from "@/lib/dados/idioma";
 
 const DICIONARIO: Record<string, { en: string; es: string }> = {
+  // --- app/login/page.tsx ---
+  "Entrar no Lastro": { en: "Sign in to Lastro", es: "Iniciar sesión en Lastro" },
+  "Criar minha conta": { en: "Create my account", es: "Crear mi cuenta" },
+  "Entrar com Google": { en: "Continue with Google", es: "Continuar con Google" },
+  "Não tem uma conta? Cadastre-se": { en: "Don't have an account? Sign up", es: "¿No tienes una cuenta? Regístrate" },
+  "Já tem conta? Fazer login": { en: "Already have an account? Sign in", es: "¿Ya tienes una cuenta? Inicia sesión" },
+  "Conta criada — confirme seu e-mail antes de entrar.": {
+    en: "Account created — confirm your email before signing in.",
+    es: "Cuenta creada — confirma tu correo electrónico antes de iniciar sesión.",
+  },
+  "Não foi possível concluir o login com o Google. Tente de novo.": {
+    en: "Couldn't complete Google sign-in. Try again.",
+    es: "No se pudo completar el inicio de sesión con Google. Inténtalo de nuevo.",
+  },
+  "O Google não retornou a autorização. Tente de novo.": {
+    en: "Google did not return authorization. Try again.",
+    es: "Google no devolvió la autorización. Inténtalo de nuevo.",
+  },
+  "Falha na autenticação. Tente de novo.": {
+    en: "Authentication failed. Try again.",
+    es: "Falló la autenticación. Inténtalo de nuevo.",
+  },
+  "Falha na autenticação.": { en: "Authentication failed.", es: "Falló la autenticación." },
+  "Nome": { en: "Name", es: "Nombre" },
+  "Seu nome": { en: "Your name", es: "Tu nombre" },
+  "WhatsApp, com DDD": { en: "WhatsApp, with area code", es: "WhatsApp, con código de área" },
+  "Como está na sua carteira. O Lastro guarda o número e não verifica registro no CONFEF — ele aparece como informado por você.": {
+    en: "As shown on your card. Lastro stores the number and does not verify registration with CONFEF — it appears as information you provided.",
+    es: "Tal como aparece en tu credencial. Lastro guarda el número y no verifica el registro ante CONFEF — aparece como informado por ti.",
+  },
+  "E-mail": { en: "Email", es: "Correo electrónico" },
+  "Senha": { en: "Password", es: "Contraseña" },
+  "Entrando…": { en: "Signing in…", es: "Iniciando sesión…" },
+  "ou": { en: "or", es: "o" },
+  "Atleta": { en: "Athlete", es: "Atleta" },
+  "Assistente de IA": { en: "AI Assistant", es: "Asistente de IA" },
+  "Relatórios e adesivos": { en: "Reports and stickers", es: "Informes y adhesivos" },
+  "Exportar imagem de treino para redes sociais": {
+    en: "Export a workout image for social media",
+    es: "Exportar una imagen de entrenamiento para redes sociales",
+  },
+  "Histórico e redes sociais": { en: "History and social media", es: "Historial y redes sociales" },
+  "Selecione qualquer treino passado para visualizar as estatísticas e exportar o adesivo oficial transparente (1080×1080) para redes sociais.": {
+    en: "Select any past workout to view the stats and export the official transparent sticker (1080×1080) for social media.",
+    es: "Selecciona cualquier entrenamiento pasado para ver las estadísticas y exportar el adhesivo oficial transparente (1080×1080) para redes sociales.",
+  },
+  "Assim que você concluir sua primeira sessão de treino, ela aparecerá aqui com métricas completas e opções de adesivo.": {
+    en: "Once you finish your first workout, it will appear here with complete metrics and sticker options.",
+    es: "Cuando completes tu primera sesión de entrenamiento, aparecerá aquí con métricas completas y opciones de adhesivo.",
+  },
+  "Ouro espartano": { en: "Spartan Gold", es: "Oro espartano" },
+  "Luxo claro": { en: "Light Luxury", es: "Lujo claro" },
+  "Calor arenito": { en: "Sandstone Warmth", es: "Calidez arenisca" },
+  "Platina pura": { en: "Pure Platinum", es: "Platino puro" },
+  "Luxo Equinócio": { en: "Equinox Luxury", es: "Lujo Equinoccio" },
+  "Artesanato Leica": { en: "Leica Craft", es: "Artesanía Leica" },
+  "Furtivo florestal": { en: "Forest Stealth", es: "Sigilo forestal" },
+
   // --- seletor-temas.tsx / ajustes/temas/page.tsx ---
   "Ajustes": { en: "Settings", es: "Ajustes" },
   "Temas": { en: "Themes", es: "Temas" },

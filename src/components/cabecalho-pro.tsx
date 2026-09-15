@@ -9,7 +9,7 @@ type CabecalhoProProps = {
   voltarHref?: string;
   mostrarLogo?: boolean;
   perfil?: { nome: string; avatarUrl: string | null } | null;
-  idioma?: Idioma;
+  idioma: Idioma;
 };
 
 export default function CabecalhoPro({
@@ -18,7 +18,7 @@ export default function CabecalhoPro({
   voltarHref,
   mostrarLogo = !voltarHref,
   perfil,
-  idioma = "pt-BR",
+  idioma,
 }: CabecalhoProProps) {
   return (
     <header className="topo-pro">
@@ -61,7 +61,7 @@ export default function CabecalhoPro({
         {perfil ? (
           <Avatar nome={perfil.nome} avatarUrl={perfil.avatarUrl} />
         ) : (
-          <div className="topo-avatar">AT</div>
+          <div className="topo-avatar">{t("Atleta", idioma).slice(0, 2).toUpperCase()}</div>
         )}
       </Link>
     </header>

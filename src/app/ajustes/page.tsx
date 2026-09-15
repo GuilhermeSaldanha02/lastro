@@ -62,7 +62,7 @@ export default async function PaginaAjustes() {
                   </svg>
                 </div>
                 <div className="bento-menu-item__info">
-                  <h3 className="bento-menu-item__titulo">{t("Coach IA", idioma)}</h3>
+                  <h3 className="bento-menu-item__titulo">{t("Assistente de IA", idioma)}</h3>
                   <p className="bento-menu-item__desc">{t("Consultoria 24h e leitura de ciclo", idioma)}</p>
                 </div>
                 <SetaNavegacao />
@@ -141,8 +141,8 @@ export default async function PaginaAjustes() {
                   </svg>
                 </div>
                 <div className="bento-menu-item__info">
-                  <h3 className="bento-menu-item__titulo">{t("Relatórios & Stickers", idioma)}</h3>
-                  <p className="bento-menu-item__desc">{t("Exportar imagem de treino para Stories", idioma)}</p>
+                  <h3 className="bento-menu-item__titulo">{t("Relatórios e adesivos", idioma)}</h3>
+                  <p className="bento-menu-item__desc">{t("Exportar imagem de treino para redes sociais", idioma)}</p>
                 </div>
                 <SetaNavegacao />
               </Link>

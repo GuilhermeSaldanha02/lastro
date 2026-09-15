@@ -11,6 +11,8 @@ import { crefValido } from "@/lib/texto/cref";
 import DicaInfo from "@/components/dica-info";
 import { SENHA_MINIMO, validarSenhaNova } from "@/lib/texto/senha";
 import { PARAM_RETORNO, sanitizarRotaDeRetorno } from "@/lib/rota-de-retorno";
+import { t } from "@/lib/texto/i18n";
+import type { Idioma } from "@/lib/dados/idioma";
 
 function rotaDeRetorno(): string {
   return sanitizarRotaDeRetorno(
@@ -24,18 +26,21 @@ const MENSAGENS_DE_ERRO: Record<string, string> = {
   auth: "Falha na autenticação. Tente de novo.",
 };
 
-function AvisoDeErroNaUrl() {
+function AvisoDeErroNaUrl({ idioma }: { idioma: Idioma }) {
   const searchParams = useSearchParams();
   const erro = searchParams.get("erro");
   if (!erro) return null;
   return (
     <p className="aviso-erro" role="alert">
-      {MENSAGENS_DE_ERRO[erro] ?? "Falha na autenticação."}
+      {t(MENSAGENS_DE_ERRO[erro] ?? "Falha na autenticação.", idioma)}
     </p>
   );
 }
 
 export default function PaginaLogin() {
+  // Não há sessão antes do login para recuperar a preferência. A entrada
+  // pública começa em português e passa a usar o idioma salvo após entrar.
+  const idioma: Idioma = "pt-BR";
   const router = useRouter();
   const [modo, setModo] = useState<"entrar" | "criar-conta">("entrar");
   const [tipoConta, setTipoConta] = useState<TipoConta>("aluno");
@@ -107,7 +112,7 @@ export default function PaginaLogin() {
         </header>
 
         <Suspense fallback={null}>
-          <AvisoDeErroNaUrl />
+          <AvisoDeErroNaUrl idioma={idioma} />
         </Suspense>
 
         <div className="cartao cartao--vidro">
@@ -123,7 +128,7 @@ export default function PaginaLogin() {
                 "PERSONAL" é só o botão mais bonito, e a pessoa descobre
                 que não tem "iniciar treino" depois de criar a conta. */}
             {modo === "criar-conta" && (
-              <div className="seletor-conta" role="radiogroup" aria-label="Tipo de conta">
+              <div className="seletor-conta" role="radiogroup" aria-label={t("Tipo de conta", idioma)}>
                 <button
                   type="button"
                   role="radio"
@@ -135,7 +140,7 @@ export default function PaginaLogin() {
                     <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
                     <circle cx="12" cy="7" r="4" />
                   </svg>
-                  USUÁRIO
+                  {t("USUÁRIO", idioma)}
                 </button>
                 <button
                   type="button"
@@ -147,7 +152,7 @@ export default function PaginaLogin() {
                   <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
                     <path d="M6.5 6.5v11M17.5 6.5v11M3 9v6M21 9v6M6.5 12h11" />
                   </svg>
-                  PERSONAL
+                  {t("PERSONAL", idioma)}
                 </button>
               </div>
             )}
@@ -155,21 +160,21 @@ export default function PaginaLogin() {
             {modo === "criar-conta" && (
               <p className="seletor-conta__nota">
                 {tipoConta === "personal"
-                  ? "Abre na fila de alunos. Seu próprio treino fica na mesma conta, a um toque em Ajustes."
-                  : "Registra seus treinos e recebe a análise semanal."}
+                  ? t("Abre na fila de alunos. Seu próprio treino fica na mesma conta, a um toque em Ajustes.", idioma)
+                  : t("Registra seus treinos e recebe a análise semanal.", idioma)}
               </p>
             )}
 
             {modo === "criar-conta" && (
               <div className="campo">
                 <label className="campo__rotulo" htmlFor="nome">
-                  Nome
+                  {t("Nome", idioma)}
                 </label>
                 <input
                   id="nome"
                   type="text"
                   autoComplete="name"
-                  placeholder="Seu nome"
+                  placeholder={t("Seu nome", idioma)}
                   value={nome}
                   onChange={(e) => setNome(e.target.value)}
                   required
@@ -184,7 +189,7 @@ export default function PaginaLogin() {
                  aqui e informa depois, em Ajustes > Personal. */
               <div className="campo">
                 <label className="campo__rotulo" htmlFor="telefone">
-                  WhatsApp, com DDD
+                  {t("WhatsApp, com DDD", idioma)}
                 </label>
                 <input
                   id="telefone"
@@ -210,10 +215,8 @@ export default function PaginaLogin() {
                   <label className="campo__rotulo" htmlFor="cref">
                     CREF
                   </label>
-                  <DicaInfo titulo="CREF">
-                    Como está na sua carteira. O lastro guarda o número e não
-                    verifica registro no CONFEF — ele aparece como informado
-                    por você.
+                  <DicaInfo titulo="CREF" idioma={idioma}>
+                    {t("Como está na sua carteira. O Lastro guarda o número e não verifica registro no CONFEF — ele aparece como informado por você.", idioma)}
                   </DicaInfo>
                 </div>
                 <input
@@ -222,15 +225,14 @@ export default function PaginaLogin() {
                   autoCapitalize="characters"
                   autoComplete="off"
                   spellCheck={false}
-                  placeholder="123456-G/PB"
+                  placeholder={t("123456-G/PB", idioma)}
                   value={cref}
                   onChange={(e) => setCref(e.target.value.toUpperCase())}
                   required
                 />
                 {cref.trim() !== "" && !crefValido(cref) && (
                   <p className="campo__nota campo__nota--alerta" role="status">
-                    Formato esperado: 123456-G/PB — seis dígitos, categoria G
-                    ou P, e a UF.
+                    {t("Formato esperado: 123456-G/PB — seis dígitos, categoria G ou P e a UF.", idioma)}
                   </p>
                 )}
               </div>
@@ -238,13 +240,13 @@ export default function PaginaLogin() {
 
             <div className="campo">
               <label className="campo__rotulo" htmlFor="email">
-                E-mail
+                {t("E-mail", idioma)}
               </label>
               <input
                 id="email"
                 type="email"
                 autoComplete="email"
-                placeholder="seu@email.com"
+                placeholder={t("seu@email.com", idioma)}
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
@@ -253,7 +255,7 @@ export default function PaginaLogin() {
 
             <div className="campo">
               <label className="campo__rotulo" htmlFor="senha">
-                Senha
+                {t("Senha", idioma)}
               </label>
               <input
                 id="senha"
@@ -277,10 +279,10 @@ export default function PaginaLogin() {
 
             <button type="submit" className="botao-primario botao-primario--heroi" disabled={carregando}>
               {carregando
-                ? "Entrando…"
+                ? t("Entrando…", idioma)
                 : modo === "entrar"
-                  ? "Entrar no Lastro"
-                  : "Criar minha conta"}
+                  ? t("Entrar no Lastro", idioma)
+                  : t("Criar minha conta", idioma)}
             </button>
           </form>
 
@@ -288,7 +290,7 @@ export default function PaginaLogin() {
               tipo escolhido e a escolha acontece em `/boas-vindas`, logo
               depois do primeiro login (PRD §11, emenda 2026-09-13). */}
           <div className="divisor-ou">
-            <span>ou</span>
+            <span>{t("ou", idioma)}</span>
           </div>
 
           <div className="pilha">
@@ -315,7 +317,7 @@ export default function PaginaLogin() {
                   d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"
                 />
               </svg>
-              Entrar com Google
+              {t("Entrar com Google", idioma)}
             </button>
 
             <button
@@ -326,7 +328,9 @@ export default function PaginaLogin() {
                 setMensagem(null);
               }}
             >
-              {modo === "entrar" ? "Não tem uma conta? Cadastre-se" : "Já tem conta? Fazer login"}
+              {modo === "entrar"
+                ? t("Não tem uma conta? Cadastre-se", idioma)
+                : t("Já tem conta? Fazer login", idioma)}
             </button>
           </div>
         </div>
