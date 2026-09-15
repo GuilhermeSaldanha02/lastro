@@ -109,6 +109,25 @@ const ROTAS = [
 /** Medidas na sessão do personal — ver o comentário do `beforeAll`. */
 const ROTAS_PERSONAL = ["/personal", "/personal/alunos"];
 
+async function montarGradeParaContraste(page: Page): Promise<void> {
+  await page.getByRole("button", { name: "Adicionar exercício" }).click();
+  await page.locator("label.chip").first().click();
+  await page.getByRole("button", { name: "Continuar" }).click();
+
+  for (const [indice, tipo] of ["aquecimento", "valendo"].entries()) {
+    if (indice > 0) await page.getByRole("button", { name: "Outra série" }).click();
+    await page.locator("#exercicio_id").selectOption({ index: 1 });
+    await page.locator("#tipo").selectOption(tipo);
+    await page.locator("#reps").fill(indice === 0 ? "12" : "8");
+    await page.locator("#peso").fill("40");
+    await page.getByRole("button", { name: "Registrar série" }).click();
+  }
+
+  await expect(page.locator(".marcador-serie--aquecimento")).toBeVisible();
+  await expect(page.locator(".marcador-serie--valendo")).toBeVisible();
+  await expect(page.locator(".grade-series__cabecalho")).toBeVisible();
+}
+
 type Falha = {
   tema: string;
   rota: string;
@@ -239,6 +258,9 @@ test("nenhum texto reprova AA, em nenhum dos sete temas", async ({ page, browser
   await page.goto("/treino");
   await page.getByRole("button", { name: /iniciar treino/i }).click();
   await page.waitForURL(/\/treino\/[^/]+$/, { timeout: 20_000 });
+  const rotaTreino = new URL(page.url()).pathname;
+  await montarGradeParaContraste(page);
+  const rotas = [...ROTAS, rotaTreino];
 
   const falhas: Falha[] = [];
   let naoMedidosTotal = 0;
@@ -264,7 +286,7 @@ test("nenhum texto reprova AA, em nenhum dos sete temas", async ({ page, browser
       )
       .toBe(tema.id);
 
-    for (const rota of ROTAS) {
+    for (const rota of rotas) {
       await page.goto(rota, { waitUntil: "domcontentloaded" });
       await page.waitForLoadState("networkidle", { timeout: 30_000 }).catch(() => {});
 

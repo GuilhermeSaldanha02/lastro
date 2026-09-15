@@ -59,6 +59,9 @@ test("registra uma série e ela sobrevive a ficar offline e voltar (A1/A2/D7)", 
   await expect(page.locator(".card-obsidian")).toHaveCount(1);
   await expect(page.getByText("1 série valendo")).toBeVisible();
 
+  await page.getByRole("button", { name: "Iniciar descanso entre séries" }).click();
+  await expect(page.getByRole("cell", { name: "Em andamento" })).toBeVisible();
+
   // "Outra série" reabre o formulário pro MESMO grupo/exercício já
   // escolhido — não precisa repetir a escolha de grupo muscular.
   await page.getByRole("button", { name: "Outra série" }).click();
@@ -67,10 +70,12 @@ test("registra uma série e ela sobrevive a ficar offline e voltar (A1/A2/D7)", 
   // a série entra na fila local (Dexie) e a UI mostra "salvo no aparelho"
   // (D7) em vez de travar ou dar erro de rede.
   await context.setOffline(true);
+  await page.waitForTimeout(2_100);
 
   await registrarSerie(page, { reps: "6", peso: "42.5" });
 
   await expect(page.getByText("2 séries valendo")).toBeVisible();
+  await expect(page.getByRole("cell", { name: /00:0[2-4]/ }).first()).toBeVisible();
   await expect(page.locator(".sync")).toContainText("salvo no aparelho");
 
   // Reconecta — o outbox (src/lib/offline/sincronizar-pendentes.ts) drena
@@ -84,4 +89,33 @@ test("registra uma série e ela sobrevive a ficar offline e voltar (A1/A2/D7)", 
   // servidor (não só otimistas na memória do cliente).
   await page.reload();
   await expect(page.getByText("2 séries valendo")).toBeVisible();
+  await expect(page.getByRole("cell", { name: /00:0[2-4]/ }).first()).toBeVisible();
+});
+
+test("mede o descanso real, fecha na próxima série e persiste após recarga", async ({ page }) => {
+  const conta = await criarUsuarioDescartavel("j1-descanso");
+  try {
+    await entrarComoUsuario(page, conta);
+    await page.goto("/treino");
+    await page.getByRole("button", { name: "Iniciar treino de hoje" }).click();
+    await page.waitForURL(/\/treino\/[^/]+$/);
+
+    await expect(
+      page.getByRole("button", { name: "Iniciar descanso entre séries" }),
+    ).toBeDisabled();
+    await page.getByRole("button", { name: "Adicionar exercício" }).click();
+    await page.locator("label.chip").first().click();
+    await page.getByRole("button", { name: "Continuar" }).click();
+    await registrarSerie(page, { reps: "10", peso: "40" });
+
+    await page.getByRole("button", { name: "Iniciar descanso entre séries" }).click();
+    await page.waitForTimeout(2_100);
+    await page.getByRole("button", { name: "Repetir série" }).click();
+
+    await expect(page.getByRole("cell", { name: /00:0[2-4]/ }).first()).toBeVisible();
+    await page.reload();
+    await expect(page.getByRole("cell", { name: /00:0[2-4]/ }).first()).toBeVisible();
+  } finally {
+    await apagarUsuarioDescartavel(conta);
+  }
 });

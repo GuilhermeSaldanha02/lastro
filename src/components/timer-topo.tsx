@@ -174,6 +174,7 @@ export default function TimerTopo({
               className="timer-topo-botao-disparar"
               onClick={descanso.iniciar}
               disabled={!descanso.podeIniciar}
+              aria-label={t("Iniciar descanso entre séries", idioma)}
               title={t(
                 descanso.podeIniciar
                   ? "Iniciar descanso entre séries"
