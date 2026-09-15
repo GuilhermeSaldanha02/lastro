@@ -6,6 +6,7 @@ import {
   marcarAvisoEmitido,
   painelDoDescanso,
   pausarDescanso,
+  podeIniciarDescanso,
   retomarDescanso,
 } from "./descanso-real";
 
@@ -57,5 +58,24 @@ describe("descanso real", () => {
     const estado = iniciarDescanso("treino-1", "serie-1", 90, 20_000);
 
     expect(concluirDescanso(estado, 10_000).descansoRealSegundos).toBe(0);
+  });
+
+  it("só inicia quando existe uma série livre de descanso", () => {
+    const ativo = iniciarDescanso("t1", "s1", 90, 0);
+
+    expect(podeIniciarDescanso(null, undefined, false)).toBe(false);
+    expect(podeIniciarDescanso(null, "s1", false)).toBe(true);
+    expect(podeIniciarDescanso(ativo, "s1", false)).toBe(false);
+    expect(podeIniciarDescanso(null, "s1", true)).toBe(false);
+  });
+
+  it("mantém pausa e retomada idempotentes", () => {
+    const iniciado = iniciarDescanso("t1", "s1", 90, 0);
+    const pausado = pausarDescanso(iniciado, 10_000);
+    const pausadoDeNovo = pausarDescanso(pausado, 20_000);
+    const retomado = retomarDescanso(pausadoDeNovo, 30_000);
+    const retomadoDeNovo = retomarDescanso(retomado, 40_000);
+
+    expect(concluirDescanso(retomadoDeNovo, 50_000).descansoRealSegundos).toBe(30);
   });
 });

@@ -31,6 +31,14 @@ export function iniciarDescanso(
   };
 }
 
+export function podeIniciarDescanso(
+  estado: EstadoDescanso | null,
+  ultimaSerieId: string | undefined,
+  ultimaSerieJaTemDescanso: boolean,
+): boolean {
+  return estado === null && Boolean(ultimaSerieId) && !ultimaSerieJaTemDescanso;
+}
+
 function ativoDesdeUltimoMarco(estado: EstadoDescanso, agoraMs: number): number {
   if (estado.iniciadoEmMs === null) return 0;
   return Math.max(0, agoraMs - estado.iniciadoEmMs);

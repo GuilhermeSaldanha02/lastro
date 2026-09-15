@@ -17,8 +17,8 @@ import {
 import FormularioSerie, { type DadosNovaSerie } from "./formulario-serie";
 import EditarSerie, { type DadosEdicaoSerie } from "./editar-serie";
 import SeletorGrupoMuscular, { type OpcaoGrupo } from "./seletor-grupo-muscular";
-import EtiquetaRecorde from "./etiqueta-recorde";
 import TimerTopo from "./timer-topo";
+import { useDescansoReal } from "./use-descanso-real";
 import RelatorioPosTreino from "./relatorio-pos-treino";
 import { assinarMarcos, estaFinalizado, marcarFim, reabrir } from "@/lib/treino/marcos-treino";
 import {
@@ -33,6 +33,8 @@ import {
 } from "@/lib/dados/modelo-treino";
 import { t } from "@/lib/texto/i18n";
 import type { Idioma } from "@/lib/dados/idioma";
+import type { DescansoConcluido } from "@/lib/treino/descanso-real";
+import { formatarDescansoReal } from "@/lib/treino/apresentacao-series";
 
 /**
  * `ehRecordePessoal` é só de tela (C4) — nunca persiste no banco, nunca
@@ -120,6 +122,7 @@ export default function TreinoDetalhe({
   // D7 — reflete a fila de verdade: só vira "sincronizado" quando uma
   // drenagem termina sem falha. Nunca é apresentado como erro.
   const [sincronizado, setSincronizado] = useState(false);
+  const [confirmacaoDescanso, setConfirmacaoDescanso] = useState<string | null>(null);
   // Grupo(s) musculares do dia (pedido do dono, 2026-08-07) — filtra o
   // exercício mostrado no formulário. Vive só nesta sessão de treino, não
   // é persistido: o app não prescreve programa (PRD §5, escopo negativo),
@@ -195,6 +198,36 @@ export default function TreinoDetalhe({
     return resultado;
   }, []);
 
+  const registrarDescansoConcluido = useCallback(
+    async ({ serieId, descansoRealSegundos }: DescansoConcluido) => {
+      setSeries((atuais) =>
+        atuais.map((serie) =>
+          serie.id === serieId ? { ...serie, descansoRealSegundos } : serie,
+        ),
+      );
+      await enfileirar(
+        "atualizar_descanso_serie",
+        { id: serieId, descansoRealSegundos },
+        usuarioId,
+      );
+      setConfirmacaoDescanso(
+        t("Descanso registrado: {tempo}", idioma).replace(
+          "{tempo}",
+          formatarDescansoReal(descansoRealSegundos),
+        ),
+      );
+    },
+    [idioma, usuarioId],
+  );
+
+  const descanso = useDescansoReal({
+    treinoId,
+    ultimaSerieId: ultima?.id,
+    ultimaSerieJaTemDescanso:
+      ultima !== undefined && ultima.descansoRealSegundos !== null,
+    aoConcluir: registrarDescansoConcluido,
+  });
+
   useEffect(() => {
     // O dreno na montagem fica FUNCIONAL de propósito: ele não mexe no
     // indicador. Estado a partir do corpo de um efeito encadeia render, e
@@ -219,6 +252,12 @@ export default function TreinoDetalhe({
     };
   }, [drenar]);
 
+  useEffect(() => {
+    if (!confirmacaoDescanso) return;
+    const id = window.setTimeout(() => setConfirmacaoDescanso(null), 4_000);
+    return () => window.clearTimeout(id);
+  }, [confirmacaoDescanso]);
+
   /**
    * D3 (PRD §4.1) — "repetir a última série" é a ação mais frequente do
    * app: reaproveita exercício/tipo/reps/peso/RIR da última série e
@@ -239,6 +278,7 @@ export default function TreinoDetalhe({
   }
 
   async function registrarSerie(dados: DadosNovaSerie): Promise<void> {
+    await descanso.concluir();
     const exercicio = exercicios.find((e) => e.id === dados.exercicioId);
     if (!exercicio) throw new Error("Exercício não encontrado no catálogo.");
 
@@ -279,10 +319,9 @@ export default function TreinoDetalhe({
     // Pede ao navegador (Background Sync) para tentar de novo quando a
     // rede voltar, mesmo se a aba ficar em segundo plano; o listener
     // `online` acima segue como fallback nos navegadores sem suporte.
-    const resultado = await drenar();
-    if (resultado.falhou) {
-      void pedirSincronizacaoEmSegundoPlano();
-    }
+    void drenar().then((resultado) => {
+      if (resultado.falhou) void pedirSincronizacaoEmSegundoPlano();
+    });
   }
 
   async function registrarPeloFormulario(dados: DadosNovaSerie): Promise<void> {
@@ -374,6 +413,7 @@ export default function TreinoDetalhe({
    * intenção assim que possível.
    */
   async function excluirSerie(id: string): Promise<void> {
+    descanso.cancelarSePertence(id);
     setSeries((atual) => atual.filter((serie) => serie.id !== id));
     setExcluindoId(null);
 
@@ -402,6 +442,16 @@ export default function TreinoDetalhe({
     });
   }
 
+  async function finalizarTreino(): Promise<void> {
+    await descanso.concluir();
+    marcarFim(treinoId);
+    setConfirmandoFim(false);
+    setMostrarRelatorio(true);
+    void drenar().then((resultado) => {
+      if (resultado.falhou) void pedirSincronizacaoEmSegundoPlano();
+    });
+  }
+
   return (
     <>
       {/* Barra de Status Sticky no Topo: Tempo de Treino Decorrido + Timer de Descanso */}
@@ -418,6 +468,7 @@ export default function TreinoDetalhe({
            é a única situação em que gravar a marca de início é honesto. */
         sessaoComecaAqui={seriesIniciais.length === 0}
         treinoFinalizado={treinoConcluido || mostrarRelatorio}
+        descanso={descanso}
       />
 
       <div className="corpo corpo--com-nav corpo--titulo-conteudo corpo--treino-detalhe">
@@ -725,16 +776,18 @@ export default function TreinoDetalhe({
               <button
                 type="button"
                 className="botao-finalizar-treino"
-                onClick={() => {
-                  marcarFim(treinoId);
-                  setConfirmandoFim(false);
-                  setMostrarRelatorio(true);
-                }}
+                onClick={() => void finalizarTreino()}
               >
                 {t("Finalizar Treino", idioma)}
               </button>
             </div>
           </div>
+        )}
+
+        {confirmacaoDescanso && (
+          <p className="confirmacao-descanso" aria-live="polite">
+            {confirmacaoDescanso}
+          </p>
         )}
 
         {/* D7 — estado de sincronização sempre visível, nunca alarmante. */}
