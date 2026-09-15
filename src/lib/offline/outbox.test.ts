@@ -28,6 +28,7 @@ describe("outbox", () => {
         ordem.push("serie");
       },
       atualizar_serie: async () => {},
+      atualizar_descanso_serie: async () => {},
       excluir_serie: async () => {},
       excluir_treino: async () => {},
     });
@@ -50,6 +51,7 @@ describe("outbox", () => {
         executado.push("serie");
       },
       atualizar_serie: async () => {},
+      atualizar_descanso_serie: async () => {},
       excluir_serie: async () => {},
       excluir_treino: async () => {},
     });
@@ -68,6 +70,7 @@ describe("outbox", () => {
       },
       criar_serie: async () => {},
       atualizar_serie: async () => {},
+      atualizar_descanso_serie: async () => {},
       excluir_serie: async () => {},
       excluir_treino: async () => {},
     });
@@ -90,6 +93,7 @@ describe("outbox", () => {
       },
       criar_serie: async () => {},
       atualizar_serie: async () => {},
+      atualizar_descanso_serie: async () => {},
       excluir_serie: async () => {},
       excluir_treino: async () => {},
     };
@@ -117,6 +121,7 @@ describe("outbox", () => {
           executado.push(payload);
         },
         atualizar_serie: async () => {},
+        atualizar_descanso_serie: async () => {},
         excluir_serie: async () => {},
         excluir_treino: async () => {},
       });
@@ -136,6 +141,7 @@ describe("outbox", () => {
           throw new Error(marcarComoPermanente("violates check constraint \"serie_rir_valido\""));
         },
         atualizar_serie: async () => {},
+        atualizar_descanso_serie: async () => {},
         excluir_serie: async () => {},
         excluir_treino: async () => {},
       });
@@ -155,6 +161,7 @@ describe("outbox", () => {
           throw new Error("sem rede");
         },
         atualizar_serie: async () => {},
+        atualizar_descanso_serie: async () => {},
         excluir_serie: async () => {},
         excluir_treino: async () => {},
       };
@@ -178,6 +185,7 @@ describe("outbox", () => {
         enviados.push(payload.id);
       },
       atualizar_serie: async () => {},
+      atualizar_descanso_serie: async () => {},
       excluir_serie: async () => {},
       excluir_treino: async () => {},
     });

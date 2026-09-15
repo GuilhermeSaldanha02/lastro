@@ -32,10 +32,12 @@
 // lançado do servidor com o prefixo, que o build de produção apagava (ver
 // `ResultadoGravacaoSerie` em `src/lib/dados/treino.ts`).
 import {
+  atualizarDescansoSerieRemoto,
   atualizarSerieRemoto,
   criarSerieRemoto,
   excluirSerieRemoto,
   excluirTreinoRemoto,
+  type AtualizacaoDescansoSerieInput,
   type AtualizacaoSerieInput,
   type NovaSerieInput,
   type ResultadoGravacaoSerie,
@@ -72,6 +74,13 @@ async function executarSincronizacao(): Promise<ResultadoSincronizacao> {
     },
     atualizar_serie: async (payload) => {
       exigirGravado(await atualizarSerieRemoto(payload as unknown as AtualizacaoSerieInput));
+    },
+    atualizar_descanso_serie: async (payload) => {
+      exigirGravado(
+        await atualizarDescansoSerieRemoto(
+          payload as unknown as AtualizacaoDescansoSerieInput,
+        ),
+      );
     },
     excluir_serie: async (payload) => {
       await excluirSerieRemoto((payload as { id: string }).id);

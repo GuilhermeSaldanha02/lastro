@@ -46,6 +46,8 @@ export type Serie = {
   rir: number | null;
   /** Valor REAL desta série (interruptor do formulário) — é isto que o agregador usa para dobrar volume (D3.5). */
   pesoPorLado: boolean;
+  /** Tempo ativo realmente medido depois desta série; null = não medido. */
+  descansoRealSegundos: number | null;
   criadoEm: string;
 };
 
@@ -183,7 +185,7 @@ export async function buscarTreino(
   const { data: series, error: erroSeries } = await supabase
     .from("serie")
     .select(
-      "id, exercicio_id, tipo, reps, peso, rir, peso_por_lado, criado_em, exercicio:exercicio_id (nome, unilateral, peso_por_lado, grupo_muscular_primario)",
+      "id, exercicio_id, tipo, reps, peso, rir, peso_por_lado, descanso_real_segundos, criado_em, exercicio:exercicio_id (nome, unilateral, peso_por_lado, grupo_muscular_primario)",
     )
     .eq("treino_id", treinoId)
     .eq("usuario_id", user.id)
@@ -203,6 +205,7 @@ export async function buscarTreino(
     peso: number;
     rir: number | null;
     peso_por_lado: boolean;
+    descanso_real_segundos: number | null;
     criado_em: string;
     exercicio: {
       nome: string;
@@ -230,6 +233,8 @@ export async function buscarTreino(
       peso: Number(s.peso),
       rir: s.rir,
       pesoPorLado: s.peso_por_lado,
+      descansoRealSegundos:
+        s.descanso_real_segundos === null ? null : Number(s.descanso_real_segundos),
       criadoEm: s.criado_em,
     })),
   };
@@ -665,6 +670,11 @@ export type AtualizacaoSerieInput = {
   pesoPorLado: boolean;
 };
 
+export type AtualizacaoDescansoSerieInput = {
+  id: string;
+  descansoRealSegundos: number;
+};
+
 /**
  * Corrige uma série já registrada. Mudar `reps`/`peso`/`tipo` muda o que
  * o agregador calcula (volume, e1RM, contagem de séries valendo) — é
@@ -697,6 +707,26 @@ export async function atualizarSerieRemoto(
   }
   revalidatePath("/treino/[id]", "page");
   revalidatePath("/");
+  return { ok: true };
+}
+
+/** Atualiza apenas o descanso medido, sem regravar os dados da série. */
+export async function atualizarDescansoSerieRemoto(
+  input: AtualizacaoDescansoSerieInput,
+): Promise<ResultadoGravacaoSerie> {
+  const { supabase } = await usuarioAutenticadoOuErro();
+  const { error } = await supabase
+    .from("serie")
+    .update({ descanso_real_segundos: input.descansoRealSegundos })
+    .eq("id", input.id);
+  if (error) {
+    const mensagem = `Falha ao atualizar descanso: ${error.message}`;
+    if (ehErroPermanenteDoPostgres(error.code)) {
+      return { ok: false, permanente: true, mensagem };
+    }
+    throw new Error(mensagem);
+  }
+  revalidatePath("/treino/[id]", "page");
   return { ok: true };
 }
 

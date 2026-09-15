@@ -5,6 +5,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 // delas: recusa do banco volta como valor, falha transitória lança.
 vi.mock("@/lib/dados/treino", () => ({
   criarSerieRemoto: vi.fn(),
+  atualizarDescansoSerieRemoto: vi.fn(),
   atualizarSerieRemoto: vi.fn(),
   excluirSerieRemoto: vi.fn(),
   excluirTreinoRemoto: vi.fn(),
@@ -13,7 +14,11 @@ vi.mock("@/lib/dados/treino", () => ({
 // A sessão real vem do cliente Supabase de navegador; aqui a conta logada é "b".
 vi.mock("./conta-da-sessao", () => ({ contaDaSessao: vi.fn(async () => "b") }));
 
-import { atualizarSerieRemoto, criarSerieRemoto } from "@/lib/dados/treino";
+import {
+  atualizarDescansoSerieRemoto,
+  atualizarSerieRemoto,
+  criarSerieRemoto,
+} from "@/lib/dados/treino";
 import { db } from "./db";
 import { contarFalhas, contarPendentes, enfileirar } from "./outbox";
 import { sincronizarPendentes } from "./sincronizar-pendentes";
@@ -26,12 +31,53 @@ const recusa = (restricao: string) => ({
 
 beforeEach(async () => {
   vi.mocked(criarSerieRemoto).mockReset();
+  vi.mocked(atualizarDescansoSerieRemoto).mockReset();
   vi.mocked(atualizarSerieRemoto).mockReset();
   await db.outbox.clear();
   await db.falhas.clear();
 });
 
 describe("sincronizarPendentes (achado A1)", () => {
+  it("sincroniza somente o descanso da série e preserva a ordem FIFO", async () => {
+    vi.mocked(criarSerieRemoto).mockResolvedValue({ ok: true });
+    vi.mocked(atualizarDescansoSerieRemoto).mockResolvedValue({ ok: true });
+    await enfileirar("criar_serie", { id: "s1", reps: 10 }, "b");
+    await enfileirar("atualizar_descanso_serie", { id: "s1", descansoRealSegundos: 94 }, "b");
+    await enfileirar("criar_serie", { id: "s2", reps: 8 }, "b");
+
+    expect(await sincronizarPendentes()).toEqual({
+      sincronizados: 3,
+      falhou: false,
+      descartados: 0,
+    });
+    expect(vi.mocked(atualizarDescansoSerieRemoto)).toHaveBeenCalledWith({
+      id: "s1",
+      descansoRealSegundos: 94,
+    });
+  });
+
+  it("não envia descanso de outra conta e não bloqueia a conta atual", async () => {
+    vi.mocked(criarSerieRemoto).mockResolvedValue({ ok: true });
+    vi.mocked(atualizarDescansoSerieRemoto).mockResolvedValue({ ok: true });
+    await enfileirar("atualizar_descanso_serie", { id: "de-a", descansoRealSegundos: 80 }, "a");
+    await enfileirar("criar_serie", { id: "de-b", reps: 8 }, "b");
+
+    expect(await sincronizarPendentes()).toEqual({ sincronizados: 1, falhou: false, descartados: 0 });
+    expect(atualizarDescansoSerieRemoto).not.toHaveBeenCalled();
+    expect((await db.outbox.toArray())[0].payload).toEqual({ id: "de-a", descansoRealSegundos: 80 });
+  });
+
+  it("retira descanso inválido e continua a fila", async () => {
+    vi.mocked(atualizarDescansoSerieRemoto).mockResolvedValue(
+      recusa("serie_descanso_real_nao_negativo"),
+    );
+    vi.mocked(criarSerieRemoto).mockResolvedValue({ ok: true });
+    await enfileirar("atualizar_descanso_serie", { id: "s1", descansoRealSegundos: -1 }, "b");
+    await enfileirar("criar_serie", { id: "s2", reps: 8 }, "b");
+
+    expect(await sincronizarPendentes()).toEqual({ sincronizados: 1, falhou: false, descartados: 1 });
+  });
+
   it("série recusada pelo banco sai para `falhas` e a série válida seguinte sincroniza", async () => {
     vi.mocked(criarSerieRemoto).mockImplementation(async (serie) =>
       serie.reps === 201 ? recusa("serie_reps_positiva") : { ok: true },

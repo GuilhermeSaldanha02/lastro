@@ -254,6 +254,7 @@ export default function TreinoDetalhe({
       peso: dados.peso,
       rir: dados.rir,
       pesoPorLado: dados.pesoPorLado,
+      descansoRealSegundos: null,
       ehRecordePessoal: dados.ehRecordePessoal,
       criadoEm: new Date().toISOString(),
     };
