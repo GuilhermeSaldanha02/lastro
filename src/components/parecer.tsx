@@ -68,7 +68,7 @@ export default function Parecer({
         {pergunta && <h2 className="doc__pergunta">{pergunta}</h2>}
         <p className="doc__meta">
           {evidencia
-            ? `${t("Semana de", idioma)} ${formatarDataCurta(evidencia.periodo.semana_atual_inicio)} — ${formatarDataCurta(evidencia.periodo.semana_atual_fim)} · ${t("Emitido em", idioma)} ${emissao}`
+            ? `${t("Semana de", idioma)} ${formatarDataCurta(evidencia.periodo.semana_atual_inicio, idioma)} — ${formatarDataCurta(evidencia.periodo.semana_atual_fim, idioma)} · ${t("Emitido em", idioma)} ${emissao}`
             : `${t("Emitido em", idioma)} ${emissao}`}
         </p>
       </header>

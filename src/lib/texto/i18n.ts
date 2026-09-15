@@ -583,6 +583,7 @@ const DICIONARIO: Record<string, { en: string; es: string }> = {
   // --- components/coach-interativo.tsx ---
   "Sessão expirada. Faça login novamente.": { en: "Session expired. Sign in again.", es: "Sesión expirada. Inicia sesión de nuevo." },
   "Falha ao consultar o coach.": { en: "Failed to reach the coach.", es: "Fallo al consultar al coach." },
+  "Falha ao consultar o assistente.": { en: "Failed to reach the assistant.", es: "No se pudo consultar al asistente." },
   "Falha de rede. Tente de novo.": { en: "Network error. Try again.", es: "Fallo de red. Intenta de nuevo." },
   "Você usou as {n} perguntas de hoje. O limite existe para sobrar cota da Análise Semanal — ele volta amanhã.": {
     en: "You have used today's {n} questions. The limit exists to leave quota for the Weekly Analysis — it resets tomorrow.",
@@ -594,8 +595,21 @@ const DICIONARIO: Record<string, { en: string; es: string }> = {
     es: "Resuelve dudas sobre periodización, fatiga y progresión basadas en tus métricas reales.",
   },
   "Sugestões de perguntas:": { en: "Suggested questions:", es: "Preguntas sugeridas:" },
+  "Como foi meu volume de treino nesta semana?": {
+    en: "How was my workout volume this week?",
+    es: "¿Cómo fue mi volumen de entrenamiento esta semana?",
+  },
+  "Qual grupo muscular estou treinando com menor frequência?": {
+    en: "Which muscle group am I training least often?",
+    es: "¿Qué grupo muscular estoy entrenando con menor frecuencia?",
+  },
+  "Devo aumentar a carga ou as repetições no meu próximo treino?": {
+    en: "Should I increase the weight or repetitions in my next workout?",
+    es: "¿Debo aumentar la carga o las repeticiones en mi próximo entrenamiento?",
+  },
   "Analisando seus dados…": { en: "Analyzing your data…", es: "Analizando tus datos…" },
   "Pergunte ao coach…": { en: "Ask the coach…", es: "Pregúntale al coach…" },
+  "Pergunte ao assistente…": { en: "Ask the assistant…", es: "Pregúntale al asistente…" },
   "Enviar pergunta": { en: "Send question", es: "Enviar pregunta" },
 
   // --- app/coach/page.tsx ---
@@ -632,6 +646,12 @@ const DICIONARIO: Record<string, { en: string; es: string }> = {
     en: "Check Settings > Reports in a few moments.",
     es: "Consulta Ajustes > Informes en unos instantes.",
   },
+  "Dados insuficientes": { en: "Insufficient data", es: "Datos insuficientes" },
+  "Parecer não encontrado": { en: "Analysis not found", es: "Informe no encontrado" },
+  "PDF ainda indisponível": { en: "PDF is not available yet", es: "El PDF aún no está disponible" },
+  "Sessão ausente.": { en: "Session missing.", es: "Sesión ausente." },
+  "Falha ao buscar o parecer.": { en: "Failed to load the analysis.", es: "No se pudo cargar el informe." },
+  "Falha ao gerar o PDF.": { en: "Failed to generate the PDF.", es: "No se pudo generar el PDF." },
   "Já existe uma análise em andamento. Aguarde ela terminar.": {
     en: "There's already an analysis in progress. Wait for it to finish.",
     es: "Ya hay un análisis en curso. Espera a que termine.",

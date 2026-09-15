@@ -60,7 +60,7 @@ export default function PareceresSalvos({
           <div className="card-relatorio-item__cabecalho">
             <div className="card-relatorio-item__data-bloco">
               <span className="card-relatorio-item__data-rotulo">
-                {formatarDataCurta(parecer.criadoEm.slice(0, 10)).toUpperCase()}
+                {formatarDataCurta(parecer.criadoEm.slice(0, 10), idioma).toUpperCase()}
               </span>
             </div>
           </div>

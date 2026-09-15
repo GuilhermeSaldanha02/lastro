@@ -21,7 +21,12 @@ const MIGRADOS = [
   /src[\\/]app[\\/](ajustes|perfil)[\\/]/,
   /src[\\/]app[\\/]@modal[\\/].*[\\/](perfil)[\\/]/,
   /src[\\/]components[\\/](aba-inferior|cabecalho-pro|editar-perfil|idioma-form|meta-semanal-form|seletor-temas)\.tsx$/,
+  /src[\\/]app[\\/](analise|coach)[\\/]/,
+  /src[\\/]app[\\/]ajustes[\\/]relatorios[\\/]/,
+  /src[\\/]app[\\/]api[\\/]parecer[\\/]/,
+  /src[\\/]components[\\/](analise-interativa|coach-interativo|parecer|pareceres-salvos|parecer-detalhe-acoes|historico-relatorios-pos-treino)\.tsx$/,
 ];
+
 const DIRETORIOS = ["src/app", "src/components"];
 const EXTENSOES = new Set([".tsx", ".jsx"]);
 

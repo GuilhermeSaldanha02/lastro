@@ -4,7 +4,9 @@
 import { NextResponse } from "next/server";
 import { renderToBuffer } from "@react-pdf/renderer";
 import { buscarParecer } from "@/lib/dados/parecer";
+import { obterIdioma } from "@/lib/dados/idioma";
 import DocumentoParecer from "@/lib/pdf/documento-parecer";
+import { t } from "@/lib/texto/i18n";
 
 // Explícito, não herdado do padrão do App Router: desde a direção visual
 // de 2026-09-03 (SDD.md §10.4.1) este módulo registra fontes reais no
@@ -28,9 +30,9 @@ export async function GET(
     // aqui: `buscarParecer` devolve `null` e a resposta é 404 (achado B2).
     const semSessao = erro instanceof Error && erro.message.includes("Sessão ausente");
     if (semSessao) {
-      return NextResponse.json({ erro: "Sessão ausente." }, { status: 401 });
+      return NextResponse.json({ erro: t("Sessão ausente.", await obterIdioma()) }, { status: 401 });
     }
-    return NextResponse.json({ erro: "Falha ao buscar o parecer." }, { status: 500 });
+    return NextResponse.json({ erro: t("Falha ao buscar o parecer.", await obterIdioma()) }, { status: 500 });
   }
 
   // Rascunho ainda em geração não tem texto nem evidência, e renderizar o
@@ -38,7 +40,10 @@ export async function GET(
   // 2026-09-13). Mesma resposta da tela do parecer para o mesmo caso: não
   // há parecer pronto com esse id.
   if (!parecer || !parecer.texto || !parecer.evidencia) {
-    return NextResponse.json({ erro: "Parecer não encontrado." }, { status: 404 });
+    return NextResponse.json(
+      { erro: t("Parecer não encontrado", parecer?.idioma ?? (await obterIdioma())) },
+      { status: 404 },
+    );
   }
 
   let buffer;
@@ -51,7 +56,7 @@ export async function GET(
     // produção é um 500 mudo na peça-assinatura. Mesmo padrão de
     // `api/analise/route.ts`.
     console.error("[pdf] falha ao renderizar o parecer:", erro);
-    return NextResponse.json({ erro: "Falha ao gerar o PDF." }, { status: 500 });
+    return NextResponse.json({ erro: t("Falha ao gerar o PDF.", parecer.idioma) }, { status: 500 });
   }
 
   return new NextResponse(new Uint8Array(buffer), {

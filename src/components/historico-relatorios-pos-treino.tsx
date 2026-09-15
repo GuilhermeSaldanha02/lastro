@@ -6,6 +6,7 @@ import type { Idioma } from "@/lib/dados/idioma";
 import type { MetricasSessao } from "@/lib/dados/metricas-treino";
 import { formatarDataCurta } from "@/lib/tempo";
 import { t } from "@/lib/texto/i18n";
+import { formatarPeso } from "@/lib/texto/formatar-delta";
 import RelatorioPosTreino from "@/components/relatorio-pos-treino";
 
 type TreinoComMetricas = Treino & {
@@ -46,7 +47,7 @@ export default function HistoricoRelatoriosPosTreino({
             <div className="card-relatorio-item__cabecalho">
               <div className="card-relatorio-item__data-bloco">
                 <span className="card-relatorio-item__data-rotulo">
-                  {formatarDataCurta(tr.data).toUpperCase()}
+                  {formatarDataCurta(tr.data, idioma).toUpperCase()}
                 </span>
                 <span className="card-relatorio-item__id-curto">
                   #{tr.id.slice(0, 6)}
@@ -79,7 +80,7 @@ export default function HistoricoRelatoriosPosTreino({
                   {t("VOLUME", idioma)}
                 </span>
                 <span className="card-relatorio-item__metrica-valor">
-                  {tr.volumeKg ? `${tr.volumeKg} kg` : "—"}
+                  {tr.volumeKg ? `${formatarPeso(tr.volumeKg, idioma)} kg` : "—"}
                 </span>
               </div>
             </div>
