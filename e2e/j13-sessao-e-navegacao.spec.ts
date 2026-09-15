@@ -5,7 +5,7 @@
 // navegador guarda um tema corrompido e quando o nome da conta é HTML.
 //
 // Falha aqui é ACHADO: cada mensagem diz o dano se o app aceitar.
-import { expect, test } from "@playwright/test";
+import { expect, test, type Page } from "@playwright/test";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import {
   clienteAutenticado,
@@ -28,6 +28,18 @@ import {
 
 let conta: UsuarioDescartavel;
 let cliente: SupabaseClient;
+
+const IDIOMAS_SESSAO = [
+  { opcao: "Português", salvo: "Idioma salvo.", acao: "Salvar meta", erro: "Sessão ausente — entre de novo." },
+  { opcao: "English", salvo: "Language saved.", acao: "Save goal", erro: "Session expired — sign in again." },
+  { opcao: "Español", salvo: "Idioma guardado.", acao: "Guardar meta", erro: "Sesión ausente — inicia sesión de nuevo." },
+] as const;
+
+async function trocarIdiomaPelaTela(page: Page, idioma: (typeof IDIOMAS_SESSAO)[number]): Promise<void> {
+  await page.goto("/ajustes");
+  await page.getByRole("radio", { name: idioma.opcao }).click();
+  await expect(page.getByText(idioma.salvo, { exact: true })).toBeVisible();
+}
 
 test.beforeAll(async () => {
   conta = await criarUsuarioDescartavel("j13-sessao");
@@ -249,3 +261,15 @@ test("nome com HTML e milhares de caracteres não quebra Home, perfil nem a list
     await apagarSemErro(pers);
   }
 });
+
+for (const idioma of IDIOMAS_SESSAO) {
+  test(`sessão expirada: o erro de meta fica em ${idioma.opcao}`, async ({ page, context }) => {
+    await entrarComoUsuario(page, conta);
+    await trocarIdiomaPelaTela(page, idioma);
+    await page.goto("/ajustes");
+    await context.clearCookies();
+    await page.locator("#meta_treinos").fill("4");
+    await page.getByRole("button", { name: idioma.acao, exact: true }).click();
+    await expect(page.locator(".aviso-erro")).toHaveText(idioma.erro);
+  });
+}

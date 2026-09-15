@@ -320,3 +320,15 @@ test("nenhum texto reprova AA, em nenhum dos sete temas", async ({ page, browser
     `${falhas.length} texto(s) abaixo do piso AA — ver lista acima`,
   ).toEqual([]);
 });
+
+test("idioma: trocar pela interface preserva a medição renderizada", async ({ page }) => {
+  await entrarComoUsuario(page, usuario);
+  await page.goto("/ajustes");
+  await page.getByRole("radio", { name: "English" }).click();
+  await expect(page.getByText("Language saved.", { exact: true })).toBeVisible();
+
+  await page.goto("/ajustes");
+  await expect(page.getByText("Settings", { exact: true }).first()).toBeVisible();
+  const { falhas } = await medirPagina(page);
+  expect(falhas, "a troca de idioma não pode introduzir texto sem contraste AA").toEqual([]);
+});

@@ -129,6 +129,38 @@ const ROTAS_PERSONAL = ["/personal", "/personal/alunos"];
 
 type Achado = { rota: string; largura: string; tipo: string; detalhe: string };
 
+/** A preferência é mudada pela tela, nunca pelo banco: é a jornada real. */
+const IDIOMAS = [
+  {
+    opcao: "Português",
+    salvo: "Idioma salvo.",
+    inicio: "Iniciar treino de hoje",
+    vazio: "Nenhum treino registrado ainda. O primeiro começa no botão acima.",
+    catalogo: "Catálogo",
+  },
+  {
+    opcao: "English",
+    salvo: "Language saved.",
+    inicio: "Start today's workout",
+    vazio: "No workouts logged yet. The first one starts with the button above.",
+    catalogo: "Catalog",
+  },
+  {
+    opcao: "Español",
+    salvo: "Idioma guardado.",
+    inicio: "Iniciar entrenamiento de hoy",
+    vazio: "Aún no hay entrenamientos registrados. El primero comienza con el botón de arriba.",
+    catalogo: "Catálogo",
+  },
+] as const;
+
+async function trocarIdiomaPelaTela(page: Page, idioma: (typeof IDIOMAS)[number]): Promise<void> {
+  await page.goto("/ajustes");
+  await page.getByRole("radio", { name: idioma.opcao }).click();
+  // Este é o rótulo que só aparece depois de a preferência ter sido salva.
+  await expect(page.getByText(idioma.salvo, { exact: true })).toBeVisible();
+}
+
 /**
  * Ruído conhecido que não é defeito do app. Lista curta e justificada de
  * propósito: filtro largo aqui transforma a varredura em teatro.
@@ -321,3 +353,22 @@ test("varre todas as telas com usuário novo, em três larguras", async ({ page,
     `varredura encontrou ${achados.length} problema(s) — ver lista acima`,
   ).toEqual([]);
 });
+
+for (const idioma of IDIOMAS) {
+  test(`idioma: aluno vê início, ação e vazio em ${idioma.opcao}`, async ({ page }) => {
+    const conta = await criarUsuarioDescartavel("j4-idioma");
+    try {
+      await entrarComoUsuario(page, conta);
+      await trocarIdiomaPelaTela(page, idioma);
+
+      await page.goto("/");
+      await expect(page.getByRole("button", { name: idioma.inicio, exact: true })).toBeVisible();
+      await expect(page.getByText(idioma.vazio, { exact: true })).toBeVisible();
+
+      await page.goto("/catalogo");
+      await expect(page.getByText(idioma.catalogo, { exact: true }).first()).toBeVisible();
+    } finally {
+      await apagarUsuarioDescartavel(conta);
+    }
+  });
+}

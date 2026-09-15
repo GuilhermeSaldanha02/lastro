@@ -11,7 +11,7 @@
 // As asserções de REDIRECIONAMENTO são, por isso, mais importantes que as
 // de navegação: uma barra sem "Treinos" com a rota aberta é pior do que
 // nenhuma das duas coisas, porque parece resolvido.
-import { expect, test } from "@playwright/test";
+import { expect, test, type Page } from "@playwright/test";
 import {
   apagarUsuarioDescartavel,
   clienteAutenticado,
@@ -20,6 +20,18 @@ import {
   type UsuarioDescartavel,
 } from "./helpers/usuario-descartavel";
 import { criarVinculoAceito, nomear } from "./helpers/vinculo";
+
+const IDIOMAS_PERSONAL = [
+  { opcao: "Português", salvo: "Idioma salvo.", fila: "Fila", alunos: "Alunos" },
+  { opcao: "English", salvo: "Language saved.", fila: "Queue", alunos: "Clients" },
+  { opcao: "Español", salvo: "Idioma guardado.", fila: "Pendientes", alunos: "Alumnos" },
+] as const;
+
+async function trocarIdiomaPelaTela(page: Page, idioma: (typeof IDIOMAS_PERSONAL)[number]): Promise<void> {
+  await page.goto("/ajustes");
+  await page.getByRole("radio", { name: idioma.opcao }).click();
+  await expect(page.getByText(idioma.salvo, { exact: true })).toBeVisible();
+}
 
 let personal: UsuarioDescartavel;
 let aluno: UsuarioDescartavel;
@@ -235,3 +247,19 @@ test("conta nascida pelo Google escolhe PERSONAL com os dados e abre direto na f
     await apagarUsuarioDescartavel(pendente);
   }
 });
+
+for (const idioma of IDIOMAS_PERSONAL) {
+  test(`idioma: personal vê título e navegação em ${idioma.opcao}`, async ({ browser }) => {
+    const contexto = await browser.newContext();
+    const page = await contexto.newPage();
+    try {
+      await entrarComoUsuario(page, personal);
+      await trocarIdiomaPelaTela(page, idioma);
+      await page.goto("/personal");
+      await expect(page.getByText(idioma.fila, { exact: true }).first()).toBeVisible();
+      await expect(page.locator("nav.nav").getByText(idioma.alunos, { exact: true })).toBeVisible();
+    } finally {
+      await contexto.close();
+    }
+  });
+}
