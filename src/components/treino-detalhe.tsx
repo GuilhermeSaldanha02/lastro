@@ -34,7 +34,11 @@ import {
 import { t } from "@/lib/texto/i18n";
 import type { Idioma } from "@/lib/dados/idioma";
 import type { DescansoConcluido } from "@/lib/treino/descanso-real";
-import { formatarDescansoReal } from "@/lib/treino/apresentacao-series";
+import {
+  formatarDescansoReal,
+  marcadoresDaSerie,
+  resumirSeriesValendo,
+} from "@/lib/treino/apresentacao-series";
 
 /**
  * `ehRecordePessoal` é só de tela (C4) — nunca persiste no banco, nunca
@@ -522,24 +526,23 @@ export default function TreinoDetalhe({
           </p>
         ) : (
           grupos.map((grupo) => {
-            const valendo = grupo.series.filter((s) => s.tipo === "valendo").length;
+            const resumo = resumirSeriesValendo(grupo.series, idioma);
             return (
-              <section className="card-obsidian" key={grupo.exercicioId} style={{ marginBottom: "var(--lastro-e-3)" }}>
+              <section className="card-obsidian grade-exercicio" key={grupo.exercicioId}>
                 <div className="card-obsidian__header">
-                  <div>
-                    <h2 style={{ fontSize: "var(--lastro-papel-corpo)", fontWeight: "var(--lastro-peso-max)", color: "var(--lastro-txt)" }}>
-                      {grupo.nome}
-                    </h2>
-                    <span style={{ fontSize: "var(--lastro-papel-rotulo)", color: "var(--lastro-txt-3)" }}>
-                      {valendo} {t(valendo === 1 ? "série valendo" : "séries valendo", idioma)}
-                    </span>
+                  <div className="grade-exercicio__identidade">
+                    <h2 className="grade-exercicio__nome">{grupo.nome}</h2>
+                    <span className="grade-exercicio__resumo">{resumo}</span>
                   </div>
-                  {grupo.series.length > 0 && grupo.series[0].exercicioNome && (
-                    <span className="tag-grupo">{t("EXERCÍCIO", idioma)}</span>
-                  )}
                 </div>
 
-                <div className="tabela-series-pro">
+                <div className="grade-series" role="table" aria-label={grupo.nome}>
+                  <div className="grade-series__cabecalho" role="row">
+                    <span role="columnheader">{t("Série", idioma)}</span>
+                    <span role="columnheader">{t("Carga", idioma)}</span>
+                    <span role="columnheader">{t("Repetições", idioma)}</span>
+                    <span role="columnheader">{t("Descanso real", idioma)}</span>
+                  </div>
                   {grupo.series.map((serie, indice) => {
                     if (editandoId === serie.id) {
                       return (
@@ -580,44 +583,61 @@ export default function TreinoDetalhe({
                       );
                     }
 
+                    const marcadores = marcadoresDaSerie(
+                      serie.tipo,
+                      Boolean(serie.ehRecordePessoal),
+                      idioma,
+                    );
+                    const descansoDaLinha =
+                      descanso.ativo && descanso.serieId === serie.id
+                        ? t("Em andamento", idioma)
+                        : formatarDescansoReal(serie.descansoRealSegundos);
+
                     return (
                       <div
-                        className={`linha-serie-pro${serie.ehRecordePessoal ? " linha-serie-pro--pr" : ""}`}
-                        key={serie.id}
-                        role="button"
+                        className={
+                          descanso.ativo && descanso.serieId === serie.id
+                            ? "grade-series__linha grade-series__linha--descanso-ativo"
+                            : "grade-series__linha"
+                        }
+                        role="row"
                         tabIndex={0}
+                        key={serie.id}
                         onClick={() => setEditandoId(serie.id)}
-                        onKeyDown={(e) => {
-                          if (e.key === "Enter" || e.key === " ") {
-                            e.preventDefault();
+                        onKeyDown={(evento) => {
+                          if (evento.key === "Enter" || evento.key === " ") {
+                            evento.preventDefault();
                             setEditandoId(serie.id);
                           }
                         }}
                       >
-                        <span className="serie-col-i">{indice + 1}</span>
-                        <div className="serie-col-val">
-                          {serie.reps}
-                          <span>×</span>
-                          {serie.peso}
-                          <span>kg</span>
-                        </div>
-                        <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                          {serie.tipo === "aquecimento" && (
-                            <span className="chip-serie chip-serie--aquecimento">{t("aquecimento", idioma)}</span>
-                          )}
-                          {serie.tipo === "valendo" && !serie.ehRecordePessoal && (
-                            <span className="chip-serie chip-serie--valendo">{t("valendo", idioma)}</span>
-                          )}
-                          {serie.ehRecordePessoal && (
-                            <span className="chip-serie chip-serie--pr">{t("recorde pessoal", idioma)}</span>
-                          )}
-                          {modoEdicao && (
+                        <span className="grade-series__serie" role="cell">
+                          <b>{indice + 1}</b>
+                          <span className="grade-series__marcadores">
+                            {marcadores.map((marcador) => (
+                              <span
+                                className={`marcador-serie marcador-serie--${marcador.tipo}`}
+                                title={marcador.completo}
+                                aria-label={marcador.completo}
+                                key={marcador.tipo}
+                              >
+                                {marcador.curto}
+                              </span>
+                            ))}
+                          </span>
+                        </span>
+                        <span className="grade-series__numero" role="cell">
+                          {serie.peso} <small>kg</small>
+                        </span>
+                        <span className="grade-series__numero" role="cell">{serie.reps}</span>
+                        <span className="grade-series__descanso" role="cell">
+                          {modoEdicao ? (
                             <button
                               type="button"
                               className="botao-icone"
                               aria-label={`${t("Excluir série", idioma)} ${indice + 1} ${t("de", idioma)} ${grupo.nome}`}
-                              onClick={(e) => {
-                                e.stopPropagation();
+                              onClick={(evento) => {
+                                evento.stopPropagation();
                                 setExcluindoId(serie.id);
                               }}
                             >
@@ -635,8 +655,8 @@ export default function TreinoDetalhe({
                                 <path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3" />
                               </svg>
                             </button>
-                          )}
-                        </div>
+                          ) : descansoDaLinha}
+                        </span>
                       </div>
                     );
                   })}
