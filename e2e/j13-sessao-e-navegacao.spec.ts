@@ -5,7 +5,7 @@
 // navegador guarda um tema corrompido e quando o nome da conta é HTML.
 //
 // Falha aqui é ACHADO: cada mensagem diz o dano se o app aceitar.
-import { expect, test } from "@playwright/test";
+import { expect, test, type Page } from "@playwright/test";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import {
   clienteAutenticado,
@@ -28,6 +28,33 @@ import {
 
 let conta: UsuarioDescartavel;
 let cliente: SupabaseClient;
+
+const IDIOMAS_SESSAO = [
+  {
+    opcao: "Português",
+    salvo: "Idioma salvo.",
+    acao: "Salvar meta",
+    erros: ["Sessão expirada. Entre novamente.", "Não foi possível salvar. Tente de novo."],
+  },
+  {
+    opcao: "English",
+    salvo: "Language saved.",
+    acao: "Save goal",
+    erros: ["Your session expired. Sign in again.", "Couldn't save. Try again."],
+  },
+  {
+    opcao: "Español",
+    salvo: "Idioma guardado.",
+    acao: "Guardar meta",
+    erros: ["Tu sesión venció. Inicia sesión de nuevo.", "No se pudo guardar. Intenta de nuevo."],
+  },
+] as const;
+
+async function trocarIdiomaPelaTela(page: Page, idioma: (typeof IDIOMAS_SESSAO)[number]): Promise<void> {
+  await page.goto("/ajustes");
+  await page.getByRole("radio", { name: idioma.opcao }).click();
+  await expect(page.getByText(idioma.salvo, { exact: true })).toBeVisible();
+}
 
 test.beforeAll(async () => {
   conta = await criarUsuarioDescartavel("j13-sessao");
@@ -100,7 +127,7 @@ test("sessão expirada: o coach avisa que a sessão acabou", async ({ page, cont
   await entrarComoUsuario(page, conta);
   await page.goto("/coach");
   await context.clearCookies();
-  await page.getByPlaceholder("Pergunte ao coach…").fill("Quanto descanso entre séries?");
+  await page.getByPlaceholder("Pergunte ao assistente…").fill("Quanto descanso entre séries?");
   await page.getByRole("button", { name: "Enviar pergunta" }).click();
   await expect(page.locator(".aviso-erro"), "o coach não avisou da sessão expirada").toContainText(/sess/i, {
     timeout: 15_000,
@@ -249,3 +276,19 @@ test("nome com HTML e milhares de caracteres não quebra Home, perfil nem a list
     await apagarSemErro(pers);
   }
 });
+
+for (const idioma of IDIOMAS_SESSAO) {
+  test(`sessão expirada: o erro de meta fica em ${idioma.opcao}`, async ({ page, context }) => {
+    await entrarComoUsuario(page, conta);
+    await trocarIdiomaPelaTela(page, idioma);
+    await page.goto("/ajustes");
+    await context.clearCookies();
+    await page.locator("#meta_treinos").fill("4");
+    const botao = page.getByRole("button", { name: idioma.acao, exact: true });
+    await botao.click();
+    const erro = page.locator(".aviso-erro");
+    await expect(erro).toBeVisible();
+    expect(idioma.erros).toContain(await erro.textContent());
+    await expect(botao).not.toBeDisabled();
+  });
+}

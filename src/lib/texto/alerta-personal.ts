@@ -23,6 +23,8 @@
 import { formatarPeso } from "./formatar-delta";
 import { formatarGrupoMuscular } from "./grupo-muscular";
 import type { AlertaPersonal } from "@/lib/analise/fila-personal";
+import type { Idioma } from "@/lib/dados/idioma";
+import { t } from "./i18n";
 
 /**
  * O alerta na ordem que o P2 pediu, literal: o que aconteceu → há quanto
@@ -39,34 +41,38 @@ export type ConteudoAlerta = {
   oQueInvestigar: string;
 };
 
-function primeiroNome(nomeCompleto: string): string {
-  return (nomeCompleto ?? "").trim().split(/\s+/)[0] || "aluno";
+function primeiroNome(nomeCompleto: string, idioma: Idioma): string {
+  return (nomeCompleto ?? "").trim().split(/\s+/)[0] || t("aluno", idioma);
 }
 
-function plural(n: number, singular: string, plural_: string): string {
-  return n === 1 ? singular : plural_;
+function plural(n: number, singular: string, plural_: string, idioma: Idioma): string {
+  return t(n === 1 ? singular : plural_, idioma);
 }
 
 export function conteudoDoAlerta(
   alerta: AlertaPersonal,
   nomeAluno: string,
+  idioma: Idioma,
 ): ConteudoAlerta {
-  const nome = primeiroNome(nomeAluno);
+  const nome = primeiroNome(nomeAluno, idioma);
 
   switch (alerta.evidencia.tipo) {
     case "grupo_sem_estimulo": {
       const { diasSemEstimulo } = alerta.evidencia;
-      const grupo = formatarGrupoMuscular(alerta.alvo);
+      const grupo = formatarGrupoMuscular(alerta.alvo, idioma);
       return {
-        titulo: `${grupo} sem estímulo`,
-        oQueAconteceu: `${nome} não registra nenhuma série valendo de ${grupo.toLowerCase()}.`,
-        haQuantoTempo: `${diasSemEstimulo} ${plural(diasSemEstimulo, "dia", "dias")}.`,
+        titulo: `${grupo} ${t("sem estímulo", idioma)}`,
+        oQueAconteceu: `${nome} ${t("não registra nenhuma série valendo de", idioma)} ${grupo.toLowerCase()}.`,
+        haQuantoTempo: `${diasSemEstimulo} ${plural(diasSemEstimulo, "dia", "dias", idioma)}.`,
         // "Já treinou antes" é fato, e é o que separa abandono de escolha
         // de programa: `recencia.ts` só conta grupo que a pessoa já
         // treinou alguma vez.
-        evidencia: `O grupo já apareceu no histórico antes — é ausência recente, não um grupo nunca treinado.`,
-        possivelCausa: `O grupo pode ter saído da ficha, ou o dia em que esse treino cai é justamente o dia em que ${nome} tem faltado.`,
-        oQueInvestigar: `Confirmar com ${nome} se esse dia de treino continua cabendo na rotina.`,
+        evidencia: t("O grupo já apareceu no histórico antes — é ausência recente, não um grupo nunca treinado.", idioma),
+        possivelCausa: t(
+          "O grupo pode ter saído da ficha, ou o dia em que esse treino cai é justamente o dia em que {nome} tem faltado.",
+          idioma,
+        ).replace("{nome}", nome),
+        oQueInvestigar: `${t("Confirmar com", idioma)} ${nome} ${t("se esse dia de treino continua cabendo na rotina.", idioma)}`,
       };
     }
 
@@ -77,19 +83,19 @@ export function conteudoDoAlerta(
       // não se inventa um número para preencher a linha de evidência.
       const numero =
         e1rmEstavelEm !== undefined
-          ? `carga estimada parada em ${formatarPeso(e1rmEstavelEm)} kg`
+          ? `${t("carga estimada parada em", idioma)} ${formatarPeso(e1rmEstavelEm, idioma)} kg`
           : volumeEstavelEm !== undefined
-            ? `volume parado em ${formatarPeso(volumeEstavelEm)} kg`
+            ? `${t("volume parado em", idioma)} ${formatarPeso(volumeEstavelEm, idioma)} kg`
             : undefined;
       return {
-        titulo: `${alerta.alvo} sem progresso`,
-        oQueAconteceu: `${alerta.alvo} não avança no registro de ${nome}.`,
-        haQuantoTempo: `${semanasSemProgresso} ${plural(semanasSemProgresso, "semana", "semanas")}.`,
+        titulo: `${alerta.alvo} ${t("sem progresso", idioma)}`,
+        oQueAconteceu: `${alerta.alvo} ${t("não avança no registro de", idioma)} ${nome}.`,
+        haQuantoTempo: `${semanasSemProgresso} ${plural(semanasSemProgresso, "semana", "semanas", idioma)}.`,
         evidencia: numero
-          ? `${numero}, com o exercício ainda sendo treinado.`
-          : `O exercício continua sendo treinado, sem melhora medida.`,
-        possivelCausa: `Pode ser carga repetida sem ajuste, execução mudando sem ninguém notar, ou recuperação insuficiente entre as sessões.`,
-        oQueInvestigar: `Perguntar a ${nome} como estão as últimas séries desse exercício e olhar a ficha de treino.`,
+          ? `${numero}, ${t("com o exercício ainda sendo treinado.", idioma)}`
+          : t("O exercício continua sendo treinado, sem melhora medida.", idioma),
+        possivelCausa: t("Pode ser carga repetida sem ajuste, execução mudando sem ninguém notar, ou recuperação insuficiente entre as sessões.", idioma),
+        oQueInvestigar: `${t("Perguntar a", idioma)} ${nome} ${t("como estão as últimas séries desse exercício e olhar a ficha de treino.", idioma)}`,
       };
     }
 
@@ -97,12 +103,12 @@ export function conteudoDoAlerta(
       const { semanas, volumeInicial, volumeAtual, quedaPct } =
         alerta.evidencia;
       return {
-        titulo: `Volume em queda`,
-        oQueAconteceu: `O volume semanal de ${nome} caiu em todas as semanas seguidas da janela.`,
-        haQuantoTempo: `${semanas} ${plural(semanas, "semana", "semanas")}.`,
-        evidencia: `De ${formatarPeso(volumeInicial)} kg para ${formatarPeso(volumeAtual)} kg — queda de ${Math.round(quedaPct)}%.`,
-        possivelCausa: `Pode ser rotina apertada, treino mais curto, ou sessão sendo encerrada antes do fim.`,
-        oQueInvestigar: `Perguntar a ${nome} se a agenda mudou nas últimas semanas.`,
+        titulo: t("Volume em queda", idioma),
+        oQueAconteceu: `${t("O volume semanal de", idioma)} ${nome} ${t("caiu em todas as semanas seguidas da janela.", idioma)}`,
+        haQuantoTempo: `${semanas} ${plural(semanas, "semana", "semanas", idioma)}.`,
+        evidencia: `${t("De", idioma)} ${formatarPeso(volumeInicial, idioma)} kg ${t("para", idioma)} ${formatarPeso(volumeAtual, idioma)} kg — ${t("queda de", idioma)} ${Math.round(quedaPct)}%.`,
+        possivelCausa: t("Pode ser rotina apertada, treino mais curto, ou sessão sendo encerrada antes do fim.", idioma),
+        oQueInvestigar: `${t("Perguntar a", idioma)} ${nome} ${t("se a agenda mudou nas últimas semanas.", idioma)}`,
       };
     }
   }
@@ -126,41 +132,42 @@ export function conteudoDoAlerta(
 export function rascunhoWhatsApp(
   alerta: AlertaPersonal,
   nomeAluno: string,
+  idioma: Idioma,
 ): string {
-  const nome = primeiroNome(nomeAluno);
+  const nome = primeiroNome(nomeAluno, idioma);
 
   switch (alerta.evidencia.tipo) {
     case "grupo_sem_estimulo": {
-      const grupo = formatarGrupoMuscular(alerta.alvo).toLowerCase();
+      const grupo = formatarGrupoMuscular(alerta.alvo, idioma).toLowerCase();
       const { diasSemEstimulo } = alerta.evidencia;
       return [
-        `Oi, ${nome}! Tudo bem?`,
+        `${t("Oi,", idioma)} ${nome}! ${t("Tudo bem?", idioma)}`,
         ``,
-        `Passei os olhos no seu histórico e vi que o treino de ${grupo} não aparece há ${diasSemEstimulo} dias.`,
+        `${t("Passei os olhos no seu histórico e vi que o treino de", idioma)} ${grupo} ${t("não aparece há", idioma)} ${diasSemEstimulo} ${plural(diasSemEstimulo, "dia", "dias", idioma)}.`,
         ``,
-        `Aconteceu alguma coisa que atrapalhou esse dia? Me conta que a gente ajusta a semana juntos.`,
+        t("Aconteceu alguma coisa que atrapalhou esse dia? Me conta que a gente ajusta a semana juntos.", idioma),
       ].join("\n");
     }
 
     case "estagnacao_exercicio": {
       const { semanasSemProgresso } = alerta.evidencia;
       return [
-        `Oi, ${nome}! Tudo bem?`,
+        `${t("Oi,", idioma)} ${nome}! ${t("Tudo bem?", idioma)}`,
         ``,
-        `Olhei seus registros e o ${alerta.alvo} está no mesmo ponto há ${semanasSemProgresso} semanas.`,
+        `${t("Olhei seus registros e o", idioma)} ${alerta.alvo} ${t("está no mesmo ponto há", idioma)} ${semanasSemProgresso} ${plural(semanasSemProgresso, "semana", "semanas", idioma)}.`,
         ``,
-        `Isso é normal de acontecer e tem saída. Como você tem se sentido nessas séries? Quero dar uma olhada na sua ficha com esse retorno.`,
+        t("Isso é normal de acontecer e tem saída. Como você tem se sentido nessas séries? Quero dar uma olhada na sua ficha com esse retorno.", idioma),
       ].join("\n");
     }
 
     case "queda_volume": {
       const { semanas } = alerta.evidencia;
       return [
-        `Oi, ${nome}! Tudo bem?`,
+        `${t("Oi,", idioma)} ${nome}! ${t("Tudo bem?", idioma)}`,
         ``,
-        `Vi que o seu volume de treino vem caindo nas últimas ${semanas} semanas.`,
+        `${t("Vi que o seu volume de treino vem caindo nas últimas", idioma)} ${semanas} ${plural(semanas, "semana", "semanas", idioma)}.`,
         ``,
-        `A rotina apertou por aí? Se estiver corrido, me fala que a gente adapta o treino ao tempo que você tem.`,
+        t("A rotina apertou por aí? Se estiver corrido, me fala que a gente adapta o treino ao tempo que você tem.", idioma),
       ].join("\n");
     }
   }

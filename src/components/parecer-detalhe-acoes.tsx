@@ -64,7 +64,14 @@ export default function ParecerDetalheAcoes({
     setBaixandoPdf(true);
     try {
       const resposta = await fetch(`/api/parecer/${parecer.id}/pdf`);
-      if (!resposta.ok) throw new Error("falha");
+      if (!resposta.ok) {
+        setErro(
+          resposta.status === 404
+            ? t("PDF ainda indisponível", idioma)
+            : t("Falha ao baixar o PDF. Tente de novo.", idioma),
+        );
+        return;
+      }
       const blob = await resposta.blob();
       const url = URL.createObjectURL(blob);
       const link = document.createElement("a");

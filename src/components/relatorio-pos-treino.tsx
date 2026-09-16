@@ -175,7 +175,7 @@ export default function RelatorioPosTreino({
     ctx.fillText(t("EXERCÍCIOS", idioma).toUpperCase(), xEx + exNumWidth + 14, yStats + 48);
 
     // Coluna 3: Grupo Muscular / Foco (alinhado à direita)
-    const focoTexto = (metricas.focoOuDivisao || "TREINO").toUpperCase();
+    const focoTexto = (metricas.focoOuDivisao || t("TREINO", idioma)).toUpperCase();
     ctx.font = "900 48px system-ui, -apple-system, sans-serif";
     ctx.fillStyle = "#FFFFFF";
     ctx.letterSpacing = "2px";
@@ -312,7 +312,7 @@ export default function RelatorioPosTreino({
     try {
       await navigator.share({
         files: [arquivo],
-        title: "Treino LASTRO",
+        title: t("Treino LASTRO", idioma),
         text: `${t("Tempo", idioma)}: ${metricas.duracaoMinutos} min · ${t("Séries Válidas", idioma)}: ${metricas.totalSeriesValendo}`,
       });
     } catch (erro) {
@@ -408,7 +408,7 @@ export default function RelatorioPosTreino({
                 <span className="pos-treino-sticker-stat-label">{t("EXERCÍCIOS", idioma)}</span>
               </div>
               <div className="pos-treino-sticker-stat-foco">
-                {metricas.focoOuDivisao || "TREINO"}
+                {metricas.focoOuDivisao || t("TREINO", idioma)}
               </div>
             </div>
           </div>
@@ -447,7 +447,7 @@ export default function RelatorioPosTreino({
               type="button"
               className="pos-treino-btn-acao-share"
               onClick={copiarParaClipboard}
-              title="Copiar imagem transparente"
+              title={t("Copiar imagem transparente", idioma)}
             >
               <div className="pos-treino-icone-circulo">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -467,7 +467,7 @@ export default function RelatorioPosTreino({
               className="pos-treino-btn-acao-share"
               onClick={salvarImagem}
               disabled={salvando}
-              title="Salvar imagem transparente"
+              title={t("Salvar imagem transparente", idioma)}
             >
               <div className="pos-treino-icone-circulo">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -486,7 +486,7 @@ export default function RelatorioPosTreino({
               type="button"
               className="pos-treino-btn-acao-share"
               onClick={compartilharNativo}
-              title="Mais opções de compartilhamento"
+              title={t("Mais opções de compartilhamento", idioma)}
             >
               <div className="pos-treino-icone-circulo">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">

@@ -81,7 +81,7 @@ export default function PlayerExecucaoExercicio({
 
           {/* Crédito discreto de atribuição visual */}
           <div className="player-exercicio-card__credito">
-            <span>Gym Visual</span>
+            <span>{midiaCadastrada?.creditos ?? t("Mídia de exercício", idioma)}</span>
           </div>
         </div>
       </div>

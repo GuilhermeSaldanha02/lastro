@@ -47,7 +47,7 @@ export default async function PaginaAjustes() {
                 o modo é da conta, como o nome. Direção A do gate de
                 2026-09-13. SÓ para quem nasceu personal (PRD §11, emenda
                 2026-09-13): usuário não vê cápsula nem aviso. */}
-            {perfil.tipoConta === "personal" && <SeletorModo modo={perfil.modo} />}
+            {perfil.tipoConta === "personal" && <SeletorModo modo={perfil.modo} idioma={idioma} />}
 
             <MetaSemanalForm metaInicial={perfil.metaTreinosSemana} idioma={idioma} />
 
@@ -62,7 +62,7 @@ export default async function PaginaAjustes() {
                   </svg>
                 </div>
                 <div className="bento-menu-item__info">
-                  <h3 className="bento-menu-item__titulo">{t("Coach IA", idioma)}</h3>
+                  <h3 className="bento-menu-item__titulo">{t("Assistente de IA", idioma)}</h3>
                   <p className="bento-menu-item__desc">{t("Consultoria 24h e leitura de ciclo", idioma)}</p>
                 </div>
                 <SetaNavegacao />
@@ -141,8 +141,8 @@ export default async function PaginaAjustes() {
                   </svg>
                 </div>
                 <div className="bento-menu-item__info">
-                  <h3 className="bento-menu-item__titulo">{t("Relatórios & Stickers", idioma)}</h3>
-                  <p className="bento-menu-item__desc">{t("Exportar imagem de treino para Stories", idioma)}</p>
+                  <h3 className="bento-menu-item__titulo">{t("Relatórios e adesivos", idioma)}</h3>
+                  <p className="bento-menu-item__desc">{t("Exportar imagem de treino para redes sociais", idioma)}</p>
                 </div>
                 <SetaNavegacao />
               </Link>

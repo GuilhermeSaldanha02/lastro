@@ -91,11 +91,11 @@ const SECOES_PERSONAL: typeof SECOES = [
 
 export default function AbaInferior({
   ativa,
-  idioma = "pt-BR",
+  idioma,
   tipoConta = "aluno",
 }: {
   ativa: Secao;
-  idioma?: Idioma;
+  idioma: Idioma;
   /** Decide QUAL barra aparece. Vem do perfil, que toda tela já carrega. */
   tipoConta?: "aluno" | "personal";
 }) {

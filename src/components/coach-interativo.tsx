@@ -8,18 +8,24 @@ import type { Idioma } from "@/lib/dados/idioma";
 type Fala = { de: "dono" | "coach"; texto: string };
 
 /**
- * Sugestões da tela — o TEXTO em si é enviado como pergunta ao clicar
- * (`enviarPergunta(sugestao)`), não é só rótulo. O Coach (`/api/coach`)
- * continua respondendo em PT-BR (fora do escopo desta etapa — feature
- * separada da Análise Semanal, ver DECISIONS.md 2026-08-24 (5)), então
- * fica em PT-BR de propósito aqui: traduzir só o botão criaria um chat
- * onde a pessoa lê a pergunta em inglês no botão e vê ela mesma aparecer
- * em português no balão depois de clicar.
+ * O rótulo acompanha o idioma da tela, mas a pergunta enviada continua em
+ * PT-BR: o prompt atual do Coach responde nesse idioma e não faz parte desta
+ * fatia. Separar os dois preserva esse contrato sem deixar os chips fixos em
+ * português numa interface em inglês ou espanhol.
  */
 const SUGESTOES = [
-  "Como foi meu volume de treino nesta semana?",
-  "Qual grupo muscular estou treinando com menor frequência?",
-  "Devo aumentar a carga ou as repetições no meu próximo treino?",
+  {
+    rotulo: "Como foi meu volume de treino nesta semana?",
+    pergunta: "Como foi meu volume de treino nesta semana?",
+  },
+  {
+    rotulo: "Qual grupo muscular estou treinando com menor frequência?",
+    pergunta: "Qual grupo muscular estou treinando com menor frequência?",
+  },
+  {
+    rotulo: "Devo aumentar a carga ou as repetições no meu próximo treino?",
+    pergunta: "Devo aumentar a carga ou as repetições no meu próximo treino?",
+  },
 ];
 
 export default function CoachInterativo({ idioma }: { idioma: Idioma }) {
@@ -71,7 +77,7 @@ export default function CoachInterativo({ idioma }: { idioma: Idioma }) {
         setErro(
           resposta.status === 401
             ? t("Sessão expirada. Faça login novamente.", idioma)
-            : (dados?.erro ?? t("Falha ao consultar o coach.", idioma)),
+            : t("Falha ao consultar o assistente.", idioma),
         );
         return;
       }
@@ -107,15 +113,15 @@ export default function CoachInterativo({ idioma }: { idioma: Idioma }) {
 
             <div className="coach-sugestoes">
               <span className="coach-sugestoes__rotulo">{t("Sugestões de perguntas:", idioma)}</span>
-              {SUGESTOES.map((sugestao, idx) => (
+              {SUGESTOES.map((sugestao) => (
                 <button
-                  key={idx}
+                  key={sugestao.pergunta}
                   type="button"
                   className="chip-sugestao"
-                  onClick={() => enviarPergunta(sugestao)}
+                  onClick={() => enviarPergunta(sugestao.pergunta)}
                   disabled={carregando}
                 >
-                  {sugestao}
+                  {t(sugestao.rotulo, idioma)}
                 </button>
               ))}
             </div>
@@ -132,7 +138,7 @@ export default function CoachInterativo({ idioma }: { idioma: Idioma }) {
                 <svg viewBox="0 0 24 24" width="12" height="12" fill="var(--lastro-ouro)" style={{ marginRight: 4 }}>
                   <path d="M12 2L14.5 9.5L22 12L14.5 14.5L12 22L9.5 14.5L2 12L9.5 9.5L12 2Z" />
                 </svg>
-                {t("Coach IA", idioma)}
+                {t("Assistente de IA", idioma)}
               </span>
             )}
             <p className="balao__texto">{fala.texto}</p>
@@ -141,7 +147,7 @@ export default function CoachInterativo({ idioma }: { idioma: Idioma }) {
 
         {carregando && (
           <div className="balao balao--dele balao--pensando">
-            <span className="balao__quem">{t("Coach IA", idioma)}</span>
+            <span className="balao__quem">{t("Assistente de IA", idioma)}</span>
             <p>{t("Analisando seus dados…", idioma)}</p>
           </div>
         )}
@@ -158,7 +164,7 @@ export default function CoachInterativo({ idioma }: { idioma: Idioma }) {
       <form className="barra-conversa" onSubmit={aoEnviar}>
         <input
           type="text"
-          placeholder={t("Pergunte ao coach…", idioma)}
+          placeholder={t("Pergunte ao assistente…", idioma)}
           value={pergunta}
           onChange={(e) => setPergunta(e.target.value)}
           maxLength={LIMITE_PERGUNTA}

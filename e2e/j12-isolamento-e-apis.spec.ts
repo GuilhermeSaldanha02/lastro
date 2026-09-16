@@ -13,7 +13,7 @@
 // CUSTO DE COTA DA GEMINI: zero. O CI não passa `GEMINI_API_KEY` ao e2e;
 // os casos de concorrência medem só linha de banco e status HTTP.
 import { randomUUID } from "node:crypto";
-import { expect, test } from "@playwright/test";
+import { expect, test, type Page } from "@playwright/test";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import {
   clienteAutenticado,
@@ -46,6 +46,18 @@ const PESO_DA_ALUNA = 61.37;
 const TEXTO_DO_PARECER = "Parecer semeado da aluna: não pode aparecer para nenhuma outra conta.";
 const NOME_DA_ALUNA = "Aluna Isolada";
 const semeado = { treinoId: "", serieId: "", modeloId: "", parecerId: "", exercicioId: "" };
+
+const IDIOMAS_404 = [
+  { opcao: "Português", salvo: "Idioma salvo.", titulo: "Página não encontrada · 404", acao: "Voltar ao início" },
+  { opcao: "English", salvo: "Language saved.", titulo: "Page not found · 404", acao: "Back to home" },
+  { opcao: "Español", salvo: "Idioma guardado.", titulo: "Página no encontrada · 404", acao: "Volver al inicio" },
+] as const;
+
+async function trocarIdiomaPelaTela(page: Page, idioma: (typeof IDIOMAS_404)[number]): Promise<void> {
+  await page.goto("/ajustes");
+  await page.getByRole("radio", { name: idioma.opcao }).click();
+  await expect(page.getByText(idioma.salvo, { exact: true })).toBeVisible();
+}
 
 /** PNG 1x1 transparente. */
 const PNG = Buffer.from(
@@ -449,3 +461,14 @@ test("conta excluída: o personal sai e a aluna recupera a prescrição sem erro
     await apagarSemErro(a);
   }
 });
+
+for (const idioma of IDIOMAS_404) {
+  test(`id inválido: a página 404 fica no idioma ${idioma.opcao}`, async ({ page }) => {
+    await entrarComoUsuario(page, desconhecida);
+    await trocarIdiomaPelaTela(page, idioma);
+    const resposta = await page.goto("/catalogo/abc");
+    expect(resposta?.status(), "id inválido precisa continuar respondendo 404").toBe(404);
+    await expect(page.getByText(idioma.titulo, { exact: true })).toBeVisible();
+    await expect(page.getByRole("link", { name: idioma.acao, exact: true })).toBeVisible();
+  });
+}

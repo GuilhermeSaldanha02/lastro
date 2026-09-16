@@ -21,25 +21,28 @@ import DicaInfo from "@/components/dica-info";
 import { obterPerfil } from "@/lib/dados/perfil";
 import { carregarFilaDoPersonal } from "@/lib/dados/personal";
 import { exigirCascaDePersonal, precisaCompletarCadastro } from "@/lib/dados/casca";
+import { t } from "@/lib/texto/i18n";
 
 export default async function PaginaPersonal() {
   const perfil = await obterPerfil();
   if (!perfil) redirect("/login");
+  const idioma = perfil.idioma ?? "pt-BR";
   exigirCascaDePersonal(perfil);
   // Quem entrou por Google ainda não informou o CREF. A área de trabalho
   // não abre antes disso — a obrigatoriedade é do app, porque no banco
   // ela abortaria o cadastro (ver `casca.ts` e a migração 0024).
   if (precisaCompletarCadastro(perfil)) redirect("/personal/completar");
 
-  const { itens, alunos } = await carregarFilaDoPersonal();
+  const { itens, alunos } = await carregarFilaDoPersonal(idioma);
 
   return (
     <main className="tela">
       <CabecalhoPro
-        titulo="Fila"
-        destaque="Alunos"
+        titulo={t("Fila", idioma)}
+        destaque={t("Alunos", idioma)}
         mostrarLogo={true}
         perfil={perfil}
+        idioma={idioma}
       />
 
       <div className="corpo corpo--com-nav corpo--titulo-conteudo transicao-pilula">
@@ -53,10 +56,9 @@ export default async function PaginaPersonal() {
             // inicial legítimo, e ela precisa dizer o que fazer.
             <div className="vazio">
               <p className="titulo-com-dica">
-                Você ainda não tem alunos.
-                <DicaInfo titulo="Como convidar um aluno">
-                  Gere um código de convite e mande para o aluno. O acesso só
-                  existe depois que ele aceitar, e acaba quando ele revogar.
+                {t("Você ainda não tem alunos.", idioma)}
+                <DicaInfo titulo={t("Como convidar um aluno", idioma)} idioma={idioma}>
+                  {t("Gere um convite e envie ao aluno. O acesso só começa depois do aceite.", idioma)}
                 </DicaInfo>
               </p>
             </div>
@@ -66,25 +68,22 @@ export default async function PaginaPersonal() {
             // dado: é o resultado da seletividade funcionando (§11.4.6).
             // Uma tela que não explica isso parece defeito.
             <div className="vazio">
-              <p>Nada pede atenção nesta semana.</p>
+              <p>{t("Nada pede atenção nesta semana.", idioma)}</p>
               <p className="campo__nota">
                 {alunos.length === 1
-                  ? "O único aluno vinculado treinou dentro do esperado."
-                  : `Os ${alunos.length} alunos vinculados treinaram dentro do esperado.`}{" "}
-                O lastro só abre um alerta quando o sinal se mantém por
-                semanas — nunca por uma sessão ruim.
+                  ? t("O único aluno com acesso treinou dentro do esperado.", idioma)
+                  : `${alunos.length} ${t("alunos com acesso treinaram dentro do esperado.", idioma)}`}{" "}
+                {t("O lastro só abre um alerta quando o sinal se mantém por semanas.", idioma)}
               </p>
             </div>
           ) : (
-            <FilaPersonal itens={itens} />
+            <FilaPersonal itens={itens} idioma={idioma} />
           )}
 
           <p className="campo__nota titulo-com-dica">
-            Como a fila funciona
-            <DicaInfo titulo="Como a fila funciona">
-              A fila cobre a última semana fechada e mostra no máximo dois
-              alertas por aluno, priorizados. O que não apareceu aqui ou não é
-              tendência ainda, ou já foi dito nas últimas semanas.
+            {t("Como a fila funciona", idioma)}
+            <DicaInfo titulo={t("Como a fila funciona", idioma)} idioma={idioma}>
+              {t("A fila cobre a última semana fechada e mostra até dois alertas por aluno.", idioma)}
             </DicaInfo>
           </p>
 
@@ -92,12 +91,12 @@ export default async function PaginaPersonal() {
             href="/ajustes/personal"
             className="botao-secundario fila-personal-rodape"
           >
-            {alunos.length === 0 ? "Gerar convite" : "Convites e alunos"}
+            {alunos.length === 0 ? t("Gerar convite", idioma) : t("Convites e alunos", idioma)}
           </Link>
         </div>
       </div>
 
-      <AbaInferior ativa="fila" tipoConta="personal" />
+      <AbaInferior ativa="fila" tipoConta="personal" idioma={idioma} />
     </main>
   );
 }

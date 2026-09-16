@@ -170,6 +170,7 @@ export default function AnaliseInterativa({
           semanas, então a frase também errava a unidade. */}
       {!dadosSuficientes && (
         <div className="vazio" aria-live="polite">
+          <p>{t("Dados insuficientes", idioma)}</p>
           {graficoTemPainel === false && (
             <p>
               {t("O gráfico de progressão precisa de", idioma)}{" "}

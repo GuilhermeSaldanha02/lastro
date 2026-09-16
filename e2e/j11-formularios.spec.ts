@@ -7,7 +7,7 @@
 // para trás a cada tentativa.
 //
 // Falha aqui é ACHADO: cada mensagem diz o dano se o app aceitar.
-import { expect, test } from "@playwright/test";
+import { expect, test, type Page } from "@playwright/test";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import {
   clienteAutenticado,
@@ -38,6 +38,18 @@ test.afterAll(async () => {
 });
 
 const contarModelos = () => contarLinhas(cliente, "modelo_treino", { usuario_id: conta.id });
+
+const IDIOMAS_FORMULARIO = [
+  { opcao: "Português", salvo: "Idioma salvo.", acao: "Salvar meta", erro: "A meta precisa ser um número inteiro entre 1 e 7." },
+  { opcao: "English", salvo: "Language saved.", acao: "Save goal", erro: "The goal must be a whole number between 1 and 7." },
+  { opcao: "Español", salvo: "Idioma guardado.", acao: "Guardar meta", erro: "La meta debe ser un número entero entre 1 y 7." },
+] as const;
+
+async function trocarIdiomaPelaTela(page: Page, idioma: (typeof IDIOMAS_FORMULARIO)[number]): Promise<void> {
+  await page.goto("/ajustes");
+  await page.getByRole("radio", { name: idioma.opcao }).click();
+  await expect(page.getByText(idioma.salvo, { exact: true })).toBeVisible();
+}
 
 // ============================================================
 // 1. MODELO DE TREINO
@@ -185,3 +197,14 @@ test("meta: 0, 8, 3,5 e -1 são recusados na tela, e 99 é recusado pelo banco",
   const { error } = await cliente.from("usuario").update({ meta_treinos_semana: 99 }).eq("id", conta.id);
   expect.soft(error, "meta 99 gravada direto pela API").not.toBeNull();
 });
+
+for (const idioma of IDIOMAS_FORMULARIO) {
+  test(`meta inválida: ação e erro aparecem em ${idioma.opcao}`, async ({ page }) => {
+    await entrarComoUsuario(page, conta);
+    await trocarIdiomaPelaTela(page, idioma);
+    await page.goto("/ajustes");
+    await page.locator("#meta_treinos").fill("0");
+    await page.getByRole("button", { name: idioma.acao, exact: true }).click();
+    await expect(page.locator(".aviso-erro")).toHaveText(idioma.erro);
+  });
+}

@@ -20,10 +20,12 @@ import { obterPerfil } from "@/lib/dados/perfil";
 import { listarAlunosVinculados } from "@/lib/dados/personal";
 import { exigirCascaDePersonal, precisaCompletarCadastro } from "@/lib/dados/casca";
 import { formatarTelefoneBrasil } from "@/lib/texto/whatsapp";
+import { t } from "@/lib/texto/i18n";
 
 export default async function PaginaAlunosDoPersonal() {
   const perfil = await obterPerfil();
   if (!perfil) redirect("/login");
+  const idioma = perfil.idioma ?? "pt-BR";
   exigirCascaDePersonal(perfil);
   if (precisaCompletarCadastro(perfil)) redirect("/personal/completar");
 
@@ -32,10 +34,11 @@ export default async function PaginaAlunosDoPersonal() {
   return (
     <main className="tela">
       <CabecalhoPro
-        titulo="Alunos"
-        destaque="Vínculos"
+        titulo={t("Alunos", idioma)}
+        destaque={t("Acessos", idioma)}
         mostrarLogo={true}
         perfil={perfil}
+        idioma={idioma}
       />
 
       <div className="corpo corpo--com-nav corpo--titulo-conteudo transicao-pilula">
@@ -43,11 +46,9 @@ export default async function PaginaAlunosDoPersonal() {
           {alunos.length === 0 ? (
             <div className="vazio">
               <p className="titulo-com-dica">
-                Nenhum aluno vinculado.
-                <DicaInfo titulo="Como convidar um aluno">
-                  Gere um código de convite e mande para o aluno. Ele aceita no
-                  app dele — cadastrar o contato de alguém não concede acesso a
-                  nada.
+                {t("Nenhum aluno com acesso.", idioma)}
+                <DicaInfo titulo={t("Como convidar um aluno", idioma)} idioma={idioma}>
+                  {t("Gere um convite e envie ao aluno. O acesso só começa depois do aceite.", idioma)}
                 </DicaInfo>
               </p>
             </div>
@@ -55,11 +56,10 @@ export default async function PaginaAlunosDoPersonal() {
             <section className="card-obsidian">
               <div className="titulo-com-dica">
                 <span className="card-obsidian__titulo">
-                  {alunos.length === 1 ? "1 aluno" : `${alunos.length} alunos`}
+                  {alunos.length === 1 ? `1 ${t("aluno", idioma)}` : `${alunos.length} ${t("alunos", idioma)}`}
                 </span>
-                <DicaInfo titulo="O que você vê">
-                  Você lê treino, série e contato de quem aceitou — só leitura.
-                  Quem encerra o vínculo é o aluno, na tela de Ajustes dele.
+                <DicaInfo titulo={t("O que você vê", idioma)} idioma={idioma}>
+                  {t("Você vê treino, série e contato de quem aceitou, somente para leitura.", idioma)}
                 </DicaInfo>
               </div>
               <ul className="lista">
@@ -71,7 +71,7 @@ export default async function PaginaAlunosDoPersonal() {
                     <p className="campo__nota">
                       {aluno.telefoneWhatsApp
                         ? formatarTelefoneBrasil(aluno.telefoneWhatsApp)
-                        : "Sem telefone salvo — a mensagem pronta não aparece até o aluno informar."}
+                        : t("Sem telefone cadastrado", idioma)}
                     </p>
                   </li>
                 ))}
@@ -80,12 +80,12 @@ export default async function PaginaAlunosDoPersonal() {
           )}
 
           <Link href="/ajustes/personal" className="botao-secundario fila-personal-rodape">
-            Convidar um aluno
+            {t("Convidar aluno", idioma)}
           </Link>
         </div>
       </div>
 
-      <AbaInferior ativa="alunos" tipoConta="personal" />
+      <AbaInferior ativa="alunos" tipoConta="personal" idioma={idioma} />
     </main>
   );
 }

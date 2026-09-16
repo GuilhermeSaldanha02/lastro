@@ -48,7 +48,7 @@ export async function criarVinculoAceito({
   const telaPersonal = await contextoPersonal.newPage();
   await entrarComoUsuario(telaPersonal, personal);
   await telaPersonal.goto("/ajustes/personal");
-  await telaPersonal.getByRole("button", { name: /Gerar código de convite/i }).click();
+  await telaPersonal.getByRole("button", { name: "Gerar convite", exact: true }).click();
 
   const codigo = (
     await telaPersonal.locator(".codigo-convite").first().textContent({ timeout: 15_000 })
@@ -81,7 +81,7 @@ export async function criarVinculoAceito({
   // Regra que fica: sinal de "terminou" tem de ser algo que NÃO pode existir
   // antes — nunca um texto que por acaso aparece nos dois estados.
   await expect(
-    telaAluno.getByRole("button", { name: /Revogar o vínculo/i }),
+    telaAluno.getByRole("button", { name: "Encerrar acesso", exact: true }),
   ).toBeVisible({ timeout: 15_000 });
 
   return { contextoPersonal, telaPersonal, contextoAluno, telaAluno, codigo: codigo! };

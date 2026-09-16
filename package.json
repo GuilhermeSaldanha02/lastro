@@ -8,6 +8,7 @@
     "start": "next start",
     "lint": "eslint",
     "test": "vitest run",
+    "check:i18n": "node scripts/verificar-textos-i18n.mjs",
     "e2e": "playwright test"
   },
   "dependencies": {

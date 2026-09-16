@@ -9,6 +9,7 @@ import AbaInferior from "@/components/aba-inferior";
 import SetaNavegacao from "@/components/seta-navegacao";
 import EtiquetaRecorde from "@/components/etiqueta-recorde";
 import CabecalhoPro from "@/components/cabecalho-pro";
+import DicaInfo from "@/components/dica-info";
 import PlayerExecucaoExercicio from "@/components/player-execucao-exercicio";
 import { obterMidiaExercicio } from "@/lib/dados/midia-exercicio";
 import { t } from "@/lib/texto/i18n";
@@ -56,7 +57,7 @@ export default async function PaginaHistoricoExercicio({
             {exercicio.pesoPorLado && <span className="tag-unilateral">{t("Peso por lado", idioma)}</span>}
             {cargaMaxima > 0 && (
               <span className="disciplina-card__streak">
-                PR: {cargaMaxima} kg
+                {t("Melhor marca:", idioma)} {cargaMaxima} kg
               </span>
             )}
           </div>
@@ -74,7 +75,15 @@ export default async function PaginaHistoricoExercicio({
               <svg viewBox="0 0 24 24" width="18" height="18" fill="var(--lastro-ouro)" aria-hidden="true">
                 <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z" />
               </svg>
-              <span>{t("Biomecânica & Instruções Técnicas", idioma)}</span>
+              <span className="titulo-com-dica">
+                <span>{t("Dica de execução", idioma)}</span>
+                <DicaInfo titulo={t("Dica de execução", idioma)} idioma={idioma}>
+                  {t(
+                    "Veja os músculos envolvidos, o movimento das articulações e a orientação para executar o exercício.",
+                    idioma,
+                  )}
+                </DicaInfo>
+              </span>
             </div>
 
             {(() => {
@@ -90,13 +99,23 @@ export default async function PaginaHistoricoExercicio({
                     )}
                     {midia?.musculos_sinergistas && (
                       <div className="dica-bloco-info">
-                        <span className="dica-rotulo">{t("Sinergistas", idioma)}</span>
+                        <span className="dica-rotulo titulo-com-dica">
+                          <span>{t("Músculos que ajudam", idioma)}</span>
+                          <DicaInfo titulo={t("Músculos que ajudam", idioma)} idioma={idioma}>
+                            {t("São músculos que participam do movimento junto com o músculo alvo.", idioma)}
+                          </DicaInfo>
+                        </span>
                         <span className="dica-valor">{midia.musculos_sinergistas}</span>
                       </div>
                     )}
                     {midia?.mecanica_articular && (
                       <div className="dica-bloco-info">
-                        <span className="dica-rotulo">{t("Mecânica Articular", idioma)}</span>
+                        <span className="dica-rotulo titulo-com-dica">
+                          <span>{t("Movimento das articulações", idioma)}</span>
+                          <DicaInfo titulo={t("Movimento das articulações", idioma)} idioma={idioma}>
+                            {t("Mostra como as articulações se movem durante o exercício.", idioma)}
+                          </DicaInfo>
+                        </span>
                         <span className="dica-valor">{midia.mecanica_articular}</span>
                       </div>
                     )}
@@ -112,7 +131,12 @@ export default async function PaginaHistoricoExercicio({
                       dado sustenta. A tela da lista já falava assim
                       ("aguardando curadoria"); agora as duas combinam. */}
                   {exercicio.dicaExecucao ? (
-                    <p className="dica-texto-principal">{exercicio.dicaExecucao}</p>
+                    <>
+                      {exercicio.dicaExecucaoOrigem === "claude" && (
+                        <p className="campo__nota">{t("Conteúdo gerado por IA", idioma)}</p>
+                      )}
+                      <p className="dica-texto-principal">{exercicio.dicaExecucao}</p>
+                    </>
                   ) : (
                     <p className="dica-texto-principal dica-texto-principal--vazio">
                       {t("Dica de execução ainda não escrita para este exercício.", idioma)}

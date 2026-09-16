@@ -446,7 +446,7 @@ test("aceite: telefone com letra O no lugar do zero não pode vincular com o nú
   // Cada desfecho tem sinal próprio e exclusivo: o alerta de erro, ou o
   // botão de revogar, que só existe com vínculo.
   const recusou = page.locator(".aviso-erro");
-  const vinculou = page.getByRole("button", { name: /Revogar o vínculo/i });
+  const vinculou = page.getByRole("button", { name: "Encerrar acesso", exact: true });
   await expect(recusou.or(vinculou)).toBeVisible({ timeout: 15_000 });
 
   if (await vinculou.isVisible()) {
@@ -522,10 +522,10 @@ test("vínculo: desistir da revogação no meio mantém o vínculo", async ({ pa
   await entrarComoUsuario(page, alunoA);
   await page.goto("/ajustes/personal");
 
-  await page.getByRole("button", { name: /Revogar o vínculo/i }).click();
-  await page.getByRole("button", { name: /Manter o vínculo/i }).click();
+  await page.getByRole("button", { name: "Encerrar acesso", exact: true }).click();
+  await page.getByRole("button", { name: "Manter acesso", exact: true }).click();
 
-  await expect(page.getByRole("button", { name: /Revogar o vínculo/i })).toBeVisible();
+  await expect(page.getByRole("button", { name: "Encerrar acesso", exact: true })).toBeVisible();
   expect(await temVinculoAceito(alunoA), "cancelar a revogação revogou").toBe(true);
 });
 
@@ -756,7 +756,7 @@ for (const cref of ["ABCDEF-G/PB", "12345O-G/PB", "123456-X/PB", "123456-G/ZZ"])
     await page.locator("#telefone_completar").fill("83 97777-6666");
     await page.locator("#cref_completar").fill(cref);
     await expect(page.locator(".campo__nota--alerta")).toBeVisible();
-    await expect(page.getByRole("button", { name: /Abrir minha fila/i })).toBeDisabled();
+    await expect(page.getByRole("button", { name: "Salvar e abrir a fila", exact: true })).toBeDisabled();
   });
 }
 
@@ -766,7 +766,7 @@ test("completar cadastro: CREF válido com telefone só de letras é recusado", 
 
   await page.locator("#cref_completar").fill("123456-G/PB");
   await page.locator("#telefone_completar").fill("abcdefghij");
-  await page.getByRole("button", { name: /Abrir minha fila/i }).click();
+  await page.getByRole("button", { name: "Salvar e abrir a fila", exact: true }).click();
 
   await expect(page.locator(".aviso-erro")).toContainText(/Telefone inválido/i, { timeout: 15_000 });
   expect(new URL(page.url()).pathname, "cadastro completou com telefone de letras").toBe("/personal/completar");
@@ -780,7 +780,7 @@ test("completar cadastro: letra O no telefone não completa com o número errado
 
     await page.locator("#cref_completar").fill("123456-G/PB");
     await page.locator("#telefone_completar").fill("83 9999O-8888");
-    await page.getByRole("button", { name: /Abrir minha fila/i }).click();
+    await page.getByRole("button", { name: "Salvar e abrir a fila", exact: true }).click();
 
     const recusou = page.locator(".aviso-erro");
     await expect(recusou.or(page.getByText("Você ainda não tem alunos."))).toBeVisible({ timeout: 15_000 });

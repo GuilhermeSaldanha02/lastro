@@ -21,7 +21,7 @@ const TEMAS: TemaOpcao[] = [
   {
     id: "ouro",
     nome: "Obsidian Ouro",
-    subtitulo: "Spartan Gold",
+    subtitulo: "Ouro espartano",
     descricao: "Luxo espartano e assinatura clássica do LASTRO.",
     fundoPreview: "#07090D",
     cardPreview: "#0E1218",
@@ -33,7 +33,7 @@ const TEMAS: TemaOpcao[] = [
   {
     id: "branco-ouro",
     nome: "Marfim & Ouro Imperial",
-    subtitulo: "Light Luxury",
+    subtitulo: "Luxo claro",
     descricao: "Modo claro refinado com superfícies de mármore e acento em ouro nobre.",
     fundoPreview: "#F6F7F9",
     cardPreview: "#FFFFFF",
@@ -45,7 +45,7 @@ const TEMAS: TemaOpcao[] = [
   {
     id: "areia",
     nome: "Duna Areia & Âmbar",
-    subtitulo: "Sandstone Warmth",
+    subtitulo: "Calor arenito",
     descricao: "Tons minerais de linho e areia do deserto em fundo carvão quente.",
     fundoPreview: "#090807",
     cardPreview: "#12100D",
@@ -57,7 +57,7 @@ const TEMAS: TemaOpcao[] = [
   {
     id: "clean",
     nome: "Clean Monolith",
-    subtitulo: "Pure Platinum",
+    subtitulo: "Platina pura",
     descricao: "Minimalismo brutalista de alto contraste com platina pura e ônix fosco.",
     fundoPreview: "#08090A",
     cardPreview: "#101214",
@@ -69,7 +69,7 @@ const TEMAS: TemaOpcao[] = [
   {
     id: "petroleo",
     nome: "Slate Petróleo & Ouro Antigo",
-    subtitulo: "Equinox Luxury",
+    subtitulo: "Luxo Equinócio",
     descricao: "Grafite petróleo profundo com detalhes em ouro antigo escovado.",
     fundoPreview: "#080D12",
     cardPreview: "#0E161F",
@@ -81,7 +81,7 @@ const TEMAS: TemaOpcao[] = [
   {
     id: "moka",
     nome: "Café Moka & Caramelo",
-    subtitulo: "Leica Craft",
+    subtitulo: "Artesanato Leica",
     descricao: "Tons terrosos de espresso escuro e caramelo tostado.",
     fundoPreview: "#0D0B0A",
     cardPreview: "#171311",
@@ -93,7 +93,7 @@ const TEMAS: TemaOpcao[] = [
   {
     id: "oliva",
     nome: "Oliva Tático",
-    subtitulo: "Forest Stealth",
+    subtitulo: "Furtivo florestal",
     descricao: "Verde sálvia militar sóbrio em grafite floresta.",
     fundoPreview: "#070908",
     cardPreview: "#0F1310",

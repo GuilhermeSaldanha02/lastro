@@ -153,15 +153,17 @@ export default function CatalogoInterativo({
 
       {semDicaCount > 0 && !busca && (
         <div className="nota-metodo">
-          <span className="nota-metodo__badge">{t("Curadoria", idioma)}</span>
+          <span className="nota-metodo__badge">{t("Revisão", idioma)}</span>
           <p>
-            {semDicaCount} {t("exercícios estão aguardando curadoria de execução. Dicas técnicas são revisadas por humanos (ADR-007).", idioma)}
+            {semDicaCount} {t("exercícios aguardam revisão da dica de execução. As dicas são revisadas por pessoas.", idioma)}
           </p>
         </div>
       )}
 
       {exerciciosFiltrados.length === 0 ? (
-        <p className="vazio">{t("Nenhum exercício encontrado para", idioma)} &ldquo;{busca}&rdquo;.</p>
+        <p className="vazio">
+          {t("Exercício não encontrado", idioma)}{busca && <> {t("Busca:", idioma)} &ldquo;{busca}&rdquo;.</>}
+        </p>
       ) : (
         <div className="catalogo-lista">
           {gruposExibicao.map((grupo) => (
@@ -209,6 +211,7 @@ export default function CatalogoInterativo({
       )}
 
       <p className="aviso-saude">
+        <strong>{t("Aviso de saúde", idioma)}.</strong>{" "}
         {t("As instruções deste catálogo não substituem orientação médica ou fisioterapêutica.", idioma)}
       </p>
     </div>

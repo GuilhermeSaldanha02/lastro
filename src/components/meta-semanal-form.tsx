@@ -25,25 +25,32 @@ export default function MetaSemanalForm({
     setErro(null);
     setSalvo(false);
 
-    if (valor.trim() === "") {
-      setSalvando(true);
-      const resultado = await definirMetaTreinosSemana(null);
-      setSalvando(false);
-      if (!resultado.ok) return setErro(resultado.erro);
-      return setSalvo(true);
-    }
-
-    const meta = Number(valor);
-    if (!Number.isInteger(meta) || meta < 1 || meta > 7) {
+    const meta = valor.trim() === "" ? null : Number(valor);
+    if (meta !== null && (!Number.isInteger(meta) || meta < 1 || meta > 7)) {
       setErro(t("A meta precisa ser um número inteiro entre 1 e 7.", idioma));
       return;
     }
 
     setSalvando(true);
-    const resultado = await definirMetaTreinosSemana(meta);
-    setSalvando(false);
-    if (!resultado.ok) return setErro(resultado.erro);
-    setSalvo(true);
+    try {
+      const resultado = await definirMetaTreinosSemana(meta);
+      if (!resultado.ok) {
+        setErro(
+          resultado.sessaoExpirada
+            ? t("Sessão expirada. Entre novamente.", idioma)
+            : resultado.erro,
+        );
+        return;
+      }
+      setSalvo(true);
+    } catch {
+      // Um Server Action pode ter a resposta interrompida quando o cookie
+      // de sessão some entre o clique e a requisição. A tela não pode ficar
+      // presa em "Salvando…" nem sugerir que a meta foi gravada.
+      setErro(t("Não foi possível salvar. Tente de novo.", idioma));
+    } finally {
+      setSalvando(false);
+    }
   }
 
   return (

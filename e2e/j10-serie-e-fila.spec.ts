@@ -82,6 +82,18 @@ async function preencher(page: Page, caso: { reps: string; peso: string; rir?: s
 const registrar = (page: Page) => page.getByRole("button", { name: "Registrar série" });
 const linhaCom = (page: Page, texto: string) => page.locator(".linha-serie-pro", { hasText: texto });
 
+const IDIOMAS_OFFLINE = [
+  { opcao: "Português", salvo: "Idioma salvo.", acao: "Iniciar treino de hoje", erro: "Sem conexão. Conecte-se à internet para iniciar o treino." },
+  { opcao: "English", salvo: "Language saved.", acao: "Start today's workout", erro: "No connection. Connect to the internet to start the workout." },
+  { opcao: "Español", salvo: "Idioma guardado.", acao: "Iniciar entrenamiento de hoy", erro: "Sin conexión. Conéctate a internet para iniciar el entrenamiento." },
+] as const;
+
+async function trocarIdiomaPelaTela(page: Page, idioma: (typeof IDIOMAS_OFFLINE)[number]): Promise<void> {
+  await page.goto("/ajustes");
+  await page.getByRole("radio", { name: idioma.opcao }).click();
+  await expect(page.getByText(idioma.salvo, { exact: true })).toBeVisible();
+}
+
 // ============================================================
 // 1. NÚMERO FORA DO LIMITE — o banco recusa o que a tela deixou passar?
 // ============================================================
@@ -479,3 +491,20 @@ test("aparelho compartilhado: série pendente de uma conta não trava a fila da 
     await apagarSemErro(outra);
   }
 });
+
+for (const idioma of IDIOMAS_OFFLINE) {
+  test(`offline: o erro de iniciar treino aparece em ${idioma.opcao}`, async ({ page, context }) => {
+    const conta = await criarUsuarioDescartavel("j10-idioma");
+    try {
+      await entrarComoUsuario(page, conta);
+      await trocarIdiomaPelaTela(page, idioma);
+      await page.goto("/treino");
+      await context.setOffline(true);
+      await page.getByRole("button", { name: idioma.acao, exact: true }).click();
+      await expect(page.locator(".aviso-erro")).toHaveText(idioma.erro);
+    } finally {
+      await context.setOffline(false);
+      await apagarSemErro(conta);
+    }
+  });
+}

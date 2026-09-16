@@ -60,8 +60,8 @@ export default async function PaginaRelatoriosAjustes() {
   return (
     <main className="tela">
       <CabecalhoPro
-        titulo={t("Relatórios & Stickers", idioma)}
-        destaque={t("Histórico e Stories", idioma)}
+        titulo={t("Relatórios e adesivos", idioma)}
+        destaque={t("Histórico e redes sociais", idioma)}
         voltarHref="/ajustes"
         perfil={perfil}
         idioma={idioma}
@@ -83,7 +83,7 @@ export default async function PaginaRelatoriosAjustes() {
           <div className="pilha">
             <p className="subtitulo-secao">
               {t(
-                "Selecione qualquer treino passado para visualizar as estatísticas e exportar o sticker oficial transparente (1080×1080) para Instagram Stories.",
+                "Selecione qualquer treino passado para visualizar as estatísticas e exportar o adesivo oficial transparente (1080×1080) para redes sociais.",
                 idioma,
               )}
             </p>
@@ -119,7 +119,7 @@ export default async function PaginaRelatoriosAjustes() {
             </h2>
             <p className="estado-vazio-card__texto">
               {t(
-                "Assim que você concluir sua primeira sessão de treino, ela aparecerá aqui com métricas completas e opções de sticker.",
+                "Assim que você concluir sua primeira sessão de treino, ela aparecerá aqui com métricas completas e opções de adesivo.",
                 idioma,
               )}
             </p>
