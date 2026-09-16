@@ -756,7 +756,7 @@ for (const cref of ["ABCDEF-G/PB", "12345O-G/PB", "123456-X/PB", "123456-G/ZZ"])
     await page.locator("#telefone_completar").fill("83 97777-6666");
     await page.locator("#cref_completar").fill(cref);
     await expect(page.locator(".campo__nota--alerta")).toBeVisible();
-    await expect(page.getByRole("button", { name: /Abrir minha fila/i })).toBeDisabled();
+    await expect(page.getByRole("button", { name: "Salvar e abrir a fila", exact: true })).toBeDisabled();
   });
 }
 
@@ -766,7 +766,7 @@ test("completar cadastro: CREF válido com telefone só de letras é recusado", 
 
   await page.locator("#cref_completar").fill("123456-G/PB");
   await page.locator("#telefone_completar").fill("abcdefghij");
-  await page.getByRole("button", { name: /Abrir minha fila/i }).click();
+  await page.getByRole("button", { name: "Salvar e abrir a fila", exact: true }).click();
 
   await expect(page.locator(".aviso-erro")).toContainText(/Telefone inválido/i, { timeout: 15_000 });
   expect(new URL(page.url()).pathname, "cadastro completou com telefone de letras").toBe("/personal/completar");
@@ -780,7 +780,7 @@ test("completar cadastro: letra O no telefone não completa com o número errado
 
     await page.locator("#cref_completar").fill("123456-G/PB");
     await page.locator("#telefone_completar").fill("83 9999O-8888");
-    await page.getByRole("button", { name: /Abrir minha fila/i }).click();
+    await page.getByRole("button", { name: "Salvar e abrir a fila", exact: true }).click();
 
     const recusou = page.locator(".aviso-erro");
     await expect(recusou.or(page.getByText("Você ainda não tem alunos."))).toBeVisible({ timeout: 15_000 });

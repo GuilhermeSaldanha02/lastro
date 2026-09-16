@@ -48,7 +48,7 @@ export async function criarVinculoAceito({
   const telaPersonal = await contextoPersonal.newPage();
   await entrarComoUsuario(telaPersonal, personal);
   await telaPersonal.goto("/ajustes/personal");
-  await telaPersonal.getByRole("button", { name: /Gerar código de convite/i }).click();
+  await telaPersonal.getByRole("button", { name: "Gerar convite", exact: true }).click();
 
   const codigo = (
     await telaPersonal.locator(".codigo-convite").first().textContent({ timeout: 15_000 })

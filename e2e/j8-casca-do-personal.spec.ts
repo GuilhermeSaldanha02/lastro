@@ -87,7 +87,7 @@ test("em modo trabalho a conta mora na fila e não alcança as telas de quem tre
   await telaPersonal.goto("/ajustes/personal");
   await expect(telaPersonal.locator("#codigo_convite")).toHaveCount(0);
   await expect(
-    telaPersonal.getByRole("button", { name: /Gerar código de convite/i }),
+    telaPersonal.getByRole("button", { name: "Gerar convite", exact: true }),
   ).toBeVisible();
 
   // ---- a casca do aluno, que não pode ter mudado ----
@@ -110,7 +110,7 @@ test("em modo trabalho a conta mora na fila e não alcança as telas de quem tre
   // O aluno vê o campo de colar código, e não o de convidar.
   await telaAluno.goto("/ajustes/personal");
   await expect(
-    telaAluno.getByRole("button", { name: /Gerar código de convite/i }),
+    telaAluno.getByRole("button", { name: "Gerar convite", exact: true }),
   ).toHaveCount(0);
 
   await contextoPersonal.close();
