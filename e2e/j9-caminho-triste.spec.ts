@@ -446,7 +446,7 @@ test("aceite: telefone com letra O no lugar do zero não pode vincular com o nú
   // Cada desfecho tem sinal próprio e exclusivo: o alerta de erro, ou o
   // botão de revogar, que só existe com vínculo.
   const recusou = page.locator(".aviso-erro");
-  const vinculou = page.getByRole("button", { name: /Revogar o vínculo/i });
+  const vinculou = page.getByRole("button", { name: "Encerrar acesso", exact: true });
   await expect(recusou.or(vinculou)).toBeVisible({ timeout: 15_000 });
 
   if (await vinculou.isVisible()) {
@@ -522,10 +522,10 @@ test("vínculo: desistir da revogação no meio mantém o vínculo", async ({ pa
   await entrarComoUsuario(page, alunoA);
   await page.goto("/ajustes/personal");
 
-  await page.getByRole("button", { name: /Revogar o vínculo/i }).click();
-  await page.getByRole("button", { name: /Manter o vínculo/i }).click();
+  await page.getByRole("button", { name: "Encerrar acesso", exact: true }).click();
+  await page.getByRole("button", { name: "Manter acesso", exact: true }).click();
 
-  await expect(page.getByRole("button", { name: /Revogar o vínculo/i })).toBeVisible();
+  await expect(page.getByRole("button", { name: "Encerrar acesso", exact: true })).toBeVisible();
   expect(await temVinculoAceito(alunoA), "cancelar a revogação revogou").toBe(true);
 });
 

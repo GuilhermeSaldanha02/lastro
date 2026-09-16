@@ -81,7 +81,7 @@ export async function criarVinculoAceito({
   // Regra que fica: sinal de "terminou" tem de ser algo que NÃO pode existir
   // antes — nunca um texto que por acaso aparece nos dois estados.
   await expect(
-    telaAluno.getByRole("button", { name: /Revogar o vínculo/i }),
+    telaAluno.getByRole("button", { name: "Encerrar acesso", exact: true }),
   ).toBeVisible({ timeout: 15_000 });
 
   return { contextoPersonal, telaPersonal, contextoAluno, telaAluno, codigo: codigo! };
