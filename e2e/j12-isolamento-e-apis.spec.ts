@@ -48,9 +48,9 @@ const NOME_DA_ALUNA = "Aluna Isolada";
 const semeado = { treinoId: "", serieId: "", modeloId: "", parecerId: "", exercicioId: "" };
 
 const IDIOMAS_404 = [
-  { opcao: "Português", salvo: "Idioma salvo.", titulo: "Página não encontrada", acao: "Voltar ao início" },
-  { opcao: "English", salvo: "Language saved.", titulo: "Page not found", acao: "Back to home" },
-  { opcao: "Español", salvo: "Idioma guardado.", titulo: "Página no encontrada", acao: "Volver al inicio" },
+  { opcao: "Português", salvo: "Idioma salvo.", titulo: "Página não encontrada · 404", acao: "Voltar ao início" },
+  { opcao: "English", salvo: "Language saved.", titulo: "Page not found · 404", acao: "Back to home" },
+  { opcao: "Español", salvo: "Idioma guardado.", titulo: "Página no encontrada · 404", acao: "Volver al inicio" },
 ] as const;
 
 async function trocarIdiomaPelaTela(page: Page, idioma: (typeof IDIOMAS_404)[number]): Promise<void> {
