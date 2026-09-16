@@ -13,6 +13,7 @@ export type TipoMutacao =
   | "criar_treino"
   | "criar_serie"
   | "atualizar_serie"
+  | "atualizar_descanso_serie"
   | "excluir_serie"
   | "excluir_treino";
 

@@ -17,8 +17,8 @@ import {
 import FormularioSerie, { type DadosNovaSerie } from "./formulario-serie";
 import EditarSerie, { type DadosEdicaoSerie } from "./editar-serie";
 import SeletorGrupoMuscular, { type OpcaoGrupo } from "./seletor-grupo-muscular";
-import EtiquetaRecorde from "./etiqueta-recorde";
 import TimerTopo from "./timer-topo";
+import { useDescansoReal } from "./use-descanso-real";
 import RelatorioPosTreino from "./relatorio-pos-treino";
 import { assinarMarcos, estaFinalizado, marcarFim, reabrir } from "@/lib/treino/marcos-treino";
 import {
@@ -33,6 +33,12 @@ import {
 } from "@/lib/dados/modelo-treino";
 import { t } from "@/lib/texto/i18n";
 import type { Idioma } from "@/lib/dados/idioma";
+import type { DescansoConcluido } from "@/lib/treino/descanso-real";
+import {
+  formatarDescansoReal,
+  marcadoresDaSerie,
+  resumirSeriesValendo,
+} from "@/lib/treino/apresentacao-series";
 
 /**
  * `ehRecordePessoal` é só de tela (C4) — nunca persiste no banco, nunca
@@ -120,6 +126,7 @@ export default function TreinoDetalhe({
   // D7 — reflete a fila de verdade: só vira "sincronizado" quando uma
   // drenagem termina sem falha. Nunca é apresentado como erro.
   const [sincronizado, setSincronizado] = useState(false);
+  const [confirmacaoDescanso, setConfirmacaoDescanso] = useState<string | null>(null);
   // Grupo(s) musculares do dia (pedido do dono, 2026-08-07) — filtra o
   // exercício mostrado no formulário. Vive só nesta sessão de treino, não
   // é persistido: o app não prescreve programa (PRD §5, escopo negativo),
@@ -195,6 +202,37 @@ export default function TreinoDetalhe({
     return resultado;
   }, []);
 
+  const registrarDescansoConcluido = useCallback(
+    async ({ serieId, descansoRealSegundos }: DescansoConcluido) => {
+      setSeries((atuais) =>
+        atuais.map((serie) =>
+          serie.id === serieId ? { ...serie, descansoRealSegundos } : serie,
+        ),
+      );
+      await enfileirar(
+        "atualizar_descanso_serie",
+        { id: serieId, descansoRealSegundos },
+        usuarioId,
+      );
+      setSincronizado(false);
+      setConfirmacaoDescanso(
+        t("Descanso registrado: {tempo}", idioma).replace(
+          "{tempo}",
+          formatarDescansoReal(descansoRealSegundos),
+        ),
+      );
+    },
+    [idioma, usuarioId],
+  );
+
+  const descanso = useDescansoReal({
+    treinoId,
+    ultimaSerieId: ultima?.id,
+    ultimaSerieJaTemDescanso:
+      ultima !== undefined && ultima.descansoRealSegundos !== null,
+    aoConcluir: registrarDescansoConcluido,
+  });
+
   useEffect(() => {
     // O dreno na montagem fica FUNCIONAL de propósito: ele não mexe no
     // indicador. Estado a partir do corpo de um efeito encadeia render, e
@@ -219,6 +257,12 @@ export default function TreinoDetalhe({
     };
   }, [drenar]);
 
+  useEffect(() => {
+    if (!confirmacaoDescanso) return;
+    const id = window.setTimeout(() => setConfirmacaoDescanso(null), 4_000);
+    return () => window.clearTimeout(id);
+  }, [confirmacaoDescanso]);
+
   /**
    * D3 (PRD §4.1) — "repetir a última série" é a ação mais frequente do
    * app: reaproveita exercício/tipo/reps/peso/RIR da última série e
@@ -239,6 +283,7 @@ export default function TreinoDetalhe({
   }
 
   async function registrarSerie(dados: DadosNovaSerie): Promise<void> {
+    await descanso.concluir();
     const exercicio = exercicios.find((e) => e.id === dados.exercicioId);
     if (!exercicio) throw new Error("Exercício não encontrado no catálogo.");
 
@@ -254,6 +299,7 @@ export default function TreinoDetalhe({
       peso: dados.peso,
       rir: dados.rir,
       pesoPorLado: dados.pesoPorLado,
+      descansoRealSegundos: null,
       ehRecordePessoal: dados.ehRecordePessoal,
       criadoEm: new Date().toISOString(),
     };
@@ -278,10 +324,9 @@ export default function TreinoDetalhe({
     // Pede ao navegador (Background Sync) para tentar de novo quando a
     // rede voltar, mesmo se a aba ficar em segundo plano; o listener
     // `online` acima segue como fallback nos navegadores sem suporte.
-    const resultado = await drenar();
-    if (resultado.falhou) {
-      void pedirSincronizacaoEmSegundoPlano();
-    }
+    void drenar().then((resultado) => {
+      if (resultado.falhou) void pedirSincronizacaoEmSegundoPlano();
+    });
   }
 
   async function registrarPeloFormulario(dados: DadosNovaSerie): Promise<void> {
@@ -373,6 +418,7 @@ export default function TreinoDetalhe({
    * intenção assim que possível.
    */
   async function excluirSerie(id: string): Promise<void> {
+    descanso.cancelarSePertence(id);
     setSeries((atual) => atual.filter((serie) => serie.id !== id));
     setExcluindoId(null);
 
@@ -401,6 +447,16 @@ export default function TreinoDetalhe({
     });
   }
 
+  async function finalizarTreino(): Promise<void> {
+    await descanso.concluir();
+    marcarFim(treinoId);
+    setConfirmandoFim(false);
+    setMostrarRelatorio(true);
+    void drenar().then((resultado) => {
+      if (resultado.falhou) void pedirSincronizacaoEmSegundoPlano();
+    });
+  }
+
   return (
     <>
       {/* Barra de Status Sticky no Topo: Tempo de Treino Decorrido + Timer de Descanso */}
@@ -417,6 +473,7 @@ export default function TreinoDetalhe({
            é a única situação em que gravar a marca de início é honesto. */
         sessaoComecaAqui={seriesIniciais.length === 0}
         treinoFinalizado={treinoConcluido || mostrarRelatorio}
+        descanso={descanso}
       />
 
       <div className="corpo corpo--com-nav corpo--titulo-conteudo corpo--treino-detalhe">
@@ -470,24 +527,23 @@ export default function TreinoDetalhe({
           </p>
         ) : (
           grupos.map((grupo) => {
-            const valendo = grupo.series.filter((s) => s.tipo === "valendo").length;
+            const resumo = resumirSeriesValendo(grupo.series, idioma);
             return (
-              <section className="card-obsidian" key={grupo.exercicioId} style={{ marginBottom: "var(--lastro-e-3)" }}>
+              <section className="card-obsidian grade-exercicio" key={grupo.exercicioId}>
                 <div className="card-obsidian__header">
-                  <div>
-                    <h2 style={{ fontSize: "var(--lastro-papel-corpo)", fontWeight: "var(--lastro-peso-max)", color: "var(--lastro-txt)" }}>
-                      {grupo.nome}
-                    </h2>
-                    <span style={{ fontSize: "var(--lastro-papel-rotulo)", color: "var(--lastro-txt-3)" }}>
-                      {valendo} {t(valendo === 1 ? "série valendo" : "séries valendo", idioma)}
-                    </span>
+                  <div className="grade-exercicio__identidade">
+                    <h2 className="grade-exercicio__nome">{grupo.nome}</h2>
+                    <span className="grade-exercicio__resumo">{resumo}</span>
                   </div>
-                  {grupo.series.length > 0 && grupo.series[0].exercicioNome && (
-                    <span className="tag-grupo">{t("EXERCÍCIO", idioma)}</span>
-                  )}
                 </div>
 
-                <div className="tabela-series-pro">
+                <div className="grade-series" role="table" aria-label={grupo.nome}>
+                  <div className="grade-series__cabecalho" role="row">
+                    <span role="columnheader">{t("Série", idioma)}</span>
+                    <span role="columnheader">{t("Carga", idioma)}</span>
+                    <span role="columnheader">{t("Repetições", idioma)}</span>
+                    <span role="columnheader">{t("Descanso real", idioma)}</span>
+                  </div>
                   {grupo.series.map((serie, indice) => {
                     if (editandoId === serie.id) {
                       return (
@@ -528,44 +584,61 @@ export default function TreinoDetalhe({
                       );
                     }
 
+                    const marcadores = marcadoresDaSerie(
+                      serie.tipo,
+                      Boolean(serie.ehRecordePessoal),
+                      idioma,
+                    );
+                    const descansoDaLinha =
+                      descanso.ativo && descanso.serieId === serie.id
+                        ? t("Em andamento", idioma)
+                        : formatarDescansoReal(serie.descansoRealSegundos);
+
                     return (
                       <div
-                        className={`linha-serie-pro${serie.ehRecordePessoal ? " linha-serie-pro--pr" : ""}`}
-                        key={serie.id}
-                        role="button"
+                        className={
+                          descanso.ativo && descanso.serieId === serie.id
+                            ? "grade-series__linha grade-series__linha--descanso-ativo"
+                            : "grade-series__linha"
+                        }
+                        role="row"
                         tabIndex={0}
+                        key={serie.id}
                         onClick={() => setEditandoId(serie.id)}
-                        onKeyDown={(e) => {
-                          if (e.key === "Enter" || e.key === " ") {
-                            e.preventDefault();
+                        onKeyDown={(evento) => {
+                          if (evento.key === "Enter" || evento.key === " ") {
+                            evento.preventDefault();
                             setEditandoId(serie.id);
                           }
                         }}
                       >
-                        <span className="serie-col-i">{indice + 1}</span>
-                        <div className="serie-col-val">
-                          {serie.reps}
-                          <span>×</span>
-                          {serie.peso}
-                          <span>kg</span>
-                        </div>
-                        <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                          {serie.tipo === "aquecimento" && (
-                            <span className="chip-serie chip-serie--aquecimento">{t("aquecimento", idioma)}</span>
-                          )}
-                          {serie.tipo === "valendo" && !serie.ehRecordePessoal && (
-                            <span className="chip-serie chip-serie--valendo">{t("valendo", idioma)}</span>
-                          )}
-                          {serie.ehRecordePessoal && (
-                            <span className="chip-serie chip-serie--pr">{t("recorde pessoal", idioma)}</span>
-                          )}
-                          {modoEdicao && (
+                        <span className="grade-series__serie" role="cell">
+                          <b>{indice + 1}</b>
+                          <span className="grade-series__marcadores">
+                            {marcadores.map((marcador) => (
+                              <span
+                                className={`marcador-serie marcador-serie--${marcador.tipo}`}
+                                title={marcador.completo}
+                                aria-label={marcador.completo}
+                                key={marcador.tipo}
+                              >
+                                {marcador.curto}
+                              </span>
+                            ))}
+                          </span>
+                        </span>
+                        <span className="grade-series__numero" role="cell">
+                          {serie.peso} <small>kg</small>
+                        </span>
+                        <span className="grade-series__numero" role="cell">{serie.reps}</span>
+                        <span className="grade-series__descanso" role="cell">
+                          {modoEdicao ? (
                             <button
                               type="button"
                               className="botao-icone"
                               aria-label={`${t("Excluir série", idioma)} ${indice + 1} ${t("de", idioma)} ${grupo.nome}`}
-                              onClick={(e) => {
-                                e.stopPropagation();
+                              onClick={(evento) => {
+                                evento.stopPropagation();
                                 setExcluindoId(serie.id);
                               }}
                             >
@@ -583,8 +656,8 @@ export default function TreinoDetalhe({
                                 <path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3" />
                               </svg>
                             </button>
-                          )}
-                        </div>
+                          ) : descansoDaLinha}
+                        </span>
                       </div>
                     );
                   })}
@@ -724,16 +797,18 @@ export default function TreinoDetalhe({
               <button
                 type="button"
                 className="botao-finalizar-treino"
-                onClick={() => {
-                  marcarFim(treinoId);
-                  setConfirmandoFim(false);
-                  setMostrarRelatorio(true);
-                }}
+                onClick={() => void finalizarTreino()}
               >
                 {t("Finalizar Treino", idioma)}
               </button>
             </div>
           </div>
+        )}
+
+        {confirmacaoDescanso && (
+          <p className="confirmacao-descanso" aria-live="polite">
+            {confirmacaoDescanso}
+          </p>
         )}
 
         {/* D7 — estado de sincronização sempre visível, nunca alarmante. */}

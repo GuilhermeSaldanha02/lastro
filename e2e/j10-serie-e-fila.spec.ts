@@ -80,7 +80,11 @@ async function preencher(page: Page, caso: { reps: string; peso: string; rir?: s
 }
 
 const registrar = (page: Page) => page.getByRole("button", { name: "Registrar série" });
-const linhaCom = (page: Page, texto: string) => page.locator(".linha-serie-pro", { hasText: texto });
+// A grade contínua substituiu as linhas em cartão (`.linha-serie-pro`).
+// Centralizar o seletor impede que os cenários de integridade da fila
+// dependam da apresentação anterior.
+const linhasDeSerie = (page: Page) => page.locator(".grade-series__linha");
+const linhaCom = (page: Page, texto: string) => linhasDeSerie(page).filter({ hasText: texto });
 
 const IDIOMAS_OFFLINE = [
   { opcao: "Português", salvo: "Idioma salvo.", acao: "Iniciar treino de hoje", erro: "Sem conexão. Conecte-se à internet para iniciar o treino." },
@@ -153,7 +157,7 @@ test("série: editar para reps 999 não pode mostrar um valor que o banco não g
   test.setTimeout(90_000);
   await entrarComoUsuario(page, aluno);
   await page.goto(urlTreino);
-  await page.locator(".linha-serie-pro").first().click();
+  await linhasDeSerie(page).first().click();
   const campo = page.locator('input[id^="reps-"]');
   await expect(campo).toBeVisible();
   const serieId = (await campo.getAttribute("id"))!.replace("reps-", "");
@@ -197,16 +201,16 @@ test("série: reps vazio, negativo, zero, com letras e peso negativo são recusa
   ];
   for (const caso of casos) {
     await abrirFormulario(page);
-    const antes = await page.locator(".linha-serie-pro").count();
+    const antes = await linhasDeSerie(page).count();
     await preencher(page, caso);
     // Campo numérico ignora letra digitada: é o que o teclado do celular faz.
     if (caso.letras) await page.locator("#reps").pressSequentially("abc");
     await registrar(page).click();
-    await expect(page.locator(".aviso-erro").or(page.locator(".linha-serie-pro").nth(antes))).toBeVisible({
+    await expect(page.locator(".aviso-erro").or(linhasDeSerie(page).nth(antes))).toBeVisible({
       timeout: 10_000,
     });
     expect.soft(await page.locator(".aviso-erro").isVisible(), `${caso.nome} não foi recusado`).toBe(true);
-    expect.soft(await page.locator(".linha-serie-pro").count(), `${caso.nome} virou série`).toBe(antes);
+    expect.soft(await linhasDeSerie(page).count(), `${caso.nome} virou série`).toBe(antes);
     await print(page, caso.nome.replace(/\s/g, "-"));
   }
 });
@@ -214,10 +218,10 @@ test("série: reps vazio, negativo, zero, com letras e peso negativo são recusa
 test("série: peso vazio não pode gravar 0 kg em silêncio (achado BAIXA pelo dono)", async ({ page }) => {
   await entrarComoUsuario(page, aluno);
   await abrirFormulario(page);
-  const antes = await page.locator(".linha-serie-pro").count();
+  const antes = await linhasDeSerie(page).count();
   await preencher(page, { reps: "9", peso: "" });
   await registrar(page).click();
-  await expect(page.locator(".aviso-erro").or(page.locator(".linha-serie-pro").nth(antes))).toBeVisible({
+  await expect(page.locator(".aviso-erro").or(linhasDeSerie(page).nth(antes))).toBeVisible({
     timeout: 10_000,
   });
   await print(page, "peso-vazio");
@@ -254,10 +258,10 @@ test("série: dois toques rápidos em 'Repetir série' criam uma série só (ach
   await entrarComoUsuario(page, aluno);
   await page.goto(urlTreino);
   const antesNoBanco = (await seriesDoTreino(comoAluno, treinoId)).length;
-  const antesNaTela = await page.locator(".linha-serie-pro").count();
+  const antesNaTela = await linhasDeSerie(page).count();
 
   await page.getByRole("button", { name: "Repetir série" }).dblclick();
-  await expect(page.locator(".linha-serie-pro").nth(antesNaTela)).toBeVisible({ timeout: 15_000 });
+  await expect(linhasDeSerie(page).nth(antesNaTela)).toBeVisible({ timeout: 15_000 });
   await esperarFilaAssentar(page);
   await page.waitForTimeout(1_000);
 

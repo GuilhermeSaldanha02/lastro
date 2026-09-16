@@ -3997,80 +3997,163 @@
   color: var(--lastro-txt-2);
 }
 
-/* Tabelas e Séries Pro */
-.tabela-series-pro {
-  display: flex;
-  flex-direction: column;
-  gap: var(--lastro-e-2);
+/* Grade contínua de séries por exercício */
+.grade-exercicio {
+  margin-bottom: var(--lastro-e-3);
 }
 
-.linha-serie-pro {
+.grade-exercicio__identidade {
   display: grid;
-  grid-template-columns: 24px 1fr auto;
-  align-items: center;
-  gap: var(--lastro-e-3);
-  padding: 10px 14px;
-  background: var(--lastro-sup-2);
+  gap: var(--lastro-e-1);
+}
+
+.grade-exercicio__nome {
+  color: var(--lastro-txt);
+  font-size: var(--lastro-papel-corpo);
+  font-weight: var(--lastro-peso-max);
+}
+
+.grade-exercicio__resumo {
+  color: var(--lastro-txt-3);
+  font-size: var(--lastro-papel-rotulo);
+}
+
+.grade-series {
+  overflow: hidden;
   border: 1px solid var(--lastro-linha);
   border-radius: var(--lastro-raio-2);
-  transition: border-color var(--lastro-dur-1) ease;
+  background: var(--lastro-sup-1);
 }
 
-.linha-serie-pro--pr {
-  border-color: var(--lastro-borda-ouro);
-  background: rgba(212, 175, 55, 0.06);
+.grade-series__cabecalho,
+.grade-series__linha {
+  display: grid;
+  grid-template-columns:
+    minmax(0, 1.15fr)
+    minmax(0, 0.85fr)
+    minmax(0, 1fr)
+    minmax(0, 1.2fr);
+  align-items: center;
 }
 
-.serie-col-i {
-  font-family: var(--lastro-fonte-num);
-  font-size: var(--lastro-papel-rotulo);
-  color: var(--lastro-txt-3);
+.grade-series__cabecalho {
+  min-height: var(--lastro-e-8);
+  background: var(--lastro-grade-cabecalho);
+  color: var(--lastro-txt-2);
+  font-size: var(--lastro-papel-detalhe);
   font-weight: var(--lastro-peso-forte);
+}
+
+.grade-series__cabecalho > span,
+.grade-series__linha > [role="cell"] {
+  min-width: 0;
+  padding: var(--lastro-e-2) var(--lastro-e-1);
   text-align: center;
 }
 
-.serie-col-val {
-  font-family: var(--lastro-fonte-num);
-  font-variant-numeric: tabular-nums;
-  font-size: var(--lastro-papel-secao);
-  font-weight: var(--lastro-peso-max);
+.grade-series__linha {
+  min-height: var(--lastro-alvo-min);
+  border-top: 1px solid var(--lastro-linha);
   color: var(--lastro-txt);
-  display: flex;
-  align-items: baseline;
-  gap: 4px;
+  cursor: pointer;
+  transition: background var(--lastro-dur-1) ease;
 }
 
-.serie-col-val span {
-  font-size: var(--lastro-papel-rotulo);
+.grade-series__linha:hover,
+.grade-series__linha--descanso-ativo {
+  background: var(--lastro-grade-linha-ativa);
+}
+
+.grade-series__linha:focus-visible {
+  outline: var(--lastro-foco-espessura) solid var(--lastro-foco);
+  outline-offset: calc(-1 * var(--lastro-foco-espessura));
+}
+
+.grade-series__serie {
+  display: flex;
+  align-items: center;
+  gap: var(--lastro-e-1);
+  font-family: var(--lastro-fonte-num);
+  font-variant-numeric: tabular-nums;
+}
+
+.grade-series__serie > b {
+  min-width: var(--lastro-e-4);
+  color: var(--lastro-txt-2);
+}
+
+.grade-series__marcadores {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--lastro-e-1);
+}
+
+.marcador-serie {
+  padding: var(--lastro-e-1);
+  border-radius: var(--lastro-raio-1);
+  font-size: var(--lastro-papel-detalhe);
+  font-weight: var(--lastro-peso-max);
+  line-height: var(--lastro-el-apertada);
+}
+
+.marcador-serie--aquecimento {
+  border: 1px solid var(--lastro-aquecimento-borda);
+  background: var(--lastro-aquecimento-fundo);
+  color: var(--lastro-aquecimento);
+}
+
+.marcador-serie--valendo {
+  border: 1px solid var(--lastro-borda-verde);
+  background: var(--lastro-esmeralda-fundo);
+  color: var(--lastro-esmeralda-claro);
+}
+
+.marcador-serie--recorde {
+  border: 1px solid var(--lastro-borda-ouro);
+  background: var(--lastro-ouro-glow);
+  color: var(--lastro-ouro-claro);
+}
+
+.grade-series__numero,
+.grade-series__descanso {
+  font-family: var(--lastro-fonte-num);
+  font-variant-numeric: tabular-nums;
+  text-align: center;
+}
+
+.grade-series__numero {
+  font-size: var(--lastro-papel-corpo);
+  font-weight: var(--lastro-peso-forte);
+}
+
+.grade-series__numero small {
   color: var(--lastro-txt-3);
+  font-size: var(--lastro-papel-detalhe);
   font-weight: var(--lastro-peso-medio);
 }
 
-.chip-serie {
-  font-size: 11px;
-  font-weight: var(--lastro-peso-max);
-  text-transform: uppercase;
-  letter-spacing: 0.4px;
-  padding: 3px 8px;
-  border-radius: 6px;
+.grade-series__descanso {
+  overflow-wrap: anywhere;
+  color: var(--lastro-txt-2);
+  font-size: var(--lastro-papel-rotulo);
 }
 
-.chip-serie--valendo {
-  background: var(--lastro-esmeralda-fundo);
+.confirmacao-descanso {
+  margin: 0;
   color: var(--lastro-esmeralda-claro);
-  border: 1px solid var(--lastro-borda-verde);
+  font-size: var(--lastro-papel-rotulo);
+  text-align: center;
 }
 
-.chip-serie--aquecimento {
-  background: rgba(245, 158, 11, 0.12);
-  color: var(--lastro-aquecimento);
-  border: 1px solid rgba(245, 158, 11, 0.3);
-}
-
-.chip-serie--pr {
-  background: var(--lastro-ouro-glow);
-  color: var(--lastro-ouro-claro);
-  border: 1px solid var(--lastro-ouro);
+@media (max-width: 340px) {
+  .grade-series__cabecalho,
+  .grade-series__linha {
+    grid-template-columns:
+      minmax(0, 0.95fr)
+      minmax(0, 0.75fr)
+      minmax(0, 0.8fr)
+      minmax(0, 1.2fr);
+  }
 }
 
 /* =========================================================================
@@ -4684,6 +4767,14 @@
   border-color: var(--lastro-ouro);
 }
 
+.timer-topo-botao-disparar:disabled {
+  border-color: var(--lastro-linha);
+  background: var(--lastro-sup-1);
+  box-shadow: none;
+  color: var(--lastro-txt-3);
+  cursor: not-allowed;
+}
+
 .timer-topo-disparar-rotulo {
   display: inline-flex;
   align-items: center;
@@ -4798,6 +4889,14 @@
   color: var(--lastro-txt);
 }
 
+.timer-topo-btn-fechar svg {
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 2;
+}
+
 /* Barra de Progresso Fina */
 .timer-topo-barra-trilho {
   width: 100%;
@@ -4810,25 +4909,6 @@
   background: var(--lastro-esmeralda-grad);
   transition: width 0.25s linear;
   box-shadow: 0 0 8px rgba(16, 185, 129, 0.5);
-}
-
-/* Card de Conclusão - Formato Pílula */
-.timer-topo-card-concluido {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  background: rgba(16, 185, 129, 0.15);
-  border: 1px solid var(--lastro-esmeralda);
-  border-radius: var(--lastro-raio-pilula) !important;
-  padding: 4px 12px;
-  gap: var(--lastro-e-2);
-  animation: lastro-pilula-entra var(--lastro-dur-2) ease;
-}
-
-.timer-topo-concluido-txt {
-  font-size: var(--lastro-papel-rotulo);
-  font-weight: 700;
-  color: var(--lastro-esmeralda-claro);
 }
 
 /* ---------- Grid da Área de Ação Refinada (Lado a Lado Pílula + Finalizar Vermelho com Letras Brancas) ---------- */

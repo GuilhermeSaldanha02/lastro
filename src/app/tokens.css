@@ -76,6 +76,10 @@
      virou token porque reprovava no branco-ouro (T3b, 2026-08-21) e
      precisava de override por tema, que hex solto não permite. */
   --lastro-aquecimento:  #FCD34D;
+  --lastro-aquecimento-fundo: rgba(245, 158, 11, 0.12);
+  --lastro-aquecimento-borda: rgba(245, 158, 11, 0.3);
+  --lastro-grade-cabecalho: var(--lastro-sup-2);
+  --lastro-grade-linha-ativa: var(--lastro-ouro-glow);
 
   /* ---- Espaçamento: Base 4px ---- */
   --lastro-e-1:   4px;

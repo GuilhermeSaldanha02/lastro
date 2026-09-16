@@ -46,6 +46,8 @@ scripts/render-temas.mjs
 docs/PROMPT-PROXIMO-CHAT.md
 backups/
 docs/screenshots/jornada-usuario/
+.superpowers/
+.worktrees/
 
 # Saída regenerável da bancada (scripts/preview/pdf.render.tsx).
 qa/evidencias/pdf-parecer-*.pdf

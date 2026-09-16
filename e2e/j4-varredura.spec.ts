@@ -161,6 +161,23 @@ async function trocarIdiomaPelaTela(page: Page, idioma: (typeof IDIOMAS)[number]
   await expect(page.getByText(idioma.salvo, { exact: true })).toBeVisible();
 }
 
+async function montarGradeDeSeries(page: Page): Promise<void> {
+  await page.getByRole("button", { name: "Adicionar exercício" }).click();
+  await page.locator("label.chip").first().click();
+  await page.getByRole("button", { name: "Continuar" }).click();
+
+  for (const [indice, reps] of ["10", "8"].entries()) {
+    if (indice > 0) await page.getByRole("button", { name: "Outra série" }).click();
+    await page.locator("#exercicio_id").selectOption({ index: 1 });
+    await page.locator("#tipo").selectOption("valendo");
+    await page.locator("#reps").fill(reps);
+    await page.locator("#peso").fill("40");
+    await page.getByRole("button", { name: "Registrar série" }).click();
+  }
+
+  await expect(page.getByRole("row")).toHaveCount(3);
+}
+
 /**
  * Ruído conhecido que não é defeito do app. Lista curta e justificada de
  * propósito: filtro largo aqui transforma a varredura em teatro.
@@ -234,6 +251,7 @@ test("varre todas as telas com usuário novo, em três larguras", async ({ page,
   await page.getByRole("button", { name: /iniciar treino/i }).click();
   await page.waitForURL(/\/treino\/[^/]+$/, { timeout: 20_000 });
   const urlTreino = new URL(page.url()).pathname;
+  await montarGradeDeSeries(page);
 
   // Um exercício real do catálogo, para `/catalogo/[id]`.
   await page.goto("/catalogo");

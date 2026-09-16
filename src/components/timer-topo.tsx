@@ -1,19 +1,12 @@
 "use client";
 
 import {
-  useCallback,
   useEffect,
   useLayoutEffect,
   useRef,
-  useState,
   useSyncExternalStore,
 } from "react";
-import {
-  formatarMinutosSegundos,
-  tocarBipConclusao,
-  vibrarConclusao,
-  desbloquearAudio,
-} from "@/lib/audio/som-timer";
+import { formatarMinutosSegundos } from "@/lib/audio/som-timer";
 import type { Idioma } from "@/lib/dados/idioma";
 import { t } from "@/lib/texto/i18n";
 import {
@@ -21,6 +14,7 @@ import {
   segundosDecorridos,
   temInicioLocal,
 } from "@/lib/treino/marcos-treino";
+import type { ControleDescansoReal } from "./use-descanso-real";
 
 type TimerTopoProps = {
   treinoId: string;
@@ -40,6 +34,7 @@ type TimerTopoProps = {
    */
   sessaoComecaAqui: boolean;
   treinoFinalizado?: boolean;
+  descanso: ControleDescansoReal;
 };
 
 /**
@@ -60,6 +55,7 @@ export default function TimerTopo({
   duracaoReconstruidaSegundos,
   sessaoComecaAqui,
   treinoFinalizado = false,
+  descanso,
 }: TimerTopoProps) {
   // 1. Cronômetro Contínuo da Sessão de Treino (Persistido e Congelável)
   //
@@ -89,37 +85,6 @@ export default function TimerTopo({
     () => null,
   );
   const segundosTreino = segundosLocais ?? duracaoReconstruidaSegundos;
-
-  // Pode DISPARAR o descanso entre séries? Só depende de o treino não ter
-  // acabado. Não precisa de marca local: o timer de descanso é estado
-  // local puro (`ativo`, `fimTimestampRef`) e nunca lê
-  // `lastro_inicio_treino_*`.
-  //
-  // Antes disto (2026-09-05) este gate era `cronometroAoVivo`, que exigia
-  // `segundosLocais !== null` — ou seja, exigia a marca de início. O nome
-  // falava do cronômetro, mas o mostrador do tempo de treino nunca
-  // consultou esse booleano: ele exibe `segundosTreino` direto, que já cai
-  // sozinho na duração reconstruída quando não há marca. O único
-  // consumidor era este botão, e para ele a exigência estava errada.
-  //
-  // O sintoma: a marca de início só é gravada em treino recém-criado
-  // (`sessaoComecaAqui`, único ponto de escrita no repo). Quem recarregou
-  // com o storage limpo, ou continuou o treino em outro navegador, seguia
-  // registrando série normalmente — mas o botão de descanso sumia. Mesma
-  // família do defeito de 2026-09-03 (o gate do render discordando do que
-  // a ação de fato exige), sintoma invertido: lá o botão mentia dizendo
-  // que funcionava, aqui ele desaparecia sem dizer nada.
-  const podeDescansar = !treinoFinalizado;
-
-  // 2. Timer de Descanso entre Séries
-  const [ativo, setAtivo] = useState(false);
-  const [pausado, setPausado] = useState(false);
-  const [segundosRestantes, setSegundosRestantes] = useState(duracaoPadraoSegundos);
-  const [duracaoTotal, setDuracaoTotal] = useState(duracaoPadraoSegundos);
-  const [finalizado, setFinalizado] = useState(false);
-
-  // Timestamp absoluto para resiliência a bloqueio de tela
-  const fimTimestampRef = useRef<number | null>(null);
 
   // Altura real deste container, publicada como variável CSS pra quem
   // precisa reservar espaço por baixo dele (`.corpo--treino-detalhe`) ou
@@ -173,88 +138,9 @@ export default function TimerTopo({
     if (sessaoComecaAqui) iniciarSessaoLocal(treinoId);
   }, [treinoId, sessaoComecaAqui]);
 
-
-  const iniciarTimer = useCallback((segundos: number) => {
-    desbloquearAudio();
-    setDuracaoTotal(segundos);
-    setSegundosRestantes(segundos);
-    fimTimestampRef.current = Date.now() + segundos * 1000;
-    setAtivo(true);
-    setPausado(false);
-    setFinalizado(false);
-  }, []);
-
-  const pausarTimer = useCallback(() => {
-    setPausado(true);
-    fimTimestampRef.current = null;
-  }, []);
-
-  const retomarTimer = useCallback(() => {
-    desbloquearAudio();
-    fimTimestampRef.current = Date.now() + segundosRestantes * 1000;
-    setPausado(false);
-  }, [segundosRestantes]);
-
-  const adicionarTempo = useCallback((segundosExtras: number) => {
-    desbloquearAudio();
-    setSegundosRestantes((atual) => {
-      const novoTempo = atual + segundosExtras;
-      setDuracaoTotal((tot) => Math.max(tot, novoTempo));
-      if (fimTimestampRef.current) {
-        fimTimestampRef.current += segundosExtras * 1000;
-      }
-      return novoTempo;
-    });
-    setFinalizado(false);
-  }, []);
-
-  const fecharTimer = useCallback(() => {
-    setAtivo(false);
-    setPausado(false);
-    setFinalizado(false);
-    fimTimestampRef.current = null;
-  }, []);
-
-  // Descanso e treino finalizado não coexistem: acabou o treino, acabou o
-  // descanso. Antes isso era `setAtivo(false)` dentro do efeito do
-  // cronômetro (o `setState` síncrono que reprovava o lint); derivar entrega
-  // o mesmo resultado sem encadear render, e sem perder o estado de quem
-  // reabrir a tela — `ativo` continua intacto por baixo.
-  const descansoAtivo = ativo && !treinoFinalizado;
-  const descansoFinalizado = finalizado && !treinoFinalizado;
-
-  // Loop de contagem regressiva baseado em timestamp absoluto
-  useEffect(() => {
-    if (!descansoAtivo || pausado) return;
-
-    const intervalo = setInterval(() => {
-      if (!fimTimestampRef.current) return;
-
-      const agora = Date.now();
-      const restanteMs = fimTimestampRef.current - agora;
-      const restanteSeg = Math.ceil(restanteMs / 1000);
-
-      if (restanteSeg <= 0) {
-        setSegundosRestantes(0);
-        setAtivo(false);
-        setFinalizado(true);
-        fimTimestampRef.current = null;
-        clearInterval(intervalo);
-        
-        // Alertas de conclusão garantidos
-        tocarBipConclusao();
-        vibrarConclusao();
-      } else {
-        setSegundosRestantes(restanteSeg);
-      }
-    }, 250);
-
-    return () => clearInterval(intervalo);
-  }, [descansoAtivo, pausado]);
-
+  const totalDaMeta = descanso.segundosReais + descanso.segundosRestantes;
   const porcentagemRestante =
-    duracaoTotal > 0 ? (segundosRestantes / duracaoTotal) * 100 : 0;
-
+    totalDaMeta > 0 ? (descanso.segundosRestantes / totalDaMeta) * 100 : 0;
   return (
     <div className="timer-topo-container" ref={containerRef}>
       <div className="barra-status-treino">
@@ -274,31 +160,38 @@ export default function TimerTopo({
           </div>
         </div>
 
-        {/* Direita: Módulo de Descanso (Parado, Ativo ou Concluído) */}
+        {/* Direita: descanso medido e persistido, pertencente à última série. */}
         <div
           className={
-            descansoAtivo || descansoFinalizado
+            descanso.ativo
               ? "status-descanso-wrapper status-descanso-wrapper--ativo"
               : "status-descanso-wrapper"
           }
         >
-          {/* `!treinoFinalizado` é o que faltava aqui, e é o defeito exato
-              do relato de uso real (2026-09-03). Sem ele, com o treino
-              finalizado o botão CONTINUAVA visível e clicável — mas
-              `descansoAtivo = ativo && !treinoFinalizado` já nascia false,
-              então `iniciarTimer` rodava e a cápsula nunca aparecia. Um
-              botão que mente é pior que um botão ausente: o dono clicou
-              várias vezes achando que era ele. Acabou o treino, some o
-              descanso. */}
-          {podeDescansar && !descansoAtivo && !descansoFinalizado && (
+          {!treinoFinalizado && !descanso.ativo && (
             <button
               type="button"
               className="timer-topo-botao-disparar"
-              onClick={() => iniciarTimer(duracaoPadraoSegundos)}
-              title={t("Iniciar descanso entre séries", idioma)}
+              onClick={descanso.iniciar}
+              disabled={!descanso.podeIniciar}
+              aria-label={t("Iniciar descanso entre séries", idioma)}
+              title={t(
+                descanso.podeIniciar
+                  ? "Iniciar descanso entre séries"
+                  : "Registre uma série para iniciar o descanso",
+                idioma,
+              )}
             >
               <span className="timer-topo-disparar-rotulo">
-                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
+                <svg
+                  width="13"
+                  height="13"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2.2"
+                  aria-hidden="true"
+                >
                   <polygon points="5 3 19 12 5 21 5 3" fill="currentColor" />
                 </svg>
                 <span>{t("Descanso", idioma)}</span>
@@ -309,12 +202,12 @@ export default function TimerTopo({
             </button>
           )}
 
-          {descansoAtivo && (
+          {!treinoFinalizado && descanso.ativo && (
             <div className="timer-topo-card-ativo">
               <div className="timer-topo-conteudo">
                 <div className="timer-topo-tempo-bloco">
                   <span className="timer-topo-tempo-txt">
-                    {formatarMinutosSegundos(segundosRestantes)}
+                    {formatarMinutosSegundos(descanso.segundosRestantes)}
                   </span>
                 </div>
 
@@ -322,7 +215,7 @@ export default function TimerTopo({
                   <button
                     type="button"
                     className="timer-topo-chip-tempo"
-                    onClick={() => adicionarTempo(30)}
+                    onClick={() => descanso.adicionarTempo(30)}
                   >
                     +30s
                   </button>
@@ -330,52 +223,29 @@ export default function TimerTopo({
                   <button
                     type="button"
                     className="timer-topo-btn-controle"
-                    onClick={pausado ? retomarTimer : pausarTimer}
+                    onClick={descanso.pausado ? descanso.retomar : descanso.pausar}
                   >
-                    {pausado ? t("Retomar", idioma) : t("Pausar", idioma)}
+                    {descanso.pausado ? t("Retomar", idioma) : t("Pausar", idioma)}
                   </button>
 
                   <button
                     type="button"
                     className="timer-topo-btn-fechar"
-                    onClick={fecharTimer}
-                    aria-label={t("Pular descanso", idioma)}
+                    onClick={() => void descanso.concluir()}
+                    aria-label={t("Encerrar descanso", idioma)}
                   >
-                    ✕
+                    <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+                      <path d="M6 6l12 12M18 6L6 18" />
+                    </svg>
                   </button>
                 </div>
               </div>
 
-              {/* Barra de progresso linear fina */}
-              <div className="timer-topo-barra-trilho">
+              <div className="timer-topo-barra-trilho" aria-hidden="true">
                 <div
                   className="timer-topo-barra-progresso"
                   style={{ width: `${porcentagemRestante}%` }}
                 />
-              </div>
-            </div>
-          )}
-
-          {descansoFinalizado && (
-            <div className="timer-topo-card-concluido">
-              <span className="timer-topo-concluido-txt">
-                {t("Pronto!", idioma)}
-              </span>
-              <div style={{ display: "flex", gap: "6px" }}>
-                <button
-                  type="button"
-                  className="timer-topo-chip-tempo"
-                  onClick={() => iniciarTimer(duracaoPadraoSegundos)}
-                >
-                  +{formatarMinutosSegundos(duracaoPadraoSegundos)}
-                </button>
-                <button
-                  type="button"
-                  className="timer-topo-btn-fechar"
-                  onClick={fecharTimer}
-                >
-                  ✕
-                </button>
               </div>
             </div>
           )}

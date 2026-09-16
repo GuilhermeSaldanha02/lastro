@@ -160,6 +160,22 @@ const DICIONARIO: Record<string, { en: string; es: string }> = {
 
   // --- components/treino-detalhe.tsx ---
   "Séries": { en: "Sets", es: "Series" },
+  "Série": { en: "Set", es: "Serie" },
+  "Carga": { en: "Load", es: "Carga" },
+  "Repetições": { en: "Reps", es: "Repeticiones" },
+  "repetição": { en: "rep", es: "repetición" },
+  "repetições": { en: "reps", es: "repeticiones" },
+  "Descanso real": { en: "Actual rest", es: "Descanso real" },
+  "Em andamento": { en: "In progress", es: "En curso" },
+  "Encerrar descanso": { en: "End rest", es: "Finalizar descanso" },
+  "Registre uma série para iniciar o descanso": {
+    en: "Log a set to start the rest timer",
+    es: "Registra una serie para iniciar el descanso",
+  },
+  "Descanso registrado: {tempo}": {
+    en: "Rest logged: {tempo}",
+    es: "Descanso registrado: {tempo}",
+  },
   "Concluído": { en: "Done", es: "Listo" },
   "Editar": { en: "Edit", es: "Editar" },
   "valendo": { en: "working", es: "válida" },

@@ -8,6 +8,13 @@ describe("i18n", () => {
   });
 
   it.each([
+    "Série",
+    "Repetições",
+    "repetição",
+    "repetições",
+    "Em andamento",
+    "Encerrar descanso",
+    "Registre uma série para iniciar o descanso",
     "Fila",
     "Alunos",
     "Modo do app",
@@ -109,5 +116,15 @@ describe("i18n", () => {
     expect(possuiTraducao(chave)).toBe(true);
     expect(t(chave, "en")).not.toBe(chave);
     expect(t(chave, "es")).not.toBe(chave);
+  });
+
+  it.each([
+    "Carga",
+    "Descanso real",
+    "Descanso registrado: {tempo}",
+  ])("registra explicitamente a tradução espanhola homógrafa de %s", (chave) => {
+    expect(possuiTraducao(chave)).toBe(true);
+    expect(t(chave, "en")).not.toBe(chave);
+    expect(t(chave, "es")).toBe(chave);
   });
 });
