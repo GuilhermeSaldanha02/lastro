@@ -8,6 +8,10 @@ on:
   push:
     branches: [main]
   pull_request:
+  # O E2E usa o Supabase hospedado e hoje leva cerca de 25 minutos. Ele é
+  # acionado manualmente nos marcos de integração; os checks rápidos seguem
+  # obrigatórios em toda PR e push na main.
+  workflow_dispatch:
 
 concurrency:
   group: ci-${{ github.ref }}
@@ -64,9 +68,11 @@ jobs:
       # Gemini real nunca é chamada por este workflow (cota de 20 req/dia,
       # KNOWLEDGE.md §3.2, não é pra queimar em todo push).
       - name: Instalar navegador do Playwright
+        if: github.event_name == 'workflow_dispatch'
         run: npx playwright install --with-deps chromium
 
       - name: E2E (jornadas J1/J2/J3 do PRD §6 + varredura de navegação)
+        if: github.event_name == 'workflow_dispatch'
         run: npm run e2e
         env:
           NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
@@ -78,7 +84,7 @@ jobs:
       # tres larguras sem a conta do dono. `if: always()` de proposito: a
       # execucao que FALHA e justamente a que precisa ser vista.
       - name: Guardar capturas da varredura
-        if: always()
+        if: always() && github.event_name == 'workflow_dispatch'
         uses: actions/upload-artifact@v4
         with:
           name: varredura-telas
