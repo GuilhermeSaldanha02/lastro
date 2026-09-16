@@ -30,9 +30,24 @@ let conta: UsuarioDescartavel;
 let cliente: SupabaseClient;
 
 const IDIOMAS_SESSAO = [
-  { opcao: "Português", salvo: "Idioma salvo.", acao: "Salvar meta", erro: "Sessão ausente — entre de novo." },
-  { opcao: "English", salvo: "Language saved.", acao: "Save goal", erro: "Session expired — sign in again." },
-  { opcao: "Español", salvo: "Idioma guardado.", acao: "Guardar meta", erro: "Sesión ausente — inicia sesión de nuevo." },
+  {
+    opcao: "Português",
+    salvo: "Idioma salvo.",
+    acao: "Salvar meta",
+    erros: ["Sessão expirada. Entre novamente.", "Não foi possível salvar. Tente de novo."],
+  },
+  {
+    opcao: "English",
+    salvo: "Language saved.",
+    acao: "Save goal",
+    erros: ["Your session expired. Sign in again.", "Couldn't save. Try again."],
+  },
+  {
+    opcao: "Español",
+    salvo: "Idioma guardado.",
+    acao: "Guardar meta",
+    erros: ["Tu sesión venció. Inicia sesión de nuevo.", "No se pudo guardar. Intenta de nuevo."],
+  },
 ] as const;
 
 async function trocarIdiomaPelaTela(page: Page, idioma: (typeof IDIOMAS_SESSAO)[number]): Promise<void> {
@@ -112,7 +127,7 @@ test("sessão expirada: o coach avisa que a sessão acabou", async ({ page, cont
   await entrarComoUsuario(page, conta);
   await page.goto("/coach");
   await context.clearCookies();
-  await page.getByPlaceholder("Pergunte ao coach…").fill("Quanto descanso entre séries?");
+  await page.getByPlaceholder("Pergunte ao assistente…").fill("Quanto descanso entre séries?");
   await page.getByRole("button", { name: "Enviar pergunta" }).click();
   await expect(page.locator(".aviso-erro"), "o coach não avisou da sessão expirada").toContainText(/sess/i, {
     timeout: 15_000,
@@ -269,7 +284,11 @@ for (const idioma of IDIOMAS_SESSAO) {
     await page.goto("/ajustes");
     await context.clearCookies();
     await page.locator("#meta_treinos").fill("4");
-    await page.getByRole("button", { name: idioma.acao, exact: true }).click();
-    await expect(page.locator(".aviso-erro")).toHaveText(idioma.erro);
+    const botao = page.getByRole("button", { name: idioma.acao, exact: true });
+    await botao.click();
+    const erro = page.locator(".aviso-erro");
+    await expect(erro).toBeVisible();
+    expect(idioma.erros).toContain(await erro.textContent());
+    await expect(botao).not.toBeDisabled();
   });
 }

@@ -11,7 +11,9 @@ import { criarClienteServidor } from "@/lib/supabase/cliente-servidor";
 import { obterIdioma } from "@/lib/dados/idioma";
 import { t } from "@/lib/texto/i18n";
 
-export type ResultadoDefinirMeta = { ok: true } | { ok: false; erro: string };
+export type ResultadoDefinirMeta =
+  | { ok: true }
+  | { ok: false; erro: string; sessaoExpirada?: boolean };
 
 /**
  * Grava a meta semanal de treinos. `null` limpa a preferência — a Home
@@ -32,7 +34,13 @@ export async function definirMetaTreinosSemana(
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) return { ok: false, erro: t("Sessão ausente — entre de novo.", idioma) };
+  if (!user) {
+    return {
+      ok: false,
+      erro: t("Sessão expirada. Entre novamente.", idioma),
+      sessaoExpirada: true,
+    };
+  }
 
   const { error } = await supabase
     .from("usuario")

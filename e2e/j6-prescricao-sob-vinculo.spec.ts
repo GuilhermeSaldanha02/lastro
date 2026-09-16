@@ -151,9 +151,9 @@ test("sob vínculo a prescrição some da tela E é recusada no servidor, sem ga
   // aluno". Sem este passo, a trava poderia ser permanente e o teste
   // acima seguiria verde.
   await telaAluno.goto("/ajustes/personal");
-  await telaAluno.getByRole("button", { name: /Revogar o vínculo/i }).click();
+  await telaAluno.getByRole("button", { name: "Encerrar acesso", exact: true }).click();
   await telaAluno
-    .getByRole("button", { name: /Confirmar e revogar/i })
+    .getByRole("button", { name: "Encerrar acesso", exact: true })
     .click();
   await expect(telaAluno.locator("#codigo_convite")).toBeVisible({
     timeout: 15_000,
