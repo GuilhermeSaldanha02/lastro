@@ -214,6 +214,7 @@ export default function TreinoDetalhe({
         { id: serieId, descansoRealSegundos },
         usuarioId,
       );
+      setSincronizado(false);
       setConfirmacaoDescanso(
         t("Descanso registrado: {tempo}", idioma).replace(
           "{tempo}",
