@@ -141,9 +141,16 @@ export default function TimerTopo({
   const totalDaMeta = descanso.segundosReais + descanso.segundosRestantes;
   const porcentagemRestante =
     totalDaMeta > 0 ? (descanso.segundosRestantes / totalDaMeta) * 100 : 0;
+  const descansoNaBarra = !treinoFinalizado && descanso.ativo;
   return (
     <div className="timer-topo-container" ref={containerRef}>
-      <div className="barra-status-treino">
+      <div
+        className={
+          descansoNaBarra
+            ? "barra-status-treino barra-status-treino--descanso-ativo"
+            : "barra-status-treino"
+        }
+      >
         {/* Esquerda: Tempo Total de Treino Decorrido */}
         <div className="status-tempo-treino" title={t("Tempo total da sessão de treino", idioma)}>
           <span className="status-tempo-treino__icone">
@@ -153,7 +160,20 @@ export default function TimerTopo({
             </svg>
           </span>
           <div className="status-tempo-treino__conteudo">
-            <span className="status-tempo-treino__rotulo">{t("Treino", idioma)}</span>
+            {/* Com o descanso rodando, "TREINO" sai da vista (fica só para leitor
+                de tela): são os ~50px que faltavam para o descanso caber na
+                MESMA linha do cronômetro em 375px, em vez de descer para uma
+                linha própria e empurrar a lista inteira ~60px para baixo
+                (relato do dono, 2026-09-17). */}
+            <span
+              className={
+                descansoNaBarra
+                  ? "status-tempo-treino__rotulo so-leitor-de-tela"
+                  : "status-tempo-treino__rotulo"
+              }
+            >
+              {t("Treino", idioma)}
+            </span>
             <span className="status-tempo-treino__valor">
               {formatarMinutosSegundos(segundosTreino)}
             </span>

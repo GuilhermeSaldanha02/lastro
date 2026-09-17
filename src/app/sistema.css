@@ -4769,10 +4769,20 @@
   justify-content: flex-end;
 }
 
-/* Descanso rodando: linha própria, largura toda. O gatilho parado
-   (compacto) continua ao lado do cronômetro, como antes. */
+/* Descanso rodando: fica na MESMA linha do cronômetro sempre que cabe.
+   Antes era `flex-basis: 100%`, que forçava uma linha própria em qualquer
+   largura — a barra crescia de ~65px para ~128px e a lista inteira pulava
+   para baixo ao iniciar o descanso (relato do dono, 2026-09-17). Com
+   `auto`, a base é o próprio conteúdo do card (~239px medidos): a quebra
+   de linha (`flex-wrap` acima) só acontece quando não cabe de verdade,
+   então os alvos de 48px continuam inteiros em tela estreita. O que abre
+   espaço em 375px é o cronômetro compacto logo abaixo. */
 .status-descanso-wrapper--ativo {
-  flex-basis: 100%;
+  flex: 1 1 auto;
+}
+
+.barra-status-treino--descanso-ativo .status-tempo-treino {
+  padding-inline: 10px;
 }
 
 .status-descanso-wrapper--ativo .timer-topo-card-ativo {
