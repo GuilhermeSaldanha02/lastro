@@ -4667,8 +4667,18 @@
    `tituloRef.current.focus()` em `seletor-grupo-muscular.tsx`) nunca mais
    divergirem um do outro. */
 .corpo--treino-detalhe {
+  /* Distância do topo da VIEWPORT até o fim do que é fixo: vale para
+     `scroll-margin-top`, que mede a partir da viewport. */
   --lastro-clearance-topo-treino: calc(
     60px + var(--lastro-timer-topo-altura, 65px) + env(safe-area-inset-top, 0px) + var(--lastro-e-3)
+  );
+  /* Reserva no FLUXO: `.topo-pro` é sticky e já ocupa os 60px dele antes
+     deste `.corpo` — somá-los de novo aqui deixava um vão morto de 72px
+     entre o timer e "Séries" (medido em 375×812, relato do dono
+     2026-09-17). Mesmo erro de contar o topo duas vezes que a nota de
+     `.corpo--com-nav` descreve para as outras telas. */
+  --lastro-reserva-topo-treino: calc(
+    var(--lastro-timer-topo-altura, 65px) + env(safe-area-inset-top, 0px) + var(--lastro-e-3)
   );
   /* Espelha a lógica acima, agora pro rodapé: `.acao-area` fixa (UX-01)
      precisa da própria altura reservada aqui, além da folga que a `.nav`
@@ -4679,7 +4689,7 @@
     var(--lastro-acao-area-altura, 96px) + var(--lastro-clearance-nav) + var(--lastro-e-3) +
       var(--lastro-e-4)
   );
-  padding-top: var(--lastro-clearance-topo-treino) !important;
+  padding-top: var(--lastro-reserva-topo-treino) !important;
   padding-bottom: var(--lastro-clearance-acao-treino) !important;
 }
 
