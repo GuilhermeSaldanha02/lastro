@@ -620,11 +620,24 @@
 }
 
 /* ---------- Área de ação: metade inferior (D2) ---------- */
-/* Fica logo acima da barra fixa (`/treino`, `/treino/[id]`) — o botão
-   "Repetir última série" não pode nascer parcialmente embaixo dela. */
+/* UX-01 (docs/BACKLOG-CANONICO.md, auditoria 2026-09-16): virou
+   `position: fixed`, igual à `.nav` e ao `.timer-topo-container` — o
+   pedido do dono é casca fixa (topo + ações) e só o miolo rolável; antes
+   esta área era o último item do fluxo e rolava junto com a lista de
+   séries. `bottom` soma a folga da pílula (`--lastro-clearance-nav`, já
+   inclui a safe-area) mais um respiro — fica encostada no card da nav,
+   igual ela fica encostada no rodapé. A altura varia por estado (uma
+   pílula, duas lado a lado, texto de confirmação de "Finalizar"), por
+   isso quem reserva espaço no miolo (`.corpo--treino-detalhe`, mais
+   abaixo) lê `--lastro-acao-area-altura`, medida de verdade via
+   `ResizeObserver` em `treino-detalhe.tsx` — mesma solução do VS-03. */
 .acao-area {
-  padding: var(--lastro-e-4) var(--lastro-e-5)
-    calc(var(--lastro-clearance-nav) + var(--lastro-e-4));
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: calc(var(--lastro-clearance-nav) + var(--lastro-e-3));
+  z-index: 20;
+  padding: var(--lastro-e-4) var(--lastro-e-5);
   border-top: 1px solid var(--lastro-linha);
   background: var(--lastro-fundo);
 }
@@ -4654,10 +4667,30 @@
    `tituloRef.current.focus()` em `seletor-grupo-muscular.tsx`) nunca mais
    divergirem um do outro. */
 .corpo--treino-detalhe {
+  /* Distância do topo da VIEWPORT até o fim do que é fixo: vale para
+     `scroll-margin-top`, que mede a partir da viewport. */
   --lastro-clearance-topo-treino: calc(
     60px + var(--lastro-timer-topo-altura, 65px) + env(safe-area-inset-top, 0px) + var(--lastro-e-3)
   );
-  padding-top: var(--lastro-clearance-topo-treino) !important;
+  /* Reserva no FLUXO: `.topo-pro` é sticky e já ocupa os 60px dele antes
+     deste `.corpo` — somá-los de novo aqui deixava um vão morto de 72px
+     entre o timer e "Séries" (medido em 375×812, relato do dono
+     2026-09-17). Mesmo erro de contar o topo duas vezes que a nota de
+     `.corpo--com-nav` descreve para as outras telas. */
+  --lastro-reserva-topo-treino: calc(
+    var(--lastro-timer-topo-altura, 65px) + env(safe-area-inset-top, 0px) + var(--lastro-e-3)
+  );
+  /* Espelha a lógica acima, agora pro rodapé: `.acao-area` fixa (UX-01)
+     precisa da própria altura reservada aqui, além da folga que a `.nav`
+     já cobrava sozinha antes. `96px` de fallback é a pílula dupla mais
+     comum (Repetir/Outra série) — melhor chute até a primeira medição do
+     que zero, mesma lógica do fallback de 65px do timer acima. */
+  --lastro-clearance-acao-treino: calc(
+    var(--lastro-acao-area-altura, 96px) + var(--lastro-clearance-nav) + var(--lastro-e-3) +
+      var(--lastro-e-4)
+  );
+  padding-top: var(--lastro-reserva-topo-treino) !important;
+  padding-bottom: var(--lastro-clearance-acao-treino) !important;
 }
 
 /* Qualquer descendente do card, não só o título — `tituloRef.focus()`
@@ -4667,6 +4700,14 @@
 .corpo--treino-detalhe .card-obsidian__titulo,
 .corpo--treino-detalhe .card-obsidian * {
   scroll-margin-top: var(--lastro-clearance-topo-treino);
+}
+
+/* `.acao-area` fixa (UX-01) cobre o mesmo trecho do fim da tela que a
+   `.nav` já cobria — um campo de formulário focado perto do fim (ex.:
+   `FormularioSerie` aberto por "Adicionar exercício") não pode rolar pra
+   debaixo dela. Mesma classe de bug do VS-03, agora no rodapé. */
+.corpo--treino-detalhe * {
+  scroll-margin-bottom: var(--lastro-clearance-acao-treino);
 }
 
 .barra-status-treino {
@@ -4728,10 +4769,20 @@
   justify-content: flex-end;
 }
 
-/* Descanso rodando: linha própria, largura toda. O gatilho parado
-   (compacto) continua ao lado do cronômetro, como antes. */
+/* Descanso rodando: fica na MESMA linha do cronômetro sempre que cabe.
+   Antes era `flex-basis: 100%`, que forçava uma linha própria em qualquer
+   largura — a barra crescia de ~65px para ~128px e a lista inteira pulava
+   para baixo ao iniciar o descanso (relato do dono, 2026-09-17). Com
+   `auto`, a base é o próprio conteúdo do card (~239px medidos): a quebra
+   de linha (`flex-wrap` acima) só acontece quando não cabe de verdade,
+   então os alvos de 48px continuam inteiros em tela estreita. O que abre
+   espaço em 375px é o cronômetro compacto logo abaixo. */
 .status-descanso-wrapper--ativo {
-  flex-basis: 100%;
+  flex: 1 1 auto;
+}
+
+.barra-status-treino--descanso-ativo .status-tempo-treino {
+  padding-inline: 10px;
 }
 
 .status-descanso-wrapper--ativo .timer-topo-card-ativo {
@@ -4967,6 +5018,38 @@
 .botao-finalizar-treino:active {
   transform: translateY(1px);
   box-shadow: 0 2px 8px rgba(220, 38, 38, 0.5);
+}
+
+/* Casca fixa do treino (UX-01), mais baixa: fixa, a área media 172px e
+   deixava pouca lista visível. O dono escolheu (2026-09-17) manter
+   "Finalizar" fixo na segunda linha, colado na primeira — as três ações
+   numa linha só não cabem (411px de texto para 335px livres em 375px).
+   O que sai é espaço morto, não alvo: o respiro de cima e de baixo
+   encolhe, o aviso de sincronização encosta nos botões e perde a
+   entrelinha folgada. Entre as duas linhas fica exatamente a folga de D1
+   (12px) — declarada aqui porque a regra de `.acao-area > * + *` perde
+   para esta. Os botões continuam com 48px (D1). Medido no preview:
+   172px → 151px. */
+.acao-area {
+  padding-block: var(--lastro-e-3) var(--lastro-e-2);
+}
+
+/* Dentro de uma linha (Ver Relatório | Reabrir, Cancelar | Finalizar) a
+   margem de 8px do botão base o deixava 8px mais baixo que o vizinho. */
+.acao-area .botao-finalizar-treino {
+  margin-top: 0;
+}
+
+.acao-area > .botao-finalizar-treino {
+  margin-top: var(--lastro-alvo-folga);
+}
+
+.acao-area .sync--area {
+  margin-top: var(--lastro-e-1);
+}
+
+.acao-area .sync {
+  line-height: 1.2;
 }
 
 /* ---------- Modal de Compartilhamento Pós-Treino Transparente (Estilo Strava) ---------- */
