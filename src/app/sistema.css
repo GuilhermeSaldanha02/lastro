@@ -620,11 +620,24 @@
 }
 
 /* ---------- Área de ação: metade inferior (D2) ---------- */
-/* Fica logo acima da barra fixa (`/treino`, `/treino/[id]`) — o botão
-   "Repetir última série" não pode nascer parcialmente embaixo dela. */
+/* UX-01 (docs/BACKLOG-CANONICO.md, auditoria 2026-09-16): virou
+   `position: fixed`, igual à `.nav` e ao `.timer-topo-container` — o
+   pedido do dono é casca fixa (topo + ações) e só o miolo rolável; antes
+   esta área era o último item do fluxo e rolava junto com a lista de
+   séries. `bottom` soma a folga da pílula (`--lastro-clearance-nav`, já
+   inclui a safe-area) mais um respiro — fica encostada no card da nav,
+   igual ela fica encostada no rodapé. A altura varia por estado (uma
+   pílula, duas lado a lado, texto de confirmação de "Finalizar"), por
+   isso quem reserva espaço no miolo (`.corpo--treino-detalhe`, mais
+   abaixo) lê `--lastro-acao-area-altura`, medida de verdade via
+   `ResizeObserver` em `treino-detalhe.tsx` — mesma solução do VS-03. */
 .acao-area {
-  padding: var(--lastro-e-4) var(--lastro-e-5)
-    calc(var(--lastro-clearance-nav) + var(--lastro-e-4));
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: calc(var(--lastro-clearance-nav) + var(--lastro-e-3));
+  z-index: 20;
+  padding: var(--lastro-e-4) var(--lastro-e-5);
   border-top: 1px solid var(--lastro-linha);
   background: var(--lastro-fundo);
 }
@@ -4657,7 +4670,17 @@
   --lastro-clearance-topo-treino: calc(
     60px + var(--lastro-timer-topo-altura, 65px) + env(safe-area-inset-top, 0px) + var(--lastro-e-3)
   );
+  /* Espelha a lógica acima, agora pro rodapé: `.acao-area` fixa (UX-01)
+     precisa da própria altura reservada aqui, além da folga que a `.nav`
+     já cobrava sozinha antes. `96px` de fallback é a pílula dupla mais
+     comum (Repetir/Outra série) — melhor chute até a primeira medição do
+     que zero, mesma lógica do fallback de 65px do timer acima. */
+  --lastro-clearance-acao-treino: calc(
+    var(--lastro-acao-area-altura, 96px) + var(--lastro-clearance-nav) + var(--lastro-e-3) +
+      var(--lastro-e-4)
+  );
   padding-top: var(--lastro-clearance-topo-treino) !important;
+  padding-bottom: var(--lastro-clearance-acao-treino) !important;
 }
 
 /* Qualquer descendente do card, não só o título — `tituloRef.focus()`
@@ -4667,6 +4690,14 @@
 .corpo--treino-detalhe .card-obsidian__titulo,
 .corpo--treino-detalhe .card-obsidian * {
   scroll-margin-top: var(--lastro-clearance-topo-treino);
+}
+
+/* `.acao-area` fixa (UX-01) cobre o mesmo trecho do fim da tela que a
+   `.nav` já cobria — um campo de formulário focado perto do fim (ex.:
+   `FormularioSerie` aberto por "Adicionar exercício") não pode rolar pra
+   debaixo dela. Mesma classe de bug do VS-03, agora no rodapé. */
+.corpo--treino-detalhe * {
+  scroll-margin-bottom: var(--lastro-clearance-acao-treino);
 }
 
 .barra-status-treino {

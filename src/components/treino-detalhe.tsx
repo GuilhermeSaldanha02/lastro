@@ -5,7 +5,15 @@
 // sem o dono esperar. Se a rede caiu no meio do treino (PRD J1, "o
 // elevador derruba o sinal"), o registro continua funcionando — a série
 // fica na fila até o próximo evento `online`.
-import { useCallback, useEffect, useMemo, useState, useSyncExternalStore } from "react";
+import {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+  useSyncExternalStore,
+} from "react";
 import type { ExercicioDoCatalogo, Serie } from "@/lib/dados/treino";
 import { historicoDoExercicio } from "@/lib/dados/treino";
 import { enfileirar } from "@/lib/offline/outbox";
@@ -447,6 +455,38 @@ export default function TreinoDetalhe({
     });
   }
 
+  // UX-01 (docs/BACKLOG-CANONICO.md) — "Repetir série"/"Adicionar
+  // exercício"/"Finalizar Treino" viviam no FLUXO, então rolavam junto com
+  // a lista de séries; o pedido do dono é casca fixa (topo + ações) com só
+  // o miolo rolável. A altura desta área varia MUITO por estado (uma
+  // pílula, duas lado a lado, ou o texto de confirmação de "Finalizar") —
+  // mesma classe de problema que `.timer-topo-container` já resolveu
+  // (achado VS-03, QA.md 2026-08-28): publica a altura real como variável
+  // CSS via `ResizeObserver` em vez de reservar um número fixo, que
+  // ficaria errado em algum dos estados.
+  const acaoAreaRef = useRef<HTMLDivElement>(null);
+  useLayoutEffect(() => {
+    const elemento = acaoAreaRef.current;
+    if (!elemento) return;
+
+    function publicarAltura(altura: number) {
+      document.documentElement.style.setProperty(
+        "--lastro-acao-area-altura",
+        `${Math.ceil(altura)}px`,
+      );
+    }
+    publicarAltura(elemento.getBoundingClientRect().height);
+
+    const observador = new ResizeObserver(([entrada]) => {
+      if (entrada) publicarAltura(entrada.target.getBoundingClientRect().height);
+    });
+    observador.observe(elemento);
+    return () => {
+      observador.disconnect();
+      document.documentElement.style.removeProperty("--lastro-acao-area-altura");
+    };
+  }, []);
+
   async function finalizarTreino(): Promise<void> {
     await descanso.concluir();
     marcarFim(treinoId);
@@ -702,8 +742,11 @@ export default function TreinoDetalhe({
         )}
       </div>
 
-      {/* Área de Ações do Treino Refinada: Pílulas Compactas Lado a Lado + Finalizar Treino */}
-      <div className="acao-area">
+      {/* Área de Ações do Treino Refinada: Pílulas Compactas Lado a Lado + Finalizar Treino.
+          `ref` mede a altura real (ver hook acima) — ela muda de estado
+          pra estado e é o que a casca fixa (`sistema.css`) reserva no
+          miolo rolável. */}
+      <div className="acao-area" ref={acaoAreaRef}>
         {/* Treino concluído fecha o registro. Antes nada aqui olhava
             `treinoConcluido` — só o rótulo do botão de baixo mudava —, então
             dava pra seguir registrando série num treino "finalizado" com o
