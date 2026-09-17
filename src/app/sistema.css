@@ -5020,6 +5020,38 @@
   box-shadow: 0 2px 8px rgba(220, 38, 38, 0.5);
 }
 
+/* Casca fixa do treino (UX-01), mais baixa: fixa, a área media 172px e
+   deixava pouca lista visível. O dono escolheu (2026-09-17) manter
+   "Finalizar" fixo na segunda linha, colado na primeira — as três ações
+   numa linha só não cabem (411px de texto para 335px livres em 375px).
+   O que sai é espaço morto, não alvo: o respiro de cima e de baixo
+   encolhe, o aviso de sincronização encosta nos botões e perde a
+   entrelinha folgada. Entre as duas linhas fica exatamente a folga de D1
+   (12px) — declarada aqui porque a regra de `.acao-area > * + *` perde
+   para esta. Os botões continuam com 48px (D1). Medido no preview:
+   172px → 151px. */
+.acao-area {
+  padding-block: var(--lastro-e-3) var(--lastro-e-2);
+}
+
+/* Dentro de uma linha (Ver Relatório | Reabrir, Cancelar | Finalizar) a
+   margem de 8px do botão base o deixava 8px mais baixo que o vizinho. */
+.acao-area .botao-finalizar-treino {
+  margin-top: 0;
+}
+
+.acao-area > .botao-finalizar-treino {
+  margin-top: var(--lastro-alvo-folga);
+}
+
+.acao-area .sync--area {
+  margin-top: var(--lastro-e-1);
+}
+
+.acao-area .sync {
+  line-height: 1.2;
+}
+
 /* ---------- Modal de Compartilhamento Pós-Treino Transparente (Estilo Strava) ---------- */
 /* O conteúdo deste modal é mais alto que a tela de um celular (medido:
    668px de conteúdo em 664px de viewport, e pior ainda em 360×640). Com
