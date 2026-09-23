@@ -1,0 +1,1 @@
+Console de produção: 0 erros durante a verificação (avisos de preload de fonte, já existentes).
