@@ -1,0 +1,1 @@
+Console do preview: 0 erros durante o teste (avisos de preload de fonte, já existentes).

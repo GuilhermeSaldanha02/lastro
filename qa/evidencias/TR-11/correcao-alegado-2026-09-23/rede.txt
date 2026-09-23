@@ -1,0 +1,6 @@
+Preview da PR #274 (lastro-git-fix-toque-duplo-repetir-finalizar), conta do dono, 375x812, 2026-09-23.
+Dois cliques em "Repetir série" com 19 ms: 1 -> 2 séries na tela, 1 POST de gravação:
+2026-09-23T20:35:05.403Z [{"id":"86f5701d-1f41-40d3-9336-66e51a2d2d14","treinoId":"aa0cd9e6-6dc4-477b-9c91-6a9142bd4a59","ordem":2,"reps":10,"peso":20}]
+Toque normal 600 ms depois: 2 -> 3, 1 POST:
+2026-09-23T20:35:11.813Z [{"id":"502ca254-4262-43fa-b21c-171558d94a62","ordem":3,"reps":10,"peso":20}]
+Banco (SQL de leitura): treino aa0cd9e6 com 3 séries, criadas 20:34:44, 20:35:05, 20:35:11.
