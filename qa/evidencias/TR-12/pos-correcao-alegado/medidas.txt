@@ -1,0 +1,5 @@
+Preview aad7f9b (PR #269), conta do dono, 375x812, sem gravar nada.
+outer-serie: titulo 137-154, Registrar 621-685, nav 735, acao-area display:none, --lastro-acao-area-altura 0px, foco no titulo.
+seletor: Continuar 611-675. apos Continuar: Registrar 621-685. Fechar (X): acao-area volta, 151px.
+edicao: Salvar 630-678, acao-area oculta; Cancelar -> volta.
+ALEGADO: medido por quem escreveu a correcao.
