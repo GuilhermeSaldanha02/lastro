@@ -25,6 +25,7 @@ import {
 import FormularioSerie, { type DadosNovaSerie } from "./formulario-serie";
 import EditarSerie, { type DadosEdicaoSerie } from "./editar-serie";
 import SeletorGrupoMuscular, { type OpcaoGrupo } from "./seletor-grupo-muscular";
+import BotaoFecharCartao, { comportamentoDeRolagem } from "./botao-fechar-cartao";
 import TimerTopo from "./timer-topo";
 import { useDescansoReal } from "./use-descanso-real";
 import RelatorioPosTreino from "./relatorio-pos-treino";
@@ -487,6 +488,42 @@ export default function TreinoDetalhe({
     };
   }, []);
 
+  // TR-12 (QA.md, 2026-09-23) — com a casca fixa, o formulário de série
+  // abria abaixo da dobra: "Outra série" com o grupo já escolhido não passa
+  // pelo seletor (o único que movia o foco), então nada rolava e o
+  // "Registrar série" ficava em y=1031 numa tela de 812. E mesmo rolado ele
+  // não cabia: com Repetir + Finalizar fixos sobravam 448px para ~500px de
+  // formulário. Enquanto a pessoa preenche (formulário aberto ou série em
+  // edição), a área de ações sai de cena — "Fechar" vai para o cabeçalho do
+  // cartão — e a tela rola até o que acabou de abrir.
+  const preenchendo = formularioAberto || editandoId !== null;
+  const tituloFormularioRef = useRef<HTMLSpanElement>(null);
+  const formularioVisivel = formularioAberto && gruposEscolhidos.length > 0;
+  useEffect(() => {
+    if (!formularioVisivel) return;
+    // Um quadro de espera: a área de ações acabou de sumir e o
+    // `ResizeObserver` acima ainda precisa publicar a altura nova, senão o
+    // `padding-bottom` antigo limita até onde dá para rolar.
+    const quadro = requestAnimationFrame(() => {
+      const titulo = tituloFormularioRef.current;
+      if (!titulo) return;
+      titulo.focus({ preventScroll: true });
+      titulo.scrollIntoView({ block: "start", behavior: comportamentoDeRolagem() });
+    });
+    return () => cancelAnimationFrame(quadro);
+  }, [formularioVisivel]);
+
+  useEffect(() => {
+    if (!editandoId) return;
+    const quadro = requestAnimationFrame(() => {
+      document
+        .getElementById(`tipo-${editandoId}`)
+        ?.closest("form")
+        ?.scrollIntoView({ block: "nearest", behavior: comportamentoDeRolagem() });
+    });
+    return () => cancelAnimationFrame(quadro);
+  }, [editandoId]);
+
   async function finalizarTreino(): Promise<void> {
     await descanso.concluir();
     marcarFim(treinoId);
@@ -708,25 +745,35 @@ export default function TreinoDetalhe({
         )}
 
         {formularioAberto && gruposEscolhidos.length === 0 && (
-          <SeletorGrupoMuscular opcoes={opcoesGrupo} onConfirmar={setGruposEscolhidos} idioma={idioma} />
+          <SeletorGrupoMuscular
+            opcoes={opcoesGrupo}
+            onConfirmar={setGruposEscolhidos}
+            onFechar={() => setFormularioAberto(false)}
+            idioma={idioma}
+          />
         )}
 
-        {formularioAberto && gruposEscolhidos.length > 0 && (
+        {formularioVisivel && (
           <section className="card-obsidian" style={{ marginBottom: "var(--lastro-e-4)" }}>
             <div className="card-obsidian__header">
               <div>
-                <span className="card-obsidian__titulo">{t("Registrar Série", idioma)}</span>
+                <span className="card-obsidian__titulo" tabIndex={-1} ref={tituloFormularioRef}>
+                  {t("Registrar Série", idioma)}
+                </span>
                 <p style={{ fontSize: "var(--lastro-papel-rotulo)", color: "var(--lastro-txt-3)", margin: 0 }}>
                   {t("Preencha a carga e repetições executadas", idioma)}
                 </p>
               </div>
-              <button
-                type="button"
-                className="botao-textual"
-                onClick={() => setGruposEscolhidos([])}
-              >
-                {t("Trocar grupo", idioma)}
-              </button>
+              <div className="card-obsidian__acoes">
+                <button
+                  type="button"
+                  className="botao-textual"
+                  onClick={() => setGruposEscolhidos([])}
+                >
+                  {t("Trocar grupo", idioma)}
+                </button>
+                <BotaoFecharCartao onClick={() => setFormularioAberto(false)} idioma={idioma} />
+              </div>
             </div>
             <FormularioSerie
               /* `key` remonta o formulário quando o `+` traz outro
@@ -746,7 +793,7 @@ export default function TreinoDetalhe({
           `ref` mede a altura real (ver hook acima) — ela muda de estado
           pra estado e é o que a casca fixa (`sistema.css`) reserva no
           miolo rolável. */}
-      <div className="acao-area" ref={acaoAreaRef}>
+      <div className="acao-area" ref={acaoAreaRef} hidden={preenchendo}>
         {/* Treino concluído fecha o registro. Antes nada aqui olhava
             `treinoConcluido` — só o rótulo do botão de baixo mudava —, então
             dava pra seguir registrando série num treino "finalizado" com o
