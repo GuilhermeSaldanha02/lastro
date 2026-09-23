@@ -48,6 +48,7 @@ import {
   formatarDescansoReal,
   marcadoresDaSerie,
   resumirSeriesValendo,
+  unidadeDaCarga,
 } from "@/lib/treino/apresentacao-series";
 
 /**
@@ -711,7 +712,7 @@ export default function TreinoDetalhe({
                           </span>
                         </span>
                         <span className="grade-series__numero" role="cell">
-                          {serie.peso} <small>kg</small>
+                          {serie.peso} <small>{unidadeDaCarga(serie.pesoPorLado, idioma)}</small>
                         </span>
                         <span className="grade-series__numero" role="cell">{serie.reps}</span>
                         <span className="grade-series__descanso" role="cell">

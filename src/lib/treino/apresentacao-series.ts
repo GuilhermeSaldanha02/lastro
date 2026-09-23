@@ -40,6 +40,14 @@ export function resumirSeriesValendo(series: SerieApresentavel[], idioma: Idioma
   return `${quantidade} ${rotuloSeries} · ${faixa} ${rotuloRepeticoes}`;
 }
 
+/**
+ * Unidade da carga na grade (TR-15): série com peso por lado dizia só "kg",
+ * igual a carga total, embora o volume dela seja o dobro.
+ */
+export function unidadeDaCarga(pesoPorLado: boolean, idioma: Idioma): string {
+  return pesoPorLado ? t("kg/lado", idioma) : "kg";
+}
+
 export function marcadoresDaSerie(
   tipo: "aquecimento" | "valendo",
   recorde: boolean,
