@@ -6,7 +6,7 @@ Conferência: `hasaneyldrm/exercises-dataset` (MIT; mídia © Gym visual, NÃO u
 
 Fora de propósito (quase duplicata do que já existe): Crucifixo máquina (= Peck deck), Rosca scott com barra W (= Rosca scott), Mergulho para peito (= Paralelas), Pulldown com corda (= Pulldown braços estendidos). Trapézio NÃO vira grupo: encolhimentos seguem em Ombro, sem mexer no histórico.
 
-**Total: +118 (leva 1: 77, leva 2: 41) → catálogo de 102 para 220.**
+**Total: +116 (leva 1: 77, leva 2: 39) → catálogo de 102 para 218.** Tiradas na revisão, por serem o mesmo movimento de um exercício existente: Tríceps pulley unilateral (= Extensão de tríceps na polia alta unilateral) e Panturrilha no degrau (= Panturrilha unilateral com halter).
 
 ## Leva 1 (77)
 
@@ -22,17 +22,16 @@ Fora de propósito (quase duplicata do que já existe): Crucifixo máquina (= Pe
 - **Abdômen (7):** Abdominal canivete · Abdominal na roda · Elevação de pernas na barra · Abdominal declinado · Giro russo · Escalador · Pallof press `U`
 - **Antebraço — grupo novo (4):** Rosca de punho com barra · Rosca de punho inversa · Rosca de punho com halter `U` · Caminhada do fazendeiro `L`
 
-## Leva 2 — "o que mais se usa" (41)
+## Leva 2 — "o que mais se usa" (39)
 
 - **Costas (6):** Puxada por trás da nuca · Puxada alta com corda · Remada baixa pegada aberta · Remada baixa unilateral no cabo `U` · Remada curvada no smith pegada supinada · Superman
 - **Ombro (5):** Desenvolvimento por trás da nuca · Elevação lateral unilateral inclinada `U` · Remada alta com halteres `L` · Desenvolvimento unilateral com halter `U` · Landmine press `U`
 - **Peito (4):** Supino declinado no smith · Crucifixo inclinado no cabo · Supino com halteres pegada neutra `L` · Flexão de braço com joelhos apoiados
 - **Bíceps (4):** Rosca direta com halteres `L` · Rosca martelo alternada `U` · Rosca bayesiana no cabo `U` · Rosca Zottman `U`
-- **Tríceps (3):** Tríceps francês com barra W · Tríceps testa no cabo · Tríceps pulley unilateral `U`
+- **Tríceps (2):** Tríceps francês com barra W · Tríceps testa no cabo
 - **Quadríceps (5):** Agachamento com halteres `L` · Agachamento búlgaro no smith `U` · Afundo com barra `U` · Agachamento frontal no smith · Agachamento isométrico na parede
 - **Posterior de coxa (2):** Stiff no smith · Flexão de joelho com caneleira em pé `U`
 - **Glúteos (4):** Agachamento sumô no smith · Afundo cruzado `U` · Abdução deitado com caneleira `U` · Caminhada lateral com mini band
-- **Panturrilha (1):** Panturrilha no degrau `U`
 - **Abdômen (6):** Abdominal remador · Abdominal infra tesourinha · Elevação de joelhos na paralela · Flexão lateral com halter `U` · Abdominal com anilha · Dead bug
 - **Antebraço (1):** Rolo de punho
 

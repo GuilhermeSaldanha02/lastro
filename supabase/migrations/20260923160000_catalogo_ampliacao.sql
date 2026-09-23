@@ -1,6 +1,6 @@
 -- ============================================================
 -- lastro · ampliação do catálogo (pedido do dono, 2026-09-23):
--- 118 exercícios novos, catálogo de 102 para 220.
+-- 116 exercícios novos, catálogo de 102 para 218.
 --
 -- ORIGEM DA LISTA. Nomes de ficha de academia brasileira, conferidos
 -- contra hasaneyldrm/exercises-dataset (MIT; é a base de onde o openGym
@@ -9,7 +9,9 @@
 -- NÃO é usada aqui: exige licença própria. Proposta revisada pelo dono:
 -- docs/catalogo-ampliacao-proposta.md.
 --
--- Quase duplicatas deixadas de fora de propósito: crucifixo máquina
+-- Quase duplicatas deixadas de fora de propósito: tríceps pulley
+-- unilateral (= Extensão de tríceps na polia alta unilateral), panturrilha
+-- no degrau (= Panturrilha unilateral com halter), crucifixo máquina
 -- (= Peck deck), rosca scott com barra W (= Rosca scott), mergulho para
 -- peito (= Paralelas), pulldown com corda (= Pulldown braços estendidos).
 --
@@ -168,8 +170,6 @@ insert into public.exercicio (nome, grupo_muscular_primario, unilateral, peso_po
    'Sentado com apoio nas costas, desça a barra atrás da cabeça só com o cotovelo. Arquear a lombar para subir mostra carga demais.', 'claude'),
   ('Tríceps testa no cabo', 'triceps', false, false,
    'Deitado com a cabeça voltada para a polia, estenda a barra acima do peito. O cabo mantém tensão no alto; não descanse com os braços travados.', 'claude'),
-  ('Tríceps pulley unilateral', 'triceps', true, false,
-   'Um braço de cada vez, cotovelo fixo ao lado do corpo. Inclinar o tronco sobre a pegada usa o peso do corpo no lugar do tríceps.', 'claude'),
   ('Agachamento goblet', 'quadriceps', false, false,
    'Segure o halter junto ao peito e desça com o tronco em pé, joelhos seguindo a ponta dos pés. Deixar o halter afastar do corpo puxa o tronco para a frente.', 'claude'),
   ('Agachamento pendular', 'quadriceps', false, false,
@@ -232,8 +232,6 @@ insert into public.exercicio (nome, grupo_muscular_primario, unilateral, peso_po
    'Ponta dos pés num degrau, desça o calcanhar abaixo do degrau e suba até a ponta. Meias repetições rápidas no alto deixam a panturrilha quase sem estímulo.', 'claude'),
   ('Panturrilha no hack', 'panturrilha', false, false,
    'Joelhos quase estendidos na máquina, suba e desça só pelo tornozelo. Dobrar o joelho para empurrar vira agachamento curto.', 'claude'),
-  ('Panturrilha no degrau', 'panturrilha', true, false,
-   'Uma perna de cada vez, segure num apoio e use toda a amplitude do degrau. Segurar com força no apoio tira peso da panturrilha.', 'claude'),
   ('Abdominal canivete', 'abdomen', false, false,
    'Suba tronco e pernas juntos tentando tocar os pés. Se a lombar sair do chão ao descer, dobre os joelhos.', 'claude'),
   ('Abdominal na roda', 'abdomen', false, false,
@@ -409,8 +407,6 @@ from (values
   ('Tríceps francês com barra W', 'es', 'Extensión de tríceps sobre la cabeza con barra Z'),
   ('Tríceps testa no cabo', 'en', 'Cable Skull Crusher'),
   ('Tríceps testa no cabo', 'es', 'Press francés en polea'),
-  ('Tríceps pulley unilateral', 'en', 'Single-Arm Triceps Pushdown'),
-  ('Tríceps pulley unilateral', 'es', 'Extensión de tríceps unilateral en polea'),
   ('Agachamento goblet', 'en', 'Goblet Squat'),
   ('Agachamento goblet', 'es', 'Sentadilla goblet'),
   ('Agachamento pendular', 'en', 'Pendulum Squat'),
@@ -473,8 +469,6 @@ from (values
   ('Panturrilha no smith', 'es', 'Elevación de talones en máquina Smith'),
   ('Panturrilha no hack', 'en', 'Hack Machine Calf Raise'),
   ('Panturrilha no hack', 'es', 'Elevación de talones en máquina hack'),
-  ('Panturrilha no degrau', 'en', 'Single-Leg Step Calf Raise'),
-  ('Panturrilha no degrau', 'es', 'Elevación de talón unilateral en escalón'),
   ('Abdominal canivete', 'en', 'V-Up'),
   ('Abdominal canivete', 'es', 'Abdominal en V'),
   ('Abdominal na roda', 'en', 'Ab Wheel Rollout'),
