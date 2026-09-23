@@ -43,6 +43,7 @@ const ROTULOS_EN: Record<string, string> = {
   POSTERIOR_COXA: "Hamstrings",
   QUADRICEPS: "Quadriceps",
   TRICEPS: "Triceps",
+  ANTEBRACO: "Forearms",
 };
 
 const ROTULOS_ES: Record<string, string> = {
@@ -56,6 +57,7 @@ const ROTULOS_ES: Record<string, string> = {
   POSTERIOR_COXA: "Isquiotibiales",
   QUADRICEPS: "Cuádriceps",
   TRICEPS: "Tríceps",
+  ANTEBRACO: "Antebrazo",
 };
 
 export function formatarGrupoMuscular(

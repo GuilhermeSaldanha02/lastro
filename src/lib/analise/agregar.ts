@@ -84,9 +84,6 @@ export function montarResumoCompacto(entrada: {
 }): ResumoCompacto {
   const janelaSemanas = entrada.janelaSemanas ?? JANELA_SEMANAS;
   const exerciciosPorId = new Map(entrada.exercicios.map((e) => [e.id, e]));
-  const gruposMusculares = Array.from(
-    new Set(entrada.exercicios.map((e) => e.grupoMuscularPrimario)),
-  );
 
   const semanaAtual = semanaAnaliseAtual(entrada.agora);
   const semanaAnterior = paraISO(somarDias(paraDataUTC(semanaAtual), -7));
@@ -100,6 +97,19 @@ export function montarResumoCompacto(entrada: {
   const todasSeriesValendo = achatarSeriesValendo(
     entrada.treinos,
     exerciciosPorId,
+  );
+
+  // Todo grupo do catálogo concorre a "sem estímulo", menos o acessório
+  // que a pessoa nunca treinou: criar o antebraço no catálogo não pode
+  // fazer toda Análise apontar um grupo que ela nunca quis treinar
+  // (decisão do dono, 2026-09-23). Histórico inteiro, só série valendo.
+  const gruposJaTreinados = new Set(todasSeriesValendo.map((s) => s.grupoMuscular));
+  const gruposMusculares = Array.from(
+    new Set(
+      entrada.exercicios
+        .filter((e) => !e.grupoAcessorio || gruposJaTreinados.has(e.grupoMuscularPrimario))
+        .map((e) => e.grupoMuscularPrimario),
+    ),
   );
 
   const seriesValendoJanela = todasSeriesValendo.filter((s) =>

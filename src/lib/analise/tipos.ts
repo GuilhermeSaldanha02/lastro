@@ -44,6 +44,13 @@ export type ExercicioBruto = {
   grupoMuscularPrimario: string;
   unilateral: boolean;
   pesoPorLado: boolean;
+  /**
+   * Grupo que quase ninguém treina direto (antebraço). Conta volume como
+   * qualquer outro, mas só entra em `grupos_sem_estimulo` para quem já o
+   * treinou alguma vez — ver `GRUPOS_ACESSORIOS`. Vem marcado por quem
+   * carrega o catálogo, porque aqui o grupo já chega traduzido.
+   */
+  grupoAcessorio?: boolean;
 };
 
 /**

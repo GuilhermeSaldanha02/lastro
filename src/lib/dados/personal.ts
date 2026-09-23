@@ -13,6 +13,7 @@
 import { criarClienteServidor } from "@/lib/supabase/cliente-servidor";
 import { montarResumoCompacto } from "@/lib/analise/agregar";
 import { diasSemEstimuloPorGrupo } from "@/lib/analise/recencia";
+import { ehGrupoAcessorio } from "@/lib/analise/grupos-acessorios";
 import {
   montarFilaDoAluno,
   type AlertaEmitido,
@@ -251,6 +252,7 @@ async function carregarCatalogo(
     grupoMuscularPrimario: e.grupo_muscular_primario as string,
     unilateral: e.unilateral as boolean,
     pesoPorLado: e.peso_por_lado as boolean,
+    grupoAcessorio: ehGrupoAcessorio(e.grupo_muscular_primario as string),
   }));
 }
 

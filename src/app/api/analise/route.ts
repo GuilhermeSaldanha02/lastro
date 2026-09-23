@@ -11,6 +11,7 @@ import { NextResponse, after } from "next/server";
 import { criarClienteServidor } from "@/lib/supabase/cliente-servidor";
 import { montarResumoCompacto } from "@/lib/analise/agregar";
 import { paraDataUTC } from "@/lib/analise/semanas";
+import { ehGrupoAcessorio } from "@/lib/analise/grupos-acessorios";
 import type {
   ExercicioBruto,
   ResumoCompacto,
@@ -142,6 +143,7 @@ async function carregarExercicios(
       formatarGrupoMuscular(e.grupo_muscular_primario, idioma),
     unilateral: e.unilateral,
     pesoPorLado: e.peso_por_lado,
+    grupoAcessorio: ehGrupoAcessorio(e.grupo_muscular_primario),
   }));
 }
 
