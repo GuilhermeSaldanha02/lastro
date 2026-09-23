@@ -17,6 +17,20 @@ describe("apresentação da grade de séries", () => {
     expect(resumirSeriesValendo(series, "es")).toBe("2 series válidas · 8–10 repeticiones");
   });
 
+  // TR-14 (QA.md, 2026-09-23): "1 série valendo · 12 repetição". O plural
+  // de "repetição" depende do número de repetições, não do número de séries.
+  it("concorda 'repetição' com o número de repetições, não de séries", () => {
+    expect(resumirSeriesValendo([serie("valendo", 12)], "pt-BR")).toBe("1 série valendo · 12 repetições");
+    expect(resumirSeriesValendo([serie("valendo", 12)], "en")).toBe("1 working set · 12 reps");
+    expect(resumirSeriesValendo([serie("valendo", 1)], "pt-BR")).toBe("1 série valendo · 1 repetição");
+    expect(resumirSeriesValendo([serie("valendo", 1), serie("valendo", 1)], "pt-BR")).toBe(
+      "2 séries valendo · 1 repetição",
+    );
+    expect(resumirSeriesValendo([serie("valendo", 10), serie("valendo", 10)], "pt-BR")).toBe(
+      "2 séries valendo · 10 repetições",
+    );
+  });
+
   it("não inventa faixa sem série valendo", () => {
     expect(resumirSeriesValendo([serie("aquecimento", 15)], "pt-BR")).toBe("0 séries valendo");
   });

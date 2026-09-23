@@ -30,6 +30,7 @@ import TimerTopo from "./timer-topo";
 import { useDescansoReal } from "./use-descanso-real";
 import RelatorioPosTreino from "./relatorio-pos-treino";
 import { assinarMarcos, estaFinalizado, marcarFim, reabrir } from "@/lib/treino/marcos-treino";
+import { criarGuardaDeToque, toqueCedoDemais } from "@/lib/treino/toque-duplo";
 import {
   calcularMetricasSessao,
   duracaoSessaoSegundos,
@@ -169,6 +170,11 @@ export default function TreinoDetalhe({
   // ("toda exclusão pede confirmação inline") e do "Descartar" rascunho da
   // PR #181, que também não era só simetria.
   const [confirmandoFim, setConfirmandoFim] = useState(false);
+  // TR-11 e TR-13 (QA.md, 2026-09-23): o 2º toque de um toque duplo gravava
+  // outra série em "Repetir série" e caía no "Finalizar" da confirmação, que
+  // nasce sob o dedo. Ver `toque-duplo.ts`.
+  const [guardaRepetir] = useState(() => criarGuardaDeToque());
+  const confirmacaoAbertaEm = useRef<number | null>(null);
   // Assinatura de VERDADE agora (`assinarMarcos`): `marcarFim` e `reabrir`
   // notificam, então a releitura é consequência da escrita. Antes era uma
   // assinatura vazia que dependia de algum outro setState do mesmo handler
@@ -278,7 +284,7 @@ export default function TreinoDetalhe({
    * registra de novo, sem passar pelo formulário.
    */
   async function repetirUltimaSerie(): Promise<void> {
-    if (!ultima) return;
+    if (!ultima || !guardaRepetir.aceitar(performance.now())) return;
     await registrarSerie({
       exercicioId: ultima.exercicioId,
       tipo: ultima.tipo,
@@ -862,7 +868,10 @@ export default function TreinoDetalhe({
           <button
             type="button"
             className="botao-finalizar-treino"
-            onClick={() => setConfirmandoFim(true)}
+            onClick={() => {
+              confirmacaoAbertaEm.current = performance.now();
+              setConfirmandoFim(true);
+            }}
           >
             <span>{t("Finalizar Treino", idioma)}</span>
           </button>
@@ -887,7 +896,11 @@ export default function TreinoDetalhe({
               <button
                 type="button"
                 className="botao-finalizar-treino"
-                onClick={() => void finalizarTreino()}
+                onClick={() => {
+                  // O 2º toque do mesmo gesto não confirma: a pessoa ainda não leu a pergunta.
+                  if (toqueCedoDemais(confirmacaoAbertaEm.current, performance.now())) return;
+                  void finalizarTreino();
+                }}
               >
                 {t("Finalizar Treino", idioma)}
               </button>

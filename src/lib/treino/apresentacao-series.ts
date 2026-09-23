@@ -33,7 +33,9 @@ export function resumirSeriesValendo(series: SerieApresentavel[], idioma: Idioma
   const menor = repeticoes[0];
   const maior = repeticoes[repeticoes.length - 1];
   const faixa = menor === maior ? `${menor}` : `${menor}–${maior}`;
-  const rotuloRepeticoes = t(menor === maior && quantidade === 1 ? "repetição" : "repetições", idioma);
+  // O plural segue o número de repetições, não o de séries (TR-14): "12
+  // repetição" saía sempre que havia uma série só.
+  const rotuloRepeticoes = t(maior === 1 ? "repetição" : "repetições", idioma);
 
   return `${quantidade} ${rotuloSeries} · ${faixa} ${rotuloRepeticoes}`;
 }
