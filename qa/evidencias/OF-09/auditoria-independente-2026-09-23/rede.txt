@@ -1,0 +1,33 @@
+OF-09 - medicoes do auditor (Playwright, viewport 375x812, producao)
+
+Roteiro: Home -> context.setOffline(true) -> toque "Treinos" na nav -> espera X ms -> setOffline(false) -> polling a cada 100 ms ate aparecer "sessões registradas" (limite 10-30 s).
+
+"Sem conexão" apareceu em todas as tentativas: 116-247 ms apos o toque.
+
+Retorno automatico (sem clique):
+ tentativa | offline por  | voltou em
+ 1         | ~1-2 s (+print) | NAO (esperado 30 s + mais 30 s; ainda "Sem conexão", navigator.onLine=true)
+ 2         | 1500 ms      | 491 ms
+ 3         | 0 ms         | 425 ms
+ 4         | 300 ms       | 470 ms
+ 5         | 3000 ms      | NAO (15 s)
+ 6         | 1500 ms      | 447 ms
+ 7         | 8000 ms      | NAO (15 s)
+ 8         | 3000 ms      | sim (tela de treinos em < 8 s)
+ 9         | 3000 ms      | NAO (10 s) - evento online disparou; reload respondido pelo SW em 17 ms (status 200, fromServiceWorker)
+ 10        | 8000 ms      | 649 ms - reload respondido pelo SW em 421 ms
+ 11        | 3000 ms      | NAO (10 s) - online disparou; reload do SW em 31 ms
+ 12        | 8000 ms      | 506 ms - reload do SW em 359 ms
+ 13        | 5000 ms      | NAO (10 s) - online disparou; reload do SW em 24 ms
+ 14        | 500 ms       | 835 ms - reload do SW em 348 ms
+
+Resultado: 7 de 14 falharam (50%). Quando volta, leva 425-835 ms.
+
+Diagnostico (feito DEPOIS do teste, pelo DOM da pagina offline):
+  o unico script da pagina "Sem conexão" e: window.addEventListener("online", function(){ location.reload(); });
+  Nas falhas, o evento "online" dispara (marcador em sessionStorage confirmou) e a pagina recarrega, mas a
+  navegacao volta do Service Worker em 17-31 ms - rapido demais para ter ido a rede: o SW ainda falhou o fetch
+  e serviu de novo a pagina offline. Como "online" nao dispara outra vez, a tela fica presa ate alguem tocar
+  "Tentar de novo". Nos sucessos o reload leva 348-421 ms (foi a rede de verdade).
+  Hipotese de correcao (nao verificada): repetir a tentativa com atraso/backoff enquanto navigator.onLine,
+  ou checar a rede (fetch) antes de recarregar.

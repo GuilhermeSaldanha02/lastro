@@ -61,9 +61,31 @@
       // parada até alguém tocar em "Tentar de novo" — e, sem o JS do app,
       // nada drenava a fila. Recarregar sozinha leva de volta à tela que a
       // pessoa pediu, e é lá que as séries pendentes sobem.
-      window.addEventListener("online", function () {
-        location.reload();
-      });
+      //
+      // Recarregar direto no evento `online` falhava em metade das vezes
+      // (auditoria independente, 7 de 14): o aviso chega antes de a rede
+      // aceitar conexão, o reload cai de novo nesta página (vinda do cache
+      // do service worker em ~20 ms) e o evento não se repete. Por isso a
+      // página só recarrega depois que uma sonda à rede responde, e segue
+      // sondando a cada 2 s — também cobre aparelho que nunca dispara
+      // `online`. Offline a sonda falha na hora, sem custo.
+      (function () {
+        var sondando = false;
+        function tentarVoltar() {
+          if (sondando) return;
+          sondando = true;
+          fetch("/manifest.webmanifest?sonda=" + Date.now(), { cache: "no-store" })
+            .then(function (resposta) {
+              if (resposta.ok) location.reload();
+            })
+            .catch(function () {})
+            .then(function () {
+              sondando = false;
+            });
+        }
+        window.addEventListener("online", tentarVoltar);
+        setInterval(tentarVoltar, 2000);
+      })();
     </script>
   </body>
 </html>

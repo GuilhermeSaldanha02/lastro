@@ -10,10 +10,11 @@
 // todas dinâmicas — precisam de sessão/dados reais, não fazem sentido
 // cacheadas). É só a rede de segurança mínima: se a navegação falhar por
 // falta de rede, mostra uma página offline própria em vez de travar.
-// v2 (OF-09, 2026-09-23): a página offline passou a recarregar sozinha
-// quando a rede volta. O nome novo força o aparelho a baixar a página nova
-// em vez de servir a antiga do cache; o `activate` apaga as versões velhas.
-const CACHE_OFFLINE = "lastro-offline-v2";
+// v2/v3 (OF-09, 2026-09-23): a página offline passou a recarregar sozinha
+// quando a rede volta (v3: só depois que uma sonda à rede responde). O nome
+// novo força o aparelho a baixar a página nova em vez de servir a antiga do
+// cache; o `activate` apaga as versões velhas.
+const CACHE_OFFLINE = "lastro-offline-v3";
 const PAGINA_OFFLINE = "/offline.html";
 
 self.addEventListener("install", (evento) => {
