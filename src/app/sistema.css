@@ -649,6 +649,14 @@
   margin-top: var(--lastro-alvo-folga);
 }
 
+/* TR-12 (QA.md, 2026-09-23): enquanto a pessoa preenche uma série
+   (formulário aberto ou série em edição) a área sai de cena para o
+   formulário caber entre o cronômetro e a nav. Altura 0 → o
+   `ResizeObserver` publica 0 e o `padding-bottom` do miolo encolhe junto. */
+.acao-area[hidden] {
+  display: none;
+}
+
 /* ---------- Grupo de exercício e linha de série ---------- */
 .grupo + .grupo {
   margin-top: var(--lastro-e-6);
@@ -4000,6 +4008,16 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
+}
+
+/* "Trocar grupo" + ✕ no cabeçalho do cartão de registrar série (TR-12):
+   o "Fechar" saiu da área de ações fixa, que some enquanto o cartão está
+   aberto. Os dois continuam alvos de 48px (D1), lado a lado. */
+.card-obsidian__acoes {
+  display: flex;
+  align-items: center;
+  flex: none;
+  margin-right: calc(-1 * var(--lastro-e-2));
 }
 
 .card-obsidian__titulo {
