@@ -1,0 +1,4 @@
+Produção 28e766c, conta do dono, 375x812, 2026-09-23, sem gravar dado.
+Service worker ativo; caches.keys() = ["lastro-offline-v2"] (v1 apagado no activate).
+setOffline(true) + toque em "Treinos": /treino com título "lastro — sem conexão" (offline.html do SW).
+setOffline(false): a página recarregou sozinha em ~601 ms e abriu /treino de verdade ("Treinos · Histórico", 32 sessões), sem toque.

@@ -1,0 +1,2 @@
+Produção 28e766c, conta do dono, 375x812, 2026-09-23, só leitura.
+Treino 397eb9de (21/09): 19 células de carga; 9 dizem "kg/lado" e 10 "kg". O banco tem 9 séries com peso_por_lado nesse treino (4 Puxador articulado máquina + 5 Remada unilateral com halter). Sem rolagem lateral.
