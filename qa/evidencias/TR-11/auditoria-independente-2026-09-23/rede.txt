@@ -1,0 +1,18 @@
+TR-11 - POSTs capturados via page.on('request') (metodo != GET) no treino aa0cd9e6-6dc4-477b-9c91-6a9142bd4a59
+
+Rodada A - dois page.mouse.click no centro de "Repetir série" (box x=20 y=586.2 w=161.5 h=49), 2o clique terminou 6 ms depois do fim do 1o (medido no Node; timestamps em pagina nao instalados nesta rodada)
+  tela: 3 -> 4 séries valendo
+  POST 1x  -> 200
+  [{"id":"2f3b40c1-1fdb-49d7-8fa1-7cb8d79b983a","treinoId":"aa0cd9e6-6dc4-477b-9c91-6a9142bd4a59","exercicioId":"7dca79cf-beac-497d-94a0-a5c15b94f45c","ordem":4,"tipo":"valendo","reps":10,"peso":20,"rir":null,"pesoPorLado":false}]
+
+Rodada B - clique normal, >= 700 ms depois (listener de click em captura na pagina: 1 evento)
+  tela: 4 -> 5
+  POST 1x -> 200
+  [{"id":"a6a07465-c83b-4abc-b1ec-0e314733c12d",...,"ordem":5,"tipo":"valendo","reps":10,"peso":20,"rir":null,"pesoPorLado":false}]
+
+Rodada C - repeticao do duplo clique com timestamps medidos NA PAGINA (evento click em captura): t=53642.2 e t=53653.4 -> intervalo 11.2 ms, 2 eventos click chegaram ao botao
+  tela: 5 -> 6
+  POST 1x -> 200
+  [{"id":"aa2707a1-d6c2-48bc-b7b9-2febd3048e30",...,"ordem":6,"tipo":"valendo","reps":10,"peso":20,"rir":null,"pesoPorLado":false}]
+
+Apos reload: "6 séries valendo · 10 repetições" (servidor tem 6, sem duplicata).
