@@ -2849,3 +2849,29 @@ Sem navegador local (sem `.env.local`). O `j14-dica-info` roda na tela pública 
 **A decisão: inlinar no `AGENTS.md`** as invariantes (§8) e os comandos com o que cada um prova (§9), em vez de transformar o ponteiro em ordem ("leia também o `CLAUDE.md`"). Ponteiro entre arquivos é obedecido quando o agente tem contexto sobrando; regra que cabe na página é obedecida sempre. As três regras do registro de QA saíram da skill `qa-registro` e entraram na §7 pelo mesmo motivo — skill só carrega no Claude Code, e a regra não é opcional por morar numa skill.
 
 **O que isso não resolve.** O `CLAUDE.md` continua existindo e continua sendo a fonte do produto e da equipe de agentes. A duplicação entre ele e a §8 do `AGENTS.md` é deliberada e tem custo: mudar uma invariante agora exige mudar dois arquivos. O custo foi aceito porque a alternativa medida — confiar no ponteiro — é a que já falhou.
+
+## 2026-09-23 (1) — Catálogo de 102 para 218, com antebraço como grupo acessório
+
+**Contexto.** O dono apontou exercícios comuns que faltavam (puxada triângulo, peck deck invertido) e pediu a comparação com o openGym. Os exercícios do openGym vêm de `hasaneyldrm/exercises-dataset` (MIT para nomes e instruções; a mídia é © Gym Visual e exige licença própria).
+
+**A decisão.** 116 exercícios novos de ficha de academia brasileira, conferidos contra a base, com nome, grupo e dica nossos (`docs/catalogo-ampliacao-proposta.md`, migração `20260923155424_catalogo_ampliacao`). Quase duplicatas ficaram de fora de propósito, para o histórico do mesmo movimento não se dividir em duas linhas. Trapézio não virou grupo: os encolhimentos seguem em ombro.
+
+**Antebraço é grupo acessório.** `grupos_sem_estimulo` percorre o catálogo inteiro, então criar o grupo faria toda Análise apontar "Antebraço sem estímulo". Escolha do dono: ele conta volume como qualquer grupo, mas só entra em "sem estímulo" para quem já o treinou alguma vez (`src/lib/analise/grupos-acessorios.ts`). A marca vem de quem carrega o catálogo, porque o agregador recebe o grupo já traduzido.
+
+## 2026-09-23 (2) — Nome de exercício em português, com o termo conhecido entre parênteses
+
+**Contexto.** O app em pt-BR mostrava 12 nomes em inglês ("Arnold press", "Peck deck", "Pallof press"…).
+
+**A decisão (escolha do dono).** Nome em português com o termo conhecido entre parênteses, como já era "Agachamento com cinto (belt squat)": "Voador (peck deck)", "Antirrotação no cabo (Pallof press)", "Desenvolvimento Arnold". Continua em inglês o jargão que academia brasileira usa assim: leg press, stiff, pulley, smith, crossover, scott, goblet, sissy, spider, Zottman, pull-over. Só o nome muda; série, modelo e tradução apontam para o id (migração `20260923160912_catalogo_nomes_em_portugues`).
+
+**O que vale agora.** Exercício novo segue a mesma regra: português primeiro; inglês só se for o jargão do salão, ou entre parênteses.
+
+## 2026-09-23 (3) — Mídia da Gym Visual mantida sem licença; os 116 novos ficam sem imagem
+
+**Contexto.** Os 102 GIFs do catálogo são © Gym Visual, vindos de `hasaneyldrm/exercises-dataset`. O `NOTICE.md` da pasta manda confirmar licença própria antes de publicar; não há registro de licença no projeto. O dono consultou e a licença é paga; ele não vai comprar.
+
+**A decisão do dono.** Manter os 102 GIFs como estão, **com o risco aceito por ele**, e deixar os 116 exercícios novos sem imagem: o player mostra só o nome sobre o ícone, sem "Animação Ativa" nem "Foco" genérico (PR #272).
+
+**O que NÃO fazer.** Não baixar nem publicar mídia nova da Gym Visual: sem licença, isso aumenta o risco que o dono aceitou só para o que já existia. Não gerar imagem por IA sem o dono pedir: é pago (Kairogen, ~2 créditos por imagem) e erra postura e equipamento.
+
+**Alternativas medidas e guardadas.** (a) Com licença: mapeamento dos 116 para a base pronto em `docs/midia-116-mapeamento-gym-visual.csv` (92 exatos, 14 aproximados, 10 sem par). Nada foi baixado. (b) Sem custo e com licença limpa: fotos da `yuhonas/free-exercise-db` (Unlicense, 2 fotos por exercício, início e fim), que cobririam cerca de 150 a 170 dos 218 — com estilo diferente (foto real, não ilustração). É a saída rápida se a Gym Visual reclamar.
