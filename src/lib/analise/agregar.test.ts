@@ -198,6 +198,64 @@ describe("montarResumoCompacto — fixture F1", () => {
   });
 });
 
+// Grupo acessório (antebraço, decisão do dono 2026-09-23): conta volume
+// como qualquer grupo, mas só vira "sem estímulo" para quem já o treinou
+// alguma vez. Sem isto, criar o grupo no catálogo faria toda Análise de
+// todo mundo apontar "Antebraço sem estímulo".
+describe("montarResumoCompacto — grupo acessório em grupos_sem_estimulo", () => {
+  const roscaPunho: ExercicioBruto = {
+    id: "rosca-punho",
+    nome: "Rosca de punho com barra",
+    grupoMuscularPrimario: "antebraco",
+    unilateral: false,
+    pesoPorLado: false,
+    grupoAcessorio: true,
+  };
+
+  it("grupo acessório nunca treinado NÃO aparece em grupos_sem_estimulo", () => {
+    const resumo = montarResumoCompacto({
+      treinos: treinosF1,
+      exercicios: [...exercicios, roscaPunho],
+      agora,
+    });
+    expect(resumo.frequencia.grupos_sem_estimulo).not.toContain("antebraco");
+    // Os grupos comuns seguem a regra de sempre (T-F2).
+    expect(resumo.frequencia.grupos_sem_estimulo).toContain("costas");
+  });
+
+  it("grupo acessório treinado antes da janela e parado dentro dela APARECE", () => {
+    const treinoAntigo: TreinoBruto = {
+      id: "t-antigo",
+      data: "2026-03-02", // bem antes da janela de comparação
+      series: [
+        { id: "s-punho", exercicioId: "rosca-punho", tipo: "valendo", reps: 12, peso: 20, pesoPorLado: false },
+      ],
+    };
+    const resumo = montarResumoCompacto({
+      treinos: [...treinosF1, treinoAntigo],
+      exercicios: [...exercicios, roscaPunho],
+      agora,
+    });
+    expect(resumo.frequencia.grupos_sem_estimulo).toContain("antebraco");
+  });
+
+  it("aquecimento sozinho não conta como 'já treinou' (FF4)", () => {
+    const soAquecimento: TreinoBruto = {
+      id: "t-aquec",
+      data: "2026-03-02",
+      series: [
+        { id: "s-aq", exercicioId: "rosca-punho", tipo: "aquecimento", reps: 15, peso: 10, pesoPorLado: false },
+      ],
+    };
+    const resumo = montarResumoCompacto({
+      treinos: [...treinosF1, soAquecimento],
+      exercicios: [...exercicios, roscaPunho],
+      agora,
+    });
+    expect(resumo.frequencia.grupos_sem_estimulo).not.toContain("antebraco");
+  });
+});
+
 // T-E5 — teto de reps. A série de 25 reps é desenhada para VENCER o
 // e1RM da sessão se o teto não fosse aplicado (110 > 40) — assim o teste
 // só passa se `elegivelParaE1rm` está de fato excluindo-a.

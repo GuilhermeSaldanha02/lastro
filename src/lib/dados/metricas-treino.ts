@@ -122,7 +122,7 @@ function inferirFoco(nomesExercicios: string[]): string {
   return "TREINO";
 }
 
-/** As 10 categorias reais do catálogo (`select id from grupo_muscular`, conferido no banco 2026-08-31). */
+/** Os grupos reais do catálogo (`select id from grupo_muscular`, conferido no banco 2026-08-31; antebraço entrou em 2026-09-23). */
 type Categoria = "pernas" | "peito" | "costas" | "ombros" | "bracos" | "abdomen";
 const CATEGORIA_POR_GRUPO: Record<string, Categoria> = {
   quadriceps: "pernas",
@@ -134,6 +134,7 @@ const CATEGORIA_POR_GRUPO: Record<string, Categoria> = {
   ombro: "ombros",
   biceps: "bracos",
   triceps: "bracos",
+  antebraco: "bracos",
   abdomen: "abdomen",
 };
 

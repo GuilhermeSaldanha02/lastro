@@ -35,6 +35,7 @@ describe("formatarGrupoMuscular", () => {
   describe("chave crua nunca chega à tela", () => {
     const CHAVES_DO_CATALOGO = [
       "abdomen",
+      "antebraco",
       "biceps",
       "costas",
       "gluteo",
@@ -67,6 +68,12 @@ describe("formatarGrupoMuscular", () => {
       expect(formatarGrupoMuscular("posterior_coxa")).toBe("Posterior de coxa");
       expect(formatarGrupoMuscular("posterior_coxa", "en")).toBe("Hamstrings");
       expect(formatarGrupoMuscular("posterior_coxa", "es")).toBe("Isquiotibiales");
+    });
+
+    it("antebraço (grupo novo, 2026-09-23) tem rótulo real nos três idiomas", () => {
+      expect(formatarGrupoMuscular("antebraco")).toBe("Antebraço");
+      expect(formatarGrupoMuscular("antebraco", "en")).toBe("Forearms");
+      expect(formatarGrupoMuscular("antebraco", "es")).toBe("Antebrazo");
     });
   });
 });
