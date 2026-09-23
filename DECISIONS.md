@@ -2875,3 +2875,11 @@ Sem navegador local (sem `.env.local`). O `j14-dica-info` roda na tela pública 
 **O que NÃO fazer.** Não baixar nem publicar mídia nova da Gym Visual: sem licença, isso aumenta o risco que o dono aceitou só para o que já existia. Não gerar imagem por IA sem o dono pedir: é pago (Kairogen, ~2 créditos por imagem) e erra postura e equipamento.
 
 **Alternativas medidas e guardadas.** (a) Com licença: mapeamento dos 116 para a base pronto em `docs/midia-116-mapeamento-gym-visual.csv` (92 exatos, 14 aproximados, 10 sem par). Nada foi baixado. (b) Sem custo e com licença limpa: fotos da `yuhonas/free-exercise-db` (Unlicense, 2 fotos por exercício, início e fim), que cobririam cerca de 150 a 170 dos 218 — com estilo diferente (foto real, não ilustração). É a saída rápida se a Gym Visual reclamar.
+
+## 2026-09-23 (4) — O aviso de sincronização só aparece quando há série esperando a rede
+
+**Contexto.** D7 dizia "estado de sincronização sempre visível, nunca alarmante". Na prática a linha "salvo no aparelho" / "sincronizado" ficava o tempo todo embaixo de "Finalizar Treino" — inclusive "salvo no aparelho" num treino vazio — e o dono pediu para tirar.
+
+**A decisão (pedido do dono).** O aviso só entra na tela quando a última drenagem deixou série na fila (sem rede): "salvo no aparelho". Com tudo no servidor ele sai da vista e fica só para leitor de tela (`.so-leitor-de-tela`), então quem usa leitor continua sabendo o estado e os E2E que leem `.sync` seguem valendo. Registrar o descanso agora drena na hora, e a drenagem da montagem também alimenta o aviso.
+
+**O que continua de D7.** Nunca alarmante, nunca erro: o aviso diz que a série está guardada, não que algo falhou.
