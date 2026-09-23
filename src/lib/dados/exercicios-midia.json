@@ -253,7 +253,7 @@
   },
   {
     "id": "b8b73c8e-066c-4a4d-ae29-2b1ae21331c5",
-    "nomePt": "Arnold press",
+    "nomePt": "Desenvolvimento Arnold",
     "nomeEn": "dumbbell arnold press",
     "nomeEs": "Press Arnold",
     "slug": "arnold-press",
@@ -841,7 +841,7 @@
   },
   {
     "id": "c80d5e23-d24b-464e-a4e0-4b1450b480b6",
-    "nomePt": "Face pull no cabo",
+    "nomePt": "Puxada para o rosto no cabo (face pull)",
     "nomeEn": "cable twisting pull",
     "nomeEs": "Face pull en polea",
     "slug": "face-pull-no-cabo",
@@ -904,7 +904,7 @@
   },
   {
     "id": "c7a31b7d-1f7d-4b1c-a2cb-b89fe1d19446",
-    "nomePt": "Hack squat",
+    "nomePt": "Agachamento hack",
     "nomeEn": "sled hack squat",
     "nomeEs": "Sentadilla hack",
     "slug": "hack-squat",
@@ -1219,7 +1219,7 @@
   },
   {
     "id": "7dca79cf-beac-497d-94a0-a5c15b94f45c",
-    "nomePt": "Peck deck",
+    "nomePt": "Voador (peck deck)",
     "nomeEn": "lever seated fly",
     "nomeEs": "Peck deck (contractora)",
     "slug": "peck-deck",
