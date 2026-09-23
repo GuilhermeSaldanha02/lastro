@@ -657,6 +657,23 @@
   display: none;
 }
 
+/* A faixa termina acima da nav, que flutua como pílula com respiro em
+   volta: por esse vão a lista aparecia passando atrás de "Finalizar"
+   (relato do dono, 2026-09-23). O pseudo-elemento pinta o fundo da faixa
+   até a borda da tela; a nav vem depois no DOM, no mesmo z-index, e fica
+   por cima. Não entra na altura medida pelo `ResizeObserver`
+   (é absolute), então a reserva do miolo não muda. */
+.acao-area::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  height: calc(var(--lastro-clearance-nav) + var(--lastro-e-3));
+  background: var(--lastro-fundo);
+  pointer-events: none;
+}
+
 /* ---------- Grupo de exercício e linha de série ---------- */
 .grupo + .grupo {
   margin-top: var(--lastro-e-6);

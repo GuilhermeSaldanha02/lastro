@@ -136,7 +136,15 @@ export default function TreinoDetalhe({
   const [modoEdicao, setModoEdicao] = useState(false);
   // D7 — reflete a fila de verdade: só vira "sincronizado" quando uma
   // drenagem termina sem falha. Nunca é apresentado como erro.
-  const [sincronizado, setSincronizado] = useState(false);
+  // Revisto a pedido do dono (2026-09-23, DECISIONS): o aviso só aparece na
+  // tela enquanto há série esperando a rede; com tudo no servidor ele sai da
+  // vista e fica só para leitor de tela. Começa `true` porque, antes da
+  // primeira drenagem, não há nada a avisar — a drenagem da montagem corrige.
+  const [sincronizado, setSincronizado] = useState(true);
+  // Série recém-gravada que a tela deve trazer para a vista (pedido do dono,
+  // 2026-09-23): o formulário fecha e a série nova ficava cortada atrás da
+  // faixa de ações.
+  const [rolarParaSerie, setRolarParaSerie] = useState<string | null>(null);
   const [confirmacaoDescanso, setConfirmacaoDescanso] = useState<string | null>(null);
   // Grupo(s) musculares do dia (pedido do dono, 2026-08-07) — filtra o
   // exercício mostrado no formulário. Vive só nesta sessão de treino, não
@@ -230,7 +238,9 @@ export default function TreinoDetalhe({
         { id: serieId, descansoRealSegundos },
         usuarioId,
       );
-      setSincronizado(false);
+      // Tenta subir na hora: com rede, o aviso nem aparece; sem rede, a
+      // drenagem falha e o "salvo no aparelho" entra na tela.
+      void drenar();
       setConfirmacaoDescanso(
         t("Descanso registrado: {tempo}", idioma).replace(
           "{tempo}",
@@ -238,7 +248,7 @@ export default function TreinoDetalhe({
         ),
       );
     },
-    [idioma, usuarioId],
+    [drenar, idioma, usuarioId],
   );
 
   const descanso = useDescansoReal({
@@ -250,13 +260,13 @@ export default function TreinoDetalhe({
   });
 
   useEffect(() => {
-    // O dreno na montagem fica FUNCIONAL de propósito: ele não mexe no
-    // indicador. Estado a partir do corpo de um efeito encadeia render, e
-    // aqui não há ganho nenhum — "salvo no aparelho" já é verdade desde o
-    // primeiro quadro (a série está gravada local). O indicador é
-    // alimentado pelos callbacks abaixo e pelo registro de série, que são
-    // os momentos em que a fila realmente muda de estado.
-    void sincronizarPendentes();
+    // O dreno da montagem agora ALIMENTA o indicador: como ele só aparece
+    // quando há série esperando a rede (D7 revisto, 2026-09-23), abrir o
+    // treino sem rede e com fila pendente precisa mostrar o aviso. O estado
+    // muda no `.then`, não no corpo do efeito (react-hooks/set-state-in-effect).
+    void sincronizarPendentes().then((resultado) => {
+      if (resultado.falhou) setSincronizado(false);
+    });
 
     const aoVoltarARede = () => {
       void drenar();
@@ -323,6 +333,7 @@ export default function TreinoDetalhe({
 
     // A UI confirma AQUI, antes de qualquer chamada de rede (D6).
     setSeries((atual) => [...atual, novaSerie]);
+    setRolarParaSerie(novaSerie.id);
 
     await enfileirar("criar_serie", {
       id: novaSerie.id,
@@ -520,6 +531,29 @@ export default function TreinoDetalhe({
     return () => cancelAnimationFrame(quadro);
   }, [formularioVisivel]);
 
+  // Depois de gravar, traz a série nova para a vista, acima da faixa de
+  // ações (o `scroll-margin-bottom` de `.corpo--treino-detalhe *` desconta a
+  // faixa). Dois quadros: o formulário acabou de fechar e a faixa voltou, e o
+  // `ResizeObserver` precisa publicar a altura dela antes de medir.
+  useEffect(() => {
+    if (!rolarParaSerie) return;
+    let quadroInterno = 0;
+    const quadro = requestAnimationFrame(() => {
+      quadroInterno = requestAnimationFrame(() => {
+        const linha = document.querySelector(`[data-serie-id="${rolarParaSerie}"]`);
+        (linha?.closest("section") ?? linha)?.scrollIntoView({
+          block: "nearest",
+          behavior: comportamentoDeRolagem(),
+        });
+        setRolarParaSerie(null);
+      });
+    });
+    return () => {
+      cancelAnimationFrame(quadro);
+      cancelAnimationFrame(quadroInterno);
+    };
+  }, [rolarParaSerie]);
+
   useEffect(() => {
     if (!editandoId) return;
     const quadro = requestAnimationFrame(() => {
@@ -688,6 +722,7 @@ export default function TreinoDetalhe({
                         role="row"
                         tabIndex={0}
                         key={serie.id}
+                        data-serie-id={serie.id}
                         onClick={() => setEditandoId(serie.id)}
                         onKeyDown={(evento) => {
                           if (evento.key === "Enter" || evento.key === " ") {
@@ -915,8 +950,9 @@ export default function TreinoDetalhe({
           </p>
         )}
 
-        {/* D7 — estado de sincronização sempre visível, nunca alarmante. */}
-        <div className="sync--area">
+        {/* D7 revisto (2026-09-23): na tela só enquanto há série esperando a
+            rede; sincronizado, fica só para leitor de tela. Nunca alarmante. */}
+        <div className={sincronizado ? "sync--area so-leitor-de-tela" : "sync--area"}>
           <p className="sync">
             <span className="sync__ponto" />
             {t(sincronizado ? "sincronizado" : "salvo no aparelho", idioma)}
