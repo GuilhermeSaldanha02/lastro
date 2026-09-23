@@ -462,6 +462,7 @@ const DICIONARIO: Record<string, { en: string; es: string }> = {
   "exercícios": { en: "exercises", es: "ejercicios" },
   "Unilateral": { en: "Unilateral", es: "Unilateral" },
   "Peso por lado": { en: "Weight per side", es: "Peso por lado" },
+  "kg/lado": { en: "kg/side", es: "kg/lado" },
   "Sem dica registrada": { en: "No tip recorded", es: "Sin consejo registrado" },
   "Dica de execução ainda não escrita para este exercício.": {
     en: "Execution tip not written yet for this exercise.",

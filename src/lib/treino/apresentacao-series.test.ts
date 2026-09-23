@@ -4,6 +4,7 @@ import {
   formatarDescansoReal,
   marcadoresDaSerie,
   resumirSeriesValendo,
+  unidadeDaCarga,
 } from "./apresentacao-series";
 
 const serie = (tipo: "aquecimento" | "valendo", reps: number) => ({ tipo, reps });
@@ -29,6 +30,15 @@ describe("apresentação da grade de séries", () => {
     expect(resumirSeriesValendo([serie("valendo", 10), serie("valendo", 10)], "pt-BR")).toBe(
       "2 séries valendo · 10 repetições",
     );
+  });
+
+  // TR-15 (QA.md, 2026-09-23): série com `pesoPorLado` aparecia só como
+  // "14 kg", igual a uma carga total — o volume dela é o dobro.
+  it("marca a unidade quando a carga é por lado", () => {
+    expect(unidadeDaCarga(false, "pt-BR")).toBe("kg");
+    expect(unidadeDaCarga(true, "pt-BR")).toBe("kg/lado");
+    expect(unidadeDaCarga(true, "en")).toBe("kg/side");
+    expect(unidadeDaCarga(true, "es")).toBe("kg/lado");
   });
 
   it("não inventa faixa sem série valendo", () => {
