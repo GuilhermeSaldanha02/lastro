@@ -1,0 +1,8 @@
+# O texto '12 repetição' é render local (src/lib/treino/apresentacao-series.ts:36); nenhuma requisição específica. Requisições da tela no período:
+2026-09-23T13:19:13.875Z POST 200 https://lastro-pi.vercel.app/treino/35fbe560-bd37-491c-a828-ac32c1ec9fa4 x-vercel-id=gru1::gru1::2gngz-1790169552437-fb1cc4abca53 x-vercel-error= x-matched-path=/treino/[id] x-vercel-cache=MISS
+2026-09-23T13:19:14.279Z POST 200 https://lastro-pi.vercel.app/treino/35fbe560-bd37-491c-a828-ac32c1ec9fa4 x-vercel-id=gru1::gru1::znxzl-1790169553492-dbc65e891cbc x-vercel-error= x-matched-path=/treino/[id] x-vercel-cache=MISS
+2026-09-23T13:19:14.560Z POST FAILED https://lastro-pi.vercel.app/treino/35fbe560-bd37-491c-a828-ac32c1ec9fa4 net::ERR_ABORTED
+2026-09-23T13:19:31.198Z POST 200 https://lastro-pi.vercel.app/treino/35fbe560-bd37-491c-a828-ac32c1ec9fa4 x-vercel-id=gru1::gru1::4hl4v-1790169570135-402ed0e58f2e x-vercel-error= x-matched-path=/treino/[id] x-vercel-cache=MISS
+2026-09-23T13:19:31.320Z POST FAILED https://lastro-pi.vercel.app/treino/35fbe560-bd37-491c-a828-ac32c1ec9fa4 net::ERR_ABORTED
+2026-09-23T13:19:31.470Z POST 200 https://lastro-pi.vercel.app/treino/35fbe560-bd37-491c-a828-ac32c1ec9fa4 x-vercel-id=gru1::gru1::68vp4-1790169570718-534ce281c255 x-vercel-error= x-matched-path=/treino/[id] x-vercel-cache=MISS
+2026-09-23T13:19:31.584Z POST FAILED https://lastro-pi.vercel.app/treino/35fbe560-bd37-491c-a828-ac32c1ec9fa4 net::ERR_ABORTED

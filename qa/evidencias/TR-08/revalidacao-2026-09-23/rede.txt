@@ -1,0 +1,18 @@
+# Captura persistente (page.on response/requestfailed), sessão 2026-09-23, conta do dono, produção e862eeb. Filtro: T13:27:2
+2026-09-23T13:27:27.152Z POST 200 https://lastro-pi.vercel.app/treino/35fbe560-bd37-491c-a828-ac32c1ec9fa4 x-vercel-id=gru1::gru1::lmf92-1790170046245-c798cf894e03 x-vercel-error= x-matched-path=/treino/[id] x-vercel-cache=MISS
+2026-09-23T13:27:27.369Z POST FAILED https://lastro-pi.vercel.app/treino/35fbe560-bd37-491c-a828-ac32c1ec9fa4 net::ERR_ABORTED
+2026-09-23T13:27:27.468Z GET 200 https://lastro-pi.vercel.app/manifest.webmanifest x-vercel-id=gru1::4dhl2-1790170046884-c1feba2a7772 x-vercel-error= x-matched-path=/manifest.webmanifest x-vercel-cache=HIT
+2026-09-23T13:27:27.582Z GET 200 https://lastro-pi.vercel.app/icon.svg x-vercel-id=gru1::k97rt-1790170046984-1a5e5ed73b74 x-vercel-error= x-matched-path=/icon.svg x-vercel-cache=HIT
+2026-09-23T13:27:27.596Z GET 200 https://lastro-pi.vercel.app/logo-lastro.png x-vercel-id=gru1::j82hp-1790170046935-1a62b96bcbbc x-vercel-error= x-matched-path=/logo-lastro.png x-vercel-cache=HIT
+2026-09-23T13:27:27.635Z GET 200 https://lastro-pi.vercel.app/perfil?_rsc=wKG-CGnmUEEecQGz x-vercel-id=gru1::gru1::mhtx9-1790170046984-2e603be82e3e x-vercel-error= x-matched-path=/(.)perfil.rsc x-vercel-cache=MISS
+2026-09-23T13:27:27.657Z GET 200 https://lastro-pi.vercel.app/?_rsc=wKG-CGnmUEEecQGz x-vercel-id=gru1::gru1::xvbxb-1790170046984-9f54898a009c x-vercel-error= x-matched-path=/index.rsc x-vercel-cache=MISS
+2026-09-23T13:27:27.681Z GET 200 https://lastro-pi.vercel.app/treino?_rsc=wKG-CGnmUEEecQGz x-vercel-id=gru1::gru1::5b2mg-1790170046972-52768c695670 x-vercel-error= x-matched-path=/treino.rsc x-vercel-cache=MISS
+2026-09-23T13:27:27.684Z GET 200 https://lastro-pi.vercel.app/analise?_rsc=wKG-CGnmUEEecQGz x-vercel-id=gru1::gru1::2csnb-1790170046984-d583a22277a2 x-vercel-error= x-matched-path=/analise.rsc x-vercel-cache=MISS
+2026-09-23T13:27:27.790Z GET 200 https://lastro-pi.vercel.app/catalogo?_rsc=wKG-CGnmUEEecQGz x-vercel-id=gru1::gru1::2csnb-1790170047132-63ccf50b0084 x-vercel-error= x-matched-path=/catalogo.rsc x-vercel-cache=MISS
+2026-09-23T13:27:27.842Z GET 200 https://lastro-pi.vercel.app/treino?_rsc=Nod8lgFfI4_zw-ji x-vercel-id=gru1::gru1::dx779-1790170047179-b45065c2e68f x-vercel-error= x-matched-path=/treino.rsc x-vercel-cache=MISS
+2026-09-23T13:27:27.845Z GET 200 https://lastro-pi.vercel.app/perfil?_rsc=Nod8lgFfI4_zw-ji x-vercel-id=gru1::gru1::xvbxb-1790170047182-967ecff4527e x-vercel-error= x-matched-path=/(.)perfil.rsc x-vercel-cache=MISS
+2026-09-23T13:27:27.867Z GET 200 https://lastro-pi.vercel.app/ajustes?_rsc=wKG-CGnmUEEecQGz x-vercel-id=gru1::gru1::5b2mg-1790170047177-a1ea005130b5 x-vercel-error= x-matched-path=/ajustes.rsc x-vercel-cache=MISS
+2026-09-23T13:27:27.976Z GET 200 https://lastro-pi.vercel.app/?_rsc=Nod8lgFfI4_zw-ji x-vercel-id=gru1::gru1::68x7h-1790170047286-39d780b8920b x-vercel-error= x-matched-path=/index.rsc x-vercel-cache=MISS
+2026-09-23T13:27:27.981Z GET 200 https://lastro-pi.vercel.app/analise?_rsc=Nod8lgFfI4_zw-ji x-vercel-id=gru1::gru1::9j747-1790170047339-74f177fd5fb9 x-vercel-error= x-matched-path=/analise.rsc x-vercel-cache=MISS
+2026-09-23T13:27:27.995Z GET 200 https://lastro-pi.vercel.app/catalogo?_rsc=Nod8lgFfI4_zw-ji x-vercel-id=gru1::gru1::nkqvv-1790170047341-714ec9d60607 x-vercel-error= x-matched-path=/catalogo.rsc x-vercel-cache=MISS
+2026-09-23T13:27:28.004Z GET 200 https://lastro-pi.vercel.app/ajustes?_rsc=Nod8lgFfI4_zw-ji x-vercel-id=gru1::gru1::5b2mg-1790170047370-992c4271f5c2 x-vercel-error= x-matched-path=/ajustes.rsc x-vercel-cache=MISS
