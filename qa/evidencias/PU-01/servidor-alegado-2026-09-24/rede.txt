@@ -1,0 +1,9 @@
+Produção ea6153e, 2026-09-24. Chrome do Playwright com a conta do dono e permissão de notificação concedida.
+- POST /api/push/disparar sem segredo: 401; com segredo errado: 401.
+- Supabase: migração registrada como 20260924131626; job lastro-avisos-descanso a cada 5 s, ativo, execuções "succeeded"; RLS ligada em push_inscricao e aviso_descanso; authenticated sem EXECUTE em private.disparar_avisos_descanso().
+- Ajustes -> "Ativar aviso": inscrição FCM criada (~10 s na primeira vez), 1 linha em push_inscricao.
+- Aviso de teste inserido por SQL (só aviso_descanso, sem série) com dispara_em = 13:18:15.
+- Cron reivindicou às 13:18:18,9 (3,9 s depois); net._http_response: 200 {"recebidos":1,"enviados":1,"expirados":[]}.
+- registration.getNotifications({tag:"lastro-descanso"}): "Descanso acabou" / "Hora da próxima série." / url /treino/397eb9de-...
+- "Desligar": inscrição removida do navegador e do banco (0 linhas).
+Falta: o iPhone do dono (tela de início) com o app fechado, e o agendamento pelo próprio timer (iniciar/pausar/+30s/encerrar).
