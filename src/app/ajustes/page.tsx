@@ -10,6 +10,7 @@ import SetaNavegacao from "@/components/seta-navegacao";
 import CabecalhoPro from "@/components/cabecalho-pro";
 import MetaSemanalForm from "@/components/meta-semanal-form";
 import IdiomaForm from "@/components/idioma-form";
+import AvisoDescansoForm from "@/components/aviso-descanso-form";
 import SeletorModo from "@/components/seletor-modo";
 import { t } from "@/lib/texto/i18n";
 
@@ -52,6 +53,8 @@ export default async function PaginaAjustes() {
             <MetaSemanalForm metaInicial={perfil.metaTreinosSemana} idioma={idioma} />
 
             <IdiomaForm idiomaInicial={idioma} />
+
+            <AvisoDescansoForm idioma={idioma} />
 
             {/* Menu de Funcionalidades */}
             <div className="bento-menu-grid">
