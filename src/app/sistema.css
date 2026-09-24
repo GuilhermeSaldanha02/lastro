@@ -5000,7 +5000,7 @@
 /* ---------- Grid da Área de Ação Refinada (Lado a Lado Pílula + Finalizar Vermelho com Letras Brancas) ---------- */
 .acao-area-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   gap: var(--lastro-e-3);
   width: 100%;
 }
@@ -5073,6 +5073,19 @@
    margem de 8px do botão base o deixava 8px mais baixo que o vizinho. */
 .acao-area .botao-finalizar-treino {
   margin-top: 0;
+  /* Na barra fixa o brilho largo vazava para fora da pílula (dono, 2026-09-24). */
+  box-shadow: 0 2px 6px rgba(220, 38, 38, 0.3);
+}
+
+/* Os dois botões lado a lado: rótulo em uma linha até 320 px. */
+.acao-area-grid > * {
+  font-size: 0.875rem;
+  padding-inline: var(--lastro-e-2);
+}
+
+.acao-area .botao-finalizar-treino:hover,
+.acao-area .botao-finalizar-treino:active {
+  box-shadow: 0 2px 6px rgba(220, 38, 38, 0.3);
 }
 
 .acao-area > .botao-finalizar-treino {
