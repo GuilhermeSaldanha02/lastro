@@ -24,12 +24,17 @@ describe("leitura do corpo enviado pelo banco", () => {
     treino_id: "aa0cd9e6-6dc4-477b-9c91-6a9142bd4a59",
   };
 
-  it("aceita a lista de avisos bem formada", () => {
-    expect(lerAvisosDoCorpo({ avisos: [valido] })).toEqual([valido]);
+  it("aceita a lista de avisos bem formada; sem tipo, é o aviso de fim", () => {
+    expect(lerAvisosDoCorpo({ avisos: [valido] })).toEqual([{ ...valido, tipo: "fim" }]);
+  });
+
+  it("lê o pré-aviso e trata tipo desconhecido como fim", () => {
+    expect(lerAvisosDoCorpo({ avisos: [{ ...valido, tipo: "pre" }] })[0].tipo).toBe("pre");
+    expect(lerAvisosDoCorpo({ avisos: [{ ...valido, tipo: "outro" }] })[0].tipo).toBe("fim");
   });
 
   it("descarta item malformado e corpo que não é lista", () => {
-    expect(lerAvisosDoCorpo({ avisos: [valido, { endpoint: 1 }] })).toEqual([valido]);
+    expect(lerAvisosDoCorpo({ avisos: [valido, { endpoint: 1 }] })).toEqual([{ ...valido, tipo: "fim" }]);
     expect(lerAvisosDoCorpo({ avisos: "x" })).toEqual([]);
     expect(lerAvisosDoCorpo(null)).toEqual([]);
   });

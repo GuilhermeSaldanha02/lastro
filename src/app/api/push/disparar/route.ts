@@ -28,11 +28,11 @@ export async function POST(requisicao: Request): Promise<NextResponse> {
     avisos.map((aviso) =>
       webpush.sendNotification(
         { endpoint: aviso.endpoint, keys: { p256dh: aviso.p256dh, auth: aviso.auth } },
-        JSON.stringify({
-          titulo: "Descanso acabou",
-          corpo: "Hora da próxima série.",
-          url: `/treino/${aviso.treino_id}`,
-        }),
+        JSON.stringify(
+          aviso.tipo === "pre"
+            ? { titulo: "Faltam 15 s", corpo: "Prepare-se para a próxima série.", url: `/treino/${aviso.treino_id}` }
+            : { titulo: "Descanso acabou", corpo: "Hora da próxima série.", url: `/treino/${aviso.treino_id}` },
+        ),
         // Descanso vencido há mais de 2 min não serve pra nada: o serviço
         // de push descarta em vez de entregar tarde.
         { TTL: 120, urgency: "high", topic: "descanso" },

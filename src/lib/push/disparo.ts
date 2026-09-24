@@ -12,6 +12,8 @@ export type AvisoVencido = {
   p256dh: string;
   auth: string;
   treino_id: string;
+  /** "pre" = faltam 15 s; "fim" = acabou. Tipo ausente ou desconhecido vira "fim". */
+  tipo: "pre" | "fim";
 };
 
 /** Compara o segredo em tempo constante. Sem segredo configurado, a rota fica dormente. */
@@ -24,7 +26,7 @@ export function disparoAutorizado(recebido: string | null, segredo: string | und
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
-function avisoValido(item: unknown): item is AvisoVencido {
+function avisoValido(item: unknown): item is Omit<AvisoVencido, "tipo"> & { tipo?: unknown } {
   if (!item || typeof item !== "object") return false;
   const a = item as Record<string, unknown>;
   return (
@@ -49,5 +51,6 @@ export function lerAvisosDoCorpo(corpo: unknown): AvisoVencido[] {
     p256dh: a.p256dh,
     auth: a.auth,
     treino_id: a.treino_id,
+    tipo: a.tipo === "pre" ? ("pre" as const) : ("fim" as const),
   }));
 }

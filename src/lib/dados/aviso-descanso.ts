@@ -11,6 +11,7 @@
 "use server";
 
 import { criarClienteServidor } from "@/lib/supabase/cliente-servidor";
+import { segundosAteOPreAviso } from "@/lib/treino/aviso-descanso";
 
 export type InscricaoPush = {
   endpoint: string;
@@ -102,6 +103,12 @@ export async function agendarAvisoDescanso(
               treino_id: treinoId,
               dispara_em: new Date(Date.now() + segundos * 1000).toISOString(),
               enviado_em: null,
+              // "Faltam 15 s" (2026-09-24). Reagendar zera o envio anterior.
+              pre_dispara_em: (() => {
+                const pre = segundosAteOPreAviso(segundos);
+                return pre === null ? null : new Date(Date.now() + pre * 1000).toISOString();
+              })(),
+              pre_enviado_em: null,
             },
             { onConflict: "usuario_id" },
           );
