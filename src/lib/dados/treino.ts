@@ -17,6 +17,7 @@ import { mapaTraducaoExercicios, mapaTraducaoGrupos } from "@/lib/dados/traducao
 import { formatarGrupoMuscular } from "@/lib/texto/grupo-muscular";
 import { ehErroPermanenteDoPostgres } from "@/lib/offline/erro-permanente";
 import { ehUuid } from "@/lib/dados/id-valido";
+import { limitarDuracao, limitarFimMs } from "@/lib/treino/fim-treino";
 
 export type Exercicio = {
   id: string;
@@ -62,6 +63,13 @@ export type Treino = {
    * É a âncora que faz a tela e `/ajustes/relatorios` medirem a mesma coisa.
    */
   iniciadoEm: string;
+  /**
+   * Fim do treino no servidor (`treino.finalizado_em`, migration
+   * 20260924152633). `null` = em andamento. Antes o fim vivia só no
+   * `localStorage`, então outro aparelho — e o "Continuar treino de hoje" —
+   * não sabiam que o treino tinha acabado.
+   */
+  finalizadoEm: string | null;
   /** Quantas séries este treino tem, contando aquecimento. */
   totalSeries: number;
   gruposMusculares?: string[];
@@ -94,13 +102,15 @@ export async function listarTreinos(): Promise<Treino[]> {
     supabase
       .from("treino")
       .select(
-        "id, data, iniciado_em, serie (tipo, reps, peso, peso_por_lado, exercicio:exercicio_id (grupo_muscular_primario, unilateral))",
+        "id, data, iniciado_em, finalizado_em, serie (tipo, reps, peso, peso_por_lado, exercicio:exercicio_id (grupo_muscular_primario, unilateral))",
       )
       // ESCOPO EXPLÍCITO. Desde a migração 0022 a RLS deixou de significar
       // "só o meu": o personal com vínculo aceito enxerga treino e série
       // do aluno. Sem esta linha a lista de treinos dele mistura os dois.
       .eq("usuario_id", user.id)
-      .order("data", { ascending: false }),
+      .order("data", { ascending: false })
+      // Desempate: desde 2026-09-24 o dia pode ter mais de um treino.
+      .order("iniciado_em", { ascending: false }),
     obterIdioma(),
   ]);
   if (error) throw new Error(`Falha ao listar treinos: ${error.message}`);
@@ -118,6 +128,7 @@ export async function listarTreinos(): Promise<Treino[]> {
     id: string;
     data: string;
     iniciado_em: string;
+    finalizado_em: string | null;
     serie: LinhaSerie[] | null;
   };
 
@@ -152,6 +163,7 @@ export async function listarTreinos(): Promise<Treino[]> {
       id: t.id,
       data: t.data,
       iniciadoEm: t.iniciado_em,
+      finalizadoEm: t.finalizado_em,
       totalSeries: series.length,
       gruposMusculares: grupos,
       volumeKg: Math.round(vol),
@@ -170,7 +182,7 @@ export async function buscarTreino(
 
   const { data: treino, error: erroTreino } = await supabase
     .from("treino")
-    .select("id, data, iniciado_em")
+    .select("id, data, iniciado_em, finalizado_em")
     .eq("id", treinoId)
     // Escopo explícito (0022): sem isto, o personal abriria a tela de
     // treino DO ALUNO por URL — tela de edição, com botões que a RLS
@@ -220,6 +232,7 @@ export async function buscarTreino(
     id: treino.id,
     data: treino.data,
     iniciadoEm: treino.iniciado_em,
+    finalizadoEm: treino.finalizado_em ?? null,
     totalSeries: linhasSeries.length,
     series: linhasSeries.map((s) => ({
       id: s.id,
@@ -486,10 +499,135 @@ export async function listarCatalogo(): Promise<ExercicioDoCatalogo[]> {
   return catalogo;
 }
 
+type ClienteServidor = Awaited<ReturnType<typeof criarClienteServidor>>;
+
+/**
+ * Treino de HOJE ainda em aberto (sem `finalizado_em`), o mais recente.
+ *
+ * Desde a migration 20260924152633 o dia pode ter mais de um treino: depois
+ * de finalizar, "Iniciar treino de hoje" cria outro (decisão do dono,
+ * 2026-09-24). O `.maybeSingle()` antigo, sem `limit`, estouraria com duas
+ * linhas. Treino em aberto é reaproveitado mesmo vazio — a proteção contra
+ * treinos vazios empilhados (achado do dono, 2026-08-07) continua valendo.
+ */
+async function treinoEmAbertoDeHoje(
+  supabase: ClienteServidor,
+  usuarioId: string,
+  hoje: string,
+): Promise<string | null> {
+  const { data, error } = await supabase
+    .from("treino")
+    .select("id")
+    .eq("data", hoje)
+    // Escopo explícito (0022). Sem isto, se o ALUNO tivesse treinado hoje,
+    // o personal seria redirecionado para dentro da sessão do aluno.
+    .eq("usuario_id", usuarioId)
+    .is("finalizado_em", null)
+    .order("iniciado_em", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+  if (error) {
+    throw new Error(`Falha ao verificar treino de hoje: ${error.message}`);
+  }
+  return data?.id ?? null;
+}
+
+/** Mesmo contrato de `ResultadoGravacaoSerie` (achado A1): recusa volta como valor. */
+export type ResultadoFimTreino =
+  | { ok: true; finalizadoEm: string | null }
+  | { ok: false; permanente: true; mensagem: string };
+
+function revalidarTreino(treinoId: string): void {
+  revalidatePath("/");
+  revalidatePath("/treino");
+  revalidatePath(`/treino/${treinoId}`);
+}
+
+/**
+ * Finaliza o treino NO SERVIDOR. Idempotente: se já está finalizado, devolve
+ * o fim gravado sem movê-lo — mesmo contrato do `marcarFim` local.
+ *
+ * `fimIso` existe para a marca que ficou só no aparelho (código antigo ou
+ * "Finalizar" sem rede) chegar ao banco com o instante real, não com o da
+ * sincronização. O servidor prende o valor entre o início e agora.
+ * `duracaoSegundos` é o cronômetro do aparelho; sem ele, fica `null`.
+ */
+export async function finalizarTreinoRemoto(
+  treinoId: string,
+  fimIso?: string,
+  duracaoSegundos?: number,
+): Promise<ResultadoFimTreino> {
+  const { supabase, user } = await usuarioAutenticadoOuErro();
+  if (!ehUuid(treinoId)) {
+    return { ok: false, permanente: true, mensagem: "Treino inexistente." };
+  }
+
+  const { data: treino, error: erroLeitura } = await supabase
+    .from("treino")
+    .select("iniciado_em, finalizado_em")
+    .eq("id", treinoId)
+    .eq("usuario_id", user.id)
+    .maybeSingle();
+  if (erroLeitura) throw new Error(`Falha ao ler treino: ${erroLeitura.message}`);
+  if (!treino) return { ok: false, permanente: true, mensagem: "Treino inexistente." };
+  if (treino.finalizado_em) return { ok: true, finalizadoEm: treino.finalizado_em };
+
+  const inicioMs = new Date(treino.iniciado_em).getTime();
+  const fimMs = limitarFimMs(fimIso, inicioMs, Date.now());
+  const { data: gravado, error } = await supabase
+    .from("treino")
+    .update({
+      finalizado_em: new Date(fimMs).toISOString(),
+      duracao_segundos: limitarDuracao(duracaoSegundos, inicioMs, fimMs),
+    })
+    .eq("id", treinoId)
+    .eq("usuario_id", user.id)
+    .is("finalizado_em", null)
+    .select("finalizado_em")
+    .maybeSingle();
+  if (error) {
+    const mensagem = `Falha ao finalizar treino: ${error.message}`;
+    if (ehErroPermanenteDoPostgres(error.code)) return { ok: false, permanente: true, mensagem };
+    throw new Error(mensagem);
+  }
+  revalidarTreino(treinoId);
+  if (gravado) return { ok: true, finalizadoEm: gravado.finalizado_em };
+
+  // Corrida: outro aparelho finalizou entre a leitura e o update. Vale o dele.
+  const { data: atual } = await supabase
+    .from("treino")
+    .select("finalizado_em")
+    .eq("id", treinoId)
+    .eq("usuario_id", user.id)
+    .maybeSingle();
+  return { ok: true, finalizadoEm: atual?.finalizado_em ?? null };
+}
+
+/** Desfaz a finalização no servidor. Idempotente num treino já aberto. */
+export async function reabrirTreinoRemoto(treinoId: string): Promise<ResultadoFimTreino> {
+  const { supabase, user } = await usuarioAutenticadoOuErro();
+  if (!ehUuid(treinoId)) {
+    return { ok: false, permanente: true, mensagem: "Treino inexistente." };
+  }
+  const { error } = await supabase
+    .from("treino")
+    .update({ finalizado_em: null, duracao_segundos: null })
+    .eq("id", treinoId)
+    .eq("usuario_id", user.id);
+  if (error) {
+    const mensagem = `Falha ao reabrir treino: ${error.message}`;
+    if (ehErroPermanenteDoPostgres(error.code)) return { ok: false, permanente: true, mensagem };
+    throw new Error(mensagem);
+  }
+  revalidarTreino(treinoId);
+  return { ok: true, finalizadoEm: null };
+}
+
 /**
  * Inicia um treino para o usuário logado, com `data = hoje` — ou reaproveita
- * o de hoje se já existir. Server Action, chamada tanto de `src/app/page.tsx`
- * quanto de `src/app/treino/page.tsx`.
+ * o de hoje que ainda está EM ABERTO (`treinoEmAbertoDeHoje`). Com o de hoje
+ * já finalizado, cria outro. Server Action, chamada tanto de
+ * `src/app/page.tsx` quanto de `src/app/treino/page.tsx`.
  *
  * Sem a checagem de reaproveitamento, cada clique em "Iniciar treino de
  * hoje" criava uma linha nova em `treino` — inclusive sem nenhuma série
@@ -503,21 +641,9 @@ export async function criarTreino(): Promise<void> {
   // noturno virar o dia seguinte e cair na semana ISO errada.
   const hoje = dataLocalBrasil();
 
-  const { data: existente, error: erroConsulta } = await supabase
-    .from("treino")
-    .select("id")
-    .eq("data", hoje)
-    // Escopo explícito (0022). Sem isto, se o ALUNO tivesse treinado hoje,
-    // o `maybeSingle()` do personal ou estouraria com duas linhas ou
-    // devolveria o treino DELE — e o personal seria redirecionado para
-    // dentro da sessão do aluno.
-    .eq("usuario_id", user.id)
-    .maybeSingle();
-  if (erroConsulta) {
-    throw new Error(`Falha ao verificar treino de hoje: ${erroConsulta.message}`);
-  }
-  if (existente) {
-    redirect(`/treino/${existente.id}`);
+  const existenteId = await treinoEmAbertoDeHoje(supabase, user.id, hoje);
+  if (existenteId) {
+    redirect(`/treino/${existenteId}`);
   }
 
   const { data, error } = await supabase
@@ -543,21 +669,9 @@ export async function criarTreinoComModelo(modeloId: string): Promise<void> {
   const { supabase, user } = await usuarioAutenticadoOuErro();
   const hoje = dataLocalBrasil();
 
-  const { data: existente, error: erroConsulta } = await supabase
-    .from("treino")
-    .select("id")
-    .eq("data", hoje)
-    // Escopo explícito (0022). Sem isto, se o ALUNO tivesse treinado hoje,
-    // o `maybeSingle()` do personal ou estouraria com duas linhas ou
-    // devolveria o treino DELE — e o personal seria redirecionado para
-    // dentro da sessão do aluno.
-    .eq("usuario_id", user.id)
-    .maybeSingle();
-  if (erroConsulta) {
-    throw new Error(`Falha ao verificar treino de hoje: ${erroConsulta.message}`);
-  }
-  if (existente) {
-    redirect(`/treino/${existente.id}?modelo=${modeloId}`);
+  const existenteId = await treinoEmAbertoDeHoje(supabase, user.id, hoje);
+  if (existenteId) {
+    redirect(`/treino/${existenteId}?modelo=${modeloId}`);
   }
 
   const { data, error } = await supabase

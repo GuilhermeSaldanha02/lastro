@@ -15,7 +15,11 @@ import {
   useSyncExternalStore,
 } from "react";
 import type { ExercicioDoCatalogo, Serie } from "@/lib/dados/treino";
-import { historicoDoExercicio } from "@/lib/dados/treino";
+import {
+  finalizarTreinoRemoto,
+  historicoDoExercicio,
+  reabrirTreinoRemoto,
+} from "@/lib/dados/treino";
 import { enfileirar } from "@/lib/offline/outbox";
 import { sincronizarPendentes } from "@/lib/offline/sincronizar-pendentes";
 import {
@@ -29,7 +33,19 @@ import BotaoFecharCartao, { comportamentoDeRolagem } from "./botao-fechar-cartao
 import TimerTopo from "./timer-topo";
 import { useDescansoReal } from "./use-descanso-real";
 import RelatorioPosTreino from "./relatorio-pos-treino";
-import { assinarMarcos, estaFinalizado, marcarFim, reabrir } from "@/lib/treino/marcos-treino";
+import {
+  assinarMarcos,
+  espelharServidor,
+  estaFinalizadoComServidor,
+  fimConfirmadoPeloServidor,
+  lerMarcos,
+  marcarFim,
+  reabrir,
+  restaurarMarcos,
+  segundosDecorridos,
+  temInicioLocal,
+} from "@/lib/treino/marcos-treino";
+import { decidirReconciliacao } from "@/lib/treino/fim-treino";
 import { criarGuardaDeToque, toqueCedoDemais } from "@/lib/treino/toque-duplo";
 import {
   calcularMetricasSessao,
@@ -82,29 +98,34 @@ function agruparPorExercicio(series: SerieUI[]) {
   return grupos;
 }
 
+/** Cronômetro deste aparelho, quando a sessão começou aqui; senão não há o que mandar. */
+function duracaoLocal(treinoId: string): number | undefined {
+  return temInicioLocal(treinoId) ? segundosDecorridos(treinoId) : undefined;
+}
+
 /**
- * Lê **puro**, sem escrever nada — mesmo motivo do `calcularSegundosTreino`
- * de `timer-topo.tsx`: é o `getSnapshot` de um `useSyncExternalStore`, e
- * roda DURANTE o render, onde `setState` é proibido. Devolve `false` no
- * servidor, onde `localStorage` não existe.
- *
- * Antes disso era `useState(() => localStorage...)` — o inicializador só
- * roda no cliente com o valor real, então reabrir um treino já finalizado
- * (numa sessão anterior) fazia o servidor renderizar "Finalizar Treino" e
- * o cliente hidratar direto pra "Ver Relatório do Treino": erro de
- * hidratação real, achado numa auditoria de QA revisitando um treino de
- * teste concluído (2026-08-28). `useSyncExternalStore` resolve isso do
- * mesmo jeito que já resolvia pro cronômetro — o servidor e a PRIMEIRA
- * pintura do cliente concordam (`false` nos dois), e o valor real aparece
- * no próximo render depois disso, sem inicializador divergente.
+ * Manda o fim ao servidor e, aceito, grava a confirmação local. Sem rede, a
+ * marca local fica SEM confirmação — é exatamente o que faz a próxima
+ * abertura do treino reenviar (`decidirReconciliacao`).
  */
-function treinoFoiFinalizado(treinoId: string): boolean {
-  return estaFinalizado(treinoId);
+async function enviarFimAoServidor(treinoId: string): Promise<void> {
+  const { fimMs } = lerMarcos(treinoId);
+  try {
+    const resultado = await finalizarTreinoRemoto(
+      treinoId,
+      fimMs === null ? undefined : new Date(fimMs).toISOString(),
+      duracaoLocal(treinoId),
+    );
+    if (resultado.ok) espelharServidor(treinoId, resultado.finalizadoEm);
+  } catch {
+    // Falha transitória (rede, sessão): fica pendente, reenviada ao reabrir a tela.
+  }
 }
 
 export default function TreinoDetalhe({
   treinoId,
   iniciadoEm,
+  finalizadoEm,
   seriesIniciais,
   exercicios,
   exerciciosPreSelecionados,
@@ -117,6 +138,8 @@ export default function TreinoDetalhe({
   treinoId: string;
   /** `treino.iniciado_em` — âncora de tempo comum ao cronômetro e aos dois relatórios. */
   iniciadoEm: string;
+  /** `treino.finalizado_em` — `null` em andamento. Fonte da verdade do fim. */
+  finalizadoEm: string | null;
   seriesIniciais: Serie[];
   exercicios: ExercicioDoCatalogo[];
   /** Vem de um modelo escolhido ao iniciar o treino (SDD §9.3) — exercícios
@@ -189,12 +212,36 @@ export default function TreinoDetalhe({
   // assinatura vazia que dependia de algum outro setState do mesmo handler
   // forçar o render — funcionava por sorte, e "reabrir" não teria essa
   // sorte, porque o clique dele mexe só no localStorage.
-  const lerConcluido = useCallback(() => treinoFoiFinalizado(treinoId), [treinoId]);
+  //
+  // Desde a migration 20260924152633 o fim mora no banco. O snapshot do
+  // servidor é o `finalizadoEm` — o HTML já sai com "Ver relatório" num
+  // treino fechado — e a leitura do cliente só deixa de usar a prop depois
+  // que o espelho local foi confirmado (`estaFinalizadoComServidor`).
+  // Antes era `() => false` no servidor, e o treino fechado hidratava como
+  // aberto (achado de 2026-08-28, que motivou o `useSyncExternalStore`).
+  const finalizadoNoServidor = finalizadoEm !== null;
+  const lerConcluido = useCallback(
+    () => estaFinalizadoComServidor(treinoId, finalizadoNoServidor),
+    [treinoId, finalizadoNoServidor],
+  );
   const treinoConcluido = useSyncExternalStore(
     assinarMarcos,
     lerConcluido,
-    () => false,
+    () => finalizadoNoServidor,
   );
+  const [erroReabrir, setErroReabrir] = useState(false);
+
+  // Reconciliação ao abrir e a cada `finalizadoEm` novo (revalidação depois
+  // das actions). Layout effect: o espelho é gravado antes da pintura.
+  useLayoutEffect(() => {
+    const decisao = decidirReconciliacao({
+      fimLocalMs: lerMarcos(treinoId).fimMs,
+      fimServidorMs: finalizadoEm === null ? null : new Date(finalizadoEm).getTime(),
+      confirmadoPeloServidor: fimConfirmadoPeloServidor(treinoId),
+    });
+    if (decisao === "enviar") void enviarFimAoServidor(treinoId);
+    else espelharServidor(treinoId, finalizadoEm);
+  }, [treinoId, finalizadoEm]);
   const grupos = useMemo(() => agruparPorExercicio(series), [series]);
   const ultima = series[series.length - 1];
 
@@ -567,12 +614,36 @@ export default function TreinoDetalhe({
 
   async function finalizarTreino(): Promise<void> {
     await descanso.concluir();
+    // Local primeiro (a tela responde na hora, com ou sem rede), servidor
+    // depois. `marcarFim` grava SEM confirmação: se o envio falhar, a
+    // próxima abertura reenvia.
     marcarFim(treinoId);
     setConfirmandoFim(false);
     setMostrarRelatorio(true);
+    void enviarFimAoServidor(treinoId);
     void drenar().then((resultado) => {
       if (resultado.falhou) void pedirSincronizacaoEmSegundoPlano();
     });
+  }
+
+  async function reabrirTreino(): Promise<void> {
+    const antes = lerMarcos(treinoId);
+    reabrir(treinoId);
+    setMostrarRelatorio(false);
+    setErroReabrir(false);
+    try {
+      const resultado = await reabrirTreinoRemoto(treinoId);
+      if (resultado.ok) {
+        espelharServidor(treinoId, null);
+        return;
+      }
+    } catch {
+      // cai no desfazer abaixo
+    }
+    // O servidor segue com o treino fechado: a tela volta a dizer isso, em
+    // vez de deixar registrar série num treino que o banco considera encerrado.
+    restaurarMarcos(treinoId, antes);
+    setErroReabrir(true);
   }
 
   return (
@@ -891,13 +962,18 @@ export default function TreinoDetalhe({
               type="button"
               className="botao-secundario botao-acao-duplo"
               onClick={() => {
-                reabrir(treinoId);
-                setMostrarRelatorio(false);
+                void reabrirTreino();
               }}
             >
               {t("Reabrir treino", idioma)}
             </button>
           </div>
+        )}
+
+        {erroReabrir && treinoConcluido && (
+          <p className="confirmacao-descanso" role="alert">
+            {t("Sem conexão — o treino continua finalizado. Tente reabrir de novo.", idioma)}
+          </p>
         )}
 
         {series.length > 0 && !treinoConcluido && !confirmandoFim && (

@@ -182,3 +182,61 @@ export function reabrir(treinoId: string): void {
   store.removeItem(chaveFimTreino(treinoId));
   notificar();
 }
+
+/* ------------------------------------------------------------------ */
+/* Espelho do servidor (migration 20260924152633)                      */
+/* ------------------------------------------------------------------ */
+
+/**
+ * Confirmação de que a marca de fim deste aparelho ESPELHA o servidor.
+ * Marca de fim sem confirmação = pendente de envio (código antigo ou
+ * "Finalizar" sem rede). Ver `decidirReconciliacao` em `fim-treino.ts`.
+ */
+export const chaveFimConfirmado = (treinoId: string) => `lastro_fim_servidor_${treinoId}`;
+
+export function fimConfirmadoPeloServidor(treinoId: string): boolean {
+  return armazenamento()?.getItem(chaveFimConfirmado(treinoId)) === "1";
+}
+
+/**
+ * "Finalizado?" — leitura pura, segura no `getSnapshot`. Sem confirmação
+ * local, o servidor decide (é o que o HTML já mostrou, então a primeira
+ * pintura não troca de estado); uma marca pendente também conta, porque o
+ * dono finalizou aqui e o envio ainda não chegou.
+ */
+export function estaFinalizadoComServidor(
+  treinoId: string,
+  finalizadoNoServidor: boolean,
+): boolean {
+  if (!armazenamento()) return finalizadoNoServidor;
+  const fimLocal = lerMarcos(treinoId).fimMs !== null;
+  return fimConfirmadoPeloServidor(treinoId) ? fimLocal : fimLocal || finalizadoNoServidor;
+}
+
+/**
+ * Faz a marca local seguir o servidor e grava a confirmação. Servidor
+ * aberto com marca local = reaberto em outro aparelho: passa por `reabrir`,
+ * que desloca o início e preserva o decorrido.
+ */
+export function espelharServidor(treinoId: string, finalizadoEmIso: string | null): void {
+  const store = armazenamento();
+  if (!store) return;
+  store.setItem(chaveFimConfirmado(treinoId), "1");
+  if (finalizadoEmIso === null) {
+    reabrir(treinoId);
+  } else if (store.getItem(chaveFimTreino(treinoId)) !== finalizadoEmIso) {
+    store.setItem(chaveFimTreino(treinoId), finalizadoEmIso);
+  }
+  notificar();
+}
+
+/** Volta os marcos ao que eram — "Reabrir" que o servidor não aceitou. */
+export function restaurarMarcos(treinoId: string, { inicioMs, fimMs }: MarcosTreino): void {
+  const store = armazenamento();
+  if (!store) return;
+  if (inicioMs === null) store.removeItem(chaveInicioTreino(treinoId));
+  else store.setItem(chaveInicioTreino(treinoId), new Date(inicioMs).toISOString());
+  if (fimMs === null) store.removeItem(chaveFimTreino(treinoId));
+  else store.setItem(chaveFimTreino(treinoId), new Date(fimMs).toISOString());
+  notificar();
+}

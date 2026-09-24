@@ -86,6 +86,7 @@ type LinhaSerie = {
 type LinhaTreino = {
   id: string;
   data: string;
+  finalizado_em: string | null;
   serie: LinhaSerie[] | null;
 };
 
@@ -103,7 +104,7 @@ export async function carregarResumoHome(hojeISO: string): Promise<ResumoHome> {
     supabase
       .from("treino")
       .select(
-        "id, data, serie (tipo, reps, peso, peso_por_lado, exercicio:exercicio_id (grupo_muscular_primario, unilateral))",
+        "id, data, finalizado_em, serie (tipo, reps, peso, peso_por_lado, exercicio:exercicio_id (grupo_muscular_primario, unilateral))",
       )
       // ESCOPO EXPLÍCITO, não confie só na RLS. Desde a migração 0022 o
       // personal com vínculo aceito TAMBÉM enxerga treino e série do aluno
@@ -112,7 +113,9 @@ export async function carregarResumoHome(hojeISO: string): Promise<ResumoHome> {
       // os treinos do ALUNO como se fossem dele — visto no navegador em
       // 2026-09-11, antes da correção.
       .eq("usuario_id", user.id)
-      .order("data", { ascending: false }),
+      .order("data", { ascending: false })
+      // Desempate: desde 2026-09-24 o dia pode ter mais de um treino.
+      .order("iniciado_em", { ascending: false }),
     obterIdioma(),
   ]);
   if (error) throw new Error(`Falha ao carregar o resumo: ${error.message}`);
@@ -197,6 +200,9 @@ export async function carregarResumoHome(hojeISO: string): Promise<ResumoHome> {
       };
     }),
     semanasFechadasComTreino: semanasComTreino.size,
-    treinoDeHojeId: treinos.find((t) => t.data === hojeISO)?.id ?? null,
+    // Só o treino de hoje EM ABERTO vira "Continuar". Finalizado, a Home
+    // oferece "Iniciar" e `criarTreino` cria outro (dono, 2026-09-24).
+    treinoDeHojeId:
+      treinos.find((t) => t.data === hojeISO && t.finalizado_em === null)?.id ?? null,
   };
 }

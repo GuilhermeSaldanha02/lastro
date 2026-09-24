@@ -22,8 +22,10 @@
  * muda de aparelho para aparelho.
  *
  * Limite conhecido e aceito: o tempo DEPOIS da última série (desmontar,
- * alongar) não entra — o banco não guarda um `finalizado_em`. Fechar essa
- * lacuna é migration, decisão do dono (ver PROGRESS.md).
+ * alongar) não entra. Desde a migration 20260924152633 o banco guarda
+ * `finalizado_em` e `duracao_segundos`, mas esta definição continua sendo a
+ * única dos relatórios e do cronômetro sem marca local — trocar a métrica
+ * mudaria números já vistos pelo dono, e isso é decisão dele.
  */
 export function duracaoSessaoSegundos(
   iniciadoEmIso: string,
