@@ -4,8 +4,14 @@ import {
   useEffect,
   useLayoutEffect,
   useRef,
+  useState,
   useSyncExternalStore,
 } from "react";
+import {
+  abrirTimerFlutuante,
+  quadroDoTimerFlutuante,
+  timerFlutuanteSuportado,
+} from "@/lib/treino/timer-flutuante";
 import { formatarMinutosSegundos } from "@/lib/audio/som-timer";
 import type { Idioma } from "@/lib/dados/idioma";
 import { t } from "@/lib/texto/i18n";
@@ -43,6 +49,8 @@ type TimerTopoProps = {
  * `calcularSegundosTreino`. Fica fora do componente porque a identidade da
  * função precisa ser estável entre renders.
  */
+const assinarNada = () => () => {};
+
 function assinarSegundo(aoMudar: () => void): () => void {
   const id = setInterval(aoMudar, 1000);
   return () => clearInterval(id);
@@ -137,6 +145,44 @@ export default function TimerTopo({
   useEffect(() => {
     if (sessaoComecaAqui) iniciarSessaoLocal(treinoId);
   }, [treinoId, sessaoComecaAqui]);
+
+  // Timer flutuante (pedido do dono, 2026-09-24). O botão só existe onde a
+  // API existe; o servidor responde `false` e o cliente mede depois da
+  // hidratação, sem divergência.
+  const flutuanteSuportado = useSyncExternalStore(
+    assinarNada,
+    timerFlutuanteSuportado,
+    () => false,
+  );
+  const [fecharFlutuante, setFecharFlutuante] = useState<(() => void) | null>(null);
+  // Lido pela janela flutuante a cada quadro; atualizado depois de cada render.
+  const painelAtual = useRef({ idioma, segundosRestantes: 0, pausado: false, metaAtingida: false });
+  useEffect(() => {
+    painelAtual.current = {
+      idioma,
+      segundosRestantes: descanso.segundosRestantes,
+      pausado: descanso.pausado,
+      metaAtingida: descanso.metaAtingida,
+    };
+  }, [idioma, descanso.segundosRestantes, descanso.pausado, descanso.metaAtingida]);
+
+  function abrirFlutuante() {
+    // Sem `await` antes: a janela precisa nascer do toque.
+    abrirTimerFlutuante(
+      () => {
+        const q = quadroDoTimerFlutuante(painelAtual.current);
+        return { ...q, rotulo: t(q.rotulo, painelAtual.current.idioma) };
+      },
+      () => setFecharFlutuante(null),
+    )
+      .then((fechar) => setFecharFlutuante(() => fechar))
+      .catch(() => setFecharFlutuante(null));
+  }
+
+  // Descanso encerrado: a janela flutuante sai junto.
+  useEffect(() => {
+    if (!descanso.ativo && fecharFlutuante) fecharFlutuante();
+  }, [descanso.ativo, fecharFlutuante]);
 
   const totalDaMeta = descanso.segundosReais + descanso.segundosRestantes;
   const porcentagemRestante =
@@ -239,6 +285,21 @@ export default function TimerTopo({
                   >
                     +30s
                   </button>
+
+                  {flutuanteSuportado && !fecharFlutuante && (
+                    <button
+                      type="button"
+                      className="timer-topo-btn-fechar"
+                      onClick={abrirFlutuante}
+                      aria-label={t("Mostrar o descanso fora do app", idioma)}
+                      title={t("Mostrar o descanso fora do app", idioma)}
+                    >
+                      <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+                        <rect x="3" y="5" width="18" height="14" rx="2" />
+                        <rect x="12" y="11" width="7" height="6" rx="1" />
+                      </svg>
+                    </button>
+                  )}
 
                   <button
                     type="button"
