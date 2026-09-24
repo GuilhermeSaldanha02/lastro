@@ -146,13 +146,21 @@ export function iniciarSessaoLocal(treinoId: string): void {
   }
 }
 
-/** Idempotente: reapertar "Finalizar" não move o fim já gravado. */
+/**
+ * Idempotente: reapertar "Finalizar" não move o fim já gravado.
+ *
+ * Fim NOVO nasce sem confirmação do servidor: a marca de confirmação é
+ * apagada aqui. Sem isso, um "Finalizar" sem rede num treino já espelhado
+ * (confirmação "1" desde a abertura) seria lido na próxima abertura como
+ * "reaberto em outro aparelho" — e o treino reabria sozinho.
+ */
 export function marcarFim(treinoId: string): void {
   const store = armazenamento();
   if (!store) return;
   const chave = chaveFimTreino(treinoId);
   if (!store.getItem(chave)) {
     store.setItem(chave, new Date().toISOString());
+    store.removeItem(chaveFimConfirmado(treinoId));
     notificar();
   }
 }
@@ -217,6 +225,10 @@ export function estaFinalizadoComServidor(
  * Faz a marca local seguir o servidor e grava a confirmação. Servidor
  * aberto com marca local = reaberto em outro aparelho: passa por `reabrir`,
  * que desloca o início e preserva o decorrido.
+ *
+ * Servidor e aparelho finalizados: fica o fim LOCAL. Nos treinos antigos o
+ * servidor tem o fim reconstruído (última série), mais cedo que o real
+ * deste aparelho; trocar mudaria o cronômetro congelado que o dono já viu.
  */
 export function espelharServidor(treinoId: string, finalizadoEmIso: string | null): void {
   const store = armazenamento();
@@ -224,7 +236,7 @@ export function espelharServidor(treinoId: string, finalizadoEmIso: string | nul
   store.setItem(chaveFimConfirmado(treinoId), "1");
   if (finalizadoEmIso === null) {
     reabrir(treinoId);
-  } else if (store.getItem(chaveFimTreino(treinoId)) !== finalizadoEmIso) {
+  } else if (!store.getItem(chaveFimTreino(treinoId))) {
     store.setItem(chaveFimTreino(treinoId), finalizadoEmIso);
   }
   notificar();
