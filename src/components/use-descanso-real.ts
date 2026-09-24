@@ -4,7 +4,7 @@ import { useCallback, useEffect, useMemo, useRef, useSyncExternalStore } from "r
 
 import { agendarAvisoDescanso } from "@/lib/dados/aviso-descanso";
 import { avisoDescansoLigado } from "@/lib/push/cliente";
-import { segundosAteOAviso } from "@/lib/treino/aviso-descanso";
+import { acaoDoAviso } from "@/lib/treino/aviso-descanso";
 
 import {
   desbloquearAudio,
@@ -140,7 +140,10 @@ export function useDescansoReal({
   const ultimoAgendado = useRef<number | null | undefined>(undefined);
   useEffect(() => {
     if (!avisoDescansoLigado()) return;
-    const segundos = segundosAteOAviso(estado, Date.now());
+    const acao = acaoDoAviso(estado, Date.now());
+    // Chegou ao fim: o aviso agendado segue e sai (ver `acaoDoAviso`).
+    if (acao.tipo === "manter") return;
+    const segundos = acao.tipo === "agendar" ? acao.segundos : null;
     if (ultimoAgendado.current === undefined && segundos === null) {
       ultimoAgendado.current = null;
       return;

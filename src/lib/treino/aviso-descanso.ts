@@ -1,5 +1,19 @@
 import { painelDoDescanso, type EstadoDescanso } from "./descanso-real";
 
+export type AcaoDoAviso = { tipo: "agendar"; segundos: number } | { tipo: "cancelar" } | { tipo: "manter" };
+
+/**
+ * O que o app manda ao servidor quando o descanso muda. Chegar ao fim NÃO
+ * cancela: com o app aberto o bip toca e o estado vira "aviso emitido", e
+ * cancelar ali apagava o push antes de o cron enviá-lo (teste de
+ * 2026-09-24). Só pausar e encerrar cancelam.
+ */
+export function acaoDoAviso(estado: EstadoDescanso | null, agoraMs: number): AcaoDoAviso {
+  if (!estado || estado.iniciadoEmMs === null) return { tipo: "cancelar" };
+  const segundos = segundosAteOAviso(estado, agoraMs);
+  return segundos === null ? { tipo: "manter" } : { tipo: "agendar", segundos };
+}
+
 /** "Faltam 15 s" (pedido do dono, 2026-09-24): hora de se preparar. */
 export const ANTECEDENCIA_PRE_AVISO = 15;
 

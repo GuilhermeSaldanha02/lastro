@@ -7,7 +7,26 @@ import {
   pausarDescanso,
   retomarDescanso,
 } from "./descanso-real";
-import { ANTECEDENCIA_PRE_AVISO, segundosAteOPreAviso, segundosAteOAviso } from "./aviso-descanso";
+import { ANTECEDENCIA_PRE_AVISO, acaoDoAviso, segundosAteOPreAviso, segundosAteOAviso } from "./aviso-descanso";
+
+// Achado no teste de 2026-09-24: chegar a zero com o app aberto marcava o
+// aviso como emitido e CANCELAVA o push no servidor antes de ele sair.
+// Chegar ao fim não cancela nada; só pausar e encerrar cancelam.
+describe("o que fazer com o aviso no servidor", () => {
+  const t0 = 1_000_000;
+  const d = iniciarDescanso("t1", "s1", 90, t0);
+  it("correndo: agenda o que falta", () => {
+    expect(acaoDoAviso(d, t0 + 30_000)).toEqual({ tipo: "agendar", segundos: 60 });
+  });
+  it("chegou a zero ou o bip já tocou: mantém o que está agendado", () => {
+    expect(acaoDoAviso(d, t0 + 90_000)).toEqual({ tipo: "manter" });
+    expect(acaoDoAviso(marcarAvisoEmitido(d), t0 + 95_000)).toEqual({ tipo: "manter" });
+  });
+  it("pausado ou encerrado: cancela", () => {
+    expect(acaoDoAviso(pausarDescanso(d, t0 + 10_000), t0 + 20_000)).toEqual({ tipo: "cancelar" });
+    expect(acaoDoAviso(null, t0)).toEqual({ tipo: "cancelar" });
+  });
+});
 
 // Pedido do dono (2026-09-24): "faltam 15 s" antes do fim, para se preparar.
 describe("pré-aviso de descanso", () => {
