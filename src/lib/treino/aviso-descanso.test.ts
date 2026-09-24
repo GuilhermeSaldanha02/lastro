@@ -7,7 +7,19 @@ import {
   pausarDescanso,
   retomarDescanso,
 } from "./descanso-real";
-import { segundosAteOAviso } from "./aviso-descanso";
+import { ANTECEDENCIA_PRE_AVISO, segundosAteOPreAviso, segundosAteOAviso } from "./aviso-descanso";
+
+// Pedido do dono (2026-09-24): "faltam 15 s" antes do fim, para se preparar.
+describe("pré-aviso de descanso", () => {
+  it("sai 15 s antes do fim", () => {
+    expect(ANTECEDENCIA_PRE_AVISO).toBe(15);
+    expect(segundosAteOPreAviso(90)).toBe(75);
+  });
+  it("descanso curto demais (≤ 20 s) ou cancelado não tem pré-aviso", () => {
+    expect(segundosAteOPreAviso(20)).toBeNull();
+    expect(segundosAteOPreAviso(null)).toBeNull();
+  });
+});
 
 // Pedido do dono (2026-09-23): saber que o descanso acabou mesmo com o app
 // em segundo plano. O servidor recebe "daqui a N segundos" (não um horário,

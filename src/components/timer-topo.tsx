@@ -21,6 +21,7 @@ import {
   temInicioLocal,
 } from "@/lib/treino/marcos-treino";
 import type { ControleDescansoReal } from "./use-descanso-real";
+import { useTelaAcesa } from "./use-tela-acesa";
 
 type TimerTopoProps = {
   treinoId: string;
@@ -178,6 +179,9 @@ export default function TimerTopo({
       .then((fechar) => setFecharFlutuante(() => fechar))
       .catch(() => setFecharFlutuante(null));
   }
+
+  // Tela acesa enquanto o descanso corre (pausado não segura a tela).
+  useTelaAcesa(!treinoFinalizado && descanso.ativo && !descanso.pausado);
 
   // Descanso encerrado: a janela flutuante sai junto.
   useEffect(() => {
