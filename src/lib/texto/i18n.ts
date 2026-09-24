@@ -900,6 +900,10 @@ const DICIONARIO: Record<string, { en: string; es: string }> = {
 
   // --- components/treino-detalhe.tsx (finalizar / reabrir treino) ---
   "Reabrir treino": { en: "Reopen workout", es: "Reabrir entrenamiento" },
+  "Sem conexão — o treino continua finalizado. Tente reabrir de novo.": {
+    en: "No connection — the workout is still finished. Try reopening again.",
+    es: "Sin conexión — el entrenamiento sigue finalizado. Intenta reabrir de nuevo.",
+  },
   "Sem conexão": { en: "No connection", es: "Sin conexión" },
   "Salvo no aparelho": { en: "Saved on device", es: "Guardado en el dispositivo" },
   "Falha ao sincronizar": { en: "Sync failed", es: "Error al sincronizar" },

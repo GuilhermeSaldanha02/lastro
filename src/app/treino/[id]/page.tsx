@@ -82,6 +82,9 @@ export default async function PaginaTreinoDetalhe({
            sempre e nunca era lida; sem ela o cronômetro inventava um
            início ao abrir treino antigo (relato de uso real, 2026-09-04). */
         iniciadoEm={treino.iniciadoEm}
+        /* Fim do treino no servidor (migration 20260924152633) — decide o
+           estado já no HTML, sem esperar o `localStorage`. */
+        finalizadoEm={treino.finalizadoEm}
         seriesIniciais={treino.series}
         exercicios={exercicios}
         exerciciosPreSelecionados={exerciciosPreSelecionados}

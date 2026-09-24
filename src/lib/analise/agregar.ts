@@ -245,7 +245,10 @@ export function montarResumoCompacto(entrada: {
     .slice(0, MAX_VOLUME_POR_EXERCICIO);
 
   // ---------- tendencia_e1rm ----------
-  // Agrupa por exercício -> por sessão (treino), dentro da janela de comparação.
+  // Agrupa por exercício -> por DIA, dentro da janela de comparação. Era por
+  // treino; desde 2026-09-24 o dia pode ter dois treinos (manhã e noite), e
+  // um dia só não pode contar como duas sessões para o mínimo da T-E6 —
+  // daria tendência onde só existe um dia de dado (decisão do dono).
   type Sessao = { data: string; e1rmMaximo: number };
   const sessoesPorExercicio = new Map<string, Sessao[]>();
   const volumeTotalPorExercicioJanela = new Map<string, number>();
@@ -254,7 +257,7 @@ export function montarResumoCompacto(entrada: {
 
   const seriesPorExercicioETreino = new Map<string, SerieValendo[]>();
   for (const s of seriesValendoJanela) {
-    const chave = `${s.exercicioId}::${s.treinoId}`;
+    const chave = `${s.exercicioId}::${s.data}`;
     if (!seriesPorExercicioETreino.has(chave)) {
       seriesPorExercicioETreino.set(chave, []);
     }

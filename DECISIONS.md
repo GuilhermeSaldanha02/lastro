@@ -2883,3 +2883,17 @@ Sem navegador local (sem `.env.local`). O `j14-dica-info` roda na tela pública 
 **A decisão (pedido do dono).** O aviso só entra na tela quando a última drenagem deixou série na fila (sem rede): "salvo no aparelho". Com tudo no servidor ele sai da vista e fica só para leitor de tela (`.so-leitor-de-tela`), então quem usa leitor continua sabendo o estado e os E2E que leem `.sync` seguem valendo. Registrar o descanso agora drena na hora, e a drenagem da montagem também alimenta o aviso.
 
 **O que continua de D7.** Nunca alarmante, nunca erro: o aviso diz que a série está guardada, não que algo falhou.
+
+## 2026-09-24 (3) — O fim do treino mora no servidor; o dia pode ter mais de um treino
+
+**Contexto.** "Finalizar treino" gravava só `lastro_fim_treino_<id>` no `localStorage`. Outro aparelho via o treino aberto, e a Home e `/treino` ofereciam "Continuar treino de hoje" com o treino de hoje já finalizado (achado da auditoria de 2026-09-23).
+
+**A decisão (aprovada pelo dono).**
+- `treino.finalizado_em` (vazio = em andamento) e `treino.duracao_segundos` (cronômetro do aparelho no momento do fim, `null` quando não medido). Migração `20260924152633_treino_finalizado_em`. Os 38 treinos de dias anteriores foram fechados na última série (ou em `iniciado_em`, sem série).
+- Server actions `finalizarTreinoRemoto` e `reabrirTreinoRemoto` (`src/lib/dados/treino.ts`), com recusa como valor de retorno (achado A1). O fim é idempotente e o servidor prende o instante entre o início e agora.
+- **Com o treino de hoje finalizado, "Iniciar treino de hoje" cria OUTRO treino no mesmo dia** (escolha do dono, contra a recomendação de "Ver treino de hoje"). `criarTreino` só reaproveita o treino de hoje EM ABERTO; "Continuar" só aparece para ele.
+- Análise: a tendência de e1RM passa a agrupar por DIA, não por treino, para dois treinos no mesmo dia não contarem como duas sessões no mínimo da T-E6. Meta semanal conta treinos (manhã e noite = 2). Top set, sequência e recência não mudam.
+
+**A chave local tem um significado só.** `lastro_fim_treino_<id>` passa a ser espelho do servidor, confirmado por `lastro_fim_servidor_<id>`. Marca de fim SEM confirmação = pendente de envio (código antigo ou "Finalizar" sem rede); só ela é mandada ao banco ao abrir o treino (`decidirReconciliacao`, `src/lib/treino/fim-treino.ts`). Marca confirmada nunca é reenviada — senão um aparelho com espelho velho refinalizaria um treino reaberto em outro aparelho.
+
+**O que NÃO muda.** A duração dos relatórios continua sendo `duracaoSessaoSegundos` (`iniciado_em` → última série). `duracao_segundos` fica gravado mas não é exibido: trocar a métrica mudaria números que o dono já viu, e isso é decisão dele.

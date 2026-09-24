@@ -49,7 +49,11 @@ export default async function PaginaTreino() {
   // andamento, e clicar de novo criava outro (achado do dono, 2026-08-07;
   // `criarTreino` agora reaproveita, mas o rótulo do botão ficava errado
   // até essa correção).
-  const treinoDeHojeId = treinos.find((t) => t.data === dataLocalBrasil())?.id ?? null;
+  // Só o treino EM ABERTO: com o de hoje finalizado, o botão volta a ser
+  // "Iniciar" e cria outro treino no mesmo dia (dono, 2026-09-24).
+  const hoje = dataLocalBrasil();
+  const treinoDeHojeId =
+    treinos.find((t) => t.data === hoje && t.finalizadoEm === null)?.id ?? null;
 
   return (
     <main className="tela">
