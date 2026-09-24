@@ -68,8 +68,10 @@ describe("espelho do fim no servidor", () => {
   });
 
   it("reaberto em outro aparelho: marca confirmada é desfeita com o início deslocado", () => {
+    // Fim fixo (não `marcarFim`, que grava "agora" — reabrir no mesmo
+    // instante não deslocaria o início e o teste dependeria do relógio).
     window.localStorage.setItem(chaveInicioTreino(ID), "2026-09-24T10:00:00.000Z");
-    marcarFim(ID);
+    window.localStorage.setItem(chaveFimTreino(ID), "2026-09-24T11:00:00.000Z");
     espelharServidor(ID, "2026-09-24T11:00:00.000Z"); // envio aceito
     const antes = lerMarcos(ID);
 
