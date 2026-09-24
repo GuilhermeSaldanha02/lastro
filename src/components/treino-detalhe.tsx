@@ -880,7 +880,7 @@ export default function TreinoDetalhe({
               className="botao-finalizar-treino"
               onClick={() => setMostrarRelatorio(true)}
             >
-              <span>{t("Ver Relatório do Treino", idioma)}</span>
+              <span>{t("Ver relatório", idioma)}</span>
             </button>
 
             {/* A saída que não existia. Reabrir devolve o registro E
