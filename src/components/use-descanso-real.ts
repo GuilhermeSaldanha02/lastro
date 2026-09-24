@@ -1,6 +1,10 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useSyncExternalStore } from "react";
+import { useCallback, useEffect, useMemo, useRef, useSyncExternalStore } from "react";
+
+import { agendarAvisoDescanso } from "@/lib/dados/aviso-descanso";
+import { avisoDescansoLigado } from "@/lib/push/cliente";
+import { segundosAteOAviso } from "@/lib/treino/aviso-descanso";
 
 import {
   desbloquearAudio,
@@ -126,6 +130,24 @@ export function useDescansoReal({
     const atual = lerDescansoLocal(window.localStorage, treinoId);
     if (atual?.serieId === serieId) apagarDescansoLocal(window.localStorage, treinoId);
   }, [treinoId]);
+
+  // Aviso fora do app (pedido do dono, 2026-09-23): toda mudança do descanso
+  // — iniciar, pausar, retomar, +30s, encerrar — reagenda ou cancela o aviso
+  // no servidor. Depende de `estado` (muda só nas ações), não do tique de
+  // segundo. Sem rede o agendamento falha e o aviso não sai; o bip do app
+  // continua valendo. Na montagem sem descanso não manda nada: não há o
+  // que cancelar que este aparelho saiba.
+  const ultimoAgendado = useRef<number | null | undefined>(undefined);
+  useEffect(() => {
+    if (!avisoDescansoLigado()) return;
+    const segundos = segundosAteOAviso(estado, Date.now());
+    if (ultimoAgendado.current === undefined && segundos === null) {
+      ultimoAgendado.current = null;
+      return;
+    }
+    ultimoAgendado.current = segundos;
+    void agendarAvisoDescanso(treinoId, segundos);
+  }, [estado, treinoId]);
 
   useEffect(() => {
     if (!estado || !painel?.metaAtingida || estado.avisoMetaEmitido) return;

@@ -73,3 +73,44 @@ async function avisarClientes() {
     cliente.postMessage({ tipo: "sincronizar-outbox" });
   }
 }
+
+// Aviso de fim de descanso (pedido do dono, 2026-09-23). Quem manda é o
+// servidor (`/api/push/disparar`, chamado pelo pg_cron). O iPhone exige que
+// TODO push mostre notificação — push silencioso pode cancelar a inscrição —,
+// então mostra sempre, mesmo com o app aberto. A `tag` faz um aviso novo
+// substituir o anterior em vez de empilhar.
+self.addEventListener("push", (evento) => {
+  let dados = {};
+  try {
+    dados = evento.data ? evento.data.json() : {};
+  } catch {
+    dados = {};
+  }
+  evento.waitUntil(
+    self.registration.showNotification(dados.titulo || "Descanso acabou", {
+      body: dados.corpo || "Hora da próxima série.",
+      tag: "lastro-descanso",
+      renotify: true,
+      icon: "/icon-512.png",
+      badge: "/icon-512.png",
+      data: { url: dados.url || "/treino" },
+    }),
+  );
+});
+
+// Tocar na notificação volta para o treino: reaproveita a janela aberta do
+// app quando existe, senão abre uma.
+self.addEventListener("notificationclick", (evento) => {
+  evento.notification.close();
+  const alvo = new URL((evento.notification.data && evento.notification.data.url) || "/treino", self.location.origin).href;
+  evento.waitUntil(
+    self.clients.matchAll({ type: "window", includeUncontrolled: true }).then((janelas) => {
+      for (const janela of janelas) {
+        if ("focus" in janela) {
+          return janela.navigate(alvo).then((j) => (j || janela).focus());
+        }
+      }
+      return self.clients.openWindow(alvo);
+    }),
+  );
+});
