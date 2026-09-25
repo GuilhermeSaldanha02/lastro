@@ -1,0 +1,14 @@
+23. [GET] https://lastro-pi.vercel.app/treino?_rsc=38QhSmsHC_8GQ6VE => [200] 
+24. [GET] https://lastro-pi.vercel.app/perfil?_rsc=38QhSmsHC_8GQ6VE => [200] 
+25. [GET] https://lastro-pi.vercel.app/?_rsc=38QhSmsHC_8GQ6VE => [200] 
+26. [GET] https://lastro-pi.vercel.app/analise?_rsc=38QhSmsHC_8GQ6VE => [200] 
+28. [GET] https://lastro-pi.vercel.app/catalogo?_rsc=38QhSmsHC_8GQ6VE => [200] 
+29. [GET] https://lastro-pi.vercel.app/ajustes?_rsc=38QhSmsHC_8GQ6VE => [200] 
+30. [GET] https://lastro-pi.vercel.app/treino?_rsc=h6GljnpMubI1oGV2 => [200] 
+31. [GET] https://lastro-pi.vercel.app/perfil?_rsc=h6GljnpMubI1oGV2 => [200] 
+32. [GET] https://lastro-pi.vercel.app/?_rsc=h6GljnpMubI1oGV2 => [200] 
+33. [GET] https://lastro-pi.vercel.app/analise?_rsc=h6GljnpMubI1oGV2 => [200] 
+34. [GET] https://lastro-pi.vercel.app/catalogo?_rsc=h6GljnpMubI1oGV2 => [200] 
+35. [GET] https://lastro-pi.vercel.app/ajustes?_rsc=h6GljnpMubI1oGV2 => [200] 
+
+Note: 23 static requests not shown, run with "static" option to see them.

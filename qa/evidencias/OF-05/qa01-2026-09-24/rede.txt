@@ -1,0 +1,37 @@
+21. [GET] https://lastro-pi.vercel.app/perfil?_rsc=5CB68i4pnAekjehf => [200] 
+22. [GET] https://lastro-pi.vercel.app/analise?_rsc=5CB68i4pnAekjehf => [200] 
+23. [GET] https://lastro-pi.vercel.app/treino?_rsc=5CB68i4pnAekjehf => [200] 
+24. [GET] https://lastro-pi.vercel.app/treino/9db03743-205e-4eaf-95f3-2b45dd3b0ed0?_rsc=5CB68i4pnAekjehf => [200] 
+27. [GET] https://lastro-pi.vercel.app/treino/397eb9de-40f9-4aae-ac5d-03387d77d74c?_rsc=5CB68i4pnAekjehf => [200] 
+28. [GET] https://lastro-pi.vercel.app/catalogo?_rsc=5CB68i4pnAekjehf => [200] 
+29. [GET] https://lastro-pi.vercel.app/ajustes?_rsc=5CB68i4pnAekjehf => [200] 
+30. [GET] https://lastro-pi.vercel.app/perfil?_rsc=tXyZJ52UQVBCVsD3 => [200] 
+31. [GET] https://lastro-pi.vercel.app/analise?_rsc=tXyZJ52UQVBCVsD3 => [200] 
+32. [GET] https://lastro-pi.vercel.app/treino?_rsc=tXyZJ52UQVBCVsD3 => [200] 
+33. [GET] https://lastro-pi.vercel.app/treino/9db03743-205e-4eaf-95f3-2b45dd3b0ed0?_rsc=tXyZJ52UQVBCVsD3 => [200] 
+34. [GET] https://lastro-pi.vercel.app/treino/397eb9de-40f9-4aae-ac5d-03387d77d74c?_rsc=tXyZJ52UQVBCVsD3 => [200] 
+35. [GET] https://lastro-pi.vercel.app/?_rsc=tXyZJ52UQVBCVsD3 => [200] 
+36. [GET] https://lastro-pi.vercel.app/catalogo?_rsc=tXyZJ52UQVBCVsD3 => [200] 
+37. [GET] https://lastro-pi.vercel.app/ajustes?_rsc=tXyZJ52UQVBCVsD3 => [200] 
+39. [GET] https://lastro-pi.vercel.app/manifest.webmanifest?sonda=1790297572254 => [504] Sem rede
+40. [GET] https://lastro-pi.vercel.app/manifest.webmanifest?sonda=1790297574252 => [504] Sem rede
+41. [GET] https://lastro-pi.vercel.app/manifest.webmanifest?sonda=1790297576267 => [504] Sem rede
+42. [GET] https://lastro-pi.vercel.app/manifest.webmanifest?sonda=1790297578261 => [504] Sem rede
+43. [GET] https://lastro-pi.vercel.app/manifest.webmanifest?sonda=1790297578937 => [200] 
+64. [GET] https://lastro-pi.vercel.app/perfil?_rsc=5CB68i4pnAekjehf => [200] 
+65. [GET] https://lastro-pi.vercel.app/analise?_rsc=5CB68i4pnAekjehf => [200] 
+66. [GET] https://lastro-pi.vercel.app/treino?_rsc=5CB68i4pnAekjehf => [200] 
+67. [GET] https://lastro-pi.vercel.app/treino/9db03743-205e-4eaf-95f3-2b45dd3b0ed0?_rsc=5CB68i4pnAekjehf => [200] 
+70. [GET] https://lastro-pi.vercel.app/treino/397eb9de-40f9-4aae-ac5d-03387d77d74c?_rsc=5CB68i4pnAekjehf => [200] 
+71. [GET] https://lastro-pi.vercel.app/catalogo?_rsc=5CB68i4pnAekjehf => [200] 
+72. [GET] https://lastro-pi.vercel.app/ajustes?_rsc=5CB68i4pnAekjehf => [200] 
+73. [GET] https://lastro-pi.vercel.app/perfil?_rsc=tXyZJ52UQVBCVsD3 => [200] 
+74. [GET] https://lastro-pi.vercel.app/analise?_rsc=tXyZJ52UQVBCVsD3 => [200] 
+75. [GET] https://lastro-pi.vercel.app/treino?_rsc=tXyZJ52UQVBCVsD3 => [200] 
+76. [GET] https://lastro-pi.vercel.app/treino/9db03743-205e-4eaf-95f3-2b45dd3b0ed0?_rsc=tXyZJ52UQVBCVsD3 => [200] 
+77. [GET] https://lastro-pi.vercel.app/treino/397eb9de-40f9-4aae-ac5d-03387d77d74c?_rsc=tXyZJ52UQVBCVsD3 => [200] 
+78. [GET] https://lastro-pi.vercel.app/?_rsc=tXyZJ52UQVBCVsD3 => [200] 
+79. [GET] https://lastro-pi.vercel.app/catalogo?_rsc=tXyZJ52UQVBCVsD3 => [200] 
+80. [GET] https://lastro-pi.vercel.app/ajustes?_rsc=tXyZJ52UQVBCVsD3 => [200] 
+
+Note: 45 static requests not shown, run with "static" option to see them.
