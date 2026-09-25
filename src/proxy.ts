@@ -30,6 +30,8 @@ const PREFIXOS_PRIVADOS = [
   "/personal",
   // Link de "esqueci minha senha" (PU-05): só quem tem sessão de recuperação.
   "/redefinir-senha",
+  // Passo a passo da conta nova (PU-08).
+  "/onboarding",
 ];
 
 export async function proxy(request: NextRequest) {

@@ -43,6 +43,8 @@ export type Perfil = {
    * guardas mandam para `/boas-vindas`.
    */
   tipoEscolhido: boolean;
+  /** `false` na conta nova que ainda não passou nem pulou o onboarding (PU-08). */
+  onboardingConcluido: boolean;
   /**
    * Id da conta (`auth.users.id`). Vem da sessão do SERVIDOR, no render: é
    * o que marca de quem é cada item da fila offline (achado M1), e segue
@@ -60,7 +62,7 @@ export async function obterPerfil(): Promise<Perfil | null> {
 
   const { data } = await supabase
     .from("usuario")
-    .select("nome, avatar_url, meta_treinos_semana, idioma, tipo_conta, cref, modo_ativo, tipo_escolhido")
+    .select("nome, avatar_url, meta_treinos_semana, idioma, tipo_conta, cref, modo_ativo, tipo_escolhido, onboarding_concluido_em")
     .eq("id", user.id)
     .maybeSingle();
 
@@ -87,6 +89,8 @@ export async function obterPerfil(): Promise<Perfil | null> {
     // Só `false` explícito é pendente. Valor inesperado conta como já
     // escolhido: a conta segue usuário, e ninguém fica preso na escolha.
     tipoEscolhido: data.tipo_escolhido !== false,
+    // Só vazio explícito é pendente; falha de leitura não pode prender ninguém no passo a passo.
+    onboardingConcluido: data.onboarding_concluido_em !== null,
     id: user.id,
   };
 }

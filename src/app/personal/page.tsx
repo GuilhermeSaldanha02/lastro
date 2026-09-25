@@ -20,7 +20,7 @@ import FilaPersonal from "@/components/fila-personal";
 import DicaInfo from "@/components/dica-info";
 import { obterPerfil } from "@/lib/dados/perfil";
 import { carregarFilaDoPersonal } from "@/lib/dados/personal";
-import { exigirCascaDePersonal, precisaCompletarCadastro } from "@/lib/dados/casca";
+import { exigirCascaDePersonal, exigirOnboarding, precisaCompletarCadastro } from "@/lib/dados/casca";
 import { t } from "@/lib/texto/i18n";
 
 export default async function PaginaPersonal() {
@@ -28,6 +28,7 @@ export default async function PaginaPersonal() {
   if (!perfil) redirect("/login");
   const idioma = perfil.idioma ?? "pt-BR";
   exigirCascaDePersonal(perfil);
+  await exigirOnboarding(perfil);
   // Quem entrou por Google ainda não informou o CREF. A área de trabalho
   // não abre antes disso — a obrigatoriedade é do app, porque no banco
   // ela abortaria o cadastro (ver `casca.ts` e a migração 0024).

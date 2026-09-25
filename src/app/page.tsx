@@ -5,7 +5,7 @@ import { redirect } from "next/navigation";
 import { criarClienteServidor } from "@/lib/supabase/cliente-servidor";
 import { carregarResumoHome } from "@/lib/dados/resumo-home";
 import { obterPerfil } from "@/lib/dados/perfil";
-import { cascaDaBarra, exigirCascaDeAluno } from "@/lib/dados/casca";
+import { cascaDaBarra, exigirCascaDeAluno, exigirOnboarding } from "@/lib/dados/casca";
 import { listarModelos } from "@/lib/dados/modelo-treino";
 import { dataLocalBrasil, formatarDataCurta } from "@/lib/tempo";
 import AbaInferior from "@/components/aba-inferior";
@@ -88,6 +88,7 @@ export default async function PaginaInicial() {
   // (PRD §11, casca escolhida no gate visual). Barra trocada é pista; esta
   // linha é a porta.
   exigirCascaDeAluno(perfil);
+  await exigirOnboarding(perfil);
 
   const idioma = perfil?.idioma ?? "pt-BR";
   const { dataTexto, semanaTexto } = formatarCabecalhoData(hoje, idioma);
