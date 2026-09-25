@@ -11,6 +11,7 @@ import { criarClienteServidor } from "@/lib/supabase/cliente-servidor";
 import { normalizarTelefoneWhatsApp } from "@/lib/texto/whatsapp";
 import { crefValido, normalizarCref } from "@/lib/texto/cref";
 import { validarSenhaNova } from "@/lib/texto/senha";
+import { VERSAO_DOCUMENTOS } from "@/lib/legal/documentos";
 
 /** PRD §11, emenda de 2026-09-11: a escolha acontece no cadastro, não no uso. */
 export type TipoConta = "aluno" | "personal";
@@ -46,6 +47,7 @@ export async function criarContaComEmail(
   telefoneBruto: string,
   tipoConta: TipoConta = "aluno",
   crefBruto = "",
+  aceitouTermos = false,
 ): Promise<ResultadoAuth> {
   const supabase = await criarClienteServidor();
 
@@ -101,6 +103,17 @@ export async function criarContaComEmail(
     cref = normalizarCref(crefBruto);
   }
 
+  // Aceite dos Termos e da Política (PU-06). Fica por último de propósito:
+  // os outros erros (telefone, CREF) são mais específicos e a pessoa os
+  // corrige antes de chegar aqui. A versão aceita e o instante vão para o
+  // metadado da conta: é a prova de qual texto a pessoa concordou.
+  if (!aceitouTermos) {
+    return {
+      ok: false,
+      erro: "Para criar a conta, aceite os Termos de Uso e a Política de Privacidade.",
+    };
+  }
+
   const { data, error } = await supabase.auth.signUp({
     email,
     password: senha,
@@ -112,6 +125,8 @@ export async function criarContaComEmail(
         // vira aluno lá dentro (0024). Mandar o valor explícito aqui é o
         // que torna a escolha da tela real.
         tipo_conta: tipoConta,
+        termos_versao: VERSAO_DOCUMENTOS,
+        termos_aceitos_em: new Date().toISOString(),
         ...(cref ? { cref } : {}),
       },
     },

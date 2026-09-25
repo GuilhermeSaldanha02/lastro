@@ -4,6 +4,7 @@
 // pública; o middleware manda pra cá quem tenta acessar /treino ou
 // /analise sem sessão.
 import { Suspense, useState, type FormEvent } from "react";
+import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { criarClienteBrowser } from "@/lib/supabase/cliente-browser";
 import { criarContaComEmail, entrarComEmail, pedirRecuperacaoSenha, type TipoConta } from "@/lib/dados/auth";
@@ -50,6 +51,7 @@ export default function PaginaLogin() {
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
   const [mensagem, setMensagem] = useState<string | null>(null);
+  const [aceitouTermos, setAceitouTermos] = useState(false);
   const [avisoOk, setAvisoOk] = useState<string | null>(null);
   const [carregando, setCarregando] = useState(false);
 
@@ -87,7 +89,7 @@ export default function PaginaLogin() {
     const resultado =
       modo === "entrar"
         ? await entrarComEmail(email, senha)
-        : await criarContaComEmail(email, senha, nome, telefone, tipoConta, cref);
+        : await criarContaComEmail(email, senha, nome, telefone, tipoConta, cref, aceitouTermos);
 
     setCarregando(false);
 
@@ -303,6 +305,26 @@ export default function PaginaLogin() {
               </button>
             )}
 
+            {modo === "criar-conta" && (
+              <label className="campo__nota" htmlFor="aceite-termos">
+                <input
+                  id="aceite-termos"
+                  type="checkbox"
+                  checked={aceitouTermos}
+                  onChange={(e) => setAceitouTermos(e.target.checked)}
+                />{" "}
+                {t("Li e aceito os", idioma)}{" "}
+                <Link href="/termos" target="_blank" rel="noopener">
+                  {t("Termos de Uso", idioma)}
+                </Link>{" "}
+                {t("e a", idioma)}{" "}
+                <Link href="/privacidade" target="_blank" rel="noopener">
+                  {t("Política de Privacidade", idioma)}
+                </Link>
+                .
+              </label>
+            )}
+
             {avisoOk && (
               <p className="campo__nota" role="status">
                 {t(avisoOk, idioma)}
@@ -359,6 +381,18 @@ export default function PaginaLogin() {
               </svg>
               {t("Entrar com Google", idioma)}
             </button>
+
+            <p className="campo__nota">
+              {t("Ao continuar com o Google você aceita os", idioma)}{" "}
+              <Link href="/termos" target="_blank" rel="noopener">
+                {t("Termos de Uso", idioma)}
+              </Link>{" "}
+              {t("e a", idioma)}{" "}
+              <Link href="/privacidade" target="_blank" rel="noopener">
+                {t("Política de Privacidade", idioma)}
+              </Link>
+              .
+            </p>
 
             <button
               type="button"
