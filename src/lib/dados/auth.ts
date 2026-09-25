@@ -29,7 +29,18 @@ export async function entrarComEmail(
     email,
     password: senha,
   });
-  if (error) return { ok: false, erro: "E-mail ou senha inválidos." };
+  if (error) {
+    // O Supabase exige confirmar o e-mail antes da primeira entrada. Sem esta
+    // mensagem, quem acabou de criar a conta e ainda não clicou no link via
+    // "senha inválida" e tentava trocar uma senha que estava certa.
+    if (error.code === "email_not_confirmed") {
+      return {
+        ok: false,
+        erro: "Confirme seu e-mail antes de entrar. Procure a mensagem do lastro na caixa de entrada ou no spam.",
+      };
+    }
+    return { ok: false, erro: "E-mail ou senha inválidos." };
+  }
   return { ok: true, confirmacaoPendente: false };
 }
 
