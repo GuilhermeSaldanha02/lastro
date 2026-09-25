@@ -19,7 +19,9 @@
 // todo request para resolver uma regra de meia dúzia de telas é caro no
 // lugar errado.
 import { redirect } from "next/navigation";
+import { cookies } from "next/headers";
 import type { Perfil } from "@/lib/dados/perfil";
+import { COOKIE_ONBOARDING_VISTO } from "@/lib/onboarding-cookie";
 
 /** Onde o modo trabalho mora. A fila é a casa dele, não a Home de treino. */
 export const CASA_DO_PERSONAL = "/personal";
@@ -38,6 +40,21 @@ export function exigirTipoEscolhido(perfil: Perfil | null): void {
   if (perfil && !perfil.tipoEscolhido) {
     redirect(ESCOLHA_DO_TIPO);
   }
+}
+
+/** Onde a conta nova passa pelo passo a passo (PU-08). */
+export const ONBOARDING = "/onboarding";
+
+/**
+ * Conta nova cai no passo a passo uma vez, na primeira Home (ou fila) que
+ * abrir. Vem DEPOIS de `exigirTipoEscolhido`: quem ainda escolhe entre
+ * usuário e personal não vê onboarding antes disso. O cookie é a reserva de
+ * quando a gravação da conclusão falhou (`dados/onboarding.ts`).
+ */
+export async function exigirOnboarding(perfil: Perfil | null): Promise<void> {
+  if (!perfil || perfil.onboardingConcluido) return;
+  if ((await cookies()).get(COOKIE_ONBOARDING_VISTO)) return;
+  redirect(ONBOARDING);
 }
 
 /**

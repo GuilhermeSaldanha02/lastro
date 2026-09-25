@@ -63,6 +63,12 @@ export async function criarUsuarioDescartavel(
      * tela de escolha.
      */
     semTipo?: boolean;
+    /**
+     * Deixa o onboarding PENDENTE (PU-08), como uma conta recém-criada de
+     * verdade. Por padrão a conta descartável já nasce com o passo a passo
+     * concluído: sem isso, todo spec que abre a Home cairia em /onboarding.
+     */
+    comOnboarding?: boolean;
   } = {},
 ): Promise<UsuarioDescartavel> {
   const admin = clienteAdmin();
@@ -86,7 +92,18 @@ export async function criarUsuarioDescartavel(
   if (error || !data.user) {
     throw new Error(`Falha ao criar usuário QA descartável: ${error?.message}`);
   }
-  return { id: data.user.id, email, senha };
+  const usuario = { id: data.user.id, email, senha };
+  if (!opcoes.comOnboarding) {
+    const cliente = await clienteAutenticado(usuario);
+    const { error: erroOnboarding } = await cliente
+      .from("usuario")
+      .update({ onboarding_concluido_em: new Date().toISOString() })
+      .eq("id", usuario.id);
+    if (erroOnboarding) {
+      throw new Error(`Falha ao concluir onboarding do usuário QA: ${erroOnboarding.message}`);
+    }
+  }
+  return usuario;
 }
 
 /** Apaga o usuário — `on delete cascade` (0001_schema_inicial.sql) cuida de treino/serie. */

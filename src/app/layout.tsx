@@ -35,7 +35,18 @@ import "./globals.css";
 // `display-mode: standalone` só é legível no cliente (não há header nem
 // user-agent confiável pra isso no servidor) — por isso continua sendo
 // JavaScript no navegador, não uma checagem no servidor.
-const ROTAS_ISENTAS_DE_FORCAR_INICIO = ["/", "/login", "/auth/callback"];
+// Termos e Privacidade (PU-06), a troca de senha (PU-05) e o onboarding
+// (PU-08) também: sem isto o PWA instalado joga a pessoa de volta para "/"
+// ao abrir a página.
+const ROTAS_ISENTAS_DE_FORCAR_INICIO = [
+  "/",
+  "/login",
+  "/auth/callback",
+  "/termos",
+  "/privacidade",
+  "/redefinir-senha",
+  "/onboarding",
+];
 
 // Trilha B, item E1 (D1, DESIGN.md §6.1) — substitui a família IBM Plex
 // inteira. As três permanecem nos MESMOS papéis de antes: Bricolage é
