@@ -172,6 +172,15 @@ export default async function PaginaAjustes() {
                 </button>
               </form>
 
+              <div className="pilha">
+                <Link href="/termos" className="botao-texto">
+                  {t("Termos de Uso", idioma)}
+                </Link>
+                <Link href="/privacidade" className="botao-texto">
+                  {t("Política de Privacidade", idioma)}
+                </Link>
+              </div>
+
               <ExcluirConta idioma={idioma} />
             </div>
           </div>
