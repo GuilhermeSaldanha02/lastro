@@ -26,7 +26,7 @@ depende de infraestrutura que não existe ainda (2ª conta, cota de IA).
 | AJ-03, AJ-04 | — | — | **Resolvidos**: graduados pelo e2e real (`j11-formularios.spec.ts`), run 36078171673. |
 | AN-02, AN-05, AN-06 | — | — | **Resolvidos**: graduados pelo e2e real (`j12-isolamento-e-apis.spec.ts`), run 36078171673. |
 | AN-03, AN-04 | MÉDIO | Baixa | Só reproduz gastando cota real de IA (Gemini) da conta do dono — aguarda autorização explícita por execução, não é "sim" permanente. |
-| CT-01 (preview 3D do catálogo) | ALTO ou BAIXO | Baixa | Depende da decisão: **ligar** `ilustracao-anatomica-3d.tsx` (25 KB, já escrito, nunca conectado a nenhuma tela) é esforço ALTO — é código não testado, precisa de QA visual completo; **ou** só documentar que o preview 3D nunca foi implementado é BAIXO. Aguardando decisão do dono. |
+| CT-01 (preview 3D do catálogo) | ALTO, se um dia entrar | Baixa | **Decidido 2026-09-25: não é regressão, é feature nunca implementada** — documentado no `QA.md`. `ilustracao-anatomica-3d.tsx` (25 KB) segue órfão, nunca conectado a nenhuma tela. Ligar esse componente algum dia continua ALTO esforço (código não testado, precisa de QA visual completo) — entra no backlog só se o dono pedir; até lá, sem ação. |
 | PF-01 | — | — | **Resolvido**: não era bug, era descrição errada do item (idioma sempre foi em `/ajustes`, nunca em `/perfil`). |
 | PE-01…PE-09 (personal) | MÉDIO | Média | O dono vai criar uma 2ª conta por fora e testar; quando estiver pronta, o agente audita as telas de personal com ela — sem custo de token até lá. |
 | OF-04, OF-06 | MÉDIO | Baixa | Exigem alternar 2 contas (login/logout) na mesma sessão de navegador — mesma trava do PE-*, resolve junto quando a 2ª conta existir. |
