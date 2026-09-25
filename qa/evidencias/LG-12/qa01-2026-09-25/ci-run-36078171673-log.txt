@@ -1,0 +1,915 @@
+verificar	Set up job	﻿2026-09-25T00:34:42.6201651Z Current runner version: '2.337.0'
+verificar	Set up job	2026-09-25T00:34:42.6229820Z ##[group]Runner Image Provisioner
+verificar	Set up job	2026-09-25T00:34:42.6231215Z Hosted Compute Agent
+verificar	Set up job	2026-09-25T00:34:42.6231932Z Version: 20260828.587
+verificar	Set up job	2026-09-25T00:34:42.6232735Z Commit: abac92662cab4cc7352de4f9f9d2e2419aad9c29
+verificar	Set up job	2026-09-25T00:34:42.6233960Z Build Date: 2026-08-28T16:44:25Z
+verificar	Set up job	2026-09-25T00:34:42.6235046Z Worker ID: {d70c9146-54b7-4452-bcf2-76ef9c927e09}
+verificar	Set up job	2026-09-25T00:34:42.6236019Z Azure Region: eastus
+verificar	Set up job	2026-09-25T00:34:42.6236668Z ##[endgroup]
+verificar	Set up job	2026-09-25T00:34:42.6238366Z ##[group]Operating System
+verificar	Set up job	2026-09-25T00:34:42.6239099Z Ubuntu
+verificar	Set up job	2026-09-25T00:34:42.6239840Z 24.04.5
+verificar	Set up job	2026-09-25T00:34:42.6240510Z LTS
+verificar	Set up job	2026-09-25T00:34:42.6241497Z ##[endgroup]
+verificar	Set up job	2026-09-25T00:34:42.6242185Z ##[group]Runner Image
+verificar	Set up job	2026-09-25T00:34:42.6242933Z Image: ubuntu-24.04
+verificar	Set up job	2026-09-25T00:34:42.6243665Z Version: 20260920.314.1
+verificar	Set up job	2026-09-25T00:34:42.6245058Z Included Software: https://github.com/actions/runner-images/blob/ubuntu24/20260920.314/images/ubuntu/Ubuntu2404-Readme.md
+verificar	Set up job	2026-09-25T00:34:42.6246974Z Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu24%2F20260920.314
+verificar	Set up job	2026-09-25T00:34:42.6248106Z ##[endgroup]
+verificar	Set up job	2026-09-25T00:34:42.6249466Z ##[group]GITHUB_TOKEN Permissions
+verificar	Set up job	2026-09-25T00:34:42.6251705Z Contents: read
+verificar	Set up job	2026-09-25T00:34:42.6252405Z Metadata: read
+verificar	Set up job	2026-09-25T00:34:42.6253103Z Packages: read
+verificar	Set up job	2026-09-25T00:34:42.6253859Z ##[endgroup]
+verificar	Set up job	2026-09-25T00:34:42.6256210Z Secret source: Actions
+verificar	Set up job	2026-09-25T00:34:42.6257374Z Cache mode: write
+verificar	Set up job	2026-09-25T00:34:42.6258490Z Prepare workflow directory
+verificar	Set up job	2026-09-25T00:34:42.6599932Z Prepare all required actions
+verificar	Set up job	2026-09-25T00:34:42.6649830Z Getting action download info
+verificar	Set up job	2026-09-25T00:34:42.9265323Z Download action repository 'actions/checkout@v4' (SHA:11d5960a326750d5838078e36cf38b85af677262)
+verificar	Set up job	2026-09-25T00:34:43.0215527Z Download action repository 'actions/setup-node@v4' (SHA:49933ea5288caeca8642d1e84afbd3f7d6820020)
+verificar	Set up job	2026-09-25T00:34:43.1118809Z Download action repository 'actions/upload-artifact@v4' (SHA:ea165f8d65b6e75b540449e92b4886f43607fa02)
+verificar	Set up job	2026-09-25T00:34:43.3340491Z Complete job name: verificar
+verificar	Run actions/checkout@v4	﻿2026-09-25T00:34:43.4252313Z ##[group]Run actions/checkout@v4
+verificar	Run actions/checkout@v4	2026-09-25T00:34:43.4253313Z with:
+verificar	Run actions/checkout@v4	2026-09-25T00:34:43.4253852Z   repository: GuilhermeSaldanha02/lastro
+verificar	Run actions/checkout@v4	2026-09-25T00:34:43.4258012Z   token: ***
+verificar	Run actions/checkout@v4	2026-09-25T00:34:43.4258523Z   ssh-strict: true
+verificar	Run actions/checkout@v4	2026-09-25T00:34:43.4259029Z   ssh-user: git
+verificar	Run actions/checkout@v4	2026-09-25T00:34:43.4259554Z   persist-credentials: true
+verificar	Run actions/checkout@v4	2026-09-25T00:34:43.4260123Z   clean: true
+verificar	Run actions/checkout@v4	2026-09-25T00:34:43.4260637Z   sparse-checkout-cone-mode: true
+verificar	Run actions/checkout@v4	2026-09-25T00:34:43.4261229Z   fetch-depth: 1
+verificar	Run actions/checkout@v4	2026-09-25T00:34:43.4261735Z   fetch-tags: false
+verificar	Run actions/checkout@v4	2026-09-25T00:34:43.4262240Z   show-progress: true
+verificar	Run actions/checkout@v4	2026-09-25T00:34:43.4262752Z   lfs: false
+verificar	Run actions/checkout@v4	2026-09-25T00:34:43.4263237Z   submodules: false
+verificar	Run actions/checkout@v4	2026-09-25T00:34:43.4263757Z   set-safe-directory: true
+verificar	Run actions/checkout@v4	2026-09-25T00:34:43.4264476Z   allow-unsafe-pr-checkout: false
+verificar	Run actions/checkout@v4	2026-09-25T00:34:43.4265362Z ##[endgroup]
+verificar	Run actions/checkout@v4	2026-09-25T00:34:43.5312483Z Syncing repository: GuilhermeSaldanha02/lastro
+verificar	Run actions/checkout@v4	2026-09-25T00:34:43.5315778Z ##[group]Getting Git version info
+verificar	Run actions/checkout@v4	2026-09-25T00:34:43.5316980Z Working directory is '/home/runner/work/lastro/lastro'
+verificar	Run actions/checkout@v4	2026-09-25T00:34:43.5318776Z [command]/usr/bin/git version
+verificar	Run actions/checkout@v4	2026-09-25T00:34:43.6625332Z git version 2.55.0
+verificar	Run actions/checkout@v4	2026-09-25T00:34:43.6654760Z ##[endgroup]
+verificar	Run actions/checkout@v4	2026-09-25T00:34:43.6672790Z Temporarily overriding HOME='/home/runner/work/_temp/55f0f0ec-942e-4a86-928c-9741a24fa236' before making global git config changes
+verificar	Run actions/checkout@v4	2026-09-25T00:34:43.6675636Z Adding repository directory to the temporary git global config as a safe directory
+verificar	Run actions/checkout@v4	2026-09-25T00:34:43.6679846Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/lastro/lastro
+verificar	Run actions/checkout@v4	2026-09-25T00:34:43.6742416Z Deleting the contents of '/home/runner/work/lastro/lastro'
+verificar	Run actions/checkout@v4	2026-09-25T00:34:43.6749528Z ##[group]Initializing the repository
+verificar	Run actions/checkout@v4	2026-09-25T00:34:43.6754715Z [command]/usr/bin/git init /home/runner/work/lastro/lastro
+verificar	Run actions/checkout@v4	2026-09-25T00:34:43.6898293Z hint: Using 'master' as the name for the initial branch. This default branch name
+verificar	Run actions/checkout@v4	2026-09-25T00:34:43.6900398Z hint: will change to "main" in Git 3.0. To configure the initial branch name
+verificar	Run actions/checkout@v4	2026-09-25T00:34:43.6902231Z hint: to use in all of your new repositories, which will suppress this warning,
+verificar	Run actions/checkout@v4	2026-09-25T00:34:43.6903696Z hint: call:
+verificar	Run actions/checkout@v4	2026-09-25T00:34:43.6904644Z hint:
+verificar	Run actions/checkout@v4	2026-09-25T00:34:43.6905656Z hint: 	git config --global init.defaultBranch <name>
+verificar	Run actions/checkout@v4	2026-09-25T00:34:43.6906517Z hint:
+verificar	Run actions/checkout@v4	2026-09-25T00:34:43.6907181Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+verificar	Run actions/checkout@v4	2026-09-25T00:34:43.6908658Z hint: 'development'. The just-created branch can be renamed via this command:
+verificar	Run actions/checkout@v4	2026-09-25T00:34:43.6910114Z hint:
+verificar	Run actions/checkout@v4	2026-09-25T00:34:43.6910658Z hint: 	git branch -m <name>
+verificar	Run actions/checkout@v4	2026-09-25T00:34:43.6911232Z hint:
+verificar	Run actions/checkout@v4	2026-09-25T00:34:43.6911937Z hint: Disable this message with "git config set advice.defaultBranchName false"
+verificar	Run actions/checkout@v4	2026-09-25T00:34:43.6913031Z Initialized empty Git repository in /home/runner/work/lastro/lastro/.git/
+verificar	Run actions/checkout@v4	2026-09-25T00:34:43.6933297Z [command]/usr/bin/git remote add origin https://github.com/GuilhermeSaldanha02/lastro
+verificar	Run actions/checkout@v4	2026-09-25T00:34:43.6987732Z ##[endgroup]
+verificar	Run actions/checkout@v4	2026-09-25T00:34:43.6989229Z ##[group]Disabling automatic garbage collection
+verificar	Run actions/checkout@v4	2026-09-25T00:34:43.6993014Z [command]/usr/bin/git config --local gc.auto 0
+verificar	Run actions/checkout@v4	2026-09-25T00:34:43.7032025Z ##[endgroup]
+verificar	Run actions/checkout@v4	2026-09-25T00:34:43.7033926Z ##[group]Setting up auth
+verificar	Run actions/checkout@v4	2026-09-25T00:34:43.7039704Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+verificar	Run actions/checkout@v4	2026-09-25T00:34:43.7081570Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+verificar	Run actions/checkout@v4	2026-09-25T00:34:43.7493448Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+verificar	Run actions/checkout@v4	2026-09-25T00:34:43.7532590Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+verificar	Run actions/checkout@v4	2026-09-25T00:34:43.7776037Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+verificar	Run actions/checkout@v4	2026-09-25T00:34:43.7815502Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+verificar	Run actions/checkout@v4	2026-09-25T00:34:43.8057312Z [command]/usr/bin/git config --local http.https://github.com/.extraheader AUTHORIZATION: basic ***
+verificar	Run actions/checkout@v4	2026-09-25T00:34:43.8103784Z ##[endgroup]
+verificar	Run actions/checkout@v4	2026-09-25T00:34:43.8105618Z ##[group]Fetching the repository
+verificar	Run actions/checkout@v4	2026-09-25T00:34:43.8116044Z [command]/usr/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin +06a2c90cc8a3442fdaaef91823865addfb261d00:refs/remotes/origin/main
+verificar	Run actions/checkout@v4	2026-09-25T00:34:46.0316841Z From https://github.com/GuilhermeSaldanha02/lastro
+verificar	Run actions/checkout@v4	2026-09-25T00:34:46.0319045Z  * [new ref]         06a2c90cc8a3442fdaaef91823865addfb261d00 -> origin/main
+verificar	Run actions/checkout@v4	2026-09-25T00:34:46.0323705Z ##[endgroup]
+verificar	Run actions/checkout@v4	2026-09-25T00:34:46.0327260Z ##[group]Determining the checkout info
+verificar	Run actions/checkout@v4	2026-09-25T00:34:46.0328996Z ##[endgroup]
+verificar	Run actions/checkout@v4	2026-09-25T00:34:46.0334688Z [command]/usr/bin/git sparse-checkout disable
+verificar	Run actions/checkout@v4	2026-09-25T00:34:46.0398196Z [command]/usr/bin/git config --local --unset-all extensions.worktreeConfig
+verificar	Run actions/checkout@v4	2026-09-25T00:34:46.0437229Z ##[group]Checking out the ref
+verificar	Run actions/checkout@v4	2026-09-25T00:34:46.0441397Z [command]/usr/bin/git checkout --progress --force -B main refs/remotes/origin/main
+verificar	Run actions/checkout@v4	2026-09-25T00:34:46.6140994Z Switched to a new branch 'main'
+verificar	Run actions/checkout@v4	2026-09-25T00:34:46.6145856Z branch 'main' set up to track 'origin/main'.
+verificar	Run actions/checkout@v4	2026-09-25T00:34:46.6170870Z ##[endgroup]
+verificar	Run actions/checkout@v4	2026-09-25T00:34:46.6225271Z [command]/usr/bin/git log -1 --format=%H
+verificar	Run actions/checkout@v4	2026-09-25T00:34:46.6253481Z 06a2c90cc8a3442fdaaef91823865addfb261d00
+verificar	Run actions/setup-node@v4	﻿2026-09-25T00:34:46.6606346Z ##[group]Run actions/setup-node@v4
+verificar	Run actions/setup-node@v4	2026-09-25T00:34:46.6606800Z with:
+verificar	Run actions/setup-node@v4	2026-09-25T00:34:46.6607072Z   node-version: 22
+verificar	Run actions/setup-node@v4	2026-09-25T00:34:46.6607346Z   cache: npm
+verificar	Run actions/setup-node@v4	2026-09-25T00:34:46.6607608Z   always-auth: false
+verificar	Run actions/setup-node@v4	2026-09-25T00:34:46.6607896Z   check-latest: false
+verificar	Run actions/setup-node@v4	2026-09-25T00:34:46.6610879Z   token: ***
+verificar	Run actions/setup-node@v4	2026-09-25T00:34:46.6611153Z ##[endgroup]
+verificar	Run actions/setup-node@v4	2026-09-25T00:34:46.8121768Z (node:2221) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+verificar	Run actions/setup-node@v4	2026-09-25T00:34:46.8122859Z (Use `node --trace-deprecation ...` to show where the warning was created)
+verificar	Run actions/setup-node@v4	2026-09-25T00:34:46.8125782Z Found in cache @ /opt/hostedtoolcache/node/22.23.2/x64
+verificar	Run actions/setup-node@v4	2026-09-25T00:34:46.8126621Z ##[group]Environment details
+verificar	Run actions/setup-node@v4	2026-09-25T00:34:47.2796017Z node: v22.23.2
+verificar	Run actions/setup-node@v4	2026-09-25T00:34:47.2797366Z npm: 10.9.8
+verificar	Run actions/setup-node@v4	2026-09-25T00:34:47.2797748Z yarn: 1.22.22
+verificar	Run actions/setup-node@v4	2026-09-25T00:34:47.2799093Z ##[endgroup]
+verificar	Run actions/setup-node@v4	2026-09-25T00:34:47.2841077Z [command]/opt/hostedtoolcache/node/22.23.2/x64/bin/npm config get cache
+verificar	Run actions/setup-node@v4	2026-09-25T00:34:47.3994560Z /home/runner/.npm
+verificar	Run actions/setup-node@v4	2026-09-25T00:34:47.4692852Z Cache hit for: node-cache-Linux-x64-npm-2f02748b8618ef5c9f1e7590f700a68bf6461b686c1280987c7926b231d8a0eb
+verificar	Run actions/setup-node@v4	2026-09-25T00:34:47.4810959Z (node:2221) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.
+verificar	Run actions/setup-node@v4	2026-09-25T00:34:48.3195750Z Received 146903732 of 146903732 (100.0%), 176.9 MBs/sec
+verificar	Run actions/setup-node@v4	2026-09-25T00:34:48.3196966Z Cache Size: ~140 MB (146903732 B)
+verificar	Run actions/setup-node@v4	2026-09-25T00:34:48.3301889Z [command]/usr/bin/tar -xf /home/runner/work/_temp/ebc31dc6-e334-41fa-97e0-01e6928a2bd1/cache.tzst -P -C /home/runner/work/lastro/lastro --use-compress-program unzstd
+verificar	Run actions/setup-node@v4	2026-09-25T00:34:48.6447406Z Cache restored successfully
+verificar	Run actions/setup-node@v4	2026-09-25T00:34:48.6519387Z Cache restored from key: node-cache-Linux-x64-npm-2f02748b8618ef5c9f1e7590f700a68bf6461b686c1280987c7926b231d8a0eb
+verificar	Instalar dependências	﻿2026-09-25T00:34:48.6721069Z ##[group]Run npm ci
+verificar	Instalar dependências	2026-09-25T00:34:48.6721417Z ^[[36;1mnpm ci^[[0m
+verificar	Instalar dependências	2026-09-25T00:34:48.7024140Z shell: /usr/bin/bash -e {0}
+verificar	Instalar dependências	2026-09-25T00:34:48.7024854Z ##[endgroup]
+verificar	Instalar dependências	2026-09-25T00:34:54.9537732Z npm warn deprecated node-domexception@1.0.0: Use your platform's native DOMException instead
+verificar	Instalar dependências	2026-09-25T00:35:03.0207824Z 
+verificar	Instalar dependências	2026-09-25T00:35:03.0211161Z added 545 packages, and audited 546 packages in 14s
+verificar	Instalar dependências	2026-09-25T00:35:03.0211705Z 
+verificar	Instalar dependências	2026-09-25T00:35:03.0212026Z 167 packages are looking for funding
+verificar	Instalar dependências	2026-09-25T00:35:03.0212604Z   run `npm fund` for details
+verificar	Instalar dependências	2026-09-25T00:35:03.0642704Z 
+verificar	Instalar dependências	2026-09-25T00:35:03.0643821Z 6 vulnerabilities (3 moderate, 2 high, 1 critical)
+verificar	Instalar dependências	2026-09-25T00:35:03.0644660Z 
+verificar	Instalar dependências	2026-09-25T00:35:03.0645154Z To address issues that do not require attention, run:
+verificar	Instalar dependências	2026-09-25T00:35:03.0645870Z   npm audit fix
+verificar	Instalar dependências	2026-09-25T00:35:03.0646145Z 
+verificar	Instalar dependências	2026-09-25T00:35:03.0646404Z To address all issues, run:
+verificar	Instalar dependências	2026-09-25T00:35:03.0646953Z   npm audit fix --force
+verificar	Instalar dependências	2026-09-25T00:35:03.0647296Z 
+verificar	Instalar dependências	2026-09-25T00:35:03.0647553Z Run `npm audit` for details.
+verificar	Lint	﻿2026-09-25T00:35:03.1649017Z ##[group]Run npm run lint
+verificar	Lint	2026-09-25T00:35:03.1649347Z ^[[36;1mnpm run lint^[[0m
+verificar	Lint	2026-09-25T00:35:03.1715904Z shell: /usr/bin/bash -e {0}
+verificar	Lint	2026-09-25T00:35:03.1716203Z ##[endgroup]
+verificar	Lint	2026-09-25T00:35:03.2781452Z 
+verificar	Lint	2026-09-25T00:35:03.2782151Z > lastro@0.1.0 lint
+verificar	Lint	2026-09-25T00:35:03.2782649Z > eslint
+verificar	Lint	2026-09-25T00:35:03.2782806Z 
+verificar	Lint	2026-09-25T00:35:14.9405120Z 
+verificar	Lint	2026-09-25T00:35:14.9406667Z /home/runner/work/lastro/lastro/e2e/j7-fila-do-personal.spec.ts
+verificar	Lint	2026-09-25T00:35:14.9441581Z ##[warning]  28:3  warning  'entrarComoUsuario' is defined but never used  @typescript-eslint/no-unused-vars
+verificar	Lint	2026-09-25T00:35:14.9451305Z 
+verificar	Lint	2026-09-25T00:35:14.9452274Z /home/runner/work/lastro/lastro/scripts/analisar-divergencias.mjs
+verificar	Lint	2026-09-25T00:35:14.9454708Z ##[warning]  26:9  warning  'consLower' is assigned a value but never used  @typescript-eslint/no-unused-vars
+verificar	Lint	2026-09-25T00:35:14.9456510Z 
+verificar	Lint	2026-09-25T00:35:14.9457368Z /home/runner/work/lastro/lastro/scripts/auditoria-completa-qa.mjs
+verificar	Lint	2026-09-25T00:35:14.9459279Z ##[warning]  49:20  warning  'user' is assigned a value but never used           @typescript-eslint/no-unused-vars
+verificar	Lint	2026-09-25T00:35:14.9462083Z ##[warning]  49:26  warning  'supabaseAdmin' is assigned a value but never used  @typescript-eslint/no-unused-vars
+verificar	Lint	2026-09-25T00:35:14.9464099Z 
+verificar	Lint	2026-09-25T00:35:14.9464884Z /home/runner/work/lastro/lastro/scripts/classificar-falhas.mjs
+verificar	Lint	2026-09-25T00:35:14.9466491Z ##[warning]   2:8  warning  'path' is defined but never used           @typescript-eslint/no-unused-vars
+verificar	Lint	2026-09-25T00:35:14.9468994Z ##[warning]  28:9  warning  'cons' is assigned a value but never used  @typescript-eslint/no-unused-vars
+verificar	Lint	2026-09-25T00:35:14.9470512Z 
+verificar	Lint	2026-09-25T00:35:14.9471008Z /home/runner/work/lastro/lastro/scripts/consolidar-auditoria.mjs
+verificar	Lint	2026-09-25T00:35:14.9472541Z ##[warning]   2:8   warning  'path' is defined but never used               @typescript-eslint/no-unused-vars
+verificar	Lint	2026-09-25T00:35:14.9475335Z ##[warning]  10:25  warning  'consulta' is assigned a value but never used  @typescript-eslint/no-unused-vars
+verificar	Lint	2026-09-25T00:35:14.9476940Z 
+verificar	Lint	2026-09-25T00:35:14.9477494Z /home/runner/work/lastro/lastro/scripts/gerar-videos-exercicios.mjs
+verificar	Lint	2026-09-25T00:35:14.9479044Z ##[warning]  17:12  warning  '_' is assigned a value but never used  @typescript-eslint/no-unused-vars
+verificar	Lint	2026-09-25T00:35:14.9480522Z 
+verificar	Lint	2026-09-25T00:35:14.9480929Z /home/runner/work/lastro/lastro/scripts/snap-pro.mjs
+verificar	Lint	2026-09-25T00:35:14.9482246Z ##[warning]  2:8  warning  'fs' is defined but never used  @typescript-eslint/no-unused-vars
+verificar	Lint	2026-09-25T00:35:14.9483704Z 
+verificar	Lint	2026-09-25T00:35:14.9484184Z /home/runner/work/lastro/lastro/scripts/test-chamadas-ia.mjs
+verificar	Lint	2026-09-25T00:35:14.9486011Z ##[warning]  4:7  warning  'envContent' is assigned a value but never used  @typescript-eslint/no-unused-vars
+verificar	Lint	2026-09-25T00:35:14.9487566Z 
+verificar	Lint	2026-09-25T00:35:14.9488166Z /home/runner/work/lastro/lastro/scripts/verificar-13-gifs-playwright.mjs
+verificar	Lint	2026-09-25T00:35:14.9489659Z ##[warning]  3:8  warning  'path' is defined but never used  @typescript-eslint/no-unused-vars
+verificar	Lint	2026-09-25T00:35:14.9491130Z 
+verificar	Lint	2026-09-25T00:35:14.9491739Z /home/runner/work/lastro/lastro/src/components/ilustracao-anatomica-3d.tsx
+verificar	Lint	2026-09-25T00:35:14.9493737Z ##[warning]  25:9  warning  'isTricepsFrances' is assigned a value but never used  @typescript-eslint/no-unused-vars
+verificar	Lint	2026-09-25T00:35:14.9496775Z ##[warning]  32:9  warning  'isRemo' is assigned a value but never used            @typescript-eslint/no-unused-vars
+verificar	Lint	2026-09-25T00:35:14.9499459Z ##[warning]  36:9  warning  'isDesenvOmbro' is assigned a value but never used     @typescript-eslint/no-unused-vars
+verificar	Lint	2026-09-25T00:35:14.9501045Z 
+verificar	Lint	2026-09-25T00:35:14.9501661Z /home/runner/work/lastro/lastro/src/components/player-execucao-exercicio.tsx
+verificar	Lint	2026-09-25T00:35:14.9504984Z ##[warning]  25:10  warning  'carregando' is assigned a value but never used                                                                                                                                                                                                                                          @typescript-eslint/no-unused-vars
+verificar	Lint	2026-09-25T00:35:14.9511615Z ##[warning]  56:15  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+verificar	Lint	2026-09-25T00:35:14.9514753Z 
+verificar	Lint	2026-09-25T00:35:14.9515362Z /home/runner/work/lastro/lastro/src/components/relatorio-pos-treino.tsx
+verificar	Lint	2026-09-25T00:35:14.9520021Z ##[warning]  376:17  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+verificar	Lint	2026-09-25T00:35:14.9522890Z 
+verificar	Lint	2026-09-25T00:35:14.9523479Z ✖ 18 problems (0 errors, 18 warnings)
+verificar	Lint	2026-09-25T00:35:14.9523854Z 
+verificar	Testes	﻿2026-09-25T00:35:15.2121520Z ##[group]Run npm run test
+verificar	Testes	2026-09-25T00:35:15.2121855Z ^[[36;1mnpm run test^[[0m
+verificar	Testes	2026-09-25T00:35:15.2184845Z shell: /usr/bin/bash -e {0}
+verificar	Testes	2026-09-25T00:35:15.2185131Z ##[endgroup]
+verificar	Testes	2026-09-25T00:35:15.3222583Z 
+verificar	Testes	2026-09-25T00:35:15.3223212Z > lastro@0.1.0 test
+verificar	Testes	2026-09-25T00:35:15.3223656Z > vitest run
+verificar	Testes	2026-09-25T00:35:15.3223817Z 
+verificar	Testes	2026-09-25T00:35:15.6212713Z ^[[33m(!) Your Vite config uses features that are unsupported by `configLoader: 'native'`, which is planned to become the default in a future major version of Vite:
+verificar	Testes	2026-09-25T00:35:15.6215480Z   - ESM syntax in a file loaded as CommonJS (vitest.config.ts:1:1). Use a `.mjs` extension or set `"type": "module"` in the closest package.json
+verificar	Testes	2026-09-25T00:35:15.6217457Z Set `VITE_CONFIG_NATIVE_IGNORE_WARNING=true` to suppress this warning.^[[39m
+verificar	Testes	2026-09-25T00:35:15.6580070Z 
+verificar	Testes	2026-09-25T00:35:15.6583608Z ^[[1m^[[30m^[[46m RUN ^[[49m^[[39m^[[22m ^[[36mv4.1.10 ^[[39m^[[90m/home/runner/work/lastro/lastro^[[39m
+verificar	Testes	2026-09-25T00:35:15.6584632Z 
+verificar	Testes	2026-09-25T00:35:16.0096468Z  ^[[32m✓^[[39m src/app/api/analise/validador.test.ts ^[[2m(^[[22m^[[2m18 tests^[[22m^[[2m)^[[22m^[[32m 19^[[2mms^[[22m^[[39m
+verificar	Testes	2026-09-25T00:35:16.0344055Z  ^[[32m✓^[[39m src/lib/analise/fila-personal.test.ts ^[[2m(^[[22m^[[2m17 tests^[[22m^[[2m)^[[22m^[[32m 24^[[2mms^[[22m^[[39m
+verificar	Testes	2026-09-25T00:35:16.0937994Z  ^[[32m✓^[[39m src/lib/analise/agregar.test.ts ^[[2m(^[[22m^[[2m25 tests^[[22m^[[2m)^[[22m^[[32m 25^[[2mms^[[22m^[[39m
+verificar	Testes	2026-09-25T00:35:16.3807938Z  ^[[32m✓^[[39m src/lib/analise/leitura-deterministica.test.ts ^[[2m(^[[22m^[[2m15 tests^[[22m^[[2m)^[[22m^[[32m 13^[[2mms^[[22m^[[39m
+verificar	Testes	2026-09-25T00:35:16.3915145Z  ^[[32m✓^[[39m src/lib/texto/alerta-personal.test.ts ^[[2m(^[[22m^[[2m20 tests^[[22m^[[2m)^[[22m^[[32m 22^[[2mms^[[22m^[[39m
+verificar	Testes	2026-09-25T00:35:16.4327020Z  ^[[32m✓^[[39m src/lib/offline/outbox.test.ts ^[[2m(^[[22m^[[2m12 tests^[[22m^[[2m)^[[22m^[[32m 70^[[2mms^[[22m^[[39m
+verificar	Testes	2026-09-25T00:35:16.6107620Z  ^[[32m✓^[[39m src/lib/dados/metricas-treino.test.ts ^[[2m(^[[22m^[[2m15 tests^[[22m^[[2m)^[[22m^[[32m 14^[[2mms^[[22m^[[39m
+verificar	Testes	2026-09-25T00:35:16.6586621Z  ^[[32m✓^[[39m src/app/api/analise/retry-transitorio.test.ts ^[[2m(^[[22m^[[2m24 tests^[[22m^[[2m)^[[22m^[[32m 22^[[2mms^[[22m^[[39m
+verificar	Testes	2026-09-25T00:35:16.8796361Z  ^[[32m✓^[[39m src/lib/treino/marcos-treino.test.ts ^[[2m(^[[22m^[[2m15 tests^[[22m^[[2m)^[[22m^[[32m 16^[[2mms^[[22m^[[39m
+verificar	Testes	2026-09-25T00:35:16.9195391Z  ^[[32m✓^[[39m src/lib/dados/uso-ia.test.ts ^[[2m(^[[22m^[[2m13 tests^[[22m^[[2m)^[[22m^[[32m 30^[[2mms^[[22m^[[39m
+verificar	Testes	2026-09-25T00:35:17.0446664Z  ^[[32m✓^[[39m src/lib/pdf/documento-parecer.test.ts ^[[2m(^[[22m^[[2m12 tests^[[22m^[[2m)^[[22m^[[32m 38^[[2mms^[[22m^[[39m
+verificar	Testes	2026-09-25T00:35:17.1657283Z  ^[[32m✓^[[39m src/app/api/coach/prompt.test.ts ^[[2m(^[[22m^[[2m21 tests^[[22m^[[2m)^[[22m^[[32m 15^[[2mms^[[22m^[[39m
+verificar	Testes	2026-09-25T00:35:17.2552896Z  ^[[32m✓^[[39m src/lib/treino/espelho-servidor.test.ts ^[[2m(^[[22m^[[2m6 tests^[[22m^[[2m)^[[22m^[[32m 8^[[2mms^[[22m^[[39m
+verificar	Testes	2026-09-25T00:35:17.2636453Z  ^[[32m✓^[[39m src/lib/offline/sincronizar-pendentes.test.ts ^[[2m(^[[22m^[[2m7 tests^[[22m^[[2m)^[[22m^[[32m 74^[[2mms^[[22m^[[39m
+verificar	Testes	2026-09-25T00:35:17.3894722Z  ^[[32m✓^[[39m src/lib/texto/formatar-delta.test.ts ^[[2m(^[[22m^[[2m23 tests^[[22m^[[2m)^[[22m^[[32m 13^[[2mms^[[22m^[[39m
+verificar	Testes	2026-09-25T00:35:17.4662892Z  ^[[32m✓^[[39m src/lib/texto/i18n.test.ts ^[[2m(^[[22m^[[2m110 tests^[[22m^[[2m)^[[22m^[[32m 34^[[2mms^[[22m^[[39m
+verificar	Testes	2026-09-25T00:35:17.4985465Z  ^[[32m✓^[[39m src/lib/analise/progressao.test.ts ^[[2m(^[[22m^[[2m13 tests^[[22m^[[2m)^[[22m^[[32m 9^[[2mms^[[22m^[[39m
+verificar	Testes	2026-09-25T00:35:17.6076231Z  ^[[32m✓^[[39m src/lib/texto/whatsapp.test.ts ^[[2m(^[[22m^[[2m14 tests^[[22m^[[2m)^[[22m^[[32m 12^[[2mms^[[22m^[[39m
+verificar	Testes	2026-09-25T00:35:17.7006548Z  ^[[32m✓^[[39m src/app/api/analise/evidencia.test.ts ^[[2m(^[[22m^[[2m8 tests^[[22m^[[2m)^[[22m^[[32m 10^[[2mms^[[22m^[[39m
+verificar	Testes	2026-09-25T00:35:17.8142170Z  ^[[32m✓^[[39m src/proxy.test.ts ^[[2m(^[[22m^[[2m15 tests^[[22m^[[2m)^[[22m^[[32m 61^[[2mms^[[22m^[[39m
+verificar	Testes	2026-09-25T00:35:17.8231922Z  ^[[32m✓^[[39m src/lib/analise/recorde-serie.test.ts ^[[2m(^[[22m^[[2m10 tests^[[22m^[[2m)^[[22m^[[32m 12^[[2mms^[[22m^[[39m
+verificar	Testes	2026-09-25T00:35:17.9290662Z  ^[[32m✓^[[39m src/lib/anilhas.test.ts ^[[2m(^[[22m^[[2m16 tests^[[22m^[[2m)^[[22m^[[32m 13^[[2mms^[[22m^[[39m
+verificar	Testes	2026-09-25T00:35:18.0091394Z  ^[[32m✓^[[39m src/lib/analise/alerta-deload.test.ts ^[[2m(^[[22m^[[2m5 tests^[[22m^[[2m)^[[22m^[[32m 8^[[2mms^[[22m^[[39m
+verificar	Testes	2026-09-25T00:35:18.0371699Z  ^[[32m✓^[[39m src/lib/texto/aviso-falha.test.ts ^[[2m(^[[22m^[[2m9 tests^[[22m^[[2m)^[[22m^[[32m 11^[[2mms^[[22m^[[39m
+verificar	Testes	2026-09-25T00:35:18.1306351Z  ^[[32m✓^[[39m src/lib/analise/series-dificeis.test.ts ^[[2m(^[[22m^[[2m6 tests^[[22m^[[2m)^[[22m^[[32m 9^[[2mms^[[22m^[[39m
+verificar	Testes	2026-09-25T00:35:18.2005577Z  ^[[32m✓^[[39m src/lib/texto/cref.test.ts ^[[2m(^[[22m^[[2m12 tests^[[22m^[[2m)^[[22m^[[32m 9^[[2mms^[[22m^[[39m
+verificar	Testes	2026-09-25T00:35:18.2546495Z  ^[[32m✓^[[39m src/lib/treino/aviso-descanso.test.ts ^[[2m(^[[22m^[[2m10 tests^[[22m^[[2m)^[[22m^[[32m 7^[[2mms^[[22m^[[39m
+verificar	Testes	2026-09-25T00:35:18.3384548Z  ^[[32m✓^[[39m src/lib/texto/grupo-muscular.test.ts ^[[2m(^[[22m^[[2m9 tests^[[22m^[[2m)^[[22m^[[32m 8^[[2mms^[[22m^[[39m
+verificar	Testes	2026-09-25T00:35:18.4106589Z  ^[[32m✓^[[39m src/app/api/analise/perguntas.test.ts ^[[2m(^[[22m^[[2m10 tests^[[22m^[[2m)^[[22m^[[32m 11^[[2mms^[[22m^[[39m
+verificar	Testes	2026-09-25T00:35:18.5020333Z  ^[[32m✓^[[39m src/lib/dados/criar-treino.test.ts ^[[2m(^[[22m^[[2m2 tests^[[22m^[[2m)^[[22m^[[32m 10^[[2mms^[[22m^[[39m
+verificar	Testes	2026-09-25T00:35:18.5602429Z  ^[[32m✓^[[39m src/lib/treino/apresentacao-series.test.ts ^[[2m(^[[22m^[[2m6 tests^[[22m^[[2m)^[[22m^[[32m 9^[[2mms^[[22m^[[39m
+verificar	Testes	2026-09-25T00:35:18.5730459Z  ^[[32m✓^[[39m src/lib/analise/estagnacao.test.ts ^[[2m(^[[22m^[[2m3 tests^[[22m^[[2m)^[[22m^[[32m 7^[[2mms^[[22m^[[39m
+verificar	Testes	2026-09-25T00:35:18.7274494Z  ^[[32m✓^[[39m src/lib/dados/limites-serie.test.ts ^[[2m(^[[22m^[[2m21 tests^[[22m^[[2m)^[[22m^[[32m 13^[[2mms^[[22m^[[39m
+verificar	Testes	2026-09-25T00:35:18.7416275Z  ^[[32m✓^[[39m src/lib/treino/descanso-real.test.ts ^[[2m(^[[22m^[[2m7 tests^[[22m^[[2m)^[[22m^[[32m 7^[[2mms^[[22m^[[39m
+verificar	Testes	2026-09-25T00:35:18.8148875Z  ^[[32m✓^[[39m src/lib/tempo.test.ts ^[[2m(^[[22m^[[2m8 tests^[[22m^[[2m)^[[22m^[[32m 35^[[2mms^[[22m^[[39m
+verificar	Testes	2026-09-25T00:35:18.9213833Z  ^[[32m✓^[[39m src/lib/analise/frequencia.test.ts ^[[2m(^[[22m^[[2m4 tests^[[22m^[[2m)^[[22m^[[32m 8^[[2mms^[[22m^[[39m
+verificar	Testes	2026-09-25T00:35:18.9566403Z  ^[[32m✓^[[39m src/lib/analise/equilibrio.test.ts ^[[2m(^[[22m^[[2m9 tests^[[22m^[[2m)^[[22m^[[32m 23^[[2mms^[[22m^[[39m
+verificar	Testes	2026-09-25T00:35:19.0085537Z  ^[[32m✓^[[39m src/lib/treino/fim-treino.test.ts ^[[2m(^[[22m^[[2m13 tests^[[22m^[[2m)^[[22m^[[32m 10^[[2mms^[[22m^[[39m
+verificar	Testes	2026-09-25T00:35:19.1327448Z  ^[[32m✓^[[39m src/lib/analise/recencia.test.ts ^[[2m(^[[22m^[[2m7 tests^[[22m^[[2m)^[[22m^[[32m 10^[[2mms^[[22m^[[39m
+verificar	Testes	2026-09-25T00:35:19.1378246Z  ^[[32m✓^[[39m src/lib/treino/descanso-real-local.test.ts ^[[2m(^[[22m^[[2m5 tests^[[22m^[[2m)^[[22m^[[32m 6^[[2mms^[[22m^[[39m
+verificar	Testes	2026-09-25T00:35:19.2123872Z  ^[[32m✓^[[39m src/lib/analise/sem-modelo-treino.test.ts ^[[2m(^[[22m^[[2m20 tests^[[22m^[[2m)^[[22m^[[32m 14^[[2mms^[[22m^[[39m
+verificar	Testes	2026-09-25T00:35:19.3326438Z  ^[[32m✓^[[39m src/app/api/coach/falha.test.ts ^[[2m(^[[22m^[[2m8 tests^[[22m^[[2m)^[[22m^[[32m 11^[[2mms^[[22m^[[39m
+verificar	Testes	2026-09-25T00:35:19.3380176Z  ^[[32m✓^[[39m src/lib/analise/agregar-dois-treinos-no-dia.test.ts ^[[2m(^[[22m^[[2m2 tests^[[22m^[[2m)^[[22m^[[32m 8^[[2mms^[[22m^[[39m
+verificar	Testes	2026-09-25T00:35:19.4351198Z  ^[[32m✓^[[39m src/lib/analise/volume.test.ts ^[[2m(^[[22m^[[2m5 tests^[[22m^[[2m)^[[22m^[[32m 5^[[2mms^[[22m^[[39m
+verificar	Testes	2026-09-25T00:35:19.5139659Z  ^[[32m✓^[[39m src/lib/analise/sequencia.test.ts ^[[2m(^[[22m^[[2m10 tests^[[22m^[[2m)^[[22m^[[32m 9^[[2mms^[[22m^[[39m
+verificar	Testes	2026-09-25T00:35:19.5476370Z  ^[[32m✓^[[39m src/lib/rota-de-retorno.test.ts ^[[2m(^[[22m^[[2m8 tests^[[22m^[[2m)^[[22m^[[32m 8^[[2mms^[[22m^[[39m
+verificar	Testes	2026-09-25T00:35:19.6360591Z  ^[[32m✓^[[39m src/lib/dados/grupos-conhecidos.test.ts ^[[2m(^[[22m^[[2m5 tests^[[22m^[[2m)^[[22m^[[32m 7^[[2mms^[[22m^[[39m
+verificar	Testes	2026-09-25T00:35:19.7234577Z  ^[[32m✓^[[39m src/lib/texto/separar-veredito.test.ts ^[[2m(^[[22m^[[2m5 tests^[[22m^[[2m)^[[22m^[[32m 6^[[2mms^[[22m^[[39m
+verificar	Testes	2026-09-25T00:35:19.7441241Z  ^[[32m✓^[[39m src/lib/push/disparo.test.ts ^[[2m(^[[22m^[[2m6 tests^[[22m^[[2m)^[[22m^[[32m 10^[[2mms^[[22m^[[39m
+verificar	Testes	2026-09-25T00:35:19.8325685Z  ^[[32m✓^[[39m src/lib/analise/prs.test.ts ^[[2m(^[[22m^[[2m3 tests^[[22m^[[2m)^[[22m^[[32m 5^[[2mms^[[22m^[[39m
+verificar	Testes	2026-09-25T00:35:19.9235141Z  ^[[32m✓^[[39m src/lib/analise/semanas.test.ts ^[[2m(^[[22m^[[2m5 tests^[[22m^[[2m)^[[22m^[[32m 7^[[2mms^[[22m^[[39m
+verificar	Testes	2026-09-25T00:35:19.9503091Z  ^[[32m✓^[[39m src/lib/texto/erro-personal.test.ts ^[[2m(^[[22m^[[2m21 tests^[[22m^[[2m)^[[22m^[[32m 16^[[2mms^[[22m^[[39m
+verificar	Testes	2026-09-25T00:35:20.0527075Z  ^[[32m✓^[[39m src/lib/dados/limites-modelo.test.ts ^[[2m(^[[22m^[[2m9 tests^[[22m^[[2m)^[[22m^[[32m 9^[[2mms^[[22m^[[39m
+verificar	Testes	2026-09-25T00:35:20.1415820Z  ^[[32m✓^[[39m src/lib/texto/senha.test.ts ^[[2m(^[[22m^[[2m9 tests^[[22m^[[2m)^[[22m^[[32m 9^[[2mms^[[22m^[[39m
+verificar	Testes	2026-09-25T00:35:20.2617259Z  ^[[32m✓^[[39m src/components/player-execucao-exercicio.test.ts ^[[2m(^[[22m^[[2m2 tests^[[22m^[[2m)^[[22m^[[32m 20^[[2mms^[[22m^[[39m
+verificar	Testes	2026-09-25T00:35:20.2676181Z  ^[[32m✓^[[39m src/lib/offline/erro-permanente.test.ts ^[[2m(^[[22m^[[2m7 tests^[[22m^[[2m)^[[22m^[[32m 7^[[2mms^[[22m^[[39m
+verificar	Testes	2026-09-25T00:35:20.3536550Z  ^[[32m✓^[[39m src/lib/treino/toque-duplo.test.ts ^[[2m(^[[22m^[[2m3 tests^[[22m^[[2m)^[[22m^[[32m 6^[[2mms^[[22m^[[39m
+verificar	Testes	2026-09-25T00:35:20.4465101Z  ^[[32m✓^[[39m src/lib/dados/validar-avatar.test.ts ^[[2m(^[[22m^[[2m4 tests^[[22m^[[2m)^[[22m^[[32m 8^[[2mms^[[22m^[[39m
+verificar	Testes	2026-09-25T00:35:20.4615365Z  ^[[32m✓^[[39m src/lib/analise/e1rm.test.ts ^[[2m(^[[22m^[[2m6 tests^[[22m^[[2m)^[[22m^[[32m 11^[[2mms^[[22m^[[39m
+verificar	Testes	2026-09-25T00:35:20.5670225Z  ^[[32m✓^[[39m src/lib/dados/midia-exercicio.test.ts ^[[2m(^[[22m^[[2m3 tests^[[22m^[[2m)^[[22m^[[32m 7^[[2mms^[[22m^[[39m
+verificar	Testes	2026-09-25T00:35:20.6389592Z  ^[[32m✓^[[39m src/lib/treino/timer-flutuante.test.ts ^[[2m(^[[22m^[[2m3 tests^[[22m^[[2m)^[[22m^[[32m 4^[[2mms^[[22m^[[39m
+verificar	Testes	2026-09-25T00:35:20.6440617Z  ^[[32m✓^[[39m src/lib/dados/id-valido.test.ts ^[[2m(^[[22m^[[2m8 tests^[[22m^[[2m)^[[22m^[[32m 6^[[2mms^[[22m^[[39m
+verificar	Testes	2026-09-25T00:35:20.6488455Z 
+verificar	Testes	2026-09-25T00:35:20.6497615Z ^[[2m Test Files ^[[22m ^[[1m^[[32m62 passed^[[39m^[[22m^[[90m (62)^[[39m
+verificar	Testes	2026-09-25T00:35:20.6501743Z ^[[2m      Tests ^[[22m ^[[1m^[[32m727 passed^[[39m^[[22m^[[90m (727)^[[39m
+verificar	Testes	2026-09-25T00:35:20.6502576Z ^[[2m   Start at ^[[22m 00:35:15
+verificar	Testes	2026-09-25T00:35:20.6505405Z ^[[2m   Duration ^[[22m 4.97s^[[2m (transform 1.39s, setup 0ms, import 3.29s, tests 946ms, environment 10ms)^[[22m
+verificar	Testes	2026-09-25T00:35:20.6506913Z 
+verificar	Build	﻿2026-09-25T00:35:20.7135126Z ##[group]Run npm run build
+verificar	Build	2026-09-25T00:35:20.7135468Z ^[[36;1mnpm run build^[[0m
+verificar	Build	2026-09-25T00:35:20.7198696Z shell: /usr/bin/bash -e {0}
+verificar	Build	2026-09-25T00:35:20.7198978Z env:
+verificar	Build	2026-09-25T00:35:20.7199463Z   NEXT_PUBLIC_SUPABASE_URL: ***
+verificar	Build	2026-09-25T00:35:20.7199887Z   NEXT_PUBLIC_SUPABASE_ANON_KEY: ***
+verificar	Build	2026-09-25T00:35:20.7201507Z   SUPABASE_SERVICE_ROLE_KEY: ***
+verificar	Build	2026-09-25T00:35:20.7201934Z   GEMINI_API_KEY: ***
+verificar	Build	2026-09-25T00:35:20.7202167Z ##[endgroup]
+verificar	Build	2026-09-25T00:35:20.8246111Z 
+verificar	Build	2026-09-25T00:35:20.8246767Z > lastro@0.1.0 build
+verificar	Build	2026-09-25T00:35:20.8247316Z > next build
+verificar	Build	2026-09-25T00:35:20.8247574Z 
+verificar	Build	2026-09-25T00:35:21.2028012Z ▲ Next.js 16.3.0 (Turbopack)
+verificar	Build	2026-09-25T00:35:21.2309680Z ✓ Running next.config.ts took 27ms
+verificar	Build	2026-09-25T00:35:21.2313161Z ⚠ No build cache found. Please configure build caching for faster rebuilds. Read more: https://nextjs.org/docs/messages/no-cache
+verificar	Build	2026-09-25T00:35:21.2547039Z Attention: Next.js now collects completely anonymous telemetry regarding usage.
+verificar	Build	2026-09-25T00:35:21.2548643Z This information is used to shape Next.js' roadmap and prioritize features.
+verificar	Build	2026-09-25T00:35:21.2550528Z You can learn more, including how to opt-out if you'd not like to participate in this anonymous program, by visiting the following URL:
+verificar	Build	2026-09-25T00:35:21.2551875Z https://nextjs.org/telemetry
+verificar	Build	2026-09-25T00:35:21.2552373Z 
+verificar	Build	2026-09-25T00:35:21.2763251Z 
+verificar	Build	2026-09-25T00:35:21.3813595Z   Creating an optimized production build ...
+verificar	Build	2026-09-25T00:35:31.4296083Z ✓ Compiled successfully in 9.6s
+verificar	Build	2026-09-25T00:35:31.4465487Z   Running TypeScript ...
+verificar	Build	2026-09-25T00:35:40.4536748Z   Finished TypeScript in 9.0s ...
+verificar	Build	2026-09-25T00:35:40.4571220Z   Collecting page data using 3 workers ...
+verificar	Build	2026-09-25T00:35:41.5361754Z   Generating static pages using 3 workers (0/30) ...
+verificar	Build	2026-09-25T00:35:41.6786281Z   Generating static pages using 3 workers (7/30) 
+verificar	Build	2026-09-25T00:35:41.7423019Z   Generating static pages using 3 workers (14/30) 
+verificar	Build	2026-09-25T00:35:41.7953163Z   Generating static pages using 3 workers (22/30) 
+verificar	Build	2026-09-25T00:35:41.9828708Z ✓ Generating static pages using 3 workers (30/30) in 447ms
+verificar	Build	2026-09-25T00:35:41.9871116Z   Finalizing page optimization ...
+verificar	Build	2026-09-25T00:35:41.9990030Z 
+verificar	Build	2026-09-25T00:35:42.0020608Z Route (app)
+verificar	Build	2026-09-25T00:35:42.0021468Z ┌ ƒ /
+verificar	Build	2026-09-25T00:35:42.0022079Z ├ ƒ /_not-found
+verificar	Build	2026-09-25T00:35:42.0022693Z ├ ƒ /(.)ajustes/anilhas
+verificar	Build	2026-09-25T00:35:42.0023354Z ├ ƒ /(.)ajustes/modelos/novo
+verificar	Build	2026-09-25T00:35:42.0024750Z ├ ƒ /(.)perfil
+verificar	Build	2026-09-25T00:35:42.0025335Z ├ ƒ /ajustes
+verificar	Build	2026-09-25T00:35:42.0025926Z ├ ƒ /ajustes/anilhas
+verificar	Build	2026-09-25T00:35:42.0026601Z ├ ƒ /ajustes/modelos
+verificar	Build	2026-09-25T00:35:42.0027236Z ├ ƒ /ajustes/modelos/novo
+verificar	Build	2026-09-25T00:35:42.0027893Z ├ ƒ /ajustes/personal
+verificar	Build	2026-09-25T00:35:42.0028517Z ├ ƒ /ajustes/relatorios
+verificar	Build	2026-09-25T00:35:42.0029267Z ├ ƒ /ajustes/relatorios/parecer/[id]
+verificar	Build	2026-09-25T00:35:42.0029957Z ├ ƒ /ajustes/temas
+verificar	Build	2026-09-25T00:35:42.0030353Z ├ ƒ /analise
+verificar	Build	2026-09-25T00:35:42.0030707Z ├ ƒ /api/analise
+verificar	Build	2026-09-25T00:35:42.0031062Z ├ ƒ /api/coach
+verificar	Build	2026-09-25T00:35:42.0031440Z ├ ƒ /api/exportar
+verificar	Build	2026-09-25T00:35:42.0031877Z ├ ƒ /api/parecer/[id]/pdf
+verificar	Build	2026-09-25T00:35:42.0032290Z ├ ƒ /api/progressao
+verificar	Build	2026-09-25T00:35:42.0032673Z ├ ƒ /api/push/disparar
+verificar	Build	2026-09-25T00:35:42.0033058Z ├ ƒ /auth/callback
+verificar	Build	2026-09-25T00:35:42.0033423Z ├ ƒ /boas-vindas
+verificar	Build	2026-09-25T00:35:42.0033796Z ├ ƒ /catalogo
+verificar	Build	2026-09-25T00:35:42.0034159Z ├ ƒ /catalogo/[id]
+verificar	Build	2026-09-25T00:35:42.0035041Z ├ ƒ /coach
+verificar	Build	2026-09-25T00:35:42.0035477Z ├ ƒ /login
+verificar	Build	2026-09-25T00:35:42.0035848Z ├ ƒ /perfil
+verificar	Build	2026-09-25T00:35:42.0036133Z ├ ƒ /personal
+verificar	Build	2026-09-25T00:35:42.0036405Z ├ ƒ /personal/alunos
+verificar	Build	2026-09-25T00:35:42.0036687Z ├ ƒ /personal/completar
+verificar	Build	2026-09-25T00:35:42.0036943Z ├ ƒ /treino
+verificar	Build	2026-09-25T00:35:42.0037314Z └ ƒ /treino/[id]
+verificar	Build	2026-09-25T00:35:42.0037465Z 
+verificar	Build	2026-09-25T00:35:42.0037473Z 
+verificar	Build	2026-09-25T00:35:42.0037618Z ƒ Proxy (Middleware)
+verificar	Build	2026-09-25T00:35:42.0037770Z 
+verificar	Build	2026-09-25T00:35:42.0037973Z ƒ  (Dynamic)  server-rendered on demand
+verificar	Build	2026-09-25T00:35:42.0038172Z 
+verificar	Type-check	﻿2026-09-25T00:35:42.1059289Z ##[group]Run npx tsc --noEmit
+verificar	Type-check	2026-09-25T00:35:42.1059646Z ^[[36;1mnpx tsc --noEmit^[[0m
+verificar	Type-check	2026-09-25T00:35:42.1121704Z shell: /usr/bin/bash -e {0}
+verificar	Type-check	2026-09-25T00:35:42.1121998Z ##[endgroup]
+verificar	Instalar navegador do Playwright	﻿2026-09-25T00:35:50.8618990Z ##[group]Run npx playwright install --with-deps chromium
+verificar	Instalar navegador do Playwright	2026-09-25T00:35:50.8619484Z ^[[36;1mnpx playwright install --with-deps chromium^[[0m
+verificar	Instalar navegador do Playwright	2026-09-25T00:35:50.8682734Z shell: /usr/bin/bash -e {0}
+verificar	Instalar navegador do Playwright	2026-09-25T00:35:50.8683062Z ##[endgroup]
+verificar	Instalar navegador do Playwright	2026-09-25T00:35:51.6697221Z Installing dependencies...
+verificar	Instalar navegador do Playwright	2026-09-25T00:35:51.6762783Z Switching to root user to install dependencies...
+verificar	Instalar navegador do Playwright	2026-09-25T00:35:51.7816540Z Get:1 file:/etc/apt/apt-mirrors.txt Mirrorlist [144 B]
+verificar	Instalar navegador do Playwright	2026-09-25T00:35:51.7973322Z Get:3 https://packages.microsoft.com/ubuntu/24.04/prod noble InRelease [3600 B]
+verificar	Instalar navegador do Playwright	2026-09-25T00:35:51.8105297Z Hit:2 http://azure.archive.ubuntu.com/ubuntu noble InRelease
+verificar	Instalar navegador do Playwright	2026-09-25T00:35:51.8139892Z Get:4 http://azure.archive.ubuntu.com/ubuntu noble-updates InRelease [126 kB]
+verificar	Instalar navegador do Playwright	2026-09-25T00:35:51.8215763Z Get:5 http://azure.archive.ubuntu.com/ubuntu noble-backports InRelease [126 kB]
+verificar	Instalar navegador do Playwright	2026-09-25T00:35:51.8255896Z Get:6 http://azure.archive.ubuntu.com/ubuntu noble-security InRelease [126 kB]
+verificar	Instalar navegador do Playwright	2026-09-25T00:35:51.8777320Z Get:7 https://packages.microsoft.com/ubuntu/24.04/prod noble/main amd64 Packages [492 kB]
+verificar	Instalar navegador do Playwright	2026-09-25T00:35:51.9008831Z Get:8 https://packages.microsoft.com/ubuntu/24.04/prod noble/main arm64 Packages [441 kB]
+verificar	Instalar navegador do Playwright	2026-09-25T00:35:51.9982594Z Get:9 http://azure.archive.ubuntu.com/ubuntu noble-updates/main amd64 Packages [1318 kB]
+verificar	Instalar navegador do Playwright	2026-09-25T00:35:52.0055422Z Get:10 http://azure.archive.ubuntu.com/ubuntu noble-updates/main Translation-en [299 kB]
+verificar	Instalar navegador do Playwright	2026-09-25T00:35:52.0073092Z Get:11 http://azure.archive.ubuntu.com/ubuntu noble-updates/main amd64 Components [181 kB]
+verificar	Instalar navegador do Playwright	2026-09-25T00:35:52.0089714Z Get:12 http://azure.archive.ubuntu.com/ubuntu noble-updates/universe amd64 Packages [1697 kB]
+verificar	Instalar navegador do Playwright	2026-09-25T00:35:52.0176753Z Get:13 http://azure.archive.ubuntu.com/ubuntu noble-updates/universe Translation-en [340 kB]
+verificar	Instalar navegador do Playwright	2026-09-25T00:35:52.0237443Z Get:14 http://azure.archive.ubuntu.com/ubuntu noble-updates/universe amd64 Components [388 kB]
+verificar	Instalar navegador do Playwright	2026-09-25T00:35:52.0264534Z Get:15 http://azure.archive.ubuntu.com/ubuntu noble-updates/restricted amd64 Packages [1654 kB]
+verificar	Instalar navegador do Playwright	2026-09-25T00:35:52.0347693Z Get:16 http://azure.archive.ubuntu.com/ubuntu noble-updates/restricted Translation-en [377 kB]
+verificar	Instalar navegador do Playwright	2026-09-25T00:35:52.0372397Z Get:17 http://azure.archive.ubuntu.com/ubuntu noble-updates/multiverse amd64 Components [940 B]
+verificar	Instalar navegador do Playwright	2026-09-25T00:35:52.0561914Z Get:18 http://azure.archive.ubuntu.com/ubuntu noble-backports/main amd64 Packages [40.6 kB]
+verificar	Instalar navegador do Playwright	2026-09-25T00:35:52.0985306Z Get:19 http://azure.archive.ubuntu.com/ubuntu noble-backports/main amd64 Components [5764 B]
+verificar	Instalar navegador do Playwright	2026-09-25T00:35:52.0997851Z Get:20 http://azure.archive.ubuntu.com/ubuntu noble-backports/universe amd64 Packages [31.0 kB]
+verificar	Instalar navegador do Playwright	2026-09-25T00:35:52.1010635Z Get:21 http://azure.archive.ubuntu.com/ubuntu noble-backports/universe Translation-en [18.6 kB]
+verificar	Instalar navegador do Playwright	2026-09-25T00:35:52.1022294Z Get:22 http://azure.archive.ubuntu.com/ubuntu noble-backports/universe amd64 Components [12.6 kB]
+verificar	Instalar navegador do Playwright	2026-09-25T00:35:52.1136791Z Get:23 http://azure.archive.ubuntu.com/ubuntu noble-security/main amd64 Packages [1053 kB]
+verificar	Instalar navegador do Playwright	2026-09-25T00:35:52.1190968Z Get:24 http://azure.archive.ubuntu.com/ubuntu noble-security/main Translation-en [219 kB]
+verificar	Instalar navegador do Playwright	2026-09-25T00:35:52.1209002Z Get:25 http://azure.archive.ubuntu.com/ubuntu noble-security/main amd64 Components [46.4 kB]
+verificar	Instalar navegador do Playwright	2026-09-25T00:35:52.1221021Z Get:26 http://azure.archive.ubuntu.com/ubuntu noble-security/universe amd64 Packages [1220 kB]
+verificar	Instalar navegador do Playwright	2026-09-25T00:35:52.1282837Z Get:27 http://azure.archive.ubuntu.com/ubuntu noble-security/universe Translation-en [245 kB]
+verificar	Instalar navegador do Playwright	2026-09-25T00:35:52.1316108Z Get:28 http://azure.archive.ubuntu.com/ubuntu noble-security/universe amd64 Components [76.3 kB]
+verificar	Instalar navegador do Playwright	2026-09-25T00:35:52.1328960Z Get:29 http://azure.archive.ubuntu.com/ubuntu noble-security/restricted amd64 Packages [1535 kB]
+verificar	Instalar navegador do Playwright	2026-09-25T00:35:52.1406506Z Get:30 http://azure.archive.ubuntu.com/ubuntu noble-security/restricted Translation-en [353 kB]
+verificar	Instalar navegador do Playwright	2026-09-25T00:35:56.4837704Z Fetched 12.4 MB in 1s (9003 kB/s)
+verificar	Instalar navegador do Playwright	2026-09-25T00:35:57.4202320Z Reading package lists...
+verificar	Instalar navegador do Playwright	2026-09-25T00:35:57.4447684Z Reading package lists...
+verificar	Instalar navegador do Playwright	2026-09-25T00:35:57.6435768Z Building dependency tree...
+verificar	Instalar navegador do Playwright	2026-09-25T00:35:57.6442863Z Reading state information...
+verificar	Instalar navegador do Playwright	2026-09-25T00:35:57.7926278Z libasound2t64 is already the newest version (1.2.11-1ubuntu0.3).
+verificar	Instalar navegador do Playwright	2026-09-25T00:35:57.7927590Z libasound2t64 set to manually installed.
+verificar	Instalar navegador do Playwright	2026-09-25T00:35:57.7928816Z libatk-bridge2.0-0t64 is already the newest version (2.52.0-1build1).
+verificar	Instalar navegador do Playwright	2026-09-25T00:35:57.7930060Z libatk-bridge2.0-0t64 set to manually installed.
+verificar	Instalar navegador do Playwright	2026-09-25T00:35:57.7931260Z libatk1.0-0t64 is already the newest version (2.52.0-1build1).
+verificar	Instalar navegador do Playwright	2026-09-25T00:35:57.7932281Z libatk1.0-0t64 set to manually installed.
+verificar	Instalar navegador do Playwright	2026-09-25T00:35:57.7933034Z libatspi2.0-0t64 is already the newest version (2.52.0-1build1).
+verificar	Instalar navegador do Playwright	2026-09-25T00:35:57.7933759Z libatspi2.0-0t64 set to manually installed.
+verificar	Instalar navegador do Playwright	2026-09-25T00:35:57.7934891Z libcairo2 is already the newest version (1.18.0-3build1).
+verificar	Instalar navegador do Playwright	2026-09-25T00:35:57.7935660Z libcairo2 set to manually installed.
+verificar	Instalar navegador do Playwright	2026-09-25T00:35:57.7936627Z libcups2t64 is already the newest version (2.4.7-1.2ubuntu7.14).
+verificar	Instalar navegador do Playwright	2026-09-25T00:35:57.7937757Z libcups2t64 set to manually installed.
+verificar	Instalar navegador do Playwright	2026-09-25T00:35:57.7938496Z libdbus-1-3 is already the newest version (1.14.10-4ubuntu4.1).
+verificar	Instalar navegador do Playwright	2026-09-25T00:35:57.7939191Z libdbus-1-3 set to manually installed.
+verificar	Instalar navegador do Playwright	2026-09-25T00:35:57.7940053Z libdrm2 is already the newest version (2.4.125-1ubuntu0.1~24.04.2).
+verificar	Instalar navegador do Playwright	2026-09-25T00:35:57.7940675Z libdrm2 set to manually installed.
+verificar	Instalar navegador do Playwright	2026-09-25T00:35:57.7941235Z libgbm1 is already the newest version (25.2.8-0ubuntu0.24.04.2).
+verificar	Instalar navegador do Playwright	2026-09-25T00:35:57.7941763Z libgbm1 set to manually installed.
+verificar	Instalar navegador do Playwright	2026-09-25T00:35:57.7942301Z libnspr4 is already the newest version (2:4.35-1.1build1).
+verificar	Instalar navegador do Playwright	2026-09-25T00:35:57.7942826Z libnspr4 set to manually installed.
+verificar	Instalar navegador do Playwright	2026-09-25T00:35:57.7943367Z libnss3 is already the newest version (2:3.98-1ubuntu0.2).
+verificar	Instalar navegador do Playwright	2026-09-25T00:35:57.7943870Z libnss3 set to manually installed.
+verificar	Instalar navegador do Playwright	2026-09-25T00:35:57.7944697Z libpango-1.0-0 is already the newest version (1.52.1+ds-1build1).
+verificar	Instalar navegador do Playwright	2026-09-25T00:35:57.7945285Z libpango-1.0-0 set to manually installed.
+verificar	Instalar navegador do Playwright	2026-09-25T00:35:57.7945850Z libx11-6 is already the newest version (2:1.8.7-1build1).
+verificar	Instalar navegador do Playwright	2026-09-25T00:35:57.7946358Z libx11-6 set to manually installed.
+verificar	Instalar navegador do Playwright	2026-09-25T00:35:57.7946811Z libxcb1 is already the newest version (1.15-1ubuntu2).
+verificar	Instalar navegador do Playwright	2026-09-25T00:35:57.7947635Z libxcb1 set to manually installed.
+verificar	Instalar navegador do Playwright	2026-09-25T00:35:57.7948082Z libxcomposite1 is already the newest version (1:0.4.5-1build3).
+verificar	Instalar navegador do Playwright	2026-09-25T00:35:57.7948520Z libxcomposite1 set to manually installed.
+verificar	Instalar navegador do Playwright	2026-09-25T00:35:57.7948954Z libxdamage1 is already the newest version (1:1.1.6-1build1).
+verificar	Instalar navegador do Playwright	2026-09-25T00:35:57.7949353Z libxdamage1 set to manually installed.
+verificar	Instalar navegador do Playwright	2026-09-25T00:35:57.7949761Z libxext6 is already the newest version (2:1.3.4-1build2).
+verificar	Instalar navegador do Playwright	2026-09-25T00:35:57.7950140Z libxext6 set to manually installed.
+verificar	Instalar navegador do Playwright	2026-09-25T00:35:57.7950570Z libxfixes3 is already the newest version (1:6.0.0-2build1).
+verificar	Instalar navegador do Playwright	2026-09-25T00:35:57.7950990Z libxfixes3 set to manually installed.
+verificar	Instalar navegador do Playwright	2026-09-25T00:35:57.7951412Z libxkbcommon0 is already the newest version (1.6.0-1build1).
+verificar	Instalar navegador do Playwright	2026-09-25T00:35:57.7951828Z libxkbcommon0 set to manually installed.
+verificar	Instalar navegador do Playwright	2026-09-25T00:35:57.7952244Z libxrandr2 is already the newest version (2:1.5.2-2build1).
+verificar	Instalar navegador do Playwright	2026-09-25T00:35:57.7952646Z libxrandr2 set to manually installed.
+verificar	Instalar navegador do Playwright	2026-09-25T00:35:57.7953274Z fonts-noto-color-emoji is already the newest version (2.047-0ubuntu0.24.04.1).
+verificar	Instalar navegador do Playwright	2026-09-25T00:35:57.7953862Z libfontconfig1 is already the newest version (2.15.0-1.1ubuntu2).
+verificar	Instalar navegador do Playwright	2026-09-25T00:35:57.7954443Z libfontconfig1 set to manually installed.
+verificar	Instalar navegador do Playwright	2026-09-25T00:35:57.7954913Z libfreetype6 is already the newest version (2.13.2+dfsg-1ubuntu0.1).
+verificar	Instalar navegador do Playwright	2026-09-25T00:35:57.7955355Z libfreetype6 set to manually installed.
+verificar	Instalar navegador do Playwright	2026-09-25T00:35:57.7955779Z fonts-liberation is already the newest version (1:2.1.5-3).
+verificar	Instalar navegador do Playwright	2026-09-25T00:35:57.7956201Z fonts-liberation set to manually installed.
+verificar	Instalar navegador do Playwright	2026-09-25T00:35:57.7956618Z The following additional packages will be installed:
+verificar	Instalar navegador do Playwright	2026-09-25T00:35:57.7957136Z   gir1.2-glib-2.0 libglib2.0-bin libglib2.0-data xfonts-encodings xfonts-utils
+verificar	Instalar navegador do Playwright	2026-09-25T00:35:57.7957898Z   xserver-common
+verificar	Instalar navegador do Playwright	2026-09-25T00:35:57.7958140Z Suggested packages:
+verificar	Instalar navegador do Playwright	2026-09-25T00:35:57.7958378Z   low-memory-monitor
+verificar	Instalar navegador do Playwright	2026-09-25T00:35:57.7958623Z Recommended packages:
+verificar	Instalar navegador do Playwright	2026-09-25T00:35:57.7958947Z   fonts-ipafont-mincho fonts-tlwg-loma xfonts-base
+verificar	Instalar navegador do Playwright	2026-09-25T00:35:57.8153381Z The following NEW packages will be installed:
+verificar	Instalar navegador do Playwright	2026-09-25T00:35:57.8154480Z   fonts-freefont-ttf fonts-ipafont-gothic fonts-tlwg-loma-otf fonts-unifont
+verificar	Instalar navegador do Playwright	2026-09-25T00:35:57.8160570Z   fonts-wqy-zenhei xfonts-cyrillic xfonts-encodings xfonts-scalable
+verificar	Instalar navegador do Playwright	2026-09-25T00:35:57.8161320Z   xfonts-utils
+verificar	Instalar navegador do Playwright	2026-09-25T00:35:57.8163530Z The following packages will be upgraded:
+verificar	Instalar navegador do Playwright	2026-09-25T00:35:57.8169312Z   gir1.2-glib-2.0 libglib2.0-0t64 libglib2.0-bin libglib2.0-data
+verificar	Instalar navegador do Playwright	2026-09-25T00:35:57.8170049Z   xserver-common xvfb
+verificar	Instalar navegador do Playwright	2026-09-25T00:35:57.8334092Z 6 upgraded, 9 newly installed, 0 to remove and 25 not upgraded.
+verificar	Instalar navegador do Playwright	2026-09-25T00:35:57.8335015Z Need to get 23.9 MB of archives.
+verificar	Instalar navegador do Playwright	2026-09-25T00:35:57.8335479Z After this operation, 79.6 MB of additional disk space will be used.
+verificar	Instalar navegador do Playwright	2026-09-25T00:35:57.8336050Z Get:1 file:/etc/apt/apt-mirrors.txt Mirrorlist [144 B]
+verificar	Instalar navegador do Playwright	2026-09-25T00:35:57.8562719Z Get:2 http://azure.archive.ubuntu.com/ubuntu noble/universe amd64 fonts-ipafont-gothic all 00303-21ubuntu1 [3513 kB]
+verificar	Instalar navegador do Playwright	2026-09-25T00:35:57.9165684Z Get:3 http://azure.archive.ubuntu.com/ubuntu noble-updates/main amd64 libglib2.0-data all 2.80.0-6ubuntu3.9 [50.1 kB]
+verificar	Instalar navegador do Playwright	2026-09-25T00:35:57.9236096Z Get:4 http://azure.archive.ubuntu.com/ubuntu noble-updates/main amd64 libglib2.0-bin amd64 2.80.0-6ubuntu3.9 [97.9 kB]
+verificar	Instalar navegador do Playwright	2026-09-25T00:35:57.9311673Z Get:5 http://azure.archive.ubuntu.com/ubuntu noble-updates/main amd64 gir1.2-glib-2.0 amd64 2.80.0-6ubuntu3.9 [183 kB]
+verificar	Instalar navegador do Playwright	2026-09-25T00:35:57.9400520Z Get:6 http://azure.archive.ubuntu.com/ubuntu noble-updates/main amd64 libglib2.0-0t64 amd64 2.80.0-6ubuntu3.9 [1547 kB]
+verificar	Instalar navegador do Playwright	2026-09-25T00:35:57.9705317Z Get:7 http://azure.archive.ubuntu.com/ubuntu noble/main amd64 fonts-freefont-ttf all 20211204+svn4273-2 [5641 kB]
+verificar	Instalar navegador do Playwright	2026-09-25T00:35:58.0593504Z Get:8 http://azure.archive.ubuntu.com/ubuntu noble/universe amd64 fonts-tlwg-loma-otf all 1:0.7.3-1 [107 kB]
+verificar	Instalar navegador do Playwright	2026-09-25T00:35:58.0671162Z Get:9 http://azure.archive.ubuntu.com/ubuntu noble/universe amd64 fonts-unifont all 1:15.1.01-1build1 [2993 kB]
+verificar	Instalar navegador do Playwright	2026-09-25T00:35:58.1155703Z Get:10 http://azure.archive.ubuntu.com/ubuntu noble/universe amd64 fonts-wqy-zenhei all 0.9.45-8 [7472 kB]
+verificar	Instalar navegador do Playwright	2026-09-25T00:35:58.2345217Z Get:11 http://azure.archive.ubuntu.com/ubuntu noble/main amd64 xfonts-encodings all 1:1.0.5-0ubuntu2 [578 kB]
+verificar	Instalar navegador do Playwright	2026-09-25T00:35:58.2487972Z Get:12 http://azure.archive.ubuntu.com/ubuntu noble/main amd64 xfonts-utils amd64 1:7.7+6build3 [94.4 kB]
+verificar	Instalar navegador do Playwright	2026-09-25T00:35:58.2563622Z Get:13 http://azure.archive.ubuntu.com/ubuntu noble/universe amd64 xfonts-cyrillic all 1:1.0.5+nmu1 [384 kB]
+verificar	Instalar navegador do Playwright	2026-09-25T00:35:58.2658161Z Get:14 http://azure.archive.ubuntu.com/ubuntu noble/main amd64 xfonts-scalable all 1:1.0.3-1.3 [304 kB]
+verificar	Instalar navegador do Playwright	2026-09-25T00:35:58.2746788Z Get:15 http://azure.archive.ubuntu.com/ubuntu noble-updates/main amd64 xserver-common all 2:21.1.12-1ubuntu1.8 [34.8 kB]
+verificar	Instalar navegador do Playwright	2026-09-25T00:35:58.2817953Z Get:16 http://azure.archive.ubuntu.com/ubuntu noble-updates/universe amd64 xvfb amd64 2:21.1.12-1ubuntu1.8 [877 kB]
+verificar	Instalar navegador do Playwright	2026-09-25T00:35:58.5686997Z Fetched 23.9 MB in 0s (50.9 MB/s)
+verificar	Instalar navegador do Playwright	2026-09-25T00:35:58.5941462Z Selecting previously unselected package fonts-ipafont-gothic.
+verificar	Instalar navegador do Playwright	2026-09-25T00:35:58.6217987Z (Reading database ... 
+verificar	Instalar navegador do Playwright	2026-09-25T00:35:58.6218865Z (Reading database ... 5%
+verificar	Instalar navegador do Playwright	2026-09-25T00:35:58.6219594Z (Reading database ... 10%
+verificar	Instalar navegador do Playwright	2026-09-25T00:35:58.6220150Z (Reading database ... 15%
+verificar	Instalar navegador do Playwright	2026-09-25T00:35:58.6220650Z (Reading database ... 20%
+verificar	Instalar navegador do Playwright	2026-09-25T00:35:58.6221134Z (Reading database ... 25%
+verificar	Instalar navegador do Playwright	2026-09-25T00:35:58.6221406Z (Reading database ... 30%
+verificar	Instalar navegador do Playwright	2026-09-25T00:35:58.6221673Z (Reading database ... 35%
+verificar	Instalar navegador do Playwright	2026-09-25T00:35:58.6221950Z (Reading database ... 40%
+verificar	Instalar navegador do Playwright	2026-09-25T00:35:58.6222214Z (Reading database ... 45%
+verificar	Instalar navegador do Playwright	2026-09-25T00:35:58.6222470Z (Reading database ... 50%
+verificar	Instalar navegador do Playwright	2026-09-25T00:35:58.6262976Z (Reading database ... 55%
+verificar	Instalar navegador do Playwright	2026-09-25T00:35:58.7004614Z (Reading database ... 60%
+verificar	Instalar navegador do Playwright	2026-09-25T00:35:58.9027663Z (Reading database ... 65%
+verificar	Instalar navegador do Playwright	2026-09-25T00:35:59.1088429Z (Reading database ... 70%
+verificar	Instalar navegador do Playwright	2026-09-25T00:35:59.2963155Z (Reading database ... 75%
+verificar	Instalar navegador do Playwright	2026-09-25T00:35:59.4266368Z (Reading database ... 80%
+verificar	Instalar navegador do Playwright	2026-09-25T00:35:59.6005104Z (Reading database ... 85%
+verificar	Instalar navegador do Playwright	2026-09-25T00:35:59.7597383Z (Reading database ... 90%
+verificar	Instalar navegador do Playwright	2026-09-25T00:35:59.8679835Z (Reading database ... 95%
+verificar	Instalar navegador do Playwright	2026-09-25T00:35:59.8680321Z (Reading database ... 100%
+verificar	Instalar navegador do Playwright	2026-09-25T00:35:59.8680904Z (Reading database ... 202190 files and directories currently installed.)
+verificar	Instalar navegador do Playwright	2026-09-25T00:35:59.8722511Z Preparing to unpack .../00-fonts-ipafont-gothic_00303-21ubuntu1_all.deb ...
+verificar	Instalar navegador do Playwright	2026-09-25T00:35:59.8811104Z Unpacking fonts-ipafont-gothic (00303-21ubuntu1) ...
+verificar	Instalar navegador do Playwright	2026-09-25T00:36:00.1242694Z Preparing to unpack .../01-libglib2.0-data_2.80.0-6ubuntu3.9_all.deb ...
+verificar	Instalar navegador do Playwright	2026-09-25T00:36:00.1264407Z Unpacking libglib2.0-data (2.80.0-6ubuntu3.9) over (2.80.0-6ubuntu3.8) ...
+verificar	Instalar navegador do Playwright	2026-09-25T00:36:00.1604052Z Preparing to unpack .../02-libglib2.0-bin_2.80.0-6ubuntu3.9_amd64.deb ...
+verificar	Instalar navegador do Playwright	2026-09-25T00:36:00.1656111Z Unpacking libglib2.0-bin (2.80.0-6ubuntu3.9) over (2.80.0-6ubuntu3.8) ...
+verificar	Instalar navegador do Playwright	2026-09-25T00:36:00.2147409Z Preparing to unpack .../03-gir1.2-glib-2.0_2.80.0-6ubuntu3.9_amd64.deb ...
+verificar	Instalar navegador do Playwright	2026-09-25T00:36:00.2168494Z Unpacking gir1.2-glib-2.0:amd64 (2.80.0-6ubuntu3.9) over (2.80.0-6ubuntu3.8) ...
+verificar	Instalar navegador do Playwright	2026-09-25T00:36:00.2570766Z Preparing to unpack .../04-libglib2.0-0t64_2.80.0-6ubuntu3.9_amd64.deb ...
+verificar	Instalar navegador do Playwright	2026-09-25T00:36:00.2639565Z Unpacking libglib2.0-0t64:amd64 (2.80.0-6ubuntu3.9) over (2.80.0-6ubuntu3.8) ...
+verificar	Instalar navegador do Playwright	2026-09-25T00:36:00.3077321Z Selecting previously unselected package fonts-freefont-ttf.
+verificar	Instalar navegador do Playwright	2026-09-25T00:36:00.3205678Z Preparing to unpack .../05-fonts-freefont-ttf_20211204+svn4273-2_all.deb ...
+verificar	Instalar navegador do Playwright	2026-09-25T00:36:00.3213148Z Unpacking fonts-freefont-ttf (20211204+svn4273-2) ...
+verificar	Instalar navegador do Playwright	2026-09-25T00:36:00.3995175Z Selecting previously unselected package fonts-tlwg-loma-otf.
+verificar	Instalar navegador do Playwright	2026-09-25T00:36:00.4118533Z Preparing to unpack .../06-fonts-tlwg-loma-otf_1%3a0.7.3-1_all.deb ...
+verificar	Instalar navegador do Playwright	2026-09-25T00:36:00.4146221Z Unpacking fonts-tlwg-loma-otf (1:0.7.3-1) ...
+verificar	Instalar navegador do Playwright	2026-09-25T00:36:00.4349155Z Selecting previously unselected package fonts-unifont.
+verificar	Instalar navegador do Playwright	2026-09-25T00:36:00.4476895Z Preparing to unpack .../07-fonts-unifont_1%3a15.1.01-1build1_all.deb ...
+verificar	Instalar navegador do Playwright	2026-09-25T00:36:00.4484612Z Unpacking fonts-unifont (1:15.1.01-1build1) ...
+verificar	Instalar navegador do Playwright	2026-09-25T00:36:00.5525085Z Selecting previously unselected package fonts-wqy-zenhei.
+verificar	Instalar navegador do Playwright	2026-09-25T00:36:00.5651286Z Preparing to unpack .../08-fonts-wqy-zenhei_0.9.45-8_all.deb ...
+verificar	Instalar navegador do Playwright	2026-09-25T00:36:00.5752633Z Unpacking fonts-wqy-zenhei (0.9.45-8) ...
+verificar	Instalar navegador do Playwright	2026-09-25T00:36:01.0469089Z Selecting previously unselected package xfonts-encodings.
+verificar	Instalar navegador do Playwright	2026-09-25T00:36:01.0599027Z Preparing to unpack .../09-xfonts-encodings_1%3a1.0.5-0ubuntu2_all.deb ...
+verificar	Instalar navegador do Playwright	2026-09-25T00:36:01.0609792Z Unpacking xfonts-encodings (1:1.0.5-0ubuntu2) ...
+verificar	Instalar navegador do Playwright	2026-09-25T00:36:01.0908296Z Selecting previously unselected package xfonts-utils.
+verificar	Instalar navegador do Playwright	2026-09-25T00:36:01.1035792Z Preparing to unpack .../10-xfonts-utils_1%3a7.7+6build3_amd64.deb ...
+verificar	Instalar navegador do Playwright	2026-09-25T00:36:01.1043740Z Unpacking xfonts-utils (1:7.7+6build3) ...
+verificar	Instalar navegador do Playwright	2026-09-25T00:36:01.1369708Z Selecting previously unselected package xfonts-cyrillic.
+verificar	Instalar navegador do Playwright	2026-09-25T00:36:01.1494885Z Preparing to unpack .../11-xfonts-cyrillic_1%3a1.0.5+nmu1_all.deb ...
+verificar	Instalar navegador do Playwright	2026-09-25T00:36:01.1501257Z Unpacking xfonts-cyrillic (1:1.0.5+nmu1) ...
+verificar	Instalar navegador do Playwright	2026-09-25T00:36:01.1846659Z Selecting previously unselected package xfonts-scalable.
+verificar	Instalar navegador do Playwright	2026-09-25T00:36:01.1972653Z Preparing to unpack .../12-xfonts-scalable_1%3a1.0.3-1.3_all.deb ...
+verificar	Instalar navegador do Playwright	2026-09-25T00:36:01.1981873Z Unpacking xfonts-scalable (1:1.0.3-1.3) ...
+verificar	Instalar navegador do Playwright	2026-09-25T00:36:01.2337297Z Preparing to unpack .../13-xserver-common_2%3a21.1.12-1ubuntu1.8_all.deb ...
+verificar	Instalar navegador do Playwright	2026-09-25T00:36:01.2357900Z Unpacking xserver-common (2:21.1.12-1ubuntu1.8) over (2:21.1.12-1ubuntu1.6) ...
+verificar	Instalar navegador do Playwright	2026-09-25T00:36:01.2737939Z Preparing to unpack .../14-xvfb_2%3a21.1.12-1ubuntu1.8_amd64.deb ...
+verificar	Instalar navegador do Playwright	2026-09-25T00:36:01.2756858Z Unpacking xvfb (2:21.1.12-1ubuntu1.8) over (2:21.1.12-1ubuntu1.6) ...
+verificar	Instalar navegador do Playwright	2026-09-25T00:36:01.3302866Z Setting up fonts-wqy-zenhei (0.9.45-8) ...
+verificar	Instalar navegador do Playwright	2026-09-25T00:36:01.3421967Z Setting up fonts-freefont-ttf (20211204+svn4273-2) ...
+verificar	Instalar navegador do Playwright	2026-09-25T00:36:01.3437619Z Setting up libglib2.0-0t64:amd64 (2.80.0-6ubuntu3.9) ...
+verificar	Instalar navegador do Playwright	2026-09-25T00:36:01.3551121Z Setting up libglib2.0-data (2.80.0-6ubuntu3.9) ...
+verificar	Instalar navegador do Playwright	2026-09-25T00:36:01.3569267Z Setting up fonts-tlwg-loma-otf (1:0.7.3-1) ...
+verificar	Instalar navegador do Playwright	2026-09-25T00:36:01.3588305Z Setting up xfonts-encodings (1:1.0.5-0ubuntu2) ...
+verificar	Instalar navegador do Playwright	2026-09-25T00:36:01.3612179Z Setting up gir1.2-glib-2.0:amd64 (2.80.0-6ubuntu3.9) ...
+verificar	Instalar navegador do Playwright	2026-09-25T00:36:01.3629679Z Setting up fonts-ipafont-gothic (00303-21ubuntu1) ...
+verificar	Instalar navegador do Playwright	2026-09-25T00:36:01.3695485Z update-alternatives: using /usr/share/fonts/opentype/ipafont-gothic/ipag.ttf to provide /usr/share/fonts/truetype/fonts-japanese-gothic.ttf (fonts-japanese-gothic.ttf) in auto mode
+verificar	Instalar navegador do Playwright	2026-09-25T00:36:01.3710128Z Setting up xserver-common (2:21.1.12-1ubuntu1.8) ...
+verificar	Instalar navegador do Playwright	2026-09-25T00:36:01.3728591Z Setting up fonts-unifont (1:15.1.01-1build1) ...
+verificar	Instalar navegador do Playwright	2026-09-25T00:36:01.3745641Z Setting up xvfb (2:21.1.12-1ubuntu1.8) ...
+verificar	Instalar navegador do Playwright	2026-09-25T00:36:01.3768980Z Setting up libglib2.0-bin (2.80.0-6ubuntu3.9) ...
+verificar	Instalar navegador do Playwright	2026-09-25T00:36:01.3788520Z Setting up xfonts-utils (1:7.7+6build3) ...
+verificar	Instalar navegador do Playwright	2026-09-25T00:36:01.3829370Z Setting up xfonts-cyrillic (1:1.0.5+nmu1) ...
+verificar	Instalar navegador do Playwright	2026-09-25T00:36:01.4131885Z Setting up xfonts-scalable (1:1.0.3-1.3) ...
+verificar	Instalar navegador do Playwright	2026-09-25T00:36:01.4417697Z Processing triggers for libc-bin (2.39-0ubuntu8.9) ...
+verificar	Instalar navegador do Playwright	2026-09-25T00:36:01.4762647Z Processing triggers for man-db (2.12.0-4build2) ...
+verificar	Instalar navegador do Playwright	2026-09-25T00:36:01.4785748Z Not building database; man-db/auto-update is not 'true'.
+verificar	Instalar navegador do Playwright	2026-09-25T00:36:01.4801379Z Processing triggers for fontconfig (2.15.0-1.1ubuntu2) ...
+verificar	Instalar navegador do Playwright	2026-09-25T00:36:02.1298097Z 
+verificar	Instalar navegador do Playwright	2026-09-25T00:36:02.1298927Z Running kernel seems to be up-to-date.
+verificar	Instalar navegador do Playwright	2026-09-25T00:36:02.1299421Z 
+verificar	Instalar navegador do Playwright	2026-09-25T00:36:02.1299683Z Restarting services...
+verificar	Instalar navegador do Playwright	2026-09-25T00:36:02.1768088Z  systemctl restart packagekit.service php8.3-fpm.service polkit.service udisks2.service
+verificar	Instalar navegador do Playwright	2026-09-25T00:36:02.3033507Z 
+verificar	Instalar navegador do Playwright	2026-09-25T00:36:02.3034829Z Service restarts being deferred:
+verificar	Instalar navegador do Playwright	2026-09-25T00:36:02.3035915Z  systemctl restart ModemManager.service
+verificar	Instalar navegador do Playwright	2026-09-25T00:36:02.3036985Z  systemctl restart networkd-dispatcher.service
+verificar	Instalar navegador do Playwright	2026-09-25T00:36:02.3038597Z 
+verificar	Instalar navegador do Playwright	2026-09-25T00:36:02.3039214Z No containers need to be restarted.
+verificar	Instalar navegador do Playwright	2026-09-25T00:36:02.3039965Z 
+verificar	Instalar navegador do Playwright	2026-09-25T00:36:02.3040868Z No user sessions are running outdated binaries.
+verificar	Instalar navegador do Playwright	2026-09-25T00:36:02.3041541Z 
+verificar	Instalar navegador do Playwright	2026-09-25T00:36:02.3042376Z No VM guests are running outdated hypervisor (qemu) binaries on this host.
+verificar	Instalar navegador do Playwright	2026-09-25T00:36:03.3056999Z Downloading Chrome for Testing 151.0.7922.34 (playwright chromium v1234) from https://cdn.playwright.dev/builds/cft/151.0.7922.34/linux64/chrome-linux64.zip
+verificar	Instalar navegador do Playwright	2026-09-25T00:36:04.3131531Z |                                                                                |   0% of 184.3 MiB
+verificar	Instalar navegador do Playwright	2026-09-25T00:36:04.4807631Z |■■■■■■■■                                                                        |  10% of 184.3 MiB
+verificar	Instalar navegador do Playwright	2026-09-25T00:36:04.5703458Z |■■■■■■■■■■■■■■■■                                                                |  20% of 184.3 MiB
+verificar	Instalar navegador do Playwright	2026-09-25T00:36:04.6419952Z |■■■■■■■■■■■■■■■■■■■■■■■■                                                        |  30% of 184.3 MiB
+verificar	Instalar navegador do Playwright	2026-09-25T00:36:04.7133238Z |■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■                                                |  40% of 184.3 MiB
+verificar	Instalar navegador do Playwright	2026-09-25T00:36:04.7845516Z |■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■                                        |  50% of 184.3 MiB
+verificar	Instalar navegador do Playwright	2026-09-25T00:36:04.8524072Z |■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■                                |  60% of 184.3 MiB
+verificar	Instalar navegador do Playwright	2026-09-25T00:36:04.9166021Z |■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■                        |  70% of 184.3 MiB
+verificar	Instalar navegador do Playwright	2026-09-25T00:36:04.9985854Z |■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■                |  80% of 184.3 MiB
+verificar	Instalar navegador do Playwright	2026-09-25T00:36:05.0671829Z |■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■        |  90% of 184.3 MiB
+verificar	Instalar navegador do Playwright	2026-09-25T00:36:05.1330563Z |■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■| 100% of 184.3 MiB
+verificar	Instalar navegador do Playwright	2026-09-25T00:36:07.9500361Z Chrome for Testing 151.0.7922.34 (playwright chromium v1234) downloaded to /home/runner/.cache/ms-playwright/chromium-1234
+verificar	Instalar navegador do Playwright	2026-09-25T00:36:07.9503643Z Downloading FFmpeg (playwright ffmpeg v1011) from https://cdn.playwright.dev/dbazure/download/playwright/builds/ffmpeg/1011/ffmpeg-linux.zip
+verificar	Instalar navegador do Playwright	2026-09-25T00:36:08.9345988Z |                                                                                |   0% of 2.3 MiB
+verificar	Instalar navegador do Playwright	2026-09-25T00:36:08.9493022Z |■■■■■■■■                                                                        |  10% of 2.3 MiB
+verificar	Instalar navegador do Playwright	2026-09-25T00:36:08.9589946Z |■■■■■■■■■■■■■■■■                                                                |  20% of 2.3 MiB
+verificar	Instalar navegador do Playwright	2026-09-25T00:36:08.9652641Z |■■■■■■■■■■■■■■■■■■■■■■■■                                                        |  30% of 2.3 MiB
+verificar	Instalar navegador do Playwright	2026-09-25T00:36:08.9715385Z |■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■                                                |  40% of 2.3 MiB
+verificar	Instalar navegador do Playwright	2026-09-25T00:36:08.9757481Z |■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■                                        |  50% of 2.3 MiB
+verificar	Instalar navegador do Playwright	2026-09-25T00:36:08.9794585Z |■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■                                |  60% of 2.3 MiB
+verificar	Instalar navegador do Playwright	2026-09-25T00:36:08.9812717Z |■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■                        |  70% of 2.3 MiB
+verificar	Instalar navegador do Playwright	2026-09-25T00:36:08.9843149Z |■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■                |  80% of 2.3 MiB
+verificar	Instalar navegador do Playwright	2026-09-25T00:36:08.9866845Z |■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■        |  90% of 2.3 MiB
+verificar	Instalar navegador do Playwright	2026-09-25T00:36:08.9882125Z |■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■| 100% of 2.3 MiB
+verificar	Instalar navegador do Playwright	2026-09-25T00:36:09.0507409Z FFmpeg (playwright ffmpeg v1011) downloaded to /home/runner/.cache/ms-playwright/ffmpeg-1011
+verificar	Instalar navegador do Playwright	2026-09-25T00:36:09.0511051Z Downloading Chrome Headless Shell 151.0.7922.34 (playwright chromium-headless-shell v1234) from https://cdn.playwright.dev/builds/cft/151.0.7922.34/linux64/chrome-headless-shell-linux64.zip
+verificar	Instalar navegador do Playwright	2026-09-25T00:36:10.0455629Z |                                                                                |   0% of 114.7 MiB
+verificar	Instalar navegador do Playwright	2026-09-25T00:36:10.2562072Z |■■■■■■■■                                                                        |  10% of 114.7 MiB
+verificar	Instalar navegador do Playwright	2026-09-25T00:36:10.3495513Z |■■■■■■■■■■■■■■■■                                                                |  20% of 114.7 MiB
+verificar	Instalar navegador do Playwright	2026-09-25T00:36:10.4098618Z |■■■■■■■■■■■■■■■■■■■■■■■■                                                        |  30% of 114.7 MiB
+verificar	Instalar navegador do Playwright	2026-09-25T00:36:10.4623024Z |■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■                                                |  40% of 114.7 MiB
+verificar	Instalar navegador do Playwright	2026-09-25T00:36:10.5122525Z |■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■                                        |  50% of 114.7 MiB
+verificar	Instalar navegador do Playwright	2026-09-25T00:36:10.5565909Z |■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■                                |  60% of 114.7 MiB
+verificar	Instalar navegador do Playwright	2026-09-25T00:36:10.6038389Z |■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■                        |  70% of 114.7 MiB
+verificar	Instalar navegador do Playwright	2026-09-25T00:36:10.6512166Z |■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■                |  80% of 114.7 MiB
+verificar	Instalar navegador do Playwright	2026-09-25T00:36:10.6937643Z |■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■        |  90% of 114.7 MiB
+verificar	Instalar navegador do Playwright	2026-09-25T00:36:10.7351831Z |■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■| 100% of 114.7 MiB
+verificar	Instalar navegador do Playwright	2026-09-25T00:36:12.7299926Z Chrome Headless Shell 151.0.7922.34 (playwright chromium-headless-shell v1234) downloaded to /home/runner/.cache/ms-playwright/chromium_headless_shell-1234
+verificar	E2E (jornadas J1/J2/J3 do PRD §6 + varredura de navegação)	﻿2026-09-25T00:36:12.7547965Z ##[group]Run npm run e2e
+verificar	E2E (jornadas J1/J2/J3 do PRD §6 + varredura de navegação)	2026-09-25T00:36:12.7548292Z ^[[36;1mnpm run e2e^[[0m
+verificar	E2E (jornadas J1/J2/J3 do PRD §6 + varredura de navegação)	2026-09-25T00:36:12.7611825Z shell: /usr/bin/bash -e {0}
+verificar	E2E (jornadas J1/J2/J3 do PRD §6 + varredura de navegação)	2026-09-25T00:36:12.7612099Z env:
+verificar	E2E (jornadas J1/J2/J3 do PRD §6 + varredura de navegação)	2026-09-25T00:36:12.7612566Z   NEXT_PUBLIC_SUPABASE_URL: ***
+verificar	E2E (jornadas J1/J2/J3 do PRD §6 + varredura de navegação)	2026-09-25T00:36:12.7612988Z   NEXT_PUBLIC_SUPABASE_ANON_KEY: ***
+verificar	E2E (jornadas J1/J2/J3 do PRD §6 + varredura de navegação)	2026-09-25T00:36:12.7614873Z   SUPABASE_SERVICE_ROLE_KEY: ***
+verificar	E2E (jornadas J1/J2/J3 do PRD §6 + varredura de navegação)	2026-09-25T00:36:12.7615158Z   CI: true
+verificar	E2E (jornadas J1/J2/J3 do PRD §6 + varredura de navegação)	2026-09-25T00:36:12.7615365Z ##[endgroup]
+verificar	E2E (jornadas J1/J2/J3 do PRD §6 + varredura de navegação)	2026-09-25T00:36:12.8668385Z 
+verificar	E2E (jornadas J1/J2/J3 do PRD §6 + varredura de navegação)	2026-09-25T00:36:12.8668908Z > lastro@0.1.0 e2e
+verificar	E2E (jornadas J1/J2/J3 do PRD §6 + varredura de navegação)	2026-09-25T00:36:12.8669296Z > playwright test
+verificar	E2E (jornadas J1/J2/J3 do PRD §6 + varredura de navegação)	2026-09-25T00:36:12.8669481Z 
+verificar	E2E (jornadas J1/J2/J3 do PRD §6 + varredura de navegação)	2026-09-25T00:36:21.4618142Z 
+verificar	E2E (jornadas J1/J2/J3 do PRD §6 + varredura de navegação)	2026-09-25T00:36:21.4618954Z Running 132 tests using 1 worker
+verificar	E2E (jornadas J1/J2/J3 do PRD §6 + varredura de navegação)	2026-09-25T00:36:21.4619330Z 
+verificar	E2E (jornadas J1/J2/J3 do PRD §6 + varredura de navegação)	2026-09-25T00:36:21.9230855Z [1/132] [chromium] › e2e/j1-treino.spec.ts:36:5 › registra uma série e ela sobrevive a ficar offline e voltar (A1/A2/D7)
+verificar	E2E (jornadas J1/J2/J3 do PRD §6 + varredura de navegação)	2026-09-25T00:36:33.2932220Z [2/132] [chromium] › e2e/j1-treino.spec.ts:95:5 › mede o descanso real, fecha na próxima série e persiste após recarga
+verificar	E2E (jornadas J1/J2/J3 do PRD §6 + varredura de navegação)	2026-09-25T00:36:41.5769493Z 
+verificar	E2E (jornadas J1/J2/J3 do PRD §6 + varredura de navegação)	2026-09-25T00:36:41.5796866Z [WebServer] ⨯ Error: The destination stream closed early.
+verificar	E2E (jornadas J1/J2/J3 do PRD §6 + varredura de navegação)	2026-09-25T00:36:41.5802531Z [WebServer]     at ignore-listed frames {
+verificar	E2E (jornadas J1/J2/J3 do PRD §6 + varredura de navegação)	2026-09-25T00:36:41.5803549Z [WebServer]   digest: '1561150396'
+verificar	E2E (jornadas J1/J2/J3 do PRD §6 + varredura de navegação)	2026-09-25T00:36:41.5804436Z [WebServer] }
+verificar	E2E (jornadas J1/J2/J3 do PRD §6 + varredura de navegação)	2026-09-25T00:36:42.0204443Z [WebServer] ⨯ Error: Sessão ausente — usuário não autenticado.
+verificar	E2E (jornadas J1/J2/J3 do PRD §6 + varredura de navegação)	2026-09-25T00:36:42.0204875Z 
+verificar	E2E (jornadas J1/J2/J3 do PRD §6 + varredura de navegação)	2026-09-25T00:36:42.0205244Z [WebServer]     at l (.next/server/chunks/ssr/src_lib_1u0ajr4._.js:1:1804)
+verificar	E2E (jornadas J1/J2/J3 do PRD §6 + varredura de navegação)	2026-09-25T00:36:42.0205923Z [WebServer]     at async y (.next/server/chunks/ssr/src_lib_1u0ajr4._.js:1:9941) {
+verificar	E2E (jornadas J1/J2/J3 do PRD §6 + varredura de navegação)	2026-09-25T00:36:42.0206393Z [WebServer]   digest: '1351627756'
+verificar	E2E (jornadas J1/J2/J3 do PRD §6 + varredura de navegação)	2026-09-25T00:36:42.0206672Z [WebServer] }
+verificar	E2E (jornadas J1/J2/J3 do PRD §6 + varredura de navegação)	2026-09-25T00:36:42.0245386Z [WebServer] ⨯ Error: Falha ao registrar série: treino_id 461c74c6-eb6d-402f-b72b-e7550bac5895 inexistente
+verificar	E2E (jornadas J1/J2/J3 do PRD §6 + varredura de navegação)	2026-09-25T00:36:42.0246234Z [WebServer]     at y (.next/server/chunks/ssr/src_lib_1u0ajr4._.js:1:10251) {
+verificar	E2E (jornadas J1/J2/J3 do PRD §6 + varredura de navegação)	2026-09-25T00:36:42.0246722Z [WebServer]   digest: '1278084845'
+verificar	E2E (jornadas J1/J2/J3 do PRD §6 + varredura de navegação)	2026-09-25T00:36:42.0247046Z [WebServer] }
+verificar	E2E (jornadas J1/J2/J3 do PRD §6 + varredura de navegação)	2026-09-25T00:36:42.0247193Z 
+verificar	E2E (jornadas J1/J2/J3 do PRD §6 + varredura de navegação)	2026-09-25T00:36:42.2249740Z [3/132] [chromium] › e2e/j10-serie-e-fila.spec.ts:118:7 › série: reps 201 não pode aparecer registrada e sumir em silêncio
+verificar	E2E (jornadas J1/J2/J3 do PRD §6 + varredura de navegação)	2026-09-25T00:36:46.9220342Z [4/132] [chromium] › e2e/j10-serie-e-fila.spec.ts:118:7 › série: reps 2,5 não pode aparecer registrada e sumir em silêncio
+verificar	E2E (jornadas J1/J2/J3 do PRD §6 + varredura de navegação)	2026-09-25T00:36:50.3327390Z [5/132] [chromium] › e2e/j10-serie-e-fila.spec.ts:118:7 › série: peso 1000,01 não pode aparecer registrada e sumir em silêncio
+verificar	E2E (jornadas J1/J2/J3 do PRD §6 + varredura de navegação)	2026-09-25T00:36:53.3893369Z [6/132] [chromium] › e2e/j10-serie-e-fila.spec.ts:118:7 › série: peso 99999999 não pode aparecer registrada e sumir em silêncio
+verificar	E2E (jornadas J1/J2/J3 do PRD §6 + varredura de navegação)	2026-09-25T00:36:56.5176057Z [7/132] [chromium] › e2e/j10-serie-e-fila.spec.ts:118:7 › série: RIR 1,5 não pode aparecer registrada e sumir em silêncio
+verificar	E2E (jornadas J1/J2/J3 do PRD §6 + varredura de navegação)	2026-09-25T00:36:59.4283786Z [8/132] [chromium] › e2e/j10-serie-e-fila.spec.ts:156:5 › série: editar para reps 999 não pode mostrar um valor que o banco não guardou
+verificar	E2E (jornadas J1/J2/J3 do PRD §6 + varredura de navegação)	2026-09-25T00:37:02.8639117Z [9/132] [chromium] › e2e/j10-serie-e-fila.spec.ts:192:5 › série: reps vazio, negativo, zero, com letras e peso negativo são recusados
+verificar	E2E (jornadas J1/J2/J3 do PRD §6 + varredura de navegação)	2026-09-25T00:37:11.9250812Z [10/132] [chromium] › e2e/j10-serie-e-fila.spec.ts:218:5 › série: peso vazio não pode gravar 0 kg em silêncio (achado BAIXA pelo dono)
+verificar	E2E (jornadas J1/J2/J3 do PRD §6 + varredura de navegação)	2026-09-25T00:37:15.2835290Z [11/132] [chromium] › e2e/j10-serie-e-fila.spec.ts:237:5 › série: duplo clique em 'Registrar série' grava uma série só
+verificar	E2E (jornadas J1/J2/J3 do PRD §6 + varredura de navegação)	2026-09-25T00:37:20.5402517Z [12/132] [chromium] › e2e/j10-serie-e-fila.spec.ts:256:5 › série: dois toques rápidos em 'Repetir série' criam uma série só (achado MÉDIA pelo dono)
+verificar	E2E (jornadas J1/J2/J3 do PRD §6 + varredura de navegação)	2026-09-25T00:37:25.2867304Z [13/132] [chromium] › e2e/j10-serie-e-fila.spec.ts:278:5 › offline: criar, editar e excluir sem rede chega ao banco exatamente assim
+verificar	E2E (jornadas J1/J2/J3 do PRD §6 + varredura de navegação)	2026-09-25T00:37:31.6534814Z [14/132] [chromium] › e2e/j10-serie-e-fila.spec.ts:325:5 › offline: 'Iniciar treino' sem rede não derruba a tela, e duplo clique com rede cria um treino só
+verificar	E2E (jornadas J1/J2/J3 do PRD §6 + varredura de navegação)	2026-09-25T00:37:44.9014582Z [15/132] [chromium] › e2e/j10-serie-e-fila.spec.ts:367:5 › fila: uma série recusada pelo banco não pode travar as séries válidas registradas depois
+verificar	E2E (jornadas J1/J2/J3 do PRD §6 + varredura de navegação)	2026-09-25T00:37:47.7081242Z [16/132] [chromium] › e2e/j10-serie-e-fila.spec.ts:414:5 › sessão: expirar no meio do treino não perde a série — ela chega ao banco depois do novo login
+verificar	E2E (jornadas J1/J2/J3 do PRD §6 + varredura de navegação)	2026-09-25T00:38:06.7186095Z [17/132] [chromium] › e2e/j10-serie-e-fila.spec.ts:449:5 › aparelho compartilhado: série pendente de uma conta não trava a fila da conta seguinte
+verificar	E2E (jornadas J1/J2/J3 do PRD §6 + varredura de navegação)	2026-09-25T00:38:17.0866820Z [18/132] [chromium] › e2e/j10-serie-e-fila.spec.ts:500:7 › offline: o erro de iniciar treino aparece em Português
+verificar	E2E (jornadas J1/J2/J3 do PRD §6 + varredura de navegação)	2026-09-25T00:38:21.8846890Z [19/132] [chromium] › e2e/j10-serie-e-fila.spec.ts:500:7 › offline: o erro de iniciar treino aparece em English
+verificar	E2E (jornadas J1/J2/J3 do PRD §6 + varredura de navegação)	2026-09-25T00:38:26.3901130Z [20/132] [chromium] › e2e/j10-serie-e-fila.spec.ts:500:7 › offline: o erro de iniciar treino aparece em Español
+verificar	E2E (jornadas J1/J2/J3 do PRD §6 + varredura de navegação)	2026-09-25T00:38:31.1357957Z [21/132] [chromium] › e2e/j11-formularios.spec.ts:65:7 › modelo: plano com reps 150 não pode deixar um modelo vazio no banco
+verificar	E2E (jornadas J1/J2/J3 do PRD §6 + varredura de navegação)	2026-09-25T00:38:34.8858179Z [22/132] [chromium] › e2e/j11-formularios.spec.ts:65:7 › modelo: plano com reps 2,5 não pode deixar um modelo vazio no banco
+verificar	E2E (jornadas J1/J2/J3 do PRD §6 + varredura de navegação)	2026-09-25T00:38:38.2235594Z [23/132] [chromium] › e2e/j11-formularios.spec.ts:65:7 › modelo: plano com peso 1000,5 não pode deixar um modelo vazio no banco
+verificar	E2E (jornadas J1/J2/J3 do PRD §6 + varredura de navegação)	2026-09-25T00:38:41.1402574Z [24/132] [chromium] › e2e/j11-formularios.spec.ts:89:5 › modelo: nome só de espaços não avança
+verificar	E2E (jornadas J1/J2/J3 do PRD §6 + varredura de navegação)	2026-09-25T00:38:43.3871907Z [25/132] [chromium] › e2e/j11-formularios.spec.ts:96:5 › modelo: nome de 10 mil caracteres não quebra a lista de modelos no celular
+verificar	E2E (jornadas J1/J2/J3 do PRD §6 + varredura de navegação)	2026-09-25T00:38:47.9506126Z [26/132] [chromium] › e2e/j11-formularios.spec.ts:116:5 › modelo: nome com símbolo gráfico é salvo e aparece igual na lista
+verificar	E2E (jornadas J1/J2/J3 do PRD §6 + varredura de navegação)	2026-09-25T00:38:52.5629987Z [27/132] [chromium] › e2e/j11-formularios.spec.ts:126:5 › modelo: duplo clique em 'Salvar modelo' cria um modelo só
+verificar	E2E (jornadas J1/J2/J3 do PRD §6 + varredura de navegação)	2026-09-25T00:38:59.9144980Z [28/132] [chromium] › e2e/j11-formularios.spec.ts:142:5 › anilhas: peso da barra zero, negativo ou absurdo não é salvo
+verificar	E2E (jornadas J1/J2/J3 do PRD §6 + varredura de navegação)	2026-09-25T00:39:04.9948264Z [29/132] [chromium] › e2e/j11-formularios.spec.ts:158:5 › anilhas: anilha de 0,001 kg não pode virar anilha de 0 kg
+verificar	E2E (jornadas J1/J2/J3 do PRD §6 + varredura de navegação)	2026-09-25T00:39:08.9852479Z [30/132] [chromium] › e2e/j11-formularios.spec.ts:187:5 › meta: 0, 8, 3,5 e -1 são recusados na tela, e 99 é recusado pelo banco
+verificar	E2E (jornadas J1/J2/J3 do PRD §6 + varredura de navegação)	2026-09-25T00:39:14.8940804Z [31/132] [chromium] › e2e/j11-formularios.spec.ts:202:7 › meta inválida: ação e erro aparecem em Português
+verificar	E2E (jornadas J1/J2/J3 do PRD §6 + varredura de navegação)	2026-09-25T00:39:18.7274486Z [32/132] [chromium] › e2e/j11-formularios.spec.ts:202:7 › meta inválida: ação e erro aparecem em English
+verificar	E2E (jornadas J1/J2/J3 do PRD §6 + varredura de navegação)	2026-09-25T00:39:23.0087689Z [33/132] [chromium] › e2e/j11-formularios.spec.ts:202:7 › meta inválida: ação e erro aparecem em Español
+verificar	E2E (jornadas J1/J2/J3 do PRD §6 + varredura de navegação)	2026-09-25T00:39:27.0987004Z [34/132] [chromium] › e2e/j12-isolamento-e-apis.spec.ts:137:5 › isolamento: conta sem relação não lê, não altera, não apaga e não cria nada em nome de outra
+verificar	E2E (jornadas J1/J2/J3 do PRD §6 + varredura de navegação)	2026-09-25T00:39:45.0263599Z [35/132] [chromium] › e2e/j12-isolamento-e-apis.spec.ts:201:5 › isolamento: ninguém move a própria série para dentro do treino de outra conta
+verificar	E2E (jornadas J1/J2/J3 do PRD §6 + varredura de navegação)	2026-09-25T00:39:47.5746672Z [36/132] [chromium] › e2e/j12-isolamento-e-apis.spec.ts:221:5 › isolamento: a conta não apaga o próprio consumo de IA para recuperar cota
+verificar	E2E (jornadas J1/J2/J3 do PRD §6 + varredura de navegação)	2026-09-25T00:39:48.0400589Z [37/132] [chromium] › e2e/j12-isolamento-e-apis.spec.ts:232:7 › rotas: a conta desconhecida não vê treino, parecer nem PDF da aluna pelo id
+verificar	E2E (jornadas J1/J2/J3 do PRD §6 + varredura de navegação)	2026-09-25T00:39:52.4965210Z [38/132] [chromium] › e2e/j12-isolamento-e-apis.spec.ts:232:7 › rotas: a conta personal vinculado não vê treino, parecer nem PDF da aluna pelo id
+verificar	E2E (jornadas J1/J2/J3 do PRD §6 + varredura de navegação)	2026-09-25T00:39:54.3409054Z [WebServer] ⨯ Error: The destination stream closed early.
+verificar	E2E (jornadas J1/J2/J3 do PRD §6 + varredura de navegação)	2026-09-25T00:39:54.3409436Z 
+verificar	E2E (jornadas J1/J2/J3 do PRD §6 + varredura de navegação)	2026-09-25T00:39:54.3409669Z [WebServer]     at ignore-listed frames {
+verificar	E2E (jornadas J1/J2/J3 do PRD §6 + varredura de navegação)	2026-09-25T00:39:54.3416759Z [WebServer]   digest: '1561150396'
+verificar	E2E (jornadas J1/J2/J3 do PRD §6 + varredura de navegação)	2026-09-25T00:39:54.3421053Z [WebServer] }
+verificar	E2E (jornadas J1/J2/J3 do PRD §6 + varredura de navegação)	2026-09-25T00:39:56.9500676Z [39/132] [chromium] › e2e/j12-isolamento-e-apis.spec.ts:254:5 › rotas: ?modelo= com o modelo de outra conta não traz o plano dela
+verificar	E2E (jornadas J1/J2/J3 do PRD §6 + varredura de navegação)	2026-09-25T00:40:00.2263275Z [40/132] [chromium] › e2e/j12-isolamento-e-apis.spec.ts:267:5 › personal vinculado: CSV e progressão levam só os dados do próprio personal
+verificar	E2E (jornadas J1/J2/J3 do PRD §6 + varredura de navegação)	2026-09-25T00:40:06.9341664Z [41/132] [chromium] › e2e/j12-isolamento-e-apis.spec.ts:286:5 › APIs: sem sessão, todas respondem 401
+verificar	E2E (jornadas J1/J2/J3 do PRD §6 + varredura de navegação)	2026-09-25T00:40:07.0050946Z [42/132] [chromium] › e2e/j12-isolamento-e-apis.spec.ts:301:5 › rotas: id que não é UUID ou que não existe responde 404, não 500
+verificar	E2E (jornadas J1/J2/J3 do PRD §6 + varredura de navegação)	2026-09-25T00:40:14.5753373Z [43/132] [chromium] › e2e/j12-isolamento-e-apis.spec.ts:325:5 › PDF: parecer ainda em geração não derruba o servidor
+verificar	E2E (jornadas J1/J2/J3 do PRD §6 + varredura de navegação)	2026-09-25T00:40:16.8667995Z [44/132] [chromium] › e2e/j12-isolamento-e-apis.spec.ts:342:5 › análise: dois pedidos simultâneos não criam dois rascunhos nem gastam cota dupla
+verificar	E2E (jornadas J1/J2/J3 do PRD §6 + varredura de navegação)	2026-09-25T00:40:20.4186879Z [WebServer] [analise] erro inesperado ao gerar parecer: Error: Variável de ambiente GEMINI_API_KEY ausente — configure .env.local (ver .env.example).
+verificar	E2E (jornadas J1/J2/J3 do PRD §6 + varredura de navegação)	2026-09-25T00:40:20.4188698Z [WebServer]     at <unknown> (.next/server/chunks/[root-of-the-server]__0lhd2it._.js:14:365366)
+verificar	E2E (jornadas J1/J2/J3 do PRD §6 + varredura de navegação)	2026-09-25T00:40:20.4189498Z [WebServer]     at new <anonymous> (.next/server/chunks/[root-of-the-server]__0lhd2it._.js:14:365464)
+verificar	E2E (jornadas J1/J2/J3 do PRD §6 + varredura de navegação)	2026-09-25T00:40:20.4189910Z 
+verificar	E2E (jornadas J1/J2/J3 do PRD §6 + varredura de navegação)	2026-09-25T00:40:20.4190191Z [WebServer]     at k (.next/server/chunks/_1jrg_fh._.js:1:23492)
+verificar	E2E (jornadas J1/J2/J3 do PRD §6 + varredura de navegação)	2026-09-25T00:40:21.0867824Z [45/132] [chromium] › e2e/j12-isolamento-e-apis.spec.ts:362:5 › análise e coach: em andamento responde 409 e teto responde 429, sem gastar cota
+verificar	E2E (jornadas J1/J2/J3 do PRD §6 + varredura de navegação)	2026-09-25T00:40:27.5653926Z [46/132] [chromium] › e2e/j12-isolamento-e-apis.spec.ts:392:5 › coach: pergunta invisível é recusada e pedidos simultâneos não furam o teto de 10
+verificar	E2E (jornadas J1/J2/J3 do PRD §6 + varredura de navegação)	2026-09-25T00:40:31.3605828Z [WebServer] [coach] falha ao gerar {
+verificar	E2E (jornadas J1/J2/J3 do PRD §6 + varredura de navegação)	2026-09-25T00:40:31.3606580Z [WebServer]   status: undefined,
+verificar	E2E (jornadas J1/J2/J3 do PRD §6 + varredura de navegação)	2026-09-25T00:40:31.3606938Z 
+verificar	E2E (jornadas J1/J2/J3 do PRD §6 + varredura de navegação)	2026-09-25T00:40:32.0694926Z [WebServer]   mensagem: 'Variável de ambiente GEMINI_API_KEY ausente — configure .env.local (ver .env.example).'
+verificar	E2E (jornadas J1/J2/J3 do PRD §6 + varredura de navegação)	2026-09-25T00:40:32.0696105Z [WebServer] }
+verificar	E2E (jornadas J1/J2/J3 do PRD §6 + varredura de navegação)	2026-09-25T00:40:32.0697619Z [47/132] [chromium] › e2e/j12-isolamento-e-apis.spec.ts:419:5 › conta excluída: a aluna sai e as telas do personal continuam de pé
+verificar	E2E (jornadas J1/J2/J3 do PRD §6 + varredura de navegação)	2026-09-25T00:40:34.8482595Z [WebServer] ⨯ Error: The destination stream closed early.
+verificar	E2E (jornadas J1/J2/J3 do PRD §6 + varredura de navegação)	2026-09-25T00:40:34.8483054Z 
+verificar	E2E (jornadas J1/J2/J3 do PRD §6 + varredura de navegação)	2026-09-25T00:40:34.8483695Z [WebServer]     at ignore-listed frames {
+verificar	E2E (jornadas J1/J2/J3 do PRD §6 + varredura de navegação)	2026-09-25T00:40:34.8484790Z [WebServer]   digest: '1561150396'
+verificar	E2E (jornadas J1/J2/J3 do PRD §6 + varredura de navegação)	2026-09-25T00:40:34.8485328Z [WebServer] }
+verificar	E2E (jornadas J1/J2/J3 do PRD §6 + varredura de navegação)	2026-09-25T00:40:44.8065671Z [48/132] [chromium] › e2e/j12-isolamento-e-apis.spec.ts:440:5 › conta excluída: o personal sai e a aluna recupera a prescrição sem erro
+verificar	E2E (jornadas J1/J2/J3 do PRD §6 + varredura de navegação)	2026-09-25T00:40:57.6166019Z [49/132] [chromium] › e2e/j12-isolamento-e-apis.spec.ts:466:7 › id inválido: a página 404 fica no idioma Português
+verificar	E2E (jornadas J1/J2/J3 do PRD §6 + varredura de navegação)	2026-09-25T00:41:01.9273962Z [50/132] [chromium] › e2e/j12-isolamento-e-apis.spec.ts:466:7 › id inválido: a página 404 fica no idioma English
+verificar	E2E (jornadas J1/J2/J3 do PRD §6 + varredura de navegação)	2026-09-25T00:41:05.6222079Z [51/132] [chromium] › e2e/j12-isolamento-e-apis.spec.ts:466:7 › id inválido: a página 404 fica no idioma Español
+verificar	E2E (jornadas J1/J2/J3 do PRD §6 + varredura de navegação)	2026-09-25T00:41:10.1205806Z [52/132] [chromium] › e2e/j13-sessao-e-navegacao.spec.ts:74:5 › voltar: depois de sair, o botão voltar não mostra dado da conta
+verificar	E2E (jornadas J1/J2/J3 do PRD §6 + varredura de navegação)	2026-09-25T00:41:20.3719183Z [53/132] [chromium] › e2e/j13-sessao-e-navegacao.spec.ts:94:5 › voltar: depois de excluir a conta, voltar não mostra nada e a senha antiga não entra
+verificar	E2E (jornadas J1/J2/J3 do PRD §6 + varredura de navegação)	2026-09-25T00:41:27.7097799Z [54/132] [chromium] › e2e/j13-sessao-e-navegacao.spec.ts:126:5 › sessão expirada: o coach avisa que a sessão acabou
+verificar	E2E (jornadas J1/J2/J3 do PRD §6 + varredura de navegação)	2026-09-25T00:41:30.2835856Z [55/132] [chromium] › e2e/j13-sessao-e-navegacao.spec.ts:138:5 › sessão expirada: a Análise avisa que a sessão acabou
+verificar	E2E (jornadas J1/J2/J3 do PRD §6 + varredura de navegação)	2026-09-25T00:41:32.9523002Z [56/132] [chromium] › e2e/j13-sessao-e-navegacao.spec.ts:150:5 › sessão expirada: a meta semanal não diz 'salva' sem ter salvo
+verificar	E2E (jornadas J1/J2/J3 do PRD §6 + varredura de navegação)	2026-09-25T00:41:40.8211232Z [57/132] [chromium] › e2e/j13-sessao-e-navegacao.spec.ts:164:5 › sessão expirada: salvar modelo não segue como se tivesse salvo
+verificar	E2E (jornadas J1/J2/J3 do PRD §6 + varredura de navegação)	2026-09-25T00:41:43.6533307Z [WebServer] ⨯ Error: Sessão ausente — usuário não autenticado.
+verificar	E2E (jornadas J1/J2/J3 do PRD §6 + varredura de navegação)	2026-09-25T00:41:43.6536334Z [WebServer]     at e (.next/server/chunks/ssr/src_lib_0e9um-g._.js:1:349)
+verificar	E2E (jornadas J1/J2/J3 do PRD §6 + varredura de navegação)	2026-09-25T00:41:43.6536893Z 
+verificar	E2E (jornadas J1/J2/J3 do PRD §6 + varredura de navegação)	2026-09-25T00:41:43.6537864Z [WebServer]     at async h (.next/server/chunks/ssr/src_lib_0e9um-g._.js:1:1318) {
+verificar	E2E (jornadas J1/J2/J3 do PRD §6 + varredura de navegação)	2026-09-25T00:41:43.6539300Z [WebServer]   digest: '1593420265'
+verificar	E2E (jornadas J1/J2/J3 do PRD §6 + varredura de navegação)	2026-09-25T00:41:43.6539811Z [WebServer] }
+verificar	E2E (jornadas J1/J2/J3 do PRD §6 + varredura de navegação)	2026-09-25T00:41:44.0830854Z [58/132] [chromium] › e2e/j13-sessao-e-navegacao.spec.ts:181:5 › login: e-mail de 5 mil caracteres e senha vazia não quebram a tela
+verificar	E2E (jornadas J1/J2/J3 do PRD §6 + varredura de navegação)	2026-09-25T00:41:48.0886131Z [59/132] [chromium] › e2e/j13-sessao-e-navegacao.spec.ts:203:7 › login: ?proximo=//evil.example não leva para fora do app
+verificar	E2E (jornadas J1/J2/J3 do PRD §6 + varredura de navegação)	2026-09-25T00:41:50.6717178Z [60/132] [chromium] › e2e/j13-sessao-e-navegacao.spec.ts:203:7 › login: ?proximo=/\evil.example não leva para fora do app
+verificar	E2E (jornadas J1/J2/J3 do PRD §6 + varredura de navegação)	2026-09-25T00:41:53.1971539Z [61/132] [chromium] › e2e/j13-sessao-e-navegacao.spec.ts:203:7 › login: ?proximo=https://evil.example/x não leva para fora do app
+verificar	E2E (jornadas J1/J2/J3 do PRD §6 + varredura de navegação)	2026-09-25T00:41:55.6760283Z [62/132] [chromium] › e2e/j13-sessao-e-navegacao.spec.ts:218:5 › tema corrompido no navegador não quebra a Home nem executa script
+verificar	E2E (jornadas J1/J2/J3 do PRD §6 + varredura de navegação)	2026-09-25T00:41:59.0537031Z [63/132] [chromium] › e2e/j13-sessao-e-navegacao.spec.ts:242:5 › nome com HTML e milhares de caracteres não quebra Home, perfil nem a lista do personal
+verificar	E2E (jornadas J1/J2/J3 do PRD §6 + varredura de navegação)	2026-09-25T00:42:14.8232840Z [64/132] [chromium] › e2e/j13-sessao-e-navegacao.spec.ts:281:7 › sessão expirada: o erro de meta fica em Português
+verificar	E2E (jornadas J1/J2/J3 do PRD §6 + varredura de navegação)	2026-09-25T00:42:19.5476677Z [65/132] [chromium] › e2e/j13-sessao-e-navegacao.spec.ts:281:7 › sessão expirada: o erro de meta fica em English
+verificar	E2E (jornadas J1/J2/J3 do PRD §6 + varredura de navegação)	2026-09-25T00:42:23.9110309Z [66/132] [chromium] › e2e/j13-sessao-e-navegacao.spec.ts:281:7 › sessão expirada: o erro de meta fica em Español
+verificar	E2E (jornadas J1/J2/J3 do PRD §6 + varredura de navegação)	2026-09-25T00:42:28.6812352Z [67/132] [chromium] › e2e/j14-dica-info.spec.ts:15:5 › dica: o i do CREF abre a explicação numa folha e fecha sem sair da tela
+verificar	E2E (jornadas J1/J2/J3 do PRD §6 + varredura de navegação)	2026-09-25T00:42:29.9115666Z [68/132] [chromium] › e2e/j2-analise.spec.ts:39:5 › pede a Análise Semanal — botão dispara a pergunta certa e a tela devolve controle na hora (A6, SDD.md §11, sem gastar cota real da Gemini)
+verificar	E2E (jornadas J1/J2/J3 do PRD §6 + varredura de navegação)	2026-09-25T00:42:34.9472360Z [69/132] [chromium] › e2e/j2-analise.spec.ts:77:5 › rascunho pronto aparece em Pareceres salvos com Salvar/Descartar (SDD.md §11.4)
+verificar	E2E (jornadas J1/J2/J3 do PRD §6 + varredura de navegação)	2026-09-25T00:42:41.2947997Z [70/132] [chromium] › e2e/j3-duvida.spec.ts:25:5 › consulta um exercício no catálogo e cai no coach quando o catálogo não basta
+verificar	E2E (jornadas J1/J2/J3 do PRD §6 + varredura de navegação)	2026-09-25T00:42:45.4811157Z [71/132] [chromium] › e2e/j4-varredura.spec.ts:238:5 › varre todas as telas com usuário novo, em três larguras
+verificar	E2E (jornadas J1/J2/J3 do PRD §6 + varredura de navegação)	2026-09-25T00:43:01.5165608Z [WebServer] ⨯ Error: The destination stream closed early.
+verificar	E2E (jornadas J1/J2/J3 do PRD §6 + varredura de navegação)	2026-09-25T00:43:01.5197629Z [WebServer]     at ignore-listed frames {
+verificar	E2E (jornadas J1/J2/J3 do PRD §6 + varredura de navegação)	2026-09-25T00:43:01.5198129Z 
+verificar	E2E (jornadas J1/J2/J3 do PRD §6 + varredura de navegação)	2026-09-25T00:43:01.5255654Z [WebServer]   digest: '1561150396'
+verificar	E2E (jornadas J1/J2/J3 do PRD §6 + varredura de navegação)	2026-09-25T00:43:01.5288435Z [WebServer] }
+verificar	E2E (jornadas J1/J2/J3 do PRD §6 + varredura de navegação)	2026-09-25T00:43:02.3639361Z [WebServer] ⨯ Error: The destination stream closed early.
+verificar	E2E (jornadas J1/J2/J3 do PRD §6 + varredura de navegação)	2026-09-25T00:43:02.3639832Z 
+verificar	E2E (jornadas J1/J2/J3 do PRD §6 + varredura de navegação)	2026-09-25T00:43:02.3645677Z [WebServer]     at ignore-listed frames {
+verificar	E2E (jornadas J1/J2/J3 do PRD §6 + varredura de navegação)	2026-09-25T00:43:02.3646485Z [WebServer]   digest: '1561150396'
+verificar	E2E (jornadas J1/J2/J3 do PRD §6 + varredura de navegação)	2026-09-25T00:43:02.3647024Z [WebServer] }
+verificar	E2E (jornadas J1/J2/J3 do PRD §6 + varredura de navegação)	2026-09-25T00:44:44.3889569Z [72/132] [chromium] › e2e/j4-varredura.spec.ts:376:7 › idioma: aluno vê início, ação e vazio em Português
+verificar	E2E (jornadas J1/J2/J3 do PRD §6 + varredura de navegação)	2026-09-25T00:44:49.5149713Z [73/132] [chromium] › e2e/j4-varredura.spec.ts:376:7 › idioma: aluno vê início, ação e vazio em English
+verificar	E2E (jornadas J1/J2/J3 do PRD §6 + varredura de navegação)	2026-09-25T00:44:54.8943427Z [74/132] [chromium] › e2e/j4-varredura.spec.ts:376:7 › idioma: aluno vê início, ação e vazio em Español
+verificar	E2E (jornadas J1/J2/J3 do PRD §6 + varredura de navegação)	2026-09-25T00:45:03.3647427Z [75/132] [chromium] › e2e/j5-contraste.spec.ts:251:5 › nenhum texto reprova AA, em nenhum dos sete temas
+verificar	E2E (jornadas J1/J2/J3 do PRD §6 + varredura de navegação)	2026-09-25T00:45:23.2260017Z [WebServer] ⨯ Error: The destination stream closed early.
+verificar	E2E (jornadas J1/J2/J3 do PRD §6 + varredura de navegação)	2026-09-25T00:45:23.2260663Z 
+verificar	E2E (jornadas J1/J2/J3 do PRD §6 + varredura de navegação)	2026-09-25T00:45:23.2265325Z [WebServer]     at ignore-listed frames {
+verificar	E2E (jornadas J1/J2/J3 do PRD §6 + varredura de navegação)	2026-09-25T00:45:23.2266526Z [WebServer]   digest: '1561150396'
+verificar	E2E (jornadas J1/J2/J3 do PRD §6 + varredura de navegação)	2026-09-25T00:45:23.2267342Z [WebServer] }
+verificar	E2E (jornadas J1/J2/J3 do PRD §6 + varredura de navegação)	2026-09-25T00:47:37.9335966Z [chromium] › e2e/j5-contraste.spec.ts:251:5 › nenhum texto reprova AA, em nenhum dos sete temas
+verificar	E2E (jornadas J1/J2/J3 do PRD §6 + varredura de navegação)	2026-09-25T00:47:37.9338019Z (elementos sobre gradiente, não medíveis por composição: 42)
+verificar	E2E (jornadas J1/J2/J3 do PRD §6 + varredura de navegação)	2026-09-25T00:47:37.9338700Z 
+verificar	E2E (jornadas J1/J2/J3 do PRD §6 + varredura de navegação)	2026-09-25T00:47:38.0241565Z [76/132] [chromium] › e2e/j5-contraste.spec.ts:346:5 › idioma: trocar pela interface preserva a medição renderizada
+verificar	E2E (jornadas J1/J2/J3 do PRD §6 + varredura de navegação)	2026-09-25T00:47:42.2213351Z [77/132] [chromium] › e2e/j6-prescricao-sob-vinculo.spec.ts:61:5 › sob vínculo a prescrição some da tela E é recusada no servidor, sem gastar cota
+verificar	E2E (jornadas J1/J2/J3 do PRD §6 + varredura de navegação)	2026-09-25T00:47:46.3149377Z [WebServer] [analise] erro inesperado ao gerar parecer: Error: Variável de ambiente GEMINI_API_KEY ausente — configure .env.local (ver .env.example).
+verificar	E2E (jornadas J1/J2/J3 do PRD §6 + varredura de navegação)	2026-09-25T00:47:46.3150422Z [WebServer]     at <unknown> (.next/server/chunks/[root-of-the-server]__0lhd2it._.js:14:365366)
+verificar	E2E (jornadas J1/J2/J3 do PRD §6 + varredura de navegação)	2026-09-25T00:47:46.3151195Z [WebServer]     at new <anonymous> (.next/server/chunks/[root-of-the-server]__0lhd2it._.js:14:365464)
+verificar	E2E (jornadas J1/J2/J3 do PRD §6 + varredura de navegação)	2026-09-25T00:47:46.3151830Z [WebServer]     at k (.next/server/chunks/_1jrg_fh._.js:1:23492)
+verificar	E2E (jornadas J1/J2/J3 do PRD §6 + varredura de navegação)	2026-09-25T00:47:46.3152175Z 
+verificar	E2E (jornadas J1/J2/J3 do PRD §6 + varredura de navegação)	2026-09-25T00:47:48.9022533Z [WebServer] ⨯ Error: The destination stream closed early.
+verificar	E2E (jornadas J1/J2/J3 do PRD §6 + varredura de navegação)	2026-09-25T00:47:48.9023097Z 
+verificar	E2E (jornadas J1/J2/J3 do PRD §6 + varredura de navegação)	2026-09-25T00:47:48.9023767Z [WebServer]     at ignore-listed frames {
+verificar	E2E (jornadas J1/J2/J3 do PRD §6 + varredura de navegação)	2026-09-25T00:47:48.9028671Z [WebServer]   digest: '1561150396'
+verificar	E2E (jornadas J1/J2/J3 do PRD §6 + varredura de navegação)	2026-09-25T00:47:48.9029509Z [WebServer] }
+verificar	E2E (jornadas J1/J2/J3 do PRD §6 + varredura de navegação)	2026-09-25T00:48:00.5581173Z [78/132] [chromium] › e2e/j7-fila-do-personal.spec.ts:69:5 › o personal recebe um alerta real do aluno e o clique fica registrado
+verificar	E2E (jornadas J1/J2/J3 do PRD §6 + varredura de navegação)	2026-09-25T00:48:16.3553939Z [79/132] [chromium] › e2e/j8-casca-do-personal.spec.ts:51:5 › em modo trabalho a conta mora na fila e não alcança as telas de quem treina
+verificar	E2E (jornadas J1/J2/J3 do PRD §6 + varredura de navegação)	2026-09-25T00:48:39.8299643Z [80/132] [chromium] › e2e/j8-casca-do-personal.spec.ts:120:5 › a MESMA conta, em modo treino, alcança o treino e perde a fila
+verificar	E2E (jornadas J1/J2/J3 do PRD §6 + varredura de navegação)	2026-09-25T00:48:45.1959245Z [81/132] [chromium] › e2e/j8-casca-do-personal.spec.ts:151:5 › a cápsula de Ajustes troca de modo, e conta de usuário não vê cápsula nem aviso
+verificar	E2E (jornadas J1/J2/J3 do PRD §6 + varredura de navegação)	2026-09-25T00:48:46.9523758Z [WebServer] ⨯ Error: The destination stream closed early.
+verificar	E2E (jornadas J1/J2/J3 do PRD §6 + varredura de navegação)	2026-09-25T00:48:46.9527466Z [WebServer]     at ignore-listed frames {
+verificar	E2E (jornadas J1/J2/J3 do PRD §6 + varredura de navegação)	2026-09-25T00:48:46.9528370Z [WebServer]   digest: '1561150396'
+verificar	E2E (jornadas J1/J2/J3 do PRD §6 + varredura de navegação)	2026-09-25T00:48:46.9533308Z [WebServer] }
+verificar	E2E (jornadas J1/J2/J3 do PRD §6 + varredura de navegação)	2026-09-25T00:48:46.9534614Z 
+verificar	E2E (jornadas J1/J2/J3 do PRD §6 + varredura de navegação)	2026-09-25T00:48:54.0119223Z [82/132] [chromium] › e2e/j8-casca-do-personal.spec.ts:196:5 › conta de personal sem CREF não abre a área de trabalho
+verificar	E2E (jornadas J1/J2/J3 do PRD §6 + varredura de navegação)	2026-09-25T00:48:57.2856895Z [83/132] [chromium] › e2e/j8-casca-do-personal.spec.ts:221:5 › conta nascida pelo Google escolhe PERSONAL com os dados e abre direto na fila
+verificar	E2E (jornadas J1/J2/J3 do PRD §6 + varredura de navegação)	2026-09-25T00:49:03.8355254Z [84/132] [chromium] › e2e/j8-casca-do-personal.spec.ts:252:7 › idioma: personal vê título e navegação em Português
+verificar	E2E (jornadas J1/J2/J3 do PRD §6 + varredura de navegação)	2026-09-25T00:49:05.7415169Z [WebServer] ⨯ Error: The destination stream closed early.
+verificar	E2E (jornadas J1/J2/J3 do PRD §6 + varredura de navegação)	2026-09-25T00:49:05.7416549Z [WebServer]     at ignore-listed frames {
+verificar	E2E (jornadas J1/J2/J3 do PRD §6 + varredura de navegação)	2026-09-25T00:49:05.7417534Z [WebServer]   digest: '1561150396'
+verificar	E2E (jornadas J1/J2/J3 do PRD §6 + varredura de navegação)	2026-09-25T00:49:05.7418344Z [WebServer] }
+verificar	E2E (jornadas J1/J2/J3 do PRD §6 + varredura de navegação)	2026-09-25T00:49:05.7433537Z 
+verificar	E2E (jornadas J1/J2/J3 do PRD §6 + varredura de navegação)	2026-09-25T00:49:08.4345267Z [85/132] [chromium] › e2e/j8-casca-do-personal.spec.ts:252:7 › idioma: personal vê título e navegação em English
+verificar	E2E (jornadas J1/J2/J3 do PRD §6 + varredura de navegação)	2026-09-25T00:49:10.3357461Z [WebServer] ⨯ Error: The destination stream closed early.
+verificar	E2E (jornadas J1/J2/J3 do PRD §6 + varredura de navegação)	2026-09-25T00:49:10.3358081Z 
+verificar	E2E (jornadas J1/J2/J3 do PRD §6 + varredura de navegação)	2026-09-25T00:49:10.3358295Z [WebServer]     at ignore-listed frames {
+verificar	E2E (jornadas J1/J2/J3 do PRD §6 + varredura de navegação)	2026-09-25T00:49:10.3358783Z [WebServer]   digest: '1561150396'
+verificar	E2E (jornadas J1/J2/J3 do PRD §6 + varredura de navegação)	2026-09-25T00:49:10.3365091Z [WebServer] }
+verificar	E2E (jornadas J1/J2/J3 do PRD §6 + varredura de navegação)	2026-09-25T00:49:13.1917449Z [86/132] [chromium] › e2e/j8-casca-do-personal.spec.ts:252:7 › idioma: personal vê título e navegação em Español
+verificar	E2E (jornadas J1/J2/J3 do PRD §6 + varredura de navegação)	2026-09-25T00:49:15.4921378Z [WebServer] ⨯ Error: The destination stream closed early.
+verificar	E2E (jornadas J1/J2/J3 do PRD §6 + varredura de navegação)	2026-09-25T00:49:15.4922024Z [WebServer]     at ignore-listed frames {
+verificar	E2E (jornadas J1/J2/J3 do PRD §6 + varredura de navegação)	2026-09-25T00:49:15.4922435Z [WebServer]   digest: '1561150396'
+verificar	E2E (jornadas J1/J2/J3 do PRD §6 + varredura de navegação)	2026-09-25T00:49:15.4922747Z [WebServer] }
+verificar	E2E (jornadas J1/J2/J3 do PRD §6 + varredura de navegação)	2026-09-25T00:49:15.4922902Z 
+verificar	E2E (jornadas J1/J2/J3 do PRD §6 + varredura de navegação)	2026-09-25T00:49:18.5759009Z [87/132] [chromium] › e2e/j9-caminho-triste.spec.ts:175:5 › cadastro: telefone só com letras é recusado
+verificar	E2E (jornadas J1/J2/J3 do PRD §6 + varredura de navegação)	2026-09-25T00:49:20.1199167Z [88/132] [chromium] › e2e/j9-caminho-triste.spec.ts:186:5 › cadastro: telefone com letra O no lugar do zero NÃO pode virar outro número
+verificar	E2E (jornadas J1/J2/J3 do PRD §6 + varredura de navegação)	2026-09-25T00:49:20.7200706Z [89/132] [chromium] › e2e/j9-caminho-triste.spec.ts:200:5 › cadastro: senha fraca é recusada antes de criar a conta
+verificar	E2E (jornadas J1/J2/J3 do PRD §6 + varredura de navegação)	2026-09-25T00:49:21.2422734Z [90/132] [chromium] › e2e/j9-caminho-triste.spec.ts:225:7 › cadastro de personal: CREF ABCDEF-G/PB (letras onde são dígitos) é recusado
+verificar	E2E (jornadas J1/J2/J3 do PRD §6 + varredura de navegação)	2026-09-25T00:49:21.8935018Z [91/132] [chromium] › e2e/j9-caminho-triste.spec.ts:225:7 › cadastro de personal: CREF 12345O-G/PB (letra O no lugar do zero) é recusado
+verificar	E2E (jornadas J1/J2/J3 do PRD §6 + varredura de navegação)	2026-09-25T00:49:22.5108928Z [92/132] [chromium] › e2e/j9-caminho-triste.spec.ts:225:7 › cadastro de personal: CREF 12345-G/PB (cinco dígitos, a norma exige seis) é recusado
+verificar	E2E (jornadas J1/J2/J3 do PRD §6 + varredura de navegação)	2026-09-25T00:49:23.1341270Z [93/132] [chromium] › e2e/j9-caminho-triste.spec.ts:225:7 › cadastro de personal: CREF 123456-E/PB (categoria E não existe) é recusado
+verificar	E2E (jornadas J1/J2/J3 do PRD §6 + varredura de navegação)	2026-09-25T00:49:23.7606050Z [94/132] [chromium] › e2e/j9-caminho-triste.spec.ts:225:7 › cadastro de personal: CREF 123456-G/XX (UF XX não existe) é recusado
+verificar	E2E (jornadas J1/J2/J3 do PRD §6 + varredura de navegação)	2026-09-25T00:49:24.4018466Z [95/132] [chromium] › e2e/j9-caminho-triste.spec.ts:225:7 › cadastro de personal: CREF 123456-G/P8 (número na UF) é recusado
+verificar	E2E (jornadas J1/J2/J3 do PRD §6 + varredura de navegação)	2026-09-25T00:49:25.0680441Z [96/132] [chromium] › e2e/j9-caminho-triste.spec.ts:241:5 › cadastro de personal: CREF vazio não passa (o campo é obrigatório)
+verificar	E2E (jornadas J1/J2/J3 do PRD §6 + varredura de navegação)	2026-09-25T00:49:25.6965779Z [97/132] [chromium] › e2e/j9-caminho-triste.spec.ts:259:5 › google: conta sem tipo escolhido não abre nenhuma tela antes da escolha
+verificar	E2E (jornadas J1/J2/J3 do PRD §6 + varredura de navegação)	2026-09-25T00:49:32.9064780Z [98/132] [chromium] › e2e/j9-caminho-triste.spec.ts:272:5 › google: escolher PERSONAL exige CREF e WhatsApp válidos, na tela e no banco
+verificar	E2E (jornadas J1/J2/J3 do PRD §6 + varredura de navegação)	2026-09-25T00:49:34.8592864Z [WebServer] ⨯ Error: The destination stream closed early.
+verificar	E2E (jornadas J1/J2/J3 do PRD §6 + varredura de navegação)	2026-09-25T00:49:34.8593576Z 
+verificar	E2E (jornadas J1/J2/J3 do PRD §6 + varredura de navegação)	2026-09-25T00:49:34.8594015Z [WebServer]     at ignore-listed frames {
+verificar	E2E (jornadas J1/J2/J3 do PRD §6 + varredura de navegação)	2026-09-25T00:49:34.8595534Z [WebServer]   digest: '1561150396'
+verificar	E2E (jornadas J1/J2/J3 do PRD §6 + varredura de navegação)	2026-09-25T00:49:34.8596366Z [WebServer] }
+verificar	E2E (jornadas J1/J2/J3 do PRD §6 + varredura de navegação)	2026-09-25T00:49:36.4855979Z [99/132] [chromium] › e2e/j9-caminho-triste.spec.ts:322:5 › google: quem escolheu USUÁRIO não escolhe de novo nem vira personal por outra porta
+verificar	E2E (jornadas J1/J2/J3 do PRD §6 + varredura de navegação)	2026-09-25T00:49:41.9697723Z [100/132] [chromium] › e2e/j9-caminho-triste.spec.ts:364:5 › aceite: botão travado com qualquer campo vazio
+verificar	E2E (jornadas J1/J2/J3 do PRD §6 + varredura de navegação)	2026-09-25T00:49:44.7928010Z [101/132] [chromium] › e2e/j9-caminho-triste.spec.ts:386:5 › aceite: código fora do formato é recusado sem criar vínculo
+verificar	E2E (jornadas J1/J2/J3 do PRD §6 + varredura de navegação)	2026-09-25T00:49:53.2828240Z [102/132] [chromium] › e2e/j9-caminho-triste.spec.ts:403:5 › aceite: código no formato certo que ninguém gerou é recusado
+verificar	E2E (jornadas J1/J2/J3 do PRD §6 + varredura de navegação)	2026-09-25T00:49:57.3034853Z [103/132] [chromium] › e2e/j9-caminho-triste.spec.ts:417:7 › aceite: código verdadeiro com telefone "abcdefghij" é recusado e não gasta o convite
+verificar	E2E (jornadas J1/J2/J3 do PRD §6 + varredura de navegação)	2026-09-25T00:50:03.6433804Z [104/132] [chromium] › e2e/j9-caminho-triste.spec.ts:417:7 › aceite: código verdadeiro com telefone "83 9999" é recusado e não gasta o convite
+verificar	E2E (jornadas J1/J2/J3 do PRD §6 + varredura de navegação)	2026-09-25T00:50:08.2737801Z [105/132] [chromium] › e2e/j9-caminho-triste.spec.ts:417:7 › aceite: código verdadeiro com telefone "0000000000000000000" é recusado e não gasta o convite
+verificar	E2E (jornadas J1/J2/J3 do PRD §6 + varredura de navegação)	2026-09-25T00:50:12.5593976Z [106/132] [chromium] › e2e/j9-caminho-triste.spec.ts:434:5 › aceite: telefone com letra O no lugar do zero não pode vincular com o número ERRADO
+verificar	E2E (jornadas J1/J2/J3 do PRD §6 + varredura de navegação)	2026-09-25T00:50:16.6576585Z [107/132] [chromium] › e2e/j9-caminho-triste.spec.ts:471:5 › aceite: ?codigo= com lixo no link não chega preenchido
+verificar	E2E (jornadas J1/J2/J3 do PRD §6 + varredura de navegação)	2026-09-25T00:50:20.5869381Z [108/132] [chromium] › e2e/j9-caminho-triste.spec.ts:486:5 › vínculo: código já usado por um aluno não serve para outro
+verificar	E2E (jornadas J1/J2/J3 do PRD §6 + varredura de navegação)	2026-09-25T00:50:27.0511970Z [109/132] [chromium] › e2e/j9-caminho-triste.spec.ts:508:5 › vínculo: aluno já vinculado não aceita um segundo convite
+verificar	E2E (jornadas J1/J2/J3 do PRD §6 + varredura de navegação)	2026-09-25T00:50:28.5146139Z [110/132] [chromium] › e2e/j9-caminho-triste.spec.ts:520:5 › vínculo: desistir da revogação no meio mantém o vínculo
+verificar	E2E (jornadas J1/J2/J3 do PRD §6 + varredura de navegação)	2026-09-25T00:50:32.0333477Z [111/132] [chromium] › e2e/j9-caminho-triste.spec.ts:536:5 › portas: personal NUNCA aceita o próprio convite
+verificar	E2E (jornadas J1/J2/J3 do PRD §6 + varredura de navegação)	2026-09-25T00:50:32.9914641Z [112/132] [chromium] › e2e/j9-caminho-triste.spec.ts:547:5 › portas: conta de usuário não vira personal, nem com CREF válido e pela função do banco
+verificar	E2E (jornadas J1/J2/J3 do PRD §6 + varredura de navegação)	2026-09-25T00:50:33.6064027Z [113/132] [chromium] › e2e/j9-caminho-triste.spec.ts:562:5 › portas: personal sem CREF não completa o cadastro com CREF fora da régua, nem pela função do banco
+verificar	E2E (jornadas J1/J2/J3 do PRD §6 + varredura de navegação)	2026-09-25T00:50:34.9676076Z [114/132] [chromium] › e2e/j9-caminho-triste.spec.ts:575:5 › portas: conta sem área de trabalho não liga o modo trabalho
+verificar	E2E (jornadas J1/J2/J3 do PRD §6 + varredura de navegação)	2026-09-25T00:50:38.0106548Z [115/132] [chromium] › e2e/j9-caminho-triste.spec.ts:585:5 › portas: a conta não apaga nem recria a própria linha de perfil
+verificar	E2E (jornadas J1/J2/J3 do PRD §6 + varredura de navegação)	2026-09-25T00:50:38.7496032Z [116/132] [chromium] › e2e/j9-caminho-triste.spec.ts:600:5 › portas: conta de aluno não gera convite
+verificar	E2E (jornadas J1/J2/J3 do PRD §6 + varredura de navegação)	2026-09-25T00:50:39.2226090Z [117/132] [chromium] › e2e/j9-caminho-triste.spec.ts:608:5 › portas: personal não revoga o vínculo do aluno
+verificar	E2E (jornadas J1/J2/J3 do PRD §6 + varredura de navegação)	2026-09-25T00:50:40.4660290Z [118/132] [chromium] › e2e/j9-caminho-triste.spec.ts:615:5 › portas: CREF em texto livre e tipo de conta inventado são barrados pelo banco
+verificar	E2E (jornadas J1/J2/J3 do PRD §6 + varredura de navegação)	2026-09-25T00:50:41.0262582Z [119/132] [chromium] › e2e/j9-caminho-triste.spec.ts:625:5 › portas: aluno não pode se promover a personal com um update na própria linha
+verificar	E2E (jornadas J1/J2/J3 do PRD §6 + varredura de navegação)	2026-09-25T00:50:41.9332287Z [120/132] [chromium] › e2e/j9-caminho-triste.spec.ts:654:5 › portas: personal sem CREF não pode gravar um CREF fora da norma direto no banco
+verificar	E2E (jornadas J1/J2/J3 do PRD §6 + varredura de navegação)	2026-09-25T00:50:42.7440549Z [121/132] [chromium] › e2e/j9-caminho-triste.spec.ts:680:5 › portas: /api/analise recusa pergunta que não é 1 a 5 sem gastar cota
+verificar	E2E (jornadas J1/J2/J3 do PRD §6 + varredura de navegação)	2026-09-25T00:50:48.1769017Z [122/132] [chromium] › e2e/j9-caminho-triste.spec.ts:699:5 › portas: /api/coach recusa pergunta vazia, só espaços, gigante ou numérica sem gastar cota
+verificar	E2E (jornadas J1/J2/J3 do PRD §6 + varredura de navegação)	2026-09-25T00:50:51.5982954Z [123/132] [chromium] › e2e/j9-caminho-triste.spec.ts:716:5 › rotas: sem sessão, a área do personal manda para o login
+verificar	E2E (jornadas J1/J2/J3 do PRD §6 + varredura de navegação)	2026-09-25T00:50:52.1166349Z [124/132] [chromium] › e2e/j9-caminho-triste.spec.ts:723:5 › rotas: aluno digitando /personal/completar volta para a Home
+verificar	E2E (jornadas J1/J2/J3 do PRD §6 + varredura de navegação)	2026-09-25T00:50:54.6217658Z [125/132] [chromium] › e2e/j9-caminho-triste.spec.ts:733:5 › rotas: personal com cadastro completo não reabre a tela de completar
+verificar	E2E (jornadas J1/J2/J3 do PRD §6 + varredura de navegação)	2026-09-25T00:50:58.2131928Z [126/132] [chromium] › e2e/j9-caminho-triste.spec.ts:743:5 › completar cadastro: personal sem CREF não abre nenhuma tela de trabalho
+verificar	E2E (jornadas J1/J2/J3 do PRD §6 + varredura de navegação)	2026-09-25T00:51:00.6609152Z [WebServer] ⨯ Error: The destination stream closed early.
+verificar	E2E (jornadas J1/J2/J3 do PRD §6 + varredura de navegação)	2026-09-25T00:51:00.6609815Z 
+verificar	E2E (jornadas J1/J2/J3 do PRD §6 + varredura de navegação)	2026-09-25T00:51:00.6610135Z [WebServer]     at ignore-listed frames {
+verificar	E2E (jornadas J1/J2/J3 do PRD §6 + varredura de navegação)	2026-09-25T00:51:00.6610954Z [WebServer]   digest: '1561150396'
+verificar	E2E (jornadas J1/J2/J3 do PRD §6 + varredura de navegação)	2026-09-25T00:51:00.6611460Z [WebServer] }
+verificar	E2E (jornadas J1/J2/J3 do PRD §6 + varredura de navegação)	2026-09-25T00:51:05.2247679Z [127/132] [chromium] › e2e/j9-caminho-triste.spec.ts:752:7 › completar cadastro: CREF ABCDEF-G/PB mostra o aviso e trava o botão
+verificar	E2E (jornadas J1/J2/J3 do PRD §6 + varredura de navegação)	2026-09-25T00:51:07.5051013Z [128/132] [chromium] › e2e/j9-caminho-triste.spec.ts:752:7 › completar cadastro: CREF 12345O-G/PB mostra o aviso e trava o botão
+verificar	E2E (jornadas J1/J2/J3 do PRD §6 + varredura de navegação)	2026-09-25T00:51:09.6646156Z [129/132] [chromium] › e2e/j9-caminho-triste.spec.ts:752:7 › completar cadastro: CREF 123456-X/PB mostra o aviso e trava o botão
+verificar	E2E (jornadas J1/J2/J3 do PRD §6 + varredura de navegação)	2026-09-25T00:51:11.8308823Z [130/132] [chromium] › e2e/j9-caminho-triste.spec.ts:752:7 › completar cadastro: CREF 123456-G/ZZ mostra o aviso e trava o botão
+verificar	E2E (jornadas J1/J2/J3 do PRD §6 + varredura de navegação)	2026-09-25T00:51:14.0112575Z [131/132] [chromium] › e2e/j9-caminho-triste.spec.ts:763:5 › completar cadastro: CREF válido com telefone só de letras é recusado
+verificar	E2E (jornadas J1/J2/J3 do PRD §6 + varredura de navegação)	2026-09-25T00:51:16.5487264Z [132/132] [chromium] › e2e/j9-caminho-triste.spec.ts:775:5 › completar cadastro: letra O no telefone não completa com o número errado
+verificar	E2E (jornadas J1/J2/J3 do PRD §6 + varredura de navegação)	2026-09-25T00:51:20.8893671Z   132 passed (15.1m)
+verificar	Guardar capturas da varredura	﻿2026-09-25T00:51:20.9187477Z ##[group]Run actions/upload-artifact@v4
+verificar	Guardar capturas da varredura	2026-09-25T00:51:20.9187849Z with:
+verificar	Guardar capturas da varredura	2026-09-25T00:51:20.9188061Z   name: varredura-telas
+verificar	Guardar capturas da varredura	2026-09-25T00:51:20.9188296Z   path: test-results/
+verificar	Guardar capturas da varredura	2026-09-25T00:51:20.9188524Z   retention-days: 7
+verificar	Guardar capturas da varredura	2026-09-25T00:51:20.9188744Z   if-no-files-found: ignore
+verificar	Guardar capturas da varredura	2026-09-25T00:51:20.9188992Z   compression-level: 6
+verificar	Guardar capturas da varredura	2026-09-25T00:51:20.9189216Z   overwrite: false
+verificar	Guardar capturas da varredura	2026-09-25T00:51:20.9189446Z   include-hidden-files: false
+verificar	Guardar capturas da varredura	2026-09-25T00:51:20.9189695Z ##[endgroup]
+verificar	Guardar capturas da varredura	2026-09-25T00:51:21.1029467Z (node:5761) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+verificar	Guardar capturas da varredura	2026-09-25T00:51:21.1031680Z (Use `node --trace-deprecation ...` to show where the warning was created)
+verificar	Guardar capturas da varredura	2026-09-25T00:51:21.1542165Z With the provided path, there will be 109 files uploaded
+verificar	Guardar capturas da varredura	2026-09-25T00:51:21.1543143Z Artifact name is valid!
+verificar	Guardar capturas da varredura	2026-09-25T00:51:21.1543643Z Root directory input is valid!
+verificar	Guardar capturas da varredura	2026-09-25T00:51:21.3679939Z Beginning upload of artifact content to blob storage
+verificar	Guardar capturas da varredura	2026-09-25T00:51:21.7345633Z (node:5761) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.
+verificar	Guardar capturas da varredura	2026-09-25T00:51:21.8970012Z Uploaded bytes 8388608
+verificar	Guardar capturas da varredura	2026-09-25T00:51:21.9464026Z Uploaded bytes 11286232
+verificar	Guardar capturas da varredura	2026-09-25T00:51:21.9607505Z Finished uploading artifact content to blob storage!
+verificar	Guardar capturas da varredura	2026-09-25T00:51:21.9608892Z SHA256 digest of uploaded artifact zip is 930301f3bdd3c2b40dc90660d536ce11dc7c770bd0295f30d67c8bc165d2962b
+verificar	Guardar capturas da varredura	2026-09-25T00:51:21.9610326Z Finalizing artifact upload
+verificar	Guardar capturas da varredura	2026-09-25T00:51:22.1395778Z Artifact varredura-telas.zip successfully finalized. Artifact ID 10841078425
+verificar	Guardar capturas da varredura	2026-09-25T00:51:22.1397538Z Artifact varredura-telas has been successfully uploaded! Final size is 11286232 bytes. Artifact ID is 10841078425
+verificar	Guardar capturas da varredura	2026-09-25T00:51:22.1403909Z Artifact download URL: https://github.com/GuilhermeSaldanha02/lastro/actions/runs/36078171673/artifacts/10841078425
+verificar	Post Run actions/setup-node@v4	﻿2026-09-25T00:51:22.1607168Z Post job cleanup.
+verificar	Post Run actions/setup-node@v4	2026-09-25T00:51:22.2836409Z (node:5773) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+verificar	Post Run actions/setup-node@v4	2026-09-25T00:51:22.2838042Z (Use `node --trace-deprecation ...` to show where the warning was created)
+verificar	Post Run actions/setup-node@v4	2026-09-25T00:51:22.2841050Z Cache hit occurred on the primary key node-cache-Linux-x64-npm-2f02748b8618ef5c9f1e7590f700a68bf6461b686c1280987c7926b231d8a0eb, not saving cache.
+verificar	Post Run actions/checkout@v4	﻿2026-09-25T00:51:22.2986529Z Post job cleanup.
+verificar	Post Run actions/checkout@v4	2026-09-25T00:51:22.3869002Z [command]/usr/bin/git version
+verificar	Post Run actions/checkout@v4	2026-09-25T00:51:22.3921551Z git version 2.55.0
+verificar	Post Run actions/checkout@v4	2026-09-25T00:51:22.3962676Z Temporarily overriding HOME='/home/runner/work/_temp/deff31f5-1a2f-44e7-b2f7-5937727b50c8' before making global git config changes
+verificar	Post Run actions/checkout@v4	2026-09-25T00:51:22.3964510Z Adding repository directory to the temporary git global config as a safe directory
+verificar	Post Run actions/checkout@v4	2026-09-25T00:51:22.3968414Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/lastro/lastro
+verificar	Post Run actions/checkout@v4	2026-09-25T00:51:22.4012515Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+verificar	Post Run actions/checkout@v4	2026-09-25T00:51:22.4053240Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+verificar	Post Run actions/checkout@v4	2026-09-25T00:51:22.4325323Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+verificar	Post Run actions/checkout@v4	2026-09-25T00:51:22.4351728Z http.https://github.com/.extraheader
+verificar	Post Run actions/checkout@v4	2026-09-25T00:51:22.4363951Z [command]/usr/bin/git config --local --unset-all http.https://github.com/.extraheader
+verificar	Post Run actions/checkout@v4	2026-09-25T00:51:22.4416126Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+verificar	Post Run actions/checkout@v4	2026-09-25T00:51:22.4676516Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+verificar	Post Run actions/checkout@v4	2026-09-25T00:51:22.4738874Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+verificar	Complete job	﻿2026-09-25T00:51:22.5212218Z Cleaning up orphan processes
+verificar	Complete job	2026-09-25T00:51:22.5680725Z ##[warning]Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@v4, actions/setup-node@v4, actions/upload-artifact@v4. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
