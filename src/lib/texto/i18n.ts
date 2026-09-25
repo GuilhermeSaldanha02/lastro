@@ -15,6 +15,20 @@ import type { Idioma } from "@/lib/dados/idioma";
 
 const DICIONARIO: Record<string, { en: string; es: string }> = {
   // --- app/login/page.tsx ---
+  "Esqueci minha senha": { en: "Forgot my password", es: "Olvidé mi contraseña" },
+  "Enviar link": { en: "Send link", es: "Enviar enlace" },
+  "Enviando link…": { en: "Sending link…", es: "Enviando enlace…" },
+  "Voltar para o login": { en: "Back to sign in", es: "Volver al inicio de sesión" },
+  "Se existir uma conta com esse e-mail, enviamos um link para criar uma senha nova. Confira também o spam.": { en: "If an account exists for this email, we sent a link to create a new password. Check your spam folder too.", es: "Si existe una cuenta con este correo, enviamos un enlace para crear una contraseña nueva. Revisa también el spam." },
+  "Criar senha nova": { en: "Create a new password", es: "Crear una contraseña nueva" },
+  "Senha nova": { en: "New password", es: "Contraseña nueva" },
+  "Repita a senha nova": { en: "Repeat the new password", es: "Repite la contraseña nueva" },
+  "Salvar senha nova": { en: "Save new password", es: "Guardar contraseña nueva" },
+  "As duas senhas não são iguais.": { en: "The two passwords do not match.", es: "Las dos contraseñas no coinciden." },
+  "A senha precisa ter letra minúscula, letra maiúscula e número.": { en: "The password needs a lowercase letter, an uppercase letter and a number.", es: "La contraseña necesita una letra minúscula, una mayúscula y un número." },
+  "Escolha uma senha diferente da atual.": { en: "Choose a password different from the current one.", es: "Elige una contraseña distinta de la actual." },
+  "O link expirou. Peça um novo em “Esqueci minha senha”.": { en: "The link expired. Request a new one with “Forgot my password”.", es: "El enlace expiró. Pide uno nuevo en “Olvidé mi contraseña”." },
+  "Não foi possível trocar a senha. Tente de novo.": { en: "Could not change the password. Try again.", es: "No se pudo cambiar la contraseña. Inténtalo de nuevo." },
   "Entrar no Lastro": { en: "Sign in to Lastro", es: "Iniciar sesión en Lastro" },
   "Criar minha conta": { en: "Create my account", es: "Crear mi cuenta" },
   "Entrar com Google": { en: "Continue with Google", es: "Continuar con Google" },

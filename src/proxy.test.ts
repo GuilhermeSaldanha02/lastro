@@ -42,6 +42,7 @@ describe("proxy — PREFIXOS_PRIVADOS", () => {
     "/catalogo",
     "/coach",
     "/personal",
+    "/redefinir-senha",
   ])("redireciona %s para /login sem sessão", async (caminho) => {
     getUserMock.mockResolvedValue({ data: { user: null } });
     const resposta = await chamarProxy(caminho);

@@ -4,7 +4,9 @@
 // vive em `login/page.tsx` usando o cliente de navegador diretamente.
 "use server";
 
+import { headers } from "next/headers";
 import { redirect } from "next/navigation";
+import { PARAM_RETORNO } from "@/lib/rota-de-retorno";
 import { criarClienteServidor } from "@/lib/supabase/cliente-servidor";
 import { normalizarTelefoneWhatsApp } from "@/lib/texto/whatsapp";
 import { crefValido, normalizarCref } from "@/lib/texto/cref";
@@ -122,4 +124,81 @@ export async function sair(): Promise<void> {
   const supabase = await criarClienteServidor();
   await supabase.auth.signOut();
   redirect("/login");
+}
+
+/**
+ * "Esqueci minha senha" (PU-05). Manda o link de recuperação do Supabase.
+ *
+ * A resposta é a MESMA exista ou não conta com esse e-mail: dizer "e-mail
+ * não cadastrado" transformaria o formulário num verificador de quem tem
+ * conta no lastro. A única falha que aparece é o limite de envio, que não
+ * revela nada sobre o e-mail.
+ *
+ * O link cai em `/auth/callback` (troca o código por sessão) e segue para
+ * `/redefinir-senha`, onde a sessão de recuperação vale só para trocar a
+ * senha. O `redirectTo` precisa estar na lista de URLs permitidas do
+ * Supabase Auth; o do Google já está.
+ */
+export async function pedirRecuperacaoSenha(
+  email: string,
+): Promise<{ ok: true } | { ok: false; erro: string }> {
+  const enderecoLimpo = email.trim();
+  if (!enderecoLimpo.includes("@")) {
+    return { ok: false, erro: "Escreva o e-mail da sua conta." };
+  }
+
+  const cabecalhos = await headers();
+  const host = cabecalhos.get("x-forwarded-host") ?? cabecalhos.get("host");
+  const protocolo = host?.startsWith("localhost") ? "http" : "https";
+  const callback = new URL(`${protocolo}://${host}/auth/callback`);
+  callback.searchParams.set(PARAM_RETORNO, "/redefinir-senha");
+
+  const supabase = await criarClienteServidor();
+  const { error } = await supabase.auth.resetPasswordForEmail(enderecoLimpo, {
+    redirectTo: callback.toString(),
+  });
+  if (error?.status === 429) {
+    return {
+      ok: false,
+      erro: "Muitos pedidos seguidos. Espere alguns minutos e tente de novo.",
+    };
+  }
+  if (error) {
+    console.error("[auth] falha ao pedir recuperação de senha", error.message);
+  }
+  return { ok: true };
+}
+
+/**
+ * Grava a senha nova de quem chegou pelo link de recuperação (ou de
+ * qualquer sessão válida). Passa pela mesma régua do cadastro
+ * (`validarSenhaNova`): trocar por uma senha fraca seria a porta dos
+ * fundos da regra de criar conta.
+ */
+export async function redefinirSenha(
+  senhaNova: string,
+): Promise<{ ok: true } | { ok: false; erro: string }> {
+  const senhaValida = validarSenhaNova(senhaNova);
+  if (!senhaValida.ok) return { ok: false, erro: senhaValida.erro };
+
+  const supabase = await criarClienteServidor();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) {
+    return {
+      ok: false,
+      erro: "O link expirou. Peça um novo em “Esqueci minha senha”.",
+    };
+  }
+
+  const { error } = await supabase.auth.updateUser({ password: senhaNova });
+  if (error) {
+    if (error.code === "same_password") {
+      return { ok: false, erro: "Escolha uma senha diferente da atual." };
+    }
+    console.error("[auth] falha ao redefinir senha", error.message);
+    return { ok: false, erro: "Não foi possível trocar a senha. Tente de novo." };
+  }
+  return { ok: true };
 }
