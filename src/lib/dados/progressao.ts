@@ -16,6 +16,8 @@ import {
   semanaInicioDoTreino,
 } from "@/lib/analise/semanas";
 import type { SerieValendo } from "@/lib/analise/tipos";
+import { obterIdioma } from "@/lib/dados/idioma";
+import { mapaTraducaoExercicios } from "@/lib/dados/traducao";
 
 export type OpcaoExercicio = { id: string; nome: string };
 
@@ -66,6 +68,9 @@ export async function carregarProgressao(): Promise<PainelProgressao[]> {
   if (erroAuth || !user) {
     throw new Error("Sessão ausente — usuário não autenticado.");
   }
+
+  const idioma = await obterIdioma();
+  const traducaoExercicios = await mapaTraducaoExercicios(idioma);
 
   const { data, error } = await supabase
     .from("treino")
@@ -152,7 +157,10 @@ export async function carregarProgressao(): Promise<PainelProgressao[]> {
     );
 
     paineis.push({
-      exercicio: { id: exercicioId, nome: nomePorExercicio.get(exercicioId)! },
+      exercicio: {
+        id: exercicioId,
+        nome: traducaoExercicios.get(exercicioId) ?? nomePorExercicio.get(exercicioId)!,
+      },
       pontos,
       plato,
     });
