@@ -23,8 +23,8 @@ invenção o que está listado aqui.
 
 | ID | Esforço | Prioridade | O que é |
 |---|---|---|---|
-| PU-02 | BAIXO | **Crítica — bloqueia as outras** | Emendar `PRD.md` §5 e §2 (Scope Change) + entrada em `DECISIONS.md` registrando a decisão de abrir ao público. Sem isso, PU-03 a PU-07 não têm base documental. |
-| PU-03 | MÉDIO | **Crítica — dinheiro real** | Medir a cota real da Gemini no console do AI Studio (`KNOWLEDGE.md` §4, nunca medido) — sem o número, não dá pra desenhar PU-04. |
+| PU-02 | BAIXO | **FEITO 2026-09-25** (PRD §2/§5 + `DECISIONS.md` 2026-09-25 (1)) — era: | Emendar `PRD.md` §5 e §2 (Scope Change) + entrada em `DECISIONS.md` registrando a decisão de abrir ao público. Sem isso, PU-03 a PU-07 não têm base documental. |
+| PU-03 | MÉDIO | **Crítica — dinheiro real** | Medir a cota real da Gemini no console do AI Studio (`KNOWLEDGE.md` §4, o free tier já foi medido: 20 req/dia e 5 req/min, §3.2; falta o tier pago e o uso público) — sem o número, não dá pra desenhar PU-04. |
 | PU-04 | ALTO | **Crítica — dinheiro real** | Limite de uso/cota de IA por conta nova (hoje só existe teto por pergunta/dia pensado pra 1 usuário — o dono). Sem isso, cada conta nova é cheque em branco no cartão do dono. Depende de PU-03. |
 | PU-05 | MÉDIO | Importante | Recuperação de senha ("esqueci minha senha") — não existe hoje. |
 | PU-06 | MÉDIO | Importante | Termos de Uso e Política de Privacidade (LGPD — o app guarda dado de saúde/treino). Documento jurídico, não só tela — considerar revisão de um advogado antes de publicar. |

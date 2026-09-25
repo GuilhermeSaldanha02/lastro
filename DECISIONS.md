@@ -2897,3 +2897,25 @@ Sem navegador local (sem `.env.local`). O `j14-dica-info` roda na tela pública 
 **A chave local tem um significado só.** `lastro_fim_treino_<id>` passa a ser espelho do servidor, confirmado por `lastro_fim_servidor_<id>`. Marca de fim SEM confirmação = pendente de envio (código antigo ou "Finalizar" sem rede); só ela é mandada ao banco ao abrir o treino (`decidirReconciliacao`, `src/lib/treino/fim-treino.ts`). Marca confirmada nunca é reenviada — senão um aparelho com espelho velho refinalizaria um treino reaberto em outro aparelho.
 
 **O que NÃO muda.** A duração dos relatórios continua sendo `duracaoSessaoSegundos` (`iniciado_em` → última série). `duracao_segundos` fica gravado mas não é exibido: trocar a métrica mudaria números que o dono já viu, e isso é decisão dele.
+
+## 2026-09-25 (1) — O lastro abre para o público (Scope Change)
+
+**O que mudou.** O dono decidiu abrir o lastro ao público: qualquer pessoa cria conta. Isso reverte, em parte, o `PRD.md` §5 ("onboarding para estranhos", "limite de uso") e ajusta a leitura da persona do §2. Emendas escritas no PRD (§2 e §5) na mesma PR.
+
+**Por quê.** Decisão do dono, 2026-09-25. O produto já tinha 6 contas de conhecidos (`PRD.md` §1) e a arquitetura (Supabase Auth + RLS por usuário) sempre suportou contas isoladas; o que faltava eram as peças que um estranho precisa e que o dono, ao lado, cobria na mão.
+
+**O que entra** (`docs/BACKLOG-CANONICO.md`, "P(-1)"): limite de uso de IA por conta (PU-03/PU-04), recuperação de senha (PU-05), Termos e Privacidade (PU-06), monitoramento de erro (PU-07), onboarding no primeiro login (PU-08), roteiro em Ajustes (PU-09), verificação da confirmação de e-mail (PU-10).
+
+**O que NÃO entra, por decisão explícita.**
+- **Planos pagos e billing.** Abrir ao público não é decidir monetizar. Continua exigindo Scope Change próprio (mesma regra do §11).
+- **Landing page antes do login.** O login segue sendo a porta de entrada.
+- **Domínio próprio.** Adiado pelo dono; `lastro-pi.vercel.app` continua.
+- Todo o resto do §5 (social, prescrição, wearable, calorias, app nativo) intacto. O veto do §2 a decidir por "outros usuários poderiam querer" também.
+
+**Alternativa descartada.** Emendar só o §5 e deixar o §2 intacto: o §2 diz "não existe segunda persona" e um agente que lesse só ele recusaria a abertura como invenção. Optou-se por uma nota curta no §2 apontando para a emenda, sem reescrever a persona de desenho.
+
+**Classificação.** Scope Change, ADIÇÃO parcial ao contrato congelado.
+
+**Impacto.** Custo de IA passa a escalar com o número de contas (a cota da Gemini é um recurso do dono): sem PU-04, cada conta nova é gasto sem teto. Dado de saúde de estranhos entra no escopo da LGPD: o texto legal (PU-06) tem de passar por advogado antes de publicado.
+
+**Como reverter.** Fechar o cadastro (desligar sign-ups no Supabase Auth) e restaurar as duas linhas do §5. Contas já criadas continuam válidas.
