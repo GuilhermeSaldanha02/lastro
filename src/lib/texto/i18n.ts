@@ -15,6 +15,9 @@ import type { Idioma } from "@/lib/dados/idioma";
 
 const DICIONARIO: Record<string, { en: string; es: string }> = {
   // --- app/login/page.tsx ---
+  "Algo deu errado": { en: "Something went wrong", es: "Algo salió mal" },
+  "Não foi possível abrir esta tela. Seus treinos salvos estão a salvo. Tente de novo.": { en: "Could not open this screen. Your saved workouts are safe. Try again.", es: "No se pudo abrir esta pantalla. Tus entrenamientos guardados están a salvo. Inténtalo de nuevo." },
+  "Tentar de novo": { en: "Try again", es: "Intentar de nuevo" },
   "Esqueci minha senha": { en: "Forgot my password", es: "Olvidé mi contraseña" },
   "Enviar link": { en: "Send link", es: "Enviar enlace" },
   "Enviando link…": { en: "Sending link…", es: "Enviando enlace…" },

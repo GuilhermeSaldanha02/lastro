@@ -28,7 +28,7 @@ invenção o que está listado aqui.
 | PU-04 | ALTO | **Crítica — dinheiro real** | Limite de uso/cota de IA por conta nova (hoje só existe teto por pergunta/dia pensado pra 1 usuário — o dono). Sem isso, cada conta nova é cheque em branco no cartão do dono. Depende de PU-03. |
 | PU-05 | MÉDIO | **FEITO 2026-09-25** | Recuperação de senha: "Esqueci minha senha" no login → e-mail → `/redefinir-senha`. Falta o dono conferir o limite de e-mails do Supabase (SMTP padrão) antes de abrir. |
 | PU-06 | MÉDIO | Importante | Termos de Uso e Política de Privacidade (LGPD — o app guarda dado de saúde/treino). Documento jurídico, não só tela — considerar revisão de um advogado antes de publicar. |
-| PU-07 | MÉDIO | Importante | Monitoramento de erro em produção (Sentry ou equivalente) — hoje um bug só aparece se alguém reclamar. |
+| PU-07 | MÉDIO | **FEITO 2026-09-25** | Monitoramento próprio, sem conta externa: tabela `erro_app` (RLS sem policy, retenção 30 dias), `instrumentation.ts` + `/api/erros`. Ler: `select * from erro_app order by criado_em desc limit 50`. Sentry fica opcional se o dono criar um DSN. |
 | PU-08 | ALTO | Desejável | **Onboarding pós-primeiro-login**: passo a passo guiado mostrando como usar o app, disparado só na primeira vez que uma conta nova entra — não é landing page, o login continua sendo a porta de entrada. |
 | PU-09 | MÉDIO | Desejável | **Roteiro completo dentro de Ajustes**, tipo "manual"/ebook: uma tela ou seção listando tudo que o app tem e como usar, sempre acessível (não só na primeira vez). |
 | PU-10 | BAIXO | Verificar antes de decidir | Confirmar se a confirmação de e-mail no cadastro já existe (há menção em `DECISIONS.md`, não confirmado ainda) — só depois decidir se falta implementar. |
