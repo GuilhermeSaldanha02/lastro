@@ -1,5 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { PASSOS_ALUNO, PASSOS_PERSONAL } from "./conteudo";
+import { SECOES_GUIA, SECOES_GUIA_PERSONAL } from "./manual";
 import { t } from "@/lib/texto/i18n";
 
 const redirect = vi.fn((destino: string) => {
@@ -44,17 +45,33 @@ describe("exigirOnboarding (PU-08)", () => {
 });
 
 describe("conteúdo do guia", () => {
-  const textos = [...PASSOS_ALUNO, ...PASSOS_PERSONAL].flatMap((p) => [p.titulo, ...p.paragrafos]);
+  const manual = [...SECOES_GUIA, ...SECOES_GUIA_PERSONAL];
+  const textos = [
+    ...[...PASSOS_ALUNO, ...PASSOS_PERSONAL].flatMap((p) => [p.titulo, ...p.paragrafos]),
+    ...manual.flatMap((p) => [p.titulo, ...p.paragrafos, ...(p.link ? [p.link.rotulo] : [])]),
+  ];
 
   it("todo texto tem tradução em inglês e espanhol (senão a tela mistura idiomas)", () => {
     for (const texto of textos) {
       expect(t(texto, "en"), `sem tradução en: ${texto}`).not.toBe(texto);
-      expect(t(texto, "es"), `sem tradução es: ${texto}`).not.toBe(texto);
+      // "Abrir X" é igual em espanhol quando X não muda (Abrir Coach, Abrir Perfil).
+      if (!texto.startsWith("Abrir ")) {
+        expect(t(texto, "es"), `sem tradução es: ${texto}`).not.toBe(texto);
+      }
     }
   });
 
-  it("ids dos passos são únicos", () => {
-    const ids = [...PASSOS_ALUNO, ...PASSOS_PERSONAL].map((p) => p.id);
-    expect(new Set(ids).size).toBe(ids.length);
+  it("ids dos passos e das seções do manual são únicos", () => {
+    // Únicos DENTRO de cada lista: o índice do manual usa o id como âncora.
+    for (const lista of [[...PASSOS_ALUNO, ...PASSOS_PERSONAL], manual]) {
+      const ids = lista.map((p) => p.id);
+      expect(new Set(ids).size).toBe(ids.length);
+    }
+  });
+
+  it("todo link do manual aponta para uma rota do app", () => {
+    for (const secao of manual) {
+      if (secao.link) expect(secao.link.href, secao.id).toMatch(/^\/[a-z]/);
+    }
   });
 });
