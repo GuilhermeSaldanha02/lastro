@@ -149,6 +149,21 @@ export default async function PaginaAjustes() {
                 </div>
                 <SetaNavegacao />
               </Link>
+
+              {/* PU-09 — o manual completo; o onboarding aparece uma vez, este fica. */}
+              <Link href="/ajustes/guia" className="bento-menu-item">
+                <div className="bento-menu-item__icone bento-menu-item__icone--ciano">
+                  <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="var(--lastro-ciano)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
+                    <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" />
+                  </svg>
+                </div>
+                <div className="bento-menu-item__info">
+                  <h3 className="bento-menu-item__titulo">{t("Como usar o lastro", idioma)}</h3>
+                  <p className="bento-menu-item__desc">{t("Manual completo do aplicativo", idioma)}</p>
+                </div>
+                <SetaNavegacao />
+              </Link>
             </div>
 
             {/* Ações de Conta */}
