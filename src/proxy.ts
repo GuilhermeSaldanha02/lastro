@@ -28,6 +28,8 @@ const PREFIXOS_PRIVADOS = [
   // Fila do personal (PRD §11). Lê dado de OUTRA conta sob vínculo aceito
   // — é a rota que menos pode ficar pública por omissão.
   "/personal",
+  // Link de "esqueci minha senha" (PU-05): só quem tem sessão de recuperação.
+  "/redefinir-senha",
 ];
 
 export async function proxy(request: NextRequest) {

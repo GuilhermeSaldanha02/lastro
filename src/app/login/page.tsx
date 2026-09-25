@@ -6,7 +6,7 @@
 import { Suspense, useState, type FormEvent } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { criarClienteBrowser } from "@/lib/supabase/cliente-browser";
-import { criarContaComEmail, entrarComEmail, type TipoConta } from "@/lib/dados/auth";
+import { criarContaComEmail, entrarComEmail, pedirRecuperacaoSenha, type TipoConta } from "@/lib/dados/auth";
 import { crefValido } from "@/lib/texto/cref";
 import DicaInfo from "@/components/dica-info";
 import { SENHA_MINIMO, validarSenhaNova } from "@/lib/texto/senha";
@@ -42,7 +42,7 @@ export default function PaginaLogin() {
   // pública começa em português e passa a usar o idioma salvo após entrar.
   const idioma: Idioma = "pt-BR";
   const router = useRouter();
-  const [modo, setModo] = useState<"entrar" | "criar-conta">("entrar");
+  const [modo, setModo] = useState<"entrar" | "criar-conta" | "recuperar">("entrar");
   const [tipoConta, setTipoConta] = useState<TipoConta>("aluno");
   const [cref, setCref] = useState("");
   const [nome, setNome] = useState("");
@@ -50,11 +50,27 @@ export default function PaginaLogin() {
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
   const [mensagem, setMensagem] = useState<string | null>(null);
+  const [avisoOk, setAvisoOk] = useState<string | null>(null);
   const [carregando, setCarregando] = useState(false);
 
   async function aoEnviar(evento: FormEvent<HTMLFormElement>) {
     evento.preventDefault();
     setMensagem(null);
+    setAvisoOk(null);
+
+    // "Esqueci minha senha" (PU-05): só o e-mail; a resposta é a mesma
+    // exista ou não a conta.
+    if (modo === "recuperar") {
+      setCarregando(true);
+      const pedido = await pedirRecuperacaoSenha(email);
+      setCarregando(false);
+      if (pedido.ok) {
+        setAvisoOk("Se existir uma conta com esse e-mail, enviamos um link para criar uma senha nova. Confira também o spam.");
+      } else {
+        setMensagem(pedido.erro);
+      }
+      return;
+    }
 
     // Só no cadastro: quem já tem conta entra com a senha que tem. A mesma
     // régua roda de novo no servidor (`criarContaComEmail`).
@@ -253,6 +269,7 @@ export default function PaginaLogin() {
               />
             </div>
 
+            {modo !== "recuperar" && (
             <div className="campo">
               <label className="campo__rotulo" htmlFor="senha">
                 {t("Senha", idioma)}
@@ -270,6 +287,27 @@ export default function PaginaLogin() {
                 minLength={modo === "criar-conta" ? SENHA_MINIMO : 6}
               />
             </div>
+            )}
+
+            {modo === "entrar" && (
+              <button
+                type="button"
+                className="botao-texto"
+                onClick={() => {
+                  setModo("recuperar");
+                  setMensagem(null);
+                  setAvisoOk(null);
+                }}
+              >
+                {t("Esqueci minha senha", idioma)}
+              </button>
+            )}
+
+            {avisoOk && (
+              <p className="campo__nota" role="status">
+                {t(avisoOk, idioma)}
+              </p>
+            )}
 
             {mensagem && (
               <p className="aviso-erro" role="alert">
@@ -279,10 +317,12 @@ export default function PaginaLogin() {
 
             <button type="submit" className="botao-primario botao-primario--heroi" disabled={carregando}>
               {carregando
-                ? t("Entrando…", idioma)
+                ? t(modo === "recuperar" ? "Enviando link…" : "Entrando…", idioma)
                 : modo === "entrar"
                   ? t("Entrar no Lastro", idioma)
-                  : t("Criar minha conta", idioma)}
+                  : modo === "recuperar"
+                    ? t("Enviar link", idioma)
+                    : t("Criar minha conta", idioma)}
             </button>
           </form>
 
@@ -326,11 +366,14 @@ export default function PaginaLogin() {
               onClick={() => {
                 setModo(modo === "entrar" ? "criar-conta" : "entrar");
                 setMensagem(null);
+                setAvisoOk(null);
               }}
             >
-              {modo === "entrar"
-                ? t("Não tem uma conta? Cadastre-se", idioma)
-                : t("Já tem conta? Fazer login", idioma)}
+              {modo === "recuperar"
+                ? t("Voltar para o login", idioma)
+                : modo === "criar-conta"
+                  ? t("Já tem conta? Fazer login", idioma)
+                  : t("Não tem uma conta? Cadastre-se", idioma)}
             </button>
           </div>
         </div>
