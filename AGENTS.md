@@ -101,7 +101,7 @@ A última linha é a que faz a orquestração funcionar. Escreva-a pensando em q
 | Escopo, critérios de aceitação | `PRD.md` |
 | Decisões de arquitetura e fitness functions | `ADR.md` · estado atual em `ARCHITECTURE.md` |
 | Por que uma decisão foi tomada | `DECISIONS.md` (busque a data/seção — nunca o arquivo inteiro) |
-| Regras visuais, tokens, gate visual | `DESIGN.md` · a entrada da decisão em `BRIEFING-VISUAL.md` |
+| Regras visuais, tokens, gate visual | `DESIGN.md` (fonte única) — `docs/historico/BRIEFING-VISUAL.md` é o briefing pré-redesenho (6/ago), superado |
 | Glossário do domínio, pesquisa, lições | `KNOWLEDGE.md` (por seção) |
 | O que já foi verificado e em que commit | `QA.md` (as regras do registro estão na §7 e na skill `qa-registro`) |
 
