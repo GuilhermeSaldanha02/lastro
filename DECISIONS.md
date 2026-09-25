@@ -2919,3 +2919,20 @@ Sem navegador local (sem `.env.local`). O `j14-dica-info` roda na tela pública 
 **Impacto.** Custo de IA passa a escalar com o número de contas (a cota da Gemini é um recurso do dono): sem PU-04, cada conta nova é gasto sem teto. Dado de saúde de estranhos entra no escopo da LGPD: o texto legal (PU-06) tem de passar por advogado antes de publicado.
 
 **Como reverter.** Fechar o cadastro (desligar sign-ups no Supabase Auth) e restaurar as duas linhas do §5. Contas já criadas continuam válidas.
+
+## 2026-09-25 (2) — Como a abertura ao público foi construída, e o que ficou de fora
+
+**Contexto.** Depois do Scope Change de (1), PU-02 a PU-10 foram executados (PRs #298–#307). Esta entrada registra as escolhas de desenho que não estão óbvias no código.
+
+**Decisões.**
+- **Monitoramento sem conta externa (PU-07).** Sentry exige criar conta e um DSN, que é do dono. Ficou uma tabelinha própria (`erro_app`), gravada só pelo servidor, com texto sanitizado (e-mail e token viram marcador, rota sem query) e retenção de 30 dias. Trocar por Sentry depois continua possível. **Alternativa descartada:** função no banco chamável por qualquer um (dispensaria a chave de admin, mas deixaria qualquer pessoa encher a tabela até o teto).
+- **Termos e Privacidade são rascunho (PU-06).** Escritos a partir do que o código faz, com lacunas entre colchetes e banner na tela. O aceite é checkbox no cadastro por e-mail (versão e instante no metadado da conta) e aviso no login com Google. **Não é parecer jurídico.**
+- **Onboarding e manual são coisas diferentes (PU-08/PU-09).** O primeiro aparece uma vez (`usuario.onboarding_concluido_em`); o segundo é consulta sempre acessível em Ajustes. Contas que já existiam na abertura foram marcadas como concluídas. Não há landing page: o login segue como porta de entrada.
+- **Recuperação de senha (PU-05)** responde igual exista ou não a conta, para o formulário não listar quem tem cadastro.
+- **PU-10:** a confirmação de e-mail já existia; só a mensagem de quem tenta entrar sem confirmar foi corrigida.
+
+**Não feito, de propósito.** PU-03 e PU-04 (cota de IA por conta e teto global): dependem de um número que só o console do AI Studio dá, com o login do dono. Enquanto isso, cada conta nova pode gastar até 15 chamadas de IA por dia da cota única do dono. Planos pagos, landing page e domínio próprio seguem fora (ver (1)).
+
+**Achado que muda o risco.** `SUPABASE_SERVICE_ROLE_KEY` não existe no ambiente de produção da Vercel: o monitoramento não grava e a exclusão de conta falha até a chave ser adicionada. Exclusão de conta é direito do titular (LGPD), então isso é pré-requisito de divulgar o app.
+
+**Como reverter.** Cada PU é uma PR; reverter a PR desfaz o código. As migrações (`erro_app`, `onboarding_concluido_em`) são aditivas e podem ficar.
