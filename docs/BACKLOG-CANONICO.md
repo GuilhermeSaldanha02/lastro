@@ -12,6 +12,28 @@
 - Regra de execução: E2E somente manual em marco de integração; testes
   rápidos continuam em toda PR.
 
+## P(-1) — abertura ao público (decisão do dono, 2026-09-25)
+
+**O dono decidiu: o lastro vai abrir para o público.** Isso contradiz o
+`PRD.md` §5 hoje ("Múltiplos usuários, planos pagos, onboarding para
+estranhos, tela de billing, limite de uso" — fora de escopo) e a persona
+única do §2. **PU-02 abaixo é pré-requisito de tudo o resto desta seção**:
+sem a emenda no PRD, qualquer agente que ler o documento vai recusar como
+invenção o que está listado aqui.
+
+| ID | Esforço | Prioridade | O que é |
+|---|---|---|---|
+| PU-02 | BAIXO | **Crítica — bloqueia as outras** | Emendar `PRD.md` §5 e §2 (Scope Change) + entrada em `DECISIONS.md` registrando a decisão de abrir ao público. Sem isso, PU-03 a PU-07 não têm base documental. |
+| PU-03 | MÉDIO | **Crítica — dinheiro real** | Medir a cota real da Gemini no console do AI Studio (`KNOWLEDGE.md` §4, nunca medido) — sem o número, não dá pra desenhar PU-04. |
+| PU-04 | ALTO | **Crítica — dinheiro real** | Limite de uso/cota de IA por conta nova (hoje só existe teto por pergunta/dia pensado pra 1 usuário — o dono). Sem isso, cada conta nova é cheque em branco no cartão do dono. Depende de PU-03. |
+| PU-05 | MÉDIO | Importante | Recuperação de senha ("esqueci minha senha") — não existe hoje. |
+| PU-06 | MÉDIO | Importante | Termos de Uso e Política de Privacidade (LGPD — o app guarda dado de saúde/treino). Documento jurídico, não só tela — considerar revisão de um advogado antes de publicar. |
+| PU-07 | MÉDIO | Importante | Monitoramento de erro em produção (Sentry ou equivalente) — hoje um bug só aparece se alguém reclamar. |
+| PU-08 | ALTO | Desejável | **Onboarding pós-primeiro-login**: passo a passo guiado mostrando como usar o app, disparado só na primeira vez que uma conta nova entra — não é landing page, o login continua sendo a porta de entrada. |
+| PU-09 | MÉDIO | Desejável | **Roteiro completo dentro de Ajustes**, tipo "manual"/ebook: uma tela ou seção listando tudo que o app tem e como usar, sempre acessível (não só na primeira vez). |
+| PU-10 | BAIXO | Verificar antes de decidir | Confirmar se a confirmação de e-mail no cadastro já existe (há menção em `DECISIONS.md`, não confirmado ainda) — só depois decidir se falta implementar. |
+| — | — | **Explicitamente NÃO agora** | Domínio próprio (`lastro-pi.vercel.app` continua). O dono decidiu adiar. |
+
 ## Ranqueamento de esforço (2026-09-25)
 
 `Esforço` estima gasto de token/tempo do agente, não dificuldade técnica.
