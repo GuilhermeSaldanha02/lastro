@@ -179,7 +179,7 @@ Deliberadamente **sem** `reps`/`peso`/`rir`/`tipo` — é exatamente a ausência
 
 *Nada aqui pode ser preenchido com invenção. Cada item vira pergunta ao dono ou medição.*
 
-- **TODO** — Quota real da Gemini no console do AI Studio (§3.2). **Bloqueia a premissa do ADR-001** ("sem teto de gasto" assume folga que ninguém mediu).
+- ~~Quota real da Gemini~~ → **RESOLVIDO (2026-09-25):** medida em §3.2 (20 req/dia e 5 req/min) e a chave está no plano GRATUITO (dono, 2026-09-25). Com a abertura ao público, esses 20/dia são de TODAS as contas juntas: `config_ia` + `reservar_uso_ia` (PU-04) repartem a cota. O plano gratuito não gera cobrança, mas **não sustenta muitas contas** (cerca de 8 análises por dia no total) e pode permitir que o Google use o conteúdo enviado; migrar para faturamento é decisão do dono.
 - ~~Regra de liberação semanal do botão Análise~~ → **RESOLVIDO:** a semana fecha na segunda (decisão registrada em `SDD.md` §8, implementada em `semanaAnaliseAtual`, `src/lib/analise/semanas.ts:52`). O botão não bloqueia por semana — fica sempre disponível; o teto é por cota de IA, mecanismo separado.
 - ~~`N` semanas de estagnação~~ → **RESOLVIDO (2026-08-04):** ver §3.7. Não há critério científico; 3–4 semanas é convenção de mercado, e a UI precisa dizer isso.
 - ~~Faixa de referência de volume por grupo~~ → **RESOLVIDO (2026-08-04):** ver §3.6. 10–20 séries/semana, com ressalvas obrigatórias na UI.

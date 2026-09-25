@@ -82,8 +82,18 @@ export default function AnaliseInterativa({
       // errado, só chegou ao fim da cota do dia.
       if (resposta.status === 429) {
         const corpo = (await resposta.json().catch(() => null)) as
-          | { limite?: number }
+          | { limite?: number; motivo?: "conta" | "global" | "minuto" }
           | null;
+        // PU-04: a mensagem depende de QUEM estourou (a conta, o lastro todo
+        // ou o minuto).
+        if (corpo?.motivo === "global") {
+          setErro(t("O lastro atingiu o limite de uso da inteligência artificial de hoje. Volta amanhã.", idioma));
+          return;
+        }
+        if (corpo?.motivo === "minuto") {
+          setErro(t("Muita gente usando a inteligência artificial agora. Tente de novo em um minuto.", idioma));
+          return;
+        }
         setErro(
           `${t("Você já gerou", idioma)} ${corpo?.limite ?? ""} ${t(
             "análises hoje — o limite diário existe para não esgotar a cota que o Coach também usa. Amanhã libera.",

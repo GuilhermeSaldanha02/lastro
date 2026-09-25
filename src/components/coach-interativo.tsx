@@ -59,19 +59,27 @@ export default function CoachInterativo({ idioma }: { idioma: Idioma }) {
 
       if (!resposta.ok) {
         const dados = (await resposta.json().catch(() => null)) as
-          | { erro?: string; limite?: number }
+          | { erro?: string; limite?: number; motivo?: "conta" | "global" | "minuto" }
           | null;
         // 429 = teto diário (migration 0020). A rota manda o código
         // `limite_diario` e o número, não a frase pronta: quem escreve
         // texto de tela é a tela, e o número vem de `TETO_DIARIO` para
         // não existir uma segunda cópia dele aqui.
         if (resposta.status === 429) {
-          setErro(
-            t(
-              "Você usou as {n} perguntas de hoje. O limite existe para sobrar cota da Análise Semanal — ele volta amanhã.",
-              idioma,
-            ).replace("{n}", String(dados?.limite ?? "")),
-          );
+          // PU-04: três motivos, três frases — dizer "você usou as suas" quando
+          // foi o lastro inteiro que esgotou a cota do dia seria mentira.
+          if (dados?.motivo === "global") {
+            setErro(t("O lastro atingiu o limite de uso da inteligência artificial de hoje. Volta amanhã.", idioma));
+          } else if (dados?.motivo === "minuto") {
+            setErro(t("Muita gente usando a inteligência artificial agora. Tente de novo em um minuto.", idioma));
+          } else {
+            setErro(
+              t(
+                "Você usou as {n} perguntas de hoje. O limite existe para sobrar cota da Análise Semanal — ele volta amanhã.",
+                idioma,
+              ).replace("{n}", String(dados?.limite ?? "")),
+            );
+          }
           return;
         }
         setErro(

@@ -10,7 +10,7 @@
 // Ao mudar o texto, mude `VERSAO_DOCUMENTOS`: é ela que fica gravada no
 // cadastro como prova de qual texto a pessoa aceitou.
 
-export const VERSAO_DOCUMENTOS = "2026-09-25-rascunho";
+export const VERSAO_DOCUMENTOS = "2026-09-25-rascunho-2";
 
 export type Secao = {
   titulo: string;
@@ -152,7 +152,7 @@ export const PRIVACIDADE: Documento = {
       titulo: "4. O que vai para a inteligência artificial",
       paragrafos: [
         "A Análise Semanal usa o modelo Gemini, do Google. O lastro calcula as métricas no próprio servidor e envia à IA apenas um resumo já calculado: nomes de exercícios, cargas, volumes, tendências e faixas de semanas. Não enviamos o seu nome, e-mail ou telefone.",
-        "O Coach envia à IA apenas o texto da pergunta que você escrever, sem os seus números de treino. O lastro não guarda o texto das perguntas do Coach. [CONFERIR COM O DONO E O ADVOGADO: como o Google trata dados enviados pela API — retenção, uso para treinar modelos e as regras do plano contratado.]",
+        "O Coach envia à IA apenas o texto da pergunta que você escrever, sem os seus números de treino. O lastro não guarda o texto das perguntas do Coach. [ATENÇÃO, DONO E ADVOGADO: a chave da Gemini está no plano GRATUITO, e nos termos de serviço da Gemini API o plano gratuito costuma permitir que o Google use o conteúdo enviado para melhorar os produtos dele; o plano com faturamento costuma não permitir. Conferir os termos vigentes ANTES de divulgar: se for o caso, este parágrafo não pode prometer o contrário, e a recomendação é migrar para o plano com faturamento.]",
       ],
     },
     {
