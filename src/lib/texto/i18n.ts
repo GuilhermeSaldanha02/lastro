@@ -995,6 +995,7 @@ const DICIONARIO: Record<string, { en: string; es: string }> = {
   "Acessos": { en: "Access", es: "Accesos" },
   "Acesso do personal": { en: "Trainer access", es: "Acceso del entrenador" },
   "Personal": { en: "Trainer", es: "Entrenador" },
+  "Vínculo, convites e fila de alunos": { en: "Link, invites and client queue", es: "Vínculo, invitaciones y fila de alumnos" },
   "Boas-vindas": { en: "Welcome", es: "Bienvenida" },
   "Sua conta": { en: "Your account", es: "Tu cuenta" },
   "Cadastro": { en: "Registration", es: "Registro" },
