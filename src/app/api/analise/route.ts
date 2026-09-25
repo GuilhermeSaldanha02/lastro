@@ -25,7 +25,7 @@ import { montarPrompt } from "./prompt";
 import { validarNumeros } from "./validador";
 import { leituraDeterministica } from "@/lib/analise/leitura-deterministica";
 import { motivoDoErro } from "./retry-transitorio";
-import { registrarUso, tetoAtingido, TETO_DIARIO } from "@/lib/dados/uso-ia";
+import { reservarUso } from "@/lib/dados/uso-ia";
 import type { FalhaMotivo } from "@/lib/dados/parecer";
 import {
   perguntaValida,
@@ -412,12 +412,10 @@ export async function POST(request: Request) {
   // 2026-09-05: contar linhas de `parecer` deixava quem DESCARTAVA um
   // rascunho recuperar a vaga sem recuperar a cota já gasta na Gemini.
   // Consumo é imutável — a chamada foi feita, ponto.
-  if (await tetoAtingido(supabase, user.id, "parecer")) {
-    return NextResponse.json(
-      { erro: "limite_diario", limite: TETO_DIARIO.parecer },
-      { status: 429 },
-    );
-  }
+  //
+  // A reserva de cota (conta, dia global e minuto — PU-04) acontece logo
+  // depois do insert do rascunho, mais abaixo: ela é atômica no banco, e só
+  // quem ganhou a vaga de geração gasta cota.
 
   const PERGUNTAS = perguntasDoIdioma(idioma);
   const { data: rascunho, error: erroInsert } = await supabase
@@ -453,8 +451,21 @@ export async function POST(request: Request) {
   }
 
   // Depois do insert, não antes: só quem ganhou a vaga de geração chama a
-  // Gemini, então só ele gasta cota.
-  await registrarUso(supabase, user.id, "parecer");
+  // Gemini, então só ele gasta cota. Reserva atômica no banco (PU-04): teto da
+  // conta, teto global do dia e teto do minuto. Negada, o rascunho recém-criado
+  // é apagado para não ficar preso em "gerando" (se o apagamento falhar, a
+  // limpeza preguiçosa de rascunhos expirados cuida dele).
+  const reserva = await reservarUso(supabase, "parecer");
+  if (!reserva.ok) {
+    const { error: erroApagar } = await supabase.from("parecer").delete().eq("id", rascunho.id);
+    if (erroApagar) {
+      console.error("[analise] falha ao apagar rascunho recusado:", erroApagar.message);
+    }
+    return NextResponse.json(
+      { erro: "limite_diario", motivo: reserva.motivo, limite: reserva.limite },
+      { status: 429 },
+    );
+  }
 
   after(() =>
     gerarESalvarParecer({

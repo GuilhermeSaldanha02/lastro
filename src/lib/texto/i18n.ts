@@ -15,6 +15,8 @@ import type { Idioma } from "@/lib/dados/idioma";
 
 const DICIONARIO: Record<string, { en: string; es: string }> = {
   // --- app/login/page.tsx ---
+  "O lastro atingiu o limite de uso da inteligência artificial de hoje. Volta amanhã.": { en: "lastro reached today's artificial intelligence usage limit. It comes back tomorrow.", es: "lastro alcanzó el límite de uso de la inteligencia artificial de hoy. Vuelve mañana." },
+  "Muita gente usando a inteligência artificial agora. Tente de novo em um minuto.": { en: "Many people are using artificial intelligence right now. Try again in a minute.", es: "Mucha gente está usando la inteligencia artificial ahora. Inténtalo de nuevo en un minuto." },
   "Como usar o lastro": { en: "How to use lastro", es: "Cómo usar lastro" },
   "Manual": { en: "Manual", es: "Manual" },
   "Índice": { en: "Contents", es: "Índice" },

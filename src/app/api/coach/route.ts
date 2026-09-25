@@ -18,7 +18,7 @@ import {
   LIMITE_PERGUNTA,
 } from "./prompt";
 import { detalheParaLog, respostaDeFalha } from "./falha";
-import { consumirUso, TETO_DIARIO } from "@/lib/dados/uso-ia";
+import { reservarUso } from "@/lib/dados/uso-ia";
 
 export async function POST(request: Request) {
   const supabase = await criarClienteServidor();
@@ -74,9 +74,13 @@ export async function POST(request: Request) {
   // e três pedidos simultâneos com 9 usos passavam os três (12 usos, CI do
   // #251). Antes da chamada, de propósito: a cota do Google é consumida pela
   // TENTATIVA, mesmo quando ela volta 503.
-  if (!(await consumirUso(supabase, "coach"))) {
+  //
+  // PU-04: a reserva também respeita o teto GLOBAL (todas as contas juntas) e
+  // o do minuto. `motivo` diz qual estourou, para a tela falar a verdade.
+  const reserva = await reservarUso(supabase, "coach");
+  if (!reserva.ok) {
     return NextResponse.json(
-      { erro: "limite_diario", limite: TETO_DIARIO.coach },
+      { erro: "limite_diario", motivo: reserva.motivo, limite: reserva.limite },
       { status: 429 },
     );
   }

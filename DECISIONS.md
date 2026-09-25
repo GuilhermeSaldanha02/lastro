@@ -2936,3 +2936,23 @@ Sem navegador local (sem `.env.local`). O `j14-dica-info` roda na tela pública 
 **Achado que muda o risco.** `SUPABASE_SERVICE_ROLE_KEY` não existe no ambiente de produção da Vercel: o monitoramento não grava e a exclusão de conta falha até a chave ser adicionada. Exclusão de conta é direito do titular (LGPD), então isso é pré-requisito de divulgar o app.
 
 **Como reverter.** Cada PU é uma PR; reverter a PR desfaz o código. As migrações (`erro_app`, `onboarding_concluido_em`) são aditivas e podem ficar.
+
+## 2026-09-25 (3) — A cota de IA é do projeto, não da conta (PU-03/PU-04)
+
+**Contexto.** O dono confirmou que a chave da Gemini está no plano GRATUITO. A cota medida (`KNOWLEDGE.md` §3.2) é de 20 requisições por dia e 5 por minuto para o projeto inteiro. O teto que existia era por conta (parecer 5 + coach 10): com N contas somava 15×N contra uma cota só, e a primeira pessoa a esgotá-la deixava o app sem IA para todos, inclusive o dono.
+
+**A decisão.**
+- Teto **global** do dia e do minuto, mais o teto por conta, lidos da tabela `config_ia` (uma linha, editável por SQL sem deploy). A decisão é da função `reservar_uso_ia`, atômica e serializada entre todas as contas (`security definer`, porque somar o consumo de todos passa por cima da RLS de `uso_ia`).
+- Unidade = requisição à Gemini. Um parecer vale 2 (tentativa + retry de validação), o coach vale 1.
+- Padrões: 16 por dia (4 de folga dos 20, para retry, 503 e QA), 4 por minuto (folga de 1 dos 5), e por conta 2 análises e 3 perguntas ao Coach por dia. Isso dá cerca de 8 análises por dia no lastro inteiro.
+- A recusa diz o motivo (`conta`, `global` ou `minuto`) e a tela fala a verdade em cada caso. Antes, "você usou as suas perguntas" apareceria mesmo quando quem esgotou foi o resto do lastro.
+- A Análise reserva depois de criar o rascunho (só quem ganha a vaga de geração gasta cota) e apaga o rascunho se a reserva for negada.
+- Falha do banco na reserva continua **deixando passar** (regra de 0020).
+
+**Alternativa descartada.** Reservar uma fatia da cota para o dono: mais complexidade para um problema que o faturamento resolve melhor.
+
+**O que isto NÃO resolve.** Plano gratuito não sustenta um app público: são cerca de 8 análises por dia no total. Recomendação: ligar o faturamento na chave (o modelo Flash custa centavos por análise) e subir os números em `config_ia`. Além do volume, os termos do plano gratuito da Gemini podem permitir que o Google use o conteúdo enviado para melhorar produtos (a conferir, e marcado como lacuna na Política de Privacidade).
+
+**Como ajustar.** `update config_ia set teto_global_dia = ..., teto_global_minuto = ..., teto_conta_parecer = ..., teto_conta_coach = ...;`
+
+**Como reverter.** Reverter a PR; a função e a tabela ficam inertes (a `consumir_uso_ia` antiga segue no banco).
