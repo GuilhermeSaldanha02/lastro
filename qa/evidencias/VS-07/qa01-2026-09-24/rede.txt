@@ -1,0 +1,7 @@
+1. [GET] https://lastro-pi.vercel.app/rota-que-nao-existe-abc123 => [404] 
+18. [GET] https://lastro-pi.vercel.app/perfil?_rsc=OXEfaXsCQr9qpu4a => [200] 
+19. [GET] https://lastro-pi.vercel.app/?_rsc=OXEfaXsCQr9qpu4a => [200] 
+22. [GET] https://lastro-pi.vercel.app/?_rsc=242tnRB5_IlegzMX => [200] 
+23. [GET] https://lastro-pi.vercel.app/perfil?_rsc=242tnRB5_IlegzMX => [200] 
+
+Note: 18 static requests not shown, run with "static" option to see them.
