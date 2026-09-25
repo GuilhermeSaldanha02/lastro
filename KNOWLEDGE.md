@@ -180,7 +180,7 @@ Deliberadamente **sem** `reps`/`peso`/`rir`/`tipo` — é exatamente a ausência
 *Nada aqui pode ser preenchido com invenção. Cada item vira pergunta ao dono ou medição.*
 
 - **TODO** — Quota real da Gemini no console do AI Studio (§3.2). **Bloqueia a premissa do ADR-001** ("sem teto de gasto" assume folga que ninguém mediu).
-- **TODO** — Regra de liberação semanal do botão Análise: a semana fecha na segunda? O botão bloqueia antes disso, ou fica sempre disponível com aviso de poucos dados?
+- ~~Regra de liberação semanal do botão Análise~~ → **RESOLVIDO:** a semana fecha na segunda (decisão registrada em `SDD.md` §8, implementada em `semanaAnaliseAtual`, `src/lib/analise/semanas.ts:52`). O botão não bloqueia por semana — fica sempre disponível; o teto é por cota de IA, mecanismo separado.
 - ~~`N` semanas de estagnação~~ → **RESOLVIDO (2026-08-04):** ver §3.7. Não há critério científico; 3–4 semanas é convenção de mercado, e a UI precisa dizer isso.
 - ~~Faixa de referência de volume por grupo~~ → **RESOLVIDO (2026-08-04):** ver §3.6. 10–20 séries/semana, com ressalvas obrigatórias na UI.
 - ~~Rotina/divisão de treino do dono~~ → **RESOLVIDO (2026-08-04):** não existe rotina declarada. O dono anota o que treinou e a Análise **deriva o padrão real dos dados**. Elimina a tela de configuração e mede o que foi feito, não o que foi prometido.
