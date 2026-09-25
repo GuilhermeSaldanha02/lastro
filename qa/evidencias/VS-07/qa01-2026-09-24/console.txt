@@ -1,0 +1,1 @@
+[    3325ms] [ERROR] Failed to load resource: the server responded with a status of 404 () @ https://lastro-pi.vercel.app/rota-que-nao-existe-abc123:0
