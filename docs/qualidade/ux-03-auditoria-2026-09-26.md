@@ -33,9 +33,22 @@ Severidade: ALTA = atrapalha a tarefa principal; MÉDIA = aparência ou uso clar
 
 **Observado e sem problema visível nesta passada:** `/ajustes` (hierarquia clara, grupos legíveis, "Excluir conta" isolado embaixo), `/ajustes/temas`, `/ajustes/modelos` (estado vazio), `/perfil`, `/catalogo/[id]`, `/personal`, `/personal/alunos`. "Sem problema visível" não é medição: alvo de toque e contraste não foram medidos aqui (o `j5-contraste` cobre contraste).
 
-## 4. Próximos passos
+## 4. Correções dos quatro achados MÉDIA (2026-09-26)
 
-1. **Dono vê esta lista** e decide o que corrigir (o handoff manda corrigir só ALTA e MÉDIA; hoje são os quatro MÉDIA: UX3-01 a UX3-04).
+O dono pediu a correção de UX3-01 a UX3-04. Uma PR por achado, todas na `main`; e2e completo do CI depois delas (run `36271452439`): **153 passaram**, incluindo um spec novo por correção. As capturas "depois" vêm do artefato da mesma execução (`qa/evidencias/UX-03/2026-09-26-depois/`). Continuam `ALEGADO`: falta outro agente auditar.
+
+| ID | PR | O que mudou | Prova |
+|---|---|---|---|
+| UX3-01 | #317 | Token `--lastro-largura-app` (48rem): `.corpo` centralizado e barras fixas (`.nav`, `.topo-pro`, `.acao-area`, `.voltar-flutuante`) alinhadas à coluna. Celular e tablet retrato inalterados. | `e2e/j19-coluna-do-app.spec.ts` (1440: coluna ≤ 768 px, centralizada, nav ≤ 768 px; 390: sem mudança). Captura `desktop_treino.png`: coluna centralizada, cabeçalho e nav alinhados. |
+| UX3-02 | #318 | `YAxis` escondido com domínio ajustado aos dados (`dominioDoGrafico`, folga = maior entre 25% da amplitude e 5% do maior valor); série estável fica no meio do gráfico, não no topo. | Teste unitário `dominio-grafico.test.ts`. Captura `celular_analise.png`: linha centralizada. |
+| UX3-03 | #319 | A seção do passo 1 de "Novo modelo" usa `.pilha` (folga entre alvos vizinhos). | `e2e/j20-modelo-novo-espaco.spec.ts` (folga ≥ 8 px). Captura `celular_ajustes_modelos_novo.png`: ~12 px entre campo e botão. |
+| UX3-04 | #320 | `/ajustes/personal` usa o `voltarHref` do `CabecalhoPro` e perde o `VoltarFlutuante` cortado. | `e2e/j21-voltar-personal.spec.ts` (voltar inteiro na tela, alvo ≥ 44 px, leva a Ajustes). Captura `celular_ajustes_personal.png`: seta de voltar visível. |
+
+**Ressalva do UX3-02:** o gráfico continua com a mesma altura; o que mudou é a linha deixar de colar no topo. Tirar o zero do eixo Y realça variações pequenas, por isso a conclusão em palavras e o percentual seguem acima do gráfico. Se o dono preferir um gráfico mais baixo, é decisão de desenho separada.
+
+## 5. Próximos passos
+
+1. ~~Dono vê a lista e decide o que corrigir~~ **Feito:** os quatro MÉDIA foram corrigidos (§4). Ficam BAIXA: UX3-05 a UX3-08.
 2. Completar a cobertura da §1 com capturas novas de **viewport rolado**, em 375×812, incluindo as rotas fora da `j4`, os temas e os idiomas.
 3. Só depois de decidido: PRs pequenas de correção, uma por achado ou por rota, cada uma com critério de aceite; e passar os itens para o `QA.md`.
 4. Outro agente audita esta lista e as correções (`ALEGADO` → `PASSOU`).
