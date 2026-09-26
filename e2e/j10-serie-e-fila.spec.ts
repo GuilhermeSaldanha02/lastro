@@ -89,7 +89,7 @@ const linhaCom = (page: Page, texto: string) => linhasDeSerie(page).filter({ has
 const IDIOMAS_OFFLINE = [
   { opcao: "Português", salvo: "Idioma salvo.", acao: "Iniciar treino de hoje", erro: "Sem conexão. Conecte-se à internet para iniciar o treino." },
   { opcao: "English", salvo: "Language saved.", acao: "Start today's workout", erro: "No connection. Connect to the internet to start the workout." },
-  { opcao: "Español", salvo: "Idioma guardado.", acao: "Iniciar entrenamiento de hoy", erro: "Sin conexión. Conéctate a internet para iniciar el entrenamiento." },
+  { opcao: "Español", salvo: "Idioma guardado.", acao: "Iniciar entreno de hoy", erro: "Sin conexión. Conéctate a internet para iniciar el entrenamiento." },
 ] as const;
 
 async function trocarIdiomaPelaTela(page: Page, idioma: (typeof IDIOMAS_OFFLINE)[number]): Promise<void> {
