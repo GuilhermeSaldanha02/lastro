@@ -3504,6 +3504,16 @@
   padding: 4px 2px var(--lastro-e-3);
   scrollbar-width: none;
   -ms-overflow-style: none;
+  /* UX3-07: pista de que a fileira rola. Sem barra de rolagem, o último chip
+     aparecia cortado sem nada dizendo que havia mais. Técnica das "sombras de
+     rolagem", sem JavaScript: as duas faixas com `local` (cor do fundo) cobrem
+     as sombras enquanto a rolagem está no começo ou no fim; as duas com
+     `scroll` só aparecem quando ainda há o que rolar naquele lado. */
+  background:
+    linear-gradient(to right, var(--lastro-fundo) 30%, transparent) left center / 28px 100% no-repeat local,
+    linear-gradient(to left, var(--lastro-fundo) 30%, transparent) right center / 28px 100% no-repeat local,
+    linear-gradient(to right, color-mix(in srgb, var(--lastro-txt-3) 45%, transparent), transparent) left center / 14px 100% no-repeat scroll,
+    linear-gradient(to left, color-mix(in srgb, var(--lastro-txt-3) 45%, transparent), transparent) right center / 14px 100% no-repeat scroll;
 }
 
 .chips-carrossel::-webkit-scrollbar {
