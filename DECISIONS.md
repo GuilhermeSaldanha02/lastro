@@ -2957,6 +2957,24 @@ Sem navegador local (sem `.env.local`). O `j14-dica-info` roda na tela pública 
 
 **Como reverter.** Reverter a PR; a função e a tabela ficam inertes (a `consumir_uso_ia` antiga segue no banco).
 
+## 2026-09-26 (1) — Termos e Privacidade aprovados pelo dono; o aceite é um portão no fim do texto
+
+**Contexto.** O texto de PU-06 estava como rascunho à espera de advogado. O dono aprovou, sem revisão de advogado, e pediu que o aceite ficasse **no final do texto**, com a pessoa seguindo depois, e que as políticas também morassem em Ajustes.
+
+**A decisão.**
+- **Portão de aceite.** Toda conta cuja versão aceita (`usuario.termos_versao_aceita`) não seja a vigente (`VERSAO_DOCUMENTOS`) cai em `/aceite` antes de qualquer tela: os dois textos seguidos e um único "Aceito e continuar" no fim. Vale para conta nova, para Google, e para as contas que já existiam (todas aceitam uma vez, inclusive a do dono). Mudar o texto de forma relevante e a versão pede novo aceite de todos.
+- O **checkbox do cadastro saiu**: o aceite é depois do login, no mesmo lugar para todos os caminhos de entrada, e fica registrado no banco (versão + instante) e não num metadado.
+- **`/ajustes/politicas`**: os dois textos dentro do app, com a data do aceite. `/termos` e `/privacidade` seguem públicas para quem ainda não tem conta.
+- Sem cookie de reserva como no onboarding: aceite é consentimento; se a gravação falhar a pessoa vê o erro e tenta de novo.
+
+**Texto.** Sem o banner de rascunho e sem as notas de advogado. Resolvido por padrão razoável: 18+ (menores não criam conta); foro do domicílio do consumidor; consentimento específico para dado de saúde (LGPD art. 11, I) e para a transferência internacional (art. 33, VIII), dados ao aceitar; cópias de segurança do provedor por período limitado, sem prazo prometido. O nome do responsável e o e-mail de contato foram dados pelo dono no mesmo dia (`RESPONSAVEL_NOME`/`RESPONSAVEL_CONTATO`).
+
+**Plano gratuito da Gemini, dito no texto.** O dono decidiu ficar no gratuito. Conferido nos termos do Google (2026-09-26): nesse plano o conteúdo enviado pode ser usado para melhorar produtos e revisores humanos podem ler entradas e saídas. A Política diz isso e orienta a não escrever dado que identifique ou revele saúde no Coach. O que vai à Análise é só o resumo calculado, sem nome, e-mail ou telefone.
+
+**Risco aceito, escrito.** Texto legal sem advogado: se algo der problema com dado de saúde de terceiros, a base é essa aprovação do dono. O texto legal só é tão certo quanto o app: se o app passar a coletar ou dividir mais coisa, o texto e a versão mudam junto.
+
+**Como reverter.** Reverter a PR; as colunas ficam inertes. Para voltar a exigir advogado, basta o dono pedir.
+
 ## 2026-09-26 (2) — Política de testes: bateria rápida em toda PR, e2e manual em marco de integração
 
 **Contexto.** O `AGENTS.md` §9 pedia a bateria completa antes de todo commit e, no mesmo arquivo, dizia que o e2e "já roda em todo PR". O `ci.yml` faz outra coisa: em PR roda só tsc, vitest e build; o e2e completo (~20 min, contas descartáveis no banco de produção) só roda por `workflow_dispatch`. O `docs/BACKLOG-CANONICO.md` já dizia "e2e somente manual em marco de integração". O texto do `AGENTS.md` era o que estava errado (DOC-02).

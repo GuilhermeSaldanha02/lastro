@@ -15,6 +15,14 @@ import type { Idioma } from "@/lib/dados/idioma";
 
 const DICIONARIO: Record<string, { en: string; es: string }> = {
   // --- app/login/page.tsx ---
+  "Termos e privacidade": { en: "Terms and privacy", es: "Términos y privacidad" },
+  "Políticas": { en: "Policies", es: "Políticas" },
+  "Políticas do lastro e o seu aceite": { en: "lastro policies and your acceptance", es: "Políticas de lastro y tu aceptación" },
+  "Você aceitou estes documentos em": { en: "You accepted these documents on", es: "Aceptaste estos documentos el" },
+  "Aceito e continuar": { en: "I accept and continue", es: "Acepto y continúo" },
+  "Ao tocar em aceitar, você concorda com os Termos de Uso e com a Política de Privacidade acima, inclusive com o tratamento dos seus dados de treino, que podem revelar informações de saúde.": { en: "By tapping accept, you agree to the Terms of Use and the Privacy Policy above, including the processing of your workout data, which may reveal health information.", es: "Al tocar en aceptar, aceptas los Términos de Uso y la Política de Privacidad de arriba, incluido el tratamiento de tus datos de entrenamiento, que pueden revelar información de salud." },
+  "Depois de entrar você lê e aceita os": { en: "After signing in you read and accept the", es: "Después de entrar lees y aceptas los" },
+  "Não foi possível registrar o aceite. Tente de novo.": { en: "Could not record your acceptance. Try again.", es: "No se pudo registrar tu aceptación. Inténtalo de nuevo." },
   "O lastro atingiu o limite de uso da inteligência artificial de hoje. Volta amanhã.": { en: "lastro reached today's artificial intelligence usage limit. It comes back tomorrow.", es: "lastro alcanzó el límite de uso de la inteligencia artificial de hoy. Vuelve mañana." },
   "Muita gente usando a inteligência artificial agora. Tente de novo em um minuto.": { en: "Many people are using artificial intelligence right now. Try again in a minute.", es: "Mucha gente está usando la inteligencia artificial ahora. Inténtalo de nuevo en un minuto." },
   "Como usar o lastro": { en: "How to use lastro", es: "Cómo usar lastro" },

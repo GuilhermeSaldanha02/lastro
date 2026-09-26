@@ -8,6 +8,7 @@
 // KNOWLEDGE.md) — por isso cada spec cria e apaga o próprio usuário.
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import type { Page } from "@playwright/test";
+import { VERSAO_DOCUMENTOS } from "../../src/lib/legal/documentos";
 
 export function clienteAdmin(): SupabaseClient {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -69,6 +70,12 @@ export async function criarUsuarioDescartavel(
      * concluído: sem isso, todo spec que abre a Home cairia em /onboarding.
      */
     comOnboarding?: boolean;
+    /**
+     * Deixa o aceite dos Termos PENDENTE (PU-06), como uma conta recém-criada
+     * de verdade. Por padrão a conta descartável já aceitou a versão vigente:
+     * sem isso, todo spec cairia em /aceite antes de chegar à tela testada.
+     */
+    comAceitePendente?: boolean;
   } = {},
 ): Promise<UsuarioDescartavel> {
   const admin = clienteAdmin();
@@ -93,14 +100,17 @@ export async function criarUsuarioDescartavel(
     throw new Error(`Falha ao criar usuário QA descartável: ${error?.message}`);
   }
   const usuario = { id: data.user.id, email, senha };
-  if (!opcoes.comOnboarding) {
+  const marcas: Record<string, string> = {};
+  if (!opcoes.comOnboarding) marcas.onboarding_concluido_em = new Date().toISOString();
+  if (!opcoes.comAceitePendente) {
+    marcas.termos_versao_aceita = VERSAO_DOCUMENTOS;
+    marcas.termos_aceitos_em = new Date().toISOString();
+  }
+  if (Object.keys(marcas).length > 0) {
     const cliente = await clienteAutenticado(usuario);
-    const { error: erroOnboarding } = await cliente
-      .from("usuario")
-      .update({ onboarding_concluido_em: new Date().toISOString() })
-      .eq("id", usuario.id);
-    if (erroOnboarding) {
-      throw new Error(`Falha ao concluir onboarding do usuário QA: ${erroOnboarding.message}`);
+    const { error: erroMarcas } = await cliente.from("usuario").update(marcas).eq("id", usuario.id);
+    if (erroMarcas) {
+      throw new Error(`Falha ao preparar o usuário QA (onboarding/aceite): ${erroMarcas.message}`);
     }
   }
   return usuario;

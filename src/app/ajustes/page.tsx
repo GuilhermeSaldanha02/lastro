@@ -150,6 +150,20 @@ export default async function PaginaAjustes() {
                 <SetaNavegacao />
               </Link>
 
+              {/* PU-06 — Termos e Política dentro do app, com o aceite da conta. */}
+              <Link href="/ajustes/politicas" className="bento-menu-item">
+                <div className="bento-menu-item__icone bento-menu-item__icone--verde">
+                  <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="var(--lastro-esmeralda)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                  </svg>
+                </div>
+                <div className="bento-menu-item__info">
+                  <h3 className="bento-menu-item__titulo">{t("Termos e privacidade", idioma)}</h3>
+                  <p className="bento-menu-item__desc">{t("Políticas do lastro e o seu aceite", idioma)}</p>
+                </div>
+                <SetaNavegacao />
+              </Link>
+
               {/* PU-09 — o manual completo; o onboarding aparece uma vez, este fica. */}
               <Link href="/ajustes/guia" className="bento-menu-item">
                 <div className="bento-menu-item__icone bento-menu-item__icone--ciano">
@@ -186,15 +200,6 @@ export default async function PaginaAjustes() {
                   <span>{t("Encerrar Sessão (Sair)", idioma)}</span>
                 </button>
               </form>
-
-              <div className="pilha">
-                <Link href="/termos" className="botao-texto">
-                  {t("Termos de Uso", idioma)}
-                </Link>
-                <Link href="/privacidade" className="botao-texto">
-                  {t("Política de Privacidade", idioma)}
-                </Link>
-              </div>
 
               <ExcluirConta idioma={idioma} />
             </div>

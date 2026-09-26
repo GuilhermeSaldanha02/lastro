@@ -5,6 +5,7 @@
 import { criarClienteServidor } from "@/lib/supabase/cliente-servidor";
 import type { SupabaseClient, User } from "@supabase/supabase-js";
 import type { Idioma } from "@/lib/dados/idioma";
+import { VERSAO_DOCUMENTOS } from "@/lib/legal/documentos";
 
 export type Perfil = {
   nome: string;
@@ -45,6 +46,10 @@ export type Perfil = {
   tipoEscolhido: boolean;
   /** `false` na conta nova que ainda não passou nem pulou o onboarding (PU-08). */
   onboardingConcluido: boolean;
+  /** `true` só quando a versão aceita é IGUAL à vigente (PU-06). Versão nova do texto = `false`. */
+  termosAceitos: boolean;
+  /** Quando a conta aceitou (ISO), ou `null` se nunca aceitou. */
+  termosAceitosEm: string | null;
   /**
    * Id da conta (`auth.users.id`). Vem da sessão do SERVIDOR, no render: é
    * o que marca de quem é cada item da fila offline (achado M1), e segue
@@ -62,7 +67,7 @@ export async function obterPerfil(): Promise<Perfil | null> {
 
   const { data } = await supabase
     .from("usuario")
-    .select("nome, avatar_url, meta_treinos_semana, idioma, tipo_conta, cref, modo_ativo, tipo_escolhido, onboarding_concluido_em")
+    .select("nome, avatar_url, meta_treinos_semana, idioma, tipo_conta, cref, modo_ativo, tipo_escolhido, onboarding_concluido_em, termos_versao_aceita, termos_aceitos_em")
     .eq("id", user.id)
     .maybeSingle();
 
@@ -91,6 +96,8 @@ export async function obterPerfil(): Promise<Perfil | null> {
     tipoEscolhido: data.tipo_escolhido !== false,
     // Só vazio explícito é pendente; falha de leitura não pode prender ninguém no passo a passo.
     onboardingConcluido: data.onboarding_concluido_em !== null,
+    termosAceitos: data.termos_versao_aceita === VERSAO_DOCUMENTOS,
+    termosAceitosEm: data.termos_aceitos_em ?? null,
     id: user.id,
   };
 }

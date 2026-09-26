@@ -32,6 +32,8 @@ const PREFIXOS_PRIVADOS = [
   "/redefinir-senha",
   // Passo a passo da conta nova (PU-08).
   "/onboarding",
+  // Aceite dos Termos (PU-06): precisa de sessão.
+  "/aceite",
 ];
 
 export async function proxy(request: NextRequest) {
