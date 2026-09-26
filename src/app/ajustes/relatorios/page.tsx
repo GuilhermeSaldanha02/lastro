@@ -60,8 +60,10 @@ export default async function PaginaRelatoriosAjustes() {
   return (
     <main className="tela">
       <CabecalhoPro
-        titulo={t("Relatórios e adesivos", idioma)}
-        destaque={t("Histórico e redes sociais", idioma)}
+        // UX3-05: título curto — "Relatórios e adesivos · Histórico" era cortado ("Histó…")
+        // na pílula do cabeçalho a 390px. O nome completo continua no menu de Ajustes.
+        titulo={t("Relatórios", idioma)}
+        destaque={t("Histórico", idioma)}
         voltarHref="/ajustes"
         perfil={perfil}
         idioma={idioma}
