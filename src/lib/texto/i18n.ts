@@ -484,7 +484,7 @@ const DICIONARIO: Record<string, { en: string; es: string }> = {
   "Registrar série": { en: "Log set", es: "Registrar serie" },
 
   // --- app/treino/page.tsx ---
-  "Treinos": { en: "Workouts", es: "Entrenamientos" },
+  "Treinos": { en: "Workouts", es: "Entrenos" },
   "Histórico": { en: "History", es: "Historial" },
   "Continuar treino de hoje": { en: "Continue today's workout", es: "Continuar entrenamiento de hoy" },
 
