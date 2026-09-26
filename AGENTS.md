@@ -193,11 +193,16 @@ npm run dev              # dev server
 
 
 
-Verificação antes de commit: `npx tsc --noEmit && npm test && npx eslint . && npm run build`.
+**Política de testes (DOC-02, decidida em 2026-09-26; `DECISIONS.md` 2026-09-26 (2)).** Testes proporcionais ao risco, com uma regra só:
+
+- **Toda PR que muda código** passa por `npx tsc --noEmit && npm test && npx eslint . && node scripts/verificar-textos-i18n.mjs && npm run build` **antes de abrir**, e o CI repete isso (job `verificar`, verde é condição de merge). Essa é a bateria rápida; ela não toca o banco.
+- **PR só de documentação** (`*.md`, sem `src/`, `e2e/`, `supabase/`) não precisa rodar a bateria local: o CI cobre.
+- **E2E é manual, em marco de integração**, não a cada PR: dispare `gh workflow run ci.yml --ref main` (`workflow_dispatch`) quando a mudança tocar login, guardas de rota, banco, cota de IA ou qualquer fluxo que os testes unitários não enxergam. Dura cerca de 20 minutos e usa contas descartáveis no banco de produção (a Gemini é mockada, não gasta cota). **Um merge em `main` cancela o e2e em andamento** (`concurrency` do `ci.yml`): espere terminar antes de mergear.
+- Spec e2e novo entra junto com a mudança que ele cobre, mesmo que só rode no próximo marco.
 
 
 
-**`npm run e2e` é o comando perigoso deste repositório.** O Playwright roda **contra o banco de produção** — não existe banco de dev —, criando e apagando contas descartáveis. A prova de E2E que vale é o CI do GitHub Actions, que já roda em todo PR:
+**`npm run e2e` é o comando perigoso deste repositório.** O Playwright roda **contra o banco de produção** — não existe banco de dev —, criando e apagando contas descartáveis. A prova de E2E que vale é o CI do GitHub Actions, disparado à mão (`workflow_dispatch`) nos marcos de integração; em toda PR roda só a bateria rápida:
 
 
 
