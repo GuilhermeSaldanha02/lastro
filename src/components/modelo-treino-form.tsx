@@ -124,7 +124,9 @@ export default function ModeloTreinoForm({
   // Passo 1 — o nome.
   if (!nomeConfirmado) {
     return (
-      <section className="grupo">
+      {/* `pilha`: a folga entre alvos vizinhos (UX3-03) — sem ela o campo e o
+          botão Continuar ficavam colados. */}
+      <section className="grupo pilha">
         <div className="grupo__cab">
           <span className="titulo-com-dica">
             <h2 className="grupo__nome">{t("Que treino é esse?", idioma)}</h2>
