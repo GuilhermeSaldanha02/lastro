@@ -15,7 +15,6 @@ import { redirect } from "next/navigation";
 import { headers } from "next/headers";
 import CabecalhoPro from "@/components/cabecalho-pro";
 import AbaInferior from "@/components/aba-inferior";
-import VoltarFlutuante from "@/components/voltar-flutuante";
 import VinculoAluno from "@/components/vinculo-aluno";
 import ConvitesPersonal from "@/components/convites-personal";
 import { obterPerfil } from "@/lib/dados/perfil";
@@ -70,7 +69,15 @@ export default async function PaginaPersonalAjustes({
 
   return (
     <main className="tela">
-      <CabecalhoPro titulo={t("Personal", idioma)} destaque={t("Acesso do personal", idioma)} perfil={perfil} idioma={idioma} />
+      {/* UX3-04: o voltar é o do cabeçalho, como nas outras subtelas de Ajustes.
+          O `VoltarFlutuante` que estava aqui aparecia cortado sob o cabeçalho. */}
+      <CabecalhoPro
+        titulo={t("Personal", idioma)}
+        destaque={t("Acesso do personal", idioma)}
+        voltarHref="/ajustes"
+        perfil={perfil}
+        idioma={idioma}
+      />
 
       <div className="corpo corpo--com-nav corpo--titulo-conteudo transicao-pilula">
         <div className="pilha">
@@ -109,7 +116,6 @@ export default async function PaginaPersonalAjustes({
         </div>
       </div>
 
-      <VoltarFlutuante href="/ajustes" rotulo={t("Ajustes", idioma)} idioma={idioma} />
       <AbaInferior ativa="ajustes" tipoConta={cascaDaBarra(perfil)} idioma={idioma} />
     </main>
   );
