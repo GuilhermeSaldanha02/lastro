@@ -14,8 +14,10 @@ import {
   ReferenceLine,
   ResponsiveContainer,
   XAxis,
+  YAxis,
 } from "recharts";
 import type { PainelProgressao } from "@/lib/dados/progressao";
+import { dominioDoGrafico } from "@/lib/analise/dominio-grafico";
 import { t } from "@/lib/texto/i18n";
 import type { Idioma } from "@/lib/dados/idioma";
 
@@ -204,6 +206,9 @@ function PainelConteudo({ painel, idioma }: { painel: PainelProgressao; idioma: 
       <div className="grafico-progressao__area">
         <ResponsiveContainer width="100%" height="100%">
           <LineChart data={serie} margin={{ top: 24, right: 40, bottom: 4, left: 40 }}>
+          {/* Eixo Y escondido, só para o domínio acompanhar os dados (UX3-02):
+              sem ele o Recharts parte do zero e a série estável cola no topo. */}
+          <YAxis hide domain={dominioDoGrafico(comDado.map((p) => p.e1rm!))} />
           <XAxis
             dataKey="semanaInicio"
             tickFormatter={formatarSemana}
