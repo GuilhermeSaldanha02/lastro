@@ -6299,3 +6299,10 @@ html:lang(en) .nav a,
 html:lang(es) .nav a {
   font-size: min(var(--lastro-papel-rotulo), 3.2vw);
 }
+
+/* UX3-09 (complemento): em português "Catálogo" (66px) já passava do item da
+   barra em 360 e 375px (62 e 65px). O teste novo de rótulos mostrou. Encolhe
+   menos que en/es porque as palavras são mais curtas: 3.6vw dá 13,5px a 375px. */
+html:lang(pt) .nav a {
+  font-size: min(var(--lastro-papel-rotulo), 3.6vw);
+}
