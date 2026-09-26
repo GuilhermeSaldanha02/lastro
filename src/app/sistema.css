@@ -2045,9 +2045,10 @@
    fonte única, nenhum cravado dentro de componente). */
 .barra-conversa {
   position: fixed;
-  /* UX3-08: folga de e-3 (era e-2) entre a caixa e a barra inferior; a 8px as
-     duas pílulas pareciam coladas. */
-  bottom: calc(var(--lastro-clearance-nav) + var(--lastro-e-3));
+  /* UX3-08: folga de e-4 (era e-2) entre a caixa e a barra inferior; a 8px as
+     duas pílulas pareciam coladas. Com e-3 a medida real saiu 11px (a borda da
+     barra come 1px), abaixo dos 12px que o teste exige. */
+  bottom: calc(var(--lastro-clearance-nav) + var(--lastro-e-4));
   left: 0;
   right: 0;
   margin: 0 auto;
