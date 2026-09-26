@@ -6289,6 +6289,9 @@
   font-weight: var(--lastro-peso-max);
   line-height: var(--lastro-el-titulo);
   color: var(--lastro-txt);
+}
+
+/* =====================================================================
    BARRA INFERIOR EM INGLÊS E ESPANHOL (UX3-09, cobertura de 2026-09-26)
    Cinco rótulos em ~65px cada: "Entrenamientos" e "Análisis" se sobrepunham em
    espanhol e "Workouts"/"Analysis" se encostavam em inglês. O espanhol ganhou o
