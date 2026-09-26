@@ -12,11 +12,12 @@
 export const VERSAO_DOCUMENTOS = "2026-09-26";
 
 /**
- * QUEM responde pelo lastro. São os dois únicos dados que só o dono pode
- * dar; sem eles a Política não identifica o controlador (LGPD art. 41).
+ * QUEM responde pelo lastro (controlador e encarregado, LGPD arts. 5º e 41).
+ * Dados informados pelo próprio dono em 2026-09-26. Mudou o responsável ou o
+ * contato? Mude aqui e a versão (`VERSAO_DOCUMENTOS`): todos aceitam de novo.
  */
-export const RESPONSAVEL_NOME = "[NOME COMPLETO DO RESPONSÁVEL]";
-export const RESPONSAVEL_CONTATO = "[E-MAIL DE CONTATO]";
+export const RESPONSAVEL_NOME = "Carlos Guilherme Saldanha Da Silva";
+export const RESPONSAVEL_CONTATO = "Guilhermesaldanha01@outlook.com";
 
 export type Secao = {
   titulo: string;

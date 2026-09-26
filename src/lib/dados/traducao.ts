@@ -37,3 +37,28 @@ export async function mapaTraducaoGrupos(
 
   return new Map((data ?? []).map((linha) => [linha.grupo_muscular_id, linha.nome]));
 }
+
+/**
+ * Dica de execução de UM exercício no idioma da pessoa (A1, migração
+ * `dica_execucao_traduzida`). `null` quando o idioma é pt-BR ou quando não há
+ * tradução: quem chama cai na dica em português, o mesmo fallback do nome.
+ */
+export async function dicaTraduzidaDoExercicio(
+  exercicioId: string,
+  idioma: Idioma,
+): Promise<string | null> {
+  if (idioma === "pt-BR") return null;
+
+  const supabase = await criarClienteServidor();
+  const { data, error } = await supabase
+    .from("exercicio_traducao")
+    .select("dica_execucao")
+    .eq("exercicio_id", exercicioId)
+    .eq("idioma", idioma)
+    .maybeSingle();
+  if (error) {
+    console.error("[traducao] falha ao ler dica traduzida:", error.message);
+    return null;
+  }
+  return data?.dica_execucao ?? null;
+}

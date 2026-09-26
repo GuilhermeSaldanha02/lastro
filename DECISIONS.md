@@ -2967,10 +2967,22 @@ Sem navegador local (sem `.env.local`). O `j14-dica-info` roda na tela pública 
 - **`/ajustes/politicas`**: os dois textos dentro do app, com a data do aceite. `/termos` e `/privacidade` seguem públicas para quem ainda não tem conta.
 - Sem cookie de reserva como no onboarding: aceite é consentimento; se a gravação falhar a pessoa vê o erro e tenta de novo.
 
-**Texto.** Sem o banner de rascunho e sem as notas de advogado. Resolvido por padrão razoável: 18+ (menores não criam conta); foro do domicílio do consumidor; consentimento específico para dado de saúde (LGPD art. 11, I) e para a transferência internacional (art. 33, VIII), dados ao aceitar; cópias de segurança do provedor por período limitado, sem prazo prometido. **Ficaram dois campos que só o dono pode dar:** nome do responsável e e-mail de contato (`RESPONSAVEL_NOME`/`RESPONSAVEL_CONTATO`).
+**Texto.** Sem o banner de rascunho e sem as notas de advogado. Resolvido por padrão razoável: 18+ (menores não criam conta); foro do domicílio do consumidor; consentimento específico para dado de saúde (LGPD art. 11, I) e para a transferência internacional (art. 33, VIII), dados ao aceitar; cópias de segurança do provedor por período limitado, sem prazo prometido. O nome do responsável e o e-mail de contato foram dados pelo dono no mesmo dia (`RESPONSAVEL_NOME`/`RESPONSAVEL_CONTATO`).
 
 **Plano gratuito da Gemini, dito no texto.** O dono decidiu ficar no gratuito. Conferido nos termos do Google (2026-09-26): nesse plano o conteúdo enviado pode ser usado para melhorar produtos e revisores humanos podem ler entradas e saídas. A Política diz isso e orienta a não escrever dado que identifique ou revele saúde no Coach. O que vai à Análise é só o resumo calculado, sem nome, e-mail ou telefone.
 
 **Risco aceito, escrito.** Texto legal sem advogado: se algo der problema com dado de saúde de terceiros, a base é essa aprovação do dono. O texto legal só é tão certo quanto o app: se o app passar a coletar ou dividir mais coisa, o texto e a versão mudam junto.
 
 **Como reverter.** Reverter a PR; as colunas ficam inertes. Para voltar a exigir advogado, basta o dono pedir.
+
+## 2026-09-26 (2) — Política de testes: bateria rápida em toda PR, e2e manual em marco de integração
+
+**Contexto.** O `AGENTS.md` §9 pedia a bateria completa antes de todo commit e, no mesmo arquivo, dizia que o e2e "já roda em todo PR". O `ci.yml` faz outra coisa: em PR roda só tsc, vitest e build; o e2e completo (~20 min, contas descartáveis no banco de produção) só roda por `workflow_dispatch`. O `docs/BACKLOG-CANONICO.md` já dizia "e2e somente manual em marco de integração". O texto do `AGENTS.md` era o que estava errado (DOC-02).
+
+**A decisão.** Testes proporcionais ao risco: (1) toda PR que muda código passa pela bateria rápida antes de abrir (tsc, vitest, eslint, checagem de i18n, build) e o CI repete; (2) PR só de documentação dispensa a bateria local; (3) o e2e completo é disparado à mão quando a mudança toca login, guardas de rota, banco, cota de IA ou fluxo que teste unitário não enxerga; (4) spec e2e novo entra junto com a mudança que ele cobre.
+
+**Por quê.** E2E a cada PR custaria ~20 min e contas no banco de produção por mudança de texto. E só bateria rápida deixaria passar o que só o e2e pega (o portão de aceite e o de onboarding, por exemplo, quebrariam todos os specs se o helper não criasse contas já prontas: foi o e2e completo que provou que não quebraram).
+
+**Cuidado que vira regra.** Um merge em `main` cancela o e2e em andamento (`concurrency: cancel-in-progress` no `ci.yml`). Esperar terminar antes de mergear.
+
+**Como reverter.** Voltar o texto do `AGENTS.md` §9; nada no código muda.

@@ -12,6 +12,7 @@ import CabecalhoPro from "@/components/cabecalho-pro";
 import DicaInfo from "@/components/dica-info";
 import PlayerExecucaoExercicio from "@/components/player-execucao-exercicio";
 import { obterMidiaExercicio } from "@/lib/dados/midia-exercicio";
+import { dicaTraduzidaDoExercicio } from "@/lib/dados/traducao";
 import { t } from "@/lib/texto/i18n";
 
 export default async function PaginaHistoricoExercicio({
@@ -28,6 +29,9 @@ export default async function PaginaHistoricoExercicio({
   const idioma = perfil?.idioma ?? "pt-BR";
 
   if (!exercicio) notFound();
+
+  // A1: a dica no idioma da pessoa; sem tradução, cai na dica em português.
+  const dicaNoIdioma = (await dicaTraduzidaDoExercicio(id, idioma)) ?? exercicio.dicaExecucao;
 
   const cronologico = [...historico].reverse();
   const marcasCronologicas = marcarRecordesHistoricos(cronologico);
@@ -130,12 +134,12 @@ export default async function PaginaHistoricoExercicio({
                       aparecia sem funcionar: a tela afirmando mais do que o
                       dado sustenta. A tela da lista já falava assim
                       ("aguardando curadoria"); agora as duas combinam. */}
-                  {exercicio.dicaExecucao ? (
+                  {dicaNoIdioma ? (
                     <>
                       {exercicio.dicaExecucaoOrigem === "claude" && (
                         <p className="campo__nota">{t("Conteúdo gerado por IA", idioma)}</p>
                       )}
-                      <p className="dica-texto-principal">{exercicio.dicaExecucao}</p>
+                      <p className="dica-texto-principal">{dicaNoIdioma}</p>
                     </>
                   ) : (
                     <p className="dica-texto-principal dica-texto-principal--vazio">
