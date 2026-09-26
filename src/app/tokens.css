@@ -197,6 +197,10 @@
 
   /* Medidas de Leitura */
   --lastro-largura-entrada: 26rem;
+  /* UX3-01: largura máxima da coluna do app. Até este valor (celular e tablet
+     retrato) nada muda; acima dele o app fica numa coluna centralizada em vez
+     de esticar até a largura da janela. */
+  --lastro-largura-app:     48rem;
   --lastro-medida-leitura:  34em;
 
   /* Bloco de Evidência */

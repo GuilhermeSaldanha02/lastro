@@ -6191,3 +6191,38 @@
   user-select: all;
   overflow-wrap: anywhere;
 }
+
+/* =====================================================================
+   COLUNA DO APP (UX3-01, auditoria de 2026-09-26)
+   O app era desenhado para celular e, em janela larga (PC), esticava os
+   cartões e as barras até a largura inteira: cartões de 1400px e uma barra
+   inferior de ponta a ponta. Agora o conteúdo fica numa coluna de no máximo
+   `--lastro-largura-app` (48rem), centralizada. Até essa largura nada muda.
+
+   As barras `fixed` continuam com o fundo cobrindo a janela toda, mas o
+   CONTEÚDO delas alinha com a coluna: o recuo lateral vira "a folga até a
+   coluna, mais o recuo de sempre". Em janela estreita a folga é negativa e
+   o `max()` devolve o recuo de sempre — o celular não muda.
+   ===================================================================== */
+.corpo {
+  width: 100%;
+  max-width: var(--lastro-largura-app);
+  margin-inline: auto;
+}
+
+.nav {
+  left: max(var(--lastro-e-4), calc((100% - var(--lastro-largura-app)) / 2 + var(--lastro-e-4)));
+  right: max(var(--lastro-e-4), calc((100% - var(--lastro-largura-app)) / 2 + var(--lastro-e-4)));
+}
+
+.topo-pro {
+  padding-inline: max(16px, calc((100% - var(--lastro-largura-app)) / 2 + 16px));
+}
+
+.acao-area {
+  padding-inline: max(var(--lastro-e-5), calc((100% - var(--lastro-largura-app)) / 2 + var(--lastro-e-5)));
+}
+
+.voltar-flutuante {
+  left: max(var(--lastro-e-4), calc((100% - var(--lastro-largura-app)) / 2 + var(--lastro-e-4)));
+}
