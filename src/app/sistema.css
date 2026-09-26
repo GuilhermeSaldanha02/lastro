@@ -6244,3 +6244,15 @@
 .voltar-flutuante {
   left: max(var(--lastro-e-4), calc((100% - var(--lastro-largura-app)) / 2 + var(--lastro-e-4)));
 }
+
+/* =====================================================================
+   BARRA INFERIOR EM INGLÊS E ESPANHOL (UX3-09, cobertura de 2026-09-26)
+   Cinco rótulos em ~65px cada: "Entrenamientos" e "Análisis" se sobrepunham em
+   espanhol e "Workouts"/"Analysis" se encostavam em inglês. O espanhol ganhou o
+   rótulo curto "Entrenos" (`i18n.ts`) e, nestes dois idiomas, a fonte da barra
+   encolhe com a largura da janela. Em português nada muda.
+   ===================================================================== */
+html:lang(en) .nav a,
+html:lang(es) .nav a {
+  font-size: min(var(--lastro-papel-rotulo), 3.2vw);
+}
