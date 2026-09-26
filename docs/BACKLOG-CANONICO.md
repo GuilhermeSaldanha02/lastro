@@ -54,8 +54,8 @@ depende de infraestrutura que não existe ainda (2ª conta, cota de IA).
 | OF-04, OF-06 | MÉDIO | Baixa | Exigem alternar 2 contas (login/logout) na mesma sessão de navegador — mesma trava do PE-*, resolve junto quando a 2ª conta existir. |
 | LG-06, LG-07, LG-08, LG-05 (triste) | MÉDIO | Baixa | Mesma trava de 2ª conta (modo personal). |
 | UX-01 | — | — | **Já resolvido** pelo TR-12 (PR #269, casca fixa em `/treino/[id]`) — este backlog não tinha sido atualizado. |
-| UX-02 (histórico cronológico) | ALTO | Média | Redesenho de tela existente (`/treino`), precisa de estados vazio/filtro e não pode inventar métrica — não iniciado. |
-| UX-03 (auditoria visual completa) | ALTO | Média | Todas as rotas × rolagem/hierarquia/toque — não iniciado, é o tipo de trabalho que mais consome token (muitas telas, muitos viewports). |
+| UX-02 (histórico cronológico) | ALTO | Média | **Delegado ao Antigravity/Gemini pelo dono (2026-09-26): `docs/HANDOFF-ANTIGRAVITY-UX-02-UX-03.md` §3.** Recomendação do Claude: melhor depois de haver gente real usando. | Redesenho de tela existente (`/treino`), precisa de estados vazio/filtro e não pode inventar métrica — não iniciado. |
+| UX-03 (auditoria visual completa) | ALTO | Média | **Delegado ao Antigravity/Gemini pelo dono (2026-09-26): `docs/HANDOFF-ANTIGRAVITY-UX-02-UX-03.md` §4.** | Todas as rotas × rolagem/hierarquia/toque — não iniciado, é o tipo de trabalho que mais consome token (muitas telas, muitos viewports). |
 | QA-02 (matriz aluno/personal) | MÉDIO | Baixa | Depende de UX-02 estar pronto e da 2ª conta para a parte personal. |
 | DOC-01 (arquivar backlogs antigos) | — | — | **Resolvido**: os arquivos já estavam em `docs/historico/`; o backlog é que não tinha sido atualizado. Era: | Mover 6 arquivos de agosto (`BACKLOG-PROXIMA-FASE.md`, `BACKLOG-REDESENHO.md`, `BACKLOG-TESTE-APARELHO.md`, `ESTUDO-*.md`, `IMPECCABLE-AUDIT.md`, `AUDITORIA-APEX-PRO.md`) para uma pasta de histórico. |
 | DOC-02 (política de testes) | — | — | **FEITO 2026-09-26**: `AGENTS.md` §9 e `DECISIONS.md` 2026-09-26 (2). Era: | É decisão a registrar, não código. |
