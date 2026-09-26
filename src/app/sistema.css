@@ -2045,7 +2045,9 @@
    fonte única, nenhum cravado dentro de componente). */
 .barra-conversa {
   position: fixed;
-  bottom: calc(var(--lastro-clearance-nav) + var(--lastro-e-2));
+  /* UX3-08: folga de e-3 (era e-2) entre a caixa e a barra inferior; a 8px as
+     duas pílulas pareciam coladas. */
+  bottom: calc(var(--lastro-clearance-nav) + var(--lastro-e-3));
   left: 0;
   right: 0;
   margin: 0 auto;
@@ -2074,7 +2076,10 @@
   min-width: 0;
   min-height: 48px;
   padding: 0 var(--lastro-e-4);
-  border: 1px solid var(--lastro-controle);
+  /* UX3-08: sem borda própria em repouso. O campo ficava com moldura dentro da
+     moldura da barra (dois contornos concêntricos); o fundo já o distingue da
+     barra, e a borda dourada aparece no foco. */
+  border: 1px solid transparent;
   border-radius: var(--lastro-raio-pilula);
   background: var(--lastro-campo-fundo, var(--lastro-sup-1));
   box-shadow: var(--lastro-elev-afundado);
