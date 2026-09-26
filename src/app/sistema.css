@@ -6244,3 +6244,49 @@
 .voltar-flutuante {
   left: max(var(--lastro-e-4), calc((100% - var(--lastro-largura-app)) / 2 + var(--lastro-e-4)));
 }
+
+/* =====================================================================
+   TEXTOS LEGAIS E TÍTULOS DE CARTÃO (UX3-11 e UX3-12, cobertura de 2026-09-26)
+   ===================================================================== */
+
+/* UX3-11: Termos, Privacidade, /aceite e /ajustes/politicas eram um bloco
+   corrido: parágrafos sem espaço entre si, seções coladas no título seguinte.
+   É o texto que a pessoa precisa LER antes de aceitar. Espaço só por tokens. */
+.documento-legal section + section {
+  margin-top: var(--lastro-e-6);
+}
+
+.documento-legal h2 {
+  font-size: var(--lastro-papel-secao);
+  margin-bottom: var(--lastro-e-2);
+}
+
+.documento-legal p + p,
+.documento-legal p + ul,
+.documento-legal ul + p {
+  margin-top: var(--lastro-e-3);
+}
+
+.documento-legal ul {
+  list-style: disc;
+  padding-left: var(--lastro-e-5);
+}
+
+.documento-legal li + li {
+  margin-top: var(--lastro-e-2);
+}
+
+.documento-legal p,
+.documento-legal li {
+  line-height: var(--lastro-el-corpo);
+}
+
+/* UX3-12: o título do passo do onboarding e o de "Criar senha nova" eram um
+   <h1> com a classe de RÓTULO (pequeno e cinza): a tela mais importante da
+   primeira impressão começava por um texto que parecia legenda. */
+.titulo-cartao {
+  font-size: var(--lastro-papel-secao);
+  font-weight: var(--lastro-peso-max);
+  line-height: var(--lastro-el-titulo);
+  color: var(--lastro-txt);
+}

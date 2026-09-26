@@ -40,7 +40,7 @@ export default function Onboarding({
             {indice + 1} / {passos.length}
           </p>
 
-          <h1 className="campo__rotulo">{t(passo.titulo, idioma)}</h1>
+          <h1 className="titulo-cartao">{t(passo.titulo, idioma)}</h1>
           {passo.paragrafos.map((p) => (
             <p key={p}>{t(p, idioma)}</p>
           ))}

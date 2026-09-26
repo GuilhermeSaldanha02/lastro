@@ -43,7 +43,7 @@ export default function FormRedefinirSenha({ idioma }: { idioma: Idioma }) {
 
   return (
     <form className="formulario" onSubmit={aoEnviar}>
-      <h1 className="campo__rotulo">{t("Criar senha nova", idioma)}</h1>
+      <h1 className="titulo-cartao">{t("Criar senha nova", idioma)}</h1>
 
       <div className="campo">
         <label className="campo__rotulo" htmlFor="senha-nova">
