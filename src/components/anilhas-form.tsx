@@ -8,10 +8,13 @@ import { useState } from "react";
 import { salvarConfigAnilhas, type ConfigAnilhas } from "@/lib/dados/config-anilhas";
 import { calcularAnilhas, normalizarPesoKg } from "@/lib/anilhas";
 import { t } from "@/lib/texto/i18n";
+import { formatarPeso } from "@/lib/texto/formatar-delta";
 import type { Idioma } from "@/lib/dados/idioma";
 
-function formatarKg(valor: number): string {
-  return valor % 1 === 0 ? String(valor) : valor.toFixed(2).replace(/0+$/, "").replace(/\.$/, "");
+// UX3-06: o separador decimal segue o idioma (2,5 em português, 2.5 em inglês),
+// como o resto do app (`formatarPeso`). Antes saía sempre com ponto.
+function formatarKg(valor: number, idioma: Idioma): string {
+  return formatarPeso(Number(valor.toFixed(2)), idioma);
 }
 
 export default function AnilhasForm({ configInicial, idioma }: { configInicial: ConfigAnilhas; idioma: Idioma }) {
@@ -120,7 +123,7 @@ export default function AnilhasForm({ configInicial, idioma }: { configInicial: 
             {anilhas.map((peso) => (
               <div className="anilha" key={peso}>
                 <p className="anilha__valor">
-                  {formatarKg(peso)}
+                  {formatarKg(peso, idioma)}
                   <span className="anilha__un">kg</span>
                 </p>
                 <button
@@ -128,7 +131,7 @@ export default function AnilhasForm({ configInicial, idioma }: { configInicial: 
                   className={
                     modoEdicao ? "botao-icone" : "botao-icone botao-icone--oculto"
                   }
-                  aria-label={`${t("Remover anilha de", idioma)} ${formatarKg(peso)} kg`}
+                  aria-label={`${t("Remover anilha de", idioma)} ${formatarKg(peso, idioma)} kg`}
                   aria-hidden={!modoEdicao}
                   tabIndex={modoEdicao ? undefined : -1}
                   onClick={() => removerAnilha(peso)}
@@ -216,12 +219,12 @@ export default function AnilhasForm({ configInicial, idioma }: { configInicial: 
               {t("De cada lado da barra:", idioma)}
             </span>
             <p style={{ fontFamily: "var(--lastro-fonte-num)", fontSize: "var(--lastro-papel-secao)", fontWeight: "var(--lastro-peso-max)", color: "var(--lastro-ouro-claro)", margin: "2px 0" }}>
-              {resultado.porLado.length === 0 ? `0 ${t("kg / lado", idioma)}` : `${resultado.porLado.reduce((acc, a) => acc + a.peso * a.quantidade, 0)} ${t("kg / lado", idioma)}`}
+              {resultado.porLado.length === 0 ? `0 ${t("kg / lado", idioma)}` : `${formatarKg(resultado.porLado.reduce((acc, a) => acc + a.peso * a.quantidade, 0), idioma)} ${t("kg / lado", idioma)}`}
             </p>
             <p style={{ fontSize: "var(--lastro-papel-rotulo)", color: "var(--lastro-txt-2)" }}>
               {resultado.porLado.length === 0
                 ? t("Só a barra, sem anilha de cada lado.", idioma)
-                : `${resultado.porLado.map((a) => `${a.quantidade}× ${formatarKg(a.peso)} kg`).join(" + ")}. ${t("Total:", idioma)} ${formatarKg(resultado.pesoTotalAlcancado)} kg${!resultado.exato ? ` (${t("mais próximo do alvo", idioma)})` : ` (${t("exato", idioma)})`}.`}
+                : `${resultado.porLado.map((a) => `${a.quantidade}× ${formatarKg(a.peso, idioma)} kg`).join(" + ")}. ${t("Total:", idioma)} ${formatarKg(resultado.pesoTotalAlcancado, idioma)} kg${!resultado.exato ? ` (${t("mais próximo do alvo", idioma)})` : ` (${t("exato", idioma)})`}.`}
             </p>
           </div>
         )}
