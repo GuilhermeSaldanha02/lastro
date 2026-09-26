@@ -46,6 +46,7 @@ const ROTAS_ISENTAS_DE_FORCAR_INICIO = [
   "/privacidade",
   "/redefinir-senha",
   "/onboarding",
+  "/aceite",
 ];
 
 // Trilha B, item E1 (D1, DESIGN.md §6.1) — substitui a família IBM Plex
