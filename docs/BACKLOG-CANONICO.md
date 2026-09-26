@@ -60,7 +60,7 @@ depende de infraestrutura que não existe ainda (2ª conta, cota de IA).
 | DOC-01 (arquivar backlogs antigos) | — | — | **Resolvido**: os arquivos já estavam em `docs/historico/`; o backlog é que não tinha sido atualizado. Era: | Mover 6 arquivos de agosto (`BACKLOG-PROXIMA-FASE.md`, `BACKLOG-REDESENHO.md`, `BACKLOG-TESTE-APARELHO.md`, `ESTUDO-*.md`, `IMPECCABLE-AUDIT.md`, `AUDITORIA-APEX-PRO.md`) para uma pasta de histórico. |
 | DOC-02 (política de testes) | — | — | **FEITO 2026-09-26**: `AGENTS.md` §9 e `DECISIONS.md` 2026-09-26 (2). Era: | É decisão a registrar, não código. |
 | DOC-03 (reconciliar DESIGN.md) | MÉDIO | Baixa | Só depois da UX-03. |
-| "descanso_real_segundos" (migration) | BAIXO | Baixa | Fio solto do PROGRESS.md — não aparece em nenhum spec nem no QA.md; provavelmente obsoleto, precisa só de 10 min pra confirmar e fechar ou reabrir como item de verdade. |
+| "descanso_real_segundos" (migration) | — | — | **Resolvido (2026-09-25, PROGRESS.md)**: 72 séries reais em produção já gravaram o valor desde a migração 20260915130000; funciona ponta a ponta. Era: | Fio solto do PROGRESS.md — não aparece em nenhum spec nem no QA.md; provavelmente obsoleto, precisa só de 10 min pra confirmar e fechar ou reabrir como item de verdade. |
 
 ## P1 — bugs a revalidar (restantes)
 
