@@ -40,7 +40,16 @@ export function exigirTipoEscolhido(perfil: Perfil | null): void {
   if (perfil && !perfil.tipoEscolhido) {
     redirect(ESCOLHA_DO_TIPO);
   }
+  // Aceite dos Termos e da Política (PU-06), DEPOIS da escolha do tipo e
+  // ANTES de qualquer tela: conta nova, conta antiga e texto atualizado caem
+  // no mesmo lugar. Todo guarda de casca passa por esta função.
+  if (perfil && !perfil.termosAceitos) {
+    redirect(ACEITE_DOS_TERMOS);
+  }
 }
+
+/** Onde a conta lê e aceita os Termos e a Política (PU-06). */
+export const ACEITE_DOS_TERMOS = "/aceite";
 
 /** Onde a conta nova passa pelo passo a passo (PU-08). */
 export const ONBOARDING = "/onboarding";
