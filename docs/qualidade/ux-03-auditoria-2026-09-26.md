@@ -46,9 +46,22 @@ O dono pediu a correção de UX3-01 a UX3-04. Uma PR por achado, todas na `main`
 
 **Ressalva do UX3-02:** o gráfico continua com a mesma altura; o que mudou é a linha deixar de colar no topo. Tirar o zero do eixo Y realça variações pequenas, por isso a conclusão em palavras e o percentual seguem acima do gráfico. Se o dono preferir um gráfico mais baixo, é decisão de desenho separada.
 
+## 4b. Correções dos quatro achados BAIXA (2026-09-26)
+
+O dono pediu também a correção de UX3-05 a UX3-08. Mesmo procedimento; e2e completo depois delas: **157 passaram** (run `36274938229`). Uma correção precisou de segunda passada: o teste do UX3-08 mediu 11 px onde exigia 12, e a folga subiu de `e-3` para `e-4` (#326). Capturas em `qa/evidencias/UX-03/2026-09-26-depois-baixa/`. Continuam `ALEGADO`.
+
+| ID | PR | O que mudou | Prova |
+|---|---|---|---|
+| UX3-05 | #322 | Título "Relatórios · Histórico" (cabia; era "Relatórios e adesivos · Histó…"); botão por treino em contorno em vez de dourado cheio; texto "Gerar imagem para Stories" (era "Gerar Imagem / Sticker Story"). | `j22-relatorios-cabecalho.spec.ts`; `celular_ajustes_relatorios.png`. |
+| UX3-06 | #323 | `formatarKg` das anilhas usa `formatarPeso` por idioma (2,5 e 1,25 em português; também no total por lado). | `anilhas-form.test.ts`, `j23-anilhas-decimal.spec.ts`; `celular_ajustes_anilhas.png`. |
+| UX3-07 | #324 | Sombras de rolagem em CSS puro em `.chips-carrossel` (treino e catálogo). | `j24-chips-rolagem.spec.ts`; `celular_treino.png` (sombra discreta na borda direita, chip "Costas" ainda cortado, agora com pista). |
+| UX3-08 | #325, #326 | Folga de 16 px entre a caixa do Coach e a barra inferior; campo sem contorno em repouso (dourado no foco). | `j25-coach-caixa.spec.ts` (folga ≥ 12 px); `celular_coach.png`. |
+
+**Ressalvas:** (a) a sombra do UX3-07 é sutil por escolha; se o dono a achar fraca, é ajuste de intensidade. (b) No Coach o campo, sem contorno, distingue-se da barra só pelo fundo; se ficar fraco em algum tema, volta o contorno.
+
 ## 5. Próximos passos
 
-1. ~~Dono vê a lista e decide o que corrigir~~ **Feito:** os quatro MÉDIA foram corrigidos (§4). Ficam BAIXA: UX3-05 a UX3-08.
+1. ~~Dono vê a lista e decide o que corrigir~~ **Feito:** os quatro MÉDIA foram corrigidos (§4). Os quatro BAIXA (UX3-05 a 08) também foram corrigidos (§4b).
 2. Completar a cobertura da §1 com capturas novas de **viewport rolado**, em 375×812, incluindo as rotas fora da `j4`, os temas e os idiomas.
 3. Só depois de decidido: PRs pequenas de correção, uma por achado ou por rota, cada uma com critério de aceite; e passar os itens para o `QA.md`.
 4. Outro agente audita esta lista e as correções (`ALEGADO` → `PASSOU`).
