@@ -274,7 +274,7 @@ const DICIONARIO: Record<string, { en: string; es: string }> = {
   "Perfil do usuário": { en: "User profile", es: "Perfil del usuario" },
   "Continuar Treino de Hoje": { en: "Continue Today's Workout", es: "Continuar Entrenamiento de Hoy" },
   "Iniciar Treino de Hoje": { en: "Start Today's Workout", es: "Iniciar Entrenamiento de Hoy" },
-  "Análise Semanal (AI Coach)": { en: "Weekly Analysis (AI Coach)", es: "Análisis Semanal (AI Coach)" },
+  "Análise Semanal (AI Coach)": { en: "Weekly Analysis", es: "Análisis Semanal" },
   "treino": { en: "workout", es: "entrenamiento" },
   "treinos": { en: "workouts", es: "entrenamientos" },
   "Toque para ver a leitura da sua semana.": {
@@ -404,7 +404,7 @@ const DICIONARIO: Record<string, { en: string; es: string }> = {
   "Excluindo…": { en: "Deleting…", es: "Eliminando…" },
 
   // --- components/iniciar-treino.tsx ---
-  "Iniciar treino de hoje": { en: "Start today's workout", es: "Iniciar entrenamiento de hoy" },
+  "Iniciar treino de hoje": { en: "Start today's workout", es: "Iniciar entreno de hoy" },
   "Como começar?": { en: "How do you want to start?", es: "¿Cómo empezar?" },
   "Treino novo": { en: "New workout", es: "Entrenamiento nuevo" },
 
@@ -486,7 +486,7 @@ const DICIONARIO: Record<string, { en: string; es: string }> = {
   // --- app/treino/page.tsx ---
   "Treinos": { en: "Workouts", es: "Entrenos" },
   "Histórico": { en: "History", es: "Historial" },
-  "Continuar treino de hoje": { en: "Continue today's workout", es: "Continuar entrenamiento de hoy" },
+  "Continuar treino de hoje": { en: "Continue today's workout", es: "Continuar entreno de hoy" },
 
   // --- components/lista-treinos.tsx ---
   "Histórico de Treinos": { en: "Workout History", es: "Historial de Entrenamientos" },
