@@ -43,7 +43,7 @@ depende de infraestrutura que não existe ainda (2ª conta, cota de IA).
 
 | ID | Esforço | Importância | Por quê |
 |---|---|---|---|
-| A1 (dica de exercício sem tradução) | MÉDIO | Média | ~436 traduções (218 exercícios × 2 idiomas) + migração nova + wiring; sem chamar IA em produção (tradução feita pelo próprio agente, uma vez). |
+| A1 (dica de exercício sem tradução) | — | — | **FEITO 2026-09-26**: `exercicio_traducao.dica_execucao` com 436 traduções (218 × en/es), lida em `/catalogo/[id]` por `dicaTraduzidaDoExercicio` com fallback ao português; hash do texto no banco conferido contra os arquivos. **Fio solto achado:** o exercício "Elevacao lateral com halteres" está sem acento no nome em português (`exercicio.nome`, id `ff8a4f89…`); não corrigido porque `exercicios-midia.json` e a migração 0021 casam por esse nome. Era: | ~436 traduções (218 exercícios × 2 idiomas) + migração nova + wiring; sem chamar IA em produção (tradução feita pelo próprio agente, uma vez). |
 | CT-02, VS-06, VS-07 | — | — | **Resolvidos** no QA-01 de 24–25/set: já corrigidos antes desta sessão, ou graduados pelo e2e real (run 36078171673). |
 | AJ-03, AJ-04 | — | — | **Resolvidos**: graduados pelo e2e real (`j11-formularios.spec.ts`), run 36078171673. |
 | AN-02, AN-05, AN-06 | — | — | **Resolvidos**: graduados pelo e2e real (`j12-isolamento-e-apis.spec.ts`), run 36078171673. |
