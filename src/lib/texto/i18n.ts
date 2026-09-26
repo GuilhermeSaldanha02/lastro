@@ -15,6 +15,8 @@ import type { Idioma } from "@/lib/dados/idioma";
 
 const DICIONARIO: Record<string, { en: string; es: string }> = {
   // --- app/login/page.tsx ---
+  "Relatórios": { en: "Reports", es: "Informes" },
+  "Gerar imagem para Stories": { en: "Create image for Stories", es: "Crear imagen para Stories" },
   "Termos e privacidade": { en: "Terms and privacy", es: "Términos y privacidad" },
   "Políticas": { en: "Policies", es: "Políticas" },
   "Políticas do lastro e o seu aceite": { en: "lastro policies and your acceptance", es: "Políticas de lastro y tu aceptación" },
@@ -976,7 +978,6 @@ const DICIONARIO: Record<string, { en: string; es: string }> = {
   // --- components/historico-relatorios-pos-treino.tsx ---
   "VOLUME": { en: "VOLUME", es: "VOLUMEN" },
   "Carregando...": { en: "Loading...", es: "Cargando..." },
-  "Gerar Imagem / Sticker Story": { en: "Generate Image / Story Sticker", es: "Generar Imagen / Sticker de Historia" },
 
   // --- components/player-execucao-exercicio.tsx ---
   "Foco:": { en: "Focus:", es: "Enfoque:" },

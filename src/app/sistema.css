@@ -5681,12 +5681,14 @@
   padding: 0 var(--lastro-e-3);
   border: 1px solid var(--lastro-borda-ouro);
   border-radius: var(--lastro-raio-1);
-  background: var(--lastro-ouro-grad);
-  color: var(--lastro-acao-txt);
+  /* UX3-05: contorno em vez do dourado cheio. O botão se repete em cada treino
+     do histórico; N botões dourados seguidos viravam ruído. O dourado cheio
+     fica para a ação principal de cada tela. */
+  background: transparent;
+  color: var(--lastro-ouro);
   font-size: var(--lastro-papel-corpo);
   font-weight: 700;
   cursor: pointer;
-  box-shadow: var(--lastro-elev-1);
   transition: transform var(--lastro-dur-1) ease, opacity var(--lastro-dur-1) ease;
 }
 

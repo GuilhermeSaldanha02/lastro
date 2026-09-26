@@ -111,7 +111,7 @@ describe("i18n", () => {
     "Sessão ausente.",
     "Falha ao buscar o parecer.",
     "Falha ao gerar o PDF.",
-    "Gerar Imagem / Sticker Story",
+    "Gerar imagem para Stories",
   ])("tem cobertura completa para %s", (chave) => {
     expect(possuiTraducao(chave)).toBe(true);
     expect(t(chave, "en")).not.toBe(chave);

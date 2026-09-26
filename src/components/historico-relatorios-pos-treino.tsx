@@ -109,7 +109,7 @@ export default function HistoricoRelatoriosPosTreino({
               <span>
                 {carregandoId === tr.id
                   ? t("Carregando...", idioma)
-                  : t("Gerar Imagem / Sticker Story", idioma)}
+                  : t("Gerar imagem para Stories", idioma)}
               </span>
             </button>
           </div>
