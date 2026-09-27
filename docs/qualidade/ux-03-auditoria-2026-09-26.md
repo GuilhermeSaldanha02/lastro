@@ -59,6 +59,25 @@ O dono pediu também a correção de UX3-05 a UX3-08. Mesmo procedimento; e2e co
 
 **Ressalvas:** (a) a sombra do UX3-07 é sutil por escolha; se o dono a achar fraca, é ajuste de intensidade. (b) No Coach o campo, sem contorno, distingue-se da barra só pelo fundo; se ficar fraco em algum tema, volta o contorno.
 
+## 4c. Cobertura medida e novos achados (2026-09-26)
+
+**Método:** `e2e/j26-cobertura-ux03.spec.ts` (mede e grava, não reprova) percorreu **60 telas** em 375×812 com contas descartáveis: as 12 rotas fora da varredura `j4` (login, termos, privacidade, 404, aceite, onboarding, boas-vindas, completar cadastro, redefinir senha, manual, políticas, detalhe do treino e do exercício), o inglês e o espanhol nas telas principais e 6 temas em Home, Treino e Ajustes; topo **e fim** do viewport, mais métricas (vazamento horizontal, alvo de toque, texto cortado, conteúdo sob a barra inferior). As capturas de "antes" estão em `qa/evidencias/UX-03/2026-09-26-cobertura/`.
+
+**Medido, sem defeito:** vazamento horizontal em nenhuma das 60 telas; nenhum conteúdo escondido pela barra inferior no fim da rolagem (a limitação da §2 fica resolvida para essas rotas); nenhum alvo de toque menor que 44 px entre elementos em bloco (links dentro de texto ficam de fora, como a regra de acessibilidade admite). **Ponto cego da medida:** ela não pega texto que se sobrepõe sem estar cortado (foi o olho que viu o defeito da barra inferior em espanhol) e não mede a faixa de ação fixa do `/treino/[id]` (vista na captura: sem problema).
+
+| ID | Achado | Sev. | Estado |
+|---|---|---|---|
+| UX3-09 | **Barra inferior em espanhol**: "Entrenamientos" e "Análisis" se **sobrepunham**; em inglês "Workouts"/"Analysis" se encostavam. Em todas as telas para quem usa es/en. | ALTA | **Corrigido** (#329): es "Entrenos", fonte da barra encolhe com a largura em en/es e em pt. `j27-nav-rotulos.spec.ts` (3 idiomas × 360/375/390 px): 9 passaram. |
+| UX3-10 | Home em espanhol: "INICIAR ENTRENAMIENTO DE HOY" quebrava em duas linhas com o ícone solto; título do cartão da Análise cortado em es/en ("Análisis Semanal (A…"). | MÉDIA | **Corrigido** (#330): "Iniciar/Continuar entreno de hoy", título sem "(AI Coach)". `j28-home-es-en.spec.ts`. |
+| UX3-11 | Termos, Privacidade, `/aceite` e `/ajustes/politicas`: bloco corrido, sem espaço entre parágrafos e seções (o texto que a pessoa precisa ler antes de aceitar). | MÉDIA | **Corrigido** (#331). `j29-texto-legal-e-titulos.spec.ts`. |
+| UX3-12 | Título do passo do onboarding e "Criar senha nova" usavam a classe de rótulo (pequena e cinza): hierarquia fraca na primeira impressão. | MÉDIA | **Corrigido** (#331): classe `titulo-cartao`. `j29`. |
+| UX3-13 | `/redefinir-senha` é um cartão solto, sem a marca (o login tem o logotipo). | BAIXA | Aberto |
+| UX3-14 | A 404 para quem não tem sessão mostra o avatar "AT" (Atleta) no cabeçalho, ligado ao perfil. | BAIXA | Aberto |
+
+**Incidentes do processo (registrados para não se repetir):** (1) a resolução de um conflito de `sistema.css` na #331 perdeu um `}` e a abertura de um comentário; o build da `main` falhou e a #331 foi mergeada com o CI vermelho porque meu encadeamento de comandos não parou no erro; corrigido na #332 e a produção nunca saiu do ar (a Vercel manteve o último deploy bom). (2) Um teste meu (UX3-09) reprovou português a 375 px por 1 px de subpixel; a tolerância virou 2 px (#333). (3) Eu disparava a suíte completa do e2e a cada correção; o dono apontou, e o `ci.yml` ganhou a entrada `specs` (#334): **só as specs que mudaram**.
+
+**Continuam `ALEGADO`.** Ainda sem medir: `/treino/[id]` com séries em estado de erro/offline, os modais de `@modal`, o detalhe do catálogo com mídia, e o contraste dos 6 temas (o `j5-contraste` cobre o tema padrão).
+
 ## 5. Próximos passos
 
 1. ~~Dono vê a lista e decide o que corrigir~~ **Feito:** os quatro MÉDIA foram corrigidos (§4). Os quatro BAIXA (UX3-05 a 08) também foram corrigidos (§4b).
