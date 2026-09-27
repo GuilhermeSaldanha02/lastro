@@ -42,8 +42,11 @@ for (const idioma of ["pt-BR", "en", "es"] as const) {
         }),
       );
       expect(itens.length).toBeGreaterThanOrEqual(4);
+      // Tolerância de 2px: a medida do texto e a do item têm arredondamento de
+      // subpixel (e o texto centrado sobra igual dos dois lados). O defeito que
+      // este teste guarda era de dezenas de px ("Entrenamientos" sobre "Análisis").
       for (const it of itens) {
-        expect(it.largTexto, `ACHADO UX3-09: "${it.texto}" (${it.largTexto}px) não cabe no item (${it.largItem}px)`).toBeLessThanOrEqual(it.largItem);
+        expect(it.largTexto, `ACHADO UX3-09: "${it.texto}" (${it.largTexto}px) não cabe no item (${it.largItem}px)`).toBeLessThanOrEqual(it.largItem + 2);
       }
     });
   }
