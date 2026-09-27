@@ -11,7 +11,17 @@ on:
   # O E2E usa o Supabase hospedado e hoje leva cerca de 25 minutos. Ele é
   # acionado manualmente nos marcos de integração; os checks rápidos seguem
   # obrigatórios em toda PR e push na main.
+  #
+  # `specs` filtra o E2E: só o que mudou, em vez dos ~25 minutos da suíte
+  # inteira. Passe pedaços dos nomes dos arquivos separados por espaço
+  # (`j27 j28`, `catalogo`); vazio roda tudo. Exemplo:
+  #   gh workflow run ci.yml --ref main -f specs="j27 j28"
   workflow_dispatch:
+    inputs:
+      specs:
+        description: 'Specs do E2E a rodar (ex.: "j27 j28"). Vazio = suíte completa.'
+        required: false
+        default: ""
 
 concurrency:
   group: ci-${{ github.ref }}
@@ -73,8 +83,11 @@ jobs:
 
       - name: E2E (jornadas J1/J2/J3 do PRD §6 + varredura de navegação)
         if: github.event_name == 'workflow_dispatch'
-        run: npm run e2e
+        # SPECS vem por variável (não interpolado no comando) e sem aspas de
+        # propósito: cada palavra vira um filtro do Playwright.
+        run: npm run e2e -- $SPECS
         env:
+          SPECS: ${{ inputs.specs }}
           NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
           NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}

@@ -2986,3 +2986,11 @@ Sem navegador local (sem `.env.local`). O `j14-dica-info` roda na tela pública 
 **Cuidado que vira regra.** Um merge em `main` cancela o e2e em andamento (`concurrency: cancel-in-progress` no `ci.yml`). Esperar terminar antes de mergear.
 
 **Como reverter.** Voltar o texto do `AGENTS.md` §9; nada no código muda.
+
+## 2026-09-26 (4) — E2E só no que mudou
+
+**Contexto.** Depois da política de (2), eu ainda disparava a suíte inteira do e2e (~25 min, contas descartáveis no banco de produção) a cada correção pequena, mesmo quando só uma spec nova ou alterada importava. O dono apontou o desperdício.
+
+**A decisão.** O `workflow_dispatch` do `ci.yml` ganhou a entrada `specs`: pedaços dos nomes dos arquivos separados por espaço, repassados ao `npm run e2e` (`gh workflow run ci.yml --ref main -f specs="j27 j28"`). Vazio roda a suíte completa. Regra: prova de uma mudança = **as specs que ela toca ou cria**. Suíte completa só em marco de integração real (login, guardas de rota, banco, cota de IA, ou várias áreas de uma vez).
+
+**Como reverter.** Voltar o `ci.yml`; sem `specs` o comportamento é o de antes.
