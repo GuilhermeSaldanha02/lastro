@@ -16,6 +16,18 @@ export default async function PaginaRedefinirSenha() {
   return (
     <main className="tela tela--entrada">
       <div className="entrada">
+        {/* UX3-13: a marca, como no login. Sem ela a tela era um cartão solto. */}
+        <header className="entrada__marca">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/logo-lastro.png"
+            alt="LASTRO"
+            className="entrada__logo-img"
+            width={150}
+            height={150}
+          />
+        </header>
+
         <div className="cartao cartao--vidro">
           <FormRedefinirSenha idioma={idioma} />
         </div>

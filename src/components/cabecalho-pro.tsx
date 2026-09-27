@@ -57,13 +57,13 @@ export default function CabecalhoPro({
         </div>
       </div>
 
-      <Link href="/perfil" className="topo-pro__avatar-link" aria-label={t("Perfil do atleta", idioma)}>
-        {perfil ? (
+      {/* UX3-14: sem sessão não há perfil a abrir. A 404 de quem não entrou
+          mostrava um avatar "AT" ligado a `/perfil`, que só devolvia ao login. */}
+      {perfil && (
+        <Link href="/perfil" className="topo-pro__avatar-link" aria-label={t("Perfil do atleta", idioma)}>
           <Avatar nome={perfil.nome} avatarUrl={perfil.avatarUrl} />
-        ) : (
-          <div className="topo-avatar">{t("Atleta", idioma).slice(0, 2).toUpperCase()}</div>
-        )}
-      </Link>
+        </Link>
+      )}
     </header>
   );
 }
