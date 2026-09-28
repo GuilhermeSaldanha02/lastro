@@ -4,9 +4,11 @@
 // `ClienteParecerGemini` de `../analise/gemini`, que segue sendo o único
 // ponto do repo que toca o SDK. A chave nunca chega ao cliente (ADR-002).
 //
-// O que este handler NÃO faz, de propósito: não lê treino, série nem
-// resumo. O coach responde dúvida geral; quem lê os números do dono é a
-// Análise Semanal. Isso mantém o dado do treino fora deste prompt.
+// Desde o AN-08 M1 (decisão do dono, 2026-09-28) a pergunta passa antes por
+// um roteador sem LLM: o que o próprio lastro calcula (volume da semana,
+// grupo menos treinado…) é respondido aqui, com os números do usuário, sem
+// Gemini e sem gastar cota. O dado do treino continua FORA do prompt: o que
+// vai à Gemini segue sendo só a pergunta.
 import { NextResponse } from "next/server";
 import { criarClienteServidor } from "@/lib/supabase/cliente-servidor";
 import { ClienteParecerGemini } from "../analise/gemini";
@@ -19,6 +21,10 @@ import {
 } from "./prompt";
 import { detalheParaLog, respostaDeFalha } from "./falha";
 import { reservarUso } from "@/lib/dados/uso-ia";
+import { obterIdioma } from "@/lib/dados/idioma";
+import { classificar, ehRecusa } from "@/lib/coach/roteador";
+import { textoDeRecusa } from "@/lib/coach/responder";
+import { responderComDados } from "@/lib/coach/responder-local";
 
 export async function POST(request: Request) {
   const supabase = await criarClienteServidor();
@@ -62,6 +68,29 @@ export async function POST(request: Request) {
       { erro: "Não foi possível verificar seu vínculo. Tente de novo." },
       { status: 503 },
     );
+  }
+
+  // AN-08 M1: resposta local ANTES da reserva — o que não chega à Gemini não
+  // pode consumir cota. Sem classificação segura, segue o caminho de sempre.
+  const classificacao = classificar(pergunta);
+  if (classificacao) {
+    const idioma = await obterIdioma();
+    if (ehRecusa(classificacao)) {
+      return NextResponse.json({
+        resposta: textoDeRecusa(classificacao.intent, idioma, temPersonal),
+        origem: "local",
+      });
+    }
+    try {
+      const resposta = await responderComDados({ supabase, usuarioId: user.id, classificacao, idioma });
+      return NextResponse.json({ resposta, origem: "local" });
+    } catch (erro) {
+      console.error("[coach] falha ao responder localmente", detalheParaLog(erro));
+      return NextResponse.json(
+        { erro: "Não foi possível ler seus treinos agora. Tente de novo." },
+        { status: 503 },
+      );
+    }
   }
 
   // Teto diário (migration 0020). O Coach dividia a cota de 20/dia com a
