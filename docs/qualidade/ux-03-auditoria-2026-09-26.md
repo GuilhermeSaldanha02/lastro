@@ -80,11 +80,23 @@ O dono pediu também a correção de UX3-05 a UX3-08. Mesmo procedimento; e2e co
 
 **Modais de `@modal` (2026-09-28):** cobertos agora por `e2e/j32-modais-interceptados.spec.ts`. Os três (`/ajustes/anilhas`, `/ajustes/modelos/novo`, `/perfil`) só existem como sobreposição quando a navegação é por clique num `<Link>` dentro do app (rota interceptada); todo spec anterior chegava neles por `page.goto` direto, que cai na página cheia — a apresentação real de folha nunca tinha sido exercida. O spec novo clica o link de verdade e confere: diálogo acessível (`role="dialog"`, `aria-label`), a página de trás continua montada (não é navegação cheia), sem vazamento horizontal, botão de fechar ≥44px, e os dois jeitos de fechar (botão e Esc) devolvem a rota certa.
 
-**Continuam `ALEGADO`, sem cobertura ainda:** `/treino/[id]` com séries em estado de erro/offline, e o detalhe do catálogo com mídia.
+**Lacunas finais cobertas (2026-09-28):** `e2e/j33-cobertura-final-ux03.spec.ts`, run `36386812415` (só `j26 j33`, 22 passaram). As telas medidas foram:
+- `/treino/[id]` com série registrada sem rede, com indicador "salvo no aparelho" e 1 pendente. Depois de reconectar, a série drena.
+- `/treino/[id]` com número fora do limite: recusado na tela, com o aviso logo acima de "Registrar série" e nada sob a barra.
+- `/catalogo/[id]` de exercício com GIF em pt/en/es. O GIF carrega e ocupa 307×307.
+
+Métricas limpas nas três: vazamento 0, conteúdo sob a nav 0, texto cortado 0. O único "alvo pequeno" medido é o checkbox de 1×1 px escondido dentro do interruptor "peso é de cada lado", ou seja, um falso positivo da medida. As capturas mostraram dois achados que a métrica não pega:
+
+| ID | Achado | Sev. | Estado |
+|---|---|---|---|
+| UX3-15 | Grade de séries de `/treino/[id]`: o peso sai cru, com ponto em português ("31.84 kg", o certo é "31,84"). Com decimal, "kg" quebra para a linha de baixo na coluna Carga. `treino-detalhe.tsx:821` imprime `serie.peso` sem o `formatarPeso` que a UX3-06 usa nas anilhas. | BAIXA | Aberto |
+| UX3-16 | `/catalogo/[id]` em en/es: o "Foco" do player, o músculo alvo, os sinergistas e a mecânica articular aparecem em português ("Flexão de Coluna Lombar / Quadril"), ao lado da dica já traduzida. Vêm de `exercicios-midia.json`, que só tem português. É a mesma classe de vazamento do A1. | MÉDIA | Aberto. Corrigir exige tradução de ~102 × 4 campos × 2 idiomas, sem IA em produção (mesmo método do A1). |
+
+Evidência: artefato `varredura-telas` do run `36386812415`, pastas `j33-*`.
 
 ## 5. Próximos passos
 
 1. ~~Dono vê a lista e decide o que corrigir~~ **Feito:** os quatro MÉDIA foram corrigidos (§4). Os quatro BAIXA (UX3-05 a 08) também foram corrigidos (§4b).
-2. ~~Completar a cobertura da §1 com capturas novas de viewport rolado, rotas fora da `j4`, temas e idiomas~~ — **feito em §4c** (`j26-cobertura-ux03.spec.ts`, 60 telas), mais contraste dos 7 temas (correção acima) e os modais interceptados. Falta só `/treino/[id]` em erro/offline e o detalhe do catálogo com mídia.
+2. ~~Completar a cobertura da §1 com capturas novas de viewport rolado, rotas fora da `j4`, temas e idiomas~~ — **feito em §4c** (`j26-cobertura-ux03.spec.ts`, 60 telas), mais contraste dos 7 temas (correção acima) e os modais interceptados. ~~Falta só `/treino/[id]` em erro/offline e o detalhe do catálogo com mídia.~~ **Feito em 2026-09-28 (`j33`, §4c).** A cobertura planejada da UX-03 está completa. Restam dois achados abertos (UX3-15 BAIXA e UX3-16 MÉDIA) e a auditoria independente (item 4).
 3. Só depois de decidido: PRs pequenas de correção, uma por achado ou por rota, cada uma com critério de aceite; e passar os itens para o `QA.md`.
 4. Outro agente audita esta lista e as correções (`ALEGADO` → `PASSOU`).
