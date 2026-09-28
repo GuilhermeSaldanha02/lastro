@@ -71,8 +71,8 @@ O dono pediu também a correção de UX3-05 a UX3-08. Mesmo procedimento; e2e co
 | UX3-10 | Home em espanhol: "INICIAR ENTRENAMIENTO DE HOY" quebrava em duas linhas com o ícone solto; título do cartão da Análise cortado em es/en ("Análisis Semanal (A…"). | MÉDIA | **Corrigido** (#330): "Iniciar/Continuar entreno de hoy", título sem "(AI Coach)". `j28-home-es-en.spec.ts`. |
 | UX3-11 | Termos, Privacidade, `/aceite` e `/ajustes/politicas`: bloco corrido, sem espaço entre parágrafos e seções (o texto que a pessoa precisa ler antes de aceitar). | MÉDIA | **Corrigido** (#331). `j29-texto-legal-e-titulos.spec.ts`. |
 | UX3-12 | Título do passo do onboarding e "Criar senha nova" usavam a classe de rótulo (pequena e cinza): hierarquia fraca na primeira impressão. | MÉDIA | **Corrigido** (#331): classe `titulo-cartao`. `j29`. |
-| UX3-13 | `/redefinir-senha` é um cartão solto, sem a marca (o login tem o logotipo). | BAIXA | Aberto |
-| UX3-14 | A 404 para quem não tem sessão mostra o avatar "AT" (Atleta) no cabeçalho, ligado ao perfil. | BAIXA | Aberto |
+| UX3-13 | `/redefinir-senha` é um cartão solto, sem a marca (o login tem o logotipo). | BAIXA | **Corrigido** (#336): logotipo acima do cartão. `j30-marca-e-404.spec.ts`. |
+| UX3-14 | A 404 para quem não tem sessão mostra o avatar "AT" (Atleta) no cabeçalho, ligado ao perfil. | BAIXA | **Corrigido** (#336): `CabecalhoPro` só mostra o avatar quando há perfil; com sessão ele continua. `j30` (3 passaram, rodando só essa spec). |
 
 **Incidentes do processo (registrados para não se repetir):** (1) a resolução de um conflito de `sistema.css` na #331 perdeu um `}` e a abertura de um comentário; o build da `main` falhou e a #331 foi mergeada com o CI vermelho porque meu encadeamento de comandos não parou no erro; corrigido na #332 e a produção nunca saiu do ar (a Vercel manteve o último deploy bom). (2) Um teste meu (UX3-09) reprovou português a 375 px por 1 px de subpixel; a tolerância virou 2 px (#333). (3) Eu disparava a suíte completa do e2e a cada correção; o dono apontou, e o `ci.yml` ganhou a entrada `specs` (#334): **só as specs que mudaram**.
 
