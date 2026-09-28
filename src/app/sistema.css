@@ -4094,9 +4094,9 @@
   display: grid;
   grid-template-columns:
     minmax(0, 1.15fr)
-    minmax(0, 0.85fr)
+    minmax(0, 1.15fr)
     minmax(0, 1fr)
-    minmax(0, 1.2fr);
+    minmax(0, 0.9fr);
   align-items: center;
 }
 
@@ -4214,9 +4214,9 @@
   .grade-series__linha {
     grid-template-columns:
       minmax(0, 0.95fr)
-      minmax(0, 0.75fr)
+      minmax(0, 0.95fr)
       minmax(0, 0.8fr)
-      minmax(0, 1.2fr);
+      minmax(0, 1fr);
   }
 }
 

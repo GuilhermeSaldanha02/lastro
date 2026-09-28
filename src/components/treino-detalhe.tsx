@@ -58,6 +58,7 @@ import {
   type ExercicioDoModelo,
 } from "@/lib/dados/modelo-treino";
 import { t } from "@/lib/texto/i18n";
+import { formatarPeso } from "@/lib/texto/formatar-delta";
 import type { Idioma } from "@/lib/dados/idioma";
 import type { DescansoConcluido } from "@/lib/treino/descanso-real";
 import {
@@ -695,9 +696,9 @@ export default function TreinoDetalhe({
                     onClick={() => abrirComPlano(exercicio)}
                     aria-label={`${t("Registrar série", idioma)}: ${exercicio.nome}`}
                   >
-                    {temPlano && (
+                    {temPlano && exercicio.peso !== null && (
                       <span className="botao-plano__valor">
-                        {exercicio.reps} × {exercicio.peso} kg
+                        {exercicio.reps} × {formatarPeso(exercicio.peso, idioma)} kg
                       </span>
                     )}
                     <span aria-hidden="true">+</span>
@@ -751,7 +752,7 @@ export default function TreinoDetalhe({
                         <div className="confirma" key={serie.id}>
                           <p className="confirma__texto">
                             {t("Excluir a série", idioma)} {indice + 1} {t("de", idioma)} {grupo.nome} —{" "}
-                            {serie.reps} × {serie.peso} kg? {t("Não dá para desfazer.", idioma)}
+                            {serie.reps} × {formatarPeso(serie.peso, idioma)} kg? {t("Não dá para desfazer.", idioma)}
                           </p>
                           <div className="confirma__acoes">
                             <button
@@ -818,7 +819,7 @@ export default function TreinoDetalhe({
                           </span>
                         </span>
                         <span className="grade-series__numero" role="cell">
-                          {serie.peso} <small>{unidadeDaCarga(serie.pesoPorLado, idioma)}</small>
+                          {formatarPeso(serie.peso, idioma)} <small>{unidadeDaCarga(serie.pesoPorLado, idioma)}</small>
                         </span>
                         <span className="grade-series__numero" role="cell">{serie.reps}</span>
                         <span className="grade-series__descanso" role="cell">

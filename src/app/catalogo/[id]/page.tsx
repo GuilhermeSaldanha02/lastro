@@ -14,6 +14,7 @@ import PlayerExecucaoExercicio from "@/components/player-execucao-exercicio";
 import { obterMidiaExercicio } from "@/lib/dados/midia-exercicio";
 import { dicaTraduzidaDoExercicio } from "@/lib/dados/traducao";
 import { t } from "@/lib/texto/i18n";
+import { formatarPeso } from "@/lib/texto/formatar-delta";
 
 export default async function PaginaHistoricoExercicio({
   params,
@@ -61,7 +62,7 @@ export default async function PaginaHistoricoExercicio({
             {exercicio.pesoPorLado && <span className="tag-unilateral">{t("Peso por lado", idioma)}</span>}
             {cargaMaxima > 0 && (
               <span className="disciplina-card__streak">
-                {t("Melhor marca:", idioma)} {cargaMaxima} kg
+                {t("Melhor marca:", idioma)} {formatarPeso(cargaMaxima, idioma)} kg
               </span>
             )}
           </div>
@@ -183,7 +184,7 @@ export default async function PaginaHistoricoExercicio({
                 <div className="cartao-treino-item__direita">
                   <div className="cartao-treino-item__metricas">
                     <span className="cartao-treino-item__vol">
-                      {serie.reps} × {serie.peso} kg
+                      {serie.reps} × {formatarPeso(serie.peso, idioma)} kg
                     </span>
                   </div>
                   <SetaNavegacao />
