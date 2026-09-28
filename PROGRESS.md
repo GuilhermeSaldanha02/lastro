@@ -17,7 +17,7 @@
   - Tela: chip de prescrição trocado por "Como foi minha semana?"; resposta local rotulada "Calculado pelo lastro"; manual atualizado.
   - Prova: e2e `j34 j3 j6 j12`, 38 passaram, `uso_ia` em 0. **Falta o dono conferir em produção na conta dele.**
   - Pendente para o dono: a Política diz que as respostas do Coach são geradas por IA, e agora isso vale só para parte delas. Ajustar na próxima revisão da Política.
-  - Próximo: M2 (período no `montarResumoCompacto`, AN-07 e resumo mensal C3), só com autorização.
+  - Próximo: **M2 aprovada pelo dono em 2026-09-28**, com o plano em 3 PRs no backlog (`AN-08.M2-1` a `M2-3`) e a decisão em `DECISIONS.md` 2026-09-28 (2). Ordem: M2-1, M2-2, M2-3.
 - **AN-08, estudo entregue (2026-09-28, sem código):** `docs/estudos/AN-08-motor-deterministico-estudo.md`. Achados principais:
   - os 3 chips do Coach são recusados pelo próprio prompt e gastam cota;
   - o relatório pós-treino ignora `unilateral` (52 exercícios), então diverge da lista;
