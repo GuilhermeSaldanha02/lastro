@@ -5,6 +5,8 @@
  * contagem de séries válidas, detalhamento por exercício e PRs do dia.
  */
 
+import { volumeDeSerie } from "@/lib/analise/volume";
+
 /**
  * Duração da SESSÃO em segundos — **definição única**, usada tanto pelo
  * relatório da tela de treino quanto pelo de `/ajustes/relatorios`.
@@ -60,6 +62,8 @@ export type SerieParaMetricas = {
   peso: number;
   tipo: "aquecimento" | "valendo";
   pesoPorLado?: boolean;
+  /** Reps contadas por lado: dobra o volume, como no agregador. */
+  exercicioUnilateral?: boolean;
   ehRecordePessoal?: boolean;
   /** Dado curado do catálogo — fonte real do foco/divisão (ver `inferirFocoPorGrupo`). */
   exercicioGrupoMuscular?: string;
@@ -210,8 +214,12 @@ export function calcularMetricasSessao(
   const gruposMusculares: string[] = [];
 
   for (const s of series) {
-    const pesoEfetivo = s.pesoPorLado ? s.peso * 2 : s.peso;
-    const volumeSerie = s.reps * pesoEfetivo;
+    const volumeSerie = volumeDeSerie({
+      reps: s.reps,
+      peso: s.peso,
+      unilateral: s.exercicioUnilateral ?? false,
+      pesoPorLado: s.pesoPorLado ?? false,
+    });
 
     let ex = mapaExercicios.get(s.exercicioId);
     if (!ex) {
