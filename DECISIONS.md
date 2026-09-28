@@ -2994,3 +2994,23 @@ Sem navegador local (sem `.env.local`). O `j14-dica-info` roda na tela pública 
 **A decisão.** O `workflow_dispatch` do `ci.yml` ganhou a entrada `specs`: pedaços dos nomes dos arquivos separados por espaço, repassados ao `npm run e2e` (`gh workflow run ci.yml --ref main -f specs="j27 j28"`). Vazio roda a suíte completa. Regra: prova de uma mudança = **as specs que ela toca ou cria**. Suíte completa só em marco de integração real (login, guardas de rota, banco, cota de IA, ou várias áreas de uma vez).
 
 **Como reverter.** Voltar o `ci.yml`; sem `specs` o comportamento é o de antes.
+
+
+## 2026-09-28 (1) — UX-02: calendário de mês em vez das duas direções propostas
+
+**Contexto.** O handoff (`docs/HANDOFF-ANTIGRAVITY-UX-02-UX-03.md` §3) previa o portão visual do `AGENTS.md`: mostrar 2–3 direções renderizadas antes de codar. O Antigravity não chegou a começar (cota esgotada); o dono pediu para o Claude assumir. O Claude montou duas direções (linhas compactas por mês; cartões de mês com resumo) num Artifact do tipo Design, com os tokens reais do app (não paleta nova).
+
+**A decisão do dono.** Nenhuma das duas: pediu para "pesquisar uma forma melhor", puxando o padrão de calendário que já existe na Home (`RastreadorDisciplina`, semana com bolinha nos dias com treino) e sugeriu estender para um calendário de mês. Depois de ver o mockup, pediu mais dois ajustes: (1) o calendário fica **colapsado por padrão**, abre ao tocar no cabeçalho; (2) cada linha do histórico ganha um **botão de gerar relatório**, para não precisar ir a `/ajustes/relatorios` só para isso.
+
+**O que foi construído.**
+- Calendário do mês colapsável (`.calendario-mes`), semana começando na segunda (mesmo padrão do `RastreadorDisciplina` e da semana ISO da Análise), bolinha esmeralda nos dias com treino, anel dourado no dia de hoje. Toca num dia marcado → filtra a lista para aquele dia e fecha o calendário. Navegação entre meses só nos que têm dado (seta desabilita no limite) — mesma regra do briefing original.
+- "Treino de hoje" (podem ser vários) em seção própria, sempre antes do histórico agrupado.
+- Histórico agrupado por mês (cabeçalho "Setembro 2026"), sem cartão grande repetido — linha fina por treino, como a UX-03 já vinha corrigindo noutras telas.
+- Filtro por grupo muscular (já existia) continua, e combina com o filtro por dia do calendário.
+- Botão de gerar relatório por linha, ícone só, reaproveitando a mesma ação de servidor de `/ajustes/relatorios` (extraída para não duplicar: `lib/dados/relatorio-treino.ts`).
+
+**Alternativa descartada.** As duas direções originais (linhas simples por mês; cartões de mês com resumo) — o dono achou que nenhuma resolvia o problema real, que era achar um treino específico sem rolar a lista inteira. Cartões de resumo por mês foram descartados de vez (custam mais altura de tela sem esse ganho).
+
+**Impacto.** Nenhuma métrica nova nem cálculo novo — volume e séries continuam vindo de `listarTreinos`. Duas funções puras novas e testadas (`lib/treino/agrupar-historico.ts`, `lib/treino/calendario-mes.ts`) fixam a regra de agrupamento e a grade do calendário fora do componente React, então são testáveis sem navegador.
+
+**Como reverter.** Reverter a PR da UX-02; `/ajustes/relatorios` continua funcionando (só passou a importar `obterMetricasDoTreino` de um arquivo novo em vez de definir a função ali).

@@ -5,9 +5,9 @@
 //
 // Modo Bancada (DESIGN.md §3.5): poucos elementos, grandes. A ação
 // primária fica na metade inferior, ao alcance do polegar (D2).
-import Link from "next/link";
 import { listarTreinos } from "@/lib/dados/treino";
 import { obterPerfil } from "@/lib/dados/perfil";
+import { obterMetricasDoTreino } from "@/lib/dados/relatorio-treino";
 import { cascaDaBarra, exigirCascaDeAluno } from "@/lib/dados/casca";
 import { listarModelos } from "@/lib/dados/modelo-treino";
 import { dataLocalBrasil } from "@/lib/tempo";
@@ -17,22 +17,7 @@ import IniciarTreino from "@/components/iniciar-treino";
 import FormIniciarTreino from "@/components/form-iniciar-treino";
 import CabecalhoPro from "@/components/cabecalho-pro";
 import { t } from "@/lib/texto/i18n";
-import type { Idioma } from "@/lib/dados/idioma";
-
-const MESES_POR_IDIOMA: Record<Idioma, string[]> = {
-  "pt-BR": ["jan", "fev", "mar", "abr", "mai", "jun", "jul", "ago", "set", "out", "nov", "dez"],
-  en: ["jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec"],
-  es: ["ene", "feb", "mar", "abr", "may", "jun", "jul", "ago", "sep", "oct", "nov", "dic"],
-};
-
-/** "2026-08-06" → "6 ago". A data já vem local; não há fuso a converter. */
-function formatarData(iso: string, idioma: Idioma): string {
-  const meses = MESES_POR_IDIOMA[idioma];
-  const [, mes, dia] = iso.split("-");
-  const indice = Number(mes) - 1;
-  if (!meses[indice] || !dia) return iso;
-  return `${Number(dia)} ${meses[indice]}`;
-}
+import Link from "next/link";
 
 export default async function PaginaTreino() {
   const [treinos, perfil, modelos] = await Promise.all([
@@ -83,15 +68,13 @@ export default async function PaginaTreino() {
           )}
         </section>
 
+        {/* UX-02: treino de hoje separado + histórico com calendário e
+            relatório por linha — tudo em ListaTreinos (2026-09-28). */}
         <ListaTreinos
-          treinos={treinos.map((treino) => ({
-            id: treino.id,
-            dataFormatada: formatarData(treino.data, idioma),
-            totalSeries: treino.totalSeries,
-            gruposMusculares: treino.gruposMusculares,
-            volumeKg: treino.volumeKg,
-          }))}
+          treinos={treinos}
+          hojeISO={hoje}
           idioma={idioma}
+          obterMetricasAcao={obterMetricasDoTreino}
         />
       </div>
 
