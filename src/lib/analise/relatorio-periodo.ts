@@ -146,6 +146,8 @@ type Frases = {
   maiorEvolucao: (exercicio: string, pct: string, sessoes: number) => string;
   maiorQueda: (exercicio: string, pct: string) => string;
   semEvolucao: (sessoes: number) => string;
+  evolucaoEstavel: string;
+  mediaTreinos: (media: number) => string;
   recordes: (n: number, lista: string) => string;
   semRecordes: string;
   recordeItem: (exercicio: string, reps: number, peso: string) => string;
@@ -167,13 +169,15 @@ const POR_IDIOMA: Record<Idioma, Frases> = {
     mesVazio: (nome) => `${nome}: nenhum treino até hoje.`,
     historico: (desde, treinos) => `Desde ${desde}: ${treinos}.`,
     semNada: "Você ainda não registrou nenhuma série valendo.",
-    base: (com, total, media, volume) => `Treinou em ${com} de ${total}, média de ${media} treinos por semana. Volume total: ${volume}.`,
+    base: (com, total, media, volume) => `Treinou em ${com} de ${total}, média de ${media} por semana. Volume total: ${volume}.`,
     mesAnterior: (nome, treinos, volume) => `${nome} inteiro: ${treinos} e ${volume}.`,
     maiorEvolucao: (ex, pct, s) => `Maior evolução: ${ex}, ${pct} de e1RM em ${s} sessões.`,
     maiorQueda: (ex, pct) => `Maior queda: ${ex}, ${pct}.`,
     semEvolucao: (s) => `Nenhum exercício teve ${s} sessões com carga medível no período para medir evolução.`,
     recordes: (n, lista) => `${n} ${n === 1 ? "recorde pessoal" : "recordes pessoais"}: ${lista}.`,
     semRecordes: "Nenhum recorde pessoal no período.",
+    evolucaoEstavel: "Nenhum exercício subiu nem caiu mais de 1% de e1RM no período.",
+    mediaTreinos: (m) => `${formatarPeso(m, "pt-BR")} ${m === 1 ? "treino" : "treinos"}`,
     recordeItem: (ex, reps, peso) => `${ex} ${reps} × ${peso} kg`,
     maisTreinados: (lista) => `Mais treinados: ${lista}.`,
     menosTreinados: (lista) => `Menos treinados: ${lista}.`,
@@ -188,13 +192,15 @@ const POR_IDIOMA: Record<Idioma, Frases> = {
     mesVazio: (nome) => `${nome}: no workouts so far.`,
     historico: (desde, treinos) => `Since ${desde}: ${treinos}.`,
     semNada: "You haven't logged any working set yet.",
-    base: (com, total, media, volume) => `Trained in ${com} of ${total}, an average of ${media} workouts per week. Total volume: ${volume}.`,
+    base: (com, total, media, volume) => `Trained in ${com} of ${total}, an average of ${media} per week. Total volume: ${volume}.`,
     mesAnterior: (nome, treinos, volume) => `All of ${nome}: ${treinos} and ${volume}.`,
     maiorEvolucao: (ex, pct, s) => `Biggest gain: ${ex}, ${pct} in e1RM over ${s} sessions.`,
     maiorQueda: (ex, pct) => `Biggest drop: ${ex}, ${pct}.`,
     semEvolucao: (s) => `No exercise had ${s} sessions with measurable load in the period to measure progress.`,
     recordes: (n, lista) => `${n} ${n === 1 ? "personal record" : "personal records"}: ${lista}.`,
     semRecordes: "No personal record in the period.",
+    evolucaoEstavel: "No exercise rose or fell more than 1% in e1RM in the period.",
+    mediaTreinos: (m) => `${formatarPeso(m, "en")} ${m === 1 ? "workout" : "workouts"}`,
     recordeItem: (ex, reps, peso) => `${ex} ${reps} × ${peso} kg`,
     maisTreinados: (lista) => `Most trained: ${lista}.`,
     menosTreinados: (lista) => `Least trained: ${lista}.`,
@@ -209,13 +215,15 @@ const POR_IDIOMA: Record<Idioma, Frases> = {
     mesVazio: (nome) => `${nome}: ningún entrenamiento hasta hoy.`,
     historico: (desde, treinos) => `Desde ${desde}: ${treinos}.`,
     semNada: "Todavía no registraste ninguna serie válida.",
-    base: (com, total, media, volume) => `Entrenaste en ${com} de ${total}, un promedio de ${media} entrenamientos por semana. Volumen total: ${volume}.`,
+    base: (com, total, media, volume) => `Entrenaste en ${com} de ${total}, un promedio de ${media} por semana. Volumen total: ${volume}.`,
     mesAnterior: (nome, treinos, volume) => `${nome} entero: ${treinos} y ${volume}.`,
     maiorEvolucao: (ex, pct, s) => `Mayor evolución: ${ex}, ${pct} de e1RM en ${s} sesiones.`,
     maiorQueda: (ex, pct) => `Mayor caída: ${ex}, ${pct}.`,
     semEvolucao: (s) => `Ningún ejercicio tuvo ${s} sesiones con carga medible en el período para medir la evolución.`,
     recordes: (n, lista) => `${n} ${n === 1 ? "récord personal" : "récords personales"}: ${lista}.`,
     semRecordes: "Ningún récord personal en el período.",
+    evolucaoEstavel: "Ningún ejercicio subió ni cayó más de 1% de e1RM en el período.",
+    mediaTreinos: (m) => `${formatarPeso(m, "es")} ${m === 1 ? "entrenamiento" : "entrenamientos"}`,
     recordeItem: (ex, reps, peso) => `${ex} ${reps} × ${peso} kg`,
     maisTreinados: (lista) => `Más entrenados: ${lista}.`,
     menosTreinados: (lista) => `Menos entrenados: ${lista}.`,
@@ -236,7 +244,7 @@ export function textoDoRelatorio(r: RelatorioPeriodo | null, idioma: Idioma): st
   }
 
   if (r.treinos > 0) {
-    const media = formatarPeso(Math.round((r.treinos / r.semanasNoPeriodo) * 10) / 10, idioma);
+    const media = f.mediaTreinos(Math.round((r.treinos / r.semanasNoPeriodo) * 10) / 10);
     frases.push(f.base(r.semanasComTreino, f.semanas(r.semanasNoPeriodo), media, f.kg(r.volume)));
   }
   if (r.anterior && r.anterior.treinos > 0) {
@@ -249,6 +257,7 @@ export function textoDoRelatorio(r: RelatorioPeriodo | null, idioma: Idioma): st
   if (subiu) frases.push(f.maiorEvolucao(subiu.exercicio, formatarPercentual(subiu.deltaPct, idioma), subiu.sessoes));
   if (caiu) frases.push(f.maiorQueda(caiu.exercicio, formatarPercentual(caiu.deltaPct, idioma)));
   if (r.evolucao.length === 0) frases.push(f.semEvolucao(MINIMO_SESSOES_TENDENCIA));
+  else if (!subiu && !caiu) frases.push(f.evolucaoEstavel);
 
   frases.push(
     r.recordes.length > 0

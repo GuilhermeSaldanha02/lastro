@@ -98,6 +98,19 @@ describe("relatório desde o primeiro treino (AN-07)", () => {
   });
 });
 
+describe("casos de borda do texto", () => {
+  it("média de exatamente 1 fica no singular, e carga igual vira 'estável', não silêncio", () => {
+    const series = achatarSeriesValendo(
+      [treino("2026-09-21", [["supino", 10, 40]]), treino("2026-09-28", [["supino", 10, 40]])],
+      new Map(EXERCICIOS.map((e) => [e.id, e])),
+    );
+    const periodo = periodoDoRelatorio("historico", HOJE, series)!;
+    const texto = textoDoRelatorio(montarRelatorioPeriodo("historico", periodo, series), "pt-BR");
+    expect(texto).toContain("média de 1 treino por semana");
+    expect(texto).toContain("Nenhum exercício subiu nem caiu mais de 1% de e1RM no período.");
+  });
+});
+
 describe("idiomas", () => {
   it("responde em inglês e espanhol", () => {
     expect(textoDoRelatorio(relatorio("mes"), "en")).toMatch(/^September 2026: 3 workouts so far\./);
