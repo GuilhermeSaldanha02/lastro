@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { obterMidiaExercicio } from "@/lib/dados/midia-exercicio";
+import { obterMidiaExercicio, traduzirBiomecanica } from "@/lib/dados/midia-exercicio";
 import { t } from "@/lib/texto/i18n";
 import type { Idioma } from "@/lib/dados/idioma";
 
@@ -45,7 +45,7 @@ export default function PlayerExecucaoExercicio({
           <div className="player-exercicio-card__badge-foco">
             <span className="player-exercicio-card__ponto-vermelho" />
             <span>
-              {t("Foco:", idioma)} {midia.musculo_alvo}
+              {t("Foco:", idioma)} {traduzirBiomecanica(midia.musculo_alvo, idioma)}
             </span>
           </div>
         )}
