@@ -16,7 +16,31 @@
 
 **AN-07 (a decidir, NÃO implementar ainda).** O dono pediu ao Coach, em produção, um relatório "do primeiro treino até hoje" e o Coach recusou. É o comportamento correto pelo desenho atual — o Coach (`PRD.md` §4.4) responde dúvida geral e não lê os números do dono; quem lê é a Análise Semanal, e só a última semana ISO fechada (`PRD.md` §3). Não existe hoje nenhuma pergunta de **período livre/histórico completo**. O dono achou "as análises muito travadas" e pediu para anotar, para mudar mais para frente — **não é para implementar agora**, é decisão de escopo pendente (like PU-03/04, mexe com a regra inegociável de resumo determinístico + cota de IA). Perguntar ao dono, quando for a vez: o que um "relatório do início até hoje" mostraria que as 5 perguntas semanais já não mostram, e se cabe dentro do orçamento de cota (`config_ia`, PU-04).
 
-**AN-08 (a decidir, NÃO implementar ainda — só a Entrega 1, quando autorizado).** O dono colou uma missão completa (2026-09-28) para uma evolução grande: um **motor determinístico** entre o dado bruto e a Gemini — a maioria das perguntas de progressão/volume/frequência/consistência responde por código, sem gastar IA, e o Coach ganha um roteador de intenção que só cai na Gemini quando a pergunta é realmente aberta. Cobre também recuperação (check-in, índice de prontidão), insights automáticos na Home, resumo mensal, página funda por exercício, e (bem mais tarde, sem implementar) Health Connect/Apple Health. Texto completo, verbatim: `docs/MISSAO-MOTOR-DETERMINISTICO.md`. **Ordem explícita do dono: PARAR depois de 5 entregas de estudo (auditoria, matriz de capacidades com 30+ perguntas, arquitetura, roadmap por fase, economia estimada de IA) e esperar aprovação — nenhuma linha de código antes disso.** Resolve/absorve o AN-07 acima (uma pergunta de período livre é exatamente o tipo de coisa que o motor determinístico responderia sem Gemini). Esforço: ALTO só para a Entrega 1 (auditoria + matriz); a implementação em si é bem maior, faseada pelo próprio roadmap que a Entrega 1 vai produzir.
+**AN-08 (a decidir, NÃO implementar ainda — só as 5 entregas de estudo, quando autorizado).** O dono colou uma missão completa (2026-09-28) para uma evolução grande: um **motor determinístico** entre o dado bruto e a Gemini — a maioria das perguntas de progressão/volume/frequência/consistência responde por código, sem gastar IA, e o Coach ganha um roteador de intenção que só cai na Gemini quando a pergunta é realmente aberta. Cobre também recuperação (check-in, índice de prontidão), insights automáticos na Home, resumo mensal, página funda por exercício, e (bem mais tarde, sem implementar) Health Connect/Apple Health. Texto completo, verbatim: `docs/MISSAO-MOTOR-DETERMINISTICO.md`. **Ordem explícita do dono: PARAR depois de 5 entregas de estudo (auditoria, matriz de capacidades com 30+ perguntas, arquitetura, roadmap por fase, economia estimada de IA) e esperar aprovação — nenhuma linha de código antes disso.** Resolve/absorve o AN-07 acima (uma pergunta de período livre é exatamente o tipo de coisa que o motor determinístico responderia sem Gemini). Esforço: ALTO só para as 5 entregas de estudo; a implementação em si é bem maior, faseada pelo roadmap que a Entrega 4 vai produzir.
+
+Sub-itens do AN-08, **todos NÃO INICIADOS**. O prefixo `AN-08.` evita colisão com IDs que já existem neste backlog (o `A1` de tradução de dica, por exemplo). Esta tabela só dá o tamanho da missão: escopo, dependências, esforço e ordem de cada linha saem da Entrega 4, depois de confrontar cada proposta com o código real — alguma pode já estar parcialmente coberta (a C2, por exemplo, pelo calendário da UX-02). Seção = seção de `docs/MISSAO-MOTOR-DETERMINISTICO.md`.
+
+| ID | Fase | O que é | Seção |
+|---|---|---|---|
+| AN-08.E1–E5 | Estudo | As 5 entregas: auditoria, matriz de capacidades (30+ perguntas), arquitetura, roadmap, economia estimada de IA. Depois delas, PARAR. | §27–§28 |
+| AN-08.F0-MATRIZ | 0 | Matriz Gemini × determinístico em níveis 0–4 (progressão, volume, frequência, consistência). | §3–§6, §24 |
+| AN-08.F0-TEMPO | 0 | Camada única de comparação temporal (semana, 4 semanas, mês, período livre × anterior). | §7 |
+| AN-08.F0-ANOMALIA | 0 | Detector de sessão fora do padrão do próprio usuário, com piso de amostra. | §8 |
+| AN-08.F0-INSIGHT | 0 | `Insight` como dado estruturado, antes de virar texto. | §9 |
+| AN-08.F0-ROTEADOR | 0 | Roteador de perguntas do Coach sem LLM para classificar (intents, padrões, aliases). | §10–§11 |
+| AN-08.F0-CACHE | 0 | Avaliar cache/snapshot de agregados, com invalidação por série nova. | §12 |
+| AN-08.F0-CUSTO | 0 | Observabilidade de custo (local × Gemini, fallback, erro de classificação), sem telemetria invasiva. | §25 |
+| AN-08.A1 | A | Check-in de recuperação (sono, energia, dor, estresse). | §13 |
+| AN-08.A2 | A | Índice de prontidão transparente, sem fórmula inventada. | §14 |
+| AN-08.A3 | A | Recuperação × desempenho, só correlação. | §15 |
+| AN-08.B1 | B | Sessão fora do padrão ao finalizar o treino. | §16 |
+| AN-08.B2 | B | "Lastro percebeu" na Home, por template, sem Gemini. | §17 |
+| AN-08.B3 | B | Explicar mudança de desempenho por evidências, sem causalidade. | §18 |
+| AN-08.C1 | C | Página funda por exercício. | §19 |
+| AN-08.C2 | C | Consistência/calendário (checar sobreposição com a UX-02). | §20 |
+| AN-08.C3 | C | Resumo mensal por template. | §21 |
+| AN-08.D1 | D | Peso corporal. | §22 |
+| AN-08.D2 | D | Health Connect / Apple Health — só estudar, bem mais tarde. | §23 |
 
 ## P(-1) — abertura ao público (decisão do dono, 2026-09-25)
 
