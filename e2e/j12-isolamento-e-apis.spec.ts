@@ -344,9 +344,10 @@ test("análise: dois pedidos simultâneos não criam dois rascunhos nem gastam c
   try {
     const cliente = await clienteAutenticado(conta);
     await entrarComoUsuario(page, conta);
+    // Pergunta 5: desde a M2-1 do AN-08 é a única que vai à Gemini e reserva cota.
     const respostas = await Promise.all([
-      page.request.post("/api/analise", { data: { pergunta: 1 } }),
-      page.request.post("/api/analise", { data: { pergunta: 2 } }),
+      page.request.post("/api/analise", { data: { pergunta: 5 } }),
+      page.request.post("/api/analise", { data: { pergunta: 5 } }),
     ]);
     const status = respostas.map((r) => r.status());
     const pareceres = await contarLinhas(cliente, "parecer", { usuario_id: conta.id });
@@ -369,16 +370,32 @@ test("análise e coach: em andamento responde 409 e teto responde 429, sem gasta
     await cliente
       .from("parecer")
       .insert({ usuario_id: conta.id, pergunta: 1, pergunta_texto: "x", idioma: "pt-BR", status: "gerando", confirmado: false });
-    const emAndamento = await page.request.post("/api/analise", { data: { pergunta: 2 } });
+    const emAndamento = await page.request.post("/api/analise", { data: { pergunta: 5 } });
     expect.soft(emAndamento.status(), "com geração em andamento").toBe(409);
     expect.soft(await usos("parecer"), "o 409 gastou cota").toBe(0);
     await cliente.from("parecer").delete().eq("usuario_id", conta.id);
 
     await cliente.from("uso_ia").insert(Array.from({ length: 5 }, () => ({ usuario_id: conta.id, origem: "parecer" })));
-    const tetoAnalise = await page.request.post("/api/analise", { data: { pergunta: 1 } });
+    const tetoAnalise = await page.request.post("/api/analise", { data: { pergunta: 5 } });
     expect.soft(tetoAnalise.status(), "análise com o teto de 5 atingido").toBe(429);
     expect.soft(await usos("parecer"), "o 429 da análise gastou cota").toBe(5);
     expect.soft(await contarLinhas(cliente, "parecer", { usuario_id: conta.id }), "o 429 criou rascunho").toBe(0);
+
+    // AN-08 M2-1: as perguntas 1 a 4 são por lógica — seguem respondendo com o
+    // teto de IA estourado, e não tocam na cota.
+    const porLogica = await page.request.post("/api/analise", { data: { pergunta: 1 } });
+    expect.soft(porLogica.status(), "pergunta 1 com o teto de IA atingido").toBe(202);
+    expect.soft(await usos("parecer"), "a pergunta 1 gastou cota de IA").toBe(5);
+    const { data: pronto } = await cliente
+      .from("parecer")
+      .select("status, aviso_falha_interpretativa")
+      .eq("usuario_id", conta.id)
+      .eq("pergunta", 1)
+      .single();
+    expect.soft(pronto, "a pergunta 1 nasce pronta, sem aviso de falha de IA").toEqual({
+      status: "pronto",
+      aviso_falha_interpretativa: false,
+    });
 
     await cliente.from("uso_ia").insert(Array.from({ length: 10 }, () => ({ usuario_id: conta.id, origem: "coach" })));
     const tetoCoach = await page.request.post("/api/coach", { data: { pergunta: "O que é RIR?" } });
