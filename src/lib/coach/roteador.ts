@@ -18,12 +18,20 @@ export type IntentDados =
 
 export type IntentRecusa = "SAUDE" | "EXECUCAO" | "PRESCRICAO";
 
+/** Relatório de período, gerado e SALVO nos pareceres (AN-08 M2-3). */
+export type IntentRelatorio = "RELATORIO_MES" | "RELATORIO_HISTORICO";
+
 export type Classificacao =
   | { intent: IntentRecusa }
+  | { intent: IntentRelatorio }
   | { intent: Exclude<IntentDados, "DIAS_SEM_GRUPO"> }
   | { intent: "DIAS_SEM_GRUPO"; grupo: string };
 
-export type ClassificacaoDados = Exclude<Classificacao, { intent: IntentRecusa }>;
+export type ClassificacaoDados = Exclude<Classificacao, { intent: IntentRecusa | IntentRelatorio }>;
+
+export function ehRelatorio(c: Classificacao): c is { intent: IntentRelatorio } {
+  return c.intent === "RELATORIO_MES" || c.intent === "RELATORIO_HISTORICO";
+}
 
 export function ehRecusa(c: Classificacao): c is { intent: IntentRecusa } {
   return c.intent === "SAUDE" || c.intent === "EXECUCAO" || c.intent === "PRESCRICAO";
@@ -115,6 +123,22 @@ export function classificar(pergunta: string): Classificacao | null {
     }
     // Volume, frequência ou resumo DE UM GRUPO ainda não tem resposta local.
     return null;
+  }
+
+  // Antes das perguntas de semana: "como foi meu mês" também tem "como foi".
+  if (
+    tem(
+      texto,
+      /\bprimeiro treino\b|\bdesde (o |que )?(inicio|comeco|comecei)\b|\btodo o (historico|periodo)\b|\bhistorico (completo|todo|inteiro)\b|\bfirst workout\b|\bsince (i started|the beginning|the start)\b|\ball time\b|\bprimer entrenamiento\b|\bdesde (el )?(principio|inicio)\b|\bdesde que empece\b/,
+    )
+  ) {
+    return { intent: "RELATORIO_HISTORICO" };
+  }
+  if (
+    tem(texto, /\b(mes|month)\b/) &&
+    tem(texto, /\b(como foi|como esta|resumo|resuma|relatorio|balanco|how was|how is|summary|summarize|report|recap|como fue|como va|resumen|informe|balance)\b/)
+  ) {
+    return { intent: "RELATORIO_MES" };
   }
 
   if (tem(texto, PALAVRA_GRUPO) && tem(texto, /\b(menos|menor|least|less|fewer)\b/) && tem(texto, TREINAR)) {

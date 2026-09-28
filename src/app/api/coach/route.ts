@@ -22,7 +22,8 @@ import {
 import { detalheParaLog, respostaDeFalha } from "./falha";
 import { reservarUso } from "@/lib/dados/uso-ia";
 import { obterIdioma } from "@/lib/dados/idioma";
-import { classificar, ehRecusa } from "@/lib/coach/roteador";
+import { classificar, ehRecusa, ehRelatorio } from "@/lib/coach/roteador";
+import { gerarESalvarRelatorio } from "@/lib/coach/relatorio-salvo";
 import { textoDeRecusa } from "@/lib/coach/responder";
 import { responderComDados } from "@/lib/coach/responder-local";
 
@@ -82,7 +83,10 @@ export async function POST(request: Request) {
       });
     }
     try {
-      const resposta = await responderComDados({ supabase, usuarioId: user.id, classificacao, idioma });
+      // AN-08 M2-3: relatório de período é gerado e SALVO nos pareceres.
+      const resposta = ehRelatorio(classificacao)
+        ? await gerarESalvarRelatorio({ supabase, usuarioId: user.id, intent: classificacao.intent, idioma })
+        : await responderComDados({ supabase, usuarioId: user.id, classificacao, idioma });
       return NextResponse.json({ resposta, origem: "local" });
     } catch (erro) {
       console.error("[coach] falha ao responder localmente", detalheParaLog(erro));
