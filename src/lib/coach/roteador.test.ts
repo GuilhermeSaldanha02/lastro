@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { classificar, ehRecusa, grupoCitado, normalizar } from "./roteador";
+import { classificar, ehRecusa, ehRelatorio, grupoCitado, normalizar } from "./roteador";
 
 describe("normalizar", () => {
   it("tira acento, pontuação e caixa", () => {
@@ -55,6 +55,31 @@ describe("classificar — perguntas de dados", () => {
   it("há quanto tempo não treino um grupo leva o grupo junto", () => {
     expect(classificar("Há quanto tempo não treino costas?")).toEqual({ intent: "DIAS_SEM_GRUPO", grupo: "costas" });
     expect(classificar("hace cuánto no entreno hombros")).toEqual({ intent: "DIAS_SEM_GRUPO", grupo: "ombro" });
+  });
+});
+
+describe("classificar — relatórios de período (AN-08 M2-3)", () => {
+  it.each([
+    ["Relatório do primeiro treino até hoje", "RELATORIO_HISTORICO"], // o pedido original do AN-07
+    ["Como estou desde que comecei?", "RELATORIO_HISTORICO"],
+    ["How have I done since my first workout?", "RELATORIO_HISTORICO"],
+    ["¿Cómo me fue desde mi primer entrenamiento?", "RELATORIO_HISTORICO"],
+    ["Como foi meu mês?", "RELATORIO_MES"],
+    ["Resumo do mês", "RELATORIO_MES"],
+    ["How was my month?", "RELATORIO_MES"],
+    ["¿Cómo fue mi mes?", "RELATORIO_MES"],
+  ])("%s → %s", (pergunta, intent) => {
+    const c = classificar(pergunta);
+    expect(c).toEqual({ intent });
+    expect(c && ehRelatorio(c)).toBe(true);
+  });
+
+  it("semana continua sendo semana", () => {
+    expect(classificar("Como foi minha semana?")).toEqual({ intent: "RESUMO_SEMANA" });
+  });
+
+  it("relatório de um grupo só ainda não é local", () => {
+    expect(classificar("Como foi meu mês de peito?")).toBeNull();
   });
 });
 

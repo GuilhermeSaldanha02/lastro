@@ -65,3 +65,25 @@ test("chips e recusa respondem com os números da conta, sem gastar cota de IA",
 
   expect(await usosDeIa(), "uma resposta local reservou cota da Gemini").toBe(0);
 });
+
+test("relatório do mês pelo Coach: responde, salva em Pareceres salvos e não gasta cota (AN-08 M2-3)", async ({ page }) => {
+  test.setTimeout(90_000);
+  await entrarComoUsuario(page, aluno);
+  await page.goto("/coach");
+
+  await page.getByPlaceholder("Pergunte ao assistente…").fill("Como foi meu mês?");
+  await page.getByRole("button", { name: "Enviar pergunta" }).click();
+  await expect(respostas(page).last()).toContainText("Relatório salvo em Pareceres salvos", { timeout: 20_000 });
+  await expect(respostas(page).last()).toHaveText(/^\S+ \d{4}: \d+ treinos? até hoje\./);
+
+  const cliente = await clienteAutenticado(aluno);
+  const { data: salvos } = await cliente
+    .from("parecer")
+    .select("pergunta, status, confirmado")
+    .eq("usuario_id", aluno.id)
+    .eq("pergunta", 6);
+  expect(salvos, "o relatório do Coach não foi salvo como parecer confirmado").toEqual([
+    { pergunta: 6, status: "pronto", confirmado: true },
+  ]);
+  expect(await usosDeIa(), "o relatório do Coach gastou cota de IA").toBe(0);
+});
