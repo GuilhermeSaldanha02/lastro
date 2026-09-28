@@ -3014,3 +3014,28 @@ Sem navegador local (sem `.env.local`). O `j14-dica-info` roda na tela pública 
 **Impacto.** Nenhuma métrica nova nem cálculo novo — volume e séries continuam vindo de `listarTreinos`. Duas funções puras novas e testadas (`lib/treino/agrupar-historico.ts`, `lib/treino/calendario-mes.ts`) fixam a regra de agrupamento e a grade do calendário fora do componente React, então são testáveis sem navegador.
 
 **Como reverter.** Reverter a PR da UX-02; `/ajustes/relatorios` continua funcionando (só passou a importar `obterMetricasDoTreino` de um arquivo novo em vez de definir a função ali).
+
+## 2026-09-28 (2) — A Análise passa a ser feita por lógica; só a pergunta 5 usa a Gemini (Scope Change)
+
+**Contexto.** O dono aprovou o estudo do AN-08 (`docs/estudos/AN-08-motor-deterministico-estudo.md`) e a M1 foi para produção (#348, #349): o Coach passou a responder por lógica o que o lastro sabe calcular. Na M2, o dono apontou que as perguntas da Análise "retornam a mesma coisa". A causa está no código: quando a Gemini falha, o que é frequente no plano gratuito, o texto de reserva (`leituraDeterministica`) recebe só o resumo e ignora qual pergunta foi feita. As 5 perguntas saem com o mesmo texto e os mesmos blocos de evidência.
+
+**A decisão do dono.**
+- **As perguntas 1 a 4 da Análise passam a ser respondidas por lógica, sem Gemini**, cada uma com resposta própria e focada.
+- **A pergunta 5 ("O que mudar na próxima semana?") continua com a Gemini.** Prescrição por regra seria o "plano gerado automaticamente" que o PRD §5 proíbe.
+- **Duas perguntas novas, também por lógica:** 6 "Como foi meu mês?" e 7 "Do primeiro treino até hoje" (fecha o AN-07). O conteúdo foi escolhido pelo dono: base, evolução por exercício, recordes e grupos.
+- **O Coach gera esses relatórios e os salva no histórico da Análise**, junto dos pareceres. Só o relatório é guardado, nunca o texto digitado.
+- **O visual da página de Análise não muda.** O que muda é como as análises são feitas e quais perguntas existem.
+
+**Por quê.** A tese do produto é "o log e o gráfico são infraestrutura; o produto é a leitura" (PRD §1), e a leitura das perguntas 1 a 4 já era calculável, porque o texto de reserva provava isso. Gastar Gemini (2 unidades por parecer, de 16 por dia para o lastro inteiro) para reescrever números que o código já tem não acrescenta leitura, e deixa a peça-assinatura dependente de uma API que cai com frequência.
+
+**Alternativa descartada.** Manter a Gemini nas 5 perguntas e só diferenciar o texto de reserva por pergunta. Resolveria a repetição, mas manteria o custo e a dependência que o dono quer reduzir.
+
+**Classificação.** Scope Change, ALTERAÇÃO da peça-assinatura (PRD §1 e §3: "parecer… usando IA sobre métricas já calculadas"). A emenda do PRD §3 entra junto com o código da M2-1.
+
+**Impacto.**
+- A cota da Gemini da Análise passa a ser gasta só pela pergunta 5.
+- As perguntas 1 a 4 deixam de ter o "aviso de falha interpretativa", porque o texto não é mais reserva: é a resposta.
+- `parecer.pergunta` passa a aceitar 1 a 7 (migração na M2-2).
+- A Política continua correta: nada novo é enviado à IA nem guardado além do relatório.
+
+**Como reverter.** Voltar a rota de `/api/analise` a chamar a Gemini para 1 a 4. As perguntas 6 e 7 e os pareceres salvos ficam válidos.
