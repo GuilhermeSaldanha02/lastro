@@ -22,7 +22,7 @@ Sub-itens do AN-08, **todos NÃO INICIADOS**. O prefixo `AN-08.` evita colisão 
 
 | ID | Fase | O que é | Seção |
 |---|---|---|---|
-| AN-08.E1–E5 | Estudo | As 5 entregas: auditoria, matriz de capacidades (30+ perguntas), arquitetura, roadmap, economia estimada de IA. Depois delas, PARAR. | §27–§28 |
+| AN-08.E1–E5 | Estudo | **ENTREGUE 2026-09-28, aguardando aprovação do dono:** `docs/estudos/AN-08-motor-deterministico-estudo.md`. As 5 entregas: auditoria, matriz de capacidades (30+ perguntas), arquitetura, roadmap, economia estimada de IA. Depois delas, PARAR. | §27–§28 |
 | AN-08.F0-MATRIZ | 0 | Matriz Gemini × determinístico em níveis 0–4 (progressão, volume, frequência, consistência). | §3–§6, §24 |
 | AN-08.F0-TEMPO | 0 | Camada única de comparação temporal (semana, 4 semanas, mês, período livre × anterior). | §7 |
 | AN-08.F0-ANOMALIA | 0 | Detector de sessão fora do padrão do próprio usuário, com piso de amostra. | §8 |
