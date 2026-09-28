@@ -581,3 +581,22 @@ describe("E1RM_REPS_MAX documentado", () => {
     expect(E1RM_REPS_MAX).toBe(12);
   });
 });
+
+describe("prs — exercício estreante (achado do QA do AN-08 M2, 2026-09-28)", () => {
+  it("exercício feito pela primeira vez na semana não vira recorde de volume contra 0", () => {
+    const treinos: TreinoBruto[] = [
+      {
+        id: "antes",
+        data: "2026-07-21",
+        series: [{ id: "x1", exercicioId: "supino", tipo: "valendo", reps: 10, peso: 50, pesoPorLado: false }],
+      },
+      {
+        id: "estreia",
+        data: "2026-07-30",
+        series: [{ id: "x2", exercicioId: "rosca", tipo: "valendo", reps: 10, peso: 20, pesoPorLado: false }],
+      },
+    ];
+    const resumo = montarResumoCompacto({ treinos, exercicios, agora });
+    expect(resumo.prs.filter((p) => p.exercicio === "Rosca direta")).toEqual([]);
+  });
+});

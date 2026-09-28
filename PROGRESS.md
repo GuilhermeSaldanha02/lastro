@@ -22,7 +22,21 @@
     - perguntas novas 6 (mês) e 7 (desde o primeiro treino), com a migração `20260928150019`;
     - o Coach gera esses relatórios e os salva em Pareceres salvos.
 
-    Só a pergunta 5 usa a Gemini. **Falta o dono conferir em produção** as 7 perguntas e o relatório pelo Coach. Próxima milestone do AN-08 só com autorização.
+    Só a pergunta 5 usa a Gemini. Próxima milestone do AN-08 só com autorização.
+  - **QA em produção na conta do dono (2026-09-28, Playwright a 375 px, autorizado; rascunhos e o relatório de teste apagados no fim).** Funcionam:
+    - as 7 perguntas;
+    - o cabeçalho "Relatório do período";
+    - o relatório pelo Coach salvo em Pareceres salvos, com o PDF gerado.
+
+    Capturas em `qa/evidencias/AN-08-M2/`. Seis achados, corrigidos na PR de achados do QA:
+    1. recorde de volume "antes 0" para exercício estreante (bug antigo do agregador, afetava também a pergunta 5);
+    2. recorde sem dizer se é e1RM ou volume;
+    3. "O Rosca…" (artigo fixo);
+    4. a pergunta 2 dizia "nenhum parado" em cima de um bloco de platô;
+    5. "Só 0 das 65 séries";
+    6. recordes do período contados por série (27 e 37, com repetição).
+
+    **Observação sem correção (decisão do dono):** a evolução compara a primeira sessão com a última, e um treino leve no fim distorce o número (-72%).
 - **AN-08, estudo entregue (2026-09-28, sem código):** `docs/estudos/AN-08-motor-deterministico-estudo.md`. Achados principais:
   - os 3 chips do Coach são recusados pelo próprio prompt e gastam cota;
   - o relatório pós-treino ignora `unilateral` (52 exercícios), então diverge da lista;

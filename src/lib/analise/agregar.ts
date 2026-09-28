@@ -400,7 +400,14 @@ export function montarResumoCompacto(entrada: {
 
       const volumeSemanaAtual =
         seriesAtual.length > 0 ? calcularVolume(seriesAtual) : undefined;
-      const volumesSemanaisHistoricos = semanasHistoricoAntesDaAtual.map(
+      // Só as semanas em que ESTE exercício aparece. Percorrer todas as
+      // semanas do histórico dava volume 0 a um exercício estreante, e a
+      // primeira vez dele virava "recorde de volume, antes 0" (achado do QA
+      // do AN-08 M2 em produção, 2026-09-28).
+      const semanasDoExercicio = semanasHistoricoAntesDaAtual.filter((semana) =>
+        seriesAnteriores.some((s) => s.semanaInicio === semana),
+      );
+      const volumesSemanaisHistoricos = semanasDoExercicio.map(
         (semana) =>
           calcularVolume(
             seriesAnteriores.filter((s) => s.semanaInicio === semana),

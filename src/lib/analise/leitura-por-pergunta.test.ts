@@ -49,7 +49,7 @@ describe("leituraDaPergunta", () => {
 
   it("1 — progresso: quem subiu, o líder, a queda, os estáveis e o recorde", () => {
     expect(leituraDaPergunta(resumo(), 1, "pt-BR")).toBe(
-      "Você progrediu em 1 de 3 exercícios. O Supino reto liderou, com +7,5% de e1RM. Em queda real: Leg press (-7%). 1 ficou estável (variação de até 1%). Recorde pessoal na semana: Supino reto (107,5, antes 105).",
+      "Você progrediu em 1 de 3 exercícios. Supino reto liderou, com +7,5% de e1RM. Em queda real: Leg press (-7%). 1 ficou estável (variação de até 1%). Recorde pessoal na semana: Supino reto (e1RM 107,5 kg, antes 105).",
     );
   });
 
@@ -61,10 +61,10 @@ describe("leituraDaPergunta", () => {
 
   it("2 — empaque: os parados e, entre eles, quem também está caindo", () => {
     expect(leituraDaPergunta(resumo(), 2, "pt-BR")).toBe(
-      "1 exercício está parado. Sem novo máximo de e1RM nem de volume: Leg press (há 5 semanas). Além de parado, em queda real: Leg press (-7%).",
+      "1 exercício está parado. Sem novo máximo de e1RM nem de volume: Leg press (há 5 semanas). Além de parado, em queda real: Leg press (-7%). No platô (e1RM variou até 1% nas últimas 4 semanas): Remada.",
     );
     expect(leituraDaPergunta(resumo({ estagnacoes: [] }), 2, "pt-BR")).toBe(
-      "Nenhum exercício parado. Nenhum ficou 4 semanas seguidas sem novo máximo de e1RM nem de volume.",
+      "Nenhum exercício parado há 4 semanas, mas 1 está no platô. No platô (e1RM variou até 1% nas últimas 4 semanas): Remada. Nenhum ficou 4 semanas seguidas sem novo máximo de e1RM nem de volume.",
     );
   });
 
@@ -87,6 +87,21 @@ describe("leituraDaPergunta", () => {
       "pt-BR",
     );
     expect(texto).toContain("Só 4 das 20 séries têm RIR registrado");
+  });
+
+  it("4 — sem RIR nenhum, diz 'nenhuma', não 'só 0'", () => {
+    const texto = leituraDaPergunta(
+      resumo({ series_dificeis: undefined, cobertura_rir_insuficiente: { series_valendo_com_rir: 0, series_valendo: 65 } }),
+      4,
+      "pt-BR",
+    );
+    expect(texto).toContain("Nenhuma das 65 séries tem RIR registrado");
+    expect(texto).not.toContain("Só 0");
+  });
+
+  it("2 — sem estagnação e sem platô, diz nenhum parado", () => {
+    const semPlato = resumo({ estagnacoes: [], tendencia_e1rm: resumo().tendencia_e1rm.filter((t) => t.exercicio !== "Remada") });
+    expect(leituraDaPergunta(semPlato, 2, "pt-BR")).toMatch(/^Nenhum exercício parado. /);
   });
 
   it("responde no idioma da conta", () => {

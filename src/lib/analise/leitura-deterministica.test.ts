@@ -67,7 +67,7 @@ describe("leituraDeterministica", () => {
       resumo({ tendencia_e1rm: [e1rm("Supino reto", 12), e1rm("Agachamento", 0)] }),
       "pt-BR",
     );
-    expect(texto).toContain("Só o Supino reto subiu de e1RM");
+    expect(texto).toContain("Só Supino reto subiu de e1RM");
     expect(texto).not.toContain("dos 2 exercícios acompanhados subiram");
   });
 

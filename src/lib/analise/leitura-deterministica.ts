@@ -54,7 +54,7 @@ type Frases = {
   /** "leg press (há 4 semanas)" */
   paradoItem: (exercicio: string, semanas: number) => string;
   quedaItem: (exercicio: string, pct: string) => string;
-  prItem: (exercicio: string, valor: string, anterior: string) => string;
+  prItem: (exercicio: string, tipo: "e1rm" | "volume", valor: string, anterior: string) => string;
 };
 
 function juntarCom(itens: string[], e: string): string {
@@ -68,9 +68,9 @@ const POR_IDIOMA: Record<Idioma, Frases> = {
     cobertura: (semana, com, total) =>
       `Semana de ${semana}, com ${com} de ${total} semanas da janela com dados.`,
     subiramVarios: (n, total, exercicio, pct) =>
-      `${n} dos ${total} exercícios acompanhados subiram, e o ${exercicio} liderou com ${pct} de e1RM.`,
+      `${n} dos ${total} exercícios acompanhados subiram, e ${exercicio} liderou com ${pct} de e1RM.`,
     subiuUm: (exercicio, pct) =>
-      `Só o ${exercicio} subiu de e1RM na janela: ${pct}.`,
+      `Só ${exercicio} subiu de e1RM na janela: ${pct}.`,
     nenhumSubiu: () => `Nenhum exercício acompanhado subiu de e1RM nesta janela.`,
     caiu: (lista) => `Em queda real: ${lista}.`,
     parados: (lista) => `Parados sem novo máximo: ${lista}.`,
@@ -87,7 +87,7 @@ const POR_IDIOMA: Record<Idioma, Frases> = {
     paradoItem: (exercicio, semanas) =>
       `${exercicio} (há ${semanas} ${semanas === 1 ? "semana" : "semanas"})`,
     quedaItem: (exercicio, pct) => `${exercicio} (${pct})`,
-    prItem: (exercicio, valor, anterior) => `${exercicio} (${valor}, antes ${anterior})`,
+    prItem: (exercicio, tipo, valor, anterior) => `${exercicio} (${tipo === "e1rm" ? "e1RM" : "volume"} ${valor} kg, antes ${anterior})`,
   },
   en: {
     cobertura: (semana, com, total) =>
@@ -111,7 +111,7 @@ const POR_IDIOMA: Record<Idioma, Frases> = {
     paradoItem: (exercicio, semanas) =>
       `${exercicio} (${semanas} ${semanas === 1 ? "week" : "weeks"})`,
     quedaItem: (exercicio, pct) => `${exercicio} (${pct})`,
-    prItem: (exercicio, valor, anterior) => `${exercicio} (${valor}, was ${anterior})`,
+    prItem: (exercicio, tipo, valor, anterior) => `${exercicio} (${tipo === "e1rm" ? "e1RM" : "volume"} ${valor} kg, was ${anterior})`,
   },
   es: {
     cobertura: (semana, com, total) =>
@@ -135,7 +135,7 @@ const POR_IDIOMA: Record<Idioma, Frases> = {
     paradoItem: (exercicio, semanas) =>
       `${exercicio} (hace ${semanas} ${semanas === 1 ? "semana" : "semanas"})`,
     quedaItem: (exercicio, pct) => `${exercicio} (${pct})`,
-    prItem: (exercicio, valor, anterior) => `${exercicio} (${valor}, antes ${anterior})`,
+    prItem: (exercicio, tipo, valor, anterior) => `${exercicio} (${tipo === "e1rm" ? "e1RM" : "volumen"} ${valor} kg, antes ${anterior})`,
   },
 };
 
@@ -266,6 +266,7 @@ export function leituraDeterministica(resumo: ResumoCompacto, idioma: Idioma): s
           resumo.prs.map((p) =>
             f.prItem(
               p.exercicio,
+              p.tipo,
               formatarPeso(p.valor, idioma),
               formatarPeso(p.valor_anterior, idioma),
             ),
