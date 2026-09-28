@@ -12,6 +12,10 @@
 - Regra de execução: E2E somente manual em marco de integração; testes
   rápidos continuam em toda PR.
 
+## P0 — nota do dono (2026-09-28, uso real em produção)
+
+**AN-07 (a decidir, NÃO implementar ainda).** O dono pediu ao Coach, em produção, um relatório "do primeiro treino até hoje" e o Coach recusou. É o comportamento correto pelo desenho atual — o Coach (`PRD.md` §4.4) responde dúvida geral e não lê os números do dono; quem lê é a Análise Semanal, e só a última semana ISO fechada (`PRD.md` §3). Não existe hoje nenhuma pergunta de **período livre/histórico completo**. O dono achou "as análises muito travadas" e pediu para anotar, para mudar mais para frente — **não é para implementar agora**, é decisão de escopo pendente (like PU-03/04, mexe com a regra inegociável de resumo determinístico + cota de IA). Perguntar ao dono, quando for a vez: o que um "relatório do início até hoje" mostraria que as 5 perguntas semanais já não mostram, e se cabe dentro do orçamento de cota (`config_ia`, PU-04).
+
 ## P(-1) — abertura ao público (decisão do dono, 2026-09-25)
 
 **O dono decidiu: o lastro vai abrir para o público.** Isso contradiz o
