@@ -21,6 +21,7 @@ import { historicoDoExercicio } from "@/lib/dados/treino";
 import { ehRecorde } from "@/lib/analise/recorde-serie";
 import { RIR_MINIMO, RIR_MAXIMO, validarNumerosDaSerie } from "@/lib/dados/limites-serie";
 import { t } from "@/lib/texto/i18n";
+import { formatarPeso } from "@/lib/texto/formatar-delta";
 import type { Idioma } from "@/lib/dados/idioma";
 import DicaInfo from "@/components/dica-info";
 
@@ -219,7 +220,7 @@ export default function FormularioSerie({
       {ultimaDoHistorico && (
         <div style={{ background: "var(--lastro-sup-2)", border: "1px solid var(--lastro-linha)", borderRadius: "var(--lastro-raio-2)", padding: "10px 14px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
           <p style={{ fontSize: "var(--lastro-papel-rotulo)", color: "var(--lastro-txt-2)", margin: 0 }}>
-            {t("Última vez:", idioma)} <strong style={{ color: "var(--lastro-ouro)", fontFamily: "var(--lastro-fonte-num)" }}>{ultimaDoHistorico.reps} × {ultimaDoHistorico.peso} kg</strong>
+            {t("Última vez:", idioma)} <strong style={{ color: "var(--lastro-ouro)", fontFamily: "var(--lastro-fonte-num)" }}>{ultimaDoHistorico.reps} × {formatarPeso(ultimaDoHistorico.peso, idioma)} kg</strong>
           </p>
           <button type="button" className="botao-textual" onClick={usarUltimosValores} style={{ color: "var(--lastro-ouro)", fontWeight: "bold" }}>
             {t("Usar valores", idioma)}

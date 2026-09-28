@@ -33,6 +33,7 @@ import {
   semearTreino,
   seriesDoTreino,
 } from "./helpers/caminho-triste";
+import { formatarPeso } from "../src/lib/texto/formatar-delta";
 
 let aluno: UsuarioDescartavel;
 let comoAluno: SupabaseClient;
@@ -84,7 +85,9 @@ const registrar = (page: Page) => page.getByRole("button", { name: "Registrar s�
 // Centralizar o seletor impede que os cenários de integridade da fila
 // dependam da apresentação anterior.
 const linhasDeSerie = (page: Page) => page.locator(".grade-series__linha");
-const linhaCom = (page: Page, texto: string) => linhasDeSerie(page).filter({ hasText: texto });
+// A grade mostra o peso formatado no idioma da conta (pt-BR: "41,23").
+const linhaCom = (page: Page, peso: string) =>
+  linhasDeSerie(page).filter({ hasText: formatarPeso(Number(peso), "pt-BR") });
 
 const IDIOMAS_OFFLINE = [
   { opcao: "Português", salvo: "Idioma salvo.", acao: "Iniciar treino de hoje", erro: "Sem conexão. Conecte-se à internet para iniciar o treino." },
