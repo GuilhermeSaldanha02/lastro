@@ -76,11 +76,15 @@ O dono pediu também a correção de UX3-05 a UX3-08. Mesmo procedimento; e2e co
 
 **Incidentes do processo (registrados para não se repetir):** (1) a resolução de um conflito de `sistema.css` na #331 perdeu um `}` e a abertura de um comentário; o build da `main` falhou e a #331 foi mergeada com o CI vermelho porque meu encadeamento de comandos não parou no erro; corrigido na #332 e a produção nunca saiu do ar (a Vercel manteve o último deploy bom). (2) Um teste meu (UX3-09) reprovou português a 375 px por 1 px de subpixel; a tolerância virou 2 px (#333). (3) Eu disparava a suíte completa do e2e a cada correção; o dono apontou, e o `ci.yml` ganhou a entrada `specs` (#334): **só as specs que mudaram**.
 
-**Continuam `ALEGADO`.** Ainda sem medir: `/treino/[id]` com séries em estado de erro/offline, os modais de `@modal`, o detalhe do catálogo com mídia, e o contraste dos 6 temas (o `j5-contraste` cobre o tema padrão).
+**Correção sobre contraste (2026-09-28):** esta seção dizia que faltava medir "o contraste dos 6 temas" — checagem no código mostrou que `e2e/j5-contraste.spec.ts` **já cobre os 7 temas** (não só o padrão), em 8 rotas (incluindo `/personal` e `/personal/alunos` na sessão do personal) e troca de idioma. Rodado isolado (`-f specs="j5"`, run `36383913422`): **2/2 passaram**, `0` textos abaixo do piso AA. Lacuna fechada — era engano deste documento, não do app.
+
+**Modais de `@modal` (2026-09-28):** cobertos agora por `e2e/j32-modais-interceptados.spec.ts`. Os três (`/ajustes/anilhas`, `/ajustes/modelos/novo`, `/perfil`) só existem como sobreposição quando a navegação é por clique num `<Link>` dentro do app (rota interceptada); todo spec anterior chegava neles por `page.goto` direto, que cai na página cheia — a apresentação real de folha nunca tinha sido exercida. O spec novo clica o link de verdade e confere: diálogo acessível (`role="dialog"`, `aria-label`), a página de trás continua montada (não é navegação cheia), sem vazamento horizontal, botão de fechar ≥44px, e os dois jeitos de fechar (botão e Esc) devolvem a rota certa.
+
+**Continuam `ALEGADO`, sem cobertura ainda:** `/treino/[id]` com séries em estado de erro/offline, e o detalhe do catálogo com mídia.
 
 ## 5. Próximos passos
 
 1. ~~Dono vê a lista e decide o que corrigir~~ **Feito:** os quatro MÉDIA foram corrigidos (§4). Os quatro BAIXA (UX3-05 a 08) também foram corrigidos (§4b).
-2. Completar a cobertura da §1 com capturas novas de **viewport rolado**, em 375×812, incluindo as rotas fora da `j4`, os temas e os idiomas.
+2. ~~Completar a cobertura da §1 com capturas novas de viewport rolado, rotas fora da `j4`, temas e idiomas~~ — **feito em §4c** (`j26-cobertura-ux03.spec.ts`, 60 telas), mais contraste dos 7 temas (correção acima) e os modais interceptados. Falta só `/treino/[id]` em erro/offline e o detalhe do catálogo com mídia.
 3. Só depois de decidido: PRs pequenas de correção, uma por achado ou por rota, cada uma com critério de aceite; e passar os itens para o `QA.md`.
 4. Outro agente audita esta lista e as correções (`ALEGADO` → `PASSOU`).
