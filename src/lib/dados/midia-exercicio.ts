@@ -1,4 +1,6 @@
 import manifestoMidia from './exercicios-midia.json';
+import traducoesBiomecanica from './exercicios-midia-traducao.json';
+import type { Idioma } from './idioma';
 
 export interface ExercicioMidia {
   id: string;
@@ -36,6 +38,19 @@ for (const item of manifestoMidia as ExercicioMidia[]) {
  */
 export function obterMidiaExercicio(exercicioId: string): ExercicioMidia | null {
   return MAPA_MIDIA_POR_ID.get(exercicioId) ?? null;
+}
+
+const TRADUCOES_BIOMECANICA = traducoesBiomecanica as Record<string, { en: string; es: string }>;
+
+/**
+ * Músculo alvo, sinergistas e mecânica articular vêm do manifesto só em
+ * português (UX3-16). A tradução é um dicionário fixo por texto inteiro,
+ * escrito uma vez e revisável, sem IA em produção — mesmo método do A1.
+ * Texto sem tradução cai no português em vez de sumir.
+ */
+export function traduzirBiomecanica(texto: string, idioma: Idioma): string {
+  if (idioma === 'pt-BR') return texto;
+  return TRADUCOES_BIOMECANICA[texto]?.[idioma] ?? texto;
 }
 
 /**

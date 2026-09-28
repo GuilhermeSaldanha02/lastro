@@ -1,5 +1,7 @@
 import { describe, it, expect } from 'vitest';
-import { obterMidiaExercicio, obterMidiaExercicioPorSlug } from './midia-exercicio';
+import { obterMidiaExercicio, obterMidiaExercicioPorSlug, traduzirBiomecanica } from './midia-exercicio';
+import manifesto from './exercicios-midia.json';
+import traducoes from './exercicios-midia-traducao.json';
 
 describe('midia-exercicio', () => {
   it('retorna a mídia para um exercício existente por ID', () => {
@@ -19,5 +21,31 @@ describe('midia-exercicio', () => {
 
   it('retorna null para ID inexistente', () => {
     expect(obterMidiaExercicio('00000000-0000-0000-0000-000000000000')).toBeNull();
+  });
+});
+
+describe("traduzirBiomecanica (UX3-16)", () => {
+  const CAMPOS = ["musculo_alvo", "musculos_sinergistas", "mecanica_articular"] as const;
+  const textosDoCatalogo = new Set(
+    (manifesto as Array<Record<string, unknown>>).flatMap((e) =>
+      CAMPOS.map((c) => e[c]).filter((v): v is string => typeof v === "string" && v.length > 0),
+    ),
+  );
+  const dicionario = traducoes as Record<string, { en?: string; es?: string }>;
+
+  it("todo texto de biomecânica do catálogo tem tradução em inglês e espanhol", () => {
+    const faltando = [...textosDoCatalogo].filter((t) => !dicionario[t]?.en || !dicionario[t]?.es);
+    expect(faltando).toEqual([]);
+  });
+
+  it("o dicionário não guarda texto que não existe mais no catálogo", () => {
+    expect(Object.keys(dicionario).filter((t) => !textosDoCatalogo.has(t))).toEqual([]);
+  });
+
+  it("traduz em en/es, mantém em pt e cai no português se faltar", () => {
+    expect(traduzirBiomecanica("Latíssimo do Dorso", "en")).toBe("Latissimus Dorsi");
+    expect(traduzirBiomecanica("Latíssimo do Dorso", "es")).toBe("Dorsal Ancho");
+    expect(traduzirBiomecanica("Latíssimo do Dorso", "pt-BR")).toBe("Latíssimo do Dorso");
+    expect(traduzirBiomecanica("Texto inexistente", "en")).toBe("Texto inexistente");
   });
 });

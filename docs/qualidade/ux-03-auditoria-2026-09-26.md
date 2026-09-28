@@ -90,7 +90,7 @@ Métricas limpas nas três: vazamento 0, conteúdo sob a nav 0, texto cortado 0.
 | ID | Achado | Sev. | Estado |
 |---|---|---|---|
 | UX3-15 | Grade de séries de `/treino/[id]`: o peso sai cru, com ponto em português ("31.84 kg", o certo é "31,84"). Com decimal, "kg" quebra para a linha de baixo na coluna Carga. `treino-detalhe.tsx:821` imprime `serie.peso` sem o `formatarPeso` que a UX3-06 usa nas anilhas. | BAIXA | Aberto |
-| UX3-16 | `/catalogo/[id]` em en/es: o "Foco" do player, o músculo alvo, os sinergistas e a mecânica articular aparecem em português ("Flexão de Coluna Lombar / Quadril"), ao lado da dica já traduzida. Vêm de `exercicios-midia.json`, que só tem português. É a mesma classe de vazamento do A1. | MÉDIA | Aberto. Corrigir exige tradução de ~102 × 4 campos × 2 idiomas, sem IA em produção (mesmo método do A1). |
+| UX3-16 | `/catalogo/[id]` em en/es: o "Foco" do player, o músculo alvo, os sinergistas e a mecânica articular aparecem em português ("Flexão de Coluna Lombar / Quadril"), ao lado da dica já traduzida. Vêm de `exercicios-midia.json`, que só tem português. É a mesma classe de vazamento do A1. | MÉDIA | **Corrigido 2026-09-28:** dicionário fixo por texto inteiro (`src/lib/dados/exercicios-midia-traducao.json`, 192 textos × en/es), lido por `traduzirBiomecanica` na página do exercício e no "Foco" do player. Um teste exige tradução para todo texto do catálogo. |
 
 Evidência: artefato `varredura-telas` do run `36386812415`, pastas `j33-*`.
 

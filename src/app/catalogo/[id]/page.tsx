@@ -11,7 +11,7 @@ import EtiquetaRecorde from "@/components/etiqueta-recorde";
 import CabecalhoPro from "@/components/cabecalho-pro";
 import DicaInfo from "@/components/dica-info";
 import PlayerExecucaoExercicio from "@/components/player-execucao-exercicio";
-import { obterMidiaExercicio } from "@/lib/dados/midia-exercicio";
+import { obterMidiaExercicio, traduzirBiomecanica } from "@/lib/dados/midia-exercicio";
 import { dicaTraduzidaDoExercicio } from "@/lib/dados/traducao";
 import { t } from "@/lib/texto/i18n";
 import { formatarPeso } from "@/lib/texto/formatar-delta";
@@ -99,7 +99,7 @@ export default async function PaginaHistoricoExercicio({
                     {midia?.musculo_alvo && (
                       <div className="dica-bloco-info">
                         <span className="dica-rotulo">{t("Músculo Alvo", idioma)}</span>
-                        <span className="dica-valor">{midia.musculo_alvo}</span>
+                        <span className="dica-valor">{traduzirBiomecanica(midia.musculo_alvo, idioma)}</span>
                       </div>
                     )}
                     {midia?.musculos_sinergistas && (
@@ -110,7 +110,7 @@ export default async function PaginaHistoricoExercicio({
                             {t("São músculos que participam do movimento junto com o músculo alvo.", idioma)}
                           </DicaInfo>
                         </span>
-                        <span className="dica-valor">{midia.musculos_sinergistas}</span>
+                        <span className="dica-valor">{traduzirBiomecanica(midia.musculos_sinergistas, idioma)}</span>
                       </div>
                     )}
                     {midia?.mecanica_articular && (
@@ -121,7 +121,7 @@ export default async function PaginaHistoricoExercicio({
                             {t("Mostra como as articulações se movem durante o exercício.", idioma)}
                           </DicaInfo>
                         </span>
-                        <span className="dica-valor">{midia.mecanica_articular}</span>
+                        <span className="dica-valor">{traduzirBiomecanica(midia.mecanica_articular, idioma)}</span>
                       </div>
                     )}
                   </div>
