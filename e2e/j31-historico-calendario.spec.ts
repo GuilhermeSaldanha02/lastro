@@ -158,12 +158,15 @@ test.describe("histórico em meses diferentes, calendário e filtro por dia", ()
     await abrirTreino(page, conta);
     await page.locator(".calendario-mes__gatilho").click();
     await page.getByRole("button", { name: "Mês anterior" }).click();
-    const mesPassadoNome = new Date(`${dataMesPassado}T12:00:00Z`).toLocaleDateString("pt-BR", {
-      month: "long",
-      year: "numeric",
-      timeZone: "UTC",
-    });
-    const rotulo = mesPassadoNome.charAt(0).toUpperCase() + mesPassadoNome.slice(1);
+    // Mesma tabela de `lib/tempo.ts` (nomeMesComAno): "Agosto 2026", sem "de" —
+    // não usar `toLocaleDateString`, cujo ICU em pt-BR inclui "de" com `year`.
+    const MESES = [
+      "janeiro", "fevereiro", "março", "abril", "maio", "junho",
+      "julho", "agosto", "setembro", "outubro", "novembro", "dezembro",
+    ];
+    const [ano, mes] = dataMesPassado.split("-").map(Number);
+    const nome = MESES[mes - 1];
+    const rotulo = `${nome.charAt(0).toUpperCase()}${nome.slice(1)} ${ano}`;
     await expect(page.locator(".calendario-mes__gatilho")).toContainText(rotulo);
   });
 });
