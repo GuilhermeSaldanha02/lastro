@@ -69,7 +69,7 @@ export const SECOES_GUIA: SecaoGuia[] = [
     paragrafos: [
       "A análise é o coração do lastro. Você escolhe uma pergunta, como “Estou progredindo?” ou “Onde eu empaquei?”, e recebe um parecer em português que cita os seus exercícios e números.",
       "Ela usa sempre a última semana completa (de segunda a domingo) e precisa de algumas semanas fechadas com treino: a própria tela diz quantas você tem e quantas faltam. A semana em andamento nunca entra.",
-      "As perguntas de progresso, empaque, equilíbrio e frequência são respondidas na hora pelo próprio lastro, sem inteligência artificial. A pergunta sobre o que mudar na próxima semana é escrita por inteligência artificial em segundo plano: você pode sair da tela e encontrá-la depois em Ajustes > Relatórios e adesivos. Ela pode errar, então confira o que for importante.",
+      "As perguntas de progresso, empaque, equilíbrio e frequência, e os relatórios do mês e desde o primeiro treino, são respondidos na hora pelo próprio lastro, sem inteligência artificial. A pergunta sobre o que mudar na próxima semana é escrita por inteligência artificial em segundo plano: você pode sair da tela e encontrá-la depois em Ajustes > Relatórios e adesivos. Ela pode errar, então confira o que for importante.",
       "Cada conta tem um limite diário de uso da inteligência artificial; na Análise, só a pergunta sobre o que mudar conta nele. Passou do limite, ele volta no dia seguinte.",
     ],
     link: { href: "/analise", rotulo: "Abrir Análise" },

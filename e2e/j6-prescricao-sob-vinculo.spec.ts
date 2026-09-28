@@ -134,7 +134,8 @@ test("sob vínculo a prescrição some da tela E é recusada no servidor, sem ga
 
   // ---- e a tela (direção "Troca de posto" do gate visual) ----
   await telaAluno.goto("/analise");
-  await expect(telaAluno.locator(".pergunta")).toHaveCount(4);
+  // 7 perguntas desde a M2-2 do AN-08 (6 e 7 são de período); sob vínculo sai a 5.
+  await expect(telaAluno.locator(".pergunta")).toHaveCount(6);
   await expect(
     telaAluno.getByRole("button", { name: /mudar na próxima semana/i }),
     "a prescrição não pode aparecer nem como card desabilitado",
@@ -160,7 +161,7 @@ test("sob vínculo a prescrição some da tela E é recusada no servidor, sem ga
   });
 
   await telaAluno.goto("/analise");
-  await expect(telaAluno.locator(".pergunta")).toHaveCount(5);
+  await expect(telaAluno.locator(".pergunta")).toHaveCount(7);
   await expect(telaAluno.locator(".perguntas__rodape")).toHaveCount(0);
   await expect(telaAluno.locator(".pergunta--primaria")).toContainText(
     /mudar na próxima semana/i,

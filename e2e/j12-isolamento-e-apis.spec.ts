@@ -465,7 +465,8 @@ test("conta excluída: o personal sai e a aluna recupera a prescrição sem erro
     const analise = await v.telaAluno.goto("/analise");
     await print(v.telaAluno, "analise-sem-personal");
     expect.soft(analise?.status() ?? 0, "/analise depois de o personal excluir a conta").toBeLessThan(500);
-    expect.soft(await v.telaAluno.locator(".pergunta").count(), "a prescrição não voltou para a aluna").toBe(5);
+    // 7 perguntas sem vínculo desde a M2-2 do AN-08 (6 e 7 são de período).
+    expect.soft(await v.telaAluno.locator(".pergunta").count(), "a prescrição não voltou para a aluna").toBe(7);
 
     const ajustes = await v.telaAluno.goto("/ajustes/personal");
     await print(v.telaAluno, "vinculo-sem-personal");

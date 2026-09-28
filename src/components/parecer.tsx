@@ -64,11 +64,13 @@ export default function Parecer({
   return (
     <article className="doc">
       <header className="doc__emissao">
-        <p className="doc__selo">{t("Análise semanal", idioma)}</p>
+        <p className="doc__selo">
+          {evidencia?.periodo.tipo_periodo ? t("Relatório do período", idioma) : t("Análise semanal", idioma)}
+        </p>
         {pergunta && <h2 className="doc__pergunta">{pergunta}</h2>}
         <p className="doc__meta">
           {evidencia
-            ? `${t("Semana de", idioma)} ${formatarDataCurta(evidencia.periodo.semana_atual_inicio, idioma)} — ${formatarDataCurta(evidencia.periodo.semana_atual_fim, idioma)} · ${t("Emitido em", idioma)} ${emissao}`
+            ? `${evidencia.periodo.tipo_periodo ? t("Período", idioma) : t("Semana de", idioma)} ${formatarDataCurta(evidencia.periodo.semana_atual_inicio, idioma)} — ${formatarDataCurta(evidencia.periodo.semana_atual_fim, idioma)} · ${t("Emitido em", idioma)} ${emissao}`
             : `${t("Emitido em", idioma)} ${emissao}`}
         </p>
       </header>

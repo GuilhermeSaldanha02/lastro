@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { separarVeredito } from "@/lib/texto/separar-veredito";
-import { leituraDaPergunta, respondidaPorLogica } from "./leitura-por-pergunta";
+import { leituraDaPergunta } from "./leitura-por-pergunta";
 import type { ResumoCompacto } from "./tipos";
 
 function resumo(parcial: Partial<ResumoCompacto> = {}): ResumoCompacto {
@@ -32,13 +32,6 @@ function resumo(parcial: Partial<ResumoCompacto> = {}): ResumoCompacto {
     ...parcial,
   };
 }
-
-describe("respondidaPorLogica", () => {
-  it("1 a 4 sim; 5 (prescrição) não", () => {
-    expect([1, 2, 3, 4].every(respondidaPorLogica)).toBe(true);
-    expect(respondidaPorLogica(5)).toBe(false);
-  });
-});
 
 describe("leituraDaPergunta", () => {
   it("cada pergunta tem a sua resposta: as quatro saem diferentes do mesmo resumo", () => {

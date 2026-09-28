@@ -10,7 +10,8 @@
  */
 import type { Idioma } from "@/lib/dados/idioma";
 
-export type NumeroPergunta = 1 | 2 | 3 | 4 | 5;
+/** 6 e 7 são de PERÍODO (mês e desde o primeiro treino), por lógica (AN-08 M2-2). */
+export type NumeroPergunta = 1 | 2 | 3 | 4 | 5 | 6 | 7;
 
 const PERGUNTAS_POR_IDIOMA: Record<Idioma, Record<NumeroPergunta, string>> = {
   "pt-BR": {
@@ -19,6 +20,8 @@ const PERGUNTAS_POR_IDIOMA: Record<Idioma, Record<NumeroPergunta, string>> = {
     3: "Meu volume está equilibrado?",
     4: "Estou treinando demais ou de menos?",
     5: "O que mudar na próxima semana?",
+    6: "Como foi meu mês?",
+    7: "Como foi do primeiro treino até hoje?",
   },
   en: {
     1: "Am I progressing?",
@@ -26,6 +29,8 @@ const PERGUNTAS_POR_IDIOMA: Record<Idioma, Record<NumeroPergunta, string>> = {
     3: "Is my volume balanced?",
     4: "Am I training too much or too little?",
     5: "What should I change next week?",
+    6: "How was my month?",
+    7: "How has it gone since my first workout?",
   },
   es: {
     1: "¿Estoy progresando?",
@@ -33,6 +38,8 @@ const PERGUNTAS_POR_IDIOMA: Record<Idioma, Record<NumeroPergunta, string>> = {
     3: "¿Mi volumen está equilibrado?",
     4: "¿Estoy entrenando de más o de menos?",
     5: "¿Qué debo cambiar la próxima semana?",
+    6: "¿Cómo fue mi mes?",
+    7: "¿Cómo me fue desde mi primer entrenamiento?",
   },
 };
 
@@ -97,7 +104,7 @@ export type PerguntasDaTela = {
  * alvo de toque que não responde.
  */
 export function perguntasDaTela(temPersonal: boolean): PerguntasDaTela {
-  const todas: NumeroPergunta[] = [1, 2, 3, 4, 5];
+  const todas: NumeroPergunta[] = [1, 2, 3, 4, 5, 6, 7];
   const primaria = temPersonal ? PERGUNTA_PRIMARIA_VINCULADO : PERGUNTA_PRIMARIA;
   const secundarias = todas.filter(
     (numero) =>
@@ -107,5 +114,5 @@ export function perguntasDaTela(temPersonal: boolean): PerguntasDaTela {
 }
 
 export function perguntaValida(valor: unknown): valor is NumeroPergunta {
-  return valor === 1 || valor === 2 || valor === 3 || valor === 4 || valor === 5;
+  return typeof valor === "number" && Number.isInteger(valor) && valor >= 1 && valor <= 7;
 }

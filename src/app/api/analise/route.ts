@@ -15,8 +15,8 @@ import type { ResumoCompacto } from "@/lib/analise/tipos";
 import { carregarExercicios, carregarTreinosDoUsuario } from "@/lib/dados/historico-analise";
 import { dataLocalBrasil } from "@/lib/tempo";
 import { ClienteParecerGemini } from "./gemini";
-import { evidenciaDaPergunta, montarEvidenciaParaTela } from "./evidencia";
-import { leituraDaPergunta, respondidaPorLogica } from "@/lib/analise/leitura-por-pergunta";
+import { montarEvidenciaParaTela } from "./evidencia";
+import { parecerPorLogica, respondidaPorLogica } from "./parecer-por-logica";
 import type { EvidenciaParaTela } from "./evidencia";
 import { montarPrompt } from "./prompt";
 import { validarNumeros } from "./validador";
@@ -232,7 +232,7 @@ export async function POST(request: Request) {
   const pergunta = (corpo as { pergunta?: unknown } | null)?.pergunta;
   if (!perguntaValida(pergunta)) {
     return NextResponse.json(
-      { erro: "pergunta precisa ser 1, 2, 3, 4 ou 5." },
+      { erro: "pergunta precisa ser um inteiro de 1 a 7." },
       { status: 400 },
     );
   }
@@ -297,8 +297,8 @@ export async function POST(request: Request) {
 
   const PERGUNTAS = perguntasDoIdioma(idioma);
 
-  // AN-08 M2-1 (`DECISIONS.md` 2026-09-28 (2)): as perguntas 1 a 4 são
-  // respondidas por lógica, sem Gemini e sem reservar cota. O parecer nasce
+  // AN-08 M2-1/M2-2 (`DECISIONS.md` 2026-09-28 (2)): toda pergunta menos a 5
+  // é respondida por lógica, sem Gemini e sem reservar cota. O parecer nasce
   // pronto, e o contrato com a tela (202 + rascunhoId) não muda.
   if (respondidaPorLogica(pergunta)) {
     try {
@@ -306,7 +306,7 @@ export async function POST(request: Request) {
         carregarTreinosDoUsuario(supabase, user.id),
         carregarExercicios(supabase, idioma),
       ]);
-      const resumo = montarResumoCompacto({ treinos, exercicios, agora: paraDataUTC(dataLocalBrasil()) });
+      const { texto, evidencia } = parecerPorLogica({ pergunta, treinos, exercicios, hojeISO: dataLocalBrasil(), idioma });
       const { data: parecer, error } = await supabase
         .from("parecer")
         .insert({
@@ -316,8 +316,8 @@ export async function POST(request: Request) {
           idioma,
           status: "pronto",
           confirmado: false,
-          texto: leituraDaPergunta(resumo, pergunta, idioma),
-          evidencia: evidenciaDaPergunta(montarEvidenciaParaTela(resumo), pergunta),
+          texto,
+          evidencia,
           aviso_falha_interpretativa: false,
           falha_motivo: null,
         })

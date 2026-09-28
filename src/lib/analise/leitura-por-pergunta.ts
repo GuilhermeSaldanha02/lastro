@@ -21,11 +21,7 @@ import {
 import { ZONA_MORTA_PCT } from "./leitura-deterministica";
 import type { ResumoCompacto } from "./tipos";
 
-export type PerguntaPorLogica = 1 | 2 | 3 | 4;
-
-export function respondidaPorLogica(pergunta: number): pergunta is PerguntaPorLogica {
-  return pergunta === 1 || pergunta === 2 || pergunta === 3 || pergunta === 4;
-}
+export type PerguntaSemanal = 1 | 2 | 3 | 4;
 
 type Frases = {
   e: string;
@@ -278,7 +274,7 @@ function demaisOuDeMenos(r: ResumoCompacto, f: Frases, idioma: Idioma): string[]
 }
 
 /** A resposta da pergunta, com o veredito como primeira frase. */
-export function leituraDaPergunta(resumo: ResumoCompacto, pergunta: PerguntaPorLogica, idioma: Idioma): string {
+export function leituraDaPergunta(resumo: ResumoCompacto, pergunta: PerguntaSemanal, idioma: Idioma): string {
   const f = POR_IDIOMA[idioma];
   const frases =
     pergunta === 1
