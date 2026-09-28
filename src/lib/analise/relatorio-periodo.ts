@@ -83,15 +83,21 @@ function evolucaoPorExercicio(series: SerieValendo[]): RelatorioPeriodo["evoluca
 function recordesNoPeriodo(todas: SerieValendo[], periodo: Periodo): RelatorioPeriodo["recordes"] {
   const porExercicio = new Map<string, SerieValendo[]>();
   for (const s of todas) porExercicio.set(s.exercicioId, [...(porExercicio.get(s.exercicioId) ?? []), s]);
-  const achados: Array<SerieValendo> = [];
+  // Um recorde por exercício por TREINO — o de maior e1RM. Contar por série
+  // fazia duas séries boas no mesmo dia virarem dois recordes (QA em
+  // produção, 2026-09-28: "27 recordes", com a mesma rosca duas vezes).
+  const melhorPorTreino = new Map<string, SerieValendo>();
   for (const lista of porExercicio.values()) {
     const cronologica = [...lista].sort((a, b) => a.data.localeCompare(b.data));
     const marcas = marcarRecordesHistoricos(cronologica.map((s) => ({ reps: s.reps, peso: s.peso, treinoId: s.treinoId })));
     cronologica.forEach((s, i) => {
-      if (marcas[i] && contem(periodo, s.data)) achados.push(s);
+      if (!marcas[i] || !contem(periodo, s.data)) return;
+      const chave = `${s.exercicioId}::${s.treinoId}`;
+      const atual = melhorPorTreino.get(chave);
+      if (!atual || calcularE1rm(s.reps, s.peso) > calcularE1rm(atual.reps, atual.peso)) melhorPorTreino.set(chave, s);
     });
   }
-  return achados
+  return Array.from(melhorPorTreino.values())
     .sort((a, b) => a.data.localeCompare(b.data))
     .map((s) => ({ exercicio: s.exercicio, reps: s.reps, peso: s.peso }));
 }

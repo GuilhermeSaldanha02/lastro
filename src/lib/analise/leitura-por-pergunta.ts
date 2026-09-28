@@ -36,10 +36,12 @@ type Frases = {
   cairam: (lista: string) => string;
   estaveis: (n: number) => string;
   recordes: (lista: string) => string;
-  recordeItem: (exercicio: string, valor: string, anterior: string) => string;
+  recordeItem: (exercicio: string, tipo: "e1rm" | "volume", valor: string, anterior: string) => string;
   // 2 — empaque
   parados: (n: number) => string;
   nenhumParado: string;
+  nenhumParadoComPlato: (n: number) => string;
+  noPlato: (semanas: number, lista: string) => string;
   nenhumParadoDetalhe: (semanas: number) => string;
   paradoItem: (exercicio: string, semanas: number) => string;
   paradosLista: (lista: string) => string;
@@ -59,6 +61,7 @@ type Frases = {
   volumeSemana: (vol: string, pct?: string) => string;
   dificeis: (dificeis: number, valendo: number, rir: number) => string;
   rirInsuficiente: (com: number, total: number) => string;
+  semRir: (total: number) => string;
   semNadaParaJulgar: string;
 };
 
@@ -74,13 +77,15 @@ const POR_IDIOMA: Record<Idioma, Frases> = {
     nenhumSubiu: "Nenhum exercício subiu de e1RM nesta janela.",
     semTendencia: "Ainda não dá para medir progresso.",
     semTendenciaDetalhe: `Nenhum exercício teve ${MINIMO_SESSOES_TENDENCIA} sessões com carga medível na janela.`,
-    lider: (exercicio, pct) => `O ${exercicio} liderou, com ${pct} de e1RM.`,
+    lider: (exercicio, pct) => `${exercicio} liderou, com ${pct} de e1RM.`,
     cairam: (lista) => `Em queda real: ${lista}.`,
     estaveis: (n) => `${n} ${n === 1 ? "ficou estável" : "ficaram estáveis"} (variação de até 1%).`,
     recordes: (lista) => `Recorde pessoal na semana: ${lista}.`,
-    recordeItem: (exercicio, valor, anterior) => `${exercicio} (${valor}, antes ${anterior})`,
+    recordeItem: (exercicio, tipo, valor, anterior) => `${exercicio} (${tipo === "e1rm" ? "e1RM" : "volume"} ${valor} kg, antes ${anterior})`,
     parados: (n) => `${n} ${n === 1 ? "exercício está parado" : "exercícios estão parados"}.`,
     nenhumParado: "Nenhum exercício parado.",
+    nenhumParadoComPlato: (n) => `Nenhum exercício parado há 4 semanas, mas ${n === 1 ? "1 está" : `${n} estão`} no platô.`,
+    noPlato: (s, lista) => `No platô (e1RM variou até 1% nas últimas ${s} semanas): ${lista}.`,
     nenhumParadoDetalhe: (s) => `Nenhum ficou ${s} semanas seguidas sem novo máximo de e1RM nem de volume.`,
     paradoItem: (exercicio, s) => `${exercicio} (há ${s} ${s === 1 ? "semana" : "semanas"})`,
     paradosLista: (lista) => `Sem novo máximo de e1RM nem de volume: ${lista}.`,
@@ -103,6 +108,7 @@ const POR_IDIOMA: Record<Idioma, Frases> = {
     volumeSemana: (vol, pct) => (pct ? `Volume da semana: ${vol} (${pct} contra a anterior).` : `Volume da semana: ${vol}.`),
     dificeis: (d, v, rir) => `${d} das ${v} séries valendo foram difíceis (RIR até ${rir}).`,
     rirInsuficiente: (com, total) => `Só ${com} das ${total} séries têm RIR registrado: pouco para medir o esforço.`,
+    semRir: (total) => `Nenhuma das ${total} séries tem RIR registrado: sem como medir o esforço.`,
     semNadaParaJulgar: "Sem treino na semana analisada.",
   },
   en: {
@@ -117,9 +123,11 @@ const POR_IDIOMA: Record<Idioma, Frases> = {
     cairam: (lista) => `Actually declining: ${lista}.`,
     estaveis: (n) => `${n} stayed flat (change of up to 1%).`,
     recordes: (lista) => `Personal record this week: ${lista}.`,
-    recordeItem: (exercicio, valor, anterior) => `${exercicio} (${valor}, was ${anterior})`,
+    recordeItem: (exercicio, tipo, valor, anterior) => `${exercicio} (${tipo === "e1rm" ? "e1RM" : "volume"} ${valor} kg, was ${anterior})`,
     parados: (n) => `${n} ${n === 1 ? "exercise is" : "exercises are"} stalled.`,
     nenhumParado: "No stalled exercise.",
+    nenhumParadoComPlato: (n) => `No exercise stalled for 4 weeks, but ${n === 1 ? "1 is" : `${n} are`} on a plateau.`,
+    noPlato: (s, lista) => `On a plateau (e1RM changed up to 1% in the last ${s} weeks): ${lista}.`,
     nenhumParadoDetalhe: (s) => `None went ${s} weeks in a row without a new e1RM or volume max.`,
     paradoItem: (exercicio, s) => `${exercicio} (${s} ${s === 1 ? "week" : "weeks"})`,
     paradosLista: (lista) => `No new e1RM or volume max: ${lista}.`,
@@ -142,6 +150,7 @@ const POR_IDIOMA: Record<Idioma, Frases> = {
     volumeSemana: (vol, pct) => (pct ? `Weekly volume: ${vol} (${pct} vs. the previous week).` : `Weekly volume: ${vol}.`),
     dificeis: (d, v, rir) => `${d} of the ${v} working sets were hard (RIR up to ${rir}).`,
     rirInsuficiente: (com, total) => `Only ${com} of the ${total} sets have RIR logged: too few to measure effort.`,
+    semRir: (total) => `None of the ${total} sets has RIR logged: effort can't be measured.`,
     semNadaParaJulgar: "No workouts in the analyzed week.",
   },
   es: {
@@ -156,9 +165,11 @@ const POR_IDIOMA: Record<Idioma, Frases> = {
     cairam: (lista) => `En caída real: ${lista}.`,
     estaveis: (n) => `${n} ${n === 1 ? "quedó estable" : "quedaron estables"} (variación de hasta 1%).`,
     recordes: (lista) => `Récord personal en la semana: ${lista}.`,
-    recordeItem: (exercicio, valor, anterior) => `${exercicio} (${valor}, antes ${anterior})`,
+    recordeItem: (exercicio, tipo, valor, anterior) => `${exercicio} (${tipo === "e1rm" ? "e1RM" : "volumen"} ${valor} kg, antes ${anterior})`,
     parados: (n) => `${n} ${n === 1 ? "ejercicio está estancado" : "ejercicios están estancados"}.`,
     nenhumParado: "Ningún ejercicio estancado.",
+    nenhumParadoComPlato: (n) => `Ningún ejercicio estancado hace 4 semanas, pero ${n === 1 ? "1 está" : `${n} están`} en meseta.`,
+    noPlato: (s, lista) => `En meseta (el e1RM varió hasta 1% en las últimas ${s} semanas): ${lista}.`,
     nenhumParadoDetalhe: (s) => `Ninguno pasó ${s} semanas seguidas sin nuevo máximo de e1RM ni de volumen.`,
     paradoItem: (exercicio, s) => `${exercicio} (hace ${s} ${s === 1 ? "semana" : "semanas"})`,
     paradosLista: (lista) => `Sin nuevo máximo de e1RM ni de volumen: ${lista}.`,
@@ -181,6 +192,7 @@ const POR_IDIOMA: Record<Idioma, Frases> = {
     volumeSemana: (vol, pct) => (pct ? `Volumen de la semana: ${vol} (${pct} contra la anterior).` : `Volumen de la semana: ${vol}.`),
     dificeis: (d, v, rir) => `${d} de las ${v} series válidas fueron difíciles (RIR hasta ${rir}).`,
     rirInsuficiente: (com, total) => `Solo ${com} de las ${total} series tienen RIR registrado: poco para medir el esfuerzo.`,
+    semRir: (total) => `Ninguna de las ${total} series tiene RIR registrado: no se puede medir el esfuerzo.`,
     semNadaParaJulgar: "Sin entrenamientos en la semana analizada.",
   },
 };
@@ -203,7 +215,7 @@ function progresso(r: ResumoCompacto, f: Frases, idioma: Idioma): string[] {
     frases.push(
       f.recordes(
         listar(
-          r.prs.map((p) => f.recordeItem(p.exercicio, formatarPeso(p.valor, idioma), formatarPeso(p.valor_anterior, idioma))),
+          r.prs.map((p) => f.recordeItem(p.exercicio, p.tipo, formatarPeso(p.valor, idioma), formatarPeso(p.valor_anterior, idioma))),
           f.e,
         ),
       ),
@@ -213,8 +225,17 @@ function progresso(r: ResumoCompacto, f: Frases, idioma: Idioma): string[] {
 }
 
 function empaque(r: ResumoCompacto, f: Frases, idioma: Idioma): string[] {
-  if (r.estagnacoes.length === 0) return [f.nenhumParado, f.nenhumParadoDetalhe(SEMANAS_ESTAGNACAO)];
   const parados = new Set(r.estagnacoes.map((e) => e.exercicio));
+  // Mesma régua do bloco "Platô" da evidência (e1RM ±1% na janela): sem ela o
+  // texto dizia "nenhum parado" em cima de um bloco de platô (QA, 2026-09-28).
+  const noPlato = r.tendencia_e1rm.filter((t) => Math.abs(t.delta_pct) <= ZONA_MORTA_PCT && !parados.has(t.exercicio));
+  const frasePlato = () => f.noPlato(r.periodo.janela_semanas, listar(noPlato.map((t) => t.exercicio), f.e));
+
+  if (r.estagnacoes.length === 0) {
+    return noPlato.length === 0
+      ? [f.nenhumParado, f.nenhumParadoDetalhe(SEMANAS_ESTAGNACAO)]
+      : [f.nenhumParadoComPlato(noPlato.length), frasePlato(), f.nenhumParadoDetalhe(SEMANAS_ESTAGNACAO)];
+  }
   const frases = [
     f.parados(r.estagnacoes.length),
     f.paradosLista(listar(r.estagnacoes.map((e) => f.paradoItem(e.exercicio, e.semanas_sem_progresso)), f.e)),
@@ -223,6 +244,7 @@ function empaque(r: ResumoCompacto, f: Frases, idioma: Idioma): string[] {
   if (emQueda.length > 0) {
     frases.push(f.quedaReal(listar(emQueda.map((t) => `${t.exercicio} (${formatarPercentual(t.delta_pct, idioma)})`), f.e)));
   }
+  if (noPlato.length > 0) frases.push(frasePlato());
   return frases;
 }
 
@@ -268,7 +290,8 @@ function demaisOuDeMenos(r: ResumoCompacto, f: Frases, idioma: Idioma): string[]
   if (r.series_dificeis) {
     frases.push(f.dificeis(r.series_dificeis.total, r.series_dificeis.series_valendo, RIR_SERIE_DIFICIL));
   } else if (r.cobertura_rir_insuficiente) {
-    frases.push(f.rirInsuficiente(r.cobertura_rir_insuficiente.series_valendo_com_rir, r.cobertura_rir_insuficiente.series_valendo));
+    const { series_valendo_com_rir: comRir, series_valendo: total } = r.cobertura_rir_insuficiente;
+    frases.push(comRir === 0 ? f.semRir(total) : f.rirInsuficiente(comRir, total));
   }
   return frases;
 }

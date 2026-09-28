@@ -111,6 +111,24 @@ describe("casos de borda do texto", () => {
   });
 });
 
+describe("recordes contados por treino", () => {
+  it("duas séries recordistas do mesmo exercício no mesmo treino contam como um recorde, o de maior e1RM", () => {
+    const series = achatarSeriesValendo(
+      [
+        treino("2026-09-01", [["supino", 10, 40]]),
+        treino("2026-09-08", [["supino", 10, 41]]),
+        treino("2026-09-15", [["supino", 10, 42]]),
+        treino("2026-09-22", [["supino", 8, 50], ["supino", 10, 50]]),
+      ],
+      new Map(EXERCICIOS.map((e) => [e.id, e])),
+    );
+    const periodo = periodoDoRelatorio("historico", HOJE, series)!;
+    expect(montarRelatorioPeriodo("historico", periodo, series).recordes).toEqual([
+      { exercicio: "Supino reto", reps: 10, peso: 50 },
+    ]);
+  });
+});
+
 describe("idiomas", () => {
   it("responde em inglês e espanhol", () => {
     expect(textoDoRelatorio(relatorio("mes"), "en")).toMatch(/^September 2026: 3 workouts so far\./);
