@@ -15,7 +15,8 @@ import type { ResumoCompacto } from "@/lib/analise/tipos";
 import { carregarExercicios, carregarTreinosDoUsuario } from "@/lib/dados/historico-analise";
 import { dataLocalBrasil } from "@/lib/tempo";
 import { ClienteParecerGemini } from "./gemini";
-import { montarEvidenciaParaTela } from "./evidencia";
+import { evidenciaDaPergunta, montarEvidenciaParaTela } from "./evidencia";
+import { leituraDaPergunta, respondidaPorLogica } from "@/lib/analise/leitura-por-pergunta";
 import type { EvidenciaParaTela } from "./evidencia";
 import { montarPrompt } from "./prompt";
 import { validarNumeros } from "./validador";
@@ -294,6 +295,42 @@ export async function POST(request: Request) {
     return NextResponse.json({ erro: "geracao_em_andamento" }, { status: 409 });
   }
 
+  const PERGUNTAS = perguntasDoIdioma(idioma);
+
+  // AN-08 M2-1 (`DECISIONS.md` 2026-09-28 (2)): as perguntas 1 a 4 são
+  // respondidas por lógica, sem Gemini e sem reservar cota. O parecer nasce
+  // pronto, e o contrato com a tela (202 + rascunhoId) não muda.
+  if (respondidaPorLogica(pergunta)) {
+    try {
+      const [treinos, exercicios] = await Promise.all([
+        carregarTreinosDoUsuario(supabase, user.id),
+        carregarExercicios(supabase, idioma),
+      ]);
+      const resumo = montarResumoCompacto({ treinos, exercicios, agora: paraDataUTC(dataLocalBrasil()) });
+      const { data: parecer, error } = await supabase
+        .from("parecer")
+        .insert({
+          usuario_id: user.id,
+          pergunta,
+          pergunta_texto: PERGUNTAS[pergunta],
+          idioma,
+          status: "pronto",
+          confirmado: false,
+          texto: leituraDaPergunta(resumo, pergunta, idioma),
+          evidencia: evidenciaDaPergunta(montarEvidenciaParaTela(resumo), pergunta),
+          aviso_falha_interpretativa: false,
+          falha_motivo: null,
+        })
+        .select("id")
+        .single();
+      if (error || !parecer) throw new Error(error?.message ?? "insert sem retorno");
+      return NextResponse.json({ ok: true, rascunhoId: parecer.id }, { status: 202 });
+    } catch (erro) {
+      console.error("[analise] falha na resposta por lógica:", erro instanceof Error ? erro.message : erro);
+      return NextResponse.json({ erro: "Falha ao iniciar a análise." }, { status: 500 });
+    }
+  }
+
   // Teto diário (migration 0020). A contagem saiu da tabela `parecer` e
   // veio para `uso_ia`, o que fecha o furo documentado em DECISIONS
   // 2026-09-05: contar linhas de `parecer` deixava quem DESCARTAVA um
@@ -304,7 +341,6 @@ export async function POST(request: Request) {
   // depois do insert do rascunho, mais abaixo: ela é atômica no banco, e só
   // quem ganhou a vaga de geração gasta cota.
 
-  const PERGUNTAS = perguntasDoIdioma(idioma);
   const { data: rascunho, error: erroInsert } = await supabase
     .from("parecer")
     .insert({

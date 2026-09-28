@@ -33,7 +33,7 @@ import { formatarPercentual, formatarPeso } from "@/lib/texto/formatar-delta";
 import { formatarDataCurta } from "@/lib/tempo";
 
 /** Delta de e1RM abaixo disto não conta como "subiu" nem "caiu". Mesma zona-morta do bloco de evidência (`evidencia.ts`). */
-const ZONA_MORTA_PCT = 1;
+export const ZONA_MORTA_PCT = 1;
 
 type Frases = {
   cobertura: (semana: string, com: number, total: number) => string;

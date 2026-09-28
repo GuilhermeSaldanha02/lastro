@@ -41,7 +41,7 @@ export const PASSOS_ALUNO: PassoGuia[] = [
     titulo: "A Análise Semanal",
     paragrafos: [
       "Escolha uma das perguntas, como “Estou progredindo?” ou “Onde eu empaquei?”. O parecer cita os seus exercícios e números.",
-      "A análise usa a última semana completa, de segunda a domingo. Ela é gerada por inteligência artificial e pode errar: confira o que importa.",
+      "A análise usa a última semana completa, de segunda a domingo. As quatro primeiras perguntas são calculadas pelo próprio lastro; a de o que mudar é escrita por inteligência artificial e pode errar: confira o que importa.",
       "Cada conta tem um limite diário de uso da inteligência artificial.",
     ],
   },

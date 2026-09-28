@@ -103,3 +103,23 @@ export function montarEvidenciaParaTela(
     blocos,
   };
 }
+
+/**
+ * Os blocos que cabem em CADA pergunta (AN-08 M2-1). Antes as cinco
+ * mostravam os mesmos blocos. Blocos são por exercício, então:
+ * - 1 (progresso) e 5 (o que mudar): todos;
+ * - 2 (empaque): só quem está parado ou sem alta;
+ * - 3 (equilíbrio) e 4 (frequência): nenhum, porque a resposta é por grupo
+ *   e por semana, e um bloco de exercício ali seria ruído. O período continua,
+ *   porque é ele que data o parecer na tela.
+ */
+export function evidenciaDaPergunta(evidencia: EvidenciaParaTela, pergunta: number): EvidenciaParaTela {
+  if (pergunta === 2) {
+    return {
+      ...evidencia,
+      blocos: evidencia.blocos.filter((b) => b.sinal !== "alta" || b.semanas_sem_progresso !== undefined),
+    };
+  }
+  if (pergunta === 3 || pergunta === 4) return { ...evidencia, blocos: [] };
+  return evidencia;
+}
