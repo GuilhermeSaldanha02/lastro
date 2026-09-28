@@ -1,4 +1,5 @@
 import { calcularE1rm, elegivelParaE1rm } from "./e1rm";
+import { evolucaoPorMetades } from "./evolucao";
 import { calcularFrequencia } from "./frequencia";
 import { calcularEstagnacoes, type ValoresSemanaisExercicio } from "./estagnacao";
 import {
@@ -286,8 +287,11 @@ export function montarResumoCompacto(entrada: {
   for (const [exercicioId, sessoes] of sessoesPorExercicio) {
     if (sessoes.length < MINIMO_SESSOES_TENDENCIA) continue; // T-E6
     sessoes.sort((a, b) => (a.data < b.data ? -1 : a.data > b.data ? 1 : 0));
-    const inicial = sessoes[0].e1rmMaximo;
-    const atual = sessoes[sessoes.length - 1].e1rmMaximo;
+    // Melhor da primeira metade × melhor da segunda (`evolucao.ts`, decisão
+    // do dono 2026-09-28): uma sessão leve isolada não vira "queda".
+    const evolucao = evolucaoPorMetades(sessoes.map((s) => s.e1rmMaximo));
+    if (!evolucao) continue;
+    const { inicial, atual } = evolucao;
     tendencia_e1rm.push({
       exercicio: nomePorExercicioId.get(exercicioId)!,
       grupo_muscular: grupoPorExercicio.get(exercicioId)!,

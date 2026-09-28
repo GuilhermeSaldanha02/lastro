@@ -12,6 +12,7 @@ import type { Idioma } from "@/lib/dados/idioma";
 import { formatarPercentual, formatarPeso } from "@/lib/texto/formatar-delta";
 import { formatarDataCurta, nomeMesComAno } from "@/lib/tempo";
 import { calcularE1rm, elegivelParaE1rm } from "./e1rm";
+import { evolucaoPorMetades } from "./evolucao";
 import { ZONA_MORTA_PCT } from "./leitura-deterministica";
 import { MINIMO_SESSOES_TENDENCIA } from "./limiares";
 import { anteriorEquivalente, contem, mesDe, periodoLivre, type Periodo } from "./periodo";
@@ -67,12 +68,11 @@ function evolucaoPorExercicio(series: SerieValendo[]): RelatorioPeriodo["evoluca
   for (const [exercicioId, dias] of porExercicioEDia) {
     if (dias.size < MINIMO_SESSOES_TENDENCIA) continue;
     const ordenadas = Array.from(dias).sort((a, b) => a[0].localeCompare(b[0]));
-    const inicial = ordenadas[0][1];
-    const final = ordenadas[ordenadas.length - 1][1];
-    if (inicial <= 0) continue;
+    const evolucao = evolucaoPorMetades(ordenadas.map(([, e1rm]) => e1rm));
+    if (!evolucao) continue;
     resultado.push({
       exercicio: nome.get(exercicioId)!,
-      deltaPct: Math.round(((final - inicial) / inicial) * 1000) / 10,
+      deltaPct: Math.round(((evolucao.atual - evolucao.inicial) / evolucao.inicial) * 1000) / 10,
       sessoes: dias.size,
     });
   }
