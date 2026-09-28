@@ -54,6 +54,12 @@ export type EvidenciaParaTela = {
     /** `semana_atual_inicio` + 6 dias — domingo da mesma semana ISO. */
     semana_atual_fim: string;
     janela_semanas: number;
+    /**
+     * Presente só nos relatórios de período (perguntas 6 e 7, AN-08 M2-2):
+     * aí `semana_atual_inicio/fim` guardam o início e o fim do PERÍODO, e o
+     * cabeçalho troca "Semana de" por "Período". Ausente = parecer semanal.
+     */
+    tipo_periodo?: "mes" | "historico";
   };
   blocos: BlocoEvidencia[];
 };

@@ -225,9 +225,11 @@ export default function DocumentoParecer({ parecer }: { parecer: ParecerSalvo })
         <View style={e.topo}>
           <Text style={e.marca}>lastro</Text>
           <View>
-            <Text style={e.selo}>{t("Análise semanal", idioma).toUpperCase()}</Text>
+            <Text style={e.selo}>
+              {(evidencia.periodo.tipo_periodo ? t("Relatório do período", idioma) : t("Análise semanal", idioma)).toUpperCase()}
+            </Text>
             <Text style={e.procedencia}>
-              {t("Semana de", idioma)}{" "}
+              {evidencia.periodo.tipo_periodo ? t("Período", idioma) : t("Semana de", idioma)}{" "}
               {formatarDataCurta(evidencia.periodo.semana_atual_inicio)} —{" "}
               {formatarDataCurta(evidencia.periodo.semana_atual_fim)}
             </Text>

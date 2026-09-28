@@ -677,12 +677,12 @@ test("portas: personal sem CREF não pode gravar um CREF fora da norma direto no
   }
 });
 
-test("portas: /api/analise recusa pergunta que não é 1 a 5 sem gastar cota", async ({ page }) => {
+test("portas: /api/analise recusa pergunta que não é 1 a 7 sem gastar cota", async ({ page }) => {
   await entrarComoUsuario(page, alunoB);
   const cotaAntes = await contar(alunoB, "uso_ia");
   const pareceresAntes = await contar(alunoB, "parecer");
 
-  for (const corpo of [{ pergunta: "5" }, { pergunta: 6 }, { pergunta: 0 }, { pergunta: "abc" }, { pergunta: 2.5 }, {}]) {
+  for (const corpo of [{ pergunta: "5" }, { pergunta: 8 }, { pergunta: 0 }, { pergunta: "abc" }, { pergunta: 2.5 }, {}]) {
     const r = await page.request.post("/api/analise", { data: corpo });
     expect(r.status(), `corpo ${JSON.stringify(corpo)} não foi recusado`).toBe(400);
   }

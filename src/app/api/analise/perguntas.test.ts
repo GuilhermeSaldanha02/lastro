@@ -11,10 +11,11 @@ import {
   PERGUNTA_PRESCRICAO,
   PERGUNTA_PRIMARIA_VINCULADO,
   perguntasDoIdioma,
+  perguntaValida,
   type NumeroPergunta,
 } from "./perguntas";
 
-const TODAS: NumeroPergunta[] = [1, 2, 3, 4, 5];
+const TODAS: NumeroPergunta[] = [1, 2, 3, 4, 5, 6, 7];
 
 describe("perguntasDaTela — sem vínculo", () => {
   const { primaria, secundarias } = perguntasDaTela(false);
@@ -23,7 +24,7 @@ describe("perguntasDaTela — sem vínculo", () => {
     expect(primaria).toBe(PERGUNTA_PRIMARIA);
   });
 
-  it("mostra as cinco perguntas, sem repetir nenhuma", () => {
+  it("mostra as sete perguntas, sem repetir nenhuma", () => {
     expect([primaria, ...secundarias].sort()).toEqual(TODAS);
   });
 
@@ -46,7 +47,7 @@ describe("perguntasDaTela — com vínculo", () => {
     expect(primaria).toBe(PERGUNTA_PRIMARIA_VINCULADO);
   });
 
-  it("o aluno não perde nenhum dos quatro diagnósticos (PRD §11.2)", () => {
+  it("o aluno não perde nenhum diagnóstico nem relatório de período (PRD §11.2)", () => {
     const diagnosticos = TODAS.filter((n) => n !== PERGUNTA_PRESCRICAO);
     expect(naTela.sort()).toEqual(diagnosticos);
   });
@@ -66,6 +67,11 @@ describe("as duas constantes de papel", () => {
 
   it("a primária sob vínculo NÃO é a prescrição — seria a trava anulada", () => {
     expect(PERGUNTA_PRIMARIA_VINCULADO).not.toBe(PERGUNTA_PRESCRICAO);
+  });
+
+  it("perguntaValida aceita só inteiros de 1 a 7", () => {
+    expect([1, 2, 3, 4, 5, 6, 7].every(perguntaValida)).toBe(true);
+    for (const invalido of [0, 8, 2.5, "5", null, undefined]) expect(perguntaValida(invalido)).toBe(false);
   });
 
   it("toda pergunta que a tela mostra tem texto nos três idiomas", () => {
