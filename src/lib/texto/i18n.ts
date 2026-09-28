@@ -15,6 +15,13 @@ import type { Idioma } from "@/lib/dados/idioma";
 
 const DICIONARIO: Record<string, { en: string; es: string }> = {
   // --- app/login/page.tsx ---
+  "Mês anterior": { en: "Previous month", es: "Mes anterior" },
+  "Próximo mês": { en: "Next month", es: "Mes siguiente" },
+  "Toque num dia marcado": { en: "Tap a marked day", es: "Toca un día marcado" },
+  "Mostrando": { en: "Showing", es: "Mostrando" },
+  "Ver todos os treinos": { en: "See all workouts", es: "Ver todos los entrenos" },
+  "Gerar relatório deste treino": { en: "Generate a report for this workout", es: "Generar informe de este entreno" },
+  "Nenhum treino nesse dia com o grupo": { en: "No workout that day with the group", es: "Ningún entreno ese día con el grupo" },
   "Relatórios": { en: "Reports", es: "Informes" },
   "Gerar imagem para Stories": { en: "Create image for Stories", es: "Crear imagen para Stories" },
   "Termos e privacidade": { en: "Terms and privacy", es: "Términos y privacidad" },

@@ -1,14 +1,10 @@
 // lastro · Relatórios de Sessões e Geração de Stickers para Stories
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { listarTreinos, buscarTreino } from "@/lib/dados/treino";
+import { listarTreinos } from "@/lib/dados/treino";
 import { listarPareceres } from "@/lib/dados/parecer";
 import { obterPerfil } from "@/lib/dados/perfil";
-import {
-  calcularMetricasSessao,
-  duracaoSessaoSegundos,
-  ultimaSerieEm,
-} from "@/lib/dados/metricas-treino";
+import { obterMetricasDoTreino } from "@/lib/dados/relatorio-treino";
 import CabecalhoPro from "@/components/cabecalho-pro";
 import AbaInferior from "@/components/aba-inferior";
 import HistoricoRelatoriosPosTreino from "@/components/historico-relatorios-pos-treino";
@@ -23,39 +19,6 @@ export default async function PaginaRelatoriosAjustes() {
 
   const idioma = perfil.idioma ?? "pt-BR";
   const [treinos, pareceres] = await Promise.all([listarTreinos(), listarPareceres()]);
-
-  async function obterMetricasDoTreino(treinoId: string) {
-    "use server";
-    const treinoComSeries = await buscarTreino(treinoId);
-    if (!treinoComSeries) return null;
-
-    // Converte séries para o formato esperado pelo calculador de métricas
-    const seriesParaMetricas = treinoComSeries.series.map((s) => ({
-      id: s.id,
-      exercicioId: s.exercicioId,
-      exercicioNome: s.exercicioNome,
-      reps: s.reps,
-      peso: s.peso,
-      tipo: s.tipo,
-      pesoPorLado: s.pesoPorLado,
-      exercicioGrupoMuscular: s.exercicioGrupoMuscular,
-    }));
-
-    // Duração pela DEFINIÇÃO ÚNICA (`duracaoSessaoSegundos`), a mesma que a
-    // tela de treino usa desde 2026-09-04. Antes daqui saía `última série −
-    // primeira série` e de lá saía o cronômetro ao vivo do localStorage:
-    // duas medidas diferentes do mesmo treino, divergindo de forma
-    // sistemática (relato de uso real do dono). A âncora agora é
-    // `treino.iniciado_em`, que os dois lados enxergam igual.
-    const duracaoSegundos = duracaoSessaoSegundos(
-      treinoComSeries.iniciadoEm,
-      ultimaSerieEm(treinoComSeries.series),
-    );
-
-    return calcularMetricasSessao(seriesParaMetricas, duracaoSegundos, undefined, {
-      identificadorTreino: `TREINO ${treinoId.slice(-4).toUpperCase()}`,
-    });
-  }
 
   return (
     <main className="tela">
@@ -94,6 +57,8 @@ export default async function PaginaRelatoriosAjustes() {
               treinos={treinos}
               idioma={idioma}
               obterMetricasAcao={obterMetricasDoTreino}
+              // ^ mesma ação de servidor de `relatorio-treino.ts`, reusada agora
+              // também em `/treino` (UX-02) — o cálculo mora num lugar só.
             />
           </div>
         ) : (

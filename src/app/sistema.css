@@ -6309,3 +6309,241 @@ html:lang(es) .nav a {
 html:lang(pt) .nav a {
   font-size: min(var(--lastro-papel-rotulo), 3.6vw);
 }
+
+/* =====================================================================
+   CALENDÁRIO DO HISTÓRICO (UX-02, 2026-09-28) — Portão visual aprovado pelo
+   dono num mockup renderizado (mesmos tokens do resto do app).
+   ===================================================================== */
+
+.calendario-mes {
+  border: 1px solid var(--lastro-linha);
+  border-radius: var(--lastro-raio-2);
+  background: var(--lastro-sup-1);
+  margin-bottom: var(--lastro-e-4);
+  overflow: hidden;
+}
+
+.calendario-mes__gatilho {
+  width: 100%;
+  min-height: var(--lastro-alvo-min);
+  border: none;
+  background: transparent;
+  color: inherit;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--lastro-e-3) var(--lastro-e-4);
+  text-align: left;
+}
+
+.calendario-mes__titulo {
+  display: flex;
+  align-items: center;
+  gap: var(--lastro-e-2);
+  min-width: 0;
+}
+
+.calendario-mes__titulo span:first-of-type {
+  font-size: var(--lastro-papel-corpo);
+  font-weight: var(--lastro-peso-forte);
+}
+
+.calendario-mes__resumo {
+  font-size: var(--lastro-papel-rotulo);
+  color: var(--lastro-txt-3);
+}
+
+.calendario-mes__seta {
+  transition: transform var(--lastro-dur-1) ease;
+  flex-shrink: 0;
+  color: var(--lastro-txt-3);
+}
+
+.calendario-mes__seta--aberta {
+  transform: rotate(180deg);
+}
+
+.calendario-mes__corpo {
+  padding: 0 var(--lastro-e-3) var(--lastro-e-4);
+}
+
+.calendario-mes__navegacao {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--lastro-e-3);
+  padding: 0 var(--lastro-e-1);
+}
+
+.calendario-mes__navegacao-botao {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 1px solid var(--lastro-linha);
+  background: transparent;
+  color: var(--lastro-txt-2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.calendario-mes__navegacao-botao:disabled {
+  color: var(--lastro-txt-3);
+  opacity: 0.4;
+}
+
+.calendario-mes__navegacao-dica {
+  font-size: var(--lastro-papel-detalhe);
+  color: var(--lastro-txt-3);
+}
+
+.calendario-mes__semana {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 2px;
+  margin-bottom: var(--lastro-e-2);
+}
+
+.calendario-mes__semana span {
+  text-align: center;
+  font-size: var(--lastro-papel-detalhe);
+  font-weight: var(--lastro-peso-forte);
+  color: var(--lastro-txt-3);
+}
+
+.calendario-mes__grade {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 2px;
+}
+
+.calendario-dia {
+  position: relative;
+  aspect-ratio: 1;
+  border-radius: var(--lastro-raio-1);
+  background: transparent;
+  border: 1px solid transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  color: var(--lastro-txt-3);
+  font-size: var(--lastro-papel-rotulo);
+}
+
+.calendario-dia--com-treino {
+  color: var(--lastro-txt);
+  font-weight: var(--lastro-peso-forte);
+}
+
+.calendario-dia--fora-do-mes {
+  color: var(--lastro-txt-3);
+  opacity: 0.35;
+}
+
+.calendario-dia--hoje {
+  border-color: var(--lastro-ouro);
+}
+
+.calendario-dia--selecionado {
+  background: var(--lastro-ouro-glow);
+  border-color: var(--lastro-ouro);
+  font-weight: var(--lastro-peso-max);
+}
+
+.calendario-dia__ponto {
+  position: absolute;
+  bottom: 5px;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--lastro-esmeralda);
+}
+
+.calendario-dia--selecionado .calendario-dia__ponto {
+  background: var(--lastro-ouro);
+}
+
+/* Filtro por dia escolhido no calendário — mesmo desenho do chip ativo do
+   filtro por grupo, mas com o "×" que devolve a lista inteira. */
+.filtro-dia-ativo {
+  display: flex;
+  align-items: center;
+  gap: var(--lastro-e-2);
+  margin-bottom: var(--lastro-e-3);
+}
+
+.filtro-dia-ativo__rotulo {
+  font-size: var(--lastro-papel-rotulo);
+  color: var(--lastro-txt-2);
+}
+
+.filtro-dia-ativo__chip {
+  display: flex;
+  align-items: center;
+  gap: var(--lastro-e-1);
+  background: var(--lastro-sup-2);
+  border: 1px solid var(--lastro-ouro);
+  border-radius: var(--lastro-raio-pilula);
+  padding: 6px 6px 6px var(--lastro-e-3);
+  font-size: var(--lastro-papel-rotulo);
+  font-weight: var(--lastro-peso-forte);
+  color: var(--lastro-ouro);
+}
+
+.filtro-dia-ativo__limpar {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: none;
+  background: var(--lastro-ouro-glow);
+  color: var(--lastro-ouro);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+}
+
+/* Seção "treino(s) de hoje" — separada do histórico (UX-02: item 1). */
+.historico-hoje {
+  margin-bottom: var(--lastro-e-5);
+}
+
+.historico-hoje__titulo {
+  font-size: var(--lastro-papel-detalhe);
+  font-weight: var(--lastro-peso-max);
+  letter-spacing: 0.06em;
+  color: var(--lastro-txt-3);
+  margin: 0 0 var(--lastro-e-2) 2px;
+  text-transform: uppercase;
+}
+
+/* Cabeçalho de mês no histórico agrupado (UX-02: item 2). */
+.historico-mes-cabecalho {
+  font-size: var(--lastro-papel-detalhe);
+  font-weight: var(--lastro-peso-max);
+  letter-spacing: 0.06em;
+  color: var(--lastro-txt-3);
+  text-transform: uppercase;
+  margin: var(--lastro-e-4) 0 var(--lastro-e-2) 2px;
+}
+
+/* Botão "gerar relatório" por linha — contorno dourado, ícone só (UX-02,
+   pedido do dono: gerar relatório sem sair de /treino). */
+.item-treino-linha__acao-relatorio {
+  width: var(--lastro-alvo-min);
+  height: var(--lastro-alvo-min);
+  flex-shrink: 0;
+  border-radius: 50%;
+  border: 1px solid var(--lastro-borda-ouro);
+  background: transparent;
+  color: var(--lastro-ouro);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+}
+
+.item-treino-linha__acao-relatorio:disabled {
+  opacity: 0.5;
+}

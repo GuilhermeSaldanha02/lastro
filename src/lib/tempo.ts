@@ -43,3 +43,29 @@ export function formatarDataCurta(iso: string, idioma: Idioma = "pt-BR"): string
     timeZone: "UTC",
   }).format(new Date(Date.UTC(ano, mes - 1, dia)));
 }
+
+const MESES_COMPLETOS = [
+  "janeiro", "fevereiro", "março", "abril", "maio", "junho",
+  "julho", "agosto", "setembro", "outubro", "novembro", "dezembro",
+];
+
+/**
+ * "2026-09" → "Setembro 2026" (UX-02, cabeçalho do calendário e do
+ * agrupamento mensal do histórico de `/treino`). Mesmo raciocínio de
+ * `formatarDataCurta`: pt-BR por tabela própria (capitaliza a primeira
+ * letra), en/es por `Intl` — sem hora, formata em UTC para não voltar um
+ * dia perto da virada de fuso.
+ */
+export function nomeMesComAno(anoMes: string, idioma: Idioma = "pt-BR"): string {
+  const [ano, mes] = anoMes.split("-").map(Number);
+  if (!ano || !mes) return anoMes;
+  if (idioma === "pt-BR") {
+    const nome = MESES_COMPLETOS[mes - 1];
+    return `${nome.charAt(0).toUpperCase()}${nome.slice(1)} ${ano}`;
+  }
+  const nome = new Intl.DateTimeFormat(idioma === "en" ? "en-US" : "es-ES", {
+    month: "long",
+    timeZone: "UTC",
+  }).format(new Date(Date.UTC(ano, mes - 1, 1)));
+  return `${nome.charAt(0).toUpperCase()}${nome.slice(1)} ${ano}`;
+}
