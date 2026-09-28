@@ -84,8 +84,9 @@ describe("relatório desde o primeiro treino (AN-07)", () => {
       [
         "Desde 10 ago 2026: 6 treinos.",
         "Treinou em 6 de 8 semanas, média de 0,8 treinos por semana. Volume total: 3.960 kg.",
-        // Supino 10 × 40 → 10 × 50: +25%. Remada 30 → 30: estável, não é queda.
-        "Maior evolução: Supino reto, +25% de e1RM em 6 sessões.",
+        // Régua por metades (`evolucao.ts`). Supino, 6 sessões: melhor de 40/42/44 (58,7) → melhor de
+        // 45/8×50/50 (66,7) = +13,6%. Remada, 3 sessões: 30 (40) → melhor de 35/30 (46,7) = +16,7%, e lidera.
+        "Maior evolução: Remada, +16,7% de e1RM em 3 sessões.",
         "3 recordes pessoais: Supino reto 10 × 45 kg, Supino reto 8 × 50 kg e Supino reto 10 × 50 kg.",
         "Mais treinados: Peito (6 séries) e Costas (3 séries). Menos treinados: Quadríceps (1 série).",
       ].join(" "),

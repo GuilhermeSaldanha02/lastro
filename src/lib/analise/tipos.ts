@@ -144,7 +144,9 @@ export type ResumoCompacto = {
   tendencia_e1rm: Array<{
     exercicio: string;
     grupo_muscular: string;
+    /** Melhor e1RM da SEGUNDA metade das sessões da janela (`evolucao.ts`). */
     e1rm_atual: number;
+    /** Melhor e1RM da PRIMEIRA metade das sessões da janela (`evolucao.ts`). */
     e1rm_inicial: number;
     delta_pct: number;
     sessoes: number;

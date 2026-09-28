@@ -3039,3 +3039,19 @@ Sem navegador local (sem `.env.local`). O `j14-dica-info` roda na tela pública 
 - A Política continua correta: nada novo é enviado à IA nem guardado além do relatório.
 
 **Como reverter.** Voltar a rota de `/api/analise` a chamar a Gemini para 1 a 4. As perguntas 6 e 7 e os pareceres salvos ficam válidos.
+
+## 2026-09-28 (3) — Evolução de e1RM: melhor da primeira metade × melhor da segunda
+
+**Contexto.** No QA da M2 em produção, o relatório "desde o primeiro treino" mostrou "Maior queda: Elevação pélvica com barra, -72,2%". A régua comparava a PRIMEIRA sessão com a ÚLTIMA, então um único treino leve no fim (ou no começo) decidia o número inteiro.
+
+**A decisão do dono.** A evolução passa a comparar o **melhor e1RM da primeira metade das sessões** com o **melhor e1RM da segunda metade**, em ordem de calendário. Vale **nos dois lugares**, por escolha do dono, para o app não dizer "subiu" num e "caiu" no outro:
+- a tendência semanal (`tendencia_e1rm` do agregador: pergunta 1, blocos de alta/platô/queda e o resumo da pergunta 5);
+- os relatórios de período (perguntas 6 e 7 e o Coach).
+
+Com 2 sessões o resultado é igual ao de antes. Com número ímpar, a sessão do meio conta na segunda metade. Função única: `src/lib/analise/evolucao.ts`.
+
+**Alternativa descartada.** Média de cada metade: suaviza, mas uma sessão ruim ainda puxa, e "melhor" é o que "recorde" e "e1RM" já significam no resto do app.
+
+**Impacto.** Alguns exercícios mudam de número e podem mudar de cor no bloco de evidência (alta/platô/queda). O gráfico de progressão não muda: ele diz "entre 03/08 e 21/09" e compara exatamente essas duas semanas.
+
+**Como reverter.** Voltar `evolucaoPorMetades` a devolver o primeiro e o último valor.
