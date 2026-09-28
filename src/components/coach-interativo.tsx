@@ -5,7 +5,8 @@ import { LIMITE_PERGUNTA, limparPergunta } from "@/app/api/coach/prompt";
 import { t } from "@/lib/texto/i18n";
 import type { Idioma } from "@/lib/dados/idioma";
 
-type Fala = { de: "dono" | "coach"; texto: string };
+/** `local` = calculado pelo próprio lastro, sem IA (AN-08 M1). */
+type Fala = { de: "dono" | "coach"; texto: string; origem?: "local" };
 
 /**
  * O rótulo acompanha o idioma da tela, mas a pergunta enviada continua em
@@ -23,8 +24,8 @@ const SUGESTOES = [
     pergunta: "Qual grupo muscular estou treinando com menor frequência?",
   },
   {
-    rotulo: "Devo aumentar a carga ou as repetições no meu próximo treino?",
-    pergunta: "Devo aumentar a carga ou as repetições no meu próximo treino?",
+    rotulo: "Como foi minha semana?",
+    pergunta: "Como foi minha semana?",
   },
 ];
 
@@ -90,8 +91,8 @@ export default function CoachInterativo({ idioma }: { idioma: Idioma }) {
         return;
       }
 
-      const dados = (await resposta.json()) as { resposta: string };
-      setFalas((atual) => [...atual, { de: "coach", texto: dados.resposta }]);
+      const dados = (await resposta.json()) as { resposta: string; origem?: "local" };
+      setFalas((atual) => [...atual, { de: "coach", texto: dados.resposta, origem: dados.origem }]);
     } catch {
       setErro(t("Falha de rede. Tente de novo.", idioma));
     } finally {
@@ -146,7 +147,7 @@ export default function CoachInterativo({ idioma }: { idioma: Idioma }) {
                 <svg viewBox="0 0 24 24" width="12" height="12" fill="var(--lastro-ouro)" style={{ marginRight: 4 }}>
                   <path d="M12 2L14.5 9.5L22 12L14.5 14.5L12 22L9.5 14.5L2 12L9.5 9.5L12 2Z" />
                 </svg>
-                {t("Assistente de IA", idioma)}
+                {fala.origem === "local" ? t("Calculado pelo lastro", idioma) : t("Assistente de IA", idioma)}
               </span>
             )}
             <p className="balao__texto">{fala.texto}</p>

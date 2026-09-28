@@ -11,12 +11,8 @@ import { NextResponse, after } from "next/server";
 import { criarClienteServidor } from "@/lib/supabase/cliente-servidor";
 import { montarResumoCompacto } from "@/lib/analise/agregar";
 import { paraDataUTC } from "@/lib/analise/semanas";
-import { ehGrupoAcessorio } from "@/lib/analise/grupos-acessorios";
-import type {
-  ExercicioBruto,
-  ResumoCompacto,
-  TreinoBruto,
-} from "@/lib/analise/tipos";
+import type { ResumoCompacto } from "@/lib/analise/tipos";
+import { carregarExercicios, carregarTreinosDoUsuario } from "@/lib/dados/historico-analise";
 import { dataLocalBrasil } from "@/lib/tempo";
 import { ClienteParecerGemini } from "./gemini";
 import { montarEvidenciaParaTela } from "./evidencia";
@@ -34,119 +30,10 @@ import {
   type NumeroPergunta,
 } from "./perguntas";
 import { obterIdioma, type Idioma } from "@/lib/dados/idioma";
-import { mapaTraducaoExercicios, mapaTraducaoGrupos } from "@/lib/dados/traducao";
-import { formatarGrupoMuscular } from "@/lib/texto/grupo-muscular";
 import { limparRascunhosExpirados } from "@/lib/dados/parecer";
 import { carregarVinculoDoAluno } from "@/lib/dados/personal";
 
 type ClienteSupabaseServidor = Awaited<ReturnType<typeof criarClienteServidor>>;
-
-type LinhaSerie = {
-  id: string;
-  exercicio_id: string;
-  tipo: "aquecimento" | "valendo";
-  reps: number;
-  peso: number;
-  rir: number | null;
-  peso_por_lado: boolean;
-};
-
-type LinhaTreino = {
-  id: string;
-  data: string;
-  serie: LinhaSerie[] | null;
-};
-
-type LinhaExercicio = {
-  id: string;
-  nome: string;
-  grupo_muscular_primario: string;
-  unilateral: boolean;
-  peso_por_lado: boolean;
-};
-
-/**
- * Todos os treinos do usuário informado, já com as séries.
- *
- * O FILTRO É EXPLÍCITO, e o comentário antigo desta função ("RLS filtra")
- * deixou de ser verdade na migração 0022: um personal com vínculo aceito
- * enxerga treino e série do aluno, então a consulta sem filtro traria as
- * duas pessoas — e este é o caminho da PEÇA-ASSINATURA. O parecer do
- * personal sairia somando o treino do aluno ao dele, citando exercício que
- * ele nunca fez, sem erro nenhum em lugar nenhum.
- */
-async function carregarTreinosDoUsuario(
-  supabase: ClienteSupabaseServidor,
-  usuarioId: string,
-): Promise<TreinoBruto[]> {
-  const { data, error } = await supabase
-    .from("treino")
-    .select(
-      "id, data, serie (id, exercicio_id, tipo, reps, peso, rir, peso_por_lado)",
-    )
-    .eq("usuario_id", usuarioId);
-  if (error) throw new Error(`Falha ao carregar treinos: ${error.message}`);
-
-  return ((data ?? []) as unknown as LinhaTreino[]).map((t) => ({
-    id: t.id,
-    data: t.data,
-    series: (t.serie ?? []).map((s) => ({
-      id: s.id,
-      exercicioId: s.exercicio_id,
-      tipo: s.tipo,
-      reps: s.reps,
-      peso: Number(s.peso),
-      rir: s.rir ?? undefined,
-      pesoPorLado: s.peso_por_lado,
-    })),
-  }));
-}
-
-/**
- * Catálogo de exercícios — dado compartilhado, não filtrado por usuário.
- *
- * Nome e grupo muscular JÁ CHEGAM traduzidos pro idioma da pessoa
- * (módulo de idiomas, etapa 3/4, decisão tomada com o dono 2026-08-24):
- * o parecer da Gemini cita nome de exercício na primeira frase (trava
- * do `prompt.ts`), e se o modelo tivesse que traduzir "Supino reto com
- * halteres" na hora, sairia um nome diferente a cada chamada —
- * inconsistente entre pareceres. Traduzindo aqui, ANTES do agregador,
- * o resumo que chega no JSON do prompt já é a única fonte, em qualquer
- * idioma — o LLM só cita o que está lá, nunca inventa nome.
- */
-async function carregarExercicios(
-  supabase: ClienteSupabaseServidor,
-  idioma: Idioma,
-): Promise<ExercicioBruto[]> {
-  const { data, error } = await supabase
-    .from("exercicio")
-    .select("id, nome, grupo_muscular_primario, unilateral, peso_por_lado");
-  if (error) throw new Error(`Falha ao carregar exercícios: ${error.message}`);
-
-  const [traducaoExercicios, traducaoGrupos] = await Promise.all([
-    mapaTraducaoExercicios(idioma),
-    mapaTraducaoGrupos(idioma),
-  ]);
-
-  return ((data ?? []) as LinhaExercicio[]).map((e) => ({
-    id: e.id,
-    nome: traducaoExercicios.get(e.id) ?? e.nome,
-    // O mais caro dos três vazamentos da mesma raiz (2026-08-27): em pt-BR
-    // `mapaTraducaoGrupos` devolve mapa vazio, então este `??` disparava
-    // SEMPRE no idioma padrão e a CHAVE DO BANCO (`posterior_coxa`) entrava
-    // no resumo que vai pro prompt — saindo impressa no parecer, que é a
-    // peça-assinatura. Mesma razão do comentário acima sobre traduzir ANTES
-    // do agregador: o resumo é a única fonte que o LLM pode citar, então
-    // precisa chegar legível, não com identificador de tabela.
-    grupoMuscularPrimario:
-      traducaoGrupos.get(e.grupo_muscular_primario) ??
-      formatarGrupoMuscular(e.grupo_muscular_primario, idioma),
-    unilateral: e.unilateral,
-    pesoPorLado: e.peso_por_lado,
-    grupoAcessorio: ehGrupoAcessorio(e.grupo_muscular_primario),
-  }));
-}
-
 
 /**
  * Fallback determinístico (SDD §6.4, política de retry, 2ª falha) — sem LLM.

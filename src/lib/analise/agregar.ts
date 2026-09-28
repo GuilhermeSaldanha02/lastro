@@ -31,7 +31,7 @@ function arredondar(valor: number, casas: number): number {
  * (FF4). Todo módulo downstream recebe apenas o resultado desta função —
  * nunca `TreinoBruto`/`SerieBruta` crus.
  */
-function achatarSeriesValendo(
+export function achatarSeriesValendo(
   treinos: TreinoBruto[],
   exerciciosPorId: Map<string, ExercicioBruto>,
 ): SerieValendo[] {
