@@ -22,12 +22,12 @@ Sub-itens do AN-08, **todos NÃO INICIADOS**. O prefixo `AN-08.` evita colisão 
 
 | ID | Fase | O que é | Seção |
 |---|---|---|---|
-| AN-08.E1–E5 | Estudo | **ENTREGUE 2026-09-28, aguardando aprovação do dono:** `docs/estudos/AN-08-motor-deterministico-estudo.md`. As 5 entregas: auditoria, matriz de capacidades (30+ perguntas), arquitetura, roadmap, economia estimada de IA. Depois delas, PARAR. | §27–§28 |
+| AN-08.E1–E5 | Estudo | **ENTREGUE E APROVADO 2026-09-28** (o dono autorizou o Coach a ler os dados do próprio usuário e a M1): `docs/estudos/AN-08-motor-deterministico-estudo.md`. As 5 entregas: auditoria, matriz de capacidades (30+ perguntas), arquitetura, roadmap, economia estimada de IA. Depois delas, PARAR. | §27–§28 |
 | AN-08.F0-MATRIZ | 0 | Matriz Gemini × determinístico em níveis 0–4 (progressão, volume, frequência, consistência). | §3–§6, §24 |
-| AN-08.F0-TEMPO | 0 | Camada única de comparação temporal (semana, 4 semanas, mês, período livre × anterior). | §7 |
+| AN-08.F0-TEMPO | 0 | **FEITO 2026-09-28 (M1, PR #348):** `src/lib/analise/periodo.ts`. Falta a M2: o `montarResumoCompacto` aceitar período (para o AN-07 e a C3). Era: Camada única de comparação temporal (semana, 4 semanas, mês, período livre × anterior). | §7 |
 | AN-08.F0-ANOMALIA | 0 | Detector de sessão fora do padrão do próprio usuário, com piso de amostra. | §8 |
 | AN-08.F0-INSIGHT | 0 | `Insight` como dado estruturado, antes de virar texto. | §9 |
-| AN-08.F0-ROTEADOR | 0 | Roteador de perguntas do Coach sem LLM para classificar (intents, padrões, aliases). | §10–§11 |
+| AN-08.F0-ROTEADOR | 0 | **FEITO 2026-09-28 (M1, PR #349):** `src/lib/coach/` (roteador, respostas, ponte com o banco). 8 perguntas de dados e 3 recusas sem Gemini nem cota; o resto segue para a Gemini. Prova: e2e `j34` (`uso_ia` segue em 0). Falta: intents de período (M2), volume e frequência de UM grupo, e o contador de resolução local (F0-CUSTO). Era: Roteador de perguntas do Coach sem LLM para classificar (intents, padrões, aliases). | §10–§11 |
 | AN-08.F0-CACHE | 0 | Avaliar cache/snapshot de agregados, com invalidação por série nova. | §12 |
 | AN-08.F0-CUSTO | 0 | Observabilidade de custo (local × Gemini, fallback, erro de classificação), sem telemetria invasiva. | §25 |
 | AN-08.A1 | A | Check-in de recuperação (sono, energia, dor, estresse). | §13 |
