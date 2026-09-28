@@ -8,14 +8,15 @@ import type { SerieValendo } from "./tipos";
  * - `pesoPorLado`: o peso registrado é de UM implemento (ex.: um halter
  *   em cada mão), não do par — sem a correção, o volume fica pela metade.
  */
-function volumeDaSerie(serie: SerieValendo): number {
+export function volumeDeSerie(
+  serie: Pick<SerieValendo, "reps" | "peso" | "unilateral" | "pesoPorLado">,
+): number {
   const multiplicador = serie.unilateral || serie.pesoPorLado ? 2 : 1;
   return serie.reps * serie.peso * multiplicador;
 }
-
 /** Σ(reps × peso) das séries valendo recebidas (já filtradas para o período desejado). */
 export function calcularVolume(series: SerieValendo[]): number {
-  return series.reduce((soma, serie) => soma + volumeDaSerie(serie), 0);
+  return series.reduce((soma, serie) => soma + volumeDeSerie(serie), 0);
 }
 
 /** Volume somado por grupo muscular, entre as séries valendo recebidas. */
@@ -25,7 +26,7 @@ export function volumePorGrupoMuscular(
   const porGrupo = new Map<string, number>();
   for (const serie of series) {
     const atual = porGrupo.get(serie.grupoMuscular) ?? 0;
-    porGrupo.set(serie.grupoMuscular, atual + volumeDaSerie(serie));
+    porGrupo.set(serie.grupoMuscular, atual + volumeDeSerie(serie));
   }
   return porGrupo;
 }

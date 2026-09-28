@@ -25,6 +25,7 @@ export async function obterMetricasDoTreino(
     peso: s.peso,
     tipo: s.tipo,
     pesoPorLado: s.pesoPorLado,
+    exercicioUnilateral: s.exercicioUnilateral,
     exercicioGrupoMuscular: s.exercicioGrupoMuscular,
   }));
 

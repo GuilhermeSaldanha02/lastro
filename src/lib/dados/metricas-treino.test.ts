@@ -62,6 +62,17 @@ describe("calcularMetricasSessao", () => {
     expect(metricas.exerciciosDetalhados[0].totalSeries).toBe(3);
   });
 
+  it("tonelagem usa a mesma regra do agregador: unilateral dobra, e nunca compõe com peso por lado", () => {
+    const series: SerieParaMetricas[] = [
+      { id: "1", exercicioId: "bulgaro", exercicioNome: "Búlgaro", reps: 10, peso: 20, tipo: "valendo", exercicioUnilateral: true },
+      { id: "2", exercicioId: "remada", exercicioNome: "Remada Unilateral", reps: 8, peso: 30, tipo: "valendo", exercicioUnilateral: true, pesoPorLado: true },
+      { id: "3", exercicioId: "supino", exercicioNome: "Supino Reto", reps: 5, peso: 100, tipo: "valendo" },
+    ];
+
+    // (10*20*2) + (8*30*2, não ×4) + (5*100) = 400 + 480 + 500
+    expect(calcularMetricasSessao(series, 60).tonelagemTotalKg).toBe(1380);
+  });
+
   it("lida com lista vazia de séries sem quebrar", () => {
     const inicio = new Date().toISOString();
     const metricas = calcularMetricasSessao([], inicio);

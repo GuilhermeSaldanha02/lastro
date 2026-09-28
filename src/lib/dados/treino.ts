@@ -15,6 +15,7 @@ import { dataLocalBrasil } from "@/lib/tempo";
 import { obterIdioma } from "@/lib/dados/idioma";
 import { mapaTraducaoExercicios, mapaTraducaoGrupos } from "@/lib/dados/traducao";
 import { formatarGrupoMuscular } from "@/lib/texto/grupo-muscular";
+import { volumeDeSerie } from "@/lib/analise/volume";
 import { ehErroPermanenteDoPostgres } from "@/lib/offline/erro-permanente";
 import { ehUuid } from "@/lib/dados/id-valido";
 import { limitarDuracao, limitarFimMs } from "@/lib/treino/fim-treino";
@@ -135,15 +136,17 @@ export async function listarTreinos(): Promise<Treino[]> {
   return ((data ?? []) as unknown as Linha[]).map((t) => {
     const series = t.serie ?? [];
     const valendo = series.filter((s) => s.tipo === "valendo");
-    let vol = 0;
-    for (const s of valendo) {
-      const peso = Number(s.peso);
-      const reps = s.reps;
-      // Fonte do multiplicador é a SÉRIE (peso_por_lado) e o EXERCÍCIO
-      // (unilateral) — nunca compostos (D3.5).
-      const mult = s.exercicio?.unilateral || s.peso_por_lado ? 2 : 1;
-      vol += peso * reps * mult;
-    }
+    const vol = valendo.reduce(
+      (soma, s) =>
+        soma +
+        volumeDeSerie({
+          reps: s.reps,
+          peso: Number(s.peso),
+          unilateral: s.exercicio?.unilateral ?? false,
+          pesoPorLado: s.peso_por_lado,
+        }),
+      0,
+    );
     const grupos = Array.from(
       new Set(
         series
