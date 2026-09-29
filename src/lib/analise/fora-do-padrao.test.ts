@@ -3,6 +3,7 @@ import {
   compararComPadrao,
   familiaDaSessao,
   mediana,
+  posicoesDaBarra,
   sessoesForaDoPadrao,
   type SessaoParaPadrao,
 } from "./fora-do-padrao";
@@ -78,6 +79,13 @@ describe("compararComPadrao", () => {
   it("sessão sem tipo ou sem volume fica de fora", () => {
     expect(compararComPadrao(s("2026-09-14", ["peito", "costas"], 14_000), anteriores)).toBeNull();
     expect(compararComPadrao(s("2026-09-14", EMPURRAR, 0), anteriores)).toBeNull();
+  });
+});
+
+describe("posicoesDaBarra", () => {
+  it("o maior dos dois fica em 80%", () => {
+    expect(posicoesDaBarra({ volume: 14_000, padrao: 10_000 })).toEqual({ sessao: 80, padrao: 57 });
+    expect(posicoesDaBarra({ volume: 6_000, padrao: 10_000 })).toEqual({ sessao: 48, padrao: 80 });
   });
 });
 

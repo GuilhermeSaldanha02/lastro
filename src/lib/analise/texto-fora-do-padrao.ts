@@ -22,6 +22,20 @@ export function formatarToneladas(kg: number, idioma: Idioma): string {
 
 export type FrasePercebida = { antes: string; numero: string; depois: string };
 
+/** Textos do bloco do pós-treino (B1, direção C). */
+export function textosBlocoPadrao(c: ComparacaoPadrao, idioma: Idioma) {
+  const familia = FAMILIA[idioma][c.familia];
+  const padrao = formatarToneladas(c.padrao, idioma);
+  const pct = `${c.desvio > 0 ? "+" : "−"}${Math.round(Math.abs(c.desvio) * 100)}%`;
+  if (idioma === "en") {
+    return { rotulo: "Lastro noticed · volume vs. your usual", pct, legenda: `your ${familia} usual: ${padrao}`, janela: `last ${c.sessoesComparadas}` };
+  }
+  if (idioma === "es") {
+    return { rotulo: "Lastro notó · volumen vs. tu patrón", pct, legenda: `tu patrón de ${familia}: ${padrao}`, janela: `últimas ${c.sessoesComparadas}` };
+  }
+  return { rotulo: "Lastro percebeu · volume vs. seu padrão", pct, legenda: `seu padrão de ${familia}: ${padrao}`, janela: `últimas ${c.sessoesComparadas}` };
+}
+
 export function frasePercebida(c: ComparacaoPadrao, idioma: Idioma): FrasePercebida {
   const familia = FAMILIA[idioma][c.familia];
   const data = formatarDataCurta(c.data, idioma);

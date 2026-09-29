@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import type { ComparacaoPadrao } from "./fora-do-padrao";
-import { formatarToneladas, frasePercebida } from "./texto-fora-do-padrao";
+import { formatarToneladas, frasePercebida, textosBlocoPadrao } from "./texto-fora-do-padrao";
 
 const acima: ComparacaoPadrao = {
   treinoId: "t1",
@@ -35,6 +35,19 @@ describe("frasePercebida", () => {
         expect(junta(frasePercebida(c, idioma))).not.toMatch(/risco|lesão|risk|injur|riesgo|lesión|porque|because/i);
       }
     }
+  });
+});
+
+describe("textosBlocoPadrao", () => {
+  it("rótulo, percentual com sinal, legenda da régua e janela", () => {
+    expect(textosBlocoPadrao(acima, "pt-BR")).toEqual({
+      rotulo: "Lastro percebeu · volume vs. seu padrão",
+      pct: "+40%",
+      legenda: "seu padrão de empurrar: 10,4 t",
+      janela: "últimas 6",
+    });
+    expect(textosBlocoPadrao(abaixo, "en").pct).toBe("−32%");
+    expect(textosBlocoPadrao(abaixo, "es").legenda).toBe("tu patrón de piernas: 12,1 t");
   });
 });
 

@@ -5463,6 +5463,81 @@
   align-items: center;
 }
 
+/* AN-08 B1 — volume da sessão contra o padrão do próprio usuário (direção C
+   do portão de 2026-09-29). Fica entre o cartão compartilhável e os botões,
+   FORA do cartão, para não sair na imagem. Conteúdo, não controle: sem
+   moldura. Abaixo do padrão é âmbar, nunca vermelho. */
+.pos-treino-padrao {
+  display: flex;
+  flex-direction: column;
+  gap: var(--lastro-e-2);
+  padding: var(--lastro-e-2) var(--lastro-e-1);
+}
+
+.pos-treino-padrao__rotulo {
+  font-size: var(--lastro-papel-rotulo);
+  font-weight: var(--lastro-peso-max);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--lastro-txt-2);
+}
+
+.pos-treino-padrao__numeros {
+  display: flex;
+  align-items: baseline;
+  gap: var(--lastro-e-3);
+}
+
+.pos-treino-padrao__volume {
+  font-family: var(--lastro-fonte-num);
+  font-weight: var(--lastro-peso-max);
+  font-size: 34px;
+  line-height: 1;
+  color: var(--lastro-txt);
+}
+
+.pos-treino-padrao__pct {
+  font-family: var(--lastro-fonte-num);
+  font-weight: var(--lastro-peso-max);
+  font-size: 20px;
+}
+
+.pos-treino-padrao__pct--acima { color: var(--lastro-alta); }
+.pos-treino-padrao__pct--abaixo { color: var(--lastro-plato); }
+
+.pos-treino-padrao__barra {
+  position: relative;
+  height: 8px;
+  margin-top: var(--lastro-e-1);
+  border-radius: var(--lastro-raio-pilula);
+  background: var(--lastro-sup-2);
+}
+
+.pos-treino-padrao__sessao {
+  position: absolute;
+  inset: 0 auto 0 0;
+  border-radius: var(--lastro-raio-pilula);
+}
+
+.pos-treino-padrao__sessao--acima { background: var(--lastro-alta); }
+.pos-treino-padrao__sessao--abaixo { background: var(--lastro-plato); }
+
+.pos-treino-padrao__marca {
+  position: absolute;
+  top: -4px;
+  width: 2px;
+  height: 16px;
+  background: var(--lastro-txt);
+}
+
+.pos-treino-padrao__legenda {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--lastro-e-3);
+  font-size: var(--lastro-papel-rotulo);
+  color: var(--lastro-txt-2);
+}
+
 /* Toast de confirmação */
 .pos-treino-toast-copiado {
   font-weight: 700;
