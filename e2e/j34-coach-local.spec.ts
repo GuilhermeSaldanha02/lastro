@@ -7,6 +7,7 @@
 import { expect, test, type Page } from "@playwright/test";
 import {
   apagarUsuarioDescartavel,
+  clienteAdmin,
   clienteAutenticado,
   criarUsuarioDescartavel,
   entrarComoUsuario,
@@ -40,6 +41,38 @@ async function usosDeIa(): Promise<number> {
 }
 
 const respostas = (page: Page) => page.locator(".balao--dele .balao__texto");
+
+/** Contador do dia (F0-CUSTO). É global, sem usuário: compara antes × depois. */
+async function contadorDoDia(intent: string, destino: string): Promise<number> {
+  const { data, error } = await clienteAdmin()
+    .from("coach_contador_diario")
+    .select("total")
+    .eq("dia", hojeNoBrasil())
+    .eq("intent", intent)
+    .eq("destino", destino)
+    .maybeSingle();
+  if (error) throw new Error(`Falha ao ler coach_contador_diario: ${error.message}`);
+  return (data?.total as number | undefined) ?? 0;
+}
+
+test("pergunta sobre UM grupo responde local e conta no contador do dia (AN-08 M3)", async ({ page }) => {
+  test.setTimeout(90_000);
+  const antes = await contadorDoDia("FREQUENCIA_GRUPO", "local");
+  await entrarComoUsuario(page, aluno);
+  await page.goto("/coach");
+
+  await page.getByPlaceholder("Pergunte ao assistente…").fill("Quantas vezes treinei peito?");
+  await page.getByRole("button", { name: "Enviar pergunta" }).click();
+  // O grupo do exercício semeado não é fixo: vale a resposta de frequência ou a de "nunca treinou".
+  await expect(respostas(page).last()).toHaveText(
+    /^(Nas últimas 4 semanas, Peito (entrou em \d+ treinos?|não entrou em nenhum treino)\. Última série valendo: .+\.|Você ainda não registrou série valendo de Peito\.)$/,
+    { timeout: 20_000 },
+  );
+  await expect(page.locator(".balao--dele .balao__quem").last()).toHaveText("Calculado pelo lastro");
+
+  expect(await contadorDoDia("FREQUENCIA_GRUPO", "local"), "a resposta local não contou").toBeGreaterThan(antes);
+  expect(await usosDeIa(), "a pergunta de grupo reservou cota da Gemini").toBe(0);
+});
 
 test("chips e recusa respondem com os números da conta, sem gastar cota de IA", async ({ page }) => {
   test.setTimeout(90_000);

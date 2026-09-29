@@ -23,7 +23,11 @@ export type ContextoResposta = {
   hojeISO: string;
   metaSemana: number | null;
   idioma: Idioma;
-  /** Nome, no idioma do usuário, do grupo citado em `DIAS_SEM_GRUPO`. */
+  /**
+   * Nome, no idioma do usuário, do grupo citado nas intents de grupo. As
+   * séries já vêm com o grupo traduzido, então o filtro é por este nome, não
+   * pela chave do banco que o roteador devolve.
+   */
   nomeGrupoAlvo?: string;
 };
 
@@ -47,6 +51,13 @@ type Frases = {
   ultimaVez: (dias: number) => string;
   diasSemGrupo: (grupo: string, quando: string) => string;
   nuncaGrupo: (grupo: string) => string;
+  series: (n: number) => string;
+  volumeGrupo: (grupo: string, vol: string, series: string) => string;
+  volumeGrupoVazio: (grupo: string) => string;
+  volumeGrupoPassada: (vol: string, series: string) => string;
+  frequenciaGrupo: (grupo: string, treinos: string) => string;
+  frequenciaGrupoZero: (grupo: string) => string;
+  ultimaSerieGrupo: (quando: string) => string;
   frequenciaComMedia: (treinos: string, media: string) => string;
   frequenciaSemMedia: (treinos: string) => string;
   umaSemanaNaoETendencia: string;
@@ -75,6 +86,13 @@ const POR_IDIOMA: Record<Idioma, Frases> = {
     ultimaVez: (dias) => `último há ${dias} dias`,
     diasSemGrupo: (grupo, quando) => `Última série valendo de ${grupo}: ${quando}.`,
     nuncaGrupo: (grupo) => `Você ainda não registrou série valendo de ${grupo}.`,
+    series: (n) => `${n} ${n === 1 ? "série" : "séries"}`,
+    volumeGrupo: (grupo, vol, series) => `${grupo} nesta semana, até hoje: ${vol} em ${series}.`,
+    volumeGrupoVazio: (grupo) => `Nenhuma série valendo de ${grupo} nesta semana ainda.`,
+    volumeGrupoPassada: (vol, series) => `Na semana passada inteira: ${vol} em ${series}.`,
+    frequenciaGrupo: (grupo, treinos) => `Nas últimas 4 semanas, ${grupo} entrou em ${treinos}.`,
+    frequenciaGrupoZero: (grupo) => `Nas últimas 4 semanas, ${grupo} não entrou em nenhum treino.`,
+    ultimaSerieGrupo: (quando) => `Última série valendo: ${quando}.`,
     frequenciaComMedia: (treinos, media) =>
       `Na última semana fechada foram ${treinos}, contra média de ${media} nas semanas anteriores com treino.`,
     frequenciaSemMedia: (treinos) => `Na última semana fechada foram ${treinos}. Ainda não há semanas anteriores para comparar.`,
@@ -103,6 +121,13 @@ const POR_IDIOMA: Record<Idioma, Frases> = {
     ultimaVez: (dias) => `last one ${dias} days ago`,
     diasSemGrupo: (grupo, quando) => `Last working set for ${grupo}: ${quando}.`,
     nuncaGrupo: (grupo) => `You haven't logged a working set for ${grupo} yet.`,
+    series: (n) => `${n} ${n === 1 ? "set" : "sets"}`,
+    volumeGrupo: (grupo, vol, series) => `${grupo} this week so far: ${vol} across ${series}.`,
+    volumeGrupoVazio: (grupo) => `No working sets for ${grupo} this week yet.`,
+    volumeGrupoPassada: (vol, series) => `All of last week: ${vol} across ${series}.`,
+    frequenciaGrupo: (grupo, treinos) => `In the last 4 weeks, ${grupo} was in ${treinos}.`,
+    frequenciaGrupoZero: (grupo) => `In the last 4 weeks, ${grupo} wasn't in any workout.`,
+    ultimaSerieGrupo: (quando) => `Last working set: ${quando}.`,
     frequenciaComMedia: (treinos, media) =>
       `Last closed week had ${treinos}, against an average of ${media} in previous weeks with training.`,
     frequenciaSemMedia: (treinos) => `Last closed week had ${treinos}. There are no previous weeks to compare yet.`,
@@ -131,6 +156,13 @@ const POR_IDIOMA: Record<Idioma, Frases> = {
     ultimaVez: (dias) => `el último hace ${dias} días`,
     diasSemGrupo: (grupo, quando) => `Última serie válida de ${grupo}: ${quando}.`,
     nuncaGrupo: (grupo) => `Todavía no registraste una serie válida de ${grupo}.`,
+    series: (n) => `${n} ${n === 1 ? "serie" : "series"}`,
+    volumeGrupo: (grupo, vol, series) => `${grupo} esta semana, hasta hoy: ${vol} en ${series}.`,
+    volumeGrupoVazio: (grupo) => `Ninguna serie válida de ${grupo} esta semana todavía.`,
+    volumeGrupoPassada: (vol, series) => `Toda la semana pasada: ${vol} en ${series}.`,
+    frequenciaGrupo: (grupo, treinos) => `En las últimas 4 semanas, ${grupo} estuvo en ${treinos}.`,
+    frequenciaGrupoZero: (grupo) => `En las últimas 4 semanas, ${grupo} no estuvo en ningún entrenamiento.`,
+    ultimaSerieGrupo: (quando) => `Última serie válida: ${quando}.`,
     frequenciaComMedia: (treinos, media) =>
       `En la última semana cerrada fueron ${treinos}, contra un promedio de ${media} en las semanas anteriores con entrenamiento.`,
     frequenciaSemMedia: (treinos) => `En la última semana cerrada fueron ${treinos}. Todavía no hay semanas anteriores para comparar.`,
@@ -221,6 +253,34 @@ export function responder(classificacao: ClassificacaoDados, ctx: ContextoRespos
       const grupo = ctx.nomeGrupoAlvo ?? classificacao.grupo;
       const dias = diasSemEstimuloPorGrupo(ctx.series, ctx.hojeISO).find((g) => g.grupo === grupo)?.diasSemEstimulo;
       return dias === undefined ? f.nuncaGrupo(grupo) : f.diasSemGrupo(grupo, QUANDO[ctx.idioma](dias));
+    }
+
+    case "VOLUME_GRUPO": {
+      const grupo = ctx.nomeGrupoAlvo ?? classificacao.grupo;
+      const doGrupo = ctx.series.filter((s) => s.grupoMuscular === grupo);
+      const nestaSemana = doGrupo.filter((s) => contem(semanaAtual, s.data));
+      const semanaPassada = anteriorEquivalente(semanaAtual);
+      const naPassada = doGrupo.filter((s) => contem(semanaPassada, s.data));
+      // Mesma regra do VOLUME_SEMANA: semana em andamento não vira percentual.
+      const frases = [
+        nestaSemana.length > 0
+          ? f.volumeGrupo(grupo, f.kg(calcularVolume(nestaSemana)), f.series(nestaSemana.length))
+          : f.volumeGrupoVazio(grupo),
+      ];
+      if (naPassada.length > 0) frases.push(f.volumeGrupoPassada(f.kg(calcularVolume(naPassada)), f.series(naPassada.length)));
+      return frases.join(" ");
+    }
+
+    case "FREQUENCIA_GRUPO": {
+      const grupo = ctx.nomeGrupoAlvo ?? classificacao.grupo;
+      const dias = diasSemEstimuloPorGrupo(ctx.series, ctx.hojeISO).find((g) => g.grupo === grupo)?.diasSemEstimulo;
+      if (dias === undefined) return f.nuncaGrupo(grupo);
+      const janela = ultimosDias(ctx.hojeISO, DIAS_JANELA_FREQUENCIA);
+      const treinos = new Set(
+        ctx.series.filter((s) => s.grupoMuscular === grupo && contem(janela, s.data)).map((s) => s.treinoId),
+      ).size;
+      const primeira = treinos > 0 ? f.frequenciaGrupo(grupo, f.treinos(treinos)) : f.frequenciaGrupoZero(grupo);
+      return `${primeira} ${f.ultimaSerieGrupo(QUANDO[ctx.idioma](dias))}`;
     }
 
     case "FREQUENCIA_COMPARADA": {

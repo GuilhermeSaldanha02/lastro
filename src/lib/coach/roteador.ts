@@ -12,9 +12,14 @@ export type IntentDados =
   | "TREINOS_NA_SEMANA"
   | "GRUPO_MENOS_FREQUENTE"
   | "DIAS_SEM_GRUPO"
+  | "VOLUME_GRUPO"
+  | "FREQUENCIA_GRUPO"
   | "FREQUENCIA_COMPARADA"
   | "SEQUENCIA_DIAS"
   | "RESUMO_SEMANA";
+
+/** Perguntas sobre UM grupo muscular citado; levam a chave do grupo junto. */
+export type IntentGrupo = "DIAS_SEM_GRUPO" | "VOLUME_GRUPO" | "FREQUENCIA_GRUPO";
 
 export type IntentRecusa = "SAUDE" | "EXECUCAO" | "PRESCRICAO";
 
@@ -24,8 +29,8 @@ export type IntentRelatorio = "RELATORIO_MES" | "RELATORIO_HISTORICO";
 export type Classificacao =
   | { intent: IntentRecusa }
   | { intent: IntentRelatorio }
-  | { intent: Exclude<IntentDados, "DIAS_SEM_GRUPO"> }
-  | { intent: "DIAS_SEM_GRUPO"; grupo: string };
+  | { intent: Exclude<IntentDados, IntentGrupo> }
+  | { intent: IntentGrupo; grupo: string };
 
 export type ClassificacaoDados = Exclude<Classificacao, { intent: IntentRecusa | IntentRelatorio }>;
 
@@ -89,6 +94,14 @@ const PRESCRICAO =
   /\b(devo|deveria|should i|debo|deberia)\b.*\b(aumentar|diminuir|subir|baixar|trocar|mudar|increase|decrease|change|bajar|cambiar)\b|\bo que (devo )?mudar\b|\bwhat should i change\b|\bque (debo )?cambiar\b|\b(monta|montar|monte|crie|criar|gere|gerar)\b.*\b(treino|ficha|programa|plano)\b|\b(build|create|make)\b.*\b(workout|program|plan)\b|\b(arma|armar|crea|crear)\b.*\b(rutina|entrenamiento|plan)\b/;
 
 const SEMANA = /\b(semana|week)\b/;
+
+const GRUPO_PRESCRITIVO =
+  /\b(devo|deveria|preciso|ideal|recomend\w*|recommend\w*|should|optimal|debo|deberia|necesito|aconsej\w*)\b/;
+const OUTRO_PERIODO =
+  /\b(mes|meses|month|months|ano|anos|year|years|desde|since|historico|history|historial|all time|primeiro treino|first workout|primer entrenamiento|hoje|today|hoy|ontem|yesterday|ayer)\b/;
+const VOLUME_DE_GRUPO = /\b(volume|volumen|tonelagem|tonnage|tonelaje|series|sets)\b/;
+const FREQUENCIA_DE_GRUPO =
+  /\b(quantas vezes|quantos treinos|quantos dias|frequencia|how many times|how often|how many workouts|how many days|frequency|cuantas veces|cuantos entrenamientos|cuantos dias|frecuencia)\b/;
 const PALAVRA_GRUPO = /\b(grupo|grupos|musculo|musculos|muscle|muscles|group|groups)\b/;
 const TREINAR = /\b(trein\w*|train\w*|entren\w*|frequen\w*|frecuen\w*)\b/;
 
@@ -109,19 +122,30 @@ export function classificar(pergunta: string): Classificacao | null {
     tem(texto, /\b(streak|sequencia|racha)\b/) ||
     tem(texto, /\b(dias|days)\b.*\b(seguidos|consecutivos|in a row|straight)\b/)
   ) {
-    return { intent: "SEQUENCIA_DIAS" };
+    // A sequência é do treino inteiro; "dias seguidos de peito" é outra
+    // pergunta, sem resposta local.
+    return grupo ? null : { intent: "SEQUENCIA_DIAS" };
   }
 
   if (grupo) {
     if (
       tem(
         texto,
-        /\b(quanto tempo|ha quanto|faz quanto|desde quando|ultima vez|how long|last time|when did i last|cuanto tiempo|hace cuanto)\b/,
+        /\b(quanto tempo|ha quanto|faz quanto|desde quando|ultima vez|how long|last time|when did i last|cuanto tiempo|hace cuanto|sem treinar|without training|sin entrenar)\b/,
       )
     ) {
       return { intent: "DIAS_SEM_GRUPO", grupo };
     }
-    // Volume, frequência ou resumo DE UM GRUPO ainda não tem resposta local.
+    // "Quantas séries de peito devo fazer?" pede prescrição, não contagem.
+    if (tem(texto, GRUPO_PRESCRITIVO)) return null;
+    // Cada intent de grupo tem janela fixa (semana; 4 semanas). Pergunta
+    // sobre outro período responderia outra coisa com número certo.
+    if (tem(texto, OUTRO_PERIODO)) return null;
+    const falaDeVolume = tem(texto, VOLUME_DE_GRUPO);
+    const falaDeFrequencia = tem(texto, FREQUENCIA_DE_GRUPO);
+    if (falaDeVolume && !falaDeFrequencia) return { intent: "VOLUME_GRUPO", grupo };
+    if (falaDeFrequencia && !falaDeVolume) return { intent: "FREQUENCIA_GRUPO", grupo };
+    // Resumo de um grupo, ou as duas coisas juntas: sem resposta local.
     return null;
   }
 
