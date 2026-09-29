@@ -18,7 +18,7 @@ Rodada de decisões sobre o backlog inteiro. Detalhe e porquês em `DECISIONS.md
 
 | Item | Decisão |
 |---|---|
-| Chave `SUPABASE_SERVICE_ROLE_KEY` | **Adicionada** em Production pelo dono (Sensitive) e redeploy feito. Falta provar o PU-07 e o "Excluir conta" sem apagar conta real. |
+| Chave `SUPABASE_SERVICE_ROLE_KEY` | **Adicionada** em Production pelo dono (Sensitive) e redeploy feito. **PU-07 provado em produção 2026-09-29** (`/api/erros` → 204 → linha em `erro_app`, apagada depois). "Excluir conta" usa o mesmo cliente admin, não executado. |
 | SMTP (PU-05/PU-10) | **Brevo grátis** (remetente verificado por e-mail, sem domínio). Configurar antes de divulgar. |
 | Gemini | **Continua no plano gratuito**; revisitar quando divulgar ou quando o F0-CUSTO mostrar aperto. |
 | POL-01 | **Junta com a revisão da Política que o check-in (A1) já exige**, para todos reaceitarem uma vez só. |
