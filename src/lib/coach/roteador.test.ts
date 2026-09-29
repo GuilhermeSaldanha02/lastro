@@ -48,8 +48,26 @@ describe("classificar — perguntas de dados", () => {
     ["Quantos dias seguidos eu treinei?", "SEQUENCIA_DIAS"],
     ["what's my streak", "SEQUENCIA_DIAS"],
     ["Resumo da semana", "RESUMO_SEMANA"],
+    ["Quantas semanas seguidas treinei?", "SEMANAS_SEGUIDAS"],
+    ["Qual minha sequência de semanas?", "SEMANAS_SEGUIDAS"],
+    ["How many weeks in a row have I trained?", "SEMANAS_SEGUIDAS"],
+    ["¿Cuántas semanas seguidas entrené?", "SEMANAS_SEGUIDAS"],
+    ["Em quantas semanas bati minha meta?", "META_CUMPRIDA"],
+    ["Bati a meta esta semana?", "META_CUMPRIDA"],
+    ["Did I hit my weekly goal?", "META_CUMPRIDA"],
+    ["¿Cumplí mi meta semanal?", "META_CUMPRIDA"],
   ])("%s → %s", (pergunta, intent) => {
     expect(classificar(pergunta)).toEqual({ intent });
+  });
+
+  it.each([
+    "Qual meta semanal devo ter?", // prescrição
+    "Qual a meta ideal de treinos?",
+    "Bati minha meta no mês?", // outro período
+    "Qual o objetivo do supino?", // meta sem pergunta de contagem
+    "Quantas semanas seguidas treinei peito?", // de um grupo
+  ])("meta e semanas ficam com a Gemini: %s", (pergunta) => {
+    expect(classificar(pergunta)).toBeNull();
   });
 
   it("há quanto tempo não treino um grupo leva o grupo junto", () => {

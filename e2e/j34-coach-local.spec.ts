@@ -74,6 +74,29 @@ test("pergunta sobre UM grupo responde local e conta no contador do dia (AN-08 M
   expect(await usosDeIa(), "a pergunta de grupo reservou cota da Gemini").toBe(0);
 });
 
+test("semanas seguidas e meta semanal respondem local (AN-08 M3, resto da C2)", async ({ page }) => {
+  test.setTimeout(90_000);
+  await entrarComoUsuario(page, aluno);
+  await page.goto("/coach");
+  const campo = page.getByPlaceholder("Pergunte ao assistente…");
+
+  // O beforeAll semeia um treino hoje: a semana em andamento entra na conta.
+  await campo.fill("Quantas semanas seguidas treinei?");
+  await page.getByRole("button", { name: "Enviar pergunta" }).click();
+  await expect(respostas(page).last()).toHaveText(
+    /^(\d+ semanas seguidas com pelo menos 1 treino, contando esta\.|Esta semana já tem treino; a semana passada ficou sem\.)$/,
+    { timeout: 20_000 },
+  );
+
+  await campo.fill("Bati minha meta esta semana?");
+  await page.getByRole("button", { name: "Enviar pergunta" }).click();
+  await expect(respostas(page).last()).toHaveText(
+    /(Nesta semana, até hoje: \d+ de \d+\.|Você ainda não definiu uma meta semanal\. Ela fica em Ajustes\.)$/,
+    { timeout: 20_000 },
+  );
+  expect(await usosDeIa(), "meta ou semanas reservaram cota da Gemini").toBe(0);
+});
+
 test("chips e recusa respondem com os números da conta, sem gastar cota de IA", async ({ page }) => {
   test.setTimeout(90_000);
   await entrarComoUsuario(page, aluno);

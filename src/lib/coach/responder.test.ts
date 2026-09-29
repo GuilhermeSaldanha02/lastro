@@ -129,6 +129,33 @@ describe("responder", () => {
     ).toBe("En las últimas 4 semanas, Espalda estuvo en 3 entrenamientos. Última serie válida: hoy.");
   });
 
+  it("semanas seguidas com treino, contando a semana em andamento", () => {
+    // Semanas de 14/09, 21/09 e 28/09 com treino; a de 07/09 vazia.
+    expect(responder({ intent: "SEMANAS_SEGUIDAS" }, contexto())).toBe(
+      "3 semanas seguidas com pelo menos 1 treino, contando esta.",
+    );
+    // Segunda, 05/10: a semana nova ainda sem treino não quebra.
+    expect(responder({ intent: "SEMANAS_SEGUIDAS" }, contexto({ hojeISO: "2026-10-05" }))).toBe(
+      "3 semanas seguidas com pelo menos 1 treino, até a semana passada. Nesta semana ainda não há treino.",
+    );
+    expect(responder({ intent: "SEMANAS_SEGUIDAS" }, contexto({ hojeISO: "2026-10-14" }))).toBe(
+      "Sem sequência de semanas: a semana passada ficou sem treino, e esta ainda não tem.",
+    );
+  });
+
+  it("meta cumprida: semanas fechadas desde o primeiro treino, e a atual à parte", () => {
+    // Primeiro treino na semana de 17/08: 6 semanas fechadas até a de 21/09; só a de 21/09 teve 2 treinos.
+    expect(responder({ intent: "META_CUMPRIDA" }, contexto({ metaSemana: 2 }))).toBe(
+      "Meta de 2 treinos por semana: cumprida em 1 das últimas 6 semanas fechadas. Nesta semana, até hoje: 2 de 2.",
+    );
+    expect(responder({ intent: "META_CUMPRIDA" }, contexto({ metaSemana: 2 }, "en"))).toBe(
+      "Goal of 2 workouts per week: met in 1 of the last 6 closed weeks. This week so far: 2 of 2.",
+    );
+    expect(responder({ intent: "META_CUMPRIDA" }, contexto())).toBe(
+      "Você ainda não definiu uma meta semanal. Ela fica em Ajustes.",
+    );
+  });
+
   it("frequência compara a semana fechada com a média, sem chamar uma semana de tendência", () => {
     expect(responder({ intent: "FREQUENCIA_COMPARADA" }, contexto())).toBe(
       "Na última semana fechada foram 2 treinos, contra média de 1 nas semanas anteriores com treino. Uma semana sozinha não é tendência.",

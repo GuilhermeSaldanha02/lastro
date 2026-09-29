@@ -78,7 +78,7 @@ export const SECOES_GUIA: SecaoGuia[] = [
     id: "coach",
     titulo: "Coach 24h",
     paragrafos: [
-      "O Coach é um chat para dúvidas de treino. Perguntas sobre os seus números que o lastro sabe calcular (volume e treinos da semana, grupo menos treinado, volume e frequência de um grupo, há quanto tempo você não treina um grupo, dias seguidos, resumo da semana) são respondidas pelo próprio lastro, sem inteligência artificial e sem gastar o limite diário. Pedindo \"como foi meu mês?\" ou um relatório desde o primeiro treino, ele gera o relatório e o salva em Pareceres salvos. As outras perguntas vão para a inteligência artificial, que não vê os seus números. O Coach não substitui um profissional, principalmente se você sente dor.",
+      "O Coach é um chat para dúvidas de treino. Perguntas sobre os seus números que o lastro sabe calcular (volume e treinos da semana, grupo menos treinado, volume e frequência de um grupo, há quanto tempo você não treina um grupo, dias e semanas seguidos, meta semanal cumprida, resumo da semana) são respondidas pelo próprio lastro, sem inteligência artificial e sem gastar o limite diário. Pedindo \"como foi meu mês?\" ou um relatório desde o primeiro treino, ele gera o relatório e o salva em Pareceres salvos. As outras perguntas vão para a inteligência artificial, que não vê os seus números. O Coach não substitui um profissional, principalmente se você sente dor.",
       "Ele divide com a Análise o mesmo tipo de limite diário de uso da inteligência artificial. Não escreva no Coach informações de saúde que você não queira compartilhar.",
     ],
     link: { href: "/coach", rotulo: "Abrir Coach" },
