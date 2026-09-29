@@ -126,3 +126,25 @@ export const SEMANAS_SUPRESSAO_ALERTA = 3;
  * que o `volume_semanal` do resumo já traz, sem agregação nova.
  */
 export const QUEDAS_VOLUME_PARA_ALERTA = 3;
+
+/**
+ * "Sessão fora do padrão" (AN-08 F0-ANOMALIA, decisão de 2026-09-29).
+ *
+ * O padrão de uma sessão é a MEDIANA do volume das últimas
+ * `PADRAO_JANELA_SESSOES` sessões do mesmo tipo (empurrar, puxar, pernas),
+ * e só existe com pelo menos `PADRAO_PISO_SESSOES` delas. A sessão fica
+ * fora do padrão quando o volume passa `PADRAO_DESVIO` acima ou abaixo.
+ *
+ * Por que 30%: simulado no histórico real do dono (21 sessões avaliáveis),
+ * ±20% marcava metade dos treinos (ruído, não notícia) e o z-score robusto
+ * de Iglewicz-Hoaglin, com só 6 amostras, deixava passar uma queda de 32%.
+ * A faixa segue o espírito da razão carga aguda/crônica (0,8–1,3), usada só
+ * como medida de "quanto é muito": o texto nunca fala em risco ou lesão.
+ */
+export const PADRAO_JANELA_SESSOES = 6;
+export const PADRAO_PISO_SESSOES = 4;
+export const PADRAO_DESVIO = 0.3;
+
+/** Home (B2): sessões fora do padrão dos últimos N dias, no máximo M. */
+export const INSIGHTS_HOME_JANELA_DIAS = 7;
+export const INSIGHTS_HOME_MAX = 2;

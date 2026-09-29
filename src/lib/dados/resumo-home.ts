@@ -14,6 +14,7 @@ import { calcularSequenciaAtual } from "@/lib/analise/sequencia";
 import { calcularSeriesPorGrupo, calcularVolumePorGrupo } from "@/lib/analise/equilibrio";
 import { semanaInicioDoTreino, semanaAnaliseAtual, paraISO, segundaFeiraDaSemana } from "@/lib/analise/semanas";
 import type { SerieValendo } from "@/lib/analise/tipos";
+import { sessoesForaDoPadrao, type ComparacaoPadrao } from "@/lib/analise/fora-do-padrao";
 import { obterIdioma } from "@/lib/dados/idioma";
 import { mapaTraducaoGrupos } from "@/lib/dados/traducao";
 import { formatarGrupoMuscular } from "@/lib/texto/grupo-muscular";
@@ -69,6 +70,12 @@ export type ResumoHome = {
   volumePorGrupo: { grupo: string; volumeKg: number }[];
   /** Os 3 treinos mais recentes, para a lista de atividade com grupos musculares. */
   recentes: TreinoRecente[];
+  /**
+   * "Lastro percebeu" (AN-08 B2): sessões dos últimos 7 dias fora do padrão
+   * do próprio usuário, no máximo 2. Sai do mesmo `select`: nenhuma
+   * requisição extra. Vazio quando não há o que dizer.
+   */
+  foraDoPadrao: ComparacaoPadrao[];
   /** Quantas semanas ISO fechadas já têm treino — a Análise precisa disso. */
   semanasFechadasComTreino: number;
   /** Se já existe um treino iniciado hoje, a home leva direto pra ele. */
@@ -199,6 +206,20 @@ export async function carregarResumoHome(hojeISO: string): Promise<ResumoHome> {
         gruposMusculares: grupos,
       };
     }),
+    foraDoPadrao: sessoesForaDoPadrao(
+      // `comSerie` já vem do mais recente para o mais antigo, a ordem que
+      // `sessoesForaDoPadrao` espera.
+      comSerie.map((t) => {
+        const valendo = valendoDoTreino(t);
+        return {
+          treinoId: t.id,
+          data: t.data,
+          grupos: Array.from(new Set(valendo.map((s) => s.grupoMuscular).filter(Boolean))),
+          volume: calcularVolume(valendo),
+        };
+      }),
+      hojeISO,
+    ),
     semanasFechadasComTreino: semanasComTreino.size,
     // Só o treino de hoje EM ABERTO vira "Continuar". Finalizado, a Home
     // oferece "Iniciar" e `criarTreino` cria outro (dono, 2026-09-24).
