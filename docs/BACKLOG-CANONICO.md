@@ -12,6 +12,29 @@
 - Regra de execução: E2E somente manual em marco de integração; testes
   rápidos continuam em toda PR.
 
+## Decisões do dono — 2026-09-29
+
+Rodada de decisões sobre o backlog inteiro. Detalhe e porquês em `DECISIONS.md` 2026-09-29 (1). **Ordem de execução escolhida pelo dono: M3 primeiro**, depois TR-17 e os bugs que a M3 trouxer, faxina, auditoria independente, check-in.
+
+| Item | Decisão |
+|---|---|
+| Chave `SUPABASE_SERVICE_ROLE_KEY` | **Adicionada** em Production pelo dono (Sensitive) e redeploy feito. Falta provar o PU-07 e o "Excluir conta" sem apagar conta real. |
+| SMTP (PU-05/PU-10) | **Brevo grátis** (remetente verificado por e-mail, sem domínio). Configurar antes de divulgar. |
+| Gemini | **Continua no plano gratuito**; revisitar quando divulgar ou quando o F0-CUSTO mostrar aperto. |
+| POL-01 | **Junta com a revisão da Política que o check-in (A1) já exige**, para todos reaceitarem uma vez só. |
+| AN-08 M3 | **Aprovada**, uma PR por item, nesta ordem: (1) F0-CUSTO + intents de volume e frequência de UM grupo; (2) resto da C2 (meta semanal, semanas seguidas); (3) F0-INSIGHT + Fase B (B1, B2; portão visual; o dono decide o limiar de "fora do padrão"); (4) C1 (antes, o dono decide se recorde é e1RM ou peso). |
+| AN-08.A1 (check-in) | **Aprovado**: registro diário (sono, energia, dor, estresse) **também em dia sem treino**, para o Coach e os relatórios mostrarem coincidências ("seu sono coincidiu com a queda"), nunca causa. **Visível ao aluno e ao personal com vínculo.** Entra com a revisão da Política (POL-01) e novo aceite. Depois da M3. |
+| AN-08.D1, D2, F0-CACHE | **Congelados** (D1 e D2 conflitam com o PRD §5; cache sem gargalo). |
+| CT-01, timer PiP, domínio | **Parados.** |
+| 2ª conta | **Existe**: conta de personal, outro e-mail, sem vínculo com a do dono, logada no Chrome dele. **QA autorizado nela** (treino e trabalho). Destrava PE-*, OF-04/06, LG-05…08 e QA-02; criar vínculo com a conta do dono pede autorização na hora. |
+| TR-03, AN-03/AN-04 | **Autorizados** uma vez, na conta de personal do Chrome (AN-03/04 gastam ~3 unidades da cota do dia). |
+| TR-17 (novo, relato do dono) | Bug: registrar 3 exercícios, apagar o 2º, adicionar um 4º e readicionar o apagado quebra o treino. Reproduzir na conta de personal, corrigir e rodar o QA de caminho triste de adicionar/apagar em `/treino/[id]`. Autorizado. |
+| "Outra série" sem exercício | **Abrir direto a lista de exercícios.** Entra na PR do TR-17. |
+| Duração do relatório pós-treino | **Estudo antes de decidir** (pedido do dono): medir a diferença real entre a última série e `duracao_segundos` e trazer opções. |
+| Faxina | **Autorizada**: acento de "Elevação lateral com halteres" (banco + `exercicios-midia.json`); apagar branches remotas já mergeadas (conferindo uma a uma); tirar a senha de `scripts/importar-102-gifs.mjs` (o dono troca a senha no Supabase); DOC-03 logo depois da auditoria independente. |
+| Treinos de teste na conta do dono | `aa0cd9e6…` e `9db03743…`: **o dono apaga ele mesmo.** |
+| Com o dono | Callback URL no Supabase Auth; teste do aviso de descanso no iPhone; trocar a senha da conta QA. |
+
 ## P0 — nota do dono (2026-09-28, uso real em produção)
 
 **AN-07 — COBERTO PELA M2 DO AN-08 (decisão do dono, 2026-09-28):** vira a pergunta 7 da Análise ("Do primeiro treino até hoje"), por lógica e sem Gemini, também pedida pelo Coach e salva no histórico (itens `AN-08.M2-2` e `AN-08.M2-3` abaixo). O dono escolheu o conteúdo: base (treinos, semanas com treino, média semanal, volume), evolução por exercício, recordes e grupos. Histórico do item: O dono pediu ao Coach, em produção, um relatório "do primeiro treino até hoje" e o Coach recusou. É o comportamento correto pelo desenho atual — o Coach (`PRD.md` §4.4) responde dúvida geral e não lê os números do dono; quem lê é a Análise Semanal, e só a última semana ISO fechada (`PRD.md` §3). Não existe hoje nenhuma pergunta de **período livre/histórico completo**. O dono achou "as análises muito travadas" e pediu para anotar, para mudar mais para frente — **não é para implementar agora**, é decisão de escopo pendente (like PU-03/04, mexe com a regra inegociável de resumo determinístico + cota de IA). Perguntar ao dono, quando for a vez: o que um "relatório do início até hoje" mostraria que as 5 perguntas semanais já não mostram, e se cabe dentro do orçamento de cota (`config_ia`, PU-04).
@@ -80,10 +103,10 @@ depende de infraestrutura que não existe ainda (2ª conta, cota de IA).
 | CT-02, VS-06, VS-07 | — | — | **Resolvidos** no QA-01 de 24–25/set: já corrigidos antes desta sessão, ou graduados pelo e2e real (run 36078171673). |
 | AJ-03, AJ-04 | — | — | **Resolvidos**: graduados pelo e2e real (`j11-formularios.spec.ts`), run 36078171673. |
 | AN-02, AN-05, AN-06 | — | — | **Resolvidos**: graduados pelo e2e real (`j12-isolamento-e-apis.spec.ts`), run 36078171673. |
-| AN-03, AN-04 | MÉDIO | Baixa | Só reproduz gastando cota real de IA (Gemini) da conta do dono — aguarda autorização explícita por execução, não é "sim" permanente. |
+| AN-03, AN-04 | MÉDIO | Baixa | **Autorizado uma vez em 2026-09-29, na conta de personal do Chrome.** Era: Só reproduz gastando cota real de IA (Gemini) da conta do dono — aguarda autorização explícita por execução, não é "sim" permanente. |
 | CT-01 (preview 3D do catálogo) | ALTO, se um dia entrar | Baixa | **Decidido 2026-09-25: não é regressão, é feature nunca implementada** — documentado no `QA.md`. `ilustracao-anatomica-3d.tsx` (25 KB) segue órfão, nunca conectado a nenhuma tela. Ligar esse componente algum dia continua ALTO esforço (código não testado, precisa de QA visual completo) — entra no backlog só se o dono pedir; até lá, sem ação. |
 | PF-01 | — | — | **Resolvido**: não era bug, era descrição errada do item (idioma sempre foi em `/ajustes`, nunca em `/perfil`). |
-| PE-01…PE-09 (personal) | MÉDIO | Média | O dono vai criar uma 2ª conta por fora e testar; quando estiver pronta, o agente audita as telas de personal com ela — sem custo de token até lá. |
+| PE-01…PE-09 (personal) | MÉDIO | Média | **Destravado 2026-09-29: a 2ª conta (personal) existe e está logada no Chrome do dono.** Era: O dono vai criar uma 2ª conta por fora e testar; quando estiver pronta, o agente audita as telas de personal com ela — sem custo de token até lá. |
 | OF-04, OF-06 | MÉDIO | Baixa | Exigem alternar 2 contas (login/logout) na mesma sessão de navegador — mesma trava do PE-*, resolve junto quando a 2ª conta existir. |
 | LG-06, LG-07, LG-08, LG-05 (triste) | MÉDIO | Baixa | Mesma trava de 2ª conta (modo personal). |
 | UX-01 | — | — | **Já resolvido** pelo TR-12 (PR #269, casca fixa em `/treino/[id]`) — este backlog não tinha sido atualizado. |
@@ -91,7 +114,7 @@ depende de infraestrutura que não existe ainda (2ª conta, cota de IA).
 | UX-03 (auditoria visual completa) | ALTO | Média | **2026-09-28: o Claude assumiu (o Antigravity ficou sem cota). A cobertura planejada está completa (`j33`: `/treino/[id]` offline e em erro, catálogo com mídia). Achados novos: UX3-15 (BAIXA, peso com ponto em pt na grade de séries, **corrigido 2026-09-28, PR #347**) e UX3-16 (MÉDIA, linha própria abaixo). Falta a auditoria independente.** Histórico: **Delegado ao Antigravity/Gemini pelo dono (2026-09-26): `docs/HANDOFF-ANTIGRAVITY-UX-02-UX-03.md` §4.** **1ª passada PARCIAL feita (Claude retomou depois de o Antigravity esgotar a cota): `docs/qualidade/ux-03-auditoria-2026-09-26.md`, 8 achados ALEGADOS (4 MÉDIA corrigidos em 2026-09-26, PRs #317 a #320; 4 BAIXA corrigidos no mesmo dia, PRs #322 a #326). **Cobertura medida (2026-09-26, §4c do documento):** 60 telas; 1 ALTA (barra inferior em espanhol) e 3 MÉDIA novas, todas corrigidas (#329 a #331); as 2 BAIXA também (UX3-13 e UX3-14, #336). **Todos os 14 achados desta auditoria estão corrigidos**; falta só a cobertura listada na §4c como "sem medir" e a auditoria de outro agente, evidências em `qa/evidencias/UX-03/`. Falta: capturas de viewport rolado, rotas fora da `j4`, idiomas, temas, e o dono decidir o que corrigir.** | Todas as rotas × rolagem/hierarquia/toque — não iniciado, é o tipo de trabalho que mais consome token (muitas telas, muitos viewports). |
 | UX3-16 (biomecânica do catálogo em pt nas telas en/es) | — | — | **FEITO 2026-09-28:** `exercicios-midia-traducao.json` (192 textos × en/es) + `traduzirBiomecanica`; teste de cobertura. Achado da `j33`, 2026-09-28. Era: Músculo alvo, sinergistas, mecânica articular e o "Foco" do player vêm de `exercicios-midia.json`, que só tem português. Corrigir exige traduzir ~102 × 4 campos × 2 idiomas, sem IA em produção (mesmo método do A1). |
 | TON-01 (tonelagem com exercício unilateral) | — | — | **FEITO 2026-09-28, PR #346** (achado D1 do estudo do AN-08). O relatório pós-treino ignorava `unilateral` (52 dos 218 exercícios) e divergia da lista. Hoje as três contas usam `volumeDeSerie`. Falta a auditoria independente. |
-| POL-01 (Política diz que todo Coach é IA) | BAIXO | Baixa | **Aberto, decisão do dono.** A Política (`lib/legal/documentos.ts`, linha 63) diz que as respostas do Coach são geradas por IA; desde a M1 parte delas é calculada pelo lastro. Ajustar na próxima revisão da Política, porque mudar `VERSAO_DOCUMENTOS` obriga todos a reaceitarem. |
+| POL-01 (Política diz que todo Coach é IA) | BAIXO | Baixa | **Decidido 2026-09-29: entra com a revisão da Política do check-in (A1).** A Política (`lib/legal/documentos.ts`, linha 63) diz que as respostas do Coach são geradas por IA; desde a M1 parte delas é calculada pelo lastro. Ajustar na próxima revisão da Política, porque mudar `VERSAO_DOCUMENTOS` obriga todos a reaceitarem. |
 | QA-02 (matriz aluno/personal) | MÉDIO | Baixa | Depende de UX-02 estar pronto e da 2ª conta para a parte personal. |
 | DOC-01 (arquivar backlogs antigos) | — | — | **Resolvido**: os arquivos já estavam em `docs/historico/`; o backlog é que não tinha sido atualizado. Era: | Mover 6 arquivos de agosto (`BACKLOG-PROXIMA-FASE.md`, `BACKLOG-REDESENHO.md`, `BACKLOG-TESTE-APARELHO.md`, `ESTUDO-*.md`, `IMPECCABLE-AUDIT.md`, `AUDITORIA-APEX-PRO.md`) para uma pasta de histórico. |
 | DOC-02 (política de testes) | — | — | **FEITO 2026-09-26**: `AGENTS.md` §9 e `DECISIONS.md` 2026-09-26 (2). Era: | É decisão a registrar, não código. |
