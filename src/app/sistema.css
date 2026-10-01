@@ -3281,6 +3281,55 @@
   display: block;
 }
 
+/* AN-08 B2 — "Lastro percebeu" dentro do cartão da Análise (direção B do
+   portão de 2026-09-29). A citação vira lista: texto reto, sem itálico e
+   sem a barra lateral, porque aqui o que fala é o número, não uma frase
+   do parecer. Abaixo do padrão é âmbar (--lastro-plato), nunca vermelho:
+   uma semana leve pode ser proposital. */
+.percebeu__rotulo {
+  display: flex;
+  align-items: center;
+  gap: var(--lastro-e-2);
+  font-size: var(--lastro-papel-rotulo);
+  font-weight: var(--lastro-peso-max);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--lastro-txt-2);
+}
+
+.ai-coach-card__citacao.percebeu__lista {
+  font-style: normal;
+  border-left: none;
+  display: flex;
+  flex-direction: column;
+  gap: var(--lastro-e-3);
+}
+
+.percebeu__item + .percebeu__item {
+  padding-top: var(--lastro-e-3);
+  border-top: 1px solid var(--lastro-linha);
+}
+
+.percebeu__numero {
+  font-family: var(--lastro-fonte-num);
+  font-weight: var(--lastro-peso-max);
+  white-space: nowrap;
+}
+
+.percebeu__numero--acima {
+  color: var(--lastro-alta);
+}
+
+.percebeu__numero--abaixo {
+  color: var(--lastro-plato);
+}
+
+.percebeu__acao {
+  font-size: var(--lastro-papel-rotulo);
+  font-weight: var(--lastro-peso-medio);
+  color: var(--lastro-ouro);
+}
+
 /* Seção de Treinos Recentes e Feed */
 .secao-header {
   display: flex;

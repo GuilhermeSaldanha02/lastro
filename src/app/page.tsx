@@ -15,6 +15,8 @@ import FormIniciarTreino from "@/components/form-iniciar-treino";
 import SetaNavegacao from "@/components/seta-navegacao";
 import RastreadorDisciplina from "@/components/rastreador-disciplina";
 import SeletorMetricasHome from "@/components/seletor-metricas-home";
+import DicaInfo from "@/components/dica-info";
+import { frasePercebida } from "@/lib/analise/texto-fora-do-padrao";
 import { t } from "@/lib/texto/i18n";
 import type { Idioma } from "@/lib/dados/idioma";
 
@@ -193,16 +195,49 @@ export default async function PaginaInicial() {
             </div>
           )}
 
-          <Link href="/analise" className="ai-coach-card__citacao">
-            <p>
-              {t(
-                resumo.treinosNaSemana > 0
-                  ? "Toque para ver a leitura da sua semana."
-                  : "Ainda sem treinos nesta semana. Inicie uma sessão para gerar o parecer inteligente.",
-                idioma,
-              )}
-            </p>
-          </Link>
+          {/* AN-08 B2 ("Lastro percebeu", direção B do portão de
+              2026-09-29): as sessões fora do padrão entram NESTE cartão, no
+              lugar do convite genérico, em vez de virar peça nova na Home.
+              Sem percepção, o cartão fica exatamente como era. */}
+          {resumo.foraDoPadrao.length > 0 ? (
+            <>
+              <div className="percebeu__rotulo">
+                <span>{t("Lastro percebeu", idioma)}</span>
+                <DicaInfo titulo={t("Como o lastro compara", idioma)} idioma={idioma}>
+                  <p>
+                    {t(
+                      "Cada treino é comparado com a mediana do volume das suas últimas 6 sessões do mesmo tipo (empurrar, puxar ou pernas). Ele aparece aqui quando fica mais de 30% acima ou abaixo disso. Com menos de 4 sessões do mesmo tipo, não há comparação.",
+                      idioma,
+                    )}
+                  </p>
+                </DicaInfo>
+              </div>
+              <Link href="/analise" className="ai-coach-card__citacao percebeu__lista">
+                {resumo.foraDoPadrao.map((c) => {
+                  const frase = frasePercebida(c, idioma);
+                  return (
+                    <span key={c.treinoId} className="percebeu__item">
+                      {frase.antes}
+                      <strong className={`percebeu__numero percebeu__numero--${c.direcao}`}>{frase.numero}</strong>
+                      {frase.depois}
+                    </span>
+                  );
+                })}
+                <span className="percebeu__acao">{t("Ver a leitura da semana →", idioma)}</span>
+              </Link>
+            </>
+          ) : (
+            <Link href="/analise" className="ai-coach-card__citacao">
+              <p>
+                {t(
+                  resumo.treinosNaSemana > 0
+                    ? "Toque para ver a leitura da sua semana."
+                    : "Ainda sem treinos nesta semana. Inicie uma sessão para gerar o parecer inteligente.",
+                  idioma,
+                )}
+              </p>
+            </Link>
+          )}
         </section>
 
         {/* Feed de Treinos Recentes */}

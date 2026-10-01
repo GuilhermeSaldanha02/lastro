@@ -288,6 +288,18 @@ const DICIONARIO: Record<string, { en: string; es: string }> = {
     en: "Tap to see your week's readout.",
     es: "Toca para ver la lectura de tu semana.",
   },
+  // AN-08 B2: "Lastro percebeu" no cartão da Análise da Home.
+  "Lastro percebeu": { en: "Lastro noticed", es: "Lastro notó" },
+  "Como o lastro compara": { en: "How lastro compares", es: "Cómo compara lastro" },
+  "Cada treino é comparado com a mediana do volume das suas últimas 6 sessões do mesmo tipo (empurrar, puxar ou pernas). Ele aparece aqui quando fica mais de 30% acima ou abaixo disso. Com menos de 4 sessões do mesmo tipo, não há comparação.": {
+    en: "Each workout is compared with the median volume of your last 6 sessions of the same type (push, pull or legs). It shows up here when it lands more than 30% above or below that. With fewer than 4 sessions of the same type, there is no comparison.",
+    es: "Cada entrenamiento se compara con la mediana del volumen de tus últimas 6 sesiones del mismo tipo (empuje, tirón o piernas). Aparece aquí cuando queda más de un 30% por encima o por debajo. Con menos de 4 sesiones del mismo tipo, no hay comparación.",
+  },
+  "Ver a leitura da semana →": { en: "See the week's readout →", es: "Ver la lectura de la semana →" },
+  "Na Home, o cartão da Análise mostra “Lastro percebeu” quando um treino dos últimos 7 dias fica mais de 30% acima ou abaixo do seu padrão: a mediana do volume das suas últimas 6 sessões do mesmo tipo (empurrar, puxar ou pernas). Aparecem no máximo dois, e só depois de 4 sessões do mesmo tipo.": {
+    en: "On Home, the Analysis card shows “Lastro noticed” when a workout from the last 7 days lands more than 30% above or below your usual: the median volume of your last 6 sessions of the same type (push, pull or legs). At most two show up, and only after 4 sessions of the same type.",
+    es: "En Inicio, la tarjeta de Análisis muestra “Lastro notó” cuando un entrenamiento de los últimos 7 días queda más de un 30% por encima o por debajo de tu patrón: la mediana del volumen de tus últimas 6 sesiones del mismo tipo (empuje, tirón o piernas). Aparecen como máximo dos, y solo después de 4 sesiones del mismo tipo.",
+  },
   "Ainda sem treinos nesta semana. Inicie uma sessão para gerar o parecer inteligente.": {
     en: "No workouts yet this week. Start a session to generate the AI report.",
     es: "Aún sin entrenamientos esta semana. Inicia una sesión para generar el informe inteligente.",
