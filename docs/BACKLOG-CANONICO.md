@@ -5,7 +5,7 @@
 > sessão e o histórico; `QA.md` guarda o registro de testes; `DECISIONS.md`
 > guarda o porquê. Item novo entra aqui; item feito vira uma linha em "Feito".
 >
-> Base: `main` em `e2f74d4` (2026-10-01). Confira com `git log --oneline -1`.
+> Base: `main` em `243dd55` (2026-10-01). Confira com `git log --oneline -1`.
 
 **Status:** `A FAZER` (aprovado, o agente pode fazer) · `DONO` (só o dono
 resolve) · `CONFERIR` (item antigo trazido de outro documento, ainda não
@@ -20,19 +20,21 @@ se continua) · `CONGELADO` / `PARADO` (decisão do dono, não mexer).
 2. Faxina.
 3. Auditoria independente, depois DOC-03.
 4. Check-in (A1) junto com a revisão da Política (POL-01).
+5. **Por último (decisão do dono, 2026-10-01): SEGREDOS** — chave e senha expostas no repositório público. O risco fica aceito até lá.
 
 ## 2. Código e QA — o agente faz
 
 | ID | O que é | Status | Importância |
 |---|---|---|---|
-| TR-17 | Registrar 3 exercícios, apagar o 2º, adicionar um 4º e readicionar o apagado quebra o treino. Causa: `registrarSerie` em `treino-detalhe.tsx` usa `ordem = series.length + 1`, e apagar repete a `ordem`. Correção: maior ordem + 1, desempate por `criado_em` no carregador (`lib/dados/treino.ts`). Teste unitário + e2e do roteiro do dono. Na mesma PR: "Outra série" abre direto a lista de exercícios. | A FAZER | Alta |
 | QA-M3 | QA em produção da M3 na conta de personal do Chrome: Home com "Lastro percebeu", bloco do pós-treino, página do exercício, pergunta de grupo no Coach conferindo `coach_contador_diario` sem `uso_ia` subir. | A FAZER | Alta |
 | QA-TR-TRISTE | QA de caminho triste de adicionar e apagar exercício em `/treino/[id]`. Depois do TR-17. | A FAZER | Média |
 | LIMPEZA-PERSONAL | Conta de personal: apagar o treino de teste `1e66619f-4ce3-4883-9641-f263fbe74627` e voltar a conta de TREINO para TRABALHO em Ajustes. | A FAZER | Baixa |
 | FAXINA-1 | Acento de "Elevação lateral com halteres" no banco e em `exercicios-midia.json` (os dois casam pelo nome). | A FAZER | Baixa |
 | FAXINA-2 | Apagar branches remotas já mergeadas, conferindo uma a uma. | A FAZER | Baixa |
-| FAXINA-3 | Tirar a senha de `scripts/importar-102-gifs.mjs` e ler de variável de ambiente (o dono troca a senha no Supabase). | A FAZER | Alta |
-| AUD-IND | Auditoria independente (outro agente, contexto limpo) do que está `ALEGADO`: TON-01, UX-03 (cobertura "sem medir" da §4c de `docs/qualidade/ux-03-auditoria-2026-09-26.md`), TR-16, e os `ALEGADO` do `QA.md` (TR-11…TR-15, OF-09, PU-01, LG-12, PE-06). | A FAZER | Média |
+| FAXINA-3 | Apagar os 9 scripts antigos de `scripts/` que guardam a senha da conta QA e, em dois deles, a chave `service_role` (nenhum é usado por `package.json`, CI ou e2e). Só depois de o dono rotacionar (ver SEGREDOS). | No final, com SEGREDOS | Alta |
+| AUD-IND | Auditoria independente (outro agente, contexto limpo) só do que ainda está `ALEGADO`: TON-01, UX-03 (cobertura "sem medir" da §4c de `docs/qualidade/ux-03-auditoria-2026-09-26.md`), TR-16, PU-01 (só o iPhone) e PE-06. TR-11…TR-15, OF-09 e LG-12 já estão PASSOU no `QA.md`. | A FAZER | Média |
+| FILA-01 | `excluirSerieRemoto` lança erro (`lib/dados/treino.ts`, ~linha 864); em produção a mensagem não chega ao cliente, então uma recusa permanente nunca vai para `falhas` e trava a fila FIFO. Mesmo padrão já corrigido em `criarSerieRemoto` (devolver resultado). Também: `moverParaFalhas` perde o `usuarioId` (`outbox.ts`). Achado do agente técnico, 2026-10-01. | A FAZER | Média |
+| E2E-PROD | O e2e roda contra o banco de produção com a `service_role` (`ci.yml`). Com usuários reais, um spec com defeito pode apagar dado real. Avaliar isolamento (branch do Supabase ou projeto de teste) antes de divulgar. Achado do agente técnico. | DECIDIR | Média |
 | DOC-03 | Reconciliar o `DESIGN.md` (decisões, pendências e medições antigas misturadas). Depois da AUD-IND. | A FAZER | Baixa |
 | QA-02 | Matriz Playwright aluno (treino livre e por modelo) e personal (modo trabalho e alternância), caminho normal e triste. A 2ª conta já existe. | A FAZER | Média |
 | PE-01…09 | Auditar as telas de personal com a conta de personal. | A FAZER | Média |
@@ -52,7 +54,8 @@ milestone só começa com autorização do dono. Revisado pelo dono em 2026-10-0
 | ID | O que é | Status | Importância |
 |---|---|---|---|
 | AN-08.A1 | **Check-in de recuperação.** Registro rápido de **sono, energia, dor muscular e estresse**, escala simples, **também em dia sem treino**. Dá contexto aos números; não vira diário médico, não diagnostica, não prescreve. Visível ao aluno e ao personal com vínculo. Feito na academia, então entra na fila offline (Dexie) como a série. Tabela nova `checkin`. Exige revisão da Política (junto com POL-01) e novo aceite de todos. (§13) | A FAZER, na ordem (depois da faxina e da auditoria) | Média |
-| POL-01 | A Política (`lib/legal/documentos.ts`) diz que todo o Coach é IA; desde a M1 parte é calculada pelo lastro. Ajustar na mesma revisão do A1, para um aceite só. | A FAZER, com o A1 | Baixa |
+| A1-ACEITE | Antes do A1: subir `VERSAO_DOCUMENTOS` manda para `/aceite` qualquer tela com a casca (`exigirTipoEscolhido`, `lib/dados/casca.ts`), provavelmente também o treino em andamento. Garantir que o reaceite não interrompe um treino. Também: o dono aprova o texto novo da Política. | A FAZER, antes do A1 | Média |
+| POL-01 | A Política (`lib/legal/documentos.ts`, linhas ~63 e ~150) diz que o Coach **e a Análise** são IA; hoje parte do Coach e as perguntas 1–4, 6 e 7 da Análise são calculadas pelo lastro (só a pergunta 5 usa IA). Ajustar na mesma revisão do A1, para um aceite só. | A FAZER, com o A1 | Baixa |
 | AN-08.A2 | **Prontidão.** Os sinais crus do check-in contra a média da própria pessoa, **sem índice único 0–100**. (§14) | A FAZER, depois do A1 | Baixa |
 | AN-08.A3 | **Recuperação × desempenho.** Coincidência, nunca causa ("a queda coincidiu com sono abaixo da sua média"). (§15) | A FAZER, depois de ~8 semanas de check-in | Baixa |
 | AN-08.F0-INSIGHT | `Insight` como dado estruturado. Hoje só Home e pós-treino usam o detector. | ADIADO: generalizar só quando um 3º lugar precisar | Baixa |
@@ -66,7 +69,7 @@ milestone só começa com autorização do dono. Revisado pelo dono em 2026-10-0
 |---|---|---|
 | SMTP | Configurar o Brevo grátis no Supabase (o SMTP padrão limita e-mails por hora: cadastro e recuperação). Antes de divulgar. | Alta |
 | CALLBACK | Conferir `https://lastro-pi.vercel.app/auth/callback` na lista de redirect do Supabase Auth e testar uma recuperação de senha. | Alta |
-| SENHA-QA | Trocar a senha da conta QA (estava em `scripts/importar-102-gifs.mjs`). | Alta |
+| SEGREDOS | **Repositório público.** A chave `service_role` do projeto (vale até 2036, ignora a RLS: lê e apaga dados de todos) está em `scripts/auditoria-completa-qa.mjs` e `scripts/test-navegacao.mjs` desde 20/08, e a senha da conta QA `qa_player_tester@lastro.app` em 9 scripts. O dono: (1) rotaciona a `service_role` no Supabase; (2) atualiza a chave na Vercel (Production) e no secret `SUPABASE_SERVICE_ROLE_KEY` do GitHub; (3) troca a senha da conta QA ou apaga a conta. Depois o agente faz a FAXINA-3. Reescrever o histórico não resolve (o repo é público). **Adiado para o final por decisão do dono (2026-10-01).** | Alta |
 | SYNC-CELULAR | Num treino real: registrar séries em modo avião, reconectar e conferir que subiram (tarefa 2.3, nunca feita em aparelho). | Média |
 | IPHONE | Testar o aviso de fim do descanso (web push) no iPhone, com o app na tela de início. | Média |
 | PWA-INICIO | Com o app instalado, abrir pelo ícone e conferir que abre em Início e que a barra superior não cobre conteúdo. Um minuto. | Baixa |
@@ -81,7 +84,7 @@ Vindos do `PROGRESS.md`, revisados pelo dono em 2026-10-01.
 
 | ID | O que é | Status | Importância |
 |---|---|---|---|
-| ANT-01 | Faixa de referência de séries semanais por grupo e `N` semanas de estagnação (PRD §10 ainda marca TODO; a pergunta 3 da Análise depende). Pesquisa com fonte primária, sem número de memória. | A FAZER | Média |
+| ANT-01 | Resolvido em `KNOWLEDGE.md` (§3.6 e §3.7, com fontes; o código usa 10–20 séries e 4 semanas). Sobra só riscar o TODO de `PRD.md` §10 e o comentário em `lib/analise/limiares.ts`. | A FAZER (BAIXO) | Baixa |
 | ANT-06 | Medida do módulo Personal: "o grupo alertado recebeu estímulo na semana seguinte?" (`alerta_personal` já grava). | A FAZER quando houver personal real usando | Baixa |
 | ANT-10 | Coluna "antes 16 × 9" por série (padrão Hevy/Strong), com portão visual. | A FAZER se o dono sentir falta no treino | Baixa |
 | ANT-14 | Hydration mismatch no console ao trocar de tema (`data-tema` diverge servidor/cliente). Não aparece para o usuário. | A FAZER, baixa prioridade | Baixa |
@@ -110,7 +113,7 @@ Vindos do `PROGRESS.md`, revisados pelo dono em 2026-10-01.
 - **UX:** UX-01 (via TR-12), UX-02 (histórico com calendário), UX-03 (cobertura planejada e 14 achados corrigidos), UX3-15 (#347), UX3-16 (#357).
 - **Catálogo:** 218 exercícios; A1 (dicas traduzidas en/es); 12 nomes em português.
 - **Cálculo:** TON-01 (tonelagem com unilateral, #346).
-- **Treino:** TR-06…TR-15, OF-09, aviso de descanso por web push.
+- **Treino:** TR-06…TR-15, OF-09, aviso de descanso por web push. TR-17 (#368: ordem da série = maior + 1; e a fila sobe a série registrada durante uma sincronização em andamento).
 - **QA-01:** CT-02, VS-06/07, AJ-03/04, AN-02/05/06, PF-01 resolvidos ou graduados pelo e2e.
 - **Docs:** DOC-01, DOC-02, PU-02; arquivo único de backlog (este, 2026-10-01).
 
