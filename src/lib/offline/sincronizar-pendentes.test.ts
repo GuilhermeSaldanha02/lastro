@@ -18,6 +18,7 @@ import {
   atualizarDescansoSerieRemoto,
   atualizarSerieRemoto,
   criarSerieRemoto,
+  excluirSerieRemoto,
 } from "@/lib/dados/treino";
 import { db } from "./db";
 import { contarFalhas, contarPendentes, enfileirar } from "./outbox";
@@ -33,6 +34,7 @@ beforeEach(async () => {
   vi.mocked(criarSerieRemoto).mockReset();
   vi.mocked(atualizarDescansoSerieRemoto).mockReset();
   vi.mocked(atualizarSerieRemoto).mockReset();
+  vi.mocked(excluirSerieRemoto).mockReset();
   await db.outbox.clear();
   await db.falhas.clear();
 });
@@ -146,6 +148,26 @@ describe("sincronizarPendentes (achado A1)", () => {
     expect(await primeira).toEqual({ sincronizados: 2, falhou: false, descartados: 0 });
     expect(criarSerieRemoto).toHaveBeenCalledTimes(1);
     expect(await contarPendentes()).toBe(0);
+  });
+
+  it("exclusão recusada pelo banco sai para `falhas` e não trava a série seguinte (FILA-01)", async () => {
+    // Antes, `excluirSerieRemoto` lançava: em produção a mensagem não chega
+    // ao cliente, então a recusa nunca era marcada como permanente e a fila
+    // FIFO parava nela para sempre.
+    vi.mocked(excluirSerieRemoto).mockResolvedValue({
+      ok: false,
+      permanente: true,
+      mensagem: "Falha ao excluir série: invalid input syntax for type uuid",
+    });
+    vi.mocked(criarSerieRemoto).mockResolvedValue({ ok: true });
+    await enfileirar("excluir_serie", { id: "nao-e-uuid" }, "b");
+    await enfileirar("criar_serie", { id: "s2", reps: 8 }, "b");
+
+    expect(await sincronizarPendentes()).toEqual({ sincronizados: 1, falhou: false, descartados: 1 });
+    const [falha] = await db.falhas.toArray();
+    expect(falha.payload).toEqual({ id: "nao-e-uuid" });
+    // A falha guarda de quem era o item, como a fila já guardava.
+    expect(falha.usuarioId).toBe("b");
   });
 
   it("erro lançado sem o prefixo (como o `digest` do build de produção) continua sendo transitório", async () => {

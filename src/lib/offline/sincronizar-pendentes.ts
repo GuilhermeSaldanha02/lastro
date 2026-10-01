@@ -103,7 +103,7 @@ async function executarSincronizacao(): Promise<ResultadoSincronizacao> {
       );
     },
     excluir_serie: async (payload) => {
-      await excluirSerieRemoto((payload as { id: string }).id);
+      exigirGravado(await excluirSerieRemoto((payload as { id: string }).id));
     },
     // Excluir o TREINO inteiro é ação online-only, disparada da lista
     // (`/treino`, via `ExcluirTreino`) — decisão consciente, não omissão:
