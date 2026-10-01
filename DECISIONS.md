@@ -3074,3 +3074,17 @@ Com 2 sessões o resultado é igual ao de antes. Com número ímpar, a sessão d
 **Impacto.** Nenhum código nesta entrada. O backlog ganhou a seção "Decisões do dono — 2026-09-29" e o item TR-17.
 
 **Como reverter.** Cada decisão é revista pelo dono; nada foi implementado por ela ainda.
+## 2026-09-29 (2) — Régua "fora do padrão", recorde de e1RM e "Outra série"
+
+**Contexto.** Fecha as três decisões de desenho da AN-08 M3 que ficaram sem registro quando as PRs #361 a #363 entraram.
+
+**Decisões.**
+- **"Fora do padrão" = ±30% da mediana do volume das últimas 6 sessões do mesmo tipo (empurrar, puxar, pernas), com piso de 4 sessões.** Pesquisa sobre as sessões reais do dono: ±20% marcava 11 de 21 sessões avaliáveis (ruído demais); o z-score robusto (Iglewicz-Hoaglin) marcava 1 (cego demais); ±30% marca 7 com a regra final. A faixa 0,8 a 1,3 da razão carga aguda/crônica (ACWR) serviu só como referência de "quanto é muito"; **o texto nunca fala em risco ou lesão**.
+- **Recorde = maior e1RM no app inteiro** (estrela das séries, Análise, Coach e Catálogo). A maior carga aparece como dado, sem estrela. A pílula "Melhor marca", que mostrava o maior peso cru e contradizia o resto, saiu.
+- **"Outra série" abre direto a lista de exercícios**, em vez de abrir sem exercício selecionado. Entra na PR do TR-17.
+
+**Alternativas descartadas.** ±20% (marca quase metade das sessões); z-score robusto (quase nunca marca); recorde por peso cru.
+
+**Impacto.** Constantes em `src/lib/analise/limiares.ts`; detector em `src/lib/analise/fora-do-padrao.ts`. Nenhuma migração.
+
+**Como reverter.** Mudar as constantes de `limiares.ts`; o recorde volta a peso cru reintroduzindo a pílula no Catálogo.

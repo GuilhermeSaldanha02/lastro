@@ -1,16 +1,14 @@
 # Missão — Motor Determinístico + Novas Camadas de Inteligência
 
-> **Status: REGISTRADA, NÃO INICIADA.** O dono colou este roteiro em
-> 2026-09-28 e pediu explicitamente para **só adicionar ao backlog, não
-> executar**. Nenhuma linha de código, migração ou entrega deste documento
-> foi produzida ainda. A ordem para começar é a "Entrega 1" (auditoria) —
-> ver `docs/BACKLOG-CANONICO.md`, item **AN-08**.
+> **Status (atualizado 2026-10-01): EM ANDAMENTO, por milestones.** O estudo
+> (5 entregas) foi aprovado em 2026-09-28; **M1 e M2 estão em produção**; a
+> **M3 está em PRs abertas (#359 a #363), ainda não mergeadas**. O estado vivo
+> está na tabela `AN-08.*` de `docs/BACKLOG-CANONICO.md`; cada milestone só
+> começa com autorização do dono. Fases A (check-in, aprovado para depois da
+> M3) e B/C seguem a ordem do backlog; D1, D2 e F0-CACHE estão congelados.
 >
-> Texto reproduzido como o dono colou, sem edição de conteúdo (só este
-> cabeçalho foi acrescentado). Relaciona-se com **AN-07** (o dono já tinha
-> pedido, num uso real, um relatório de período livre que o Coach recusou —
-> esta missão é o desenho completo do motor que, entre outras coisas,
-> respondería isso sem gastar Gemini).
+> Histórico: este roteiro foi colado em 2026-09-28 e registrado sem execução.
+> O texto abaixo é o original do dono, sem edição de conteúdo.
 
 ---
 
