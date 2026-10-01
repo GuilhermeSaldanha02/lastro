@@ -16,7 +16,7 @@ import {
   entrarComoUsuario,
   type UsuarioDescartavel,
 } from "./helpers/usuario-descartavel";
-import { hojeNoBrasil } from "./helpers/caminho-triste";
+import { hojeNoBrasil, print } from "./helpers/caminho-triste";
 import { medirSobreposicao } from "./helpers/sobreposicao";
 import { semearHistoricoParaAnalise } from "./helpers/semear-historico";
 
@@ -34,7 +34,7 @@ let aluno: UsuarioDescartavel;
 let treinador: UsuarioDescartavel;
 let treinoPassadoId = "";
 let exercicioId = "";
-let treinoAbertoId = "";
+let exerciciosDoTreino: string[] = [];
 
 test.beforeAll(async () => {
   aluno = await criarUsuarioDescartavel("j41-aluno", "aluno");
@@ -45,8 +45,9 @@ test.beforeAll(async () => {
   const { data: ex } = await cliente.from("exercicio").select("id").not("dica_execucao", "is", null).limit(1).single();
   exercicioId = ex?.id ?? "";
 
-  // Treino de HOJE aberto, com 6 exercícios do mesmo grupo: lista longa, para a
-  // faixa de ações e o fim da rolagem terem o que provar.
+  // Contas e exercícios; o treino de HOJE é criado em cada teste (ver
+  // `novoTreinoAberto`), porque um teste que finaliza e reabre deixa o treino
+  // em estado que o servidor ainda pode estar gravando quando o próximo começa.
   treinador = await criarUsuarioDescartavel("j41-treino", "aluno");
   const c2 = await clienteAutenticado(treinador);
   const { data: exercicios, error } = await c2
@@ -56,22 +57,27 @@ test.beforeAll(async () => {
     .order("nome")
     .limit(6);
   if (error || !exercicios || exercicios.length < 6) throw new Error(`Preparação: 6 exercícios de peito: ${error?.message}`);
-  const { data: aberto, error: erroTreino } = await c2
-    .from("treino")
-    .insert({ usuario_id: treinador.id, data: hojeNoBrasil() })
-    .select("id")
-    .single();
-  if (erroTreino || !aberto) throw new Error(`Preparação: treino: ${erroTreino?.message}`);
-  treinoAbertoId = aberto.id;
-  const { error: erroSeries } = await c2.from("serie").insert(
-    exercicios.map((e, i) => ({ treino_id: treinoAbertoId, exercicio_id: e.id, ordem: i + 1, tipo: "valendo", reps: 10, peso: 40 + i })),
-  );
-  if (erroSeries) throw new Error(`Preparação: séries: ${erroSeries.message}`);
-});
+  exerciciosDoTreino = exercicios.map((e) => e.id);});
 
 test.afterAll(async () => {
   for (const c of [aluno, treinador]) if (c) await apagarUsuarioDescartavel(c);
 });
+
+/** Treino de HOJE aberto com 6 exercícios do mesmo grupo (lista longa: a faixa de ações e o fim da rolagem têm o que provar). */
+async function novoTreinoAberto(): Promise<string> {
+  const cliente = await clienteAutenticado(treinador);
+  const { data: treino, error } = await cliente
+    .from("treino")
+    .insert({ usuario_id: treinador.id, data: hojeNoBrasil() })
+    .select("id")
+    .single();
+  if (error || !treino) throw new Error(`Preparação: treino: ${error?.message}`);
+  const { error: erroSeries } = await cliente.from("serie").insert(
+    exerciciosDoTreino.map((id, i) => ({ treino_id: treino.id, exercicio_id: id, ordem: i + 1, tipo: "valendo", reps: 10, peso: 40 + i })),
+  );
+  if (erroSeries) throw new Error(`Preparação: séries: ${erroSeries.message}`);
+  return treino.id;
+}
 
 async function definirIdioma(conta: UsuarioDescartavel, idioma: Idioma) {
   const cliente = await clienteAutenticado(conta);
@@ -135,12 +141,13 @@ for (const idioma of IDIOMAS) {
       await definirIdioma(treinador, idioma);
       await page.setViewportSize({ width: largura, height: 812 });
       await entrarComoUsuario(page, treinador);
-      await page.goto(`/treino/${treinoAbertoId}`);
+      await page.goto(`/treino/${await novoTreinoAberto()}`);
       await expect(page.locator(".grade-exercicio")).toHaveCount(6);
       const todos: string[] = [];
 
       // Aberto, com séries.
       await reservaAcompanha(page, "aberto");
+      await print(page, `j41-treino-aberto-${idioma}-${largura}`);
       todos.push(...(await achados(page, `${idioma} ${largura}px treino aberto`)));
 
       // Formulário aberto ("Outra série"): a faixa sai de cena.
