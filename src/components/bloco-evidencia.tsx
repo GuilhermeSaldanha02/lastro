@@ -1,6 +1,6 @@
 // lastro · DESIGN.md §3.6.3 — o bloco de evidência, peça 09. Três linhas
 // (exercício, número, procedência) + coluna de sinal à esquerda + delta à
-// direita. Cor NUNCA é o único canal (§3.2 nota C): o sinal tem ícone,
+// direita. Cor NUNCA é o único canal (§3.2 nota E): o sinal tem ícone,
 // palavra ("Alta"/"Platô"/"Queda") e o texto do delta — três canais, um
 // deles a cor.
 import type { BlocoEvidencia as TipoBloco } from "@/app/api/analise/evidencia";
