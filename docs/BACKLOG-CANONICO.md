@@ -128,9 +128,16 @@ não conferidos contra o código.
 ## 8. Arquivos removidos na unificação (2026-10-01)
 
 Apagados para não haver mais de uma lista de pendências. Recuperar com
-`git checkout e2f74d4 -- <caminho>`:
+`git checkout <commit> -- <caminho>`:
 
 - `docs/HANDOFF-ANTIGRAVITY-UX-02-UX-03.md` (UX-02 e UX-03 feitas pelo Claude)
 - `docs/RELATORIO-ESTADO-PROJETO.md` (retrato de 31/08)
 - `docs/historico/BACKLOG-PROXIMA-FASE.md`, `BACKLOG-REDESENHO.md`, `BACKLOG-TESTE-APARELHO.md` (todos fechados)
 - `docs/PROMPT-PROXIMO-CHAT.md` (local, fora do git; prompt de 14/09)
+
+Segunda limpeza (2026-10-01), documentos já cumpridos ou superados (recuperar de `4184e6e`):
+
+- `docs/historico/` inteira (auditoria Apex Pro, briefing visual de agosto, escopo, estudos do redesenho, auditoria impeccable)
+- `docs/prd/auditoria-geral/` (auditoria de 17/08)
+- `docs/superpowers/` (planos e specs já implementados)
+- `docs/RELATORIO_AUDITORIA_GIFS_102.md`, `docs/qa-acesso.md`, `docs/catalogo-ampliacao-proposta.md`, `qa/relatorio-caminho-triste-2026-09-13.md`
