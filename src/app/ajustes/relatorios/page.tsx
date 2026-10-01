@@ -48,7 +48,7 @@ export default async function PaginaRelatoriosAjustes() {
           <div className="pilha">
             <p className="subtitulo-secao">
               {t(
-                "Selecione qualquer treino passado para visualizar as estatísticas e exportar o adesivo oficial transparente (1080×1080) para redes sociais.",
+                "Selecione um treino passado, escolha o modelo e exporte um sticker transparente com os grupos musculares treinados.",
                 idioma,
               )}
             </p>

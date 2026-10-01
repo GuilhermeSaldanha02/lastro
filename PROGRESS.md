@@ -9,6 +9,14 @@
 
 ## ESTADO ATUAL
 
+- **Última sessão:** 2026-10-01 · agente: codex · branch: feat/stickers-personalizados.
+- **Entregue localmente:** nove stickers escolhidos pelo dono, todos com símbolo/nome oficiais; seletor com miniaturas e preferência persistida; PNG transparente idêntico à prévia, 1080px de largura e altura proporcional. Foco agora lista grupos principais das séries valendo; aquecimento e exercícios sem série valendo não entram. Anatomia SVG frontal/posterior colore os mesmos IDs.
+- **Verificação:** 995 testes em 88 arquivos verdes, TypeScript e i18n verdes, lint sem erros (avisos preexistentes e uso intencional de img/Blob); build de produção verde. Bancada mobile sintética reproduzível em scripts/verificar-stickers.mjs; nove modelos/downloads/alpha/persistência/teclado/tema claro/retry/storage bloqueado verificados sem Supabase. Evidências em qa/evidencias/STICKERS-01 (ALEGADO). Revisão independente de código sem bloqueadores após correções de contraste.
+- **Próximo passo:** dono conferir os modelos no pós-treino e no histórico; integrar por PR quando aprovado. Ainda não publicado.
+- **Não commitado de terceiros/gerado:** next-env.d.ts já apareceu modificado antes da integração, preservado fora do commit desta tarefa (rotas de build em vez de dev).
+- **Para o próximo agente:** grupos são primários cadastrados no catálogo, não inferência biomecânica. Nenhuma mudança de banco. Valores SVG em lib/stickers/tokens.ts e paleta fixa em tokens.css. Os pendentes anteriores seguem no bloco preservado abaixo.
+
+## Handoff anterior preservado — 2026-09-29
 > Bloco de handoff entre agentes (Antigravity ⇄ Claude). **Sobrescrever a cada sessão**, nunca acumular. Formato e regras: `AGENTS.md` §3.
 
 - **Última sessão:** 2026-09-29 · agente: claude · **Rodada de decisões do dono sobre o backlog inteiro** (registradas em `docs/BACKLOG-CANONICO.md`, seção "Decisões do dono — 2026-09-29", e `DECISIONS.md` 2026-09-29 (1)). Resumo: `SUPABASE_SERVICE_ROLE_KEY` adicionada em Production pelo dono (conferida pela API da Vercel, sem ler o valor); SMTP = Brevo grátis; Gemini segue grátis; POL-01 junta com a revisão da Política do check-in; AN-08 M3 aprovada (F0-CUSTO + roteador de um grupo → resto da C2 → F0-INSIGHT + Fase B → C1), check-in (A1) aprovado, visível ao aluno e ao personal com vínculo, também em dia sem treino; D1/D2/F0-CACHE congelados; CT-01, PiP e domínio parados. Bug novo **TR-17** relatado pelo dono (apagar exercício e readicionar quebra o treino). **A 2ª conta existe**: conta de personal, outro e-mail, sem vínculo, logada no Chrome do dono — QA autorizado nela. Ordem de execução escolhida pelo dono: M3 primeiro, depois TR-17 e os bugs das implementações novas.
@@ -150,7 +158,6 @@ E no navegador, em 375px: a fila renderizou o alerta certo com dado real ("Costa
 - **`treino.iniciado_em` é a âncora de tempo do app**; duração de sessão tem uma definição só (`duracaoSessaoSegundos()`).
 - **Confira `git status --short` DEPOIS de `git add`.**
 - **`gh run watch --exit-status` sai 0 quando a conexão cai.** Faça polling de `gh pr view <n> --json statusCheckRollup`.
-
 
 ## Ordem das fases — e por que esta ordem
 

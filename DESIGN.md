@@ -1,5 +1,7 @@
 # DESIGN.md — `lastro`
 
+> **2026-10-01 — stickers escolhidos pelo dono:** nove composições (Números, Lateral, Minimalista, Placa, Bilhete, Arco, Etiqueta, Editorial e Anatômico), todas com `public/logo-lastro.png` preservado. A paleta exportada é fixa em `--lastro-sticker-*` de `tokens.css`, independente do tema da interface. Medidas do artefato SVG têm fonte única em `src/lib/stickers/tokens.ts`; não são tokens de interface. Prévia, miniatura e exportação compartilham o mesmo PNG de largura 1080 e altura proporcional. O mapa anatômico destaca os grupos principais cadastrados dos exercícios com séries valendo, sem inferir músculos secundários. O seletor mantém a última escolha localmente.
+
 > **Fonte ÚNICA do visual.** Nenhum valor de cor, espaçamento ou tipografia é definido em outro lugar. Verificar autoconsistência deste arquivo a cada edição.
 >
 > **Estado em 2026-08-06:** a identidade estética foi **APROVADA pelo dono** — padrão *"Areia & Azul Petróleo"*, com matéria (gradiente, vidro, bevel, sombra). Os valores vivem em `src/app/tokens.css`, que é o espelho executável de §3.1; as classes, em `src/app/sistema.css`. A referência navegável é `design/padrao-visual.html`, que traz a aferição de contraste rodando na própria página.

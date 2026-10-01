@@ -4501,7 +4501,7 @@
   margin-bottom: var(--lastro-e-3);
   border-radius: var(--lastro-raio-3);
   background: #ffffff;
-  border: 1px solid var(--lastro-borda);
+  border: 1px solid var(--lastro-borda-ouro);
   overflow: hidden;
   display: flex;
   flex-direction: column;
@@ -4661,14 +4661,14 @@
   gap: 8px;
   padding: 10px 14px;
   background: var(--lastro-sup-1);
-  border-top: 1px solid var(--lastro-borda);
+  border-top: 1px solid var(--lastro-borda-ouro);
 }
 
 .player-exercicio-card__fase-btn {
   flex: 1;
   padding: 8px 12px;
   border-radius: 6px;
-  border: 1px solid var(--lastro-borda);
+  border: 1px solid var(--lastro-borda-ouro);
   background: var(--lastro-sup-0);
   color: var(--lastro-txt-2);
   font-size: 12px;
@@ -5248,6 +5248,10 @@
    cortado e INALCANÇÁVEL por rolagem, então `overflow-y: auto` sozinho
    não bastaria. */
 .pos-treino-overlay {
+  --lastro-txt: var(--lastro-sticker-branco);
+  --lastro-txt-2: var(--lastro-sticker-txt-secundario);
+  --lastro-sup-1: var(--lastro-sticker-superficie);
+  --lastro-sup-2: var(--lastro-sticker-superficie);
   position: fixed;
   inset: 0;
   z-index: 100;
@@ -5300,243 +5304,6 @@
   color: var(--lastro-txt);
 }
 
-/* Cartão do treino — estado de REPOUSO.
-   O xadrez de transparência é jargão de editor de imagem e, em repouso,
-   só suja o cartão de quem acabou de treinar (pedido do dono,
-   2026-08-27). Aqui ele vira uma peça acabada, com a mesma tinta do resto
-   do app; o xadrez entra só no modificador abaixo, durante a ação. */
-.pos-treino-card-transparente-wrapper {
-  position: relative;
-  width: 100%;
-  aspect-ratio: 1 / 1;
-  border-radius: var(--lastro-raio-2);
-  overflow: hidden;
-  border: 1px solid var(--lastro-borda-ouro);
-  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.7), 0 0 24px var(--lastro-ouro-glow);
-  background-color: #07090D !important;
-  background-image: radial-gradient(
-    circle at 78% 18%,
-    rgba(212, 175, 55, 0.18) 0%,
-    transparent 60%
-  ) !important;
-  transition: background-color var(--lastro-dur-2) ease;
-}
-
-/* Estado de AÇÃO: copiou/salvou/compartilhou. Aqui o xadrez informa —
-   é o momento em que "o fundo sai transparente" importa de verdade. */
-.pos-treino-card-transparente-wrapper--xadrez {
-  border-color: rgba(255, 255, 255, 0.12);
-  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.7);
-  background-color: #0e1218;
-  background-image:
-    linear-gradient(45deg, #181f2a 25%, transparent 25%),
-    linear-gradient(-45deg, #181f2a 25%, transparent 25%),
-    linear-gradient(45deg, transparent 75%, #181f2a 75%),
-    linear-gradient(-45deg, transparent 75%, #181f2a 75%);
-  background-size: 24px 24px;
-  background-position: 0 0, 0 12px, 12px -12px, -12px 0px;
-}
-
-.pos-treino-tag-transparente {
-  position: absolute;
-  top: 14px;
-  right: 14px;
-  border: 1px solid rgba(255, 255, 255, 0.4);
-  padding: 2px 8px;
-  border-radius: 4px;
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  color: #FFFFFF;
-  background: rgba(0, 0, 0, 0.35);
-  backdrop-filter: blur(4px);
-  z-index: 2;
-}
-
-/* Conteúdo do Sticker Strava / Story Premium */
-.pos-treino-strava-conteudo {
-  position: absolute;
-  inset: 0;
-  padding: 24px 22px;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  gap: 16px;
-  z-index: 2;
-}
-
-.pos-treino-sticker-topo-linha {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  width: 100%;
-  gap: 12px;
-}
-
-.pos-treino-sticker-hero {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-
-.pos-treino-sticker-logo-wrapper {
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  flex: none;
-}
-
-.pos-treino-sticker-logo-img {
-  width: 60px;
-  height: 60px;
-  object-fit: contain;
-  filter: drop-shadow(0 4px 14px rgba(0, 0, 0, 0.95));
-}
-
-.pos-treino-sticker-sessao-label {
-  font-size: 11px;
-  font-weight: 800;
-  letter-spacing: 0.15em;
-  color: rgba(255, 255, 255, 0.85);
-  text-transform: uppercase;
-  text-shadow: 0 2px 6px rgba(0, 0, 0, 0.8);
-}
-
-.pos-treino-sticker-tempo-destaque {
-  font-size: 2.5rem;
-  font-weight: 900;
-  color: #FFFFFF;
-  letter-spacing: -0.04em;
-  font-family: var(--lastro-fonte-txt);
-  text-shadow: 0 3px 12px rgba(0, 0, 0, 0.9);
-  line-height: 1.05;
-}
-
-.pos-treino-sticker-divisor {
-  display: flex;
-  align-items: center;
-  width: 100%;
-  margin: 2px 0;
-  color: var(--lastro-ouro);
-  filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.8));
-}
-
-.pos-treino-sticker-divisor-traco {
-  flex: 1;
-  height: 1.5px;
-  background: var(--lastro-ouro);
-}
-
-.pos-treino-sticker-divisor-seta {
-  flex: none;
-  margin-left: -2px;
-  color: var(--lastro-ouro);
-}
-
-.pos-treino-sticker-stats-grid {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  width: 100%;
-  gap: 12px;
-}
-
-.pos-treino-sticker-stat-col {
-  display: flex;
-  align-items: baseline;
-  gap: 6px;
-}
-
-.pos-treino-sticker-stat-num {
-  font-size: 1.6rem;
-  font-weight: 900;
-  color: #FFFFFF;
-  letter-spacing: -0.02em;
-  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.85);
-  line-height: 1;
-}
-
-.pos-treino-sticker-stat-label {
-  font-size: 9.5px;
-  font-weight: 800;
-  color: var(--lastro-ouro);
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-}
-
-.pos-treino-sticker-stat-foco {
-  font-size: 1.15rem;
-  font-weight: 900;
-  color: #FFFFFF;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.85);
-  text-align: right;
-}
-
-.pos-treino-logo-topo-direito {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  flex: none;
-  margin-top: -4px;
-}
-
-.pos-treino-logo-topo-direito__img {
-  width: 68px;
-  height: 68px;
-  object-fit: contain;
-  filter: drop-shadow(0 4px 14px rgba(0, 0, 0, 0.95));
-}
-
-.pos-treino-strava-exercicios {
-  margin-top: 4px;
-  padding-top: 8px;
-  border-top: 1px solid rgba(255, 255, 255, 0.2);
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  width: 100%;
-}
-
-.pos-treino-strava-exercicios-titulo {
-  font-size: 10px;
-  font-weight: 700;
-  color: var(--lastro-ouro);
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-}
-
-.pos-treino-strava-lista-vertical {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  width: 100%;
-}
-
-.pos-treino-strava-linha-ex {
-  font-size: 11.5px;
-  font-weight: 600;
-  color: #FFFFFF;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.85);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.pos-treino-strava-tag-mais {
-  font-size: 10px;
-  color: rgba(255, 255, 255, 0.6);
-  font-style: italic;
-  display: flex;
-  align-items: center;
-}
-
-/* AN-08 B1 — volume da sessão contra o padrão do próprio usuário (direção C
-   do portão de 2026-09-29). Fica entre o cartão compartilhável e os botões,
-   FORA do cartão, para não sair na imagem. Conteúdo, não controle: sem
-   moldura. Abaixo do padrão é âmbar, nunca vermelho. */
 .pos-treino-padrao {
   display: flex;
   flex-direction: column;
@@ -6741,3 +6508,16 @@ html:lang(pt) .nav a {
 .item-treino-linha__acao-relatorio:disabled {
   opacity: 0.5;
 }
+
+/* Seletor: a prévia e a exportação usam o mesmo PNG. */
+.pos-treino-header-espaco { width: var(--lastro-e-10); }
+.pos-treino-previa { height: var(--lastro-sticker-previa-altura); display: flex; align-items: center; justify-content: center; padding: var(--lastro-e-4); border-radius: var(--lastro-raio-2); background: var(--lastro-sticker-preto); color: var(--lastro-sticker-branco); }
+.pos-treino-previa-imagem { max-width: 100%; max-height: 100%; object-fit: contain; }
+.pos-treino-previa--xadrez { background-image: conic-gradient(var(--lastro-sticker-superficie) 25%, transparent 0 50%, var(--lastro-sticker-superficie) 0 75%, transparent 0); background-size: var(--lastro-e-6) var(--lastro-e-6); }
+.pos-treino-sticker-ajuda { font-size: var(--lastro-papel-rotulo); color: var(--lastro-txt-2); margin: 0; }
+.pos-treino-modelos { display: flex; gap: var(--lastro-e-2); overflow-x: auto; padding-bottom: var(--lastro-e-2); }
+.pos-treino-modelo { flex: 0 0 var(--lastro-sticker-miniatura-largura); min-height: var(--lastro-alvo-min); border: 1px solid var(--lastro-borda-ouro); border-radius: var(--lastro-raio-2); padding: var(--lastro-e-2); background: var(--lastro-sticker-preto); color: var(--lastro-sticker-branco); cursor: pointer; font: inherit; }
+.pos-treino-modelo[aria-pressed="true"] { border-color: var(--lastro-ouro); box-shadow: inset 0 0 0 1px var(--lastro-ouro); }
+.pos-treino-modelo:focus-visible { outline: 2px solid var(--lastro-ouro); outline-offset: 2px; }
+.pos-treino-modelo:disabled { opacity: .5; cursor: wait; }
+.pos-treino-modelo-imagem { display: block; width: 100%; height: var(--lastro-sticker-miniatura-altura); object-fit: contain; margin-bottom: var(--lastro-e-2); }

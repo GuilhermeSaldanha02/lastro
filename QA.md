@@ -1,5 +1,11 @@
 # QA.md — Registro Incremental de Verificação
 
+## STICKERS-01 — 2026-10-01
+
+**Resultado:** ALEGADO (bancada sintética local; revisão independente de código sem bloqueadores). Área visual / treino / i18n.
+
+`node scripts/verificar-stickers.mjs` verifica nove modelos, teclado, persistência, PNG byte a byte igual à prévia, transparência, anatomia primária, títulos longos a 390/320px, contraste no tema claro, logo indisponível/retry e armazenamento bloqueado. Sem Supabase ou rede externa. Provas em `qa/evidencias/STICKERS-01/`: `print.png`, `print-claro.png`, `console.txt`, `rede.txt`. Compartilhamento nativo e colagem no Instagram ainda precisam de conferência no aparelho real do dono. Suíte: 995 testes verdes, TypeScript/i18n/build verdes, lint sem erros. Branch: `feat/stickers-personalizados`.
+
 Registro durável de verificação. **Um item verificado num commit (`SHA`) continua válido enquanto nenhum arquivo da área dele mudar.** Antes de auditar, calcule o que ficou obsoleto e rode só isso:
 
 ```bash

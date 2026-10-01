@@ -14,6 +14,22 @@
 import type { Idioma } from "@/lib/dados/idioma";
 
 const DICIONARIO: Record<string, { en: string; es: string }> = {
+  "Escolha entre nove modelos de sticker. Os grupos exibidos vêm dos exercícios com séries válidas registradas; aquecimentos não entram. O modelo anatômico destaca os grupos principais cadastrados nesses exercícios, sem estimar músculos secundários.": { en: "Choose from nine sticker styles. Displayed groups come from exercises with recorded working sets; warm-ups are excluded. The anatomical style highlights the primary groups assigned to those exercises without estimating secondary muscles.", es: "Elige entre nueve estilos de sticker. Los grupos mostrados vienen de ejercicios con series efectivas registradas; no se incluyen calentamientos. El estilo anatómico destaca los grupos principales registrados en esos ejercicios sin estimar músculos secundarios." },
+  "Selecione um treino passado, escolha o modelo e exporte um sticker transparente com os grupos musculares treinados.": { en: "Select a past workout, choose a style and export a transparent sticker with the trained muscle groups.", es: "Selecciona un entreno pasado, elige el estilo y exporta un sticker transparente con los grupos musculares entrenados." },
+  "Números": { en: "Numbers", es: "Números" },
+  "Lateral": { en: "Side", es: "Lateral" },
+  "Placa": { en: "Badge", es: "Placa" },
+  "Bilhete": { en: "Ticket", es: "Billete" },
+  "Arco": { en: "Arc", es: "Arco" },
+  "Etiqueta": { en: "Label", es: "Etiqueta" },
+  "Editorial": { en: "Editorial", es: "Editorial" },
+  "Anatômico": { en: "Anatomical", es: "Anatómico" },
+  "Frente": { en: "Front", es: "Frente" },
+  "Costas": { en: "Back", es: "Espalda" },
+  "Prévia do sticker do treino": { en: "Workout sticker preview", es: "Vista previa del sticker del entreno" },
+  "Modelo do sticker": { en: "Sticker style", es: "Estilo del sticker" },
+  "Escolha o sticker para colocar sobre sua foto no Story.": { en: "Choose a sticker to place over your Story photo.", es: "Elige un sticker para colocar sobre tu foto en la historia." },
+
   // --- app/login/page.tsx ---
   "Mês anterior": { en: "Previous month", es: "Mes anterior" },
   "Próximo mês": { en: "Next month", es: "Mes siguiente" },

@@ -83,59 +83,116 @@ describe("calcularMetricasSessao", () => {
     expect(metricas.totalExercicios).toBe(0);
     expect(metricas.prsBatidos).toEqual([]);
     expect(metricas.focoOuDivisao).toBe("TREINO");
+    expect(metricas.gruposMuscularesTreinados).toEqual([]);
     expect(metricas.identificadorTreino).toBe("TREINO 404B");
   });
 
-  it("infere foco muscular 'PERNAS' quando há exercícios de membros inferiores", () => {
+  it("não infere grupo muscular pelo nome do exercício", () => {
     const series: SerieParaMetricas[] = [
       { id: "1", exercicioId: "agachamento", exercicioNome: "Agachamento Livre", reps: 8, peso: 100, tipo: "valendo" },
       { id: "2", exercicioId: "leg-press", exercicioNome: "Leg Press 45", reps: 10, peso: 200, tipo: "valendo" },
     ];
     const metricas = calcularMetricasSessao(series, 60 * 60);
-    expect(metricas.focoOuDivisao).toBe("PERNAS");
+    expect(metricas.focoOuDivisao).toBe("TREINO");
+    expect(metricas.gruposMuscularesTreinados).toEqual([]);
   });
 
-  it("infere 'SUPERIORES' pra um dia de empurrar (peito+ombro+tríceps), não 'FULL BODY' (achado do dono, 2026-09-02)", () => {
+  it("exibe os grupos específicos de um dia de empurrar", () => {
     const series: SerieParaMetricas[] = [
       { id: "1", exercicioId: "supino", exercicioNome: "Supino Reto", reps: 8, peso: 80, tipo: "valendo", exercicioGrupoMuscular: "peito" },
       { id: "2", exercicioId: "desenvolvimento", exercicioNome: "Desenvolvimento com Halteres", reps: 10, peso: 20, tipo: "valendo", exercicioGrupoMuscular: "ombro" },
       { id: "3", exercicioId: "triceps-corda", exercicioNome: "Tríceps na Corda", reps: 12, peso: 25, tipo: "valendo", exercicioGrupoMuscular: "triceps" },
     ];
     const metricas = calcularMetricasSessao(series, 60 * 60);
-    expect(metricas.focoOuDivisao).toBe("SUPERIORES");
+    expect(metricas.focoOuDivisao).toBe("PEITO · OMBRO · TRÍCEPS");
+    expect(metricas.gruposMuscularesTreinados).toEqual(["peito", "ombro", "triceps"]);
   });
 
-  it("infere 'SUPERIORES' pelo fallback de nome (sem exercicioGrupoMuscular) pro mesmo dia de empurrar", () => {
+  it("usa TREINO quando nenhum grupo veio preenchido, mesmo com nomes reconhecíveis", () => {
     const series: SerieParaMetricas[] = [
       { id: "1", exercicioId: "supino", exercicioNome: "Supino Reto", reps: 8, peso: 80, tipo: "valendo" },
       { id: "2", exercicioId: "desenvolvimento", exercicioNome: "Desenvolvimento com Halteres", reps: 10, peso: 20, tipo: "valendo" },
       { id: "3", exercicioId: "triceps-corda", exercicioNome: "Tríceps na Corda", reps: 12, peso: 25, tipo: "valendo" },
     ];
     const metricas = calcularMetricasSessao(series, 60 * 60);
-    expect(metricas.focoOuDivisao).toBe("SUPERIORES");
+    expect(metricas.focoOuDivisao).toBe("TREINO");
   });
 
-  it("infere 'FULL BODY' só quando pernas E algum grupo superior aparecem juntos", () => {
+  it("preserva grupos de membros inferiores e superiores separados", () => {
     const series: SerieParaMetricas[] = [
       { id: "1", exercicioId: "agachamento", exercicioNome: "Agachamento Livre", reps: 8, peso: 100, tipo: "valendo", exercicioGrupoMuscular: "quadriceps" },
       { id: "2", exercicioId: "supino", exercicioNome: "Supino Reto", reps: 8, peso: 80, tipo: "valendo", exercicioGrupoMuscular: "peito" },
     ];
     const metricas = calcularMetricasSessao(series, 60 * 60);
-    expect(metricas.focoOuDivisao).toBe("FULL BODY");
+    expect(metricas.focoOuDivisao).toBe("QUADRÍCEPS · PEITO");
   });
 
-  it("não confunde pernas + abdômen (sem grupo superior) com 'FULL BODY'", () => {
+  it("preserva quadríceps e abdômen na mesma sessão", () => {
     const series: SerieParaMetricas[] = [
       { id: "1", exercicioId: "agachamento", exercicioNome: "Agachamento Livre", reps: 8, peso: 100, tipo: "valendo", exercicioGrupoMuscular: "quadriceps" },
       { id: "2", exercicioId: "prancha", exercicioNome: "Prancha Abdominal", reps: 1, peso: 0, tipo: "valendo", exercicioGrupoMuscular: "abdomen" },
     ];
     const metricas = calcularMetricasSessao(series, 60 * 60);
-    expect(metricas.focoOuDivisao).toBe("PERNAS");
+    expect(metricas.focoOuDivisao).toBe("QUADRÍCEPS · ABDÔMEN");
+  });
+
+  it("exclui grupos de aquecimento e coleta o grupo da série valendo do mesmo exercício", () => {
+    const series: SerieParaMetricas[] = [
+      { id: "1", exercicioId: "supino", exercicioNome: "Supino", reps: 10, peso: 20, tipo: "aquecimento", exercicioGrupoMuscular: "peito" },
+      { id: "2", exercicioId: "rosca", exercicioNome: "Rosca", reps: 10, peso: 5, tipo: "aquecimento" },
+      { id: "3", exercicioId: "rosca", exercicioNome: "Rosca", reps: 10, peso: 10, tipo: "valendo", exercicioGrupoMuscular: "biceps" },
+    ];
+    const metricas = calcularMetricasSessao(series, 60);
+    expect(metricas.gruposMuscularesTreinados).toEqual(["biceps"]);
+    expect(metricas.focoOuDivisao).toBe("BÍCEPS");
+    expect(metricas.totalExercicios).toBe(1);
+    expect(metricas.exerciciosDetalhados).toHaveLength(2);
+    expect(metricas.exerciciosDetalhados[1].totalSeries).toBe(2);
+  });
+
+  it("não conta exercícios nem foco em uma sessão só de aquecimento", () => {
+    const metricas = calcularMetricasSessao([
+      { id: "1", exercicioId: "supino", exercicioNome: "Supino", reps: 10, peso: 20, tipo: "aquecimento", exercicioGrupoMuscular: "peito", ehRecordePessoal: true },
+    ], 120);
+    expect(metricas.totalExercicios).toBe(0);
+    expect(metricas.totalSeriesValendo).toBe(0);
+    expect(metricas.totalSeriesAquecimento).toBe(1);
+    expect(metricas.tonelagemTotalKg).toBe(0);
+    expect(metricas.prsBatidos).toEqual([]);
+    expect(metricas.gruposMuscularesTreinados).toEqual([]);
+    expect(metricas.focoOuDivisao).toBe("TREINO");
+    expect(metricas.duracaoMinutos).toBe(2);
+  });
+
+  it("normaliza IDs, elimina repetições e mantém bíceps, tríceps e antebraço separados", () => {
+    const grupos = [" BICEPS ", "triceps", "antebraco", "biceps", "TRICEPS", "   "];
+    const series: SerieParaMetricas[] = grupos.map((grupo, i) => ({
+      id: String(i), exercicioId: String(i), exercicioNome: "Exercício", reps: 8, peso: 10, tipo: "valendo", exercicioGrupoMuscular: grupo,
+    }));
+    const metricas = calcularMetricasSessao(series, 60);
+    expect(metricas.gruposMuscularesTreinados).toEqual(["biceps", "triceps", "antebraco"]);
+    expect(metricas.focoOuDivisao).toBe("BÍCEPS · TRÍCEPS · ANTEBRAÇO");
+  });
+
+  it("mantém o ID desconhecido e formata seu rótulo sem inferir pelo nome do exercício", () => {
+    const metricas = calcularMetricasSessao([
+      { id: "1", exercicioId: "supino", exercicioNome: "Supino", reps: 8, peso: 20, tipo: "valendo", exercicioGrupoMuscular: " GRUPO_NOVO " },
+    ], 60);
+    expect(metricas.gruposMuscularesTreinados).toEqual(["grupo_novo"]);
+    expect(metricas.focoOuDivisao).toBe("GRUPO NOVO");
+  });
+
+  it("formata posterior de coxa pelo rótulo existente do catálogo", () => {
+    const metricas = calcularMetricasSessao([
+      { id: "1", exercicioId: "flexora", exercicioNome: "Flexora", reps: 8, peso: 20, tipo: "valendo", exercicioGrupoMuscular: "POSTERIOR_COXA" },
+    ], 60);
+    expect(metricas.gruposMuscularesTreinados).toEqual(["posterior_coxa"]);
+    expect(metricas.focoOuDivisao).toBe("POSTERIOR DE COXA");
   });
 
   it("aceita opções personalizadas de foco e identificador", () => {
     const series: SerieParaMetricas[] = [
-      { id: "1", exercicioId: "supino", exercicioNome: "Supino", reps: 8, peso: 80, tipo: "valendo" },
+      { id: "1", exercicioId: "supino", exercicioNome: "Supino", reps: 8, peso: 80, tipo: "valendo", exercicioGrupoMuscular: "peito" },
     ];
     const metricas = calcularMetricasSessao(series, 45 * 60, undefined, {
       focoOuDivisao: "PEITO & TRÍCEPS",
@@ -145,6 +202,7 @@ describe("calcularMetricasSessao", () => {
     expect(metricas.focoOuDivisao).toBe("PEITO & TRÍCEPS");
     expect(metricas.identificadorTreino).toBe("TREINO #042");
     expect(metricas.fraseAssinatura).toBe("Foco total.");
+    expect(metricas.gruposMuscularesTreinados).toEqual(["peito"]);
   });
 });
 
