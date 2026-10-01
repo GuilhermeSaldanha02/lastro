@@ -92,8 +92,10 @@ const tem = (texto: string, padrao: RegExp) => padrao.test(texto);
 
 const SAUDE = /\b(dor|dores|doi|doem|doendo|lesao|lesionei|machuquei|machucado|formigamento|formigando|tontura|pain|hurts?|injury|injured|dizzy|dolor|duele|duelen|lesion|mareo)\b/;
 const EXECUCAO = /\b(execucao|executar|executo|postura|pegada|technique|ejecucion|ejecutar|forma correta)\b/;
+// COACH-PRESC: inclui a forma conjugada ("o que eu mudo", "what do I change",
+// "qué cambio esta semana"), não só o infinitivo. O passado ("mudou") fica de fora.
 const PRESCRICAO =
-  /\b(devo|deveria|should i|debo|deberia)\b.*\b(aumentar|diminuir|subir|baixar|trocar|mudar|increase|decrease|change|bajar|cambiar)\b|\bo que (devo )?mudar\b|\bwhat should i change\b|\bque (debo )?cambiar\b|\b(monta|montar|monte|crie|criar|gere|gerar)\b.*\b(treino|ficha|programa|plano)\b|\b(build|create|make)\b.*\b(workout|program|plan)\b|\b(arma|armar|crea|crear)\b.*\b(rutina|entrenamiento|plan)\b/;
+  /\b(devo|deveria|should i|debo|deberia)\b.*\b(aumentar|diminuir|subir|baixar|trocar|mudar|increase|decrease|change|bajar|cambiar)\b|\bo que (eu )?(devo |preciso )?(mudar|trocar|ajustar|alterar)\b|\bo que (eu )?(mudo|troco|altero|ajusto)\b|\bwhat (do i|should i|can i|shall i) (change|adjust|modify|tweak)\b|\bque (debo |tengo que )?(cambiar|ajustar|modificar)\b|\bque (cambio|ajusto|modifico) (esta|este|la proxima|el proximo|en mi|para)\b|\b(monta|montar|monte|crie|criar|gere|gerar)\b.*\b(treino|ficha|programa|plano)\b|\b(build|create|make)\b.*\b(workout|program|plan)\b|\b(arma|armar|crea|crear)\b.*\b(rutina|entrenamiento|plan)\b/;
 
 const SEMANA = /\b(semana|week)\b/;
 

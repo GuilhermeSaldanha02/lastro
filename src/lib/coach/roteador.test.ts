@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { classificar, ehRecusa, ehRelatorio, grupoCitado, normalizar } from "./roteador";
+import { textoDeRecusa } from "./responder";
 
 describe("normalizar", () => {
   it("tira acento, pontuação e caixa", () => {
@@ -148,6 +149,39 @@ describe("classificar — recusas que não gastam cota", () => {
     const c = classificar(pergunta);
     expect(c).toEqual({ intent });
     expect(c && ehRecusa(c)).toBe(true);
+  });
+
+  // COACH-PRESC (auditoria 2026-10-01, PE-06): "o que eu mudo essa semana?" é o
+  // critério do PE-06 e não casava, porque o padrão só tinha o infinitivo
+  // ("o que mudar"). Mesma pergunta, conjugada ou com "eu" no meio.
+  it.each([
+    "O que eu mudo essa semana?",
+    "o que eu mudo na próxima semana",
+    "O que eu devo mudar essa semana?",
+    "O que eu troco no meu treino?",
+    "O que eu ajusto na semana que vem?",
+    "What do I change this week?",
+    "What should I adjust next week?",
+    "¿Qué cambio esta semana?",
+    "¿Qué debo ajustar la próxima semana?",
+  ])("prescrição conjugada: %s", (pergunta) => {
+    expect(classificar(pergunta)).toEqual({ intent: "PRESCRICAO" });
+  });
+
+  it("o passado não é pedido de prescrição: 'o que mudou' segue o caminho normal", () => {
+    expect(classificar("O que mudou na minha semana?")).not.toEqual({ intent: "PRESCRICAO" });
+  });
+
+  it("sob vínculo, toda forma de pedir prescrição devolve o encaminhamento ao personal, sem Gemini (PE-06)", () => {
+    for (const [pergunta, idioma] of [
+      ["O que eu mudo essa semana?", "pt-BR"],
+      ["What do I change this week?", "en"],
+      ["¿Qué cambio esta semana?", "es"],
+    ] as const) {
+      const c = classificar(pergunta);
+      expect(c && ehRecusa(c)).toBe(true);
+      expect(textoDeRecusa(c!.intent as "PRESCRICAO", idioma, true)).toMatch(/personal|entrenador/i);
+    }
   });
 
   it("saúde vence qualquer outra leitura da mesma frase", () => {
