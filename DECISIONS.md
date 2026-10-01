@@ -3055,3 +3055,22 @@ Com 2 sessões o resultado é igual ao de antes. Com número ímpar, a sessão d
 **Impacto.** Alguns exercícios mudam de número e podem mudar de cor no bloco de evidência (alta/platô/queda). O gráfico de progressão não muda: ele diz "entre 03/08 e 21/09" e compara exatamente essas duas semanas.
 
 **Como reverter.** Voltar `evolucaoPorMetades` a devolver o primeiro e o último valor.
+
+## 2026-09-29 (1) — Rodada de decisões do dono sobre o backlog inteiro
+
+**Contexto.** Depois da M2 do AN-08, o backlog tinha itens bloqueados por decisão do dono, itens grandes registrados sem aprovação e um bloco ESTADO ATUAL desatualizado. O dono pediu todas as decisões de uma vez, com opções e recomendação.
+
+**As decisões.**
+- **Abertura ao público:** o dono adicionou `SUPABASE_SERVICE_ROLE_KEY` em Production; SMTP será o Brevo grátis (aceita remetente verificado sem domínio próprio, que continua adiado); Gemini segue no plano gratuito, porque depois da M2 só a pergunta 5 e as perguntas abertas do Coach gastam cota.
+- **POL-01:** a Política corrige o "todo o Coach é IA" junto com a revisão que o check-in exige, para o aceite novo acontecer uma vez só. O erro atual está do lado seguro (declara IA a mais).
+- **AN-08 M3 aprovada**, uma PR por item: F0-CUSTO + intents de um grupo; resto da C2; F0-INSIGHT + Fase B; C1. **Ordem de trabalho do dono: M3 antes dos bugs**, porque ao terminar a M3 os bugs das implementações novas são tratados junto com o TR-17.
+- **Check-in (A1) aprovado** com uma mudança sobre o estudo: vale também em dia sem treino, porque o valor está em o Coach e os relatórios mostrarem coincidência entre recuperação e desempenho. Visível ao aluno e ao personal com vínculo (a RLS nova precisa cobrir isso de propósito, e a Política dizer). O texto nunca afirma causa.
+- **Congelados:** D1, D2, F0-CACHE. **Parados:** CT-01, timer PiP, domínio.
+- **QA:** a 2ª conta existe (personal, sem vínculo com a do dono); QA autorizado nela, incluindo TR-03 e AN-03/04 uma vez.
+- **Produto:** "Outra série" passa a abrir direto a lista de exercícios. A duração do relatório pós-treino volta como estudo antes de decidir.
+
+**Alternativas descartadas.** Ligar o faturamento da Gemini agora (sem uso que justifique); corrigir a Política já (dois aceites em sequência); check-in só para o aluno (o dono quer o personal enxergando); resolver bugs antes da M3.
+
+**Impacto.** Nenhum código nesta entrada. O backlog ganhou a seção "Decisões do dono — 2026-09-29" e o item TR-17.
+
+**Como reverter.** Cada decisão é revista pelo dono; nada foi implementado por ela ainda.
