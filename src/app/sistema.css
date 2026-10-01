@@ -3751,6 +3751,76 @@
   text-transform: uppercase;
 }
 
+/* AN-08 C1 — "Seu recorde" na página do exercício (direção C do portão de
+   2026-09-29). Conteúdo, não controle: sem moldura, separado por linhas
+   finas. O número grande é o recorde de e1RM; maior carga e evolução são
+   fatos menores ao lado. */
+.desempenho-exercicio {
+  display: flex;
+  flex-direction: column;
+  gap: var(--lastro-e-2);
+  padding: var(--lastro-e-5) 0;
+  margin-bottom: var(--lastro-e-4);
+  border-top: 1px solid var(--lastro-linha);
+  border-bottom: 1px solid var(--lastro-linha);
+}
+
+.desempenho-exercicio__rotulo {
+  font-size: var(--lastro-papel-rotulo);
+  font-weight: var(--lastro-peso-max);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--lastro-txt-2);
+}
+
+.desempenho-exercicio__recorde {
+  font-family: var(--lastro-fonte-num);
+  font-weight: var(--lastro-peso-max);
+  font-size: 52px;
+  line-height: 1;
+  /* `--lastro-ouro`, não `-claro`: no tema claro o "-claro" vira #D4AF37
+     sobre branco (~2:1), e o `--lastro-ouro` desse tema é o escuro. */
+  color: var(--lastro-ouro);
+}
+
+.desempenho-exercicio__serie {
+  font-size: var(--lastro-papel-corpo);
+  color: var(--lastro-txt-2);
+}
+
+.desempenho-exercicio__fatos {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--lastro-e-4) var(--lastro-e-8);
+  margin-top: var(--lastro-e-2);
+}
+
+.desempenho-exercicio__fato {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.desempenho-exercicio__fato-rotulo {
+  font-size: var(--lastro-papel-rotulo);
+  color: var(--lastro-txt-2);
+}
+
+.desempenho-exercicio__fato-valor {
+  font-family: var(--lastro-fonte-num);
+  font-weight: var(--lastro-peso-max);
+  font-size: 22px;
+  color: var(--lastro-txt);
+}
+
+.desempenho-exercicio__fato-valor--alta { color: var(--lastro-alta); }
+.desempenho-exercicio__fato-valor--queda { color: var(--lastro-queda); }
+
+.desempenho-exercicio__fato-nota {
+  font-size: 12px;
+  color: var(--lastro-txt-3);
+}
+
 /* Exercício Hero Card */
 .exercicio-hero-card {
   background: var(--lastro-sup-1);

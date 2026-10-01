@@ -989,6 +989,24 @@ const DICIONARIO: Record<string, { en: string; es: string }> = {
   },
   "Conteúdo gerado por IA": { en: "AI-generated content", es: "Contenido generado por IA" },
   "Melhor marca:": { en: "Best mark:", es: "Mejor marca:" },
+  // AN-08 C1: "Seu recorde" na página do exercício.
+  "Seu recorde · e1RM": { en: "Your record · e1RM", es: "Tu récord · e1RM" },
+  "O que é o e1RM": { en: "What e1RM is", es: "Qué es el e1RM" },
+  "O e1RM estima a carga máxima para uma repetição a partir do peso e das repetições de cada série (fórmula de Epley, em séries de até 12 repetições). É por ele que o lastro marca recordes, no app inteiro.": {
+    en: "e1RM estimates your one-rep max from the weight and reps of each set (Epley formula, sets of up to 12 reps). It is what lastro uses to mark records, across the whole app.",
+    es: "El e1RM estima tu carga máxima para una repetición a partir del peso y las repeticiones de cada serie (fórmula de Epley, en series de hasta 12 repeticiones). Es con él que lastro marca récords, en toda la app.",
+  },
+  "batido na última sessão": { en: "set in your last session", es: "logrado en tu última sesión" },
+  "batido há 1 sessão": { en: "set 1 session ago", es: "logrado hace 1 sesión" },
+  "batido há {n} sessões": { en: "set {n} sessions ago", es: "logrado hace {n} sesiones" },
+  "Maior carga": { en: "Heaviest load", es: "Mayor carga" },
+  "Evolução": { en: "Progress", es: "Evolución" },
+  "melhor da 1ª × 2ª metade": { en: "best of 1st × 2nd half", es: "mejor de la 1ª × 2ª mitad" },
+  "reps": { en: "reps", es: "reps" },
+  "Na página de um exercício que você já fez aparece o seu recorde: o maior e1RM, a carga estimada para uma repetição. É a mesma régua da estrela de recorde nas séries e da Análise. Ao lado ficam a maior carga que você já levantou e a evolução, que compara a melhor sessão da primeira metade com a da segunda.": {
+    en: "On the page of an exercise you have done, you see your record: the highest e1RM, the estimated load for one rep. It is the same rule as the record star on sets and in Analysis. Next to it are the heaviest load you have lifted and your progress, which compares the best session of the first half with the best of the second.",
+    es: "En la página de un ejercicio que ya hiciste aparece tu récord: el mayor e1RM, la carga estimada para una repetición. Es la misma regla de la estrella de récord en las series y en el Análisis. Al lado están la mayor carga que levantaste y la evolución, que compara la mejor sesión de la primera mitad con la de la segunda.",
+  },
   "Histórico de Séries": { en: "Set History", es: "Historial de Series" },
   // Achado da auditoria independente (PR #160): chamadas t(...) MULTI-LINHA
   // escapavam do script de varredura (regex de linha única) — ficavam em

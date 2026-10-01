@@ -90,6 +90,7 @@ export const SECOES_GUIA: SecaoGuia[] = [
     paragrafos: [
       "O catálogo tem centenas de exercícios em português, com busca e filtro por grupo muscular. Cada exercício traz dicas de execução, e os que têm imagem mostram o movimento.",
       "Os nomes seguem o jeito de falar da academia; quando o termo em inglês é o mais conhecido, ele aparece entre parênteses.",
+      "Na página de um exercício que você já fez aparece o seu recorde: o maior e1RM, a carga estimada para uma repetição. É a mesma régua da estrela de recorde nas séries e da Análise. Ao lado ficam a maior carga que você já levantou e a evolução, que compara a melhor sessão da primeira metade com a da segunda.",
     ],
     link: { href: "/catalogo", rotulo: "Abrir Catálogo" },
   },

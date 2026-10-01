@@ -14,7 +14,8 @@ import PlayerExecucaoExercicio from "@/components/player-execucao-exercicio";
 import { obterMidiaExercicio, traduzirBiomecanica } from "@/lib/dados/midia-exercicio";
 import { dicaTraduzidaDoExercicio } from "@/lib/dados/traducao";
 import { t } from "@/lib/texto/i18n";
-import { formatarPeso } from "@/lib/texto/formatar-delta";
+import { formatarPercentual, formatarPeso } from "@/lib/texto/formatar-delta";
+import { desempenhoDoExercicio } from "@/lib/analise/desempenho-exercicio";
 
 export default async function PaginaHistoricoExercicio({
   params,
@@ -38,10 +39,10 @@ export default async function PaginaHistoricoExercicio({
   const marcasCronologicas = marcarRecordesHistoricos(cronologico);
   const marcas = [...marcasCronologicas].reverse();
 
-  // Calcula o PR de carga máxima de todos os tempos
-  const cargaMaxima = historico.length > 0
-    ? Math.max(...historico.map((s) => s.peso))
-    : 0;
+  // AN-08 C1: recorde é o maior e1RM (o mesmo da estrela das séries, da
+  // Análise e do Coach); a maior carga fica como dado, sem estrela. Antes
+  // daqui a "Melhor marca" era o maior peso e contradizia o resto do app.
+  const desempenho = desempenhoDoExercicio(historico);
 
   return (
     <main className="tela">
@@ -60,11 +61,6 @@ export default async function PaginaHistoricoExercicio({
             <span className="tag-grupo">{exercicio.grupoMuscularNome.toUpperCase()}</span>
             {exercicio.unilateral && <span className="tag-unilateral">{t("Unilateral", idioma)}</span>}
             {exercicio.pesoPorLado && <span className="tag-unilateral">{t("Peso por lado", idioma)}</span>}
-            {cargaMaxima > 0 && (
-              <span className="disciplina-card__streak">
-                {t("Melhor marca:", idioma)} {formatarPeso(cargaMaxima, idioma)} kg
-              </span>
-            )}
           </div>
 
           {/* Player com modos: Ver Execução (vídeo animado) e Ver Aparelho / Posição */}
@@ -153,6 +149,67 @@ export default async function PaginaHistoricoExercicio({
           </div>
 
         </div>
+
+        {/* AN-08 C1 — "Seu recorde" (direção C do portão de 2026-09-29):
+            o recorde de e1RM grande, e embaixo a maior carga e a evolução.
+            Sem gráfico: o histórico logo abaixo já é a linha do tempo, e o
+            gráfico de progressão mora na Análise. */}
+        {desempenho.recorde && (
+          <section className="desempenho-exercicio">
+            <span className="desempenho-exercicio__rotulo titulo-com-dica">
+              <span>
+                <span aria-hidden="true">★ </span>
+                {t("Seu recorde · e1RM", idioma)}
+              </span>
+              <DicaInfo titulo={t("O que é o e1RM", idioma)} idioma={idioma}>
+                {t(
+                  "O e1RM estima a carga máxima para uma repetição a partir do peso e das repetições de cada série (fórmula de Epley, em séries de até 12 repetições). É por ele que o lastro marca recordes, no app inteiro.",
+                  idioma,
+                )}
+              </DicaInfo>
+            </span>
+            <span className="desempenho-exercicio__recorde">
+              {formatarPeso(Math.round(desempenho.recorde.e1rm * 10) / 10, idioma)} kg
+            </span>
+            <span className="desempenho-exercicio__serie">
+              {desempenho.recorde.reps} × {formatarPeso(desempenho.recorde.peso, idioma)} kg
+              {" · "}
+              {formatarDataCurta(desempenho.recorde.data, idioma)}
+              {" · "}
+              {desempenho.recorde.sessoesDepois === 0
+                ? t("batido na última sessão", idioma)
+                : desempenho.recorde.sessoesDepois === 1
+                  ? t("batido há 1 sessão", idioma)
+                  : t("batido há {n} sessões", idioma).replace("{n}", String(desempenho.recorde.sessoesDepois))}
+            </span>
+            <div className="desempenho-exercicio__fatos">
+              {desempenho.maiorCarga && (
+                <div className="desempenho-exercicio__fato">
+                  <span className="desempenho-exercicio__fato-rotulo">{t("Maior carga", idioma)}</span>
+                  <span className="desempenho-exercicio__fato-valor">
+                    {formatarPeso(desempenho.maiorCarga.peso, idioma)} kg
+                  </span>
+                  <span className="desempenho-exercicio__fato-nota">
+                    {desempenho.maiorCarga.reps} {t("reps", idioma)} · {formatarDataCurta(desempenho.maiorCarga.data, idioma)}
+                  </span>
+                </div>
+              )}
+              {desempenho.evolucaoPct !== null && (
+                <div className="desempenho-exercicio__fato">
+                  <span className="desempenho-exercicio__fato-rotulo">{t("Evolução", idioma)}</span>
+                  <span
+                    className={`desempenho-exercicio__fato-valor desempenho-exercicio__fato-valor--${
+                      desempenho.evolucaoPct >= 0 ? "alta" : "queda"
+                    }`}
+                  >
+                    {formatarPercentual(Math.round(desempenho.evolucaoPct), idioma)}
+                  </span>
+                  <span className="desempenho-exercicio__fato-nota">{t("melhor da 1ª × 2ª metade", idioma)}</span>
+                </div>
+              )}
+            </div>
+          </section>
+        )}
 
         {/* Histórico de Séries Executadas */}
         <div className="secao-header">
