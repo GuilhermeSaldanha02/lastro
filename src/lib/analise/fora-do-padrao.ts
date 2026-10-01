@@ -103,6 +103,17 @@ export function compararComPadrao(
 }
 
 /**
+ * Posições (0–100) da barra do pós-treino (B1, direção C): o maior dos dois
+ * valores fica em 80% da largura, para sobrar respiro à direita; a marca é o
+ * padrão, o preenchimento é a sessão.
+ */
+export function posicoesDaBarra(c: Pick<ComparacaoPadrao, "volume" | "padrao">): { sessao: number; padrao: number } {
+  const escala = Math.max(c.volume, c.padrao) / 0.8;
+  if (escala <= 0) return { sessao: 0, padrao: 0 };
+  return { sessao: Math.round((c.volume / escala) * 100), padrao: Math.round((c.padrao / escala) * 100) };
+}
+
+/**
  * As sessões fora do padrão para a Home (B2). `sessoes` vem da MAIS
  * RECENTE para a mais antiga (a ordem do carregador da Home): cada uma se
  * compara só com as que vêm DEPOIS dela na lista. Entram as dos últimos

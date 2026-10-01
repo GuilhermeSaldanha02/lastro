@@ -71,7 +71,7 @@ export const SECOES_GUIA: SecaoGuia[] = [
       "Ela usa sempre a última semana completa (de segunda a domingo) e precisa de algumas semanas fechadas com treino: a própria tela diz quantas você tem e quantas faltam. A semana em andamento nunca entra.",
       "As perguntas de progresso, empaque, equilíbrio e frequência, e os relatórios do mês e desde o primeiro treino, são respondidos na hora pelo próprio lastro, sem inteligência artificial. A pergunta sobre o que mudar na próxima semana é escrita por inteligência artificial em segundo plano: você pode sair da tela e encontrá-la depois em Ajustes > Relatórios e adesivos. Ela pode errar, então confira o que for importante.",
       "Cada conta tem um limite diário de uso da inteligência artificial; na Análise, só a pergunta sobre o que mudar conta nele. Passou do limite, ele volta no dia seguinte.",
-      "Na Home, o cartão da Análise mostra “Lastro percebeu” quando um treino dos últimos 7 dias fica mais de 30% acima ou abaixo do seu padrão: a mediana do volume das suas últimas 6 sessões do mesmo tipo (empurrar, puxar ou pernas). Aparecem no máximo dois, e só depois de 4 sessões do mesmo tipo.",
+      "Na Home, o cartão da Análise mostra “Lastro percebeu” quando um treino dos últimos 7 dias fica mais de 30% acima ou abaixo do seu padrão: a mediana do volume das suas últimas 6 sessões do mesmo tipo (empurrar, puxar ou pernas). Aparecem no máximo dois, e só depois de 4 sessões do mesmo tipo. Ao finalizar um treino fora do padrão, a tela de compartilhar também mostra o volume contra o seu padrão, fora da imagem compartilhada.",
     ],
     link: { href: "/analise", rotulo: "Abrir Análise" },
   },

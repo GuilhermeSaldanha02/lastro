@@ -53,6 +53,8 @@ import {
   ultimaSerieEm,
 } from "@/lib/dados/metricas-treino";
 import { gruposConhecidos } from "@/lib/dados/grupos-conhecidos";
+import { carregarPadraoDaSessao } from "@/lib/dados/padrao-sessao";
+import { compararComPadrao, type ComparacaoPadrao } from "@/lib/analise/fora-do-padrao";
 import {
   atualizarPlanoDoExercicio,
   type ExercicioDoModelo,
@@ -197,6 +199,43 @@ export default function TreinoDetalhe({
     peso: number;
   } | null>(null);
   const [mostrarRelatorio, setMostrarRelatorio] = useState(false);
+  const metricasRelatorio = useMemo(
+    () =>
+      calcularMetricasSessao(series, duracaoSessaoSegundos(iniciadoEm, ultimaSerieEm(series)), undefined, {
+        identificadorTreino: treinoId ? `TREINO ${treinoId.slice(-4).toUpperCase()}` : "TREINO 404B",
+      }),
+    [series, iniciadoEm, treinoId],
+  );
+
+  // AN-08 B1: ao abrir o relatório, busca SÓ a régua (as sessões anteriores)
+  // no servidor. O volume desta sessão vem das séries da tela, as mesmas do
+  // cartão, porque parte delas pode estar na fila offline. Sem rede, ou sem
+  // padrão, nada aparece e o relatório fica como sempre foi.
+  const [padraoDaSessao, setPadraoDaSessao] = useState<Awaited<ReturnType<typeof carregarPadraoDaSessao>>>(null);
+  useEffect(() => {
+    if (!mostrarRelatorio) return;
+    let vivo = true;
+    carregarPadraoDaSessao(treinoId)
+      .then((r) => {
+        if (vivo) setPadraoDaSessao(r);
+      })
+      .catch(() => {
+        if (vivo) setPadraoDaSessao(null);
+      });
+    return () => {
+      vivo = false;
+    };
+  }, [mostrarRelatorio, treinoId]);
+  const comparacaoPadrao: ComparacaoPadrao | null = useMemo(() => {
+    if (!padraoDaSessao) return null;
+    const grupos = Array.from(
+      new Set(series.filter((s) => s.tipo === "valendo").map((s) => s.exercicioGrupoMuscular).filter(Boolean)),
+    );
+    return compararComPadrao(
+      { treinoId, data: padraoDaSessao.data, grupos, volume: metricasRelatorio.tonelagemTotalKg },
+      padraoDaSessao.anteriores,
+    );
+  }, [padraoDaSessao, series, treinoId, metricasRelatorio.tonelagemTotalKg]);
   // Confirmação inline de "Finalizar Treino". Nasceu de relato de uso real
   // (2026-09-03): o dono encostou no botão sem querer, o cronômetro
   // congelou e não havia volta. O custo é real — mesma lógica do PRD §4.1
@@ -1045,11 +1084,10 @@ export default function TreinoDetalhe({
                número para o mesmo treino (relato de uso real, 2026-09-04). O
                cronômetro do topo segue sendo um relógio de sessão — ele não é
                a métrica do documento. */
-            metricas={calcularMetricasSessao(series, duracaoSessaoSegundos(iniciadoEm, ultimaSerieEm(series)), undefined, {
-            identificadorTreino: treinoId ? `TREINO ${treinoId.slice(-4).toUpperCase()}` : "TREINO 404B",
-          })}
+            metricas={metricasRelatorio}
           idioma={idioma}
           onFechar={() => setMostrarRelatorio(false)}
+          comparacao={comparacaoPadrao}
         />
       )}
     </>

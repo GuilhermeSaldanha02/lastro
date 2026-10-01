@@ -5,17 +5,26 @@ import { useRouter } from "next/navigation";
 import type { MetricasSessao } from "@/lib/dados/metricas-treino";
 import type { Idioma } from "@/lib/dados/idioma";
 import { t } from "@/lib/texto/i18n";
+import { posicoesDaBarra, type ComparacaoPadrao } from "@/lib/analise/fora-do-padrao";
+import { formatarToneladas, textosBlocoPadrao } from "@/lib/analise/texto-fora-do-padrao";
 
 type RelatorioPosTreinoProps = {
   metricas: MetricasSessao;
   idioma: Idioma;
   onFechar: () => void;
+  /**
+   * AN-08 B1: a sessão contra o padrão do próprio usuário. Só a tela de
+   * treino passa isto, logo depois de finalizar; os relatórios reabertos
+   * pelo histórico não passam (lá o padrão teria de ser o daquela época).
+   */
+  comparacao?: ComparacaoPadrao | null;
 };
 
 export default function RelatorioPosTreino({
   metricas,
   idioma,
   onFechar,
+  comparacao,
 }: RelatorioPosTreinoProps) {
   const router = useRouter();
   const [salvando, setSalvando] = useState(false);
@@ -413,6 +422,35 @@ export default function RelatorioPosTreino({
             </div>
           </div>
         </div>
+
+        {/* AN-08 B1 (direção C do portão de 2026-09-29): fora do cartão
+            acima de propósito, para não sair na imagem compartilhada. Só
+            aparece quando a sessão ficou fora do padrão; sem rede, sem
+            padrão ou dentro dele, a tela fica como sempre foi. */}
+        {comparacao && comparacao.direcao !== "dentro" && (() => {
+          const textos = textosBlocoPadrao(comparacao, idioma);
+          const barra = posicoesDaBarra(comparacao);
+          return (
+            <section className="pos-treino-padrao">
+              <span className="pos-treino-padrao__rotulo">{textos.rotulo}</span>
+              <div className="pos-treino-padrao__numeros">
+                <span className="pos-treino-padrao__volume">{formatarToneladas(comparacao.volume, idioma)}</span>
+                <span className={`pos-treino-padrao__pct pos-treino-padrao__pct--${comparacao.direcao}`}>{textos.pct}</span>
+              </div>
+              <div className="pos-treino-padrao__barra" aria-hidden="true">
+                <div
+                  className={`pos-treino-padrao__sessao pos-treino-padrao__sessao--${comparacao.direcao}`}
+                  style={{ width: `${barra.sessao}%` }}
+                />
+                <div className="pos-treino-padrao__marca" style={{ left: `${barra.padrao}%` }} />
+              </div>
+              <div className="pos-treino-padrao__legenda">
+                <span>{textos.legenda}</span>
+                <span>{textos.janela}</span>
+              </div>
+            </section>
+          );
+        })()}
 
         {/* Resultado da última ação — sucesso E falha. `aria-live` porque
             quem usa leitor de tela precisa saber o que aconteceu tanto
