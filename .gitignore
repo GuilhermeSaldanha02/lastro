@@ -4,7 +4,7 @@
 .env.*
 !.env.example
 
-# Credencial do usuário de QA persistente (docs/qa-acesso.md explica o que é;
+# Credencial do usuário de QA persistente (acesso revogado em 2026-08-28;
 # a senha em si nunca entra no git).
 .qa-credentials.local
 
