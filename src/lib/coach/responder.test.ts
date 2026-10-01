@@ -92,6 +92,43 @@ describe("responder", () => {
     );
   });
 
+  it("volume de um grupo: semana até hoje e a semana passada inteira, sem percentual", () => {
+    // Peito: 29/09 10×50. Semana passada: 22/09 10×50 e 24/09 8×60.
+    const texto = responder({ intent: "VOLUME_GRUPO", grupo: "peito" }, contexto({ nomeGrupoAlvo: "Peito" }));
+    expect(texto).toBe("Peito nesta semana, até hoje: 500 kg em 1 série. Na semana passada inteira: 980 kg em 2 séries.");
+    expect(texto).not.toMatch(/%/);
+    expect(responder({ intent: "VOLUME_GRUPO", grupo: "quadriceps" }, contexto({ nomeGrupoAlvo: "Quadríceps" }))).toBe(
+      "Nenhuma série valendo de Quadríceps nesta semana ainda.",
+    );
+  });
+
+  it("frequência de um grupo: treinos nas últimas 4 semanas e a última série", () => {
+    expect(responder({ intent: "FREQUENCIA_GRUPO", grupo: "peito" }, contexto({ nomeGrupoAlvo: "Peito" }))).toBe(
+      "Nas últimas 4 semanas, Peito entrou em 4 treinos. Última série valendo: ontem.",
+    );
+    expect(
+      responder({ intent: "FREQUENCIA_GRUPO", grupo: "quadriceps" }, contexto({ nomeGrupoAlvo: "Quadríceps" })),
+    ).toBe("Nas últimas 4 semanas, Quadríceps não entrou em nenhum treino. Última série valendo: há 41 dias.");
+    expect(responder({ intent: "FREQUENCIA_GRUPO", grupo: "biceps" }, contexto({ nomeGrupoAlvo: "Bíceps" }))).toBe(
+      "Você ainda não registrou série valendo de Bíceps.",
+    );
+  });
+
+  it("grupo em outro idioma: filtra pelo nome traduzido, não pela chave do banco", () => {
+    const traduzidos: Record<string, string> = { Peito: "Chest", Costas: "Back", Quadríceps: "Quadriceps" };
+    const exercicios = EXERCICIOS.map((e) => ({ ...e, grupoMuscularPrimario: traduzidos[e.grupoMuscularPrimario] }));
+    const series = achatarSeriesValendo(TREINOS, new Map(exercicios.map((e) => [e.id, e])));
+    expect(responder({ intent: "VOLUME_GRUPO", grupo: "costas" }, contexto({ series, nomeGrupoAlvo: "Back" }, "en"))).toBe(
+      "Back this week so far: 880 kg across 2 sets. All of last week: 400 kg across 1 set.",
+    );
+    const es = Object.fromEntries(Object.keys(traduzidos).map((k) => [k, k === "Costas" ? "Espalda" : k]));
+    const exerciciosEs = EXERCICIOS.map((e) => ({ ...e, grupoMuscularPrimario: es[e.grupoMuscularPrimario] }));
+    const seriesEs = achatarSeriesValendo(TREINOS, new Map(exerciciosEs.map((e) => [e.id, e])));
+    expect(
+      responder({ intent: "FREQUENCIA_GRUPO", grupo: "costas" }, contexto({ series: seriesEs, nomeGrupoAlvo: "Espalda" }, "es")),
+    ).toBe("En las últimas 4 semanas, Espalda estuvo en 3 entrenamientos. Última serie válida: hoy.");
+  });
+
   it("frequência compara a semana fechada com a média, sem chamar uma semana de tendência", () => {
     expect(responder({ intent: "FREQUENCIA_COMPARADA" }, contexto())).toBe(
       "Na última semana fechada foram 2 treinos, contra média de 1 nas semanas anteriores com treino. Uma semana sozinha não é tendência.",

@@ -37,8 +37,6 @@ export async function responderComDados(entrada: {
     metaSemana: (perfil.data?.meta_treinos_semana as number | null | undefined) ?? null,
     idioma,
     nomeGrupoAlvo:
-      classificacao.intent === "DIAS_SEM_GRUPO"
-        ? nomeDoGrupo(traducaoGrupos, classificacao.grupo, idioma)
-        : undefined,
+      "grupo" in classificacao ? nomeDoGrupo(traducaoGrupos, classificacao.grupo, idioma) : undefined,
   });
 }

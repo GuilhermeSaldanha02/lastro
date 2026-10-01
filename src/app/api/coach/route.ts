@@ -26,6 +26,7 @@ import { classificar, ehRecusa, ehRelatorio } from "@/lib/coach/roteador";
 import { gerarESalvarRelatorio } from "@/lib/coach/relatorio-salvo";
 import { textoDeRecusa } from "@/lib/coach/responder";
 import { responderComDados } from "@/lib/coach/responder-local";
+import { INTENT_ABERTA, registrarResolucaoCoach } from "@/lib/dados/contador-coach";
 
 export async function POST(request: Request) {
   const supabase = await criarClienteServidor();
@@ -77,6 +78,7 @@ export async function POST(request: Request) {
   if (classificacao) {
     const idioma = await obterIdioma();
     if (ehRecusa(classificacao)) {
+      await registrarResolucaoCoach(supabase, classificacao.intent, "recusa");
       return NextResponse.json({
         resposta: textoDeRecusa(classificacao.intent, idioma, temPersonal),
         origem: "local",
@@ -84,12 +86,15 @@ export async function POST(request: Request) {
     }
     try {
       // AN-08 M2-3: relatório de período é gerado e SALVO nos pareceres.
-      const resposta = ehRelatorio(classificacao)
+      const relatorio = ehRelatorio(classificacao);
+      const resposta = relatorio
         ? await gerarESalvarRelatorio({ supabase, usuarioId: user.id, intent: classificacao.intent, idioma })
         : await responderComDados({ supabase, usuarioId: user.id, classificacao, idioma });
+      await registrarResolucaoCoach(supabase, classificacao.intent, relatorio ? "relatorio" : "local");
       return NextResponse.json({ resposta, origem: "local" });
     } catch (erro) {
       console.error("[coach] falha ao responder localmente", detalheParaLog(erro));
+      await registrarResolucaoCoach(supabase, classificacao.intent, "erro_local");
       return NextResponse.json(
         { erro: "Não foi possível ler seus treinos agora. Tente de novo." },
         { status: 503 },
@@ -111,6 +116,9 @@ export async function POST(request: Request) {
   // PU-04: a reserva também respeita o teto GLOBAL (todas as contas juntas) e
   // o do minuto. `motivo` diz qual estourou, para a tela falar a verdade.
   const reserva = await reservarUso(supabase, "coach");
+  // AN-08 F0-CUSTO: "gemini" só DEPOIS da reserva aceita, para a soma do dia
+  // bater com as linhas de `uso_ia` de origem 'coach'.
+  await registrarResolucaoCoach(supabase, INTENT_ABERTA, reserva.ok ? "gemini" : "limite");
   if (!reserva.ok) {
     return NextResponse.json(
       { erro: "limite_diario", motivo: reserva.motivo, limite: reserva.limite },

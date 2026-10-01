@@ -55,6 +55,41 @@ describe("classificar — perguntas de dados", () => {
   it("há quanto tempo não treino um grupo leva o grupo junto", () => {
     expect(classificar("Há quanto tempo não treino costas?")).toEqual({ intent: "DIAS_SEM_GRUPO", grupo: "costas" });
     expect(classificar("hace cuánto no entreno hombros")).toEqual({ intent: "DIAS_SEM_GRUPO", grupo: "ombro" });
+    expect(classificar("Quantos dias sem treinar peito?")).toEqual({ intent: "DIAS_SEM_GRUPO", grupo: "peito" });
+  });
+});
+
+describe("classificar — volume e frequência de UM grupo (AN-08 M3)", () => {
+  it.each([
+    ["Qual meu volume de peito nesta semana?", "VOLUME_GRUPO", "peito"],
+    ["Como está meu volume de peito?", "VOLUME_GRUPO", "peito"],
+    ["Quantas séries de costas fiz?", "VOLUME_GRUPO", "costas"],
+    ["how many sets of chest this week", "VOLUME_GRUPO", "peito"],
+    ["¿Cuántas series de espalda esta semana?", "VOLUME_GRUPO", "costas"],
+    ["Quantas vezes treinei costas?", "FREQUENCIA_GRUPO", "costas"],
+    ["Qual a frequência de ombro?", "FREQUENCIA_GRUPO", "ombro"],
+    ["How often do I train shoulders?", "FREQUENCIA_GRUPO", "ombro"],
+    ["¿Con qué frecuencia entreno pecho?", "FREQUENCIA_GRUPO", "peito"],
+  ])("%s → %s (%s)", (pergunta, intent, grupo) => {
+    expect(classificar(pergunta)).toEqual({ intent, grupo });
+  });
+
+  it.each([
+    // Prescrição disfarçada de contagem: número certo para a pergunta errada.
+    "Quantas séries de peito devo fazer por semana?",
+    "Qual o volume ideal de peito?",
+    "How many sets of chest should I do?",
+    "¿Cuántas series de pecho debo hacer?",
+    // Período que a intent não cobre (a janela é fixa).
+    "Volume de peito no mês",
+    "Quantas vezes treinei costas desde o início?",
+    "Volume de peito hoje",
+    // A sequência é do treino inteiro, não de um grupo.
+    "Quantos dias seguidos treinei peito?",
+    // As duas coisas ao mesmo tempo.
+    "Quantas vezes e quantas séries de peito?",
+  ])("fica com a Gemini: %s", (pergunta) => {
+    expect(classificar(pergunta)).toBeNull();
   });
 });
 
@@ -107,7 +142,7 @@ describe("classificar — na dúvida, segue para a Gemini (null)", () => {
     "Vale a pena treinar em jejum?",
     "O que é RIR?",
     "Qual o volume de peito e costas nesta semana?",
-    "Como está meu volume de peito?",
+    "Como está meu peito?",
     "Como foi meu treino hoje?",
     "",
   ])("%s", (pergunta) => {
