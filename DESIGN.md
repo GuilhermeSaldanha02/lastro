@@ -2,25 +2,14 @@
 
 > **Fonte ÚNICA do visual.** Nenhum valor de cor, espaçamento ou tipografia é definido em outro lugar. Verificar autoconsistência deste arquivo a cada edição.
 >
-> **Estado em 2026-08-06:** a identidade estética foi **APROVADA pelo dono** — padrão *"Areia & Azul Petróleo"*, com matéria (gradiente, vidro, bevel, sombra). Os valores vivem em `src/app/tokens.css`, que é o espelho executável de §3.1; as classes, em `src/app/sistema.css`. A referência navegável é `design/padrao-visual.html`, que traz a aferição de contraste rodando na própria página.
+> **Estado (reconciliado em 2026-10-01, DOC-03).** O valor de qualquer token vive em `src/app/tokens.css`; as classes, em `src/app/sistema.css`. O app tem **7 temas** (§3.1): o padrão é o **"ouro"**, o redesenho **Apex Pro** (2026-08-20, `8d30cf0`: obsidiana, ouro champagne e esmeralda), escuro; há o claro **"branco-ouro"** e mais cinco (areia, clean, petroleo, moka, oliva). O contraste dos 7 temas é medido pelo teste `e2e/j5-contraste.spec.ts`, no app renderizado; ele, e não uma tabela deste documento, é a fonte dos números.
 >
-> **Uma restrição funcional foi revista pelo dono nesta data: D5.** O tema padrão passou a ser **claro** (areia), não escuro. A justificativa original de D5 (academia com luz baixa, tela clara cansa à noite) continua válida como risco conhecido; o dono a aceitou conscientemente em favor do padrão escolhido.
->
-> **2026-08-11 — revisto de novo.** A pílula da aba inferior deixou de ser vidro areia e passou a ser petróleo (mais claro que a barra de topo), a pedido do dono. **Duas superfícies petróleo agora, não uma** — a barra de topo continua a mais escura das duas; a pílula é uma versão mais clara da mesma tinta, amarrando as duas pontas da tela. Onde este documento disser "a única superfície escura", leia "a barra de topo é a mais escura das duas superfícies petróleo".
->
-> **2026-08-15 — §6 acrescentado (item E5 do redesenho).** O vocabulário das 10 peças do redesenho, decidido pelo dono e antes só em artifact, virou seção durável deste documento. **Nada em §6 está implementado ainda** — §3 continua sendo a tipografia e os tokens que o código de fato usa até a Trilha B (`docs/BACKLOG-REDESENHO.md`) chegar em cada peça.
->
-> **2026-08-15 — Nível 1 da Trilha B implementado (E1, E2, E3, E4).** §3.3, §3.4 e §3.5 foram reescritos para bater com o código: a família passou de IBM Plex Sans/Mono/Serif para Bricolage Grotesque/Archivo/Fraunces (E1); a escala numerada `--lastro-t-meta`/`--lastro-t-corpo`/`--lastro-t-1..8` foi substituída pelos seis papéis nomeados de §6.2 (E2); bevel e gradiente saíram das superfícies areia, com `.nav` como única exceção mantida (E3); tokens de duração/curva M3 entraram em `tokens.css` (E4). Onde §3 e §6 hoje dizem a mesma coisa, §6 fica com o texto histórico da decisão e §3 com o que o código executa.
->
-> ⚠️ **2026-08-20 — PIVÔ NÃO DOCUMENTADO ATÉ 2026-08-21: §3.0–3.2 e a tabela C1–C14 de §4.2 descrevem uma paleta que não existe mais.** Numa sessão separada, o redesenho **"Apex Pro"** (`8d30cf0`) substituiu "Areia & Azul Petróleo" por um tema **escuro** (obsidiana `#07090D`, ouro `#D4AF37`, esmeralda `#10B981`) sem atualizar este documento. Os nomes de token abaixo (`--lastro-fundo`, `--lastro-sup-1`, `--lastro-txt-3`...) ainda existem em `src/app/tokens.css`, mas com **valores diferentes** dos escritos aqui. **A fonte de verdade visual é `src/app/tokens.css` — confirme contra ele antes de citar qualquer número desta seção.**
->
-> **O que foi corrigido nesta data (auditoria `docs/AUDITORIA-APEX-PRO.md`, achados A05/A06/T3):** `--lastro-txt-3` reprovava AA contra as superfícies do Apex Pro (3,36:1 sobre `--lastro-sup-3`, piso 4,5) enquanto a linha C3 abaixo — calculada para a paleta areia — dizia "4,85, passa". O token do `:root` foi corrigido para `#7C8DA6`, remedido ao vivo: 4,74 (`sup-3`, pior caso) · 5,18 (`sup-2`) · 5,56 (`sup-1`) · 5,90 (`fundo`).
->
-> **Ampliado depois de medir as 6 paletas do card de Tema (`/ajustes`, `docs/BACKLOG-PROXIMA-FASE.md` T1 — já mergeado, já no ar).** Três reprovavam o mesmo bug: `petroleo` (4,20 → **4,71**, `#8596AD`), `moka` (4,39 → **4,74**, `#8293AB`), `branco-ouro` (3,86 → **4,89**, `#556478` — tema claro, token próprio, não herdava o `:root`). `areia`/`clean`/`oliva` já passavam por herança. Confirmado por `getComputedStyle` real em cada tema (`document.documentElement.setAttribute('data-tema', ...)`), zero elemento com `txt-3` reprovando onde antes eram 104+14 (padrão) mais os três temas quebrados.
->
-> **Achado colateral, NÃO corrigido, maior que este fix:** medindo `branco-ouro` por inteiro apareceram 33 elementos reprovando por `--lastro-ouro`/`--lastro-esmeralda-claro`/`--lastro-ciano` (pior caso **1,79:1**) — acentos calibrados pro Apex Pro escuro, nunca ajustados pro único tema claro. Registrado como T3b (`docs/BACKLOG-PROXIMA-FASE.md`).
->
-> **O que NÃO foi corrigido — escopo travado pelo dono (opção 2, não a reconciliação completa):** o resto de §3.1/§3.2 e toda a tabela C1–C14 de §4.2 seguem descrevendo a paleta areia, com números que não representam o Apex Pro. Remedir os 14 pares contra as 7 paletas de tema é tarefa própria (T3b), ainda não feita. **Não usar nenhum número de §3.1/§3.2/§4.2 além do C3 já corrigido sem remedir primeiro contra `tokens.css`.**
+> **Como ler este documento.**
+> - **Vale como contrato:** §1 (contexto), §2 (D1 a D10), o método e os limiares de §3.2, §3.3 a §3.8 (tipografia, papéis, densidade, parecer, gráfico, autoconsistência), §4 (roteiro do gate) e §6 (vocabulário do redesenho, com o estado de cada peça).
+> - **Reescrito em 2026-10-01, sem os números da paleta Areia:** §3.0, §3.1, a tabela de razões de §3.2 e §4.2.
+> - **Histórico, mantido só pela razão da decisão:** §5 (decisões de 2026-08-06; as que tratam da paleta Areia foram superadas) e as notas datadas espalhadas pelo texto. O texto antigo completo está no git (`git log -- DESIGN.md`).
+> - **Documentos que este arquivo citava e que já não existem:** os backlogs de agosto, a auditoria Apex Pro e o planejamento do redesenho foram arquivados em 2026-10-01 e estão no git; o que falta fazer vive só em `docs/BACKLOG-CANONICO.md`. O `design/padrao-visual.html` é a página de referência da paleta **Areia**, histórica: não usar como referência do visual atual.
+> - **Linha do tempo:** Areia & Azul Petróleo, claro (2026-08-06, D5 revista) → fontes e papéis tipográficos novos (2026-08-15, E1 a E4) → **Apex Pro, escuro (2026-08-20)**, que trocou a paleta sem atualizar este documento até 2026-08-21.
 
 ---
 
@@ -40,7 +29,7 @@ Isso não é detalhe de acabamento — é a restrição que decide o layout inte
 | D2 | **Ações primárias na metade inferior da tela**, ao alcance do polegar | Uma mão só. Botão no topo obriga a reposicionar o aparelho |
 | D3 | **"Repetir última série" é o botão mais proeminente do app** | É a ação mais frequente do fluxo de treino. Se ela custar mais de um toque, o log é abandonado |
 | D4 | **Legível a um braço de distância** — corpo nunca abaixo de 16px | O celular fica apoiado no banco, não na mão, entre séries |
-| D5 | ~~Tema escuro como padrão~~ → **Tema claro (areia) como padrão** | **REVISTA pelo dono em 2026-08-06.** A justificativa original — academia com luz baixa, tela clara cansa à noite — segue válida e vira risco aceito. Duas superfícies petróleo (barra de topo e a pílula da aba inferior, 2026-08-11); o resto do padrão segue areia. **A partir de M9 (2026-08-15, `DECISIONS.md` D5 do redesenho — numeração diferente desta tabela, mesma letra por coincidência), a barra de topo some tela por tela** conforme a propagação avança — cada conversão remove essa superfície da tela convertida; a pílula da aba inferior não muda |
+| D5 | **Tema escuro como padrão; o claro é uma opção** | Histórico: o padrão era escuro (academia com luz baixa, tela clara cansa à noite); o dono **revisou em 2026-08-06** para claro (areia), aceitando o risco; o redesenho **Apex Pro (2026-08-20)** devolveu o **escuro** ("ouro") como padrão e manteve o claro como o tema `branco-ouro`, escolhido em `/ajustes/temas`. A justificativa original vale de novo como razão do padrão. A partir de M9 (2026-08-15, `DECISIONS.md` D5 do redesenho — numeração diferente desta tabela, mesma letra por coincidência), a barra de topo some tela por tela conforme a propagação avança; a pílula da aba inferior não muda |
 | D6 | **Nenhuma ação de registro espera resposta de rede** | ADR/ARCHITECTURE: registrar série é offline-first. A UI confirma na hora |
 | D7 | **Estado de sincronização sempre visível, nunca alarmante** | O usuário precisa saber que o dado está salvo local, sem que isso pareça erro |
 | D8 | **Contraste AA medido, não estimado** | Gate de acessibilidade é critério do gate visual, não fase posterior |
@@ -51,123 +40,88 @@ Isso não é detalhe de acabamento — é a restrição que decide o layout inte
 
 ## 3. Tokens
 
-> **Este bloco `:root` é o único lugar do projeto onde um valor literal de cor, espaço, tamanho ou fonte pode existir.** Qualquer hex, `px`, `rem` ou nome de fonte fora daqui — em componente, em Tailwind config, em CSS de módulo, em prop de Recharts — é violação e reprova no review.
+> **O arquivo `src/app/tokens.css` é o único lugar do projeto onde um valor literal de cor, espaço, tamanho ou fonte pode existir.** Qualquer hex, `px`, `rem` ou nome de fonte fora dele — em componente, em Tailwind config, em CSS de módulo, em prop de Recharts — é violação e reprova no review.
 
-### 3.0 Tese visual — aprovada em 2026-08-06, SUPERSEDIDA em 2026-08-20
+### 3.0 Tese visual
 
-> ⛔ **SEÇÃO SUPERSEDIDA — não use número daqui.** O redesenho "Apex Pro" (2026-08-20, `8d30cf0`) trocou a paleta areia por um tema escuro sem atualizar esta seção. Os nomes de token continuam existindo em `src/app/tokens.css`, mas **com outros valores**. A fonte de verdade é o `tokens.css`; remedir contra ele é a tarefa T3b, ainda não feita. Aviso repetido aqui de propósito: quem chega direto nesta seção por busca ou índice não passa pelo banner do topo do arquivo.
+**Vigente: Apex Pro (2026-08-20).** Obsidiana (`--lastro-fundo`), superfícies de vidro fumê em três degraus (`--lastro-sup-1..3`), **ouro champagne** como assinatura e ação primária, **esmeralda** como sinal de progressão e ciano para sincronização. Tema escuro por padrão (D5), com seis alternativas (§3.1). O número vem em `--lastro-fonte-num` (tabular), e a cor só aparece onde **significa** alguma coisa (§3.2, nota E).
 
-**"Areia & Azul Petróleo".** Areia é a superfície, azul petróleo é a tinta, verde é a ação — e só a ação. Número em mono tabular; cor cromática usada só onde ela *significa* alguma coisa.
+**A regra de escala, que sobreviveu à troca de paleta (rediagnóstico de 2026-08-08):** o que dá vida a uma tela não é brilho nem saturação, é **contraste de escala, de peso e de densidade** — cada tela tem um elemento que pesa mais que os outros, e o resto flutua em volta dele. Onde um valor parece "no mesmo degrau" dos vizinhos (mesma elevação, mesmo tamanho, mesmo peso), é este princípio sendo ignorado. §3.6.2 o aplica ao veredito do parecer.
 
-**A matéria é do padrão, e é deliberada.** Gradiente, vidro, bevel e sombra entram por decisão do dono, contra a proposta anterior: sem elevação, cartão claro sobre fundo claro fica solto — a peça não gruda na tela. Três regras seguram isso sem virar enfeite:
+**Matéria (decidida pelo dono em 2026-08-06 e vigente):** gradiente, vidro, bevel e sombra fazem parte do padrão, porque sem elevação "parece que fica algo solto". Três regras seguram isso sem virar enfeite: a luz vem de cima (fio claro na borda superior, sombra para baixo); gradiente tem no máximo dois passos; e texto sobre gradiente é medido contra o passo de **pior caso**, nunca contra uma média. A escala de elevação (`--lastro-elev-1` repouso, `--lastro-elev-2` levantado, `--lastro-elev-3` só a ação primária, `--lastro-elev-afundado` para campo, que recebe em vez de saltar) está em `tokens.css`.
 
-1. **A luz vem de cima.** Todo elemento levantado leva um fio claro na borda superior (bevel) e a sombra cai para baixo.
-2. **A sombra é quente**, nunca cinza — cinza sobre areia acinzenta o fundo e suja a paleta.
-3. **Gradiente tem no máximo dois passos**, sempre do claro para o escuro. Texto sobre gradiente é medido contra o passo de **pior caso**, nunca contra uma média.
+> **Histórico.** A tese "instrumento sóbrio, sem gradiente, vidro, brilho ou 3D" (ISA-101) foi reprovada pelo dono em 2026-08-06 e seguiu valendo só como disciplina (base quieta, cor que significa). Entre 2026-08-06 e 2026-08-20 o padrão foi **"Areia & Azul Petróleo"**, claro; a descrição completa dele, a galeria de referência que se consultou e as razões medidas daquela paleta estão no git (`git log -- DESIGN.md`) e **não valem mais**. Onde o PRD e este documento conflitarem, o PRD vence.
 
-**Escala de elevação:** `elev-1` repouso (painel, item de lista) · `elev-2` levantado (bloco de evidência, barra de topo) · `elev-3` só a ação primária · `afundado` para campo, que é o inverso do botão: recebe em vez de saltar.
+### 3.1 Paleta — a fonte única é `src/app/tokens.css`
 
-**Restrição derivada da paleta (rediagnóstico, 2026-08-08).** Areia clara e quente não sustenta vitalidade por brilho nem saturação — as referências que "têm vida" (WHOOP, Oura, Ultrahuman) são escuras, e é de lá que vem a vitalidade delas. Tentar comprar vida com brilho ou saturação num fundo areia produz **wellness pastel**, anti-referência já declarada. A moeda que sobra é **contraste de escala, de peso e de densidade**: cada tela tem um elemento que pesa mais que os outros, e o resto flutua em volta dele. Onde um valor parecer "no mesmo degrau" dos vizinhos — mesma elevação, mesmo tamanho, mesmo peso — é sintoma desta restrição sendo ignorada, não da paleta estar errada. §3.6.2 aplica isto diretamente no veredito do parecer.
+> **Custódia.** O bloco `:root` mora em `src/app/tokens.css`, o **único arquivo do projeto onde um valor literal de cor, espaço, tamanho, peso, raio, sombra ou duração pode existir**. Qualquer hex, `px` ou `rem` fora dele — em componente, em CSS de módulo, em prop de Recharts — é violação e reprova no review. Este documento explica o *porquê*; o arquivo executa. Cada token carrega a razão medida no comentário ao lado.
 
-> **Histórico.** A tese anterior — *"instrumento sóbrio, nada de gradiente, vidro, brilho ou 3D"*, derivada da leitura de uma galeria de referência e de ISA-101 (High-Performance HMI) — foi **reprovada pelo dono**. ISA-101 segue útil como disciplina (base quieta, cor que significa, sem bevel decorativo), mas é norma de controle de processo, para operador caçando falha; o `lastro` é instrumento de leitura para uma pessoa. Onde conflitarem, **o PRD vence**.
+**Temas.** O tema ativo vem do `localStorage` (`lastro_tema`), aplicado como `data-tema` no `<html>` (`layout.tsx`); sem escolha, vale o `:root`, que é o "ouro". A escolha é em `/ajustes/temas`.
 
-**Referência consultada:** `https://3dgallery-eqrvxb8t.manus.space` — catálogo curado de 179 sites (Lusion, Active Theory, Obys, Awwwards, Godly, Linear, Stripe, luxo/e-commerce 3D). Lida por download do HTML, do CSS (`/assets/index-BAPlKeQi.css`) e do bundle JS. **Nada foi renderizado nem olhado** — ver §3.9.
+| `data-tema` | Nome | Regime |
+|---|---|---|
+| `ouro` (padrão, `:root`) | Apex Pro — obsidiana, ouro champagne e esmeralda | escuro |
+| `branco-ouro` | Marfim & Ouro Imperial | **claro**, com tokens próprios (os acentos são recalibrados, não herdam o escuro) |
+| `areia` | Duna Areia & Âmbar | escuro |
+| `clean` | Clean Monolith (platina e titânio) | escuro |
+| `petroleo` | Slate Petróleo & Ouro Antigo | escuro |
+| `moka` | Café Moka & Caramelo | escuro |
+| `oliva` | Oliva Tático | escuro |
 
-Dois achados que orientaram a decisão:
+A leitura humana do tema padrão ("ouro") — reprodução para leitura, o valor que executa é o do `tokens.css`:
 
-1. O CSS da própria galeria é **tema padrão do Tailwind v4** (`--font-sans: ui-sans-serif`, escala slate/blue/cyan em `oklch`). A galeria é uma **régua de artesanato**, não uma especificação de estilo. Não se copia dela nenhum valor.
-2. A massa da galeria é imersiva/WebGL/luxo — gradiente, vidro, sobreposição de baixo contraste, texto sobre vídeo. **Esse ramo é incompatível com D4 e D8** (celular suado, luz ruim, contraste AA medido). A adjacência que se adota é o outro ramo do mesmo catálogo — **Linear e Stripe**: hierarquia tipográfica, densidade de dado, contenção. Isso é rejeição por restrição funcional, não por gosto.
+| Papel | Token | Valor |
+|---|---|---|
+| Fundo | `--lastro-fundo` | `#07090D` |
+| Cartão, bloco de evidência | `--lastro-sup-1` | `#0E1218` |
+| Superfície elevada, cabeçalho de tabela | `--lastro-sup-2` | `#141A22` |
+| Destaque flutuante, chip | `--lastro-sup-3` | `#1B222C` |
+| Divisória — **só decorativa** (nota A de §3.2) | `--lastro-linha` | `rgba(255,255,255,.08)` |
+| Limite de alvo de toque | `--lastro-controle` | `rgba(255,255,255,.16)` |
+| Corpo, número, título | `--lastro-txt` | `#F8FAFC` |
+| Secundário | `--lastro-txt-2` | `#94A3B8` |
+| Procedência, metadado, unidade | `--lastro-txt-3` | `#7C8DA6` |
+| Barra de topo (gradiente) | `--lastro-barra-a` → `--lastro-barra-b` | `#0B0F15` → `#07090D` |
+| Assinatura | `--lastro-ouro` (claro / escuro) | `#D4AF37` (`#E6C86E` / `#A67C1E`) |
+| **Ação — preenchimento** | `--lastro-acao-a` → `--lastro-acao-b` | `#E6C86E` → `#D4AF37` |
+| **Ação — tinta sobre ela** | `--lastro-acao-txt` | `#07090D` |
+| **Ação — borda** | `--lastro-acao-borda` | `#E6C86E` |
+| **Ação — como texto ou link** | `--lastro-acao-tinta` | `#D4AF37` |
+| Alta · progressão | `--lastro-alta` | `#10B981` |
+| Platô · estagnação | `--lastro-plato` | `#F59E0B` — âmbar, nunca vermelho |
+| Queda · regressão | `--lastro-queda` | `#EF4444` |
+| Sincronização (D7) | `--lastro-sync` | `#06B6D4` — jamais vermelho |
+| Erro — **reservado a falha real** | `--lastro-erro` | `#EF4444` |
+| Foco (D9) | `--lastro-foco` | `#D4AF37` |
 
-### 3.1 Paleta — a fonte única agora é `src/app/tokens.css`
+**Regras de papel que valem em todos os temas:**
 
-> ⛔ **SEÇÃO SUPERSEDIDA — não use número daqui.** O redesenho "Apex Pro" (2026-08-20, `8d30cf0`) trocou a paleta areia por um tema escuro sem atualizar esta seção. Os nomes de token continuam existindo em `src/app/tokens.css`, mas **com outros valores**. A fonte de verdade é o `tokens.css`; remedir contra ele é a tarefa T3b, ainda não feita. Aviso repetido aqui de propósito: quem chega direto nesta seção por busca ou índice não passa pelo banner do topo do arquivo.
+- **Preenchimento e tinta são dois papéis, não a mesma cor.** O preenchimento da ação (`--lastro-acao-a/b`) carrega a tinta escura `--lastro-acao-txt`; o dourado usado **como texto** (aba ativa, link, item selecionado) é `--lastro-acao-tinta`, nunca o preenchimento.
+- **Cada sinal tem um só significado.** Alta, platô, queda e sincronização não se reaproveitam como cor decorativa, e o erro só aparece em falha real.
+- **No tema claro os acentos são recalibrados** (`branco-ouro`): o dourado e o esmeralda do escuro não passam contraste sobre fundo claro. Quem muda um acento muda nos 7 temas e confere pela `e2e/j5-contraste.spec.ts`.
 
-> **Mudança de custódia (2026-08-06).** O bloco `:root` deixou de morar neste documento e passou a morar em **`src/app/tokens.css`**, que é o **único arquivo do projeto onde um valor literal de cor, espaço, tamanho, peso, raio, sombra ou duração pode existir**. Qualquer hex, `px` ou `rem` fora dele — em componente, em CSS de módulo, em prop de Recharts — é violação e reprova no review.
->
-> **Por que inverteu:** manter os mesmos ~90 valores em dois lugares garante divergência. O documento passa a explicar *por que* cada cor é o que é; o arquivo passa a ser o que executa. Cada token em `tokens.css` carrega a razão medida no comentário ao lado.
-
-Tema **claro** por padrão (D5 revista). A leitura humana da paleta:
-
-| Papel | Token | Valor | Razão medida |
-|---|---|---|---|
-| Fundo | `--lastro-fundo` | `#F0EAE0` | — |
-| Cartão, bloco de evidência | `--lastro-sup-1` | `#FBF8F3` | — |
-| Faixa, cabeçalho de tabela | `--lastro-sup-2` | `#E4DACB` | — |
-| Divisória — **só decorativa** | `--lastro-linha` | `#CFC3B1` | 1.45:1 · reprova de propósito, ver nota A |
-| Limite de alvo de toque | `--lastro-controle` | `#8A7C68` | 3.40:1 no fundo |
-| Corpo, número, título | `--lastro-txt` | `#12303F` | 11.54:1 |
-| Secundário | `--lastro-txt-2` | `#3A5361` | 6.78:1 |
-| Procedência, metadado | `--lastro-txt-3` | ~~`#476069`~~ **superado — ver §3.1 topo** | 4.83:1 no `sup-2` — número da paleta areia, não confiar. Valor Apex Pro real e remedido: `#7C8DA6`, 4,74:1 no `sup-3` (pior caso) |
-| Barra de topo (gradiente) | `--lastro-barra-a/b` | `#17414F` → `#0E2833` | texto a 9.21:1 contra o topo |
-| **Ação — preenchimento** | `--lastro-acao-a/b` | `#46C27B` → `#35A866` | tinta a 5.12:1 na base, o pior caso |
-| **Ação — tinta sobre ela** | `--lastro-acao-txt` | `#0A2A18` | — |
-| **Ação — borda e texto** | `--lastro-acao-borda` / `--lastro-acao-tinta` | `#0E5E35` | 6.57:1 no fundo |
-| Alta · progressão | `--lastro-alta` | `#1B6B3A` | 6.17:1 no `sup-1` |
-| Platô · estagnação | `--lastro-plato` | `#8A5A0B` | 5.59:1 — âmbar, nunca vermelho |
-| Queda · regressão | `--lastro-queda` | `#A33220` | 6.53:1 |
-| Sincronização (D7) | `--lastro-sync` | `#2E6076` | 5.75:1 · jamais vermelho |
-| Erro — **reservado a falha real** | `--lastro-erro` | `#A32014` | 6.33:1 |
-| Foco (D9) | `--lastro-foco` | `#0B5CAB` | 5.60:1 |
-
-**A decisão que mais custou: por que a ação é preenchimento vivo com tinta escura.**
-
-Duas medições obrigaram a inversão, e nenhuma das duas era visível a olho:
-
-1. Verde vivo **não sustenta texto branco** — `#2ECC71` com branco dá **2.10:1**, contra 4.5 exigidos. Era o que a referência do dono trazia.
-2. Um verde escuro o bastante para carregar branco fica a **1.06:1 de `--lastro-alta`** — ou seja, vira *o mesmo verde* do sinal de progressão. E como a ação primária aparece em toda tela o tempo todo, o verde deixaria de significar "progresso" e viraria só "botão", exatamente o que §3.2 nota C existe para impedir.
-
-Preenchimento vivo + tinta escura resolve os dois de uma vez. Consequências obrigatórias:
-
-- **O verde vivo não cumpre o limite de 3:1 contra a areia** (1.89:1). Quem cumpre é a **borda** `--lastro-acao-borda`. Botão de ação sem essa borda reprova.
-- **O verde vivo NUNCA é texto.** Aba ativa, link e item selecionado usam `--lastro-acao-tinta`. Preenchimento e tinta são dois papéis, não a mesma cor.
-- **Pressionar não escurece o preenchimento** — escurecer derruba a tinta para 3.76:1. O afundamento é pela sombra (`--lastro-elev-afundado`) e por 1px de deslocamento.
-
-**Avatar de iniciais — base é corpo claro, não a barra (correção A1, 2026-08-13).** O componente `<Avatar>` foi desenhado assumindo que sempre vive dentro de `.barra-topo`, sobre o gradiente petróleo — ali o preenchimento translúcido `--lastro-avatar-iniciais-fundo` sobre `--lastro-barra-txt` funciona (9.21:1). `/perfil` foi a primeira tela a usar `<Avatar>` fora da barra, direto no corpo claro (`--lastro-fundo`), e as três propriedades (preenchimento, letra, borda) colapsaram na mesma cor — invisível, não só baixo contraste. Correção: a base do `.avatar`/`.avatar--iniciais` em `sistema.css` passa a assumir corpo claro (`--lastro-sup-2` de preenchimento, `--lastro-txt` de letra — **9.99:1**, confirmado 2026-08-13 sobre as cores computadas de verdade num Chrome real e recalculado pela fórmula WCAG de §3.2, não estimado — bate com o piso G2.1 do gate —, borda `--lastro-controle` — 3.40:1, o limite de componente já documentado acima, também recalculado e confirmado); `.barra-topo .avatar`/`.avatar--iniciais` sobrescreve de volta pro petróleo original, preservando os 9.21:1 medidos ali (`getComputedStyle` confirmou que os valores da barra ficaram bit a bit idênticos aos de antes da correção — gate G2.3). Não envolver o avatar num chip petróleo fora da barra — §3.0 fixa duas superfícies petróleo (barra de topo e pílula tingida) e só duas.
-
-**Espaçamento, alvos, escala de tamanho, peso, raio, duração e matéria** seguem em `tokens.css` com os mesmos nomes usados neste documento. Base 4px; `--lastro-alvo-min` 48px (D1), `--lastro-alvo-acao` 72px (D3); escala de tamanho com piso 14px e corpo em 16px (D4).
+**Espaçamento, alvos, escala de tamanho, peso, raio, duração e matéria** seguem em `tokens.css` com os mesmos nomes usados neste documento. Base 4px; `--lastro-alvo-min` 48px (D1) e `--lastro-alvo-acao` 64px (D3; este documento dizia 72px, valor da fase Areia); os papéis tipográficos estão em §3.4.
 
 ### 3.2 Contraste — medido em navegador, não estimado (D8)
 
-> ⛔ **SEÇÃO SUPERSEDIDA — não use número daqui.** O redesenho "Apex Pro" (2026-08-20, `8d30cf0`) trocou a paleta areia por um tema escuro sem atualizar esta seção. Os nomes de token continuam existindo em `src/app/tokens.css`, mas **com outros valores**. A fonte de verdade é o `tokens.css`; remedir contra ele é a tarefa T3b, ainda não feita. Aviso repetido aqui de propósito: quem chega direto nesta seção por busca ou índice não passa pelo banner do topo do arquivo.
+> **Reescrita parcial em 2026-10-01 (DOC-03):** a tabela de razões e as notas C e D eram da paleta Areia e foram removidas; o método, os limiares e as regras de uso continuam. **Os números vêm de `e2e/j5-contraste.spec.ts`**, que mede o pixel renderizado nos 7 temas, trocando o tema pela interface — a única medição que o projeto aceita (D8). Não citar razão de contraste daqui sem medir de novo.
 
 Fórmula WCAG 2.x (linearização sRGB, `L = 0.2126R + 0.7152G + 0.0722B`, `(Lmax+0.05)/(Lmin+0.05)`). **Aferição do método, rodada antes de cada medição:** `#FFFFFF/#000000 = 21.00`, `#777777/#FFFFFF = 4.48`, `#767676/#FFFFFF = 4.54` — batem com os canônicos do WCAG.
 
-**Mudança de método (2026-08-06):** as razões deixaram de ser aritmética sobre hex escritos à mão e passam a ser **medidas sobre as cores computadas de uma página renderizada**. `design/padrao-visual.html` roda a matriz inteira na própria página, no navegador. Reproduzir a medição é abrir o arquivo e rolar até §06.
+**Mudança de método (2026-08-06):** as razões deixaram de ser aritmética sobre hex escritos à mão e passam a ser **medidas sobre as cores computadas de uma página renderizada**. Hoje isso é feito por `e2e/j5-contraste.spec.ts`, nos 7 temas. (O `design/padrao-visual.html`, que fazia isso para a paleta Areia, é histórico.)
 
 Limiares: **4.5:1** texto normal · **3:1** texto grande (≥24px em `--lastro-peso-forte` — Seção ou Título de tela em negrito —, ou ≥30px — Título de tela) e limite de componente de interface.
 
 **Regra nova, que o gradiente obriga:** onde há gradiente, o texto é medido contra o **passo de pior caso**, nunca contra uma média nem contra o passo mais favorável.
 
-| Par | Razão | Limiar | Veredito |
-|---|---|---|---|
-| `--lastro-txt` / fundo · sup-1 · sup-2 | 11.54 · 13.04 · 9.99 | 4.5 | passa |
-| `--lastro-txt-2` / fundo · sup-1 | 6.78 · 7.65 | 4.5 | passa |
-| `--lastro-txt-3` / fundo · sup-1 · sup-2 | ~~5.58 · 6.30 · 4.83~~ — números da paleta areia | 4.5 | **superado, ver nota abaixo** |
-| `--lastro-alta` / sup-1 | 6.17 | 4.5 | passa |
-| `--lastro-plato` / sup-1 | 5.59 | 4.5 | passa |
-| `--lastro-queda` / sup-1 | 6.53 | 4.5 | passa |
-| `--lastro-sync` / fundo | 5.75 | 4.5 | passa |
-| `--lastro-erro` / fundo | 6.33 | 4.5 | passa |
-| `--lastro-acao-tinta` / fundo (aba ativa, link) | 6.57 | 4.5 | passa |
-| `--lastro-acao-txt` / topo do gradiente da ação | 6.82 | 4.5 | passa |
-| `--lastro-acao-txt` / **base** do gradiente — pior caso | **5.12** | 4.5 | passa |
-| `--lastro-barra-txt` / topo do gradiente da barra — pior caso | 9.21 | 4.5 | passa |
-| `--lastro-acao-borda` / fundo (limite do botão) | 6.57 | 3.0 | passa |
-| `--lastro-controle` / fundo · sup-1 | 3.40 · 3.84 | 3.0 | passa |
-| `--lastro-foco` / fundo | 5.60 | 3.0 | passa |
-| `--lastro-linha` / fundo | 1.45 | — | **reprova de propósito** — ver nota A |
-| `--lastro-acao-a` (vivo) / fundo | **1.89** | 3.0 | **reprova** — ver nota D |
-| `--lastro-acao-a` vs `--lastro-alta` | 2.89 | — | ver nota C |
+**Pares que o gate exige** (os números saem da medição, não deste documento): texto e texto secundário sobre fundo e superfícies (4,5:1); metadado `--lastro-txt-3` sobre a pior superfície, `sup-3`, o par mais apertado (4,5:1); os sinais `alta`, `plato`, `queda`, `sync` e `erro` sobre as superfícies em que são desenhados (4,5:1 se for texto, 3:1 se for traço ou barra); texto da ação sobre o pior passo do gradiente (4,5:1); limite de componente `--lastro-controle` e anel de foco (3:1). `--lastro-linha` fica de fora de propósito (nota A).
 
-**Nota A — `--lastro-linha` é decorativa por decisão.** 1.45:1 não serve como limite de componente. Ela só separa blocos que já se distinguem por superfície ou elevação. **Todo alvo de toque usa `--lastro-controle`** (pior caso 3.40:1), ou uma borda própria quando o preenchimento não cumpre o limite (nota D). Regra de reprovação: qualquer controle cujo único limite visual seja `--lastro-linha` reprova o gate.
+**Nota A — `--lastro-linha` é decorativa por decisão.** Ela só separa blocos que já se distinguem por superfície ou elevação, e **não cumpre** o limite de 3:1 de componente. **Todo alvo de toque usa `--lastro-controle`**, ou uma borda própria quando o preenchimento não cumpre o limite. Regra de reprovação: qualquer controle cujo único limite visual seja `--lastro-linha` reprova o gate.
 
-**Nota B — o anel de foco nunca encosta no elemento.** É sempre desenhado **fora**, com afastamento: `outline: var(--lastro-foco-espessura) solid var(--lastro-foco); outline-offset: var(--lastro-foco-afast);`. O vão do `offset` mostra a superfície do pai, onde o anel entrega 5.60:1. **Proibido `outline-offset: 0` ou anel interno (`inset`)** — contra um preenchimento saturado o anel some.
+**Nota B — o anel de foco nunca encosta no elemento.** É sempre desenhado **fora**, com afastamento: `outline: var(--lastro-foco-espessura) solid var(--lastro-foco); outline-offset: var(--lastro-foco-afast);`. O vão do `offset` mostra a superfície do pai, onde o anel tem contraste. **Proibido `outline-offset: 0` ou anel interno (`inset`)** — contra um preenchimento saturado o anel some.
 
-**Nota C — a separação entre o verde de ação e o verde de sinal é de 2.89:1, e não pode ser maior.** Os dois têm de ser verdes: um porque o dono escolheu, o outro porque verde é progressão. O que os separa não é só a razão — é o **papel e o tamanho**: a ação é um preenchimento de 72px de largura total; `--lastro-alta` é uma barra de 4px e um texto de 14px. Eles nunca ocorrem no mesmo papel. **Um verde escuro o bastante para carregar texto branco ficaria a 1.06:1 do `--lastro-alta`** — literalmente o mesmo verde —, e foi por isso que a ação virou preenchimento vivo com tinta escura (§3.1).
 
-**Nota D — o preenchimento vivo da ação reprova o limite de 3:1 de propósito, e quem cumpre é a borda.** `#46C27B` contra a areia dá 1.89:1: verde claro e areia são os dois claros. `--lastro-acao-borda` (6.57:1) é o limite real do componente. **Botão de ação sem essa borda reprova o gate.** Pela mesma razão, **o verde vivo nunca é usado como texto sobre a areia** — aba ativa, link e item selecionado usam `--lastro-acao-tinta`.
-
-**Nota E — os sinais continuam sem poder depender da cor.** No tema claro as luminâncias se afastaram um pouco (5.59 a 6.53 contra o `sup-1`), mas a regra não afrouxa: quem tem deficiência de visão de cor não distingue âmbar de terracota, e blocos de alta, platô e queda aparecem lado a lado no mesmo parecer.
+**Nota E — os sinais não podem depender da cor.** Quem tem deficiência de visão de cor não distingue âmbar de terracota, e blocos de alta, platô e queda aparecem lado a lado no mesmo parecer. Isso vale nos 7 temas.
 
 Consequência obrigatória, não recomendação — **em toda ocorrência, no gráfico e no parecer, cada sinal se distingue por dois canais além da cor:**
 
@@ -179,32 +133,7 @@ Consequência obrigatória, não recomendação — **em toda ocorrência, no gr
 
 **Cor nunca é o portador da informação — é reforço.** Bloco de evidência ou trecho de gráfico que dependa só da cor para dizer o que é **reprova o gate**. Ver §3.7 e §3.6.6.
 
-**Nota Apex Pro & Marfim/Ouro (Reconciliação T3b — 2026-08-27):**
-Os tokens de texto, acento e sinalização foram aferidos e calibrados para conformidade WCAG AA em ambos os regimes:
-- **No tema escuro Apex Pro (`:root`):**
-  - `--lastro-txt` (`#FFFFFF`): 18.5:1 sobre `fundo` (`#07090D`).
-  - `--lastro-txt-2` (`#94A3B8`): 9.2:1 sobre `fundo`.
-  - `--lastro-txt-3` (`#7C8DA6`): **4,74** (`sup-3`, pior caso) · **5,18** (`sup-2`) · **5,56** (`sup-1`) · **5,90** (`fundo`).
-  - `--lastro-ouro` (`#D4AF37`): 10.1:1 sobre `fundo`.
-  - `--lastro-esmeralda` (`#10B981`): 9.4:1 sobre `fundo`.
-  - `--lastro-alta` (`#10B981`): 9.4:1 sobre `fundo`.
-  - `--lastro-plato` (`#F59E0B`): 9.8:1 sobre `fundo`.
-  - `--lastro-queda` (`#EF4444`): 5.2:1 sobre `fundo`.
-- **No tema claro Marfim & Ouro Imperial (`[data-tema="branco-ouro"]`):**
-  - `--lastro-txt` (`#0F172A`): 16.2:1 sobre `fundo` (`#F6F7F9`).
-  - `--lastro-txt-2` (`#475569`): 7.0:1 sobre `fundo`.
-  - `--lastro-txt-3` (`#556478`): **4,89:1** no pior caso (`sup-3`).
-  - `--lastro-ouro` (`#755607`): **4,94:1** no pior caso (fundo composto tingido).
-  - `--lastro-esmeralda` (`#0A7854`): **4,91:1** sobre fundo claro.
-  - `--lastro-esmeralda-claro` (`#1C7153`): **4,99:1** sobre fundo composto.
-  - `--lastro-ciano` (`#047385`): **4,94:1** sobre fundo composto.
-  - `--lastro-erro` (`#C43838`): **4,93:1** sobre fundo claro.
-  - `--lastro-alta` (`#0A7854`): **4,91:1** sobre `sup-1`.
-  - `--lastro-plato` (`#8A5A0B`): **5,59:1** sobre `sup-1`.
-  - `--lastro-queda` (`#A32014`): **6,33:1** sobre `sup-1`.
-  - `--lastro-sync` (`#04768A`): **4,94:1** sobre `fundo`.
-  - `--lastro-aquecimento` (`#766324`): **4,93:1** sobre fundo tingido.
-  - `--lastro-foco` (`#0B5CAB`): **5,60:1** sobre `fundo`.
+
 
 ### 3.3 Tipografia
 
@@ -328,7 +257,7 @@ O tom é de **observação de instrumento**, não de cobrança. Regras:
 - **Sem ícone de alerta.** Nada de triângulo, exclamação ou cadeado. A barra lateral do bloco em `--lastro-plato` já marca.
 - **Nunca sozinho.** O bloco de platô aparece **ao lado de um bloco em `--lastro-alta`** sempre que houver um. O contraste entre o que anda e o que parou é o formato do parecer — é literalmente a frase-modelo do PRD §3: *"seu supino está em X há N semanas enquanto o agachamento subiu Y% no mesmo período"*.
 - **Formulação:** constatação com número, sem verbo de julgamento. Sem "você deveria", "está falhando", "atenção". A leitura é: *o instrumento marcou isto*.
-- **Redundância obrigatória, e vale igual para regressão:** o platô se identifica por barra em `--lastro-plato` **e** pela palavra "sem mudança" com a contagem; a queda, por barra em `--lastro-queda` **e** pelo delta com sinal negativo e o intervalo. Pela nota C de §3.2 os quatro sinais têm luminância equivalente — **um bloco de queda ao lado de um bloco de platô, distinguidos só por cor, reprova o gate.** A regra de tom (observação, nunca cobrança; nunca `--lastro-erro`) se aplica igualmente aos dois.
+- **Redundância obrigatória, e vale igual para regressão:** o platô se identifica por barra em `--lastro-plato` **e** pela palavra "sem mudança" com a contagem; a queda, por barra em `--lastro-queda` **e** pelo delta com sinal negativo e o intervalo. Pela nota E de §3.2 os sinais não podem depender da cor — **um bloco de queda ao lado de um bloco de platô, distinguidos só por cor, reprova o gate.** A regra de tom (observação, nunca cobrança; nunca `--lastro-erro`) se aplica igualmente aos dois.
 
 > **`N` semanas de estagnação e as faixas de referência por grupo muscular são TODOs abertos do PRD §10, com fonte primária pendente.** Qualquer número desses que apareça em texto de exemplo neste documento é **ilustrativo**. A UI lê o valor real do agregador; nenhum limiar é literal em componente.
 
@@ -355,7 +284,7 @@ A pergunta é genuína, não uma decisão fechada — a recomendação abaixo re
 A ideia do dono (uma linha por exercício, todas no mesmo desenho, com legenda lateral de nomes) foi considerada e **recusada nesta forma**, por dois motivos técnicos, não de gosto:
 
 1. **Sobrepor várias linhas quebra a área de toque e o teclado (item 5 desta seção e gate K6, §4.3).** Cada ponto já exige um alvo de `--lastro-alvo-min` (48px) navegável por foco. Com 4 exercícios × até 12 semanas de histórico, um canvas único teria de acomodar dezenas de alvos de 48px empilhados numa tela de 200px de altura — inviável em qualquer viewport, incluindo o desktop (K6 exige alcançar **cada ponto de cada série** só com teclado).
-2. **Distinguir mais de duas linhas só por matiz não sobrevive à paleta do sistema.** O `lastro` não tem uma paleta categórica reservada para "N séries quaisquer" — só tokens semânticos, cada um com papel fixo (`--lastro-alta` é sempre progressão, `--lastro-plato` é sempre estagnação, nunca identidade de exercício; §3.2 nota C proíbe emprestar cor de um papel para outro). Mesmo usando a rampa de tinta neutra (`--lastro-txt`/`txt-2`/`txt-3`/`--lastro-controle`), a razão de contraste **entre elas** — não contra o fundo — é baixa o bastante (`txt-2` contra `txt-3` gira perto de 1.2:1) para duas linhas próximas ficarem indistinguíveis a um braço de distância (D4), em luz ruim, exatamente a cena de uso (§1).
+2. **Distinguir mais de duas linhas só por matiz não sobrevive à paleta do sistema.** O `lastro` não tem uma paleta categórica reservada para "N séries quaisquer" — só tokens semânticos, cada um com papel fixo (`--lastro-alta` é sempre progressão, `--lastro-plato` é sempre estagnação, nunca identidade de exercício; §3.1 (regras de papel) proíbe emprestar cor de um papel para outro). Mesmo usando a rampa de tinta neutra (`--lastro-txt`/`txt-2`/`txt-3`/`--lastro-controle`), a razão de contraste **entre elas** — não contra o fundo — é baixa o bastante (`txt-2` contra `txt-3` gira perto de 1,3:1 no tema padrão, calculado dos tokens) para duas linhas próximas ficarem indistinguíveis a um braço de distância (D4), em luz ruim, exatamente a cena de uso (§1).
 
 **A composição que resolve isso: pequenos múltiplos empilhados — um mini-gráfico por exercício, cada um com sua própria linha e sua própria escala.** Não é um select nem uma legenda: é a mesma estrutura de hoje (nome do exercício + conclusão em palavras + desenho), repetida uma vez por exercício, em pilha vertical, sem exigir nenhuma escolha para aparecer.
 
@@ -412,7 +341,7 @@ Desde 2026-08-06 o bloco `:root` vive em **`src/app/tokens.css`**, não neste ar
 
 **O que aparece fora dele neste documento, e é legítimo:**
 
-- **razões de contraste** em §3.2 e §4.2 — resultado de medição, não valor de design;
+- **razões de contraste** que eventualmente aparecerem aqui — resultado de medição, não valor de design (a fonte delas é a `e2e/j5-contraste.spec.ts`);
 - **limiares do WCAG** (4.5 e 3.0) — norma externa, não decisão nossa;
 - os literais `48px` e `16px` em **D1 e D4 (§2)** — restrições congeladas, anteriores ao gate. Os tokens `--lastro-alvo-min` e `--lastro-papel-corpo` valem exatamente isso, e é o token que o código usa;
 - os **hex da tabela de §3.1** — reprodução para leitura humana; o valor que executa é o do `tokens.css`;
@@ -433,7 +362,7 @@ grep -nE '#[0-9A-Fa-f]{3,6}|[0-9]+rem|[0-9]{2,}px|rgba([0-9]' src/app/sistema.c
 Rodada em 2026-08-06: vazia. **Cinco violações foram encontradas e corrigidas nesta passagem** — o `26rem` da coluna do login, o traço do botão de barra, o desfoque do vidro, a sombra da aba inferior e a segunda linha do botão primário, todos promovidos a token.
 
 ### 3.9 O que este documento NÃO é
-**A paleta e a matéria foram medidas em navegador real** — não são mais aritmética sobre hex escritos à mão (§3.2). O que **ainda não foi olhado em celular real** são as telas logadas: `/treino`, `/treino/[id]` e `/analise` ficam atrás de autenticação. **O gate de §4 continua pendente para elas** e é executado pelo dono, no aparelho dele.
+Não é a medição: o contraste sai de `e2e/j5-contraste.spec.ts` (7 temas, pixel renderizado); o texto sobreposto ou cortado, de `e2e/j41-sobreposicao-idiomas.spec.ts` e `e2e/j26-cobertura-ux03.spec.ts`. **O que nenhuma medição substitui é o olho do dono no celular real** (§5, advertência): o gate de §4 para as telas logadas (`/treino`, `/treino/[id]`, `/analise`) segue sendo executado por ele, no aparelho.
 
 ---
 
@@ -457,30 +386,11 @@ Viewports mínimos: **360×640** (piso realista de celular), **390×844**, **128
 
 ### 4.2 Contraste — medir, não confiar na tabela
 
-> ⛔ **SEÇÃO SUPERSEDIDA — não use número daqui.** O redesenho "Apex Pro" (2026-08-20, `8d30cf0`) trocou a paleta areia por um tema escuro sem atualizar esta seção. Os nomes de token continuam existindo em `src/app/tokens.css`, mas **com outros valores**. A fonte de verdade é o `tokens.css`; remedir contra ele é a tarefa T3b, ainda não feita. Aviso repetido aqui de propósito: quem chega direto nesta seção por busca ou índice não passa pelo banner do topo do arquivo.
+> **Reescrita em 2026-10-01 (DOC-03):** a tabela C1–C14 era da paleta Areia e foi removida (só a linha C3 tinha sido remedida contra o Apex Pro). A medição agora é executável e roda nos **7 temas**: `e2e/j5-contraste.spec.ts` mede o pixel renderizado, com as camadas translúcidas compostas, troca o tema pela interface (`/ajustes/temas`), usa conta descartável e passa por 8 rotas. Ela reprova abaixo dos limiares de §3.2 (4,5:1 para texto normal; 3:1 para texto grande e limite de componente). O par mais apertado do sistema é `--lastro-txt-3` sobre `--lastro-sup-3`.
 
-Medir com conta-gotas sobre a tela **renderizada** (a tabela de §3.2 é a expectativa; o gate confirma que o CSS entregue bate com ela). Pares obrigatórios, com a razão esperada:
+Medir com conta-gotas sobre a tela **renderizada** continua valendo para qualquer peça nova que a `j5` ainda não alcance. Pares a conferir, sem número fixo (o número é o que sair da medição): texto e secundário sobre cada superfície; metadado sobre `sup-3`; texto da ação sobre o pior passo do gradiente; limite do botão e `--lastro-controle` (3:1); foco contra a superfície do vão do `outline-offset` (3:1); sinais (`alta`, `plato`, `queda`, `sync`) sobre as superfícies em que são desenhados; `--lastro-erro` sobre `sup-3`, o pior caso do erro.
 
-⚠️ **A tabela abaixo (C1–C14) é da paleta areia, pré-Apex Pro (ver §3.0, nota 2026-08-20).** Só a linha **C3** foi remedida contra o tema atual — as outras 13 não. Não usá-las como gate real até remedir.
-
-| # | Par medido, na tela | Esperado | Limiar | Reprova se |
-|---|---|---|---|---|
-| C1 | `--lastro-txt` sobre `--lastro-fundo` (corpo, G1) | 17.27 | 4.5 | < 4.5 ou divergir da expectativa em mais de 0.2 |
-| C2 | `--lastro-txt-2` sobre `--lastro-sup-1` (rótulo, G1) | 9.26 | 4.5 | idem |
-| C3 | `--lastro-txt-3` sobre `--lastro-sup-3` — **o par mais apertado do sistema** | ~~4.85~~ (areia) → **4,74 remedido, Apex Pro, 2026-08-21** | 4.5 | < 4.5 |
-| C4 | Número em `--lastro-txt` sobre `--lastro-sup-2` (bloco de evidência, G2) | 14.05 | 4.5 | idem |
-| C5 | Procedência `--lastro-txt-3` sobre `--lastro-sup-2` (G2) | 5.68 | 4.5 | idem |
-| C6 | `--lastro-acao-txt` sobre `--lastro-acao-fundo` (botão D3, G1) | 17.27 | 4.5 | idem |
-| C7 | Limite do botão: `--lastro-acao-fundo` contra `--lastro-fundo` | 17.27 | 3.0 | < 3.0 |
-| C8 | `--lastro-borda-controle` contra `--lastro-sup-3` — **pior caso de componente** | 3.39 | 3.0 | < 3.0 |
-| C9 | `--lastro-foco` contra a superfície do vão de `outline-offset`, em G1 e G2 | 9.63 a 13.87 | 3.0 | < 3.0, **ou** o anel encostando em `--lastro-acao-fundo` (nota B de §3.2) |
-| C10 | `--lastro-plato` sobre `--lastro-sup-1` (traço e anotação do gráfico, G6) | 8.59 | 3.0 | < 3.0 |
-| C11 | `--lastro-alta` sobre `--lastro-sup-1` (traço do gráfico, G6) | 9.86 | 3.0 | < 3.0 |
-| C12 | `--lastro-plato` sobre `--lastro-sup-2` (barra do bloco de platô, G2) | 7.61 | 3.0 | < 3.0 |
-| C13 | `--lastro-sync` sobre a superfície onde o indicador vive (G7) | 8.23 a 8.96 | 4.5 | < 4.5 |
-| C14 | `--lastro-erro` sobre `--lastro-sup-3` — pior caso do erro | 4.88 | 4.5 | < 4.5 |
-
-**Reprova geral:** qualquer texto sobre imagem, vídeo, gradiente ou sobreposição translúcida cujo contraste não seja mensurável em ponto fixo. O sistema não tem esse recurso (§3.0) — se apareceu, é regressão.
+**Reprova geral:** qualquer texto sobre imagem, vídeo, gradiente ou sobreposição translúcida cujo contraste não seja mensurável em ponto fixo. O sistema não usa texto sobre imagem ou vídeo, e sobre gradiente mede-se o passo de pior caso (§3.0, §3.2) — se apareceu fora disso, é regressão.
 
 ### 4.3 Foco e teclado (D9)
 
@@ -525,7 +435,9 @@ Anel de foco: `--lastro-foco-espessura` sólido em `--lastro-foco`, com `--lastr
 
 ---
 
-## 5. Decisões do dono — RESOLVIDAS em 2026-08-06
+## 5. Decisões do dono — RESOLVIDAS em 2026-08-06 (histórico)
+
+> **Estado em 2026-10-01:** estas decisões ficam como razão histórica. **Superadas pelo Apex Pro (2026-08-20):** o item 1 (a personalidade "Areia & Azul Petróleo") e a revisão de D5 (tema claro como padrão). **Trocado em 2026-08-15:** o item 2 (o par tipográfico). **Seguem valendo:** os itens 3, 4 e 5, e o 6 (procedência em Rótulo).
 
 | # | O que estava em aberto | Decisão |
 |---|---|---|
@@ -534,9 +446,9 @@ Anel de foco: `--lastro-foco-espessura` sólido em `--lastro-foco`, com `--lastr
 | 3 | **Os dois regimes de densidade** (§3.5) | **Mantidos.** Modo Bancada e Modo Leitura seguem com tratamentos diferentes |
 | 4 | **O parecer como documento datado** (§3.6) | **Mantido**, e reforçado: a proibição de conversa deixou de ser geral e passou a ter escopo (ver abaixo) |
 | 5 | **Âmbar para platô** em vez de vermelho | **Mantido.** `--lastro-plato` é âmbar; vermelho segue proibido em estagnação |
-| 6 | **O tamanho da linha de procedência** | **Mantida em Rótulo (`--lastro-papel-rotulo`, 14px desde sempre — só o nome do token mudou em 2026-08-15, E2).** No tema claro ela deixou de ser a razão mais apertada do sistema: `--lastro-txt-3` entrega 4.83:1 no pior caso, com margem sobre o limiar |
+| 6 | **O tamanho da linha de procedência** | **Mantida em Rótulo (`--lastro-papel-rotulo`, 14px desde sempre — só o nome do token mudou em 2026-08-15, E2).** O par mais apertado do sistema é `--lastro-txt-3` sobre `--lastro-sup-3`, e quem o mede é o teste `e2e/j5-contraste.spec.ts` |
 
-**A revisão que veio junto e não estava na lista: D5.** O tema padrão passou de escuro para **claro**. É restrição funcional revista pelo dono, com o risco original — academia com luz baixa, leitura noturna — aceito conscientemente.
+**A revisão que veio junto e não estava na lista: D5.** O tema padrão passou de escuro para **claro**. É restrição funcional revista pelo dono, com o risco original — academia com luz baixa, leitura noturna — aceito conscientemente. **Superada em 2026-08-20:** o redesenho Apex Pro devolveu o escuro como padrão (§2, D5).
 
 **A proibição de balão ganhou escopo.** Antes valia como regra geral de estética; agora vale só onde tem razão de produto:
 
@@ -544,17 +456,17 @@ Anel de foco: `--lastro-foco-espessura` sólido em `--lastro-foco`, com `--lastr
 - **Canto arredondado, elevação e sombra NÃO reprovam em lugar nenhum** — são do padrão. O que faz uma peça ler como conversa é o rabicho, a alternância e o campo embaixo, não o raio da borda.
 - **No coach 24h o balão é correto e completo**, com rabicho, alternância e campo de digitação. É a única tela do app onde se conversa (PRD §4.4).
 
-**Advertência que continua de pé:** a validação final de qualquer peça visual é **olho do dono em navegador real, no celular**. Medição de DOM não substitui — `getComputedStyle` não detecta toda renderização errada. As telas logadas (`/treino`, `/treino/[id]`, `/analise`) **ainda não passaram por isso**: ficam atrás de autenticação e o gate de §4 segue pendente para elas.
+**Advertência que continua de pé:** a validação final de qualquer peça visual é **olho do dono em navegador real, no celular**. Medição de DOM não substitui — `getComputedStyle` não detecta toda renderização errada.
 
 ---
 
-## 6. Vocabulário do redesenho — Trilha B (decidido, ainda não implementado)
+## 6. Vocabulário do redesenho — Trilha B (em grande parte implementado; o estado de cada peça está nas tabelas abaixo)
 
-> **Este parágrafo existe porque um documento cuja fonte era artifact não é fonte durável de projeto** (item E5 do backlog, pré-requisito de tudo abaixo dele). As 10 decisões do dono que fundamentam esta seção, com a evidência e a alternativa descartada de cada uma, estão em `DECISIONS.md` 2026-08-15 — este parágrafo não repete essa evidência, só o vocabulário resultante. O que construir com ele, e em que ordem, está em `docs/BACKLOG-REDESENHO.md`.
+> **Este bloco existe porque um documento cuja fonte era artifact não é fonte durável de projeto.** As 10 decisões do dono que fundamentam esta seção, com a evidência e a alternativa descartada de cada uma, estão em `DECISIONS.md` 2026-08-15; aqui fica só o vocabulário resultante. O plano de execução da época (o backlog do redesenho) foi arquivado em 2026-10-01 e continua no git; o que falta fazer vive só em `docs/BACKLOG-CANONICO.md`.
 >
-> **Travas que continuam valendo em toda a Trilha B:** nenhum pigmento da paleta muda (§3.1) e a pílula de navegação (`.nav`, `aba-inferior.tsx`, tokens `--lastro-nav-*`/`--lastro-vidro-nav*`) fica intacta. Nada em §6 autoriza mexer nas duas.
+> **Travas que continuam valendo em toda a Trilha B:** a pílula de navegação (`.nav`, `aba-inferior.tsx`, tokens `--lastro-nav-*`/`--lastro-vidro-nav*`) fica intacta, e nenhuma cor nova entra fora de `tokens.css`. A trava original, "nenhum pigmento da paleta muda", era da paleta Areia e perdeu o sentido com o Apex Pro.
 >
-> **Estado (atualizado 2026-08-15):** Nível 1 (E1, E2, E3, E4 — "só token, sem mudar marcação") está **em produção**; §3.3/§3.4/§3.5 já refletem isso. §6.1 (famílias), §6.2 (papéis), §6.7 (M3) descrevem o que o código executa agora, não mais um alvo futuro. O que **continua** só decidido, não implementado, é o restante da Trilha B: §6.3 (superfícies), §6.4 (regra verbo×substantivo), §6.5 (as 10 peças) e §6.6 (mapa de telas) — Nível 2 (M1-M9) e Nível 3 (H1-H4) do backlog.
+> **Estado (reconciliado em 2026-10-01, DOC-03):** o Nível 1 (E1 a E4) está em produção, e §6.1, §6.2 e §6.7 (duração e curva) descrevem o que o código executa. Dos Níveis 2 e 3 (M1 a M9, H1 a H4), o estado de cada peça está em §6.5 e §6.6, com a data de cada entrega; o que está marcado "pendente" ali **não foi reconferido contra o código** em 2026-10-01. Conferido: a serifa (`--lastro-fonte-serif`) só é usada na marca do `/login` (`.entrada__marca h1`) e no veredito do parecer (`.doc__veredito`), então a propagação da peça 9 para a prosa do parecer e do Coach segue pendente.
 >
 > **Sobre os literais que ainda aparecem abaixo em §6.3–§6.6 (tamanho em px, duração em ms):** continuam sendo o **alvo decidido**, não valor executável, e fora da lista de exceções de §3.8 até a peça correspondente ser implementada — mesma regra de antes, agora só para o que falta.
 
@@ -650,7 +562,7 @@ Cada peça vem de um app premiado (Apple Design Award ou finalista), recriada na
 
 **Este mapa cobre 12 das 13 telas do artifact original.** `/ajustes/modelos/novo` existe no app (ver rota em `src/app/ajustes/modelos/novo/`) e não recebeu peça mapeada na sessão que gerou o vocabulário — ficou de fora por omissão do artifact, não por decisão. **Parcialmente resolvido em M7 (2026-08-15):** o 1º passo da tela (escolher grupo muscular, via `SeletorGrupoMuscular`) ganhou peça 5 (chips). O 2º passo (escolher exercícios, lista de caixas de seleção em `modelo-treino-form.tsx`) continua sem peça mapeada — fica pendência aberta. **M9 propagado ✅ (H4, 2026-08-16)** — `VoltarFlutuante` pra `/ajustes/modelos` (o pai real, não `/ajustes`).
 
-**Ordem sugerida de propagação** (`docs/BACKLOG-REDESENHO.md`, item H4): `/ajustes/anilhas` (pequena, exercita quase tudo) → `/analise` (peça-assinatura) → `/treino/[id]` (a mais complexa) → o resto. Uma tela por PR, olhada no celular antes da seguinte. **`/ajustes/anilhas` — ✅ fechada (H4, 2026-08-16).** A rota cheia de fallback (`src/app/ajustes/anilhas/page.tsx`) trocou `.barra-topo` por `TituloTela`+`VoltarFlutuante` — mesmo mecanismo do M9, terceiro consumidor real. Próxima da fila: `/analise`.
+**Ordem sugerida de propagação** (item H4 do backlog do redesenho, arquivado em 2026-10-01 e disponível no git): `/ajustes/anilhas` (pequena, exercita quase tudo) → `/analise` (peça-assinatura) → `/treino/[id]` (a mais complexa) → o resto. Uma tela por PR, olhada no celular antes da seguinte. **`/ajustes/anilhas` — ✅ fechada (H4, 2026-08-16).** A rota cheia de fallback (`src/app/ajustes/anilhas/page.tsx`) trocou `.barra-topo` por `TituloTela`+`VoltarFlutuante` — mesmo mecanismo do M9, terceiro consumidor real. Próxima da fila: `/analise`.
 
 ### 6.7 Padrões de transição (D7) — tokens em `tokens.css` desde E4 (2026-08-15), aplicação parcial (H3, 2026-08-16)
 

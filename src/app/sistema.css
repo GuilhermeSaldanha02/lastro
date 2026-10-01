@@ -1102,7 +1102,7 @@
   accent-color: var(--lastro-acao-borda);
 }
 
-/* Marcado muda BORDA + PESO, não só a cor de fundo (nota C, §3.2). */
+/* Marcado muda BORDA + PESO, não só a cor de fundo (nota E, §3.2). */
 .selecao-grupos__opcao:has(input:checked) {
   border-color: var(--lastro-acao-borda);
   font-weight: var(--lastro-peso-forte);
@@ -1148,7 +1148,7 @@
   clip-path: inset(50%);
 }
 
-/* Marcado muda BORDA + PESO, não só a cor de fundo (nota C, §3.2, mesma
+/* Marcado muda BORDA + PESO, não só a cor de fundo (nota E, §3.2, mesma
    regra de `.selecao-grupos__opcao` acima). */
 .chip:has(input:checked) {
   border-color: var(--lastro-acao-borda);
@@ -1584,7 +1584,7 @@
 }
 
 /* ---------- Bloco de evidência: barra lateral no sinal, 3 canais ------
-   Peça 09. Cor NUNCA é o único canal (§3.2 nota C): ícone + palavra
+   Peça 09. Cor NUNCA é o único canal (§3.2 nota E): ícone + palavra
    (.evidencia__sinal) e o texto do delta (.evidencia__delta) também
    identificam alta/platô/queda — a cor é redundante, não a única prova. */
 /* Duas linhas no celular, três colunas do tablet pra cima.
@@ -1596,7 +1596,7 @@
    ser o primeiro a ceder.
    Sinal e delta viram uma linha de cabeçalho — os dois são curtos e a
    leitura "↑ Alta … +66,7%" continua pareada; o corpo fica com a largura
-   inteira do cartão. Os três canais de §3.2 nota C seguem intactos:
+   inteira do cartão. Os três canais de §3.2 nota E seguem intactos:
    ícone, palavra e texto do delta. */
 .evidencia {
   display: flex;
