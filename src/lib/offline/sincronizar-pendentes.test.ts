@@ -124,6 +124,30 @@ describe("sincronizarPendentes (achado A1)", () => {
     expect(await contarFalhas()).toBe(0);
   });
 
+  it("item enfileirado durante uma passada em andamento sobe antes de a chamada resolver (TR-17)", async () => {
+    // Registrar série conclui o descanso da anterior (que já chama a
+    // sincronização) e logo depois enfileira a série nova. A segunda chamada
+    // pegava carona na passada que já tinha lido a fila, e a série nova
+    // ficava parada no aparelho até o próximo gatilho.
+    let liberar: () => void = () => {};
+    vi.mocked(atualizarDescansoSerieRemoto).mockImplementation(
+      () => new Promise((resolve) => (liberar = () => resolve({ ok: true }))),
+    );
+    vi.mocked(criarSerieRemoto).mockResolvedValue({ ok: true });
+    await enfileirar("atualizar_descanso_serie", { id: "s1", descansoRealSegundos: 60 }, "b");
+
+    const primeira = sincronizarPendentes();
+    await vi.waitFor(() => expect(atualizarDescansoSerieRemoto).toHaveBeenCalled());
+    await enfileirar("criar_serie", { id: "s2", reps: 8 }, "b");
+    const segunda = sincronizarPendentes();
+    liberar();
+
+    expect(await segunda).toEqual({ sincronizados: 2, falhou: false, descartados: 0 });
+    expect(await primeira).toEqual({ sincronizados: 2, falhou: false, descartados: 0 });
+    expect(criarSerieRemoto).toHaveBeenCalledTimes(1);
+    expect(await contarPendentes()).toBe(0);
+  });
+
   it("erro lançado sem o prefixo (como o `digest` do build de produção) continua sendo transitório", async () => {
     vi.mocked(criarSerieRemoto).mockRejectedValue(
       new Error("An error occurred in the Server Components render. digest: 2357073175"),

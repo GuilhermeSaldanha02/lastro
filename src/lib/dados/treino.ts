@@ -50,6 +50,8 @@ export type Serie = {
   pesoPorLado: boolean;
   /** Tempo ativo realmente medido depois desta série; null = não medido. */
   descansoRealSegundos: number | null;
+  /** Posição no treino. A próxima série usa a maior + 1, nunca `length + 1` (TR-17). */
+  ordem: number;
   criadoEm: string;
 };
 
@@ -200,11 +202,16 @@ export async function buscarTreino(
   const { data: series, error: erroSeries } = await supabase
     .from("serie")
     .select(
-      "id, exercicio_id, tipo, reps, peso, rir, peso_por_lado, descanso_real_segundos, criado_em, exercicio:exercicio_id (nome, unilateral, peso_por_lado, grupo_muscular_primario)",
+      "id, exercicio_id, tipo, reps, peso, rir, peso_por_lado, descanso_real_segundos, criado_em, ordem, exercicio:exercicio_id (nome, unilateral, peso_por_lado, grupo_muscular_primario)",
     )
     .eq("treino_id", treinoId)
     .eq("usuario_id", user.id)
-    .order("ordem", { ascending: true });
+    // TR-17: treinos gravados antes da correção têm `ordem` repetida. O
+    // desempate por `criado_em` (e por `id`, só para ser determinístico)
+    // devolve a ordem de registro sem precisar mexer no dado.
+    .order("ordem", { ascending: true })
+    .order("criado_em", { ascending: true })
+    .order("id", { ascending: true });
   if (erroSeries) {
     throw new Error(`Falha ao listar séries: ${erroSeries.message}`);
   }
@@ -222,6 +229,7 @@ export async function buscarTreino(
     peso_por_lado: boolean;
     descanso_real_segundos: number | null;
     criado_em: string;
+    ordem: number;
     exercicio: {
       nome: string;
       unilateral: boolean;
@@ -252,6 +260,7 @@ export async function buscarTreino(
       descansoRealSegundos:
         s.descanso_real_segundos === null ? null : Number(s.descanso_real_segundos),
       criadoEm: s.criado_em,
+      ordem: s.ordem,
     })),
   };
 }

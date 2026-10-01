@@ -47,6 +47,7 @@ import {
 } from "@/lib/treino/marcos-treino";
 import { decidirReconciliacao } from "@/lib/treino/fim-treino";
 import { criarGuardaDeToque, toqueCedoDemais } from "@/lib/treino/toque-duplo";
+import { proximaOrdem } from "@/lib/treino/ordem-serie";
 import {
   calcularMetricasSessao,
   duracaoSessaoSegundos,
@@ -156,6 +157,9 @@ export default function TreinoDetalhe({
   idioma: Idioma;
 }) {
   const [series, setSeries] = useState<SerieUI[]>(seriesIniciais);
+  // TR-17: maior `ordem` já usada nesta tela. Apagar série não a diminui, e
+  // duas séries registradas antes de a lista re-renderizar não a repetem.
+  const ultimaOrdemRef = useRef(proximaOrdem(seriesIniciais) - 1);
   const [formularioAberto, setFormularioAberto] = useState(false);
   const [editandoId, setEditandoId] = useState<string | null>(null);
   const [excluindoId, setExcluindoId] = useState<string | null>(null);
@@ -400,6 +404,8 @@ export default function TreinoDetalhe({
     const exercicio = exercicios.find((e) => e.id === dados.exercicioId);
     if (!exercicio) throw new Error("Exercício não encontrado no catálogo.");
 
+    const ordem = proximaOrdem(series, ultimaOrdemRef.current);
+    ultimaOrdemRef.current = ordem;
     const novaSerie: SerieUI = {
       id: crypto.randomUUID(),
       exercicioId: dados.exercicioId,
@@ -415,8 +421,8 @@ export default function TreinoDetalhe({
       descansoRealSegundos: null,
       ehRecordePessoal: dados.ehRecordePessoal,
       criadoEm: new Date().toISOString(),
+      ordem,
     };
-    const ordem = series.length + 1;
 
     // A UI confirma AQUI, antes de qualquer chamada de rede (D6).
     setSeries((atual) => [...atual, novaSerie]);

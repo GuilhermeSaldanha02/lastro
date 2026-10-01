@@ -3088,3 +3088,14 @@ Com 2 sessões o resultado é igual ao de antes. Com número ímpar, a sessão d
 **Impacto.** Constantes em `src/lib/analise/limiares.ts`; detector em `src/lib/analise/fora-do-padrao.ts`. Nenhuma migração.
 
 **Como reverter.** Mudar as constantes de `limiares.ts`; o recorde volta a peso cru reintroduzindo a pílula no Catálogo.
+## 2026-10-01 (1) — TR-17: `ordem` da série é a maior + 1, sem índice único no banco
+
+**Contexto.** Relato do dono: registrar 3 exercícios, apagar o 2º, adicionar um 4º e readicionar o apagado "fica dando bug". A série nova usava `ordem = series.length + 1`; apagar encolhia a lista e a seguinte repetia uma `ordem` existente (no banco ficaram Voador e Crucifixo com `ordem = 3`). O carregador ordena por `ordem`, então o empate tornava imprevisíveis a ordem na tela, o "Repetir série" e o descanso real.
+
+**O que mudou.**
+- `proximaOrdem` (`src/lib/treino/ordem-serie.ts`): maior `ordem` existente + 1, com uma ref na tela para duas séries registradas antes de a lista re-renderizar.
+- `buscarTreino` ordena por `ordem`, depois `criado_em`, depois `id`. Isso conserta na leitura os treinos já gravados com `ordem` repetida, sem mexer em dado.
+
+**Alternativa descartada: índice único em `(treino_id, ordem)`.** Não criar. (1) As duplicatas que já existem em produção barram a migração. (2) Pior: séries pendentes na fila offline não aparecem na tela depois de recarregar, então a maior + 1 pode colidir com uma delas; com índice único, esse `criar_serie` falharia para sempre e a fila FIFO travaria tudo que vem depois. Sem o índice, a colisão vira só um empate, que o desempate por `criado_em` resolve.
+
+**Como reverter.** Voltar `registrarSerie` a `series.length + 1` e tirar os dois `order` extras de `buscarTreino`.

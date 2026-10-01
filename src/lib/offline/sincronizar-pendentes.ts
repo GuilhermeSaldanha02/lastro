@@ -52,13 +52,33 @@ function exigirGravado(resultado: ResultadoGravacaoSerie): void {
 }
 
 let emAndamento: Promise<ResultadoSincronizacao> | null = null;
+// TR-17 (2026-10-01): a passada em andamento já leu a fila. Quem chega
+// durante ela (registrar série conclui o descanso, que sincroniza, e logo
+// depois enfileira a série) marca isto, e a passada roda de novo antes de
+// resolver. Sem isto a série nova ficava no aparelho até o próximo gatilho.
+let pedidoDuranteAPassada = false;
 
 export async function sincronizarPendentes(): Promise<ResultadoSincronizacao> {
-  if (emAndamento) return emAndamento;
-  emAndamento = executarSincronizacao().finally(() => {
+  if (emAndamento) {
+    pedidoDuranteAPassada = true;
+    return emAndamento;
+  }
+  emAndamento = sincronizarAteAssentar().finally(() => {
     emAndamento = null;
   });
   return emAndamento;
+}
+
+async function sincronizarAteAssentar(): Promise<ResultadoSincronizacao> {
+  const total: ResultadoSincronizacao = { sincronizados: 0, falhou: false, descartados: 0 };
+  do {
+    pedidoDuranteAPassada = false;
+    const passada = await executarSincronizacao();
+    total.sincronizados += passada.sincronizados;
+    total.descartados += passada.descartados;
+    total.falhou = passada.falhou;
+  } while (pedidoDuranteAPassada && !total.falhou);
+  return total;
 }
 
 async function executarSincronizacao(): Promise<ResultadoSincronizacao> {
