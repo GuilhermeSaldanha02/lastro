@@ -41,7 +41,7 @@ describe("frasePercebida", () => {
 describe("textosBlocoPadrao", () => {
   it("rótulo, percentual com sinal, legenda da régua e janela", () => {
     expect(textosBlocoPadrao(acima, "pt-BR")).toEqual({
-      rotulo: "Lastro percebeu · volume vs. seu padrão",
+      rotulo: "Volume vs. seu padrão",
       pct: "+40%",
       legenda: "seu padrão de empurrar: 10,4 t",
       janela: "últimas 6",
