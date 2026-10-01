@@ -47,18 +47,15 @@ se continua) · `CONGELADO` / `PARADO` (decisão do dono, não mexer).
 
 Texto original do dono: `docs/MISSAO-MOTOR-DETERMINISTICO.md` (a seção indicada).
 Estudo aprovado: `docs/estudos/AN-08-motor-deterministico-estudo.md`. Cada
-milestone só começa com autorização do dono.
+milestone só começa com autorização do dono. Revisado pelo dono em 2026-10-01.
 
 | ID | O que é | Status | Importância |
 |---|---|---|---|
-| AN-08.A1 | **Check-in de recuperação.** Registro rápido de **sono, energia, dor muscular e estresse**, escala simples, **também em dia sem treino**. Dá contexto aos números; não vira diário médico, não diagnostica, não prescreve. Visível ao aluno e ao personal com vínculo. Feito na academia, então entra na fila offline (Dexie) como a série. Tabela nova `checkin`. Exige revisão da Política (junto com POL-01) e novo aceite de todos. (§13) | A FAZER, depois da faxina e da auditoria | Média |
-| POL-01 | A Política (`lib/legal/documentos.ts`) diz que todo o Coach é IA; desde a M1 parte é calculada pelo lastro. Ajustar na mesma revisão do A1 (mudar `VERSAO_DOCUMENTOS` pede novo aceite). | A FAZER, com o A1 | Baixa |
-| AN-08.A2 | **Prontidão.** Leitura rápida do check-in. Proposta do estudo: os sinais crus contra a média da própria pessoa, sem índice único 0–100 inventado. (§14) | DECIDIR, depende do A1 | Baixa |
-| AN-08.A3 | **Recuperação × desempenho.** Coincidência, nunca causa ("a queda coincidiu com sono abaixo da sua média"). Só com ~8 semanas de check-in. (§15) | DECIDIR, depende do A1 | Baixa |
-| AN-08.B3 | **Explicar mudança de desempenho** juntando e1RM, frequência, volume e recuperação como evidência, sem afirmar causa. (§18) | DECIDIR | Baixa |
-| AN-08.F0-INSIGHT | `Insight` como dado estruturado antes de virar texto. Parcial: a Home e o pós-treino usam o detector, mas a fila do personal não foi generalizada. (§9) | DECIDIR | Baixa |
-| AN-08.F0-MATRIZ | Matriz Gemini × determinístico em níveis 0–4. (§3–§6) | CONFERIR: provavelmente coberta pela Entrega 2 do estudo | Baixa |
-| AN-08.C2 (resto) | Visualização de consistência: semanas abaixo da meta, tendência de consistência. Calendário (UX-02), semanas seguidas e meta cumprida já existem. (§20) | DECIDIR | Baixa |
+| AN-08.A1 | **Check-in de recuperação.** Registro rápido de **sono, energia, dor muscular e estresse**, escala simples, **também em dia sem treino**. Dá contexto aos números; não vira diário médico, não diagnostica, não prescreve. Visível ao aluno e ao personal com vínculo. Feito na academia, então entra na fila offline (Dexie) como a série. Tabela nova `checkin`. Exige revisão da Política (junto com POL-01) e novo aceite de todos. (§13) | A FAZER, na ordem (depois da faxina e da auditoria) | Média |
+| POL-01 | A Política (`lib/legal/documentos.ts`) diz que todo o Coach é IA; desde a M1 parte é calculada pelo lastro. Ajustar na mesma revisão do A1, para um aceite só. | A FAZER, com o A1 | Baixa |
+| AN-08.A2 | **Prontidão.** Os sinais crus do check-in contra a média da própria pessoa, **sem índice único 0–100**. (§14) | A FAZER, depois do A1 | Baixa |
+| AN-08.A3 | **Recuperação × desempenho.** Coincidência, nunca causa ("a queda coincidiu com sono abaixo da sua média"). (§15) | A FAZER, depois de ~8 semanas de check-in | Baixa |
+| AN-08.F0-INSIGHT | `Insight` como dado estruturado. Hoje só Home e pós-treino usam o detector. | ADIADO: generalizar só quando um 3º lugar precisar | Baixa |
 | AN-08.F0-CACHE | Cache de agregados. | CONGELADO (sem gargalo) | — |
 | AN-08.D1 | Peso corporal. | CONGELADO (conflita com o PRD §5) | — |
 | AN-08.D2 | Health Connect / Apple Health. | CONGELADO | — |
@@ -70,40 +67,32 @@ milestone só começa com autorização do dono.
 | SMTP | Configurar o Brevo grátis no Supabase (o SMTP padrão limita e-mails por hora: cadastro e recuperação). Antes de divulgar. | Alta |
 | CALLBACK | Conferir `https://lastro-pi.vercel.app/auth/callback` na lista de redirect do Supabase Auth e testar uma recuperação de senha. | Alta |
 | SENHA-QA | Trocar a senha da conta QA (estava em `scripts/importar-102-gifs.mjs`). | Alta |
+| SYNC-CELULAR | Num treino real: registrar séries em modo avião, reconectar e conferir que subiram (tarefa 2.3, nunca feita em aparelho). | Média |
 | IPHONE | Testar o aviso de fim do descanso (web push) no iPhone, com o app na tela de início. | Média |
+| PWA-INICIO | Com o app instalado, abrir pelo ícone e conferir que abre em Início e que a barra superior não cobre conteúdo. Um minuto. | Baixa |
+| DICAS | Revisar por amostra ~20 dicas dos exercícios que o dono usa (hoje 0 de 218 marcadas `humano`) e marcar `dica_execucao_origem = 'humano'` nas aprovadas. | Baixa |
 | TESTE-DONO | Apagar os treinos de teste da conta do dono: `aa0cd9e6…` e `9db03743…`. | Baixa |
 | GEMINI | Segue no plano gratuito (20/dia). Revisitar quando divulgar ou quando o contador da M3 mostrar aperto. | Média |
-| DICAS | Revisar as dicas de execução (escritas pelo Claude) e marcar `dica_execucao_origem = 'humano'` nas aprovadas. Critério A9 do PRD. | Baixa |
-| BACKUP-BANCO | Apagar `supabase_migrations.backup_20260905_antes_repair` quando quiser. | Baixa |
-| P1 | Perguntar ao personal P1: o que é "mensagem padrão" (link pronto ou algo automático) e quantos alunos tem e quantos perdeu em 6 meses. | Baixa |
+| P1 | Perguntar ao personal P1 o que é "mensagem padrão" e quantos alunos tem e perdeu em 6 meses. Só se o módulo Personal virar produto. | Baixa |
 
-## 5. Itens antigos — conferir e decidir se continuam
+## 5. Itens antigos que continuam
 
-Trazidos do `PROGRESS.md` (seções "Backlog", "Pendências do DONO", "Declarado
-como NÃO coberto" e "Pendências consolidadas", removidas em 2026-10-01). Ainda
-não conferidos contra o código.
+Vindos do `PROGRESS.md`, revisados pelo dono em 2026-10-01.
 
 | ID | O que é | Status | Importância |
 |---|---|---|---|
-| ANT-01 | Faixa de referência de séries semanais por grupo muscular e `N` semanas de estagnação: o PRD §10 ainda marca TODO. Exige fonte primária (assunto de saúde). | CONFERIR | Média |
-| ANT-02 | Módulo Personal só em pt-BR: strings sem en/es no `i18n.ts`. | CONFERIR | Média |
-| ANT-03 | Ciclo de sync offline em celular real: registrar em modo avião, reconectar, conferir no PC (tarefa 2.3, nunca feito em aparelho). | CONFERIR | Média |
-| ANT-04 | Fase 6, integração final: revisão integral do Inspetor, todas as fitness functions de uma vez, gate visual em celular físico. Os e2e das 3 jornadas já existem. | DECIDIR | Média |
-| ANT-05 | Comparativo "o parecer disse × o que foi feito". Precisa de mais pareceres salvos. | DECIDIR | Baixa |
-| ANT-06 | Medida do módulo Personal: consulta "o grupo alertado recebeu estímulo na semana seguinte?" (`alerta_personal` já grava). Só com uso real. | DECIDIR | Baixa |
-| ANT-07 | Esconder a prescrição sob vínculo (PRD §11.4.2). Estado vazio tem portão visual. | DECIDIR | Baixa |
-| ANT-08 | "Queda de frequência" do Personal foi entregue como queda de volume; frequência ao pé da letra não foi feita (`DECISIONS.md` 2026-09-11 (4)). | DECIDIR | Baixa |
-| ANT-09 | O personal não tem como encerrar vínculo (só o aluno revoga, como a §11.4.3 descreve). Ninguém pediu. | DECIDIR | Baixa |
-| ANT-10 | Coluna "antes 16 × 9" por série (padrão Hevy/Strong). Exige consulta ao histórico do exercício. Nunca decidida. | DECIDIR | Baixa |
-| ANT-11 | Relatório pós-treino: `metricas-treino.ts` conta exercício só de aquecimento em `totalExercicios`. | CONFERIR | Baixa |
-| ANT-12 | Relatório pós-treino com emojis (🏆, 🔥) em `relatorio-pos-treino.tsx`. | CONFERIR | Baixa |
-| ANT-13 | Strings do timer sem en/es no `i18n.ts`. | CONFERIR | Baixa |
-| ANT-14 | Hydration mismatch no console ao trocar de tema (`data-tema` diverge servidor/cliente). | CONFERIR | Baixa |
-| ANT-15 | Os 5× `404` da Gemini de 27–29/ago. Investigar só se reaparecerem. | DECIDIR | Baixa |
-| ANT-16 | Usuário QA `qa-lastro-parecer@example.com` (seedado em agosto) pode ainda existir no banco. | CONFERIR | Baixa |
-| ANT-17 | `QA.md` ainda marca REPROVOU em PE-07, OF-06, VS-07 e AN-05; o backlog antigo dava VS-07 e AN-05 como resolvidos. Reconciliar o `QA.md`. | CONFERIR | Baixa |
-| ANT-18 | Barra superior fixa e PWA abrindo em Início: faltava conferência em aparelho com o PWA instalado. | CONFERIR | Baixa |
+| ANT-01 | Faixa de referência de séries semanais por grupo e `N` semanas de estagnação (PRD §10 ainda marca TODO; a pergunta 3 da Análise depende). Pesquisa com fonte primária, sem número de memória. | A FAZER | Média |
+| ANT-06 | Medida do módulo Personal: "o grupo alertado recebeu estímulo na semana seguinte?" (`alerta_personal` já grava). | A FAZER quando houver personal real usando | Baixa |
+| ANT-10 | Coluna "antes 16 × 9" por série (padrão Hevy/Strong), com portão visual. | A FAZER se o dono sentir falta no treino | Baixa |
+| ANT-14 | Hydration mismatch no console ao trocar de tema (`data-tema` diverge servidor/cliente). Não aparece para o usuário. | A FAZER, baixa prioridade | Baixa |
+| ANT-17 | Reconciliar os status do `QA.md` (PE-07, OF-06, VS-07, AN-05 ainda REPROVOU lá). | A FAZER junto da AUD-IND | Baixa |
 
+### Cortados ou resolvidos na revisão de 2026-10-01
+
+- **Resolvidos (conferidos no código e no banco):** ANT-02 (Personal já usa `t()`), ANT-11 (`totalExercicios` já conta só exercício com série valendo), ANT-12 (sem emoji no relatório), ANT-13 (timer já usa `t()`), ANT-16 (0 contas `qa-lastro*` no banco).
+- **Cortados pelo dono:** AN-08.B3 (o A3 entrega quase o mesmo), AN-08.C2 resto (calendário, semanas seguidas e meta cumprida já cobrem), ANT-04 Fase 6 (a AUD-IND e o e2e cobrem), ANT-05 parecer × feito (só 2 pareceres salvos), ANT-07 esconder prescrição sob vínculo, ANT-08 frequência ao pé da letra (aceito como queda de volume), ANT-09 personal encerrar vínculo, ANT-15 os 404 da Gemini de agosto (o `erro_app` pega se voltarem).
+- **Dado como feito:** AN-08.F0-MATRIZ (é a Entrega 2 do estudo).
+- **Apagado:** `supabase_migrations.backup_20260905_antes_repair` (20 linhas, backup de antes do repair de 05/09).
 ## 6. Parados
 
 | ID | O que é | Status |
