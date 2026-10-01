@@ -51,7 +51,7 @@ test("finalizar uma sessão fora do padrão mostra o bloco fora do cartão compa
 
   const bloco = page.locator(".pos-treino-padrao");
   await expect(bloco).toBeVisible({ timeout: 20_000 });
-  await expect(bloco).toContainText("Lastro percebeu · volume vs. seu padrão", { ignoreCase: true });
+  await expect(bloco).toContainText("Volume vs. seu padrão", { ignoreCase: true });
   await expect(page.locator(".pos-treino-padrao__volume")).toHaveText("0,8 t");
   await expect(page.locator(".pos-treino-padrao__pct--acima")).toHaveText("+60%");
   await expect(bloco).toContainText("seu padrão de empurrar: 0,5 t");

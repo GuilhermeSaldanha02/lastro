@@ -323,6 +323,20 @@
   --lastro-foco:            #0B5CAB;
 }
 
+/* POS-CONTRASTE (2026-10-01): o bloco "volume vs. seu padrão" do
+   pós-treino fica sobre `.pos-treino-overlay`, cujo fundo é escuro em
+   todos os temas. No tema claro, os tokens acima (texto escuro) sumiam ali:
+   o volume "2,7 t" saiu quase invisível em produção. Dentro do bloco valem
+   os valores do tema escuro padrão (`:root`), já medidos contra fundo
+   escuro. */
+[data-tema="branco-ouro"] .pos-treino-padrao {
+  --lastro-txt:          #F8FAFC;
+  --lastro-txt-2:        #94A3B8;
+  --lastro-sup-2:        #141A22;
+  --lastro-alta:         #10B981;
+  --lastro-plato:        #F59E0B;
+}
+
 /* 2. DUNA AREIA & ÂMBAR (SANDSTONE WARMTH) */
 [data-tema="areia"] {
   --lastro-fundo:        #090807;

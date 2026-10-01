@@ -28,12 +28,12 @@ export function textosBlocoPadrao(c: ComparacaoPadrao, idioma: Idioma) {
   const padrao = formatarToneladas(c.padrao, idioma);
   const pct = `${c.desvio > 0 ? "+" : "−"}${Math.round(Math.abs(c.desvio) * 100)}%`;
   if (idioma === "en") {
-    return { rotulo: "Lastro noticed · volume vs. your usual", pct, legenda: `your ${familia} usual: ${padrao}`, janela: `last ${c.sessoesComparadas}` };
+    return { rotulo: "Volume vs. your usual", pct, legenda: `your ${familia} usual: ${padrao}`, janela: `last ${c.sessoesComparadas}` };
   }
   if (idioma === "es") {
-    return { rotulo: "Lastro notó · volumen vs. tu patrón", pct, legenda: `tu patrón de ${familia}: ${padrao}`, janela: `últimas ${c.sessoesComparadas}` };
+    return { rotulo: "Volumen vs. tu patrón", pct, legenda: `tu patrón de ${familia}: ${padrao}`, janela: `últimas ${c.sessoesComparadas}` };
   }
-  return { rotulo: "Lastro percebeu · volume vs. seu padrão", pct, legenda: `seu padrão de ${familia}: ${padrao}`, janela: `últimas ${c.sessoesComparadas}` };
+  return { rotulo: "Volume vs. seu padrão", pct, legenda: `seu padrão de ${familia}: ${padrao}`, janela: `últimas ${c.sessoesComparadas}` };
 }
 
 export function frasePercebida(c: ComparacaoPadrao, idioma: Idioma): FrasePercebida {
