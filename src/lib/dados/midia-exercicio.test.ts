@@ -13,6 +13,16 @@ describe('midia-exercicio', () => {
     expect(midia?.thumbnailUrl).toContain('.gif');
   });
 
+  it('nenhum exercício com GIF fica com o texto genérico de preenchimento (CAT-BIOMEC)', () => {
+    // 30 exercícios mostravam "Musculatura Alvo Principal" etc. na página do
+    // exercício, o que parece erro. Todo exercício precisa dos três campos reais.
+    const genericos = ['Musculatura Alvo Principal', 'Músculos Estabilizadores', 'Padrão Biomecânico Anatômico'];
+    const ruins = (manifesto as Array<{ nomePt?: string; musculo_alvo?: string; musculos_sinergistas?: string; mecanica_articular?: string }>)
+      .filter((e) => [e.musculo_alvo, e.musculos_sinergistas, e.mecanica_articular].some((c) => !c || genericos.includes(c)))
+      .map((e) => e.nomePt);
+    expect(ruins).toEqual([]);
+  });
+
   it('retorna a mídia por slug', () => {
     const midia = obterMidiaExercicioPorSlug('abdominal-infra');
     expect(midia).not.toBeNull();
