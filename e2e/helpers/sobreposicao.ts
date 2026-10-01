@@ -25,6 +25,30 @@ export async function medirSobreposicao(page: Page): Promise<Sobreposicao[]> {
       }
       return null;
     };
+    // O que o navegador DESENHA é a caixa do texto recortada pelos ancestrais com
+    // overflow (reticências do título da Home, texto só para leitor de tela a
+    // 1 px). Sem este recorte, texto cortado e invisível contava como cruzamento.
+    type Caixa = { left: number; right: number; top: number; bottom: number; width: number; height: number };
+    const recortar = (el: Element, r: DOMRect): Caixa => {
+      let left = r.left;
+      let right = r.right;
+      let top = r.top;
+      let bottom = r.bottom;
+      for (let e: Element | null = el; e && e !== document.body && e !== document.documentElement; e = e.parentElement) {
+        const s = getComputedStyle(e);
+        if (s.overflowX === "visible" && s.overflowY === "visible") continue;
+        const b = e.getBoundingClientRect();
+        if (s.overflowX !== "visible") {
+          left = Math.max(left, b.left);
+          right = Math.min(right, b.right);
+        }
+        if (s.overflowY !== "visible") {
+          top = Math.max(top, b.top);
+          bottom = Math.min(bottom, b.bottom);
+        }
+      }
+      return { left, right, top, bottom, width: right - left, height: bottom - top };
+    };
     const ignorar = new Set(["SCRIPT", "STYLE", "NOSCRIPT", "SVG", "PATH", "OPTION"]);
     const itens = [...document.querySelectorAll("body *")]
       .filter(
@@ -37,7 +61,7 @@ export async function medirSobreposicao(page: Page): Promise<Sobreposicao[]> {
       .map((el) => {
         const faixa = document.createRange();
         faixa.selectNodeContents(el);
-        const caixas = [...faixa.getClientRects()].filter((r) => r.width > 1 && r.height > 1);
+        const caixas = [...faixa.getClientRects()].map((r) => recortar(el, r)).filter((r) => r.width > 1 && r.height > 1);
         return { el, caixas, camada: camada(el) };
       })
       .filter((i) => i.caixas.length > 0);
