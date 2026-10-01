@@ -856,14 +856,25 @@ export async function atualizarDescansoSerieRemoto(
   return { ok: true };
 }
 
-/** Exclui uma série. A RLS impede excluir série de outro usuário. */
-export async function excluirSerieRemoto(id: string): Promise<void> {
+/**
+ * Exclui uma série. A RLS impede excluir série de outro usuário.
+ *
+ * Recusa permanente volta como VALOR, igual `criarSerieRemoto` (FILA-01,
+ * 2026-10-01): lançada, a mensagem some no build de produção, a fila nunca
+ * a reconhece como permanente e para nela para sempre.
+ */
+export async function excluirSerieRemoto(id: string): Promise<ResultadoGravacaoSerie> {
   const { supabase } = await usuarioAutenticadoOuErro();
 
   const { error } = await supabase.from("serie").delete().eq("id", id);
-  if (error) throw new Error(`Falha ao excluir série: ${error.message}`);
+  if (error) {
+    const mensagem = `Falha ao excluir série: ${error.message}`;
+    if (ehErroPermanenteDoPostgres(error.code)) return { ok: false, permanente: true, mensagem };
+    throw new Error(mensagem);
+  }
   revalidatePath("/treino/[id]", "page");
   revalidatePath("/");
+  return { ok: true };
 }
 
 /**

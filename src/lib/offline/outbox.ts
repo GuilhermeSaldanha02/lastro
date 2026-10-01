@@ -47,6 +47,9 @@ async function moverParaFalhas(item: MutacaoPendente, erro: unknown): Promise<vo
     tentativas: item.tentativas + 1,
     falhouEm: Date.now(),
     erro: erro instanceof Error ? erro.message : String(erro),
+    // De quem era o item (FILA-01): sem isto, num aparelho compartilhado, a
+    // falha guardada não diz a qual conta ela pertence.
+    ...(item.usuarioId ? { usuarioId: item.usuarioId } : {}),
   };
   await db.transaction("rw", db.outbox, db.falhas, async () => {
     await db.falhas.add(falha);
