@@ -4208,14 +4208,18 @@
   background: var(--lastro-sup-1);
 }
 
+/* UX-03-RESTO (2026-10-01): "Repeticiones" (es, 12 letras, sem espaço para
+   quebrar) passava da coluna e se sobrepunha a "Descanso real" a 375 px; em
+   português e espanhol a 320 px também. A coluna das repetições ganha a maior
+   fatia, e o cabeçalho quebra a palavra em vez de vazar para a vizinha. */
 .grade-series__cabecalho,
 .grade-series__linha {
   display: grid;
   grid-template-columns:
-    minmax(0, 1.15fr)
-    minmax(0, 1.15fr)
     minmax(0, 1fr)
-    minmax(0, 0.9fr);
+    minmax(0, 1fr)
+    minmax(0, 1.3fr)
+    minmax(0, 1fr);
   align-items: center;
 }
 
@@ -4232,6 +4236,7 @@
   min-width: 0;
   padding: var(--lastro-e-2) var(--lastro-e-1);
   text-align: center;
+  overflow-wrap: anywhere;
 }
 
 .grade-series__linha {
@@ -4272,6 +4277,8 @@
 }
 
 .marcador-serie {
+  /* O selo ("VÁL", "REC") nunca quebra: em 320 px aparecia "VÁ / L". */
+  white-space: nowrap;
   padding: var(--lastro-e-1);
   border-radius: var(--lastro-raio-1);
   font-size: var(--lastro-papel-detalhe);
@@ -4332,10 +4339,21 @@
   .grade-series__cabecalho,
   .grade-series__linha {
     grid-template-columns:
-      minmax(0, 0.95fr)
-      minmax(0, 0.95fr)
-      minmax(0, 0.8fr)
-      minmax(0, 1fr);
+      minmax(0, 1.05fr)
+      minmax(0, 0.85fr)
+      minmax(0, 1.3fr)
+      minmax(0, 1.1fr);
+  }
+
+  /* A 320 px o cabeçalho em espanhol ("Repeticiones", "Descanso real") quebrava
+     a palavra no meio. Letra um pouco menor e menos respiro lateral. */
+  .grade-series__cabecalho {
+    font-size: calc(var(--lastro-papel-detalhe) - 2px);
+  }
+
+  .grade-series__cabecalho > span,
+  .grade-series__linha > [role="cell"] {
+    padding-inline: 2px;
   }
 }
 
