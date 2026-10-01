@@ -15,7 +15,10 @@ export type TipoMutacao =
   | "atualizar_serie"
   | "atualizar_descanso_serie"
   | "excluir_serie"
-  | "excluir_treino";
+  | "excluir_treino"
+  // AN-08 A1: check-in diário. Mesma fila das séries, pelo mesmo motivo: é feito
+  // na academia, sem sinal, e não pode se perder nem travar o que vem depois.
+  | "registrar_checkin";
 
 export type MutacaoPendente = {
   id?: number;
