@@ -26,9 +26,7 @@ se continua) · `CONGELADO` / `PARADO` (decisão do dono, não mexer).
 
 | ID | O que é | Status | Importância |
 |---|---|---|---|
-| POS-CONTRASTE | No bloco "volume vs. seu padrão" do pós-treino, o número grande ("2,7 t") sai em azul-escuro sobre o fundo escuro e quase não aparece (visto em produção, 2026-10-01, conta de personal, tema da conta). Conferir o token da cor contra os 7 temas. Junto com o POS-ROTULO. | A FAZER | Média |
 | CAT-BIOMEC | Página de exercício com GIF ("Supino declinado com barra") mostra texto genérico em Músculo alvo, Músculos que ajudam e Movimento ("Musculatura Alvo Principal", "Padrão Biomecânico Anatômico") em vez do conteúdo real. Investigar se falta a entrada em `exercicios-midia.json` ou se é o fallback. | A FAZER | Média |
-| QA-TR-TRISTE | QA de caminho triste de adicionar e apagar exercício em `/treino/[id]`. Depois do TR-17. | A FAZER | Média |
 | FAXINA-1 | Acento de "Elevação lateral com halteres" no banco e em `exercicios-midia.json` (os dois casam pelo nome). | A FAZER | Baixa |
 | FAXINA-2 | Apagar branches remotas já mergeadas, conferindo uma a uma. | A FAZER | Baixa |
 | FAXINA-3 | Apagar os 9 scripts antigos de `scripts/` que guardam a senha da conta QA e, em dois deles, a chave `service_role` (nenhum é usado por `package.json`, CI ou e2e). Só depois de o dono rotacionar (ver SEGREDOS). | No final, com SEGREDOS | Alta |
@@ -42,7 +40,6 @@ se continua) · `CONGELADO` / `PARADO` (decisão do dono, não mexer).
 | LG-05…08 | Linguagem das telas de personal (`docs/qualidade/matriz-linguagem.md`, várias células PENDENTE também em LG-01…LG-10). | A FAZER | Baixa |
 | TR-03 | Treino iniciado por modelo. Autorizado uma vez na conta de personal. | A FAZER | Baixa |
 | AN-03, AN-04 | Reproduzir na conta de personal (gasta ~3 unidades da cota do dia). Autorizado uma vez. | A FAZER | Baixa |
-| POS-ROTULO | O rótulo do bloco "volume vs. seu padrão" do pós-treino quebra em 2 linhas a 375 px. Encurtar. | A FAZER | Baixa |
 | EST-DURACAO | Estudo: diferença entre a duração até a última série e `duracao_segundos` no relatório pós-treino. Esperar ~3 semanas de dado (hoje só 2 sessões têm o campo) e trazer opções. | A FAZER, sem prazo | Baixa |
 
 ## 3. AN-08 — motor determinístico (o que falta)
@@ -115,6 +112,7 @@ Vindos do `PROGRESS.md`, revisados pelo dono em 2026-10-01.
 - **Cálculo:** TON-01 (tonelagem com unilateral, #346).
 - **Treino:** TR-06…TR-15, OF-09, aviso de descanso por web push. TR-17 (#368: ordem da série = maior + 1; e a fila sobe a série registrada durante uma sincronização em andamento).
 - **QA-M3 em produção (2026-10-01, conta de personal, dado semeado e apagado no fim):** Coach `VOLUME_GRUPO` resolvido local com `uso_ia` em 0; "Lastro percebeu" na Home (+50% sobre a mediana 1,8 t); página do exercício (recorde e1RM 120 kg, maior carga sem estrela, evolução +45%); bloco do pós-treino (2,7 t, +50%, últimas 6). Também: as 3 séries do treino registrado pela tela subiram com ordem 1, 2, 3 (TR-17 e fila em produção). LIMPEZA-PERSONAL feita (o `1e66619f` já não existia; conta de volta em TRABALHO).
+- **QA-TR-TRISTE em produção (2026-10-01, conta de personal, treino apagado no fim):** roteiro do dono (ordens 1, 3, 4, 5 no banco, tela A, C, D, B depois de recarregar), dois toques no Excluir apagam uma série só, Repetir repete o último e, apagado o último exercício inteiro, repete o anterior com ordem nova. Sem rede não foi testado no navegador (coberto pelo e2e `j10`). **POS-ROTULO e POS-CONTRASTE (#371):** rótulo "Volume vs. seu padrão" e cores do tema escuro no bloco quando o tema é o claro; e2e `j37` verde. Conferência visual em produção do tema claro: não feita.
 - **QA-01:** CT-02, VS-06/07, AJ-03/04, AN-02/05/06, PF-01 resolvidos ou graduados pelo e2e.
 - **Docs:** DOC-01, DOC-02, PU-02; arquivo único de backlog (este, 2026-10-01).
 
