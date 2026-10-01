@@ -10,6 +10,7 @@ import { calcularSequenciaAtual } from "@/lib/analise/sequencia";
 import { diasSemEstimuloPorGrupo } from "@/lib/analise/recencia";
 import { leituraDeterministica } from "@/lib/analise/leitura-deterministica";
 import { anteriorEquivalente, contem, semanaDe, ultimosDias } from "@/lib/analise/periodo";
+import { metaNasSemanas, semanasSeguidasComTreino } from "@/lib/analise/consistencia-semanal";
 import type { ResumoCompacto, SerieValendo } from "@/lib/analise/tipos";
 import type { Idioma } from "@/lib/dados/idioma";
 import { formatarPeso } from "@/lib/texto/formatar-delta";
@@ -58,6 +59,12 @@ type Frases = {
   frequenciaGrupo: (grupo: string, treinos: string) => string;
   frequenciaGrupoZero: (grupo: string) => string;
   ultimaSerieGrupo: (quando: string) => string;
+  semanasSeguidasComAtual: (n: number) => string;
+  semanasSeguidasSemAtual: (n: number) => string;
+  semSemanasSeguidas: string;
+  metaNaoDefinida: string;
+  metaCumprida: (meta: string, cumpridas: number, fechadas: number) => string;
+  metaSemanaAtual: (feitos: number, meta: number) => string;
   frequenciaComMedia: (treinos: string, media: string) => string;
   frequenciaSemMedia: (treinos: string) => string;
   umaSemanaNaoETendencia: string;
@@ -93,6 +100,21 @@ const POR_IDIOMA: Record<Idioma, Frases> = {
     frequenciaGrupo: (grupo, treinos) => `Nas últimas 4 semanas, ${grupo} entrou em ${treinos}.`,
     frequenciaGrupoZero: (grupo) => `Nas últimas 4 semanas, ${grupo} não entrou em nenhum treino.`,
     ultimaSerieGrupo: (quando) => `Última série valendo: ${quando}.`,
+    semanasSeguidasComAtual: (n) =>
+      n === 1
+        ? "Esta semana já tem treino; a semana passada ficou sem."
+        : `${n} semanas seguidas com pelo menos 1 treino, contando esta.`,
+    semanasSeguidasSemAtual: (n) =>
+      n === 1
+        ? "A semana passada teve treino; a anterior ficou sem. Nesta semana ainda não há treino."
+        : `${n} semanas seguidas com pelo menos 1 treino, até a semana passada. Nesta semana ainda não há treino.`,
+    semSemanasSeguidas: "Sem sequência de semanas: a semana passada ficou sem treino, e esta ainda não tem.",
+    metaNaoDefinida: "Você ainda não definiu uma meta semanal. Ela fica em Ajustes.",
+    metaCumprida: (meta, cumpridas, fechadas) =>
+      fechadas === 1
+        ? `Meta de ${meta} por semana: ${cumpridas === 1 ? "cumprida" : "não cumprida"} na semana passada.`
+        : `Meta de ${meta} por semana: cumprida em ${cumpridas} das últimas ${fechadas} semanas fechadas.`,
+    metaSemanaAtual: (feitos, meta) => `Nesta semana, até hoje: ${feitos} de ${meta}.`,
     frequenciaComMedia: (treinos, media) =>
       `Na última semana fechada foram ${treinos}, contra média de ${media} nas semanas anteriores com treino.`,
     frequenciaSemMedia: (treinos) => `Na última semana fechada foram ${treinos}. Ainda não há semanas anteriores para comparar.`,
@@ -128,6 +150,21 @@ const POR_IDIOMA: Record<Idioma, Frases> = {
     frequenciaGrupo: (grupo, treinos) => `In the last 4 weeks, ${grupo} was in ${treinos}.`,
     frequenciaGrupoZero: (grupo) => `In the last 4 weeks, ${grupo} wasn't in any workout.`,
     ultimaSerieGrupo: (quando) => `Last working set: ${quando}.`,
+    semanasSeguidasComAtual: (n) =>
+      n === 1
+        ? "This week already has a workout; last week had none."
+        : `${n} weeks in a row with at least 1 workout, counting this one.`,
+    semanasSeguidasSemAtual: (n) =>
+      n === 1
+        ? "Last week had a workout; the one before had none. No workout this week yet."
+        : `${n} weeks in a row with at least 1 workout, up to last week. No workout this week yet.`,
+    semSemanasSeguidas: "No weekly streak: last week had no workout, and this week has none yet.",
+    metaNaoDefinida: "You haven't set a weekly goal yet. It's in Settings.",
+    metaCumprida: (meta, cumpridas, fechadas) =>
+      fechadas === 1
+        ? `Goal of ${meta} per week: ${cumpridas === 1 ? "met" : "not met"} last week.`
+        : `Goal of ${meta} per week: met in ${cumpridas} of the last ${fechadas} closed weeks.`,
+    metaSemanaAtual: (feitos, meta) => `This week so far: ${feitos} of ${meta}.`,
     frequenciaComMedia: (treinos, media) =>
       `Last closed week had ${treinos}, against an average of ${media} in previous weeks with training.`,
     frequenciaSemMedia: (treinos) => `Last closed week had ${treinos}. There are no previous weeks to compare yet.`,
@@ -163,6 +200,21 @@ const POR_IDIOMA: Record<Idioma, Frases> = {
     frequenciaGrupo: (grupo, treinos) => `En las últimas 4 semanas, ${grupo} estuvo en ${treinos}.`,
     frequenciaGrupoZero: (grupo) => `En las últimas 4 semanas, ${grupo} no estuvo en ningún entrenamiento.`,
     ultimaSerieGrupo: (quando) => `Última serie válida: ${quando}.`,
+    semanasSeguidasComAtual: (n) =>
+      n === 1
+        ? "Esta semana ya tiene entrenamiento; la semana pasada quedó sin."
+        : `${n} semanas seguidas con al menos 1 entrenamiento, contando esta.`,
+    semanasSeguidasSemAtual: (n) =>
+      n === 1
+        ? "La semana pasada tuvo entrenamiento; la anterior quedó sin. Esta semana todavía no hay entrenamiento."
+        : `${n} semanas seguidas con al menos 1 entrenamiento, hasta la semana pasada. Esta semana todavía no hay entrenamiento.`,
+    semSemanasSeguidas: "Sin racha de semanas: la semana pasada quedó sin entrenamiento, y esta todavía no tiene.",
+    metaNaoDefinida: "Todavía no definiste una meta semanal. Está en Ajustes.",
+    metaCumprida: (meta, cumpridas, fechadas) =>
+      fechadas === 1
+        ? `Meta de ${meta} por semana: ${cumpridas === 1 ? "cumplida" : "no cumplida"} la semana pasada.`
+        : `Meta de ${meta} por semana: cumplida en ${cumpridas} de las últimas ${fechadas} semanas cerradas.`,
+    metaSemanaAtual: (feitos, meta) => `Esta semana, hasta hoy: ${feitos} de ${meta}.`,
     frequenciaComMedia: (treinos, media) =>
       `En la última semana cerrada fueron ${treinos}, contra un promedio de ${media} en las semanas anteriores con entrenamiento.`,
     frequenciaSemMedia: (treinos) => `En la última semana cerrada fueron ${treinos}. Todavía no hay semanas anteriores para comparar.`,
@@ -281,6 +333,21 @@ export function responder(classificacao: ClassificacaoDados, ctx: ContextoRespos
       ).size;
       const primeira = treinos > 0 ? f.frequenciaGrupo(grupo, f.treinos(treinos)) : f.frequenciaGrupoZero(grupo);
       return `${primeira} ${f.ultimaSerieGrupo(QUANDO[ctx.idioma](dias))}`;
+    }
+
+    case "SEMANAS_SEGUIDAS": {
+      const { semanas, incluiAtual } = semanasSeguidasComTreino(ctx.series, ctx.hojeISO);
+      if (semanas === 0) return f.semSemanasSeguidas;
+      return incluiAtual ? f.semanasSeguidasComAtual(semanas) : f.semanasSeguidasSemAtual(semanas);
+    }
+
+    case "META_CUMPRIDA": {
+      if (!ctx.metaSemana) return f.metaNaoDefinida;
+      const r = metaNasSemanas(ctx.series, ctx.metaSemana, ctx.hojeISO);
+      const frases: string[] = [];
+      if (r.semanasFechadas > 0) frases.push(f.metaCumprida(f.treinos(r.meta), r.cumpridas, r.semanasFechadas));
+      frases.push(f.metaSemanaAtual(r.treinosSemanaAtual, r.meta));
+      return frases.join(" ");
     }
 
     case "FREQUENCIA_COMPARADA": {

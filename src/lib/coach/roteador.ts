@@ -16,6 +16,8 @@ export type IntentDados =
   | "FREQUENCIA_GRUPO"
   | "FREQUENCIA_COMPARADA"
   | "SEQUENCIA_DIAS"
+  | "SEMANAS_SEGUIDAS"
+  | "META_CUMPRIDA"
   | "RESUMO_SEMANA";
 
 /** Perguntas sobre UM grupo muscular citado; levam a chave do grupo junto. */
@@ -117,6 +119,27 @@ export function classificar(pergunta: string): Classificacao | null {
   // Pergunta sobre mais de um grupo ao mesmo tempo ainda não tem resposta
   // local; responder um só seria responder outra pergunta.
   if (grupo === "varios") return null;
+
+  // Antes da sequência de dias: "sequência de semanas" também tem "sequência".
+  if (tem(texto, /\b(semanas|weeks)\b/) && tem(texto, /\b(seguidas|consecutivas|in a row|straight|sequencia|streak|racha)\b/)) {
+    return grupo ? null : { intent: "SEMANAS_SEGUIDAS" };
+  }
+
+  // Meta semanal (a de Ajustes). Antes de "quantos treinos na semana".
+  // "Qual meta devo ter?" é prescrição: fica com a Gemini.
+  if (tem(texto, /\b(meta|metas|goal|goals|objetivo|objetivos)\b/)) {
+    // A resposta cobre as últimas 8 semanas e a atual; outro período é outra pergunta.
+    if (grupo || tem(texto, GRUPO_PRESCRITIVO) || tem(texto, OUTRO_PERIODO)) return null;
+    if (
+      tem(
+        texto,
+        /\b(bati|bato|batendo|cumpri|cumpro|cumprida|cumprindo|atingi|alcancei|hit|met|meet|meeting|reach|reached|cumpli|cumplida|alcance|logre|quantas semanas|how many weeks|cuantas semanas)\b/,
+      )
+    ) {
+      return { intent: "META_CUMPRIDA" };
+    }
+    return null;
+  }
 
   if (
     tem(texto, /\b(streak|sequencia|racha)\b/) ||
