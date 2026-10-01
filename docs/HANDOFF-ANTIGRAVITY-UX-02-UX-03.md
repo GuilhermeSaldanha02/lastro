@@ -1,5 +1,7 @@
 # Handoff para o Antigravity (Gemini) — UX-02 e UX-03
 
+> **ATUALIZAÇÃO 2026-10-01: este handoff foi superado.** O Antigravity ficou sem cota e o Claude assumiu os dois itens em 2026-09-28. **UX-02 está feita** (histórico com calendário do mês). **UX-03 está com a cobertura planejada completa e os 14 achados corrigidos**; falta só a auditoria independente de outro agente e a cobertura marcada "sem medir" na §4c de `docs/qualidade/ux-03-auditoria-2026-09-26.md`. A seção §6 (itens do dono) também mudou: a chave `SUPABASE_SERVICE_ROLE_KEY` já foi adicionada e a 2ª conta (personal) já existe. Fonte do estado vivo: `docs/BACKLOG-CANONICO.md` e o bloco ESTADO ATUAL do `PROGRESS.md`. O texto abaixo fica como registro.
+
 > Escrito em 2026-09-26 pelo Claude, a pedido do dono. **Você vai executar isto sozinho, sem ter visto a conversa que gerou o projeto.** Tudo o que precisa saber está aqui ou nos arquivos apontados. Se algo faltar, **pergunte ao dono; não invente**.
 >
 > Recomendação registrada no backlog: estas duas tarefas rendem mais **depois que o lastro tiver gente real usando**, porque aí o dono decide com dado onde está o atrito. Fazer agora é permitido, só menos informado.

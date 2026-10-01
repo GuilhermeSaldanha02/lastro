@@ -6,7 +6,10 @@
 
 ## Estado da auditoria
 
-- Base: `main` em `bd10edd` (atualizado 2026-09-25).
+- Base: `main` em `6b1746e` (#357), atualizado 2026-10-01. **Em aberto, ainda
+  não mergeadas:** #358 (decisões do dono de 2026-09-29, só documentação) e
+  as cinco PRs da AN-08 M3, #359 a #363 (ver a tabela `AN-08.*`). Tudo isso
+  está mergeável, mas só vale como "feito" depois do merge.
 - QA-01 (reexecução do QA.md) rodou treino, leitura pura, e2e no CI e
   offline: 68 → 56 obsoletos. Detalhe completo em `QA.md`.
 - Regra de execução: E2E somente manual em marco de integração; testes
@@ -48,22 +51,22 @@ Sub-itens do AN-08. **Linha sem status = não iniciada.** O prefixo `AN-08.` evi
 | AN-08.E1–E5 | Estudo | **ENTREGUE E APROVADO 2026-09-28** (o dono autorizou o Coach a ler os dados do próprio usuário e a M1): `docs/estudos/AN-08-motor-deterministico-estudo.md`. As 5 entregas: auditoria, matriz de capacidades (30+ perguntas), arquitetura, roadmap, economia estimada de IA. Depois delas, PARAR. | §27–§28 |
 | AN-08.F0-MATRIZ | 0 | Matriz Gemini × determinístico em níveis 0–4 (progressão, volume, frequência, consistência). | §3–§6, §24 |
 | AN-08.F0-TEMPO | 0 | **FEITO 2026-09-28 (M1, PR #348):** `src/lib/analise/periodo.ts`. Falta a M2: o `montarResumoCompacto` aceitar período (para o AN-07 e a C3). Era: Camada única de comparação temporal (semana, 4 semanas, mês, período livre × anterior). | §7 |
-| AN-08.F0-ANOMALIA | 0 | Detector de sessão fora do padrão do próprio usuário, com piso de amostra. | §8 |
+| AN-08.F0-ANOMALIA | 0 | **PR ABERTA #361 (M3-3), não mergeada.** Piso de 4 sessões do mesmo tipo, mediana das últimas 6, limiar ±30%. Detector de sessão fora do padrão do próprio usuário, com piso de amostra. | §8 |
 | AN-08.F0-INSIGHT | 0 | `Insight` como dado estruturado, antes de virar texto. | §9 |
 | AN-08.F0-ROTEADOR | 0 | **FEITO 2026-09-28 (M1, PR #349):** `src/lib/coach/` (roteador, respostas, ponte com o banco). 8 perguntas de dados e 3 recusas sem Gemini nem cota; o resto segue para a Gemini. Prova: e2e `j34` (`uso_ia` segue em 0). Falta: intents de período (M2), volume e frequência de UM grupo, e o contador de resolução local (F0-CUSTO). Era: Roteador de perguntas do Coach sem LLM para classificar (intents, padrões, aliases). | §10–§11 |
 | AN-08.M2-1 | M2 | **FEITO 2026-09-28 (PR #352).** Prova: e2e `j12` (com o teto de IA estourado, a pergunta 1 responde e não gasta cota). Era: Perguntas 1 a 4 da Análise respondidas **por lógica, sem Gemini**, cada uma com resposta própria e focada: 1 progresso (e1RM e recordes), 2 empaque (estagnações), 3 equilíbrio (séries por grupo × faixa, grupos sem estímulo), 4 demais ou de menos (frequência × média, volume semanal, séries difíceis). Corrige o achado do dono de que as perguntas "retornam a mesma coisa": o texto de quando a Gemini falha (`leituraDeterministica`) ignora qual pergunta foi feita. A pergunta 5 (o que mudar) segue com a Gemini, porque prescrição por regra é proibida (PRD §5). **O visual da Análise NÃO muda** (decisão do dono). Emenda o PRD §3 junto com o código (`DECISIONS.md` 2026-09-28 (2)). | — |
 | AN-08.M2-2 | M2 | **FEITO 2026-09-28 (PR #353, migração `20260928150019`).** Prova: e2e `j35` com captura da página a 375 px. Era: Duas perguntas novas na Análise, por lógica: **6 "Como foi meu mês?"** (mês atual × anterior, fecha a C3) e **7 "Do primeiro treino até hoje"** (fecha o AN-07). Conteúdo escolhido pelo dono: base, evolução por exercício (só com 2+ sessões), recordes e grupos. Migração: `parecer.pergunta` passa a aceitar 1 a 7. Mesma lista e mesmo histórico de pareceres, sem mudança visual. | §7, §21 |
 | AN-08.M2-3 | M2 | **FEITO 2026-09-28** (intents `RELATORIO_MES` e `RELATORIO_HISTORICO` no roteador, `lib/coach/relatorio-salvo.ts`; salva como parecer confirmado em Pareceres salvos). Prova: e2e `j34`. Era: O Coach reconhece "como foi meu mês?" e "relatório desde o primeiro treino", gera o mesmo relatório da M2-2 e **salva como parecer no histórico da Análise**, avisando "Salvo na Análise". Guarda só o relatório, nunca o texto digitado, então a Política continua valendo. Depende da M2-2. | §10 |
 | AN-08.F0-CACHE | 0 | Avaliar cache/snapshot de agregados, com invalidação por série nova. | §12 |
-| AN-08.F0-CUSTO | 0 | Observabilidade de custo (local × Gemini, fallback, erro de classificação), sem telemetria invasiva. | §25 |
+| AN-08.F0-CUSTO | 0 | **PR ABERTA #359 (M3-1), não mergeada** (junto com as intents de volume e frequência de UM grupo). Observabilidade de custo (local × Gemini, fallback, erro de classificação), sem telemetria invasiva. | §25 |
 | AN-08.A1 | A | Check-in de recuperação (sono, energia, dor, estresse). | §13 |
 | AN-08.A2 | A | Índice de prontidão transparente, sem fórmula inventada. | §14 |
 | AN-08.A3 | A | Recuperação × desempenho, só correlação. | §15 |
-| AN-08.B1 | B | Sessão fora do padrão ao finalizar o treino. | §16 |
-| AN-08.B2 | B | "Lastro percebeu" na Home, por template, sem Gemini. | §17 |
+| AN-08.B1 | B | **PR ABERTA #362 (M3-3), não mergeada; empilhada na #361.** Sessão fora do padrão ao finalizar o treino. | §16 |
+| AN-08.B2 | B | **PR ABERTA #361 (M3-3), não mergeada.** "Lastro percebeu" na Home, por template, sem Gemini. | §17 |
 | AN-08.B3 | B | Explicar mudança de desempenho por evidências, sem causalidade. | §18 |
-| AN-08.C1 | C | Página funda por exercício. | §19 |
-| AN-08.C2 | C | Consistência/calendário (checar sobreposição com a UX-02). | §20 |
+| AN-08.C1 | C | **PR ABERTA #363 (M3-4), não mergeada.** Recorde = maior e1RM também no Catálogo. Página funda por exercício. | §19 |
+| AN-08.C2 | C | **Semanas seguidas e meta semanal: PR ABERTA #360 (M3-2), não mergeada; empilhada na #359.** Consistência/calendário (checar sobreposição com a UX-02). | §20 |
 | AN-08.C3 | C | **Entra na M2-2** (pergunta 6 da Análise). Era: Resumo mensal por template. | §21 |
 | AN-08.D1 | D | Peso corporal. | §22 |
 | AN-08.D2 | D | Health Connect / Apple Health — só estudar, bem mais tarde. | §23 |
