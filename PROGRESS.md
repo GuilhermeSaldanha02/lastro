@@ -14,7 +14,8 @@
 - **Dois achados do uso real, já corrigidos:** o check-in de uma conta aparecia na outra no mesmo navegador (#392, chaves do navegador por conta) e as abas do cartão se sobrepunham a 320 px em espanhol (#393). Lição: o CI da #390 rodou só a j43, e a suíte completa pegou a falha. Antes de mesclar PR que mexe na Home, rodar a j41 pelo menos.
 - **Decisões do dono desta sessão:** um "Agora não" encerra a subida automática do dia; compartilhamento com o personal continua LIGADO por padrão (recusada a sugestão de desligar); texto da Política 2026-10-01 aprovado; QA e auditoria ficam para o FINAL, para não haver retrabalho.
 - **Pendente de verificação final (a fazer por último, junto com QA e auditoria):** visual do mapa muscular a 320 e 390 px (a conta de teste não tem treino, então só dá com dado), revisão do código dos 28 arquivos da #390 e teste real na conta de uso do dono.
-- **Próximo passo (construção):** só o E2E-PROD (isolar o e2e do banco de produção). O resto do backlog de construção espera condição (A3 ~8 semanas de check-in) ou decisão do dono (CAT-GRUPOS, DESIGN-HTML, 2 branches locais). SMTP, CALLBACK e SEGREDOS são do dono; SEGREDOS por último.
+- **E2E-PROD feito (2026-10-02, #396):** o e2e roda no projeto `lastro-teste`; toda migração nova deve ir para os DOIS projetos (`docs/E2E-PROJETO-TESTE.md`). Secrets `TESTE_*` no GitHub.
+- **Próximo passo (construção):** nada de construção pendente além de BANCO-RECRIAVEL (decisão do dono). O resto do backlog de construção espera condição (A3 ~8 semanas de check-in) ou decisão do dono (CAT-GRUPOS, DESIGN-HTML, 2 branches locais). SMTP, CALLBACK e SEGREDOS são do dono; SEGREDOS por último.
 - **Para o próximo agente:** o check-in nunca vai à IA (`src/lib/checkin/nao-vai-para-ia.test.ts` trava isso). `playwright.config.ts` não silencia mais a folha: a marca "já respondi hoje" é por conta e vem de `entrarComoUsuario`.
 
 ## Handoff anterior preservado — 2026-09-29
