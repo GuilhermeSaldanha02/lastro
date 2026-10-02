@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { deveAbrirSozinha, lerRespostaGuardada } from "./abertura";
+import { chaveFolhaDispensada, chaveFolhaVista, chaveRespostaDoDia, deveAbrirSozinha, lerRespostaGuardada } from "./abertura";
 
 const HOJE = "2026-10-02";
 const ontem = { dia: "2026-10-01", sono: 4, energia: null, dor_muscular: null, estresse: null };
@@ -56,5 +56,14 @@ describe("lerRespostaGuardada", () => {
     expect(lerRespostaGuardada("{quebrado")).toBeNull();
     expect(lerRespostaGuardada(JSON.stringify({ sono: 3 }))).toBeNull();
     expect(lerRespostaGuardada("123")).toBeNull();
+  });
+});
+
+describe("chaves por conta", () => {
+  it("cada conta tem as suas chaves (uma conta não enxerga a outra no mesmo aparelho)", () => {
+    expect(chaveRespostaDoDia("a")).not.toBe(chaveRespostaDoDia("b"));
+    expect(chaveFolhaVista("a")).not.toBe(chaveFolhaVista("b"));
+    expect(chaveFolhaDispensada("a")).not.toBe(chaveFolhaDispensada("b"));
+    expect(chaveRespostaDoDia("a")).toContain("a");
   });
 });

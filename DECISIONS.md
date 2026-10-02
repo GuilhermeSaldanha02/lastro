@@ -3145,3 +3145,9 @@ Depois do teste do dono em produção e de 3 pareceres (QA, privacidade, produto
 - Conta com o aceite da Política pendente **e** um treino em aberto hoje: a Home (por onde o PWA sempre reabre) deixa de mandar para `/aceite` (`exigirCascaDeAluno(perfil, { treinoEmAndamento })`, `lib/dados/casca.ts`). A pessoa chega em "Continuar Treino de Hoje"; o treino em si (`/treino/[id]`) já não passava pelo guarda. Todas as outras telas guardadas seguem mandando para `/aceite`, que fica para a primeira delas depois do treino.
 - "Em aberto" = o `treinoDeHojeId` da Home (treino de hoje sem `finalizado_em`). Treino aberto de dias anteriores não conta, de propósito.
 - Teste: `casca.test.ts` (unitário) e `e2e/j44-aceite-com-treino-aberto.spec.ts`.
+
+## 2026-10-02 (3) — Check-in: o que o navegador guarda é por conta
+
+- **Achado em produção (dono, 2026-10-02):** com duas contas no mesmo Chrome, a Home da conta B mostrava o check-in da conta A. A resposta do dia (`lastro_checkin`) e a dispensa ("Agora não") ficavam em chaves globais do `localStorage`; o servidor dizia "sem check-in hoje", mas o cartão lia o aparelho. Além de errado, é dado de bem-estar de uma pessoa aparecendo na tela de outra.
+- **Correção:** todas as chaves levam o id do usuário (`lastro_checkin:<id>`, `lastro_checkin_visto:<id>`, `lastro_checkin_dispensado:<id>`; helpers em `lib/checkin/abertura.ts`), e as chaves globais antigas são apagadas ao abrir a Home.
+- **e2e:** a marca "já respondi hoje" deixou a config global do Playwright e passou para `entrarComoUsuario` (por conta). Teste novo na j43: duas contas no mesmo navegador não se misturam.

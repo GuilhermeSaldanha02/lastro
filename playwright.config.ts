@@ -33,20 +33,6 @@ if (existsSync(envLocal)) {
 
 const PORTA = 3100;
 
-// O check-in diário sobe sozinho na Home (AN-08 A1) e a folha é modal: sem
-// isto ela interceptaria os cliques de toda spec que passa pela Home. Marcar
-// "já respondi hoje" neste navegador a silencia; a j43 desliga esta marca.
-const HOJE_NO_BRASIL = new Date().toLocaleDateString("sv-SE", { timeZone: "America/Sao_Paulo" });
-export const CHECKIN_JA_RESPONDIDO = {
-  cookies: [],
-  origins: [
-    {
-      origin: `http://localhost:${PORTA}`,
-      localStorage: [{ name: "lastro_checkin", value: JSON.stringify({ dia: HOJE_NO_BRASIL, sono: 3, energia: null, dor_muscular: null, estresse: null }) }],
-    },
-  ],
-};
-
 export default defineConfig({
   testDir: "./e2e",
   fullyParallel: false,
@@ -57,7 +43,6 @@ export default defineConfig({
   timeout: 60_000,
   use: {
     baseURL: `http://localhost:${PORTA}`,
-    storageState: CHECKIN_JA_RESPONDIDO,
     trace: "retain-on-failure",
     screenshot: "only-on-failure",
     // O service worker (public/sw.js) responde a TODO fetch não-navegação

@@ -6,11 +6,11 @@
 import { useState } from "react";
 import { unstable_rethrow, useRouter } from "next/navigation";
 import { apagarMeusCheckins } from "@/lib/dados/checkin";
-import { CHAVE_FOLHA_DISPENSADA, CHAVE_RESPOSTA_DO_DIA } from "@/lib/checkin/abertura";
+import { chaveFolhaDispensada, chaveRespostaDoDia } from "@/lib/checkin/abertura";
 import type { Idioma } from "@/lib/dados/idioma";
 import { t } from "@/lib/texto/i18n";
 
-export default function ApagarCheckins({ hoje, idioma }: { hoje: string; idioma: Idioma }) {
+export default function ApagarCheckins({ hoje, usuarioId, idioma }: { hoje: string; usuarioId: string; idioma: Idioma }) {
   const router = useRouter();
   const [confirmando, setConfirmando] = useState(false);
   const [apagando, setApagando] = useState(false);
@@ -24,8 +24,8 @@ export default function ApagarCheckins({ hoje, idioma }: { hoje: string; idioma:
       try {
         // Esquece a resposta do aparelho e não pergunta de novo hoje: quem acabou
         // de apagar não quer ser abordado na mesma hora.
-        window.localStorage.removeItem(CHAVE_RESPOSTA_DO_DIA);
-        window.localStorage.setItem(CHAVE_FOLHA_DISPENSADA, hoje);
+        window.localStorage.removeItem(chaveRespostaDoDia(usuarioId));
+        window.localStorage.setItem(chaveFolhaDispensada(usuarioId), hoje);
       } catch {
         // sem armazenamento: nada a esquecer
       }
