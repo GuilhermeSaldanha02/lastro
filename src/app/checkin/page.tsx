@@ -28,7 +28,7 @@ export default async function PaginaCheckin() {
   return (
     <main className="tela">
       <CabecalhoPro
-        titulo={t("Check-in diário", idioma)}
+        titulo={t("Check-in", idioma)}
         destaque={t("7 dias", idioma)}
         voltarHref="/"
         perfil={perfil}
