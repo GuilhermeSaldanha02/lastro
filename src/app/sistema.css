@@ -2920,7 +2920,9 @@
 
 .metrica-switcher__tabs {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  /* Cada aba nunca fica menor que o próprio texto: com 4 colunas iguais, a 320 px
+     em espanhol "Check-in" e "Volumen" se sobrepunham em 5 px (j41). */
+  grid-template-columns: repeat(4, minmax(max-content, 1fr));
   background: var(--lastro-fundo);
   padding: 4px;
   border-radius: var(--lastro-raio-2);
