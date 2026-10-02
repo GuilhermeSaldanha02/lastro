@@ -153,3 +153,38 @@ test("duas contas no mesmo navegador não se misturam: a resposta de uma não ap
     await apagarUsuarioDescartavel(b);
   }
 });
+
+function diasAtras(hoje: string, n: number): string {
+  const [a, m, d] = hoje.split("-").map(Number);
+  return new Date(Date.UTC(a, m - 1, d - n)).toISOString().slice(0, 10);
+}
+
+test("A2: com 4+ dias de histórico, o cartão compara hoje com a média da própria pessoa (e sem histórico não mostra nada)", async ({ browser }) => {
+  test.setTimeout(150_000);
+  const conta = await criarUsuarioDescartavel("j43-a2");
+  try {
+    // 5 dias anteriores: energia 2, sono 3, só isso (dor e estresse sem histórico).
+    const cliente = await clienteAutenticado(conta);
+    const hoje = dataLocalBrasil();
+    const linhas = [1, 2, 3, 4, 5].map((n) => ({ usuario_id: conta.id, dia: diasAtras(hoje, n), sono: 3, energia: 2 }));
+    const { error } = await cliente.from("checkin").insert(linhas);
+    expect(error, "semear o histórico").toBeNull();
+
+    const { contexto, page } = await abrirApp(browser, conta);
+    await expect(FOLHA(page)).toBeVisible({ timeout: 15_000 });
+    await page.getByRole("button", { name: "Sono, nota 3 de 5" }).click();
+    await page.getByRole("button", { name: "Energia, nota 5 de 5" }).click();
+    await page.getByRole("button", { name: "Dor muscular, nota 2 de 5" }).click();
+    await FOLHA(page).getByRole("button", { name: "Salvar", exact: true }).click();
+    await expect(page.getByRole("button", { name: "Editar" })).toBeVisible();
+
+    // Energia 5 contra média 2: acima. Sono 3 contra média 3: na média.
+    // Dor não tem histórico: nenhuma comparação.
+    await expect(page.getByText("acima da sua média")).toHaveCount(1);
+    await expect(page.getByText("na sua média")).toHaveCount(1);
+    await expect(page.getByText("abaixo da sua média")).toHaveCount(0);
+    await contexto.close();
+  } finally {
+    await apagarUsuarioDescartavel(conta);
+  }
+});

@@ -15,7 +15,8 @@ import FormIniciarTreino from "@/components/form-iniciar-treino";
 import SetaNavegacao from "@/components/seta-navegacao";
 import RastreadorDisciplina from "@/components/rastreador-disciplina";
 import CartaoCheckin from "@/components/cartao-checkin";
-import { buscarCheckinDoDia } from "@/lib/dados/checkin";
+import { listarCheckinsRecentes } from "@/lib/dados/checkin";
+import { JANELA_DE_DIAS } from "@/lib/checkin/media";
 import SeletorMetricasHome from "@/components/seletor-metricas-home";
 import DicaInfo from "@/components/dica-info";
 import { frasePercebida } from "@/lib/analise/texto-fora-do-padrao";
@@ -83,11 +84,11 @@ export default async function PaginaInicial() {
   }
 
   const hoje = dataLocalBrasil();
-  const [resumo, perfil, modelos, checkinDeHoje] = await Promise.all([
+  const [resumo, perfil, modelos, checkinsRecentes] = await Promise.all([
     carregarResumoHome(hoje),
     obterPerfil(),
     listarModelos(),
-    buscarCheckinDoDia(hoje),
+    listarCheckinsRecentes(JANELA_DE_DIAS + 1),
   ]);
   // Conta de personal não tem Home de treino — ela cai na própria fila
   // (PRD §11, casca escolhida no gate visual). Barra trocada é pista; esta
@@ -155,7 +156,7 @@ export default async function PaginaInicial() {
 
         {/* Check-in diário e métricas reais no mesmo quadro. */}
         <SeletorMetricasHome
-          checkin={<CartaoCheckin hoje={hoje} usuarioId={user.id} checkinInicial={checkinDeHoje} idioma={idioma} embutido />}
+          checkin={<CartaoCheckin hoje={hoje} usuarioId={user.id} checkinInicial={checkinsRecentes.find((c) => c.dia === hoje) ?? null} anteriores={checkinsRecentes.filter((c) => c.dia < hoje)} idioma={idioma} embutido />}
           volumeFormatado={volumeFormatado}
           seriesValendo={resumo.seriesValendoNaSemana}
           treinosNaSemana={resumo.treinosNaSemana}
