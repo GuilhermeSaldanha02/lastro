@@ -4,7 +4,7 @@
 //
 // As outras specs rodam com a marca "já respondi hoje" (playwright.config.ts);
 // esta é a que a desliga.
-import { expect, test, type Browser, type Page } from "@playwright/test";
+import { expect, test, type Browser, type BrowserContext, type Page } from "@playwright/test";
 import {
   apagarUsuarioDescartavel,
   clienteAutenticado,
@@ -31,8 +31,8 @@ test.afterAll(async () => {
 const FOLHA = (page: Page) => page.getByRole("dialog", { name: "Como você está hoje?" });
 
 /** Uma "abertura do app" nova: contexto limpo (sessionStorage zerado), mesma conta. */
-async function abrirApp(browser: Browser, usuario: UsuarioDescartavel) {
-  const contexto = await browser.newContext();
+async function abrirApp(browser: Browser, usuario: UsuarioDescartavel, estado?: Awaited<ReturnType<BrowserContext["storageState"]>>) {
+  const contexto = await browser.newContext(estado ? { storageState: estado } : {});
   const page = await contexto.newPage();
   await entrarComoUsuario(page, usuario, { checkinAberto: true });
   // O login já cai na Home: é essa a "abertura do app". Recarregar na mesma aba
@@ -73,10 +73,19 @@ test("a folha sobe sozinha, salvar grava e, respondido, ela não volta mais no d
   await expect(reaberto.page.getByRole("listitem")).toHaveCount(7);
   await expect(reaberto.page.getByRole("img", { name: "Sono: nota 4 de 5" })).toBeVisible();
   await expect(reaberto.page.getByText("Sem check-in neste dia.")).toHaveCount(6);
+
+  // Apagar meus check-ins: pede confirmação, apaga tudo e não deixa nada no banco.
+  await reaberto.page.getByRole("button", { name: "Apagar meus check-ins" }).click();
+  await reaberto.page.getByRole("button", { name: "Sim, apagar tudo" }).click();
+  await expect(reaberto.page.getByText("Sem check-in neste dia.")).toHaveCount(7);
+  await expect(reaberto.page.getByRole("button", { name: "Apagar meus check-ins" })).toHaveCount(0);
+  await expect
+    .poll(async () => (await cliente.from("checkin").select("dia")).data)
+    .toEqual([]);
   await reaberto.contexto.close();
 });
 
-test("'Agora não' não repete na mesma abertura, mas volta na próxima enquanto o dia está sem resposta", async ({ browser }) => {
+test("'Agora não' encerra a subida automática do dia: nem uma abertura nova do app a repete, e o cartão segue lá", async ({ browser }) => {
   test.setTimeout(120_000);
   const { contexto, page } = await abrirApp(browser, adiador);
 
@@ -95,10 +104,17 @@ test("'Agora não' não repete na mesma abertura, mas volta na próxima enquanto
   const cliente = await clienteAutenticado(adiador);
   const { data } = await cliente.from("checkin").select("dia").eq("dia", dataLocalBrasil());
   expect(data).toEqual([]);
-  await contexto.close();
 
-  // Abertura nova do app: sobe de novo.
-  const novo = await abrirApp(browser, adiador);
-  await expect(FOLHA(novo.page)).toBeVisible({ timeout: 15_000 });
+  // Abertura nova do app NESTE aparelho (o localStorage vem junto, o sessionStorage não):
+  // a dispensa vale pelo dia, a folha não sobe e o cartão continua como porta.
+  // Só o localStorage: sem os cookies, a nova abertura faz o login de novo.
+  const { origins } = await contexto.storageState();
+  const estado = { cookies: [], origins };
+  await contexto.close();
+  const novo = await abrirApp(browser, adiador, estado);
+  await expect(novo.page.getByRole("button", { name: "Responder" })).toBeVisible({ timeout: 15_000 });
+  await expect(FOLHA(novo.page)).toHaveCount(0);
+  await novo.page.getByRole("button", { name: "Responder" }).click();
+  await expect(FOLHA(novo.page)).toBeVisible();
   await novo.contexto.close();
 });

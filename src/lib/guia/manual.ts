@@ -137,6 +137,7 @@ export const SECOES_GUIA: SecaoGuia[] = [
       "Quando você abre o app e ainda não respondeu o do dia, sobe uma folha com quatro notas de 1 a 5: sono, energia, dor muscular e estresse. É opcional: responda só o que quiser, ou toque em “Agora não”. Respondeu, ela não volta mais naquele dia.",
       "Depois, o cartão na Home mostra como você marcou, e dá para corrigir a qualquer hora do dia. Vale também em dia sem treino.",
       "As notas são suas. Se você treina com um personal, ele as vê só enquanto você mantiver ligado “Compartilhar meu check-in diário com o personal”, em Ajustes > Personal, e você desliga quando quiser. Elas nunca vão para a inteligência artificial.",
+      "Tocou em “Agora não”? A folha não sobe mais sozinha naquele dia, e o cartão na Home continua lá para você responder quando quiser. Para apagar tudo, use “Apagar meus check-ins” na tela “Ver últimos 7 dias”.",
     ],
   },
   {

@@ -121,6 +121,18 @@ export async function definirCompartilhaCheckin(compartilha: boolean): Promise<v
   revalidatePath("/ajustes/personal");
 }
 
+/**
+ * Apaga TODOS os check-ins da PRÓPRIA conta (a retirada do consentimento sem
+ * apagar a conta, LGPD art. 8º §5º). Escopo explícito, mesmo com a RLS.
+ */
+export async function apagarMeusCheckins(): Promise<void> {
+  const { supabase, user } = await usuarioAutenticadoOuErro();
+  const { error } = await supabase.from("checkin").delete().eq("usuario_id", user.id);
+  if (error) throw new Error(`Falha ao apagar os check-ins: ${error.message}`);
+  revalidatePath("/checkin");
+  revalidatePath("/");
+}
+
 function escaparCsv(valor: string): string {
   return `"${valor.replace(/"/g, '""')}"`;
 }
