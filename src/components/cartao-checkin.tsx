@@ -18,6 +18,7 @@ import Link from "next/link";
 import Folha from "./folha";
 import { registrarCheckinNaFila } from "@/lib/offline/checkin";
 import { CAMPOS_CHECKIN, type CampoCheckin, type NotaCheckin } from "@/lib/checkin/escala";
+import { descreverNotaCheckin } from "@/lib/checkin/resumo";
 import {
   CHAVE_FOLHA_DISPENSADA,
   CHAVE_FOLHA_VISTA,
@@ -35,12 +36,23 @@ type Notas = Record<CampoCheckin, NotaCheckin | null>;
 const NOTAS: NotaCheckin[] = [1, 2, 3, 4, 5];
 
 /** Rótulo do campo e as duas pontas da escala (chaves em português; `t()` traduz). */
-const CAMPOS: Record<CampoCheckin, { nome: string; curto: string; baixo: string; alto: string }> = {
-  sono: { nome: "Sono", curto: "Sono", baixo: "Péssimo", alto: "Ótimo" },
-  energia: { nome: "Energia", curto: "Energia", baixo: "Nenhuma", alto: "Muita" },
-  dor_muscular: { nome: "Dor muscular", curto: "Dor", baixo: "Nenhuma", alto: "Muita" },
-  estresse: { nome: "Estresse", curto: "Estresse", baixo: "Baixo", alto: "Alto" },
+const CAMPOS: Record<CampoCheckin, { nome: string; baixo: string; alto: string }> = {
+  sono: { nome: "Sono", baixo: "Péssimo", alto: "Ótimo" },
+  energia: { nome: "Energia", baixo: "Nenhuma", alto: "Muita" },
+  dor_muscular: { nome: "Dor muscular", baixo: "Nenhuma", alto: "Muita" },
+  estresse: { nome: "Estresse", baixo: "Baixo", alto: "Alto" },
 };
+
+function IconeCheckin({ campo }: { campo: CampoCheckin }) {
+  return (
+    <svg className="checkin-resumo__icone" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" focusable="false">
+      {campo === "sono" && <path d="M20.5 14A8.5 8.5 0 0 1 10 3.5 8.5 8.5 0 1 0 20.5 14Z" />}
+      {campo === "energia" && <path d="m13 2-9 12h7l-1 8 10-12h-7l1-8Z" />}
+      {campo === "dor_muscular" && <path d="M7 13 5 7l2-3h4l1 3-3 1 2 5c2-3 5-3 7-1 2 2 2 5 0 7-3 3-9 2-13 0l-2-5m8-1 2 2" />}
+      {campo === "estresse" && <path d="M9 21v-4H6v-4H3l3-5a7 7 0 0 1 14 1c0 3-2 5-3 7v5M10 8h5m-3-3v6" />}
+    </svg>
+  );
+}
 
 function notasDe(inicial: CheckinDoDia | RespostaGuardada | null): Notas {
   const vazio: Notas = { sono: null, energia: null, dor_muscular: null, estresse: null };
@@ -55,6 +67,7 @@ export default function CartaoCheckin({
   usuarioId,
   checkinInicial,
   idioma,
+  embutido = false,
 }: {
   /** O dia local da pessoa (AAAA-MM-DD), calculado no servidor. */
   hoje: string;
@@ -62,6 +75,8 @@ export default function CartaoCheckin({
   /** O check-in de hoje que o servidor já tem, ou `null`. */
   checkinInicial: CheckinDoDia | null;
   idioma: Idioma;
+  /** Integra o conteúdo à superfície da aba, sem outro cartão ao redor. */
+  embutido?: boolean;
 }) {
   const [notas, setNotas] = useState<Notas>(() => notasDe(checkinInicial));
   const [respondido, setRespondido] = useState(checkinInicial !== null);
@@ -142,7 +157,7 @@ export default function CartaoCheckin({
 
   return (
     <>
-      <section className={respondido ? "checkin-cartao" : "checkin-cartao checkin-cartao--pendente"} aria-label={t("Check-in de hoje", idioma)}>
+      <section className={`checkin-cartao${respondido ? "" : " checkin-cartao--pendente"}${embutido ? " checkin-cartao--embutido" : ""}`} aria-label={t("Check-in de hoje", idioma)}>
         {respondido ? (
           <>
             <div className="checkin-cartao__cabecalho">
@@ -151,27 +166,22 @@ export default function CartaoCheckin({
                 {t("Editar", idioma)}
               </button>
             </div>
-            <div className="checkin-barras">
+            <dl className="checkin-resumo">
               {CAMPOS_CHECKIN.map((campo) => {
                 const nota = notas[campo];
-                const nome = t(CAMPOS[campo].curto, idioma);
                 return (
-                  <div
-                    key={campo}
-                    className="checkin-barra"
-                    role="img"
-                    aria-label={nota === null ? `${nome}: ${t("sem resposta", idioma)}` : `${nome}: ${t("nota", idioma)} ${nota} ${t("de 5", idioma)}`}
-                  >
-                    <div className="checkin-barra__segmentos" aria-hidden="true">
-                      {[5, 4, 3, 2, 1].map((n) => (
-                        <span key={n} className={nota !== null && n <= nota ? "checkin-barra__segmento checkin-barra__segmento--cheio" : "checkin-barra__segmento"} />
-                      ))}
-                    </div>
-                    <span className="checkin-barra__nome">{nome}</span>
+                  <div key={campo} className="checkin-resumo__linha">
+                    <dt className="checkin-resumo__campo">
+                      <IconeCheckin campo={campo} />
+                      <span>{t(CAMPOS[campo].nome, idioma)}</span>
+                    </dt>
+                    <dd className="checkin-resumo__valor" title={nota === null ? undefined : `${t("nota", idioma)} ${nota} ${t("de 5", idioma)}`}>
+                      {t(descreverNotaCheckin(campo, nota), idioma)}
+                    </dd>
                   </div>
                 );
               })}
-            </div>
+            </dl>
             <Link href="/checkin" className="botao-textual">
               {t("Ver últimos 7 dias", idioma)}
             </Link>

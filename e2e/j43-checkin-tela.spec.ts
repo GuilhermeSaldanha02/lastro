@@ -51,6 +51,13 @@ test("a folha sobe sozinha, salvar grava e, respondido, ela não volta mais no d
   await FOLHA(page).getByRole("button", { name: "Salvar", exact: true }).click();
   await expect(FOLHA(page)).toBeHidden();
   await expect(page.getByRole("button", { name: "Editar" })).toBeVisible();
+  await expect(page.getByRole("tab", { name: "Check-in", exact: true })).toHaveAttribute("aria-selected", "true");
+  await expect(page.locator(".checkin-resumo__linha")).toHaveCount(4);
+  await page.getByRole("tab", { name: "Grupos", exact: true }).click();
+  await expect(page.getByRole("button", { name: "Editar", exact: true })).toBeHidden();
+  await page.getByRole("tab", { name: "Check-in", exact: true }).click();
+  await expect(page.getByRole("button", { name: "Editar", exact: true })).toBeVisible();
+  await expect(FOLHA(page)).toHaveCount(0);
 
   const hoje = dataLocalBrasil();
   const cliente = await clienteAutenticado(respondedor);
