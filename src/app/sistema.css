@@ -6586,7 +6586,8 @@ html:lang(pt) .nav a {
 .checkin-barras {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: var(--lastro-e-3);
+  /* gap enxuto: a 320 px o rótulo "Estresse" não cabe numa coluna mais estreita */
+  gap: var(--lastro-e-2);
 }
 
 .checkin-barra {
@@ -6616,10 +6617,8 @@ html:lang(pt) .nav a {
 
 .checkin-barra__nome {
   max-width: 100%;
-  overflow: hidden;
-  text-overflow: ellipsis;
   white-space: nowrap;
-  font-size: calc(var(--lastro-papel-detalhe) + 2px);
+  font-size: calc(var(--lastro-papel-detalhe) + 1px);
   color: var(--lastro-txt-2);
 }
 
