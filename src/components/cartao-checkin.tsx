@@ -14,6 +14,7 @@
 //
 // Este dado NUNCA vai para a IA (`lib/checkin/nao-vai-para-ia.test.ts`).
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import Folha from "./folha";
 import { registrarCheckinNaFila } from "@/lib/offline/checkin";
 import { CAMPOS_CHECKIN, type CampoCheckin, type NotaCheckin } from "@/lib/checkin/escala";
@@ -162,6 +163,9 @@ export default function CartaoCheckin({
                 );
               })}
             </div>
+            <Link href="/checkin" className="botao-textual">
+              {t("Ver últimos 7 dias", idioma)}
+            </Link>
             {pendente && <p className="campo__nota">{t("Salvo no aparelho. Sobe quando houver sinal.", idioma)}</p>}
           </>
         ) : (

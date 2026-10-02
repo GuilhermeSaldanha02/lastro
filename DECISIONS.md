@@ -3127,3 +3127,7 @@ Com 2 sessões o resultado é igual ao de antes. Com número ímpar, a sessão d
 - **Política/Termos:** `VERSAO_DOCUMENTOS` = 2026-10-01, com o check-in como dado de bem-estar opcional, a regra "nunca vai para a IA", o personal vendo se o aluno compartilha, a exportação e a correção do POL-01. **Texto aguardando aprovação do dono; esta PR não é mesclada antes.**
 - **e2e:** `playwright.config.ts` e `entrarComoUsuario` marcam "já respondi hoje" para a folha modal não interceptar as outras specs; a `j43` desliga essa marca.
 - **Limitação conhecida:** quem volta ao PWA no meio de um treino abre em `/` e cai em `/aceite` se o aceite estiver pendente (o treino aberto em si não passa pelo guarda).
+
+## 2026-10-01 (4) — Check-in diário: últimos 7 dias (AN-08 A1, PR 3/3)
+
+- Tela `/checkin` (link "Ver últimos 7 dias" no cartão da Home): 7 dias terminando hoje, com os dias sem resposta visíveis como "Sem check-in neste dia". Só registro: sem cruzar com desempenho (A2/A3, depois de ~8 semanas de dado) e nunca para a IA. A tela do personal fica para depois.
