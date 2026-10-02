@@ -175,22 +175,22 @@ export async function entrarComoUsuario(
   usuario: UsuarioDescartavel,
   opcoes: { checkinAberto?: boolean } = {},
 ): Promise<void> {
-  // O check-in diário sobe sozinho na Home e a folha é modal (AN-08 A1). Os
-  // contextos criados por `browser.newContext()` não herdam o `storageState`
-  // da config, então a marca "já respondi hoje" vai também por aqui. Só a j43
-  // (`checkinAberto`) quer ver a folha.
+  // O check-in diário sobe sozinho na Home e a folha é modal (AN-08 A1): sem
+  // silenciá-la ela interceptaria os cliques de toda spec que passa pela Home.
+  // A marca "já respondi hoje" é POR CONTA (a chave leva o id do usuário). Só a
+  // j43 (`checkinAberto`) quer ver a folha.
   if (!opcoes.checkinAberto) {
     const hoje = new Date().toLocaleDateString("sv-SE", { timeZone: "America/Sao_Paulo" });
-    await page.addInitScript((dia) => {
+    await page.addInitScript(({ dia, id }) => {
       try {
         window.localStorage.setItem(
-          "lastro_checkin",
+          `lastro_checkin:${id}`,
           JSON.stringify({ dia, sono: 3, energia: null, dor_muscular: null, estresse: null }),
         );
       } catch {
         // sem armazenamento: nada a silenciar
       }
-    }, hoje);
+    }, { dia: hoje, id: usuario.id });
   }
   await page.goto("/login");
   await page.locator("#email").fill(usuario.email);

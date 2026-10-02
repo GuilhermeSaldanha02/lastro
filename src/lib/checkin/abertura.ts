@@ -12,12 +12,19 @@
 // várias vezes ao dia, então UM "Agora não" encerra a subida automática do dia
 // (`localStorage`). O cartão da Home continua sendo a porta para responder.
 
+// Tudo que o navegador guarda é POR CONTA (a chave leva o id do usuário). Um
+// aparelho com duas contas (o dono usa duas no mesmo Chrome) não pode mostrar o
+// check-in de uma na outra, nem a dispensa de uma calar a outra: a primeira
+// versão guardava numa chave só e foi achada assim em produção (2026-10-02).
+
 /** `localStorage`: a resposta do dia neste aparelho (cobre a fila offline ainda não sincronizada). */
-export const CHAVE_RESPOSTA_DO_DIA = "lastro_checkin";
+export const chaveRespostaDoDia = (usuarioId: string) => `lastro_checkin:${usuarioId}`;
 /** `sessionStorage`: o dia em que a folha já subiu nesta abertura do app. */
-export const CHAVE_FOLHA_VISTA = "lastro_checkin_visto";
+export const chaveFolhaVista = (usuarioId: string) => `lastro_checkin_visto:${usuarioId}`;
 /** `localStorage`: o dia em que a pessoa dispensou a folha ("Agora não"). */
-export const CHAVE_FOLHA_DISPENSADA = "lastro_checkin_dispensado";
+export const chaveFolhaDispensada = (usuarioId: string) => `lastro_checkin_dispensado:${usuarioId}`;
+/** Chaves da primeira versão, globais e por isso erradas: o componente as apaga. */
+export const CHAVES_ANTIGAS_GLOBAIS = ["lastro_checkin", "lastro_checkin_dispensado"] as const;
 
 export type RespostaGuardada = {
   dia: string;

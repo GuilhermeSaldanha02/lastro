@@ -14,8 +14,6 @@ import {
 } from "./helpers/usuario-descartavel";
 import { dataLocalBrasil } from "../src/lib/tempo";
 
-test.use({ storageState: { cookies: [], origins: [] } });
-
 let respondedor: UsuarioDescartavel;
 let adiador: UsuarioDescartavel;
 
@@ -124,4 +122,34 @@ test("'Agora não' encerra a subida automática do dia: nem uma abertura nova do
   await novo.page.getByRole("button", { name: "Responder" }).click();
   await expect(FOLHA(novo.page)).toBeVisible();
   await novo.contexto.close();
+});
+
+test("duas contas no mesmo navegador não se misturam: a resposta de uma não aparece na outra", async ({ browser }) => {
+  test.setTimeout(150_000);
+  const a = await criarUsuarioDescartavel("j43-conta-a");
+  const b = await criarUsuarioDescartavel("j43-conta-b");
+  const contexto = await browser.newContext();
+  try {
+    const page = await contexto.newPage();
+
+    // A responde (e fica gravado no localStorage deste navegador).
+    await entrarComoUsuario(page, a, { checkinAberto: true });
+    await expect(FOLHA(page)).toBeVisible({ timeout: 15_000 });
+    await page.getByRole("button", { name: "Sono, nota 5 de 5" }).click();
+    await FOLHA(page).getByRole("button", { name: "Salvar", exact: true }).click();
+    await expect(page.getByRole("button", { name: "Editar" })).toBeVisible();
+
+    // Mesmo navegador (mesmo localStorage), outra conta.
+    await contexto.clearCookies();
+    await entrarComoUsuario(page, b, { checkinAberto: true });
+    // B nunca respondeu: a folha sobe e o cartão não traz a nota de A.
+    await expect(FOLHA(page)).toBeVisible({ timeout: 15_000 });
+    await FOLHA(page).getByRole("button", { name: "Agora não" }).click();
+    await expect(page.getByRole("button", { name: "Responder" })).toBeVisible();
+    await expect(page.getByRole("button", { name: "Editar" })).toHaveCount(0);
+  } finally {
+    await contexto.close();
+    await apagarUsuarioDescartavel(a);
+    await apagarUsuarioDescartavel(b);
+  }
 });

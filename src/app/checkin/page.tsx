@@ -66,7 +66,7 @@ export default async function PaginaCheckin() {
           ))}
         </ul>
 
-        {recentes.length > 0 && <ApagarCheckins hoje={hoje} idioma={idioma} />}
+        {recentes.length > 0 && <ApagarCheckins hoje={hoje} usuarioId={perfil.id} idioma={idioma} />}
       </div>
       <AbaInferior ativa="inicio" tipoConta={cascaDaBarra(perfil)} idioma={idioma} />
     </main>

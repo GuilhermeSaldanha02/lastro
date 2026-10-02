@@ -20,9 +20,10 @@ import { registrarCheckinNaFila } from "@/lib/offline/checkin";
 import { CAMPOS_CHECKIN, type CampoCheckin, type NotaCheckin } from "@/lib/checkin/escala";
 import { descreverNotaCheckin } from "@/lib/checkin/resumo";
 import {
-  CHAVE_FOLHA_DISPENSADA,
-  CHAVE_FOLHA_VISTA,
-  CHAVE_RESPOSTA_DO_DIA,
+  CHAVES_ANTIGAS_GLOBAIS,
+  chaveFolhaDispensada,
+  chaveFolhaVista,
+  chaveRespostaDoDia,
   deveAbrirSozinha,
   lerRespostaGuardada,
   type RespostaGuardada,
@@ -89,13 +90,18 @@ export default function CartaoCheckin({
   // guardou. O estado muda num `.then` (e não no corpo do efeito), como o resto
   // do app faz (`treino-detalhe.tsx`, regra `react-hooks/set-state-in-effect`).
   useEffect(() => {
+    try {
+      for (const antiga of CHAVES_ANTIGAS_GLOBAIS) window.localStorage.removeItem(antiga);
+    } catch {
+      // sem armazenamento: nada a limpar
+    }
     let guardada: RespostaGuardada | null = null;
     let folhaVistaNoDia: string | null = null;
     let dispensadoNoDia: string | null = null;
     try {
-      guardada = lerRespostaGuardada(window.localStorage.getItem(CHAVE_RESPOSTA_DO_DIA));
-      folhaVistaNoDia = window.sessionStorage.getItem(CHAVE_FOLHA_VISTA);
-      dispensadoNoDia = window.localStorage.getItem(CHAVE_FOLHA_DISPENSADA);
+      guardada = lerRespostaGuardada(window.localStorage.getItem(chaveRespostaDoDia(usuarioId)));
+      folhaVistaNoDia = window.sessionStorage.getItem(chaveFolhaVista(usuarioId));
+      dispensadoNoDia = window.localStorage.getItem(chaveFolhaDispensada(usuarioId));
     } catch {
       // Armazenamento bloqueado (aba privada): sem memória, segue só pelo servidor.
     }
@@ -103,7 +109,7 @@ export default function CartaoCheckin({
     const abrir = deveAbrirSozinha({ hoje, respondidoNoServidor: checkinInicial !== null, guardada, folhaVistaNoDia, dispensadoNoDia });
     if (abrir) {
       try {
-        window.sessionStorage.setItem(CHAVE_FOLHA_VISTA, hoje);
+        window.sessionStorage.setItem(chaveFolhaVista(usuarioId), hoje);
       } catch {
         // Sem sessionStorage a folha pode subir mais de uma vez; é o custo aceitável.
       }
@@ -115,7 +121,7 @@ export default function CartaoCheckin({
       }
       if (abrir) setAberta(true);
     });
-  }, [hoje, checkinInicial]);
+  }, [hoje, usuarioId, checkinInicial]);
 
   const respondidas = CAMPOS_CHECKIN.filter((c) => notas[c] !== null).length;
 
@@ -128,7 +134,7 @@ export default function CartaoCheckin({
     setAberta(false);
     setErro(null);
     try {
-      window.localStorage.setItem(CHAVE_FOLHA_DISPENSADA, hoje);
+      window.localStorage.setItem(chaveFolhaDispensada(usuarioId), hoje);
     } catch {
       // sem localStorage a dispensa vale só enquanto a aba durar (sessionStorage)
     }
@@ -141,7 +147,7 @@ export default function CartaoCheckin({
     try {
       const { pendente: ficouNaFila } = await registrarCheckinNaFila({ dia: hoje, ...notas }, usuarioId);
       try {
-        window.localStorage.setItem(CHAVE_RESPOSTA_DO_DIA, JSON.stringify({ dia: hoje, ...notas }));
+        window.localStorage.setItem(chaveRespostaDoDia(usuarioId), JSON.stringify({ dia: hoje, ...notas }));
       } catch {
         // Sem localStorage a fila já guarda a resposta; só não lembramos dela na Home.
       }
