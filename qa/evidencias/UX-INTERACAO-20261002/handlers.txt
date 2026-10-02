@@ -1,0 +1,9 @@
+REPRODUZIDO: onboarding.tsx mantém ocupado=true e erro=null após rejeição de transporte
+REPRODUZIDO: aceite-termos.tsx mantém ocupado=true e erro=null após rejeição de transporte
+REPRODUZIDO: idioma-form.tsx mantém ocupado=true e erro=null após rejeição de transporte
+REPRODUZIDO: editar-perfil.tsx mantém ocupado=true e erro=null após rejeição de transporte
+REPRODUZIDO: + do modelo só abre formulário depois de resolver busca do histórico
+REPRODUZIDO: edição já enfileirada continua aberta até drenar resolver
+REPRODUZIDO: resposta 202 deixa emAndamento preenchido; código usa esse estado para bloquear perguntas
+REPRODUZIDO: alterar nota e fechar mantém nota alterada no estado do resumo sem chamar salvar
+8 cenários reproduzidos. Evidência de lógica isolada; não é prova visual ou E2E.
