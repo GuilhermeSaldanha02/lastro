@@ -34,6 +34,7 @@ let aluno: UsuarioDescartavel;
 let treinador: UsuarioDescartavel;
 let treinoPassadoId = "";
 let exercicioId = "";
+let exercicioComGifId = "";
 let exerciciosDoTreino: string[] = [];
 
 test.beforeAll(async () => {
@@ -42,8 +43,12 @@ test.beforeAll(async () => {
   await semearHistoricoParaAnalise(cliente, aluno.id);
   const { data: treino } = await cliente.from("treino").select("id").limit(1).single();
   treinoPassadoId = treino?.id ?? "";
-  const { data: ex } = await cliente.from("exercicio").select("id").not("dica_execucao", "is", null).limit(1).single();
+  // Ordem fixa: sem `order`, cada projeto devolvia um exercício diferente e a tela do catálogo
+  // com GIF (selo "Animação Ativa" + crédito) ficava sem cobertura num e coberta no outro.
+  const { data: ex } = await cliente.from("exercicio").select("id").not("dica_execucao", "is", null).order("nome").limit(1).single();
   exercicioId = ex?.id ?? "";
+  const { data: comGif } = await cliente.from("exercicio").select("id").eq("nome", "Afundo com halteres").maybeSingle();
+  exercicioComGifId = comGif?.id ?? "";
 
   // Contas e exercícios; o treino de HOJE é criado em cada teste (ver
   // `novoTreinoAberto`), porque um teste que finaliza e reabre deixa o treino
@@ -101,6 +106,7 @@ for (const idioma of IDIOMAS) {
         "/", "/treino", "/analise", "/coach", "/catalogo", "/perfil",
         "/ajustes", "/ajustes/guia", "/ajustes/relatorios", "/ajustes/anilhas", "/ajustes/modelos", "/ajustes/personal", "/ajustes/politicas",
         `/treino/${treinoPassadoId}`, `/catalogo/${exercicioId}`,
+        ...(exercicioComGifId ? [`/catalogo/${exercicioComGifId}`] : []),
       ];
       const todos: string[] = [];
       for (const rota of rotas) {
