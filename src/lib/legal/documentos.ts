@@ -156,7 +156,7 @@ export const PRIVACIDADE: Documento = {
         "Manter a segurança, prevenir abuso, limitar o uso da inteligência artificial e corrigir erros (legítimo interesse).",
       ],
       paragrafos: [
-        "Para os dados que podem ser de saúde, a base é o seu consentimento específico e em destaque (LGPD art. 11, I), que você dá ao aceitar esta Política. Você pode retirá-lo a qualquer momento excluindo a conta.",
+        "Para os dados que podem ser de saúde, a base é o seu consentimento específico e em destaque (LGPD art. 11, I), que você dá ao aceitar esta Política. Você pode retirá-lo a qualquer momento excluindo a conta; para o check-in, também apagando só os seus check-ins, em Check-in > Apagar meus check-ins.",
         "Não vendemos os seus dados, não os usamos para publicidade e não os entregamos a anunciantes.",
       ],
     },
@@ -208,7 +208,7 @@ export const PRIVACIDADE: Documento = {
       titulo: "9. Seus direitos",
       paragrafos: [
         "A LGPD (art. 18) garante que você pode: confirmar que tratamos seus dados, acessá-los, corrigi-los, pedir anonimização, bloqueio ou eliminação, pedir portabilidade, saber com quem compartilhamos, revogar o consentimento e se opor a um tratamento.",
-        `Direto no aplicativo, em Ajustes: “Exportar Meus Dados (CSV)” baixa uma cópia dos seus treinos, “Exportar check-ins (CSV)” baixa os seus check-ins diários, e “Excluir conta” apaga a conta e os dados. Para qualquer outro pedido, escreva para ${RESPONSAVEL_CONTATO}. Você também pode reclamar à Autoridade Nacional de Proteção de Dados (ANPD).`,
+        `Direto no aplicativo, em Ajustes: “Exportar Meus Dados (CSV)” baixa uma cópia dos seus treinos, “Exportar check-ins (CSV)” baixa os seus check-ins diários, “Apagar meus check-ins” (na tela do check-in) os apaga sem apagar a conta, e “Excluir conta” apaga a conta e os dados. Para qualquer outro pedido, escreva para ${RESPONSAVEL_CONTATO}. Você também pode reclamar à Autoridade Nacional de Proteção de Dados (ANPD).`,
       ],
     },
     {

@@ -139,6 +139,7 @@ export const SECOES_GUIA: SecaoGuia[] = [
       "Na Home, o quadro começa em Check-in. As abas Volume e Séries mostram o total da semana e o histórico por treino; use as setas para consultar cada sessão. Aquecimentos não entram.",
       "Em Grupos, escolha Séries ou Volume. O corpo mostra os grupos principais cadastrados nos exercícios e a participação de cada um no total da semana. Alterne Frente e Costas para ver todas as regiões; a lista traz os valores completos. Os percentuais são arredondados e não medem ativação muscular.",
       "As notas são suas. Se você treina com um personal, ele as vê só enquanto você mantiver ligado “Compartilhar meu check-in diário com o personal”, em Ajustes > Personal, e você desliga quando quiser. Elas nunca vão para a inteligência artificial.",
+      "Tocou em “Agora não”? A folha não sobe mais sozinha naquele dia, e o cartão na Home continua lá para você responder quando quiser. Para apagar tudo, use “Apagar meus check-ins” na tela “Ver últimos 7 dias”.",
     ],
   },
   {

@@ -20,6 +20,7 @@ import { registrarCheckinNaFila } from "@/lib/offline/checkin";
 import { CAMPOS_CHECKIN, type CampoCheckin, type NotaCheckin } from "@/lib/checkin/escala";
 import { descreverNotaCheckin } from "@/lib/checkin/resumo";
 import {
+  CHAVE_FOLHA_DISPENSADA,
   CHAVE_FOLHA_VISTA,
   CHAVE_RESPOSTA_DO_DIA,
   deveAbrirSozinha,
@@ -90,14 +91,16 @@ export default function CartaoCheckin({
   useEffect(() => {
     let guardada: RespostaGuardada | null = null;
     let folhaVistaNoDia: string | null = null;
+    let dispensadoNoDia: string | null = null;
     try {
       guardada = lerRespostaGuardada(window.localStorage.getItem(CHAVE_RESPOSTA_DO_DIA));
       folhaVistaNoDia = window.sessionStorage.getItem(CHAVE_FOLHA_VISTA);
+      dispensadoNoDia = window.localStorage.getItem(CHAVE_FOLHA_DISPENSADA);
     } catch {
       // Armazenamento bloqueado (aba privada): sem memória, segue só pelo servidor.
     }
     const noAparelhoHoje = guardada?.dia === hoje ? guardada : null;
-    const abrir = deveAbrirSozinha({ hoje, respondidoNoServidor: checkinInicial !== null, guardada, folhaVistaNoDia });
+    const abrir = deveAbrirSozinha({ hoje, respondidoNoServidor: checkinInicial !== null, guardada, folhaVistaNoDia, dispensadoNoDia });
     if (abrir) {
       try {
         window.sessionStorage.setItem(CHAVE_FOLHA_VISTA, hoje);
@@ -120,9 +123,15 @@ export default function CartaoCheckin({
     setNotas((atual) => ({ ...atual, [campo]: atual[campo] === nota ? null : nota }));
   }
 
+  // "Agora não", ✕, Esc e toque fora: um só encerra a subida automática do dia.
   function fechar() {
     setAberta(false);
     setErro(null);
+    try {
+      window.localStorage.setItem(CHAVE_FOLHA_DISPENSADA, hoje);
+    } catch {
+      // sem localStorage a dispensa vale só enquanto a aba durar (sessionStorage)
+    }
   }
 
   async function salvar() {

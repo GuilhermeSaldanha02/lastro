@@ -7,23 +7,31 @@ const hoje = { dia: HOJE, sono: 4, energia: null, dor_muscular: null, estresse: 
 
 describe("deveAbrirSozinha", () => {
   it("abre quando não há resposta de hoje em lugar nenhum e a folha ainda não subiu", () => {
-    expect(deveAbrirSozinha({ hoje: HOJE, respondidoNoServidor: false, guardada: null, folhaVistaNoDia: null })).toBe(true);
+    expect(deveAbrirSozinha({ hoje: HOJE, respondidoNoServidor: false, guardada: null, folhaVistaNoDia: null, dispensadoNoDia: null })).toBe(true);
   });
 
   it("a resposta de ontem não conta: um dia novo pede o check-in de novo", () => {
-    expect(deveAbrirSozinha({ hoje: HOJE, respondidoNoServidor: false, guardada: ontem, folhaVistaNoDia: "2026-10-01" })).toBe(true);
+    expect(deveAbrirSozinha({ hoje: HOJE, respondidoNoServidor: false, guardada: ontem, folhaVistaNoDia: "2026-10-01", dispensadoNoDia: "2026-10-01" })).toBe(true);
   });
 
   it("não abre se o servidor já tem o check-in de hoje (respondeu, fechou o app e abriu de novo)", () => {
-    expect(deveAbrirSozinha({ hoje: HOJE, respondidoNoServidor: true, guardada: null, folhaVistaNoDia: null })).toBe(false);
+    expect(deveAbrirSozinha({ hoje: HOJE, respondidoNoServidor: true, guardada: null, folhaVistaNoDia: null, dispensadoNoDia: null })).toBe(false);
   });
 
   it("não abre se este aparelho guardou a resposta de hoje (feita sem sinal, ainda na fila)", () => {
-    expect(deveAbrirSozinha({ hoje: HOJE, respondidoNoServidor: false, guardada: hoje, folhaVistaNoDia: null })).toBe(false);
+    expect(deveAbrirSozinha({ hoje: HOJE, respondidoNoServidor: false, guardada: hoje, folhaVistaNoDia: null, dispensadoNoDia: null })).toBe(false);
   });
 
   it("depois de um 'Agora não', não sobe de novo na mesma abertura do app", () => {
-    expect(deveAbrirSozinha({ hoje: HOJE, respondidoNoServidor: false, guardada: null, folhaVistaNoDia: HOJE })).toBe(false);
+    expect(deveAbrirSozinha({ hoje: HOJE, respondidoNoServidor: false, guardada: null, folhaVistaNoDia: HOJE, dispensadoNoDia: null })).toBe(false);
+  });
+
+  it("um 'Agora não' encerra a subida automática do dia, mesmo numa abertura nova do app", () => {
+    expect(deveAbrirSozinha({ hoje: HOJE, respondidoNoServidor: false, guardada: null, folhaVistaNoDia: null, dispensadoNoDia: HOJE })).toBe(false);
+  });
+
+  it("a dispensa de ontem não vale hoje", () => {
+    expect(deveAbrirSozinha({ hoje: HOJE, respondidoNoServidor: false, guardada: null, folhaVistaNoDia: null, dispensadoNoDia: "2026-10-01" })).toBe(true);
   });
 });
 

@@ -6,14 +6,18 @@
 // o navegador guarda e pergunta aqui.
 //
 // "Abrir o app" = uma sessão do navegador (`sessionStorage`): navegar de volta
-// à Home dentro da mesma abertura não faz a folha subir de novo depois de um
-// "Agora não". Fechar o app (ou a aba) e abrir outra vez a traz de volta,
-// enquanto o dia não tiver resposta.
+// à Home dentro da mesma abertura não faz a folha subir de novo.
+//
+// Limite de insistência (parecer de produto, 2026-10-02): o lastro é aberto
+// várias vezes ao dia, então UM "Agora não" encerra a subida automática do dia
+// (`localStorage`). O cartão da Home continua sendo a porta para responder.
 
 /** `localStorage`: a resposta do dia neste aparelho (cobre a fila offline ainda não sincronizada). */
 export const CHAVE_RESPOSTA_DO_DIA = "lastro_checkin";
 /** `sessionStorage`: o dia em que a folha já subiu nesta abertura do app. */
 export const CHAVE_FOLHA_VISTA = "lastro_checkin_visto";
+/** `localStorage`: o dia em que a pessoa dispensou a folha ("Agora não"). */
+export const CHAVE_FOLHA_DISPENSADA = "lastro_checkin_dispensado";
 
 export type RespostaGuardada = {
   dia: string;
@@ -50,9 +54,12 @@ export function deveAbrirSozinha(entrada: {
   guardada: RespostaGuardada | null;
   /** O dia em que a folha já subiu nesta abertura do app. */
   folhaVistaNoDia: string | null;
+  /** O dia em que a pessoa tocou em "Agora não" (neste aparelho). */
+  dispensadoNoDia: string | null;
 }): boolean {
   if (entrada.respondidoNoServidor) return false;
   if (entrada.guardada?.dia === entrada.hoje) return false;
   if (entrada.folhaVistaNoDia === entrada.hoje) return false;
+  if (entrada.dispensadoNoDia === entrada.hoje) return false;
   return true;
 }
