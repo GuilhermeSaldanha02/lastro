@@ -3139,3 +3139,9 @@ Depois do teste do dono em produção e de 3 pareceres (QA, privacidade, produto
 - **Apagar meus check-ins:** botão com confirmação em `/checkin` (`apagarMeusCheckins`, só a própria conta). É a retirada do consentimento do check-in sem apagar a conta (LGPD art. 8º §5º). Política §3 e §9 e o manual dizem isso (sem subir a versão: amplia um direito, não restringe nada).
 - **Compartilhamento com o personal continua LIGADO por padrão** (decisão do dono; o parecer de privacidade sugeriu desligado, recusado). Fica registrado que o aluno o desliga a qualquer momento em Ajustes > Personal.
 - O check-in de teste gravado pelo agente na conta do dono em 2026-10-02 foi mantido por ele.
+
+## 2026-10-02 (2) — A1-ACEITE: o reaceite espera o treino em aberto
+
+- Conta com o aceite da Política pendente **e** um treino em aberto hoje: a Home (por onde o PWA sempre reabre) deixa de mandar para `/aceite` (`exigirCascaDeAluno(perfil, { treinoEmAndamento })`, `lib/dados/casca.ts`). A pessoa chega em "Continuar Treino de Hoje"; o treino em si (`/treino/[id]`) já não passava pelo guarda. Todas as outras telas guardadas seguem mandando para `/aceite`, que fica para a primeira delas depois do treino.
+- "Em aberto" = o `treinoDeHojeId` da Home (treino de hoje sem `finalizado_em`). Treino aberto de dias anteriores não conta, de propósito.
+- Teste: `casca.test.ts` (unitário) e `e2e/j44-aceite-com-treino-aberto.spec.ts`.
