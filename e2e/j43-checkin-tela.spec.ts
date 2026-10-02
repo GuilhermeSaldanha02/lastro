@@ -69,7 +69,7 @@ test("a folha sobe sozinha, salvar grava e, respondido, ela não volta mais no d
 
   // Os últimos 7 dias: hoje com as notas, os outros 6 como "sem check-in".
   await reaberto.page.getByRole("link", { name: "Ver últimos 7 dias" }).click();
-  await expect(reaberto.page).toHaveURL(//checkin$/);
+  await expect(reaberto.page).toHaveURL(/\/checkin$/);
   await expect(reaberto.page.getByRole("listitem")).toHaveCount(7);
   await expect(reaberto.page.getByRole("img", { name: "Sono: nota 4 de 5" })).toBeVisible();
   await expect(reaberto.page.getByText("Sem check-in neste dia.")).toHaveCount(6);
