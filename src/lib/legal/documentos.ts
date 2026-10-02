@@ -9,7 +9,7 @@
 // Mudou o texto de forma que importa? Mude a versão: toda conta volta a
 // `/aceite` uma vez. Erro de digitação não pede nova versão.
 
-export const VERSAO_DOCUMENTOS = "2026-09-26";
+export const VERSAO_DOCUMENTOS = "2026-10-01";
 
 /**
  * QUEM responde pelo lastro (controlador e encarregado, LGPD arts. 5º e 41).
@@ -60,7 +60,7 @@ export const TERMOS: Documento = {
     {
       titulo: "4. Inteligência artificial",
       paragrafos: [
-        "O parecer da Análise Semanal e as respostas do Coach são gerados por um modelo de inteligência artificial. Ele pode errar, simplificar demais ou não considerar o seu caso. Confira o que for importante e não use a resposta como única base para uma decisão de saúde.",
+        "A pergunta 5 da Análise Semanal e as respostas do Coach a perguntas abertas são geradas por um modelo de inteligência artificial; o restante da Análise e do Coach é calculado pelo próprio lastro a partir dos seus registros. A inteligência artificial pode errar, simplificar demais ou não considerar o seu caso. Confira o que for importante e não use a resposta como única base para uma decisão de saúde.",
         "O uso da inteligência artificial tem um limite diário por conta e um limite diário para todo o lastro. Quando um limite é atingido, o recurso volta no dia seguinte. Podemos ajustar esses limites a qualquer momento para manter o serviço funcionando para todos.",
       ],
     },
@@ -137,9 +137,10 @@ export const PRIVACIDADE: Documento = {
         "O seu aceite: qual versão destes documentos você aceitou e quando.",
         "Dados técnicos de erro: quando o aplicativo falha, gravamos a mensagem de erro, a página (sem os parâmetros do endereço), o tipo de navegador e, se você estava logado, o identificador da sua conta. Esses registros são apagados em 30 dias.",
         "Vínculo com personal: se você aceitar um convite, o vínculo, o estado dele e os alertas de treino gerados para o seu personal.",
+        "Check-in diário (opcional): notas de 1 a 5 para sono, energia, dor muscular e estresse, com a data. Não há campo de texto livre, e você pode responder só algumas das quatro.",
       ],
       paragrafos: [
-        "Os dados de treino e de condicionamento físico podem revelar informações sobre a sua saúde e, por isso, são tratados com cuidado especial (dado pessoal sensível, LGPD art. 5º, II). O lastro não pede peso corporal, exames, doenças ou medicamentos, e você não deve digitar esse tipo de informação em campos de texto livre, como a pergunta ao Coach.",
+        "Os dados de treino e de condicionamento físico podem revelar informações sobre a sua saúde e, por isso, são tratados com cuidado especial (dado pessoal sensível, LGPD art. 5º, II). O check-in diário (notas de 1 a 5 de sono, energia, dor muscular e estresse) é a única informação de bem-estar que o lastro pede, e é sempre opcional. O lastro não pede peso corporal, exames, doenças ou medicamentos, e você não deve digitar esse tipo de informação em campos de texto livre, como a pergunta ao Coach.",
       ],
     },
     {
@@ -147,7 +148,9 @@ export const PRIVACIDADE: Documento = {
       itens: [
         "Criar e manter a sua conta e permitir o login (execução do contrato).",
         "Registrar e mostrar os seus treinos, gráficos e histórico, inclusive quando você está sem internet e sincroniza depois (execução do contrato).",
-        "Gerar a Análise Semanal e as respostas do Coach com inteligência artificial (execução do contrato e, no que for dado de saúde, o seu consentimento).",
+        "Gerar a pergunta 5 da Análise Semanal e as respostas abertas do Coach com inteligência artificial (execução do contrato e, no que for dado de saúde, o seu consentimento).",
+        "Registrar o seu check-in diário, se você responder, e mostrá-lo a você (o seu consentimento).",
+        "Mostrar o seu check-in diário ao seu personal vinculado, enquanto você mantiver o compartilhamento ligado (o seu consentimento).",
         "Ligar a sua conta a um personal, somente quando você aceita o convite (o seu consentimento).",
         "Enviar o aviso de fim de descanso, somente se você ativar (o seu consentimento).",
         "Manter a segurança, prevenir abuso, limitar o uso da inteligência artificial e corrigir erros (legítimo interesse).",
@@ -160,8 +163,9 @@ export const PRIVACIDADE: Documento = {
     {
       titulo: "4. O que vai para a inteligência artificial",
       paragrafos: [
-        "A Análise Semanal usa o modelo Gemini, do Google. O lastro calcula as métricas no próprio servidor e envia à IA apenas um resumo já calculado: nomes de exercícios, cargas, volumes, tendências e faixas de semanas. Não enviamos o seu nome, e-mail ou telefone.",
-        "O Coach envia à IA apenas o texto da pergunta que você escrever, sem os seus números de treino. O lastro não guarda o texto das perguntas do Coach.",
+        "A pergunta 5 da Análise Semanal usa o modelo Gemini, do Google. O lastro calcula as métricas no próprio servidor e envia à IA apenas um resumo já calculado: nomes de exercícios, cargas, volumes, tendências e faixas de semanas. Não enviamos o seu nome, e-mail ou telefone.",
+        "O Coach envia à IA apenas o texto da pergunta aberta que você escrever, sem os seus números de treino. O lastro não guarda o texto das perguntas do Coach.",
+        "O check-in diário nunca vai para a inteligência artificial: nem as notas, nem qualquer resumo delas.",
         "Importante: o lastro usa o plano gratuito da Gemini API. Segundo os termos do Google para esse plano, o conteúdo enviado pode ser usado para melhorar os produtos e serviços do Google, e revisores humanos podem ler as entradas e as respostas. O conteúdo é separado da sua identidade, mas por isso não escreva no Coach nada que identifique você ou revele saúde (nome, doenças, lesões, medicamentos, exames).",
       ],
     },
@@ -186,7 +190,7 @@ export const PRIVACIDADE: Documento = {
     {
       titulo: "7. Quem mais pode ver",
       itens: [
-        "Personal vinculado: só depois que você aceita o convite. Ele vê o seu nome, o seu WhatsApp e os sinais do seu treino (por exemplo, exercício estagnado ou grupo muscular sem treino). Você encerra o vínculo quando quiser, e o acesso termina na hora.",
+        "Personal vinculado: só depois que você aceita o convite. Ele vê o seu nome, o seu WhatsApp, os sinais do seu treino (por exemplo, exercício estagnado ou grupo muscular sem treino) e, enquanto você mantiver ligado em Ajustes > Personal, o seu check-in diário; desligar corta essa leitura na hora. Você encerra o vínculo quando quiser, e o acesso termina na hora.",
         "Foto de perfil: é guardada em um armazenamento com endereço público. Quem tiver o endereço exato da imagem pode abri-la, mas ele não é listado no app para outras pessoas. Se preferir, não use foto.",
         "Outros usuários: as contas não se veem entre si. Não há perfil público, feed, ranking nem comparação.",
         "Autoridades: quando houver ordem legal.",
@@ -204,7 +208,7 @@ export const PRIVACIDADE: Documento = {
       titulo: "9. Seus direitos",
       paragrafos: [
         "A LGPD (art. 18) garante que você pode: confirmar que tratamos seus dados, acessá-los, corrigi-los, pedir anonimização, bloqueio ou eliminação, pedir portabilidade, saber com quem compartilhamos, revogar o consentimento e se opor a um tratamento.",
-        `Direto no aplicativo, em Ajustes: “Exportar Meus Dados (CSV)” baixa uma cópia dos seus treinos, e “Excluir conta” apaga a conta e os dados. Para qualquer outro pedido, escreva para ${RESPONSAVEL_CONTATO}. Você também pode reclamar à Autoridade Nacional de Proteção de Dados (ANPD).`,
+        `Direto no aplicativo, em Ajustes: “Exportar Meus Dados (CSV)” baixa uma cópia dos seus treinos, “Exportar check-ins (CSV)” baixa os seus check-ins diários, e “Excluir conta” apaga a conta e os dados. Para qualquer outro pedido, escreva para ${RESPONSAVEL_CONTATO}. Você também pode reclamar à Autoridade Nacional de Proteção de Dados (ANPD).`,
       ],
     },
     {

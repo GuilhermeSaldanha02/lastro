@@ -3099,3 +3099,31 @@ Com 2 sessões o resultado é igual ao de antes. Com número ímpar, a sessão d
 **Alternativa descartada: índice único em `(treino_id, ordem)`.** Não criar. (1) As duplicatas que já existem em produção barram a migração. (2) Pior: séries pendentes na fila offline não aparecem na tela depois de recarregar, então a maior + 1 pode colidir com uma delas; com índice único, esse `criar_serie` falharia para sempre e a fila FIFO travaria tudo que vem depois. Sem o índice, a colisão vira só um empate, que o desempate por `criado_em` resolve.
 
 **Como reverter.** Voltar `registrarSerie` a `series.length + 1` e tirar os dois `order` extras de `buscarTreino`.
+## 2026-10-01 (2) — Check-in diário (AN-08 A1): desenho decidido pelo dono
+
+**Contexto.** O A1 estava aprovado desde 2026-09-29 (registro diário de sono, energia, dor e estresse, também em dia sem treino, visível ao aluno e ao personal com vínculo). Em 2026-10-01 o dono escolheu, entre opções apresentadas, os detalhes abaixo. Esta PR entrega só a base (banco, regras de acesso, fila offline); a tela e o texto novo da Política vêm nas PRs seguintes.
+
+**Decisões.**
+- **Perguntas:** quatro notas de 1 a 5 (sono, energia, dor muscular, estresse), todas opcionais, pelo menos uma por dia, **sem texto livre** (a Política manda não digitar dado de saúde em campo livre) e sem "horas dormidas" (não virar dado médico). Uma linha por conta e por dia, corrigível por upsert.
+- **Onde aparece:** cartão na Home, sem bloquear nada, valendo também em dia sem treino. Tela nova passa por portão visual antes de ser codada.
+- **Quem vê:** o aluno e o personal com vínculo aceito, **mas o aluno tem um botão** para deixar de compartilhar (`usuario.compartilha_checkin`, ligado por padrão, revogável na hora). O consentimento é do aluno, como o PRD §11.4.3 já exige para o vínculo. O personal só lê (nunca escreve) e, na primeira versão, não tem tela própria.
+- **Reaceite da Política:** sobe `VERSAO_DOCUMENTOS` uma vez só, junto com a correção do POL-01, e o treino aberto fica isento do bloqueio de aceite (não interromper quem está treinando). Texto novo escrito pelo Claude e **aprovado pelo dono antes de valer**. Agora é o momento mais barato: poucos usuários, app ainda sem divulgação.
+- **Primeira versão:** só registrar, mostrar os últimos 7 dias ao aluno e liberar a leitura ao personal. Cruzar com desempenho (A2, A3) só depois de umas 8 semanas de dado, sempre como coincidência, nunca como causa.
+
+**Regra inegociável.** O check-in **nunca vai para a IA**. A Política diz que, no plano gratuito da Gemini, o Google pode usar o conteúdo e revisores humanos podem lê-lo. `src/lib/checkin/nao-vai-para-ia.test.ts` reprova qualquer menção a check-in nos arquivos que montam o que vai para a Gemini (`src/app/api/analise`, `src/app/api/coach`, `src/lib/analise`). O roteador local do Coach (`src/lib/coach`) fica fora da lista de propósito: responde por cálculo, sem IA.
+
+**Alternativas descartadas.** Texto livre (conflita com a Política); "horas dormidas" (parece medição médica); passo obrigatório antes do treino (atrito no fluxo central, e não cobre dia sem treino); compartilhar sempre, sem botão do aluno (tira o controle do dado dele); mostrar ao personal só uma média (perde o que o personal pediu).
+
+**Impacto.** Migração `20261001233025`: tabela `checkin` (RLS: a conta mexe no próprio; o personal só lê quando `private.pode_ver_checkin`) e coluna `usuario.compartilha_checkin`. Novo tipo de mutação `registrar_checkin` na fila offline, com a mesma regra das séries: recusa permanente volta como valor e sai da fila. A exportação em CSV e a exclusão de conta cobrem o check-in (a exclusão por cascade de `auth.users`).
+
+**Como reverter.** Antes de a tela existir: `drop table public.checkin; alter table public.usuario drop column compartilha_checkin;` e remover o tipo da fila. Depois, o dado do usuário está em jogo e a reversão pede o dono.
+## 2026-10-01 (3) — Check-in diário: a folha sobe sozinha (AN-08 A1, PR 2/3)
+
+- **Direção C** do portão visual: cartão compacto na Home (depois da disciplina semanal) e folha com as 4 notas.
+- **Abertura automática (pedido do dono):** ao abrir o app sem resposta do dia, a folha sobe sozinha. Respondeu, mesmo fechando e abrindo o app de novo, não aparece mais. A memória é dupla: o servidor (`checkin` do dia) e o aparelho (`localStorage.lastro_checkin`, que cobre a resposta ainda na fila offline).
+- **"Agora não" mantido** (a Política exige dado de saúde opcional): fechar sem responder não grava nada, não repete na mesma abertura do app (`sessionStorage`) e volta na próxima abertura até haver resposta. Se o dono quiser obrigatório, é tirar o botão.
+- **Compartilhar com o personal:** interruptor em Ajustes > Personal (`usuario.compartilha_checkin`, ligado por padrão), efeito imediato.
+- **Exportação:** `/api/exportar?dados=checkins` e link em Ajustes.
+- **Política/Termos:** `VERSAO_DOCUMENTOS` = 2026-10-01, com o check-in como dado de bem-estar opcional, a regra "nunca vai para a IA", o personal vendo se o aluno compartilha, a exportação e a correção do POL-01. **Texto aguardando aprovação do dono; esta PR não é mesclada antes.**
+- **e2e:** `playwright.config.ts` e `entrarComoUsuario` marcam "já respondi hoje" para a folha modal não interceptar as outras specs; a `j43` desliga essa marca.
+- **Limitação conhecida:** quem volta ao PWA no meio de um treino abre em `/` e cai em `/aceite` se o aceite estiver pendente (o treino aberto em si não passa pelo guarda).

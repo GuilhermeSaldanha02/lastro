@@ -42,6 +42,7 @@ import {
   type NovaSerieInput,
   type ResultadoGravacaoSerie,
 } from "@/lib/dados/treino";
+import { registrarCheckinRemoto } from "@/lib/dados/checkin";
 import { contaDaSessao } from "./conta-da-sessao";
 import { marcarComoPermanente } from "./erro-permanente";
 import { sincronizar, type ResultadoSincronizacao } from "./outbox";
@@ -104,6 +105,11 @@ async function executarSincronizacao(): Promise<ResultadoSincronizacao> {
     },
     excluir_serie: async (payload) => {
       exigirGravado(await excluirSerieRemoto((payload as { id: string }).id));
+    },
+    // Check-in diário (AN-08 A1): upsert por (conta, dia), então reenviar é seguro.
+    // Recusa do banco volta como valor e sai da fila, como a série.
+    registrar_checkin: async (payload) => {
+      exigirGravado(await registrarCheckinRemoto(payload));
     },
     // Excluir o TREINO inteiro é ação online-only, disparada da lista
     // (`/treino`, via `ExcluirTreino`) — decisão consciente, não omissão:

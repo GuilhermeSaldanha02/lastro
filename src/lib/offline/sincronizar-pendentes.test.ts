@@ -11,6 +11,9 @@ vi.mock("@/lib/dados/treino", () => ({
   excluirTreinoRemoto: vi.fn(),
 }));
 
+// O check-in também fala com o Supabase; aqui só importa o contrato: recusa do banco volta como valor.
+vi.mock("@/lib/dados/checkin", () => ({ registrarCheckinRemoto: vi.fn() }));
+
 // A sessão real vem do cliente Supabase de navegador; aqui a conta logada é "b".
 vi.mock("./conta-da-sessao", () => ({ contaDaSessao: vi.fn(async () => "b") }));
 
@@ -20,6 +23,7 @@ import {
   criarSerieRemoto,
   excluirSerieRemoto,
 } from "@/lib/dados/treino";
+import { registrarCheckinRemoto } from "@/lib/dados/checkin";
 import { db } from "./db";
 import { contarFalhas, contarPendentes, enfileirar } from "./outbox";
 import { sincronizarPendentes } from "./sincronizar-pendentes";
@@ -35,6 +39,7 @@ beforeEach(async () => {
   vi.mocked(atualizarDescansoSerieRemoto).mockReset();
   vi.mocked(atualizarSerieRemoto).mockReset();
   vi.mocked(excluirSerieRemoto).mockReset();
+  vi.mocked(registrarCheckinRemoto).mockReset();
   await db.outbox.clear();
   await db.falhas.clear();
 });
@@ -170,6 +175,41 @@ describe("sincronizarPendentes (achado A1)", () => {
     expect(falha.usuarioId).toBe("b");
   });
 
+  it("check-in recusado pelo banco sai para `falhas` e não trava a série seguinte (AN-08 A1)", async () => {
+    vi.mocked(registrarCheckinRemoto).mockResolvedValue({
+      ok: false,
+      permanente: true,
+      mensagem: "Falha ao registrar check-in: violates check constraint \"checkin_energia_1a5\"",
+    });
+    vi.mocked(criarSerieRemoto).mockResolvedValue({ ok: true });
+    await enfileirar("registrar_checkin", { dia: "2026-10-01", energia: 9 }, "b");
+    await enfileirar("criar_serie", { id: "s2", reps: 8 }, "b");
+
+    expect(await sincronizarPendentes()).toEqual({ sincronizados: 1, falhou: false, descartados: 1 });
+    const [falha] = await db.falhas.toArray();
+    expect(falha.tipo).toBe("registrar_checkin");
+    expect(falha.usuarioId).toBe("b");
+    expect(await contarPendentes()).toBe(0);
+  });
+
+  it("check-in válido sobe na ordem da fila, junto das séries", async () => {
+    vi.mocked(registrarCheckinRemoto).mockResolvedValue({ ok: true });
+    vi.mocked(criarSerieRemoto).mockResolvedValue({ ok: true });
+    await enfileirar("criar_serie", { id: "s1", reps: 10 }, "b");
+    await enfileirar("registrar_checkin", { dia: "2026-10-01", sono: 4 }, "b");
+
+    expect(await sincronizarPendentes()).toEqual({ sincronizados: 2, falhou: false, descartados: 0 });
+    expect(registrarCheckinRemoto).toHaveBeenCalledWith({ dia: "2026-10-01", sono: 4 });
+  });
+
+  it("falha transitória do check-in (rede) mantém o item na fila e para ali", async () => {
+    vi.mocked(registrarCheckinRemoto).mockRejectedValue(new Error("digest: 123"));
+    await enfileirar("registrar_checkin", { dia: "2026-10-01", sono: 4 }, "b");
+
+    expect(await sincronizarPendentes()).toEqual({ sincronizados: 0, falhou: true, descartados: 0 });
+    expect(await contarPendentes()).toBe(1);
+    expect(await contarFalhas()).toBe(0);
+  });
   it("erro lançado sem o prefixo (como o `digest` do build de produção) continua sendo transitório", async () => {
     vi.mocked(criarSerieRemoto).mockRejectedValue(
       new Error("An error occurred in the Server Components render. digest: 2357073175"),

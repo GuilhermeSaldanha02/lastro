@@ -14,6 +14,8 @@ import IniciarTreino from "@/components/iniciar-treino";
 import FormIniciarTreino from "@/components/form-iniciar-treino";
 import SetaNavegacao from "@/components/seta-navegacao";
 import RastreadorDisciplina from "@/components/rastreador-disciplina";
+import CartaoCheckin from "@/components/cartao-checkin";
+import { buscarCheckinDoDia } from "@/lib/dados/checkin";
 import SeletorMetricasHome from "@/components/seletor-metricas-home";
 import DicaInfo from "@/components/dica-info";
 import { frasePercebida } from "@/lib/analise/texto-fora-do-padrao";
@@ -81,10 +83,11 @@ export default async function PaginaInicial() {
   }
 
   const hoje = dataLocalBrasil();
-  const [resumo, perfil, modelos] = await Promise.all([
+  const [resumo, perfil, modelos, checkinDeHoje] = await Promise.all([
     carregarResumoHome(hoje),
     obterPerfil(),
     listarModelos(),
+    buscarCheckinDoDia(hoje),
   ]);
   // Conta de personal não tem Home de treino — ela cai na própria fila
   // (PRD §11, casca escolhida no gate visual). Barra trocada é pista; esta
@@ -148,6 +151,9 @@ export default async function PaginaInicial() {
           streakDias={resumo.sequenciaAtual}
           idioma={idioma}
         />
+
+        {/* Check-in diário (AN-08 A1): sobe sozinho até haver resposta do dia */}
+        <CartaoCheckin hoje={hoje} usuarioId={user.id} checkinInicial={checkinDeHoje} idioma={idioma} />
 
         {/* Seletor de Métricas com Gráfico de Onda (Volume / Cargas / Séries) */}
         <SeletorMetricasHome

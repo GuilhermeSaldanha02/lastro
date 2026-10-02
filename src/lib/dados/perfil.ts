@@ -48,6 +48,12 @@ export type Perfil = {
   onboardingConcluido: boolean;
   /** `true` só quando a versão aceita é IGUAL à vigente (PU-06). Versão nova do texto = `false`. */
   termosAceitos: boolean;
+  /**
+   * O aluno deixa o personal com vínculo ler o check-in (`usuario.compartilha_checkin`,
+   * padrão ligado). Só `false` explícito é desligado: valor inesperado não esconde nada do
+   * dono, e a regra de acesso de verdade é a da policy no banco, não esta leitura.
+   */
+  compartilhaCheckin: boolean;
   /** Quando a conta aceitou (ISO), ou `null` se nunca aceitou. */
   termosAceitosEm: string | null;
   /**
@@ -67,7 +73,7 @@ export async function obterPerfil(): Promise<Perfil | null> {
 
   const { data } = await supabase
     .from("usuario")
-    .select("nome, avatar_url, meta_treinos_semana, idioma, tipo_conta, cref, modo_ativo, tipo_escolhido, onboarding_concluido_em, termos_versao_aceita, termos_aceitos_em")
+    .select("nome, avatar_url, meta_treinos_semana, idioma, tipo_conta, cref, modo_ativo, tipo_escolhido, onboarding_concluido_em, termos_versao_aceita, termos_aceitos_em, compartilha_checkin")
     .eq("id", user.id)
     .maybeSingle();
 
@@ -98,6 +104,7 @@ export async function obterPerfil(): Promise<Perfil | null> {
     onboardingConcluido: data.onboarding_concluido_em !== null,
     termosAceitos: data.termos_versao_aceita === VERSAO_DOCUMENTOS,
     termosAceitosEm: data.termos_aceitos_em ?? null,
+    compartilhaCheckin: data.compartilha_checkin !== false,
     id: user.id,
   };
 }

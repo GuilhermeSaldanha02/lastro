@@ -31,6 +31,7 @@ describe("outbox", () => {
       atualizar_descanso_serie: async () => {},
       excluir_serie: async () => {},
       excluir_treino: async () => {},
+      registrar_checkin: async () => {},
     });
 
     expect(ordem).toEqual(["treino", "serie"]);
@@ -54,6 +55,7 @@ describe("outbox", () => {
       atualizar_descanso_serie: async () => {},
       excluir_serie: async () => {},
       excluir_treino: async () => {},
+      registrar_checkin: async () => {},
     });
 
     expect(executado).toEqual([]);
@@ -73,6 +75,7 @@ describe("outbox", () => {
       atualizar_descanso_serie: async () => {},
       excluir_serie: async () => {},
       excluir_treino: async () => {},
+      registrar_checkin: async () => {},
     });
 
     const [item] = await db.outbox.toArray();
@@ -96,6 +99,7 @@ describe("outbox", () => {
       atualizar_descanso_serie: async () => {},
       excluir_serie: async () => {},
       excluir_treino: async () => {},
+      registrar_checkin: async () => {},
     };
 
     const primeira = await sincronizar(executores);
@@ -124,6 +128,7 @@ describe("outbox", () => {
         atualizar_descanso_serie: async () => {},
         excluir_serie: async () => {},
         excluir_treino: async () => {},
+        registrar_checkin: async () => {},
       });
 
       expect(executado).toEqual([{ treinoId: "t1", rir: 2 }]);
@@ -144,6 +149,7 @@ describe("outbox", () => {
         atualizar_descanso_serie: async () => {},
         excluir_serie: async () => {},
         excluir_treino: async () => {},
+        registrar_checkin: async () => {},
       });
 
       const [falha] = await db.falhas.toArray();
@@ -164,6 +170,7 @@ describe("outbox", () => {
         atualizar_descanso_serie: async () => {},
         excluir_serie: async () => {},
         excluir_treino: async () => {},
+        registrar_checkin: async () => {},
       };
 
       for (let vez = 0; vez < 5; vez++) {
@@ -188,6 +195,7 @@ describe("outbox", () => {
       atualizar_descanso_serie: async () => {},
       excluir_serie: async () => {},
       excluir_treino: async () => {},
+      registrar_checkin: async () => {},
     });
 
     it("grava a conta dona junto do item", async () => {

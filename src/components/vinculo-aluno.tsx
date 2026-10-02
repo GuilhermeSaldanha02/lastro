@@ -11,6 +11,7 @@ import {
   aceitarConvitePersonal,
   revogarVinculoPersonal,
 } from "@/lib/dados/personal-acoes";
+import { definirCompartilhaCheckin } from "@/lib/dados/checkin";
 import { formatarTelefoneBrasil } from "@/lib/texto/whatsapp";
 import DicaInfo from "./dica-info";
 import type { VinculoDoAluno } from "@/lib/dados/personal";
@@ -22,12 +23,15 @@ export default function VinculoAluno({
   vinculo,
   telefoneAtual,
   codigoDoLink,
+  compartilhaCheckin,
   idioma,
 }: {
   vinculo: VinculoDoAluno | null;
   telefoneAtual: string | null;
   /** Código que veio no link do convite (`?codigo=`), já preenchido. */
   codigoDoLink: string;
+  /** Se o aluno deixa o personal ver o check-in diário (AN-08 A1). */
+  compartilhaCheckin: boolean;
   idioma: Idioma;
 }) {
   const [codigo, setCodigo] = useState(codigoDoLink);
@@ -37,6 +41,20 @@ export default function VinculoAluno({
   const [erro, setErro] = useState<string | null>(null);
   const [enviando, setEnviando] = useState(false);
   const [confirmandoRevogacao, setConfirmandoRevogacao] = useState(false);
+  const [compartilha, setCompartilha] = useState(compartilhaCheckin);
+
+  // Liga e desliga na hora; se o servidor recusar, volta ao valor anterior.
+  async function alternarCompartilhamento(valor: boolean) {
+    setErro(null);
+    setCompartilha(valor);
+    try {
+      await definirCompartilhaCheckin(valor);
+    } catch (falha) {
+      unstable_rethrow(falha);
+      setCompartilha(!valor);
+      setErro(apresentarErroPersonal("Não foi possível concluir a ação. Tente de novo.", idioma));
+    }
+  }
 
   async function aceitar() {
     setErro(null);
@@ -75,6 +93,20 @@ export default function VinculoAluno({
         <p className="campo__nota">
           {t("O personal pode ver seus treinos, séries e contato de WhatsApp, sem editar seu histórico.", idioma)}
         </p>
+
+        <label className="interruptor" htmlFor="compartilha_checkin">
+          <input
+            id="compartilha_checkin"
+            className="interruptor__entrada"
+            type="checkbox"
+            checked={compartilha}
+            onChange={(e) => alternarCompartilhamento(e.target.checked)}
+          />
+          <span className="interruptor__trilho">
+            <span className="interruptor__bolinha" />
+          </span>
+          {t("Compartilhar meu check-in diário com o personal", idioma)}
+        </label>
 
         {erro && (
           <p className="aviso-erro" role="alert">
