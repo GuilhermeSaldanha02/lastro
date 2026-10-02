@@ -95,6 +95,21 @@ export async function listarCheckinsRecentes(quantos = 7): Promise<CheckinDoDia[
   }));
 }
 
+/** O check-in de um dia da PRÓPRIA conta, ou `null` se ainda não respondeu. */
+export async function buscarCheckinDoDia(dia: string): Promise<CheckinDoDia | null> {
+  const { supabase, user } = await usuarioAutenticadoOuErro();
+  const { data, error } = await supabase
+    .from("checkin")
+    .select("dia, sono, energia, dor_muscular, estresse")
+    .eq("usuario_id", user.id)
+    .eq("dia", dia)
+    .maybeSingle();
+  if (error) throw new Error(`Falha ao buscar o check-in do dia: ${error.message}`);
+  if (!data) return null;
+  const l = data as LinhaCheckin;
+  return { dia: l.dia, sono: l.sono, energia: l.energia, dorMuscular: l.dor_muscular, estresse: l.estresse };
+}
+
 /** O aluno liga ou desliga o compartilhamento do check-in com o personal vinculado. */
 export async function definirCompartilhaCheckin(compartilha: boolean): Promise<void> {
   const { supabase, user } = await usuarioAutenticadoOuErro();

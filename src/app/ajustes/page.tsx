@@ -190,6 +190,14 @@ export default async function PaginaAjustes() {
                 <span>{t("Exportar Meus Dados (CSV)", idioma)}</span>
               </a>
 
+              <a href="/api/exportar?dados=checkins" className="botao-secundario botao-com-icone" style={{ width: "100%" }}>
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                  <path d="M12 15V3M12 15l-4-4M12 15l4-4" />
+                  <path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2" />
+                </svg>
+                <span>{t("Exportar check-ins (CSV)", idioma)}</span>
+              </a>
+
               <form action={sair} style={{ width: "100%" }}>
                 <button type="submit" className="botao-secundario botao-com-icone">
                   <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">

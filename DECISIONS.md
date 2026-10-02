@@ -3117,3 +3117,13 @@ Com 2 sessões o resultado é igual ao de antes. Com número ímpar, a sessão d
 **Impacto.** Migração `20261001233025`: tabela `checkin` (RLS: a conta mexe no próprio; o personal só lê quando `private.pode_ver_checkin`) e coluna `usuario.compartilha_checkin`. Novo tipo de mutação `registrar_checkin` na fila offline, com a mesma regra das séries: recusa permanente volta como valor e sai da fila. A exportação em CSV e a exclusão de conta cobrem o check-in (a exclusão por cascade de `auth.users`).
 
 **Como reverter.** Antes de a tela existir: `drop table public.checkin; alter table public.usuario drop column compartilha_checkin;` e remover o tipo da fila. Depois, o dado do usuário está em jogo e a reversão pede o dono.
+## 2026-10-01 (3) — Check-in diário: a folha sobe sozinha (AN-08 A1, PR 2/3)
+
+- **Direção C** do portão visual: cartão compacto na Home (depois da disciplina semanal) e folha com as 4 notas.
+- **Abertura automática (pedido do dono):** ao abrir o app sem resposta do dia, a folha sobe sozinha. Respondeu, mesmo fechando e abrindo o app de novo, não aparece mais. A memória é dupla: o servidor (`checkin` do dia) e o aparelho (`localStorage.lastro_checkin`, que cobre a resposta ainda na fila offline).
+- **"Agora não" mantido** (a Política exige dado de saúde opcional): fechar sem responder não grava nada, não repete na mesma abertura do app (`sessionStorage`) e volta na próxima abertura até haver resposta. Se o dono quiser obrigatório, é tirar o botão.
+- **Compartilhar com o personal:** interruptor em Ajustes > Personal (`usuario.compartilha_checkin`, ligado por padrão), efeito imediato.
+- **Exportação:** `/api/exportar?dados=checkins` e link em Ajustes.
+- **Política/Termos:** `VERSAO_DOCUMENTOS` = 2026-10-01, com o check-in como dado de bem-estar opcional, a regra "nunca vai para a IA", o personal vendo se o aluno compartilha, a exportação e a correção do POL-01. **Texto aguardando aprovação do dono; esta PR não é mesclada antes.**
+- **e2e:** `playwright.config.ts` e `entrarComoUsuario` marcam "já respondi hoje" para a folha modal não interceptar as outras specs; a `j43` desliga essa marca.
+- **Limitação conhecida:** quem volta ao PWA no meio de um treino abre em `/` e cai em `/aceite` se o aceite estiver pendente (o treino aberto em si não passa pelo guarda).

@@ -130,10 +130,19 @@ export const SECOES_GUIA: SecaoGuia[] = [
     link: { href: "/ajustes/personal", rotulo: "Abrir Personal" },
   },
   {
+    id: "checkin-diario",
+    titulo: "Check-in diário",
+    paragrafos: [
+      "Quando você abre o app e ainda não respondeu o do dia, sobe uma folha com quatro notas de 1 a 5: sono, energia, dor muscular e estresse. É opcional: responda só o que quiser, ou toque em “Agora não”. Respondeu, ela não volta mais naquele dia.",
+      "Depois, o cartão na Home mostra como você marcou, e dá para corrigir a qualquer hora do dia. Vale também em dia sem treino.",
+      "As notas são suas. Se você treina com um personal, ele as vê só enquanto você mantiver ligado “Compartilhar meu check-in diário com o personal”, em Ajustes > Personal, e você desliga quando quiser. Elas nunca vão para a inteligência artificial.",
+    ],
+  },
+  {
     id: "seus-dados",
     titulo: "Seus dados",
     paragrafos: [
-      "Em Ajustes, “Exportar Meus Dados (CSV)” baixa uma cópia dos seus treinos.",
+      "Em Ajustes, “Exportar Meus Dados (CSV)” baixa uma cópia dos seus treinos, e “Exportar check-ins (CSV)” baixa os seus check-ins diários.",
       "“Excluir conta” apaga a conta e os dados. Não dá para desfazer. Os Termos de Uso e a Política de Privacidade também estão em Ajustes.",
     ],
     link: { href: "/privacidade", rotulo: "Ler a Política de Privacidade" },
