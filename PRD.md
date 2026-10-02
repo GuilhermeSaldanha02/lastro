@@ -182,8 +182,8 @@ Isto reabre conscientemente o "Sem tela de configuração de rotina" acima e o A
 
 ## 10. TODOs — dados que faltam e não podem ser inventados
 
-- **TODO** — Faixa de referência de séries semanais por grupo muscular, com **fonte primária consultada**. Assunto de saúde: não usar número de memória. → tarefa de pesquisa no `PROGRESS.md`.
-- **TODO** — `N` semanas que caracterizam estagnação. Mesma tarefa de pesquisa.
+- ~~TODO — Faixa de referência de séries semanais por grupo muscular~~ **RESOLVIDO (2026-10-01, ANT-01).** Pesquisa com fontes em `KNOWLEDGE.md` §3.6; o código usa 10–20 séries (`src/lib/analise/limiares.ts`).
+- ~~TODO — `N` semanas que caracterizam estagnação~~ **RESOLVIDO (2026-10-01, ANT-01).** Não há critério científico; a decisão e as fontes estão em `KNOWLEDGE.md` §3.7, e o código usa 4 semanas (`src/lib/analise/limiares.ts`).
 - ~~TODO — Regra de liberação semanal do botão Análise~~ **RESOLVIDO (2026-08-05).** Botão sempre disponível, sem bloqueio até a semana ISO fechar — ver §3 e `DECISIONS.md` "Tarefa 1.0d".
 - ~~TODO — Quota real da Gemini~~ **RESOLVIDO (2026-08-05), medido em uso real.** 20 requisições/dia no free tier de `gemini-3.6-flash` — ver `KNOWLEDGE.md` §3.2 e `DECISIONS.md` "Quota da Gemini medida".
 
