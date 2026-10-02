@@ -92,7 +92,8 @@ export default async function PaginaInicial() {
   // Conta de personal não tem Home de treino — ela cai na própria fila
   // (PRD §11, casca escolhida no gate visual). Barra trocada é pista; esta
   // linha é a porta.
-  exigirCascaDeAluno(perfil);
+  // Com treino em aberto hoje, o reaceite espera (A1-ACEITE): ver `casca.ts`.
+  exigirCascaDeAluno(perfil, { treinoEmAndamento: resumo.treinoDeHojeId !== null });
   await exigirOnboarding(perfil);
 
   const idioma = perfil?.idioma ?? "pt-BR";

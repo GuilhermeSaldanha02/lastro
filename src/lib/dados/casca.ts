@@ -36,14 +36,23 @@ export const ESCOLHA_DO_TIPO = "/boas-vindas";
  * usuário e só depois escolheria personal — o que é exatamente a promoção
  * que a regra de 2026-09-13 proíbe.
  */
-export function exigirTipoEscolhido(perfil: Perfil | null): void {
+export function exigirTipoEscolhido(
+  perfil: Perfil | null,
+  opcoes: { treinoEmAndamento?: boolean } = {},
+): void {
   if (perfil && !perfil.tipoEscolhido) {
     redirect(ESCOLHA_DO_TIPO);
   }
   // Aceite dos Termos e da Política (PU-06), DEPOIS da escolha do tipo e
   // ANTES de qualquer tela: conta nova, conta antiga e texto atualizado caem
   // no mesmo lugar. Todo guarda de casca passa por esta função.
-  if (perfil && !perfil.termosAceitos) {
+  //
+  // A1-ACEITE (decisão do dono, 2026-10-01): quem está com um treino em aberto
+  // não é interrompido pelo reaceite. A Home, que é por onde o app reabre e onde
+  // mora "Continuar Treino de Hoje", passa `treinoEmAndamento`; o aceite fica
+  // para a primeira tela guardada depois que o treino terminar. O treino em si
+  // (`/treino/[id]`) já não passa por este guarda.
+  if (perfil && !perfil.termosAceitos && !opcoes.treinoEmAndamento) {
     redirect(ACEITE_DOS_TERMOS);
   }
 }
@@ -72,8 +81,11 @@ export async function exigirOnboarding(perfil: Perfil | null): Promise<void> {
  *
  * Recebe o perfil que a página já carregou; não faz consulta própria.
  */
-export function exigirCascaDeAluno(perfil: Perfil | null): void {
-  exigirTipoEscolhido(perfil);
+export function exigirCascaDeAluno(
+  perfil: Perfil | null,
+  opcoes: { treinoEmAndamento?: boolean } = {},
+): void {
+  exigirTipoEscolhido(perfil, opcoes);
   if (perfil?.modo === "trabalho") {
     redirect(CASA_DO_PERSONAL);
   }
