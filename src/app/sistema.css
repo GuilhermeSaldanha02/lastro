@@ -5857,10 +5857,20 @@
   box-shadow: 0 0 6px #10B981;
 }
 
+/* O crédito vai para o TOPO da mídia: embaixo ele dividia a linha com o selo
+   "Animação Ativa" e os dois se sobrepunham em 320 px (achado da j41 no projeto
+   de teste, 2026-10-02). */
 .player-exercicio-card__credito {
   position: absolute;
-  bottom: 10px;
+  top: 10px;
   right: 10px;
+  bottom: auto;
+  left: auto;
+  display: block;
+  max-width: calc(100% - 20px);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
   background: rgba(7, 9, 13, 0.75);
   color: rgba(255, 255, 255, 0.6);
   font-size: 10px;
