@@ -1308,6 +1308,9 @@ const DICIONARIO: Record<string, { en: string; es: string }> = {
   "Todas são opcionais. Só você vê, e o seu personal se você compartilhar.": { en: "All optional. Only you can see them, and your trainer if you share.", es: "Todas son opcionales. Solo tú las ves, y tu entrenador si lo compartes." },
   "Compartilhar meu check-in diário com o personal": { en: "Share my daily check-in with my trainer", es: "Compartir mi check-in diario con mi entrenador" },
   "Exportar check-ins (CSV)": { en: "Export check-ins (CSV)", es: "Exportar check-ins (CSV)" },
+  "Últimos 7 dias": { en: "Last 7 days", es: "Últimos 7 días" },
+  "Ver últimos 7 dias": { en: "See the last 7 days", es: "Ver los últimos 7 días" },
+  "Sem check-in neste dia.": { en: "No check-in this day.", es: "Sin check-in este día." },
   "Salvo no aparelho. Sobe quando houver sinal.": { en: "Saved on this device. It uploads when there is signal.", es: "Guardado en el dispositivo. Se sube cuando haya señal." },
 };
 
