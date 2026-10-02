@@ -23,6 +23,8 @@ export interface ExercicioMidia {
   musculo_alvo?: string;
   musculos_sinergistas?: string;
   mecanica_articular?: string;
+  /** 'claude' = músculo alvo, sinergistas e mecânica escritos por IA, ainda sem revisão humana (BIOMEC-REVISAO). */
+  anatomia_origem?: 'claude';
 }
 
 const MAPA_MIDIA_POR_ID = new Map<string, ExercicioMidia>();

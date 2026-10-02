@@ -23,6 +23,13 @@ describe('midia-exercicio', () => {
     expect(ruins).toEqual([]);
   });
 
+  it('os 30 exercícios do CAT-BIOMEC levam o marcador de anatomia escrita por IA (BIOMEC-REVISAO)', () => {
+    // Sem revisão humana, a tela avisa. Quando um humano revisar, tire o
+    // marcador do exercício revisado e ajuste esta contagem.
+    const marcados = (manifesto as Array<{ anatomia_origem?: string }>).filter((e) => e.anatomia_origem === 'claude');
+    expect(marcados).toHaveLength(30);
+  });
+
   it('retorna a mídia por slug', () => {
     const midia = obterMidiaExercicioPorSlug('abdominal-infra');
     expect(midia).not.toBeNull();

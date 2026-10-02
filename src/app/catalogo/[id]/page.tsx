@@ -91,6 +91,9 @@ export default async function PaginaHistoricoExercicio({
               const midia = obterMidiaExercicio(exercicio.id);
               return (
                 <div className="dica-corpo">
+                  {midia?.anatomia_origem === "claude" && (
+                    <p className="campo__nota">{t("Conteúdo gerado por IA", idioma)}</p>
+                  )}
                   <div className="dica-grade-anatomi">
                     {midia?.musculo_alvo && (
                       <div className="dica-bloco-info">
