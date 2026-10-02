@@ -56,7 +56,7 @@ A última linha é a que faz a orquestração funcionar. Escreva-a pensando em q
 
 - **Nunca commitar direto na `main`.** Sair dela: `feat/`, `fix/`, `chore/`, `refactor/`. Integração por PR.
 - **MÓDULO GRANDE TEM BRANCH DE INTEGRAÇÃO PRÓPRIA** (decisão do dono, registrada em 2026-09-11 depois de a regra ter se perdido entre sessões). Funcionalidade que chega em várias fatias não vai para a `main` uma fatia por vez:
-  1. Cria-se **uma** branch do módulo a partir da `main` — hoje, `feat/modulo-personal`.
+  1. Cria-se **uma** branch do módulo a partir da `main` — o módulo Personal já foi integrado na `main`; o próximo módulo em fatias (por exemplo a Comunidade, se for autorizada) ganha a sua, p. ex. `feat/modulo-comunidade`.
   2. Cada fatia sai **dela**, não da `main`, e volta para **ela** por PR.
   3. A `main` só recebe o módulo quando ele estiver **inteiro e funcionando**, num PR só.
 
@@ -202,7 +202,7 @@ npm run dev              # dev server
 
 
 
-**`npm run e2e` é o comando perigoso deste repositório.** O Playwright roda **contra o banco de produção** — não existe banco de dev —, criando e apagando contas descartáveis. A prova de E2E que vale é o CI do GitHub Actions, disparado à mão (`workflow_dispatch`) nos marcos de integração; em toda PR roda só a bateria rápida:
+**`npm run e2e` é o comando perigoso deste repositório.** Desde a #396 o Playwright roda **contra o projeto Supabase de teste `lastro-teste`** (secrets `TESTE_*`; `playwright.config.ts` recusa a URL de produção), criando e apagando contas descartáveis lá. **Toda migração nova vai para os DOIS projetos** (produção `tbkzcqfvafznxallyfqk` e teste `zefhypctyizvgipwyjds`), e `list_migrations` é conferido contra o disco; ver `docs/E2E-PROJETO-TESTE.md`. A prova de E2E que vale é o CI do GitHub Actions, disparado à mão (`workflow_dispatch`) nos marcos de integração; em toda PR roda só a bateria rápida:
 
 
 
