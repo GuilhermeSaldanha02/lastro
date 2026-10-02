@@ -64,17 +64,15 @@ export default function PlayerExecucaoExercicio({
                 }}
                 loading="eager"
               />
+              {/* Badge de Status de Animação — ancorado na IMAGEM (e não no contêiner, que
+                  tem a legenda de crédito embaixo). */}
+              <div className="player-exercicio-card__badge-status">
+                <span className="player-exercicio-card__ponto-vivo" />
+                <span>{t("Animação Ativa", idioma)}</span>
+              </div>
             </div>
           ) : (
             <FallbackSemMidia nomeExercicio={nomeExercicio} />
-          )}
-
-          {/* Badge de Status de Animação — só quando a animação carregou. */}
-          {!erroMidia && (
-            <div className="player-exercicio-card__badge-status">
-              <span className="player-exercicio-card__ponto-vivo" />
-              <span>{t("Animação Ativa", idioma)}</span>
-            </div>
           )}
 
           {/* Crédito discreto de atribuição visual */}
