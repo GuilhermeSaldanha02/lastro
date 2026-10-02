@@ -118,7 +118,6 @@ Vindos do `PROGRESS.md`, revisados pelo dono em 2026-10-01.
 
 | ID | O que é | Status | Importância |
 |---|---|---|---|
-| ANT-01 | Resolvido em `KNOWLEDGE.md` (§3.6 e §3.7, com fontes; o código usa 10–20 séries e 4 semanas). Sobra só riscar o TODO de `PRD.md` §10 (linhas ~183 a 185) e o comentário em `lib/analise/limiares.ts` (linhas ~20 e ~105). | A FAZER (BAIXO) | Baixa |
 | ANT-06 | Medida do módulo Personal: "o grupo alertado recebeu estímulo na semana seguinte?" (`alerta_personal` já grava). | ESPERA CONDIÇÃO: personal real usando | Baixa |
 | ANT-10 | Coluna "antes 16 × 9" por série (padrão Hevy/Strong), com portão visual. | ESPERA CONDIÇÃO: se o dono sentir falta no treino | Baixa |
 | ANT-14 | Hydration mismatch no console ao trocar de tema (`data-tema` diverge servidor/cliente). Não aparece para o usuário. Só se vê no console: reproduzir antes de mexer. | A FAZER, baixa prioridade | Baixa |
@@ -159,6 +158,7 @@ Vindos do `PROGRESS.md`, revisados pelo dono em 2026-10-01.
 - **QA-01:** CT-02, VS-06/07, AJ-03/04, AN-02/05/06, PF-01 resolvidos ou graduados pelo e2e.
 - **Check-in diário e Home (2026-10-02):** AN-08.A1 completo, A1-ACEITE (#391: o reaceite espera o treino em aberto), A2 mínimo (#394), Home nova do Codex (#390: Check-in, Volume, Séries e Grupos num quadro, mapa muscular), e dois achados corrigidos no uso real: o check-in de uma conta aparecia na outra no mesmo navegador (#392, agora por conta) e abas sobrepostas a 320 px em espanhol (#393). Teste visual a 390 e 320 px do check-in (#388). Detalhe em `DECISIONS.md` 2026-10-01 a 2026-10-02.
 - **E2E-PROD (2026-10-02):** projeto Supabase de teste criado e replicado (schema, grants, catálogo; conferido por hash), e2e isolado da produção com trava. O teste achou um defeito antigo: o crédito da mídia sobrepunha o selo "Animação Ativa" na página de exercício com GIF (corrigido, j41 cobre). Achado de risco registrado como BANCO-RECRIAVEL.
+- **ANT-01 (2026-10-02):** o TODO de `PRD.md` §10 foi riscado (aponta para `KNOWLEDGE.md` §3.6 e §3.7) e os comentários de `lib/analise/limiares.ts` não dizem mais "ainda TODO". Só texto.
 - **Docs:** DOC-01, DOC-02, PU-02; arquivo único de backlog (este, 2026-10-01).
 
 ## 8. Arquivos removidos na unificação (2026-10-01)
