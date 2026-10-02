@@ -9,6 +9,8 @@
 
 ## ESTADO ATUAL
 
+- **Registro adicional (Codex, 2026-10-02):** GUIA-01/02 e COM-01/02/03 registrados somente no backlog canônico, seção 2.1, sem implementação; PR #397 integra este registro. Auditoria de interatividade solicitada depois, em andamento. `next-env.d.ts` preexistente preservado por autorização do dono. As entregas recentes abaixo foram preservadas na integração.
+
 - **Última sessão:** 2026-10-02 · agente: claude · **Reconciliação do backlog (opção B escolhida pelo dono).** Três agentes (realidade, produto, cético) conferiram os 137 IDs do `docs/BACKLOG-CANONICO.md` contra código, banco e PRs. Backlog refeito a partir da `main` aplicando só o §2.1 da #397 (GUIA e COM, sem implementação autorizada), mais 6 itens novos (§2.2), status corrigidos (PIP entregue, TESTE-DONO sem linhas em produção, duplicidades) e `AGENTS.md` conferido. Próximos passos, nesta ordem: mesclar esta PR e fechar a #397; FAXINA-BRANCHES-2 (só depois do merge); DESIGN-6, ANT-01, ANT-14 (reproduzir antes) e o aviso do BIOMEC-REVISAO; perguntas ao dono (CAT-GRUPOS, BRANCHES-LOCAIS, DESIGN-HTML, BANCO-RECRIAVEL, CHECKIN-PERSONAL, métricas da Home, TESTE-DONO). QA, auditoria, SEGREDOS e FAXINA-3 ficam por último.
 - **Sessão anterior:** 2026-10-02 · agente: claude · **Check-in diário completo, A1-ACEITE e A2 mínimo em produção** (`main` em `1df8bd5`). Tudo mesclado por PR com CI e e2e verdes; detalhe em `DECISIONS.md` 2026-10-01 a 2026-10-02 e `docs/BACKLOG-CANONICO.md` (linha "Check-in diário e Home" em Feito).
 - **Entregue:** check-in (#383, #384, #387, #388, #389), A1-ACEITE (#391), A2 mínimo (#394), Home nova do Codex integrada (#390: Check-in, Volume, Séries e Grupos num quadro, mapa muscular).
