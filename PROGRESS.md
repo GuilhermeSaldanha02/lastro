@@ -10,11 +10,11 @@
 ## ESTADO ATUAL
 
 - **Última sessão:** 2026-10-01 · agente: codex · branch: feat/stickers-personalizados.
-- **Entregue localmente:** nove stickers escolhidos pelo dono, todos com símbolo/nome oficiais; seletor com miniaturas e preferência persistida; PNG transparente idêntico à prévia, 1080px de largura e altura proporcional. Foco agora lista grupos principais das séries valendo; aquecimento e exercícios sem série valendo não entram. Anatomia SVG frontal/posterior colore os mesmos IDs.
+- **Entrega autorizada para produção:** nove stickers escolhidos pelo dono, todos com símbolo/nome oficiais; seletor com miniaturas e preferência persistida; PNG transparente idêntico à prévia, 1080px de largura e altura proporcional. Foco agora lista grupos principais das séries valendo; aquecimento e exercícios sem série valendo não entram. Anatomia SVG frontal/posterior colore os mesmos IDs. PR #386: https://github.com/GuilhermeSaldanha02/lastro/pull/386.
 - **Verificação:** 995 testes em 88 arquivos verdes, TypeScript e i18n verdes, lint sem erros (avisos preexistentes e uso intencional de img/Blob); build de produção verde. Bancada mobile sintética reproduzível em scripts/verificar-stickers.mjs; nove modelos/downloads/alpha/persistência/teclado/tema claro/retry/storage bloqueado verificados sem Supabase. Evidências em qa/evidencias/STICKERS-01 (ALEGADO). Revisão independente de código sem bloqueadores após correções de contraste.
-- **Próximo passo:** dono conferir os modelos no pós-treino e no histórico; integrar por PR quando aprovado. Ainda não publicado.
+- **Publicação:** dono autorizou subir. Branch atualizada com a main (incluindo check-in), 1.031 testes/91 arquivos e build verdes. CI E2E j31/j37/j40 passou em 36951951807; segunda passada após integração em 36952321209. Merge pelo PR #386 após checks e confirmação do deploy da Vercel. Dono conferir seletor no pós-treino/histórico e compartilhar no aparelho real.
 - **Não commitado de terceiros/gerado:** next-env.d.ts já apareceu modificado antes da integração, preservado fora do commit desta tarefa (rotas de build em vez de dev).
-- **Para o próximo agente:** grupos são primários cadastrados no catálogo, não inferência biomecânica. Nenhuma mudança de banco. Valores SVG em lib/stickers/tokens.ts e paleta fixa em tokens.css. Os pendentes anteriores seguem no bloco preservado abaixo.
+- **Para o próximo agente:** publicação executada de checkout isolado C:/lastro-stickers-publicacao, pois outro trabalho trocou C:/lastro para main durante os checks. Grupos são primários cadastrados no catálogo, não inferência biomecânica. Nenhuma mudança de banco nos stickers. Valores SVG em lib/stickers/tokens.ts e paleta fixa em tokens.css. Os pendentes anteriores seguem no bloco preservado abaixo.
 
 ## Handoff anterior preservado — 2026-09-29
 > Bloco de handoff entre agentes (Antigravity ⇄ Claude). **Sobrescrever a cada sessão**, nunca acumular. Formato e regras: `AGENTS.md` §3.
