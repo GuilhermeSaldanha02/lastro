@@ -42,6 +42,26 @@ se continua) · `CONGELADO` / `PARADO` (decisão do dono, não mexer).
 | AN-03, AN-04 | Reproduzir na conta de personal (gasta ~3 unidades da cota do dia). Autorizado uma vez. | A FAZER | Baixa |
 | EST-DURACAO | Estudo: diferença entre a duração até a última série e `duracao_segundos` no relatório pós-treino. Esperar ~3 semanas de dado (hoje só 2 sessões têm o campo) e trazer opções. | A FAZER, sem prazo | Baixa |
 
+### 2.1. Tutorial interativo e Comunidade — registrados em 2026-10-02
+
+**Pedido do dono: registrar neste backlog existente, sem implementar agora e sem criar backlog paralelo.** A ordem da seção 1 continua válida; prioridade e início destes trabalhos ainda serão definidos. Este registro não autoriza implementação. As ideias gerais sugeridas antes desta conversa não viram novas tarefas automaticamente.
+
+| ID | O que é | Status | Importância |
+|---|---|---|---|
+| GUIA-01 | **Primeiro acesso guiado dentro do app.** Reformular o onboarding existente para ensinar o uso pelas próprias telas e ações, acompanhando o ciclo de iniciar treino, escolher exercício, registrar e repetir série, usar descanso, finalizar e consultar relatório; apresentar também histórico, evolução, Análise e demais recursos no contexto adequado. O dono pediu um passo a passo interativo do uso do aplicativo. | REGISTRADO — sem implementação autorizada | A definir |
+| GUIA-02 | **Guia interativo em Ajustes.** Reformular a tela existente de como usar (`/ajustes/guia`), considerada insatisfatória pelo dono. Organizar a ajuda por tarefas e permitir refazer os percursos dentro do app, reutilizando o mecanismo do primeiro acesso em vez de manter dois tutoriais independentes. | REGISTRADO — sem implementação autorizada | A definir |
+| COM-01 | **Grupos de amigos com competição.** Criar uma área Comunidade com grupos, convites, mural de treinos compartilhados e desafios com classificação entre os participantes. Definir nome/imagem do grupo, integrantes e administração. O foco escolhido pelo dono é competir dentro de grupos de amigos. | REGISTRADO — desenhar o módulo antes de implementar | A definir |
+| COM-02 | **Feed global de treinos.** Dentro da Comunidade, permitir alternar entre os grupos e o feed global e publicar que houve um treino. Aproveitar o relatório do treino finalizado para compor a publicação, com prévia e escolha do destino. Publicação pública deve ser voluntária e não liberar automaticamente acesso ao histórico completo. | REGISTRADO — sem implementação autorizada | A definir |
+| COM-03 | **Comentários, seguidores e mensagens.** Explicitamente deixados pelo dono para bem depois; não entram na primeira versão da Comunidade. | ADIADO — bem depois, sem previsão | A definir |
+
+**Propostas discutidas, ainda a detalhar com o dono:**
+
+- **Tutorial:** destacar controles reais e avançar conforme as ações; oferecer voltar, pular e continuar depois; organizar a ajuda por tarefas (registrar treino, usar modelos, entender evolução, usar offline e conectar personal). Definir demonstração versus primeiro treino real para não contaminar histórico e métricas com dados fictícios. O alcance completo e a divisão entre primeiro acesso e orientações contextuais ainda precisam de desenho.
+- **Desafios:** começar por dias com treino registrado no período, no máximo um ponto por dia, com empates na mesma posição. Participar do grupo não deve obrigar a entrar no desafio; pontuação não deve depender de publicar no mural. São propostas, não regras fechadas: definir elegibilidade, treino vazio, exclusão/edição, sincronização offline, prazo de fechamento e registros retroativos antes de implementar.
+- **Feed:** legenda opcional, escolha dos dados visíveis, ordem cronológica e possíveis curtidas. Esses detalhes ainda não estão aprovados individualmente. Prever privacidade, saída dos grupos, remoção de integrantes, exclusão de publicações, bloqueio, denúncia e operação de moderação antes de abrir o feed público. Sem mensagens privadas nesta etapa.
+- **Escopo:** ranking por academia, cidade, estado e Brasil foi uma alternativa explorada, substituída nesta conversa pelo foco em grupos de amigos e feed global; não entra como tarefa aprovada. Feed global não significa ranking nacional.
+- **Integração:** o PRD §5 hoje exclui feed e ranking. O novo pedido reabre esse escopo, mas o contrato do produto precisa ser reconciliado antes da implementação; não interpretar a discussão como liberação irrestrita de recursos sociais. Desenhar a experiência completa, incluindo sua relação com o tutorial, antes de fatiar. A sugestão foi grupos/desafios/mural primeiro e feed global depois; ordem final a confirmar. Por ser módulo em várias fatias, seguir a branch de integração própria exigida pelo `AGENTS.md` §4, sem entregar fatias incompletas na `main`.
+
 ## 3. AN-08 — motor determinístico (o que falta)
 
 Texto original do dono: `docs/MISSAO-MOTOR-DETERMINISTICO.md` (a seção indicada).
