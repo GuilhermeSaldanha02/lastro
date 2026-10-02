@@ -2920,7 +2920,7 @@
 
 .metrica-switcher__tabs {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   background: var(--lastro-fundo);
   padding: 4px;
   border-radius: var(--lastro-raio-2);
@@ -2928,7 +2928,8 @@
 }
 
 .metrica-tab {
-  padding: 8px 10px;
+  padding: var(--lastro-e-2) 0;
+  white-space: nowrap;
   min-height: var(--lastro-alvo-min); /* D1 — media 38px */
   border: none;
   background: transparent;
@@ -2957,6 +2958,7 @@
   display: flex;
   align-items: baseline;
   justify-content: space-between;
+  gap: var(--lastro-e-2);
 }
 
 .metrica-switcher__grande {
@@ -2998,6 +3000,7 @@
    .metrica-tab, só que menor e à direita do topo (2026-08-28). */
 .metrica-switcher__subtabs {
   display: flex;
+  align-self: flex-start;
   gap: 4px;
   background: var(--lastro-fundo);
   padding: 4px;
@@ -3024,119 +3027,6 @@
   color: var(--lastro-txt);
   box-shadow: var(--lastro-elev-1);
   border: 1px solid var(--lastro-linha);
-}
-
-/* Barras do histórico — uma por treino real (`resumo.historicoBarras`).
-   Substituíram três SVGs de `path` fixo que desenhavam a mesma curva
-   para qualquer usuário, inclusive com zero treino (auditoria
-   2026-08-21). Sem treino, o componente não renderiza barra nenhuma:
-   ausência de dado tem que parecer ausência. */
-.metrica-barras {
-  display: flex;
-  align-items: flex-end;
-  gap: var(--lastro-e-2);
-  height: 84px;
-  width: 100%;
-  margin-top: var(--lastro-e-2);
-}
-
-.metrica-barra {
-  flex: 1 1 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: flex-end;
-  height: 100%;
-  min-width: 0;
-}
-
-.metrica-barra__haste {
-  width: 100%;
-  border-radius: var(--lastro-raio-1) var(--lastro-raio-1) 2px 2px;
-  background: linear-gradient(
-    180deg,
-    var(--lastro-esmeralda-claro) 0%,
-    var(--lastro-esmeralda) 100%
-  );
-  box-shadow: var(--lastro-bevel);
-}
-
-/* O treino mais recente é o dourado — mesma função de destaque que o
-   ponto dourado tinha no desenho antigo, agora apontando para um dado
-   que existe. */
-.metrica-barra:last-child .metrica-barra__haste {
-  background: var(--lastro-ouro-grad);
-  box-shadow:
-    var(--lastro-bevel),
-    0 0 12px var(--lastro-ouro-glow);
-}
-
-.metrica-barra__dia {
-  font-family: var(--lastro-fonte-num);
-  font-variant-numeric: tabular-nums;
-  font-size: var(--lastro-papel-rotulo);
-  color: var(--lastro-txt-2);
-  margin-top: var(--lastro-e-1);
-}
-
-/* Aba "Grupos" — barras horizontais porque o rótulo é uma palavra
-   ("Posterior de coxa"), e palavra não cabe sob coluna de 40px. */
-.grupo-barras {
-  display: flex;
-  flex-direction: column;
-  gap: var(--lastro-e-2);
-  margin-top: var(--lastro-e-3);
-  list-style: none;
-  padding: 0;
-}
-
-.grupo-barra {
-  display: grid;
-  grid-template-columns: 8.5rem 1fr 2rem;
-  align-items: center;
-  gap: var(--lastro-e-2);
-}
-
-.grupo-barra__nome {
-  font-size: var(--lastro-papel-rotulo);
-  color: var(--lastro-txt-2);
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.grupo-barra__trilho {
-  height: 10px;
-  background: rgba(255, 255, 255, 0.06);
-  border-radius: var(--lastro-raio-pilula);
-  overflow: hidden;
-}
-
-.grupo-barra__preenchimento {
-  display: block;
-  height: 100%;
-  border-radius: var(--lastro-raio-pilula);
-  background: linear-gradient(
-    90deg,
-    var(--lastro-esmeralda) 0%,
-    var(--lastro-esmeralda-claro) 100%
-  );
-}
-
-/* O grupo mais treinado da semana leva o dourado — mesma gramática de
-   destaque da barra mais recente no histórico. */
-.grupo-barra:first-child .grupo-barra__preenchimento {
-  background: var(--lastro-ouro-grad);
-  box-shadow: 0 0 10px var(--lastro-ouro-glow);
-}
-
-.grupo-barra__valor {
-  font-family: var(--lastro-fonte-num);
-  font-variant-numeric: tabular-nums;
-  font-size: var(--lastro-papel-rotulo);
-  font-weight: var(--lastro-peso-forte);
-  color: var(--lastro-txt);
-  text-align: right;
 }
 
 /* Card "grupos sem estímulo recente" (Análise) — informação passiva, sem
@@ -6583,44 +6473,55 @@ html:lang(pt) .nav a {
   cursor: pointer;
 }
 
-.checkin-barras {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  /* gap enxuto: a 320 px o rótulo "Estresse" não cabe numa coluna mais estreita */
-  gap: var(--lastro-e-2);
-}
+.checkin-cartao--embutido { padding: 0; border: 0; background: transparent; }
+.checkin-resumo { display: grid; }
+.checkin-resumo__linha { display: flex; align-items: center; justify-content: space-between; gap: var(--lastro-e-3); padding: var(--lastro-e-3) 0; border-bottom: 1px solid var(--lastro-linha); }
+.checkin-resumo__campo { display: flex; align-items: center; gap: var(--lastro-e-3); font-size: var(--lastro-papel-rotulo); color: var(--lastro-txt-2); }
+.checkin-resumo__icone { width: var(--lastro-e-6); height: var(--lastro-e-6); flex: none; color: var(--lastro-ouro); }
+.checkin-resumo__valor { text-align: right; font-size: var(--lastro-papel-rotulo); font-weight: var(--lastro-peso-forte); color: var(--lastro-txt); }
 
-.checkin-barra {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: var(--lastro-e-1);
-  min-width: 0;
-}
+/* Histórico por sessão, separado dos totais semanais acima. */
+.historico-metrica { margin-top: var(--lastro-e-4); width: 100%; max-width: var(--lastro-mapa-largura); align-self: center; }
+.historico-metrica__titulo { color: var(--lastro-txt-2); font-size: var(--lastro-papel-rotulo); font-weight: var(--lastro-peso-forte); }
+.historico-metrica__grafico { width: 100%; display: block; overflow: visible; }
+.historico-metrica__grade { stroke: var(--lastro-linha); stroke-dasharray: 3 5; }
+.historico-metrica__linha { stroke: var(--lastro-esmeralda); stroke-width: 2; fill: none; }
+.historico-metrica__ponto { fill: var(--lastro-sup-1); stroke: var(--lastro-esmeralda); stroke-width: 2; }
+.historico-metrica__ponto--ativo { fill: var(--lastro-ouro); stroke: var(--lastro-ouro); }
+.historico-metrica__coluna { fill: var(--lastro-esmeralda); }
+.historico-metrica__coluna--ativa { fill: var(--lastro-ouro); }
+.historico-metrica__datas { display: grid; text-align: center; color: var(--lastro-txt-3); font-size: var(--lastro-papel-rotulo); }
+.historico-metrica__selecao { display: flex; align-items: center; justify-content: space-between; margin-top: var(--lastro-e-4); padding: var(--lastro-e-2); border-radius: var(--lastro-raio-2); background: var(--lastro-sup-2); }
+.historico-metrica__selecao button { min-width: var(--lastro-alvo-min); min-height: var(--lastro-alvo-min); border: 1px solid var(--lastro-linha); border-radius: var(--lastro-raio-1); background: var(--lastro-sup-1); color: var(--lastro-txt); font-size: var(--lastro-papel-titulo-tela); cursor: pointer; }
+.historico-metrica__selecao button:disabled { opacity: var(--lastro-opacidade-desabilitado); cursor: default; }
+.historico-metrica__selecao div { display: grid; gap: var(--lastro-e-1); text-align: center; }
+.historico-metrica__selecao strong { font-family: var(--lastro-fonte-num); font-size: var(--lastro-papel-secao); }
+.historico-metrica__selecao span, .historico-metrica__nota { color: var(--lastro-txt-3); font-size: var(--lastro-papel-rotulo); }
+.historico-metrica__nota { margin-top: var(--lastro-e-3); }
 
-.checkin-barra__segmentos {
-  display: flex;
-  flex-direction: column;
-  gap: var(--lastro-e-1);
-  width: 100%;
-}
-
-.checkin-barra__segmento {
-  height: var(--lastro-e-1);
-  border-radius: var(--lastro-raio-chip);
-  background: var(--lastro-controle);
-}
-
-.checkin-barra__segmento--cheio {
-  background: var(--lastro-acao-b);
-}
-
-.checkin-barra__nome {
-  max-width: 100%;
-  white-space: nowrap;
-  font-size: calc(var(--lastro-papel-detalhe) + 1px);
-  color: var(--lastro-txt-2);
-}
+.mapa-grupos { display: grid; gap: var(--lastro-e-3); }
+.mapa-grupos__legenda { font-size: var(--lastro-papel-rotulo); color: var(--lastro-txt-3); }
+.mapa-grupos__vistas { display: flex; justify-content: center; gap: var(--lastro-e-2); }
+.mapa-grupos__vistas button, .mapa-grupos__fora button { min-height: var(--lastro-alvo-min); padding: var(--lastro-e-2) var(--lastro-e-4); border: 1px solid var(--lastro-linha); border-radius: var(--lastro-raio-pilula); background: var(--lastro-sup-1); color: var(--lastro-txt-2); font-size: var(--lastro-papel-rotulo); cursor: pointer; }
+.mapa-grupos__vistas button[aria-pressed="true"] { border-color: var(--lastro-borda-ouro); background: var(--lastro-sup-2); color: var(--lastro-txt); }
+.mapa-grupos__canvas { position: relative; width: 100%; max-width: var(--lastro-mapa-largura); justify-self: center; }
+.mapa-grupos__svg { width: 100%; display: block; }
+.mapa-grupos__silhueta { fill: var(--lastro-sup-2); stroke: var(--lastro-txt-3); stroke-width: 1; }
+.mapa-grupos__musculo { fill: var(--lastro-sup-3); stroke: var(--lastro-sup-1); stroke-width: 1; }
+.mapa-grupos__musculo--ativo { fill: var(--lastro-ouro); }
+.mapa-grupos__linha, .mapa-grupos__seta { stroke: var(--lastro-ouro); fill: none; stroke-width: 1.2; }
+.mapa-grupos__rotulo { position: absolute; width: 27%; transform: translateY(-50%); display: grid; gap: var(--lastro-e-1); }
+.mapa-grupos__rotulo--esquerda { left: 0; text-align: left; }
+.mapa-grupos__rotulo--direita { right: 0; text-align: right; }
+.mapa-grupos__nome { color: var(--lastro-txt-2); font-size: var(--lastro-papel-rotulo); overflow-wrap: anywhere; line-height: var(--lastro-el-titulo); }
+.mapa-grupos__percentual { font-family: var(--lastro-fonte-num); color: var(--lastro-txt); font-size: var(--lastro-papel-secao); line-height: var(--lastro-el-apertada); }
+.mapa-grupos__fora { display: flex; flex-wrap: wrap; gap: var(--lastro-e-2); font-size: var(--lastro-papel-rotulo); }
+.mapa-grupos__fora > span { width: 100%; color: var(--lastro-txt-3); }
+.mapa-grupos__detalhes { border-top: 1px solid var(--lastro-linha); font-size: var(--lastro-papel-rotulo); }
+.mapa-grupos__detalhes summary { min-height: var(--lastro-alvo-min); padding-block: var(--lastro-e-4); cursor: pointer; color: var(--lastro-txt-2); }
+.mapa-grupos__lista { list-style: none; display: grid; gap: var(--lastro-e-3); }
+.mapa-grupos__lista li { display: grid; grid-template-columns: minmax(0, 1fr) auto auto; gap: var(--lastro-e-2); align-items: baseline; }
+.mapa-grupos__lista li > span:first-child { overflow-wrap: anywhere; }
 
 .checkin-folha {
   display: flex;

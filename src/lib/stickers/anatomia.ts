@@ -26,6 +26,9 @@ const COSTAS: readonly Regiao[] = [
   { grupo: "panturrilha", d: "M54 263 Q67 259 66 280 L62 308 L57 310 L53 288 Z M106 263 Q93 259 94 280 L98 308 L103 310 L107 288 Z" },
 ];
 
+/** A Home reutiliza exatamente as regiões do sticker, sem alterar o desenho exportado. */
+export const GEOMETRIA_ANATOMIA = { silhueta: SILHUETA, frente: FRENTE, costas: COSTAS } as const;
+
 export function desenharAnatomia(grupos: readonly string[], ouro: string, base: string, escape: (texto: string) => string): string {
   const ativos = new Set(grupos);
   const a = TOKENS_STICKER.anatomia;

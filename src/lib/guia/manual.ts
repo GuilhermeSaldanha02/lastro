@@ -136,6 +136,8 @@ export const SECOES_GUIA: SecaoGuia[] = [
     paragrafos: [
       "Quando você abre o app e ainda não respondeu o do dia, sobe uma folha com quatro notas de 1 a 5: sono, energia, dor muscular e estresse. É opcional: responda só o que quiser, ou toque em “Agora não”. Respondeu, ela não volta mais naquele dia.",
       "Depois, o cartão na Home mostra como você marcou, e dá para corrigir a qualquer hora do dia. Vale também em dia sem treino.",
+      "Na Home, o quadro começa em Check-in. As abas Volume e Séries mostram o total da semana e o histórico por treino; use as setas para consultar cada sessão. Aquecimentos não entram.",
+      "Em Grupos, escolha Séries ou Volume. O corpo mostra os grupos principais cadastrados nos exercícios e a participação de cada um no total da semana. Alterne Frente e Costas para ver todas as regiões; a lista traz os valores completos. Os percentuais são arredondados e não medem ativação muscular.",
       "As notas são suas. Se você treina com um personal, ele as vê só enquanto você mantiver ligado “Compartilhar meu check-in diário com o personal”, em Ajustes > Personal, e você desliga quando quiser. Elas nunca vão para a inteligência artificial.",
     ],
   },

@@ -152,11 +152,9 @@ export default async function PaginaInicial() {
           idioma={idioma}
         />
 
-        {/* Check-in diário (AN-08 A1): sobe sozinho até haver resposta do dia */}
-        <CartaoCheckin hoje={hoje} usuarioId={user.id} checkinInicial={checkinDeHoje} idioma={idioma} />
-
-        {/* Seletor de Métricas com Gráfico de Onda (Volume / Cargas / Séries) */}
+        {/* Check-in diário e métricas reais no mesmo quadro. */}
         <SeletorMetricasHome
+          checkin={<CartaoCheckin hoje={hoje} usuarioId={user.id} checkinInicial={checkinDeHoje} idioma={idioma} embutido />}
           volumeFormatado={volumeFormatado}
           seriesValendo={resumo.seriesValendoNaSemana}
           treinosNaSemana={resumo.treinosNaSemana}
