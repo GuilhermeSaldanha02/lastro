@@ -1,0 +1,39 @@
+ALEGADO — bancada sintética local, viewport 390 x 844; sem Supabase. Famílias UI com cortes estáticos locais do PDF; arte exportada usa tokens reais.
+debug: [vite] connecting...
+debug: [vite] connected.
+info: %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+PASSOU Números: PNG 1080 x 850; alpha canto 0; miniatura/prévia/arquivo idênticos.
+PASSOU Lateral: PNG 1080 x 1865; alpha canto 0; miniatura/prévia/arquivo idênticos.
+PASSOU Minimalista: PNG 1080 x 509; alpha canto 0; miniatura/prévia/arquivo idênticos.
+PASSOU Placa: PNG 1080 x 373; alpha canto 0; miniatura/prévia/arquivo idênticos.
+PASSOU Bilhete: PNG 1080 x 1618; alpha canto 0; miniatura/prévia/arquivo idênticos.
+PASSOU Arco: PNG 1080 x 893; alpha canto 0; miniatura/prévia/arquivo idênticos.
+PASSOU Etiqueta: PNG 1080 x 293; alpha canto 0; miniatura/prévia/arquivo idênticos.
+PASSOU Editorial: PNG 1080 x 932; alpha canto 0; miniatura/prévia/arquivo idênticos.
+PASSOU Anatômico: PNG 1080 x 1628; alpha canto 0; miniatura/prévia/arquivo idênticos.
+PASSOU anatomia: quatro grupos reais ativos; peito aquecimento inativo; frente/costas presentes.
+debug: [vite] connecting...
+debug: [vite] connected.
+info: %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+PASSOU persistência após recarregar: Anatômico.
+PASSOU foco de teclado e seleção por Enter.
+debug: [vite] connecting...
+debug: [vite] connected.
+info: %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+PASSOU lista longa/overflow 390px: {"viewport":390,"pagina":390,"overlay":390,"container":366,"imagem":334}
+debug: [vite] connecting...
+debug: [vite] connected.
+info: %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+PASSOU lista longa/overflow 320px: {"viewport":320,"pagina":320,"overlay":320,"container":296,"imagem":264}
+debug: [vite] connecting...
+debug: [vite] connected.
+info: %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+PASSOU contraste tema claro: [{"seletor":".pos-treino-share-titulo","minimo":4.5,"contraste":17.48381393525785},{"seletor":".pos-treino-btn-fechar-topo","minimo":4.5,"contraste":17.48381393525785},{"seletor":".pos-treino-sticker-ajuda","minimo":4.5,"contraste":7.134397889810445},{"seletor":"icone-0","minimo":3,"contraste":17.94659132345323},{"seletor":"icone-1","minimo":3,"contraste":17.94659132345323},{"seletor":"icone-2","minimo":3,"contraste":17.94659132345323}]
+PASSOU tema branco-ouro: seleção e prévia presentes, sem overflow; print-claro.png.
+retry/debug: [vite] connecting...
+retry/debug: [vite] connected.
+retry/info: %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+retry/error: Failed to load resource: the server responded with a status of 404 (Not Found)
+PASSOU logo 404 simulado: ações/modelos bloqueados, mensagem e retry recuperam prévia e ações; sem exceção de página.
+PASSOU localStorage bloqueado: prévia e seleção funcionam; sem exceção de página.
+PASSOU: zero erros inesperados de console/página/rede e zero acesso externo; logo 404 simulado registrado à parte.

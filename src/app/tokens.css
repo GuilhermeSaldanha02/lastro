@@ -456,3 +456,19 @@
   --lastro-barra-b:      #070908;
 }
 
+
+/* Arte exportada: paleta fixa independente do tema da interface. */
+:root {
+  --lastro-sticker-ouro: #E6C86E;
+  --lastro-sticker-branco: #F8FAFC;
+  --lastro-sticker-preto: #07090D;
+  --lastro-sticker-papel: #F4EEDD;
+  --lastro-sticker-sombra: #000000;
+  --lastro-sticker-txt-secundario: #94A3B8;
+  --lastro-sticker-superficie: #0E1218;
+  --lastro-sticker-fonte: Arial, sans-serif;
+  --lastro-sticker-fonte-num: Arial, sans-serif;
+  --lastro-sticker-previa-altura: 300px;
+  --lastro-sticker-miniatura-largura: 112px;
+  --lastro-sticker-miniatura-altura: 76px;
+}

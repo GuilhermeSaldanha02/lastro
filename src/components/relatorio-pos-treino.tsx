@@ -1,6 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useId, useState } from "react";
+import { useStickers } from "@/lib/stickers/use-stickers";
+import { MODELOS_STICKER } from "@/lib/stickers/modelos";
 import { useRouter } from "next/navigation";
 import type { MetricasSessao } from "@/lib/dados/metricas-treino";
 import type { Idioma } from "@/lib/dados/idioma";
@@ -27,6 +29,8 @@ export default function RelatorioPosTreino({
   comparacao,
 }: RelatorioPosTreinoProps) {
   const router = useRouter();
+  const tituloId = useId();
+  const stickers = useStickers(metricas, idioma);
   const [salvando, setSalvando] = useState(false);
   /**
    * Resultado da última ação de compartilhar. Substitui o `copiado`
@@ -62,138 +66,8 @@ export default function RelatorioPosTreino({
     router.push("/treino");
   }
 
-  /**
-   * Gera a imagem PNG em alta resolução (1080x1080) com fundo 100% transparente
-   * com fidelidade visual 1:1 ao preview:
-   * - Topo: Brasão oficial dourado do LASTRO
-   * - Hero: "SESSÃO FINALIZADA" + "91 min"
-   * - Divisor dourado com seta vetorial
-   * - 3 Colunas: Séries, Exercícios e Foco/Divisão
-   * - Rodapé: Frase sutil de assinatura + Badge dourado do treino
-   */
   async function gerarBlobImagemTransparente(): Promise<Blob | null> {
-    const canvas = document.createElement("canvas");
-    canvas.width = 1080;
-    canvas.height = 1080;
-    const ctx = canvas.getContext("2d");
-    if (!ctx) return null;
-
-    // Fundo 100% transparente (alpha 0)
-    ctx.clearRect(0, 0, 1080, 1080);
-
-    const startX = 100;
-    const endX = 1080 - 100;
-
-    // Sombra suave e nítida para contraste sobre qualquer foto/vídeo no Instagram
-    ctx.shadowColor = "rgba(0, 0, 0, 0.85)";
-    ctx.shadowBlur = 12;
-    ctx.shadowOffsetX = 0;
-    ctx.shadowOffsetY = 4;
-
-    ctx.textAlign = "left";
-    ctx.textBaseline = "top";
-
-    const yInicio = 360;
-
-    // 1. Logotipo Oficial do LASTRO no Lado Direito (na mesma linha que sessão e tempo)
-    try {
-      const imgLogo = new Image();
-      imgLogo.crossOrigin = "anonymous";
-      await new Promise<void>((resolve) => {
-        imgLogo.onload = () => resolve();
-        imgLogo.onerror = () => resolve();
-        imgLogo.src = "/logo-lastro.png";
-      });
-
-      if (imgLogo.complete && imgLogo.naturalWidth > 0) {
-        const logoSize = 165;
-        const logoX = endX - logoSize;
-        const logoY = yInicio + 15;
-
-        ctx.shadowColor = "rgba(0, 0, 0, 0.9)";
-        ctx.shadowBlur = 16;
-        ctx.drawImage(imgLogo, logoX, logoY, logoSize, logoSize);
-      }
-    } catch {
-      // Continua sem quebrar se a imagem falhar
-    }
-
-    // 2. SESSÃO FINALIZADA (Lado Esquerdo)
-    const ySessao = yInicio;
-    ctx.font = "800 28px system-ui, -apple-system, sans-serif";
-    ctx.fillStyle = "rgba(255, 255, 255, 0.8)";
-    ctx.letterSpacing = "4px";
-    ctx.fillText(t("SESSÃO FINALIZADA", idioma).toUpperCase(), startX, ySessao);
-
-    // 3. TEMPO EM DESTAQUE (Hero: Lado Esquerdo abaixo de Sessão Finalizada)
-    const yTempo = ySessao + 46;
-    ctx.font = "900 135px system-ui, -apple-system, sans-serif";
-    ctx.fillStyle = "#FFFFFF";
-    ctx.letterSpacing = "-3px";
-    ctx.fillText(`${metricas.duracaoMinutos} min`, startX, yTempo);
-
-    // 4. DIVISOR DOURADO COM SETA
-    const yDivisor = yTempo + 185;
-    ctx.strokeStyle = "#D4AF37"; // Dourado champagne
-    ctx.lineWidth = 3;
-    ctx.shadowColor = "rgba(0, 0, 0, 0.8)";
-    ctx.shadowBlur = 8;
-    ctx.beginPath();
-    ctx.moveTo(startX, yDivisor);
-    ctx.lineTo(endX, yDivisor);
-    ctx.stroke();
-
-    // Seta vetorial na ponta direita
-    ctx.fillStyle = "#D4AF37";
-    ctx.beginPath();
-    ctx.moveTo(endX - 16, yDivisor - 9);
-    ctx.lineTo(endX + 2, yDivisor);
-    ctx.lineTo(endX - 16, yDivisor + 9);
-    ctx.closePath();
-    ctx.fill();
-
-    // 5. LINHA DE ESTATÍSTICAS (3 COLUNAS)
-    const yStats = yDivisor + 45;
-
-    // Coluna 1: Séries
-    ctx.font = "900 78px system-ui, -apple-system, sans-serif";
-    ctx.fillStyle = "#FFFFFF";
-    ctx.letterSpacing = "-1px";
-    ctx.textAlign = "left";
-    const totalSeriesStr = String(metricas.totalSeriesValendo);
-    ctx.fillText(totalSeriesStr, startX, yStats);
-    const seriesNumWidth = ctx.measureText(totalSeriesStr).width;
-
-    ctx.font = "800 20px system-ui, -apple-system, sans-serif";
-    ctx.fillStyle = "#D4AF37";
-    ctx.letterSpacing = "2px";
-    ctx.fillText(t("SÉRIES", idioma).toUpperCase(), startX + seriesNumWidth + 14, yStats + 48);
-
-    // Coluna 2: Exercícios
-    const xEx = startX + 330;
-    ctx.font = "900 78px system-ui, -apple-system, sans-serif";
-    ctx.fillStyle = "#FFFFFF";
-    ctx.letterSpacing = "-1px";
-    const totalExStr = String(metricas.totalExercicios);
-    ctx.fillText(totalExStr, xEx, yStats);
-    const exNumWidth = ctx.measureText(totalExStr).width;
-
-    ctx.font = "800 20px system-ui, -apple-system, sans-serif";
-    ctx.fillStyle = "#D4AF37";
-    ctx.letterSpacing = "2px";
-    ctx.fillText(t("EXERCÍCIOS", idioma).toUpperCase(), xEx + exNumWidth + 14, yStats + 48);
-
-    // Coluna 3: Grupo Muscular / Foco (alinhado à direita)
-    const focoTexto = (metricas.focoOuDivisao || t("TREINO", idioma)).toUpperCase();
-    ctx.font = "900 48px system-ui, -apple-system, sans-serif";
-    ctx.fillStyle = "#FFFFFF";
-    ctx.letterSpacing = "2px";
-    ctx.textAlign = "right";
-    ctx.fillText(focoTexto, endX, yStats + 22);
-
-    return new Promise<Blob | null>((resolve) => {
-      canvas.toBlob((blob) => resolve(blob), "image/png");
-    });
+    return stickers.imagem?.blob ?? null;
   }
 
   /**
@@ -334,7 +208,7 @@ export default function RelatorioPosTreino({
   }
 
   return (
-    <div className="pos-treino-overlay" role="dialog" aria-modal="true">
+    <div className="pos-treino-overlay" role="dialog" aria-modal="true" aria-labelledby={tituloId}>
       <div className="pos-treino-share-container">
         {/* Barra de Topo */}
         <div className="pos-treino-share-header">
@@ -345,82 +219,30 @@ export default function RelatorioPosTreino({
           >
             {t("Fechar", idioma)}
           </button>
-          <span className="pos-treino-share-titulo">
+          <span className="pos-treino-share-titulo" id={tituloId}>
             {t("Compartilhar Treino", idioma)}
           </span>
-          <div style={{ width: "40px" }} />
+          <div className="pos-treino-header-espaco" />
         </div>
 
-        {/* Card Central com Preview 1:1 ao arquivo gerado.
-            O xadrez de transparência é jargão de editor de imagem: para
-            quem acabou de treinar ele só suja o cartão. Por padrão o
-            preview aparece limpo, e o xadrez entra por alguns segundos
-            SÓ quando a pessoa copia ou salva — que é o momento em que
-            saber "o fundo vai sair transparente" importa de verdade
-            (pedido do dono, 2026-08-27). */}
-        <div
-          className={`pos-treino-card-transparente-wrapper${
-            mostrandoTransparencia ? " pos-treino-card-transparente-wrapper--xadrez" : ""
-          }`}
-        >
-          {mostrandoTransparencia && (
-            <div className="pos-treino-tag-transparente">
-              <span>{t("Fundo transparente", idioma)}</span>
+        <div className={`pos-treino-previa${mostrandoTransparencia ? " pos-treino-previa--xadrez" : ""}`} aria-busy={!stickers.imagem && !stickers.erro}>
+          {stickers.imagem ? (
+            <img src={stickers.imagem.url} alt={t("Prévia do sticker do treino", idioma)} className="pos-treino-previa-imagem" />
+          ) : stickers.erro ? (
+            <div role="alert">
+              <p>{t("Não foi possível gerar a imagem do treino.", idioma)}</p>
+              <button type="button" className="botao-secundario" onClick={stickers.repetir}>{t("Tentar novamente", idioma)}</button>
             </div>
-          )}
-
-          <div className="pos-treino-strava-conteudo pos-treino-sticker-novo">
-            {/* Topo: Lado Esquerdo = Sessão + Tempo; Lado Direito = Logo Oficial */}
-            <div className="pos-treino-sticker-topo-linha">
-              <div className="pos-treino-sticker-hero">
-                <span className="pos-treino-sticker-sessao-label">
-                  {t("SESSÃO FINALIZADA", idioma)}
-                </span>
-                <span className="pos-treino-sticker-tempo-destaque">
-                  {metricas.duracaoMinutos} min
-                </span>
-              </div>
-
-              <div className="pos-treino-sticker-logo-wrapper">
-                <img
-                  src="/logo-lastro.png"
-                  alt="LASTRO"
-                  className="pos-treino-sticker-logo-img"
-                  width={64}
-                  height={64}
-                />
-              </div>
-            </div>
-
-            {/* Linha Divisória Dourada com Seta */}
-            <div className="pos-treino-sticker-divisor" aria-hidden="true">
-              <div className="pos-treino-sticker-divisor-traco" />
-              <svg
-                className="pos-treino-sticker-divisor-seta"
-                width="10"
-                height="10"
-                viewBox="0 0 10 10"
-                fill="currentColor"
-              >
-                <path d="M1 1L9 5L1 9V1Z" />
-              </svg>
-            </div>
-
-            {/* Linha das 3 Estatísticas */}
-            <div className="pos-treino-sticker-stats-grid">
-              <div className="pos-treino-sticker-stat-col">
-                <span className="pos-treino-sticker-stat-num">{metricas.totalSeriesValendo}</span>
-                <span className="pos-treino-sticker-stat-label">{t("SÉRIES", idioma)}</span>
-              </div>
-              <div className="pos-treino-sticker-stat-col">
-                <span className="pos-treino-sticker-stat-num">{metricas.totalExercicios}</span>
-                <span className="pos-treino-sticker-stat-label">{t("EXERCÍCIOS", idioma)}</span>
-              </div>
-              <div className="pos-treino-sticker-stat-foco">
-                {metricas.focoOuDivisao || t("TREINO", idioma)}
-              </div>
-            </div>
-          </div>
+          ) : <span role="status">{t("Carregando...", idioma)}</span>}
+        </div>
+        <p className="pos-treino-sticker-ajuda">{t("Escolha o sticker para colocar sobre sua foto no Story.", idioma)}</p>
+        <div className="pos-treino-modelos" role="group" aria-label={t("Modelo do sticker", idioma)}>
+          {MODELOS_STICKER.map(({ id, nome }) => (
+            <button key={id} type="button" className="pos-treino-modelo" aria-pressed={stickers.modelo === id} onClick={() => stickers.escolher(id)} disabled={!stickers.imagens[id]}>
+              {stickers.imagens[id] && <img src={stickers.imagens[id]!.url} alt="" className="pos-treino-modelo-imagem" />}
+              <span>{t(nome, idioma)}</span>
+            </button>
+          ))}
         </div>
 
         {/* AN-08 B1 (direção C do portão de 2026-09-29): fora do cartão
@@ -485,6 +307,7 @@ export default function RelatorioPosTreino({
               type="button"
               className="pos-treino-btn-acao-share"
               onClick={copiarParaClipboard}
+              disabled={!stickers.imagem || salvando}
               title={t("Copiar imagem transparente", idioma)}
             >
               <div className="pos-treino-icone-circulo">
@@ -504,7 +327,7 @@ export default function RelatorioPosTreino({
               type="button"
               className="pos-treino-btn-acao-share"
               onClick={salvarImagem}
-              disabled={salvando}
+              disabled={!stickers.imagem || salvando}
               title={t("Salvar imagem transparente", idioma)}
             >
               <div className="pos-treino-icone-circulo">
@@ -524,6 +347,7 @@ export default function RelatorioPosTreino({
               type="button"
               className="pos-treino-btn-acao-share"
               onClick={compartilharNativo}
+              disabled={!stickers.imagem || salvando}
               title={t("Mais opções de compartilhamento", idioma)}
             >
               <div className="pos-treino-icone-circulo">

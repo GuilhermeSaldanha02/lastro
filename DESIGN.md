@@ -1,5 +1,7 @@
 # DESIGN.md — `lastro`
 
+> **2026-10-01 — stickers escolhidos pelo dono:** nove composições (Números, Lateral, Minimalista, Placa, Bilhete, Arco, Etiqueta, Editorial e Anatômico), todas com `public/logo-lastro.png` preservado. A paleta exportada é fixa em `--lastro-sticker-*` de `tokens.css`, independente do tema da interface. Medidas do artefato SVG têm fonte única em `src/lib/stickers/tokens.ts`; não são tokens de interface. Prévia, miniatura e exportação compartilham o mesmo PNG de largura 1080 e altura proporcional. O mapa anatômico destaca os grupos principais cadastrados dos exercícios com séries valendo, sem inferir músculos secundários. O seletor mantém a última escolha localmente.
+
 > **Fonte ÚNICA do visual.** Nenhum valor de cor, espaçamento ou tipografia é definido em outro lugar. Verificar autoconsistência deste arquivo a cada edição.
 >
 > **Estado (reconciliado em 2026-10-01, DOC-03).** O valor de qualquer token vive em `src/app/tokens.css`; as classes, em `src/app/sistema.css`. O app tem **7 temas** (§3.1): o padrão é o **"ouro"**, o redesenho **Apex Pro** (2026-08-20, `8d30cf0`: obsidiana, ouro champagne e esmeralda), escuro; há o claro **"branco-ouro"** e mais cinco (areia, clean, petroleo, moka, oliva). O contraste dos 7 temas é medido pelo teste `e2e/j5-contraste.spec.ts`, no app renderizado; ele, e não uma tabela deste documento, é a fonte dos números.

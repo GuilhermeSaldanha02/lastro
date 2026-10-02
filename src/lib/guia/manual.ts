@@ -100,6 +100,7 @@ export const SECOES_GUIA: SecaoGuia[] = [
     paragrafos: [
       "Em Ajustes > Relatórios e adesivos ficam os pareceres da Análise já gerados e o histórico dos seus treinos. Escolha um treino para ver as estatísticas e exportar uma imagem transparente para redes sociais.",
       "A imagem é criada no seu aparelho: nada é publicado ou enviado por conta própria. Você decide se copia, salva ou compartilha.",
+      "Escolha entre nove modelos de sticker. Os grupos exibidos vêm dos exercícios com séries válidas registradas; aquecimentos não entram. O modelo anatômico destaca os grupos principais cadastrados nesses exercícios, sem estimar músculos secundários.",
     ],
     link: { href: "/ajustes/relatorios", rotulo: "Abrir Relatórios e adesivos" },
   },
