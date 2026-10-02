@@ -4,6 +4,7 @@
 import { redirect } from "next/navigation";
 import CabecalhoPro from "@/components/cabecalho-pro";
 import AbaInferior from "@/components/aba-inferior";
+import ApagarCheckins from "@/components/apagar-checkins";
 import { obterPerfil } from "@/lib/dados/perfil";
 import { cascaDaBarra, exigirCascaDeAluno, exigirOnboarding } from "@/lib/dados/casca";
 import { listarCheckinsRecentes } from "@/lib/dados/checkin";
@@ -64,6 +65,8 @@ export default async function PaginaCheckin() {
             </li>
           ))}
         </ul>
+
+        {recentes.length > 0 && <ApagarCheckins hoje={hoje} idioma={idioma} />}
       </div>
       <AbaInferior ativa="inicio" tipoConta={cascaDaBarra(perfil)} idioma={idioma} />
     </main>

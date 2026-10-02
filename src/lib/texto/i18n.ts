@@ -1329,6 +1329,12 @@ const DICIONARIO: Record<string, { en: string; es: string }> = {
   "Ver últimos 7 dias": { en: "See the last 7 days", es: "Ver los últimos 7 días" },
   "Sem check-in neste dia.": { en: "No check-in this day.", es: "Sin check-in este día." },
   "Salvo no aparelho. Sobe quando houver sinal.": { en: "Saved on this device. It uploads when there is signal.", es: "Guardado en el dispositivo. Se sube cuando haya señal." },
+  "Não foi possível apagar. Tente de novo.": { en: "Could not delete. Try again.", es: "No se pudo borrar. Inténtalo de nuevo." },
+  "Apagar remove todos os seus check-ins, para sempre. Seus treinos não mudam.": { en: "Deleting removes all your check-ins, forever. Your workouts do not change.", es: "Borrar elimina todos tus check-ins, para siempre. Tus entrenamientos no cambian." },
+  "Apagando…": { en: "Deleting…", es: "Borrando…" },
+  "Sim, apagar tudo": { en: "Yes, delete everything", es: "Sí, borrar todo" },
+  "Apagar meus check-ins": { en: "Delete my check-ins", es: "Borrar mis check-ins" },
+  "Tocou em “Agora não”? A folha não sobe mais sozinha naquele dia, e o cartão na Home continua lá para você responder quando quiser. Para apagar tudo, use “Apagar meus check-ins” na tela “Ver últimos 7 dias”.": { en: "Tapped “Not now”? The sheet will not come up by itself again that day, and the card on Home stays there for you to answer whenever you like. To delete everything, use “Delete my check-ins” on the “See the last 7 days” screen.", es: "¿Tocaste “Ahora no”? La hoja no vuelve a aparecer sola ese día, y la tarjeta en Inicio sigue ahí para que respondas cuando quieras. Para borrar todo, usa “Borrar mis check-ins” en la pantalla “Ver los últimos 7 días”." },
 };
 
 export function possuiTraducao(chavePtBr: string): boolean {

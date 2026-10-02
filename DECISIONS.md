@@ -3131,3 +3131,11 @@ Com 2 sessões o resultado é igual ao de antes. Com número ímpar, a sessão d
 ## 2026-10-01 (4) — Check-in diário: últimos 7 dias (AN-08 A1, PR 3/3)
 
 - Tela `/checkin` (link "Ver últimos 7 dias" no cartão da Home): 7 dias terminando hoje, com os dias sem resposta visíveis como "Sem check-in neste dia". Só registro: sem cruzar com desempenho (A2/A3, depois de ~8 semanas de dado) e nunca para a IA. A tela do personal fica para depois.
+
+## 2026-10-02 — Check-in: um "Agora não" encerra o dia; "Apagar meus check-ins"; compartilhamento segue ligado
+
+Depois do teste do dono em produção e de 3 pareceres (QA, privacidade, produto), o dono aprovou:
+- **Limite de insistência:** um "Agora não" (ou ✕/Esc/toque fora) encerra a subida automática da folha naquele dia, mesmo numa abertura nova do app (`localStorage.lastro_checkin_dispensado`). O cartão da Home continua sendo a porta. Troca a regra anterior, em que a folha voltava a cada abertura.
+- **Apagar meus check-ins:** botão com confirmação em `/checkin` (`apagarMeusCheckins`, só a própria conta). É a retirada do consentimento do check-in sem apagar a conta (LGPD art. 8º §5º). Política §3 e §9 e o manual dizem isso (sem subir a versão: amplia um direito, não restringe nada).
+- **Compartilhamento com o personal continua LIGADO por padrão** (decisão do dono; o parecer de privacidade sugeriu desligado, recusado). Fica registrado que o aluno o desliga a qualquer momento em Ajustes > Personal.
+- O check-in de teste gravado pelo agente na conta do dono em 2026-10-02 foi mantido por ele.
