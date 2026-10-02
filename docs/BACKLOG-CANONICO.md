@@ -5,7 +5,7 @@
 > sessão e o histórico; `QA.md` guarda o registro de testes; `DECISIONS.md`
 > guarda o porquê. Item novo entra aqui; item feito vira uma linha em "Feito".
 >
-> Base: `main` em `243dd55` (2026-10-01). Confira com `git log --oneline -1`.
+> Base: `main` em `1df8bd5` (2026-10-02). Confira com `git log --oneline -1`.
 
 **Status:** `A FAZER` (aprovado, o agente pode fazer) · `DONO` (só o dono
 resolve) · `CONFERIR` (item antigo trazido de outro documento, ainda não
@@ -48,10 +48,10 @@ milestone só começa com autorização do dono. Revisado pelo dono em 2026-10-0
 
 | ID | O que é | Status | Importância |
 |---|---|---|---|
-| AN-08.A1 | **Check-in de recuperação.** Registro rápido de **sono, energia, dor muscular e estresse**, escala simples, **também em dia sem treino**. Dá contexto aos números; não vira diário médico, não diagnostica, não prescreve. Visível ao aluno e ao personal com vínculo. Feito na academia, então entra na fila offline (Dexie) como a série. Tabela nova `checkin`. Exige revisão da Política (junto com POL-01) e novo aceite de todos. (§13) | **PARCIAL** — PR 1 (banco, fila, RLS) e PR 2 (cartão + folha que sobe sozinha, compartilhar, exportação, Política 2026-10-01) mescladas; falta o histórico dos últimos 7 dias (PR 3) | Média |
+| AN-08.A1 | **Check-in de recuperação.** Registro rápido de **sono, energia, dor muscular e estresse**, escala simples, **também em dia sem treino**. Dá contexto aos números; não vira diário médico, não diagnostica, não prescreve. Visível ao aluno e ao personal com vínculo. Feito na academia, então entra na fila offline (Dexie) como a série. Tabela nova `checkin`. Exige revisão da Política (junto com POL-01) e novo aceite de todos. (§13) | **FEITO** (2026-10-02, PRs #383, #384, #387, #389, #392): banco, fila, RLS, cartão e folha que sobe sozinha, um "Agora não" encerra o dia, histórico de 7 dias, apagar meus check-ins, compartilhar com o personal (ligado por padrão), exportação e Política 2026-10-01. Sem tela do personal ainda | Média |
 | A1-ACEITE | Antes do A1: subir `VERSAO_DOCUMENTOS` manda para `/aceite` qualquer tela com a casca (`exigirTipoEscolhido`, `lib/dados/casca.ts`), provavelmente também o treino em andamento. Garantir que o reaceite não interrompe um treino. Também: o dono aprova o texto novo da Política. | **FEITO** (Home abre com treino em aberto; texto da Política aprovado) | Média |
 | POL-01 | A Política (`lib/legal/documentos.ts`, linhas ~63 e ~150) diz que o Coach **e a Análise** são IA; hoje parte do Coach e as perguntas 1–4, 6 e 7 da Análise são calculadas pelo lastro (só a pergunta 5 usa IA). Ajustar na mesma revisão do A1, para um aceite só. | **FEITO** (Política 2026-10-01) | Baixa |
-| AN-08.A2 | **Prontidão.** Os sinais crus do check-in contra a média da própria pessoa, **sem índice único 0–100**. (§14) | A FAZER, depois do A1 | Baixa |
+| AN-08.A2 | **Prontidão.** Os sinais crus do check-in contra a média da própria pessoa, **sem índice único 0–100**. (§14) | **FEITO, versão mínima** (PR #394, 2026-10-02): "acima, na ou abaixo da sua média" sob cada sinal do cartão, com 4+ dias de histórico. Só aparece depois de uns 4 dias de uso | Baixa |
 | AN-08.A3 | **Recuperação × desempenho.** Coincidência, nunca causa ("a queda coincidiu com sono abaixo da sua média"). (§15) | A FAZER, depois de ~8 semanas de check-in | Baixa |
 | AN-08.F0-INSIGHT | `Insight` como dado estruturado. Hoje só Home e pós-treino usam o detector. | ADIADO: generalizar só quando um 3º lugar precisar | Baixa |
 | AN-08.F0-CACHE | Cache de agregados. | CONGELADO (sem gargalo) | — |
@@ -118,6 +118,7 @@ Vindos do `PROGRESS.md`, revisados pelo dono em 2026-10-01.
 - **DOC-03 (`DESIGN.md` reconciliado, 2026-10-01):** o cabeçalho agora diz o que vale e o que é histórico; §3.0, §3.1, a tabela de razões de §3.2 e §4.2 foram reescritas sem os números da paleta Areia (que não existe mais desde o Apex Pro) e apontam para o `e2e/j5-contraste.spec.ts` como fonte dos números; D5 corrigida (o padrão é o tema escuro "ouro", com 7 temas); `--lastro-alvo-acao` é 64 px (o texto dizia 72); a razão `txt-2`/`txt-3` é 1,3:1 (o texto dizia 1,2); §5 e §6 ganharam o estado atual; referências a documentos apagados e à "nota C" removida foram corrigidas, inclusive em comentários de `sistema.css`, `tokens.css` e `bloco-evidencia.tsx` (só comentário). Passou de 674 para ~586 linhas; o texto antigo está no git.
 - **Auditoria independente (2026-10-01, outro agente, produção, conta de personal):** TON-01 e TR-16 PASSOU; UX-03 §4c medida sem defeito, mas segue ALEGADO (falta UX-03-RESTO); PU-01 e PE-06 não executáveis por agente. **ANT-17:** OF-06 e VS-07 reconciliados no `QA.md` como PASSOU (corrigidos em e97be60, #253). **FILA-01 (#375):** exclusão recusada pelo banco sai da fila em vez de travá-la; `falhas` guarda o `usuarioId`; e2e `j10` verde. Evidências em `qa/evidencias/<ID>/auditoria-independente-2026-10-01/`.
 - **QA-01:** CT-02, VS-06/07, AJ-03/04, AN-02/05/06, PF-01 resolvidos ou graduados pelo e2e.
+- **Check-in diário e Home (2026-10-02):** AN-08.A1 completo, A1-ACEITE (#391: o reaceite espera o treino em aberto), A2 mínimo (#394), Home nova do Codex (#390: Check-in, Volume, Séries e Grupos num quadro, mapa muscular), e dois achados corrigidos no uso real: o check-in de uma conta aparecia na outra no mesmo navegador (#392, agora por conta) e abas sobrepostas a 320 px em espanhol (#393). Teste visual a 390 e 320 px do check-in (#388). Detalhe em `DECISIONS.md` 2026-10-01 a 2026-10-02.
 - **Docs:** DOC-01, DOC-02, PU-02; arquivo único de backlog (este, 2026-10-01).
 
 ## 8. Arquivos removidos na unificação (2026-10-01)
