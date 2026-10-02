@@ -1,5 +1,13 @@
 # QA.md — Registro Incremental de Verificação
 
+## UX-INTERACAO-20261002 — diagnóstico de interatividade
+
+**Resultado: ALEGADO; reprodução de lógica isolada e inspeção estática, sem graduação visual/E2E.** Base `9dee403`, auditoria solicitada pelo dono em 2026-10-02. O cálculo de obsoletos foi consultado; a varredura não substitui a VERIFICACAO-FINAL nem revalida a lista inteira.
+
+Oito cenários reproduzidos: rejeição de transporte em onboarding/aceite/idioma/avatar; espera do histórico antes de abrir formulário de modelo; espera da sincronização para encerrar edição de série; estado de emissão após 202 na Análise; nota editada mantida no resumo ao fechar o check-in sem salvar. Prova executável documentada em `qa/evidencias/UX-INTERACAO-20261002/reproducao.md`, saída crua em `handlers.txt`.
+
+Leitura adicional: folhas/foco e descarte, Coach/reenviar, modelos/edição, catálogo/acentos. A lista de ações fica somente em `docs/BACKLOG-CANONICO.md` §2.3 (INT-01…09). Não houve alteração de funcionalidade, gravação em conta real, chamadas à IA ou execução de E2E. O navegador disponível passou a exibir uma sessão real durante a pausa; não foi usado para testar mutações. Sem `print.png`, `console.txt` e `rede.txt` desta reprodução: não há alegação de validação no navegador. A tentativa de segunda revisão por agente ficou indisponível por limite de uso; estes achados ainda precisam da passada independente.
+
 ## STICKERS-01 — 2026-10-01
 
 **Resultado:** ALEGADO (bancada sintética local; revisão independente de código sem bloqueadores). Área visual / treino / i18n.
