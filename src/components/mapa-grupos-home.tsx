@@ -24,6 +24,19 @@ export default function MapaGruposHome({ grupos, metrica, idioma }: {
     return chamada ? [{ ...item, chamada }] : [];
   });
   const fora = distribuicao.filter(({ grupo }) => !chamadaGrupo(grupo, vista) && chamadaGrupo(grupo, outraVista));
+  const compacto = (["esquerda", "direita"] as const).every(lado => visiveis.filter(item => item.chamada.lado === lado).length <= 2);
+  const altura = compacto ? desenho.compacto.altura : desenho.altura;
+  const topoCorpo = compacto ? desenho.compacto.topoCorpo : desenho.topoCorpo;
+  const chamadas = visiveis.map(item => ({ ...item, chamada: { ...item.chamada } }));
+  if (compacto) {
+    for (const lado of ["esquerda", "direita"] as const) {
+      let anterior = 0;
+      for (const item of chamadas.filter(item => item.chamada.lado === lado).sort((a, b) => a.chamada.y - b.chamada.y)) {
+        item.chamada.rotuloY = Math.max(item.chamada.y + topoCorpo, anterior + desenho.compacto.intervalo);
+        anterior = item.chamada.rotuloY;
+      }
+    }
+  }
   const percentual = (valor: number) => `${valor.toLocaleString(idioma, { maximumFractionDigits: 1 })}%`;
   const legenda = t(metrica === "series" ? "Participação nas séries da semana" : "Participação no volume da semana", idioma);
 
@@ -31,7 +44,6 @@ export default function MapaGruposHome({ grupos, metrica, idioma }: {
 
   return (
     <div className="mapa-grupos">
-      <p className="mapa-grupos__legenda">{legenda}</p>
       <div className="mapa-grupos__vistas" role="group" aria-label={t("Vista do corpo", idioma)}>
         {(["frente", "costas"] as const).map((opcao) => (
           <button type="button" key={opcao} aria-pressed={vista === opcao} onClick={() => setVista(opcao)}>
@@ -39,25 +51,25 @@ export default function MapaGruposHome({ grupos, metrica, idioma }: {
           </button>
         ))}
       </div>
-      <div className="mapa-grupos__canvas">
-        <svg className="mapa-grupos__svg" viewBox={`0 0 ${desenho.largura} ${desenho.altura}`} aria-hidden="true" focusable="false">
+      <div className="mapa-grupos__canvas" aria-label={legenda}>
+        <svg className="mapa-grupos__svg" viewBox={`0 0 ${desenho.largura} ${altura}`} aria-hidden="true" focusable="false">
           <defs>
             <marker id={marcadorId} markerWidth={desenho.marcador.tamanho} markerHeight={desenho.marcador.tamanho} refX={desenho.marcador.referencia} refY={desenho.marcador.tamanho / 2} orient="auto">
               <path className="mapa-grupos__seta" d={desenho.marcador.caminho} />
             </marker>
           </defs>
-          <g transform={`translate(${desenho.deslocamentoCorpo} ${desenho.topoCorpo})`}>
+          <g transform={`translate(${desenho.deslocamentoCorpo} ${topoCorpo})`}>
             <path className="mapa-grupos__silhueta" d={GEOMETRIA_ANATOMIA.silhueta} />
             {GEOMETRIA_ANATOMIA[vista].map(({ grupo, d }) => (
               <path key={grupo} data-grupo={grupo} className={`mapa-grupos__musculo${ativos.has(grupo) ? " mapa-grupos__musculo--ativo" : ""}`} d={d} />
             ))}
           </g>
-          {visiveis.map(({ grupo, chamada }) => (
-            <path key={grupo} className="mapa-grupos__linha" markerEnd={`url(#${marcadorId})`} d={`M${chamada.x + desenho.deslocamentoCorpo} ${chamada.y + desenho.topoCorpo} L${chamada.lado === "esquerda" ? desenho.fimEsquerda : desenho.fimDireita} ${chamada.rotuloY}`} />
+          {chamadas.map(({ grupo, chamada }) => (
+            <path key={grupo} className="mapa-grupos__linha" markerEnd={`url(#${marcadorId})`} d={`M${chamada.x + desenho.deslocamentoCorpo} ${chamada.y + topoCorpo} L${chamada.lado === "esquerda" ? desenho.fimEsquerda : desenho.fimDireita} ${chamada.rotuloY}`} />
           ))}
         </svg>
-        {visiveis.map(({ grupo, percentual: participacao, chamada }) => (
-          <div className={`mapa-grupos__rotulo mapa-grupos__rotulo--${chamada.lado}`} key={grupo} style={{ top: `${chamada.rotuloY / desenho.altura * 100}%` }}>
+        {chamadas.map(({ grupo, percentual: participacao, chamada }) => (
+          <div className={`mapa-grupos__rotulo mapa-grupos__rotulo--${chamada.lado}`} key={grupo} style={{ top: `${chamada.rotuloY / altura * 100}%` }}>
             <span className="mapa-grupos__nome">{formatarGrupoMuscular(grupo, idioma)}</span>
             <strong className="mapa-grupos__percentual">{percentual(participacao)}</strong>
           </div>

@@ -6499,12 +6499,12 @@ html:lang(pt) .nav a {
 .historico-metrica__selecao span, .historico-metrica__nota { color: var(--lastro-txt-3); font-size: var(--lastro-papel-rotulo); }
 .historico-metrica__nota { margin-top: var(--lastro-e-3); }
 
-.mapa-grupos { display: grid; gap: var(--lastro-e-3); }
+.mapa-grupos { display: grid; gap: var(--lastro-e-2); }
 .mapa-grupos__legenda { font-size: var(--lastro-papel-rotulo); color: var(--lastro-txt-3); }
 .mapa-grupos__vistas { display: flex; justify-content: center; gap: var(--lastro-e-2); }
 .mapa-grupos__vistas button, .mapa-grupos__fora button { min-height: var(--lastro-alvo-min); padding: var(--lastro-e-2) var(--lastro-e-4); border: 1px solid var(--lastro-linha); border-radius: var(--lastro-raio-pilula); background: var(--lastro-sup-1); color: var(--lastro-txt-2); font-size: var(--lastro-papel-rotulo); cursor: pointer; }
 .mapa-grupos__vistas button[aria-pressed="true"] { border-color: var(--lastro-borda-ouro); background: var(--lastro-sup-2); color: var(--lastro-txt); }
-.mapa-grupos__canvas { position: relative; width: 100%; max-width: var(--lastro-mapa-largura); justify-self: center; }
+.mapa-grupos__canvas { position: relative; width: 100%; max-width: var(--lastro-corpo-home-largura); justify-self: center; }
 .mapa-grupos__svg { width: 100%; display: block; }
 .mapa-grupos__silhueta { fill: var(--lastro-sup-2); stroke: var(--lastro-txt-3); stroke-width: 1; }
 .mapa-grupos__musculo { fill: var(--lastro-sup-3); stroke: var(--lastro-sup-1); stroke-width: 1; }

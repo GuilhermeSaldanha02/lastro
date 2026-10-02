@@ -4,6 +4,7 @@ type Chamada = { x: number; y: number; lado: "esquerda" | "direita"; rotuloY: nu
 export const TOKENS_MAPA_GRUPOS = {
   largura: 360,
   altura: 520,
+  compacto: { altura: 380, topoCorpo: 15, intervalo: 95 },
   deslocamentoCorpo: 100,
   topoCorpo: 80,
   fimEsquerda: 102,

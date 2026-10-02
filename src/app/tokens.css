@@ -6,6 +6,7 @@
 :root,
 [data-tema="ouro"] {
   --lastro-mapa-largura: 420px;
+  --lastro-corpo-home-largura: 320px;
   --lastro-opacidade-desabilitado: .4;
   /* ---- Superfícies e Profundidade (Obsidiana e Vidro Fumê) ---- */
   --lastro-fundo:        #07090D;

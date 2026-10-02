@@ -51,14 +51,16 @@ export default function SeletorMetricasHome({ checkin, volumeFormatado, seriesVa
                   {opcao === "volume" ? volumeFormatado.valor : opcao === "series" ? seriesValendo : quantidadeGrupos}
                   <span className="metrica-switcher__unidade">{opcao === "volume" ? volumeFormatado.unidade : opcao === "series" ? t("séries", idioma) : t(quantidadeGrupos === 1 ? "grupo" : "grupos", idioma)}</span>
                 </div>
-                <p className="metrica-switcher__subtitulo">{t(opcao === "volume" ? "Volume acumulado na semana" : opcao === "series" ? "Séries valendo nesta semana" : "Grupos treinados nesta semana", idioma)}</p>
+                {opcao !== "grupos" && <p className="metrica-switcher__subtitulo">{t(opcao === "volume" ? "Volume acumulado na semana" : "Séries valendo nesta semana", idioma)}</p>}
               </div>
               {opcao !== "grupos" && <span className="metrica-switcher__delta">{treinosNaSemana > 0 ? `${treinosNaSemana} ${t(treinosNaSemana === 1 ? "sessão" : "sessões", idioma)}` : t("Sem treinos", idioma)}</span>}
-            </div>
-            {opcao === "grupos" ? <>
+              {opcao === "grupos" &&
               <div className="metrica-switcher__subtabs" role="group" aria-label={t("Métrica dos grupos", idioma)}>
                 {(["series", "volume"] as const).map(m => <button type="button" key={m} aria-pressed={metrica === m} className={`metrica-subtab${metrica === m ? " metrica-subtab--ativa" : ""}`} onClick={() => setMetrica(m)}>{t(m === "series" ? "Séries" : "Volume", idioma)}</button>)}
-              </div>
+              </div>}
+            </div>
+            {opcao === "grupos" ? <>
+              <p className="metrica-switcher__subtitulo">{t(metrica === "series" ? "Participação nas séries da semana" : "Participação no volume da semana", idioma)}</p>
               <MapaGruposHome grupos={grupos} metrica={metrica} idioma={idioma} />
             </> : <GraficoSessoesHome sessoes={historicoBarras} metrica={opcao} idioma={idioma} />}
           </div>

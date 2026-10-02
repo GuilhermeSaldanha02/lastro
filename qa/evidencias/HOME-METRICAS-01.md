@@ -20,3 +20,6 @@ Bancada importa componentes e CSS reais. Apenas dados sintéticos claramente rot
 ## Limites
 
 Persistência remota e autenticação não exercitadas nesta bancada. Carregadores/registro offline sem mudança; testes existentes verdes. Deploy não executado nem solicitado para esta entrega. Confirmar no aparelho real após publicação autorizada.
+
+## Ajuste após avaliação do dono
+Cabeçalho de Grupos compacto; largura do mapa limitada; canvas reduzido para poucos grupos, mantendo espaço com muitos. Bancada completa e TypeScript passaram novamente; 7 testes de métricas verdes e lint restrito sem erros. Revisor independente inspecionou diff e capturas atualizadas sem cortes, colisões ou outros achados.
