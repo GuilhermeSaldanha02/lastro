@@ -3158,3 +3158,9 @@ Depois do teste do dono em produção e de 3 pareceres (QA, privacidade, produto
 - **Sem índice único de 0 a 100, sem juízo de bom ou ruim** (dor "acima" é mais dor; sono "acima" é mais sono) e sem recomendar nada. Nunca vai à IA (a trava `nao-vai-para-ia.test.ts` continua valendo).
 - Nada que já existia mudou de lugar. A Home passou a buscar os últimos 15 check-ins numa consulta só (em vez de só o do dia).
 - Fica visível só depois de ~4 dias de uso; até lá a Home é idêntica à de antes.
+
+## 2026-10-02 (5) — E2E-PROD: o e2e roda num projeto Supabase de teste
+
+- O e2e usava a `service_role` contra a produção (um spec com defeito podia apagar dado real). Agora o passo de e2e do CI usa o projeto `lastro-teste` (US$ 0/mês), pelos secrets `TESTE_*` sem fallback, e `playwright.config.ts` recusa a URL de produção. Detalhes e preparos em `docs/E2E-PROJETO-TESTE.md`.
+- **Achado de risco (recuperação de desastre):** as migrações do repositório não recriam o banco. Faltam os 7 grupos base (semeados à mão), há UUIDs de exercício de produção dentro da 0012, e a 0014 depende de uma função que só existe em projetos antigos. Foi preciso uma migração de preparo por problema para replicar. Registrado no backlog como BANCO-RECRIAVEL.
+- **Processo novo:** toda migração aplicada na produção é aplicada também no `lastro-teste`.

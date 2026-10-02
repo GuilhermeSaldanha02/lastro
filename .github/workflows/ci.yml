@@ -88,9 +88,13 @@ jobs:
         run: npm run e2e -- $SPECS
         env:
           SPECS: ${{ inputs.specs }}
-          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
-          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
-          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          # E2E-PROD (2026-10-02): o e2e roda contra o projeto Supabase de TESTE
+          # (`lastro-teste`), nunca contra a produção. Os secrets `TESTE_*` não
+          # têm fallback de propósito: sem eles o passo falha alto. A trava em
+          # `playwright.config.ts` recusa a URL de produção.
+          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.TESTE_SUPABASE_URL }}
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.TESTE_SUPABASE_ANON_KEY }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.TESTE_SUPABASE_SERVICE_ROLE_KEY }}
           CI: true
 
       # As capturas da varredura (j4) sao o unico jeito de OLHAR o app em

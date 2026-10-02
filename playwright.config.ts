@@ -33,6 +33,22 @@ if (existsSync(envLocal)) {
 
 const PORTA = 3100;
 
+// E2E-PROD (2026-10-02): o e2e cria e apaga contas e dados com a `service_role`.
+// Nunca contra a produção: ele roda no projeto de teste (`lastro-teste`). Esta
+// trava recusa a URL de produção; `E2E_PERMITE_PRODUCAO=1` existe só para uma
+// exceção consciente, fora do CI.
+const REF_SUPABASE_PRODUCAO = "tbkzcqfvafznxallyfqk";
+if (
+  (process.env.NEXT_PUBLIC_SUPABASE_URL ?? "").includes(REF_SUPABASE_PRODUCAO) &&
+  process.env.E2E_PERMITE_PRODUCAO !== "1"
+) {
+  throw new Error(
+    "E2E recusado: NEXT_PUBLIC_SUPABASE_URL aponta para o Supabase de PRODUÇÃO. " +
+      "O e2e roda no projeto de teste (secrets TESTE_* no CI). " +
+      "Para uma exceção consciente fora do CI: E2E_PERMITE_PRODUCAO=1.",
+  );
+}
+
 export default defineConfig({
   testDir: "./e2e",
   fullyParallel: false,
