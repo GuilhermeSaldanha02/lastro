@@ -6588,3 +6588,12 @@ html:lang(pt) .nav a {
   grid-template-columns: 1fr 1fr;
   gap: var(--lastro-e-3);
 }
+
+/* A2 (prontidão mínima): a nota de hoje contra a média da própria pessoa. Só o
+   fato, em tom discreto, sem cor de "bom" ou "ruim". */
+.checkin-resumo__media {
+  display: block;
+  font-size: calc(var(--lastro-papel-detalhe) + 1px);
+  font-weight: var(--lastro-peso-medio);
+  color: var(--lastro-txt-3);
+}

@@ -19,6 +19,7 @@ import Folha from "./folha";
 import { registrarCheckinNaFila } from "@/lib/offline/checkin";
 import { CAMPOS_CHECKIN, type CampoCheckin, type NotaCheckin } from "@/lib/checkin/escala";
 import { descreverNotaCheckin } from "@/lib/checkin/resumo";
+import { compararComMedia, type ComparacaoComMedia } from "@/lib/checkin/media";
 import {
   CHAVES_ANTIGAS_GLOBAIS,
   chaveFolhaDispensada,
@@ -35,6 +36,13 @@ import { t } from "@/lib/texto/i18n";
 type Notas = Record<CampoCheckin, NotaCheckin | null>;
 
 const NOTAS: NotaCheckin[] = [1, 2, 3, 4, 5];
+
+/** A2: só o fato, sem juízo (dor "acima" é mais dor; sono "acima" é mais sono). */
+const TEXTO_COMPARACAO: Record<ComparacaoComMedia, string> = {
+  acima: "acima da sua média",
+  abaixo: "abaixo da sua média",
+  "na-media": "na sua média",
+};
 
 /** Rótulo do campo e as duas pontas da escala (chaves em português; `t()` traduz). */
 const CAMPOS: Record<CampoCheckin, { nome: string; baixo: string; alto: string }> = {
@@ -67,6 +75,7 @@ export default function CartaoCheckin({
   hoje,
   usuarioId,
   checkinInicial,
+  anteriores = [],
   idioma,
   embutido = false,
 }: {
@@ -75,6 +84,8 @@ export default function CartaoCheckin({
   usuarioId: string;
   /** O check-in de hoje que o servidor já tem, ou `null`. */
   checkinInicial: CheckinDoDia | null;
+  /** Check-ins dos dias ANTERIORES a hoje, do mais novo ao mais antigo (A2). */
+  anteriores?: CheckinDoDia[];
   idioma: Idioma;
   /** Integra o conteúdo à superfície da aba, sem outro cartão ao redor. */
   embutido?: boolean;
@@ -175,6 +186,7 @@ export default function CartaoCheckin({
             <dl className="checkin-resumo">
               {CAMPOS_CHECKIN.map((campo) => {
                 const nota = notas[campo];
+                const comparacao = compararComMedia(nota, anteriores.map((d) => (campo === "dor_muscular" ? d.dorMuscular : d[campo])));
                 return (
                   <div key={campo} className="checkin-resumo__linha">
                     <dt className="checkin-resumo__campo">
@@ -183,6 +195,7 @@ export default function CartaoCheckin({
                     </dt>
                     <dd className="checkin-resumo__valor" title={nota === null ? undefined : `${t("nota", idioma)} ${nota} ${t("de 5", idioma)}`}>
                       {t(descreverNotaCheckin(campo, nota), idioma)}
+                      {comparacao && <span className="checkin-resumo__media">{t(TEXTO_COMPARACAO[comparacao], idioma)}</span>}
                     </dd>
                   </div>
                 );

@@ -3151,3 +3151,10 @@ Depois do teste do dono em produção e de 3 pareceres (QA, privacidade, produto
 - **Achado em produção (dono, 2026-10-02):** com duas contas no mesmo Chrome, a Home da conta B mostrava o check-in da conta A. A resposta do dia (`lastro_checkin`) e a dispensa ("Agora não") ficavam em chaves globais do `localStorage`; o servidor dizia "sem check-in hoje", mas o cartão lia o aparelho. Além de errado, é dado de bem-estar de uma pessoa aparecendo na tela de outra.
 - **Correção:** todas as chaves levam o id do usuário (`lastro_checkin:<id>`, `lastro_checkin_visto:<id>`, `lastro_checkin_dispensado:<id>`; helpers em `lib/checkin/abertura.ts`), e as chaves globais antigas são apagadas ao abrir a Home.
 - **e2e:** a marca "já respondi hoje" deixou a config global do Playwright e passou para `entrarComoUsuario` (por conta). Teste novo na j43: duas contas no mesmo navegador não se misturam.
+
+## 2026-10-02 (4) — A2 (prontidão), versão mínima
+
+- O cartão de check-in da Home mostra, sob a palavra de cada sinal, "acima da sua média", "na sua média" ou "abaixo da sua média": a nota de hoje contra a média dos até 14 dias anteriores **do mesmo sinal**, só com **4 ou mais dias** de histórico daquele sinal (`lib/checkin/media.ts`, testado). Diferença de 1 ponto ou mais = acima/abaixo.
+- **Sem índice único de 0 a 100, sem juízo de bom ou ruim** (dor "acima" é mais dor; sono "acima" é mais sono) e sem recomendar nada. Nunca vai à IA (a trava `nao-vai-para-ia.test.ts` continua valendo).
+- Nada que já existia mudou de lugar. A Home passou a buscar os últimos 15 check-ins numa consulta só (em vez de só o do dia).
+- Fica visível só depois de ~4 dias de uso; até lá a Home é idêntica à de antes.
