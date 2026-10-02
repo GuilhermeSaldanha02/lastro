@@ -106,6 +106,7 @@ export default async function PaginaPersonalAjustes({
               vinculo={vinculo}
               telefoneAtual={telefone}
               codigoDoLink={codigo}
+              compartilhaCheckin={perfil.compartilhaCheckin}
               idioma={idioma}
             />
           )}
