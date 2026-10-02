@@ -35,7 +35,9 @@ async function abrirApp(browser: Browser, usuario: UsuarioDescartavel) {
   const contexto = await browser.newContext();
   const page = await contexto.newPage();
   await entrarComoUsuario(page, usuario, { checkinAberto: true });
-  await page.goto("/");
+  // O login já cai na Home: é essa a "abertura do app". Recarregar na mesma aba
+  // não a repete (sessionStorage), de propósito.
+  if (new URL(page.url()).pathname !== "/") await page.goto("/");
   return { contexto, page };
 }
 
